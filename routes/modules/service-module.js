@@ -201,6 +201,7 @@ Service.prototype.getServiceProviders = function(req,res,next){
                     if (result) {
                         var queryParams =   st.db.escape(token) + ',' + st.db.escape(lat)
                             + ',' + st.db.escape(lng)+ ',' + st.db.escape(serviceType) + ',' + st.db.escape(req.query.service_mid);
+
                         var query = 'CALL pgetserviceproviders(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, serviceResult) {

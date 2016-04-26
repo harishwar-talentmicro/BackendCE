@@ -1249,7 +1249,7 @@ Association.prototype.associationGetServiceImg = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Images are not available';
-                                            responseMessage.data = null;
+                                            responseMessage.data = [];
                                             res.status(200).json(responseMessage);
                                         }
                                     }
@@ -1257,7 +1257,7 @@ Association.prototype.associationGetServiceImg = function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Images are not available';
-                                        responseMessage.data = null;
+                                        responseMessage.data = [];
                                         res.status(200).json(responseMessage);
                                     }
                                 }
@@ -1265,7 +1265,7 @@ Association.prototype.associationGetServiceImg = function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Images are not available';
-                                    responseMessage.data = null;
+                                    responseMessage.data = [];
                                     res.status(200).json(responseMessage);
                                 }
                             }

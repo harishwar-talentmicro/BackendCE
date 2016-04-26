@@ -41,6 +41,7 @@ function Job(db,stdLib){
     }
 };
 
+
 /**
  * @todo FnSaveJobs
  * Method : POST
@@ -104,6 +105,7 @@ Job.prototype.create = function(req,res,next){
     var iphoneId;
     var userId = [];
     var emailArray = [];
+    var instituteArray = [];
     var jobTypeList =  [
         "Full Time",
         "Part Time",
@@ -418,14 +420,9 @@ Job.prototype.create = function(req,res,next){
                                             console.log('job post notification...');
                                             userId = (notificationResult[0][0].ids) ? notificationResult[0][0].ids.split(',') : '';
                                             emailArray = (notificationResult[0][0].emailids) ? notificationResult[0][0].emailids.split(',') : '';
+                                            instituteArray = (notificationResult[2][0].institues) ? notificationResult[2][0].institues.split(',') : '';
+                                            console.log('instituteArray',instituteArray);
 
-                                            //for (var i = 0; i < notificationResult[0].length; i++) {
-                                            //    userId = (notificationResult[0][i].ids) ? notificationResult[0][i].ids.split(',') : '';
-                                            //}
-                                            //var mIds = '';
-                                            //for (var c = 0; c < notificationResult[0].length; c++) {
-                                            //    var mIds =  (notificationResult[0][c].ids) ? notificationResult[0][c].ids + ',' + mIds : '';
-                                            //}
                                             var jobqueryParameters = st.db.escape(notificationResult[0][0].ids) + ',' + st.db.escape(jobID);
                                             /**
                                              * to create group of institute and studens for send notification and messages
@@ -445,6 +442,12 @@ Job.prototype.create = function(req,res,next){
                                             });
                                             console.log(userId);
                                             var combineQuery = "";
+                                            var combinePOquery = "";
+                                            /**
+                                             * for recruitment function type is 4
+                                             * @type {number}
+                                             */
+                                            var functionType = 4;
                                             var path = require('path');
                                             for (var k = 0; k < userId.length; k++) {
                                                 var gidQuery = 'select tid from tmgroups where GroupType=1 and adminID=' + userId[k];
@@ -474,9 +477,7 @@ Job.prototype.create = function(req,res,next){
                                                         JobTitle : jobTitle,
                                                         JobCode : jobCode,
                                                         CompanyName : notificationResult[1][0].cn
-
                                                     }, '', emailArray[e]);
-
                                                 }
                                                 combineQuery += 'CALL pSendMsgRequestbyPO(' + sendMsgParams + ');' +
                                                     'CALL pComposeMessage(' + composeMsgParams + '); '
@@ -500,16 +501,15 @@ Job.prototype.create = function(req,res,next){
                                                             var messageId = 0, masterid = 0, latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
                                                             var msgUserid = 0, a_name = '';
                                                             var jid = jobID;
-                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                operationType, iphoneId, messageId, masterid);
+                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                                messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
+                                                                dateTime, a_name, msgUserid, jid);
                                                             notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
                                                                 messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
                                                                 dateTime, a_name, msgUserid, jid);
                                                             console.log('Job Post Notification Send Successfully');
-
                                                         }
                                                         console.log('postNotification : Job Post Notification Send Successfully');
-
                                                     }
                                                     else {
                                                         console.log('postNotification : Error in sending notifications');
@@ -517,6 +517,73 @@ Job.prototype.create = function(req,res,next){
                                                 }
                                                 else {
                                                     console.log('postNotification : Error in sending notifications');
+                                                }
+                                            });
+
+                                            for (var ins = 0; ins < instituteArray.length; ins++ ){
+                                                var queryPOparams = st.db.escape(instituteArray[ins]) + ',' + st.db.escape(functionType);
+                                                combinePOquery += 'CALL get_subuser_list(' + queryPOparams + ');';
+                                            }
+                                            st.db.query(combinePOquery, function (err, notDetailsRes) {
+                                                console.log(combinePOquery);
+                                                if (notDetailsRes && notDetailsRes[0]) {
+                                                    console.log(notDetailsRes);
+                                                    for (var count = 0; count < notDetailsRes[0].length; count++) {
+                                                        console.log('notDetailsRes[0].length',notDetailsRes[0].length);
+                                                        if (notDetailsRes[0][count].userRights){
+                                                            if ((!isNaN(parseInt(notDetailsRes[0][count*2].userRights.split('')[4]))) &&
+                                                                parseInt(notDetailsRes[0][count*2].userRights.split('')[4]) > 0 ){
+                                                                console.log("comming to this block");
+                                                                var receiverId = notDetailsRes[0][count*2].receiverId;
+                                                                var senderTitle = insertResult[0][0].EZEID;
+                                                                var groupTitle = notDetailsRes[0][count*2].groupTitle;
+                                                                var groupId = notDetailsRes[0][count*2].groupId;
+                                                                var messageText = 'New job posted to your institute';
+                                                                /**
+                                                                 * messageType 23 when any job will be posted placement officer of verified
+                                                                 * institute will get notification
+                                                                 */
+                                                                var messageType = 23;
+                                                                var operationType = 0;
+                                                                var iphoneId = notDetailsRes[0][count*2].iphoneId;
+                                                                var messageId = 0;
+                                                                var masterid = notDetailsRes[0][count*2].masterid;
+                                                                var latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
+                                                                var msgUserid = 0, a_name = '';
+
+                                                                var jid = jobID;
+                                                                console.log(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                                    messageType, operationType, iphoneId, messageId, masterid);
+                                                                /**
+                                                                 * Send notification to when any job will be posted placement officer of verified
+                                                                 * institute will get notification
+                                                                 */
+                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                                    messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
+                                                                    dateTime, a_name, msgUserid, jid);
+                                                                console.log("Notification Send");
+                                                                /**
+                                                                 * Send mail to when any job will be posted placement officer of verified
+                                                                 * institute
+                                                                 */
+                                                                /**
+                                                                 * @todo add template functionality is added
+                                                                 */
+                                                                //if (notDetailsRes[0][count*2].CVMailID){
+                                                                //    mailerApi.sendMail('job_apply_comapney_template', {
+                                                                //        ezeoneId : insertResult[0][0].EZEID,
+                                                                //        JobType : (insertResult[0][0].JobType) ? insertResult[0][0].JobType : 'FullTime',
+                                                                //        JobTitle : insertResult[0][0].JobTitle,
+                                                                //        JobCode : insertResult[0][0].JobCode,
+                                                                //        DateTime : dateTime
+                                                                //    }, '', notDetailsRes[0][count*2].CVMailID);
+                                                                //}
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                else {
+                                                    console.log('get_subuser_enquiry:user details not loaded');
                                                 }
                                             });
                                         }
@@ -588,7 +655,6 @@ Job.prototype.create = function(req,res,next){
                                 location_id = '';
                                 createJobPosting();
                             }
-
                         }
                         else {
                             location_id = '';
@@ -629,14 +695,11 @@ Job.prototype.create = function(req,res,next){
 
 function FnSaveSkills(skill, callBack) {
     try {
-
         //below query to check token exists for the users or not.
         if (skill != null) {
-
             var responseMessage = {
                 SkillID: 0
             };
-
             st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname) +' and functionid='+st.db.escape(skill.fid), function (err, skillResult) {
                 if ((!err)) {
                     if (skillResult[0]) {
@@ -1441,7 +1504,7 @@ Job.prototype.applyJob = function(req,res,next){
                                                                    var senderTitle = insertResult[0][0].EZEID;
                                                                    var groupTitle = notDetailsRes[0][count].groupTitle;
                                                                    var groupId = notDetailsRes[0][count].groupId;
-                                                                   var messageText = fn+' has applied to job';
+                                                                   var messageText = 'Name has applied to job';
                                                                    /**
                                                                     * messageType 22 when student will apply to job who has posted
                                                                     * job and placement officer if verified college will get notification
@@ -1468,6 +1531,9 @@ Job.prototype.applyJob = function(req,res,next){
                                                                        messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
                                                                        dateTime, a_name, msgUserid, jid);
                                                                    console.log('Job Post Notification Send Successfully');
+                                                                   /**
+                                                                    * @TODO add mail template functionality is already added
+                                                                    */
                                                                    /**
                                                                     * Send mail to those users who are falling under the category of the folder
                                                                     * which is assigned to this lead
@@ -1506,8 +1572,9 @@ Job.prototype.applyJob = function(req,res,next){
                                                                     * Send notification to those users who are falling under the category of the folder
                                                                     * which is assigned to this lead
                                                                     */
-                                                                   notification.publish(receiverId, senderTitle, groupTitle, groupId,
-                                                                       messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                   notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                                       messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
+                                                                       dateTime, a_name, msgUserid, jid);
                                                                    console.log("Notification Send");
 
                                                                    /**
@@ -1515,7 +1582,6 @@ Job.prototype.applyJob = function(req,res,next){
                                                                     * which is assigned to this lead
                                                                     */
                                                                    if (notDetailsRes[0][count].CVMailID){
-
                                                                        mailerApi.sendMail('job_apply_comapney_template', {
                                                                            ezeoneId : insertResult[0][0].EZEID,
                                                                            JobType : (insertResult[0][0].JobType) ? insertResult[0][0].JobType : 'FullTime',
@@ -1872,6 +1938,7 @@ Job.prototype.jobs = function(req,res,next){
                                             }
                                         }
                                         else {
+
                                             responseMessage.message = 'Jobs not loaded ';
                                             console.log('FnJobs: Jobs not loaded');
                                             res.status(200).json(responseMessage);
@@ -4557,11 +4624,230 @@ Job.prototype.activateJobPO = function(req,res,next){
                         console.log(query);
                         st.db.query(query, function (err, jobResult) {
                             if (!err) {
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Job status updated successfully';
-                                responseMessage.data = null;
-                                res.status(200).json(responseMessage);
+                                if (jobResult){
+                                    console.log(jobResult);
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Job status updated successfully';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                    var userId = [];
+                                    var emailArray = [];
+                                    var instituteArray = [];
+                                    var combineQuery = "";
+                                    var combinePOquery = "";
+                                    /**
+                                     * for recruitment function type is 4
+                                     * @type {number}
+                                     */
+                                    var functionType = 4;
+
+                                    if (parseInt(req.body.st) == 1){
+                                        userId = (notificationResult[0][0].ids) ? notificationResult[0][0].ids.split(',') : '';
+                                        emailArray = (notificationResult[0][0].emailids) ? notificationResult[0][0].emailids.split(',') : '';
+                                        instituteArray = (notificationResult[2][0].institues) ? notificationResult[2][0].institues.split(',') : '';
+                                        console.log('instituteArray',instituteArray);
+                                        console.log(userId);
+                                        var path = require('path');
+                                        for (var k = 0; k < userId.length; k++) {
+                                            var gidQuery = 'select tid from tmgroups where GroupType=1 and adminID=' + userId[k];
+                                            var iosIdQuery = 'select EZEID,IPhoneDeviceID as iphoneID, FirstName as fn from tmaster where tid=' + userId[k];
+                                            var file = path.join(__dirname, '../../mail/templates/job_post.html');
+                                            var data = fs.readFileSync(file, "utf8");
+                                            data = data.replace("[JobType]", jobTypeList[jobType]);
+                                            data = data.replace("[JobTitle]", jobTitle);
+                                            data = data.replace("[JobCode]", req.body.jobid);
+                                            data = data.replace("[CompanyName]", notificationResult[1][0].cn);
+
+                                            for (var e = 0; e < emailArray.length; e++){
+                                                mailerApi.sendMail('job_post_template', {
+                                                    userName : 'abc',
+                                                    JobType : jobTypeList[jobType],
+                                                    JobTitle : jobTitle,
+                                                    JobCode : jobCode,
+                                                    CompanyName : notificationResult[1][0].cn
+                                                }, '', emailArray[e]);
+                                            }
+                                            combineQuery +=  gidQuery + ';' + iosIdQuery + ';';
+                                            console.log(combineQuery);
+                                        }
+                                        st.db.query(combineQuery, function (err, messageResult) {
+                                            if (!err) {
+                                                if (messageResult) {
+                                                    console.log(messageResult);
+                                                    for( var j = 0; j < userId.length; j++){
+                                                        var receiverId = messageResult[j*(5)+3][0].tid;
+                                                        var senderTitle = ezeoneId;
+                                                        var groupTitle = ezeoneId;
+                                                        var groupId = notificationResult[1][0].tid;
+                                                        var messageText = data;
+                                                        var messageType = 8;
+                                                        var operationType = 0;
+                                                        var iphoneId = (messageResult[j*(5)+4][0].iphoneID) ? messageResult[j*(5)+4][0].iphoneID : null ;
+                                                        var messageId = 0, masterid = 0, latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
+                                                        var msgUserid = 0, a_name = '';
+                                                        var jid = jobID;
+                                                        console.log(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                            messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
+                                                            dateTime, a_name, msgUserid, jid);
+                                                        notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                            messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
+                                                            dateTime, a_name, msgUserid, jid);
+                                                        console.log('Job Post Notification Send Successfully');
+                                                    }
+                                                    console.log('postNotification : Job Post Notification Send Successfully');
+                                                }
+                                                else {
+                                                    console.log('postNotification : Error in sending notifications');
+                                                }
+                                            }
+                                            else {
+                                                console.log('postNotification : Error in sending notifications');
+                                            }
+                                        });
+                                        for (var ins = 0; ins < instituteArray.length; ins++ ){
+                                            var queryPOparams = st.db.escape(instituteArray[ins]) + ',' + st.db.escape(functionType);
+                                            combinePOquery += 'CALL get_subuser_list(' + queryPOparams + ');';
+                                        }
+                                        st.db.query(combinePOquery, function (err, notDetailsRes) {
+                                            console.log(combinePOquery);
+                                            if (notDetailsRes && notDetailsRes[0]) {
+                                                console.log(notDetailsRes);
+                                                for (var count = 0; count < notDetailsRes[0].length; count++) {
+                                                    console.log('notDetailsRes[0].length',notDetailsRes[0].length);
+                                                    if (notDetailsRes[0][count].userRights){
+                                                        if ((!isNaN(parseInt(notDetailsRes[0][count*2].userRights.split('')[4]))) &&
+                                                            parseInt(notDetailsRes[0][count*2].userRights.split('')[4]) > 0 ){
+                                                            console.log("comming to this block");
+                                                            var receiverId = notDetailsRes[0][count*2].receiverId;
+                                                            var senderTitle = insertResult[0][0].EZEID;
+                                                            var groupTitle = notDetailsRes[0][count*2].groupTitle;
+                                                            var groupId = notDetailsRes[0][count*2].groupId;
+                                                            var messageText = 'New job posted to your institute';
+                                                            /**
+                                                             * messageType 23 when any job will be posted placement officer of verified
+                                                             * institute will get notification
+                                                             */
+                                                            var messageType = 23;
+                                                            var operationType = 0;
+                                                            var iphoneId = notDetailsRes[0][count*2].iphoneId;
+                                                            var messageId = 0;
+                                                            var masterid = notDetailsRes[0][count*2].masterid;
+                                                            var latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
+                                                            var msgUserid = 0, a_name = '';
+
+                                                            var jid = jobID;
+                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                                messageType, operationType, iphoneId, messageId, masterid);
+                                                            /**
+                                                             * Send notification to when any job will be posted placement officer of verified
+                                                             * institute will get notification
+                                                             */
+                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                                messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
+                                                                dateTime, a_name, msgUserid, jid);
+                                                            console.log("Notification Send");
+                                                            /**
+                                                             * Send mail to when any job will be posted placement officer of verified
+                                                             * institute
+                                                             */
+                                                            /**
+                                                             * @todo add template functionality is added
+                                                             */
+                                                            //if (notDetailsRes[0][count*2].CVMailID){
+                                                            //    mailerApi.sendMail('job_apply_comapney_template', {
+                                                            //        ezeoneId : insertResult[0][0].EZEID,
+                                                            //        JobType : (insertResult[0][0].JobType) ? insertResult[0][0].JobType : 'FullTime',
+                                                            //        JobTitle : insertResult[0][0].JobTitle,
+                                                            //        JobCode : insertResult[0][0].JobCode,
+                                                            //        DateTime : dateTime
+                                                            //    }, '', notDetailsRes[0][count*2].CVMailID);
+                                                            //}
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else {
+                                                console.log('get_subuser_enquiry:user details not loaded');
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        for (var ins = 0; ins < instituteArray.length; ins++ ){
+                                            var queryPOparams = st.db.escape(instituteArray[ins]) + ',' + st.db.escape(functionType);
+                                            combinePOquery += 'CALL get_subuser_list(' + queryPOparams + ');';
+                                        }
+                                        st.db.query(combinePOquery, function (err, notDetailsRes) {
+                                            console.log(combinePOquery);
+                                            if (notDetailsRes && notDetailsRes[0]) {
+                                                console.log(notDetailsRes);
+                                                for (var count = 0; count < notDetailsRes[0].length; count++) {
+                                                    console.log('notDetailsRes[0].length',notDetailsRes[0].length);
+                                                    if (notDetailsRes[0][count].userRights){
+                                                        if ((!isNaN(parseInt(notDetailsRes[0][count*2].userRights.split('')[4]))) &&
+                                                            parseInt(notDetailsRes[0][count*2].userRights.split('')[4]) > 0 ){
+                                                            console.log("comming to this block");
+                                                            var receiverId = notDetailsRes[0][count*2].receiverId;
+                                                            var senderTitle = insertResult[0][0].EZEID;
+                                                            var groupTitle = notDetailsRes[0][count*2].groupTitle;
+                                                            var groupId = notDetailsRes[0][count*2].groupId;
+                                                            var messageText = 'New job posted to your institute';
+                                                            /**
+                                                             * messageType 23 when any job will be posted placement officer of verified
+                                                             * institute will get notification
+                                                             */
+                                                            var messageType = 23;
+                                                            var operationType = 0;
+                                                            var iphoneId = notDetailsRes[0][count*2].iphoneId;
+                                                            var messageId = 0;
+                                                            var masterid = notDetailsRes[0][count*2].masterid;
+                                                            var latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
+                                                            var msgUserid = 0, a_name = '';
+
+                                                            var jid = jobID;
+                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                                messageType, operationType, iphoneId, messageId, masterid);
+                                                            /**
+                                                             * Send notification to when any job will be posted placement officer of verified
+                                                             * institute will get notification
+                                                             */
+                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                                messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
+                                                                dateTime, a_name, msgUserid, jid);
+                                                            console.log("Notification Send");
+                                                            /**
+                                                             * Send mail to when any job will be posted placement officer of verified
+                                                             * institute
+                                                             */
+                                                            /**
+                                                             * @todo add template functionality is added
+                                                             */
+                                                            //if (notDetailsRes[0][count*2].CVMailID){
+                                                            //    mailerApi.sendMail('job_apply_comapney_template', {
+                                                            //        ezeoneId : insertResult[0][0].EZEID,
+                                                            //        JobType : (insertResult[0][0].JobType) ? insertResult[0][0].JobType : 'FullTime',
+                                                            //        JobTitle : insertResult[0][0].JobTitle,
+                                                            //        JobCode : insertResult[0][0].JobCode,
+                                                            //        DateTime : dateTime
+                                                            //    }, '', notDetailsRes[0][count*2].CVMailID);
+                                                            //}
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else {
+                                                console.log('get_subuser_enquiry:user details not loaded');
+                                            }
+                                        });
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error while updating job status';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
                             }
                             else {
                                 responseMessage.message = 'An error occured in query ! Please try again';
@@ -4828,5 +5114,6 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
         }
     }
 };
+
 
 module.exports = Job;

@@ -99,7 +99,6 @@ var sendNotiToSubuser = function(token,toEZEID,functionType,folderRuleID){
                                                     }
                                                 }
                                             }
-
                                         }
                                     }
                                     else {

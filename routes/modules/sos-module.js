@@ -16,7 +16,6 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-
 var st = null;
 var Notification = require('./notification/notification-master.js');
 var notification = null;
@@ -54,6 +53,7 @@ Sos.prototype.saveSos = function(req,res,next) {
     var request = (req.body.request) ? req.body.request : '';
     var mobile = (req.body.mobile) ? req.body.mobile : '';
 
+
     req.body.service_mid = parseInt(req.body.service_mid) ? req.body.service_mid : 0;
 
     var responseMessage = {
@@ -74,7 +74,8 @@ Sos.prototype.saveSos = function(req,res,next) {
                 if (insertResult) {
                     if (insertResult[0]) {
                         var queryParams1 = st.db.escape(request) + ',' + st.db.escape(mobile)+ ',' + st.db.escape(latitude)
-                            + ',' + st.db.escape(longitude)+ ',' + st.db.escape(deviceId);
+                            + ',' + st.db.escape(longitude)+ ',' + st.db.escape(deviceId)+ ',' + st.db.escape(ezeid)
+                            + ',' + st.db.escape(req.body.service_mid);
                         var query = 'CALL pPostSOSrequest(' + queryParams1 + ')';
                         console.log(query);
                         st.db.query(query, function (err, reqResult) {
@@ -209,6 +210,7 @@ Sos.prototype.postSos = function(req,res,next) {
     var longitude = req.body.lng;
     var deviceId = req.body.device_id;
     var iphoneID='';
+    var ezeid = (req.body.ezeid) ? alterEzeoneId(req.body.ezeid) : '';
 
     var responseMessage = {
         status: false,
@@ -219,12 +221,15 @@ Sos.prototype.postSos = function(req,res,next) {
 
     try {
         var queryParams = st.db.escape(request) + ',' + st.db.escape(mobile)+ ',' + st.db.escape(latitude)
-            + ',' + st.db.escape(longitude)+ ',' + st.db.escape(deviceId);
+            + ',' + st.db.escape(longitude)+ ',' + st.db.escape(deviceId)+ ',' + st.db.escape(ezeid)
+            + ',' + st.db.escape(req.body.service_mid);
 
         var query = 'CALL pPostSOSrequest(' + queryParams + ')';
+        console.log(query);
         st.db.query(query, function (err, insertResult) {
             if (!err) {
                 if (insertResult) {
+                    console.log(insertResult);
                     responseMessage.status = true;
                     responseMessage.error = null;
                     responseMessage.message = 'Sos Posted successfully';
@@ -290,6 +295,7 @@ Sos.prototype.loadSosRequest = function(req,res,next) {
             if (!err) {
                 if (getResult) {
                     if (getResult[0]) {
+                        console.log(getResult);
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.data = getResult[0];
