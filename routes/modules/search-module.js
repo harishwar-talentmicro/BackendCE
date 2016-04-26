@@ -177,7 +177,27 @@ Search.prototype.searchKeyword = function(req,res,next){
                                             if (SearchResult[0][0].totalcount == 1) {
                                                 if(SearchResult[1]) {
                                                     if (SearchResult[1].length > 0) {
-                                                        console.log('coming..1');
+
+
+                                                        /**
+                                                         * Performing the logic based on saving of working hours
+                                                         */
+
+
+                                                        for(var counter = 0 ; counter < SearchResult[1].length; counter++){
+
+
+                                                            console.log('Open Status of SearchResult : ', st.getOpenStatus(SearchResult[1][counter].OpenStatus,SearchResult[1][counter].wh));
+
+                                                            SearchResult[1][counter]['OpenStatus'] = st.getOpenStatus(SearchResult[1][counter].OpenStatus,SearchResult[1][counter].wh);
+
+                                                            /**
+                                                             * Removing wh property from search results
+                                                             */
+                                                            SearchResult[1][counter]['wh'] = undefined;
+                                                        }
+
+
                                                         res.json({
                                                             totalcount: SearchResult[0][0].totalcount,
                                                             Result: SearchResult[1]
@@ -320,6 +340,15 @@ Search.prototype.searchKeyword = function(req,res,next){
                                     if (SearchResult[1]) {
                                         for (var i = 0; i < SearchResult[1].length; i++) {
 
+                                            console.log('Open Status of SearchResult : ', st.getOpenStatus(SearchResult[1][i].OpenStatus,SearchResult[1][i].wh));
+
+                                            SearchResult[1][i]['OpenStatus'] = st.getOpenStatus(SearchResult[1][i].OpenStatus,SearchResult[1][i].wh);
+
+                                            /**
+                                             * Removing wh property from search results
+                                             */
+                                            SearchResult[1][i]['wh'] = undefined;
+
 
                                             if (SearchResult[1][i].tilebanner == '') {
 
@@ -410,6 +439,18 @@ Search.prototype.searchKeyword = function(req,res,next){
                                 if (SearchResult[0].length > 0) {
                                     if (SearchResult[1]) {
                                         //res.send(SearchResult[0]);
+
+                                        for(var counter = 0; counter < SearchResult[1].length; counter++ ){
+                                            console.log('Open Status of SearchResult : ', st.getOpenStatus(SearchResult[1][counter].OpenStatus,SearchResult[1][counter].wh));
+
+                                            SearchResult[1][counter]['OpenStatus'] = st.getOpenStatus(SearchResult[1][counter].OpenStatus,SearchResult[1][counter].wh);
+
+                                            /**
+                                             * Removing wh property from search results
+                                             */
+                                            SearchResult[1][counter]['wh'] = undefined;
+                                        }
+
                                         res.json({totalcount: SearchResult[0][0].totalcount, Result: SearchResult[1]});
                                         console.log('FnSearchByKeywords:  tmaster:Search Found');
                                     }
@@ -539,6 +580,15 @@ Search.prototype.searchInformation = function(req,res,next){
                             if (UserInfoResult[0].length > 0) {
 
                                 UserInfoResult[0][0].dealbanner = (UserInfoResult[0][0].dealbanner) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[0][0].dealbanner) : '';
+
+                                if(UserInfoResult[0][0]){
+                                    UserInfoResult[0][0].OpenStatus = st.getOpenStatus(UserInfoResult[0][0].OpenStatus,UserInfoResult[0][0].wh);
+                                    /**
+                                     * Removing wh property
+                                     */
+                                    UserInfoResult[0][0].wh = undefined;
+                                }
+
                                 //console.log(UserInfoResult[1]);
                                 if(UserInfoResult[1]) {
                                     if (UserInfoResult[1].length) {
