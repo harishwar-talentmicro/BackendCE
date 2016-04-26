@@ -369,6 +369,75 @@ StdLib.prototype.sendMail = function(req, res){
 
     };
 
+
+/**
+ * Getting business is open or not based on calculation of working hours
+ * @param openStatusParam
+ * @param workingHoursStrParam
+ * @returns {number} OpenClose Status , 2 for Close and 1 for Open
+ */
+StdLib.prototype.getOpenStatus = function(openStatusParam,workingHoursStrParam){
+    /**
+     * Considering optimistically as closed
+     * and then performing the logic to find it if the business is open or not
+     *
+     * Vedha is giving openStatusParam as 0 in case it is not a holiday else
+     * she is giving 1 if holiday so direclty we can decide business is closed
+     */
+    var openStatus = 2;
+    if(openStatusParam){
+        return openStatus;
+    }
+    else{
+
+        /**
+         * Splitting working hours set
+         */
+        var workingHoursRes = (workingHoursStrParam) ? workingHoursStrParam.split('^') :[];
+
+        var currentDateObj = new Date();
+
+        /**
+         * Current Time in minutes
+         */
+        var currentTimeInMinutes = (currentDateObj.getHours() * 60) + currentDateObj.getMinutes;
+
+        var currentDay = currentDateObj.getDay();
+
+        if(workingHoursRes.length){
+            for(var counter1 = 0; counter1 < workingHoursRes.length; counter1++){
+                var workingHourComponents = (workingHoursRes[counter1]) ? workingHoursRes[counter1].split('-') : [];
+
+                if(workingHourComponents.length){
+
+                    /**
+                     * Working hours component
+                     */
+
+                    var workingHourComponentObj = {
+                        tid : (workingHourComponents[0]) ? workingHourComponents[0] : 0,
+                        masterId : (workingHourComponents[1]) ? workingHourComponents[1] : 0,
+                        days : (workingHourComponents[2]) ? workingHourComponents[2].split(',') : [],
+                        startTime : (workingHourComponents[3]) ? workingHourComponents[3] : 0,
+                        endTime : (workingHourComponents[4]) ? workingHourComponents[4] : 0
+                    };
+
+
+                    if(currentTimeInMinutes >= workingHourComponentObj.startTime && currentTimeInMinutes <= workingHourComponentObj.endTime){
+                        openStatus = 1;
+                        break;
+                    }
+
+                }
+
+            }
+
+        }
+
+        return openStatus;
+    }
+};
+
 function FnSendMailEzeid(MailContent, CallBack) {
     var _this = this;
     try {
@@ -415,6 +484,7 @@ function FnSendMailEzeid(MailContent, CallBack) {
         return 'error'
     }
 };
+
 
 
 module.exports = StdLib;

@@ -210,6 +210,14 @@ Service.prototype.getServiceProviders = function(req,res,next){
                                     if(serviceResult[0]){
                                         if(serviceResult[1]){
                                             for(var i=0; i < serviceResult[0].length; i++){
+
+                                                serviceResult[0][i].OpenStatus = st.getOpenStatus(serviceResult[0][i].OpenStatus,serviceResult[0][i].wh);
+
+                                                /**
+                                                 * Removing wh property from search results
+                                                 */
+                                                serviceResult[0][i].wh = undefined;
+
                                                 serviceResult[0][i].tilebanner = serviceResult[0][i].tilebanner ?
                                                 req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[1][i].tilebanner: '';
                                             }
