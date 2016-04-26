@@ -50,7 +50,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
     var token = req.body.token;
     var id = parseInt(req.body.id);            // task id
     var status = parseInt(req.body.s);
-    var transactionId = (isNaN(parseInt(req.body.tx))) ? parseInt(req.body.tx) : 0;   // Transaction id
+    var transactionId = (isNaN(parseInt(req.body.tx))) ? 0 :  parseInt(req.body.tx) ;   // Transaction id
     var c_particulars = req.body.cp;           // Conveyance Particulars <string>
     var c_amount = req.body.ca;             // Conveyance Amount <float>
     var userIDs = req.body.au;              // Additional User IDs (Comma separted MasterIDs of users) <string>
@@ -103,6 +103,8 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
+                        console.log(transactionId,"transactionId");
+                        console.log(req.body.tx,"transactionIdtest");
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(id)+ ',' + st.db.escape(transactionId)
                             + ',' + st.db.escape(status) + ',' + st.db.escape(c_particulars) + ',' + st.db.escape(c_amount)
                             + ',' + st.db.escape(userIDs) + ',' + st.db.escape(taskDate)+ ',' + st.db.escape(ownerId)
