@@ -1249,7 +1249,7 @@ Association.prototype.associationGetServiceImg = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Images are not available';
-                                            responseMessage.data = null;
+                                            responseMessage.data = [];
                                             res.status(200).json(responseMessage);
                                         }
                                     }
@@ -1257,7 +1257,7 @@ Association.prototype.associationGetServiceImg = function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Images are not available';
-                                        responseMessage.data = null;
+                                        responseMessage.data = [];
                                         res.status(200).json(responseMessage);
                                     }
                                 }
@@ -1265,7 +1265,7 @@ Association.prototype.associationGetServiceImg = function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Images are not available';
-                                    responseMessage.data = null;
+                                    responseMessage.data = [];
                                     res.status(200).json(responseMessage);
                                 }
                             }
@@ -2159,13 +2159,11 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                 console.log(notiResult,"notiResult");
                                                                 if (notiResult[0]){
                                                                     if (notiResult[0].length > 0){
-                                                                        console.log(notiResult[1],"notiResult[1]");
-                                                                        console.log(notiResult[0],"notiResult[3]");
                                                                         if (notiResult[3]){
                                                                             for (var i = 0; i < notiResult[0].length; i++ ) {
                                                                                 var fn = (notiResult[1][0].fn) ? notiResult[1][0].fn :
                                                                                     ((notiResult[1][0].ln) ? notiResult[1][0].ln : notiResult[1][0].s_title);
-                                                                                var receiverId = notiResult[0][i].g_title;
+                                                                                var receiverId = notiResult[0][i].gid;
                                                                                 var senderTitle = notiResult[1][0].s_title;
                                                                                 var groupTitle = notiResult[0][i].g_title;
                                                                                 var groupId = notiResult[0][i].gid;
