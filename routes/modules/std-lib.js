@@ -423,7 +423,7 @@ StdLib.prototype.getOpenStatus = function(openStatusParam,workingHoursStrParam){
                     };
 
 
-                    if(currentTimeInMinutes >= workingHourComponentObj.startTime && currentTimeInMinutes <= workingHourComponentObj.endTime){
+                    if(currentTimeInMinutes >= workingHourComponentObj.startTime && currentTimeInMinutes <= workingHourComponentObj.endTime && workingHourComponentObj.indexOf(currentDay.toString) !== -1){
                         openStatus = 1;
                         break;
                     }

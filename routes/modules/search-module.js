@@ -186,7 +186,7 @@ Search.prototype.searchKeyword = function(req,res,next){
 
                                                         for(var counter = 0 ; counter < SearchResult[1].length; counter++){
 
-
+                                                            console.log('SearchResult[1][counter]',SearchResult[1][counter]);
                                                             console.log('Open Status of SearchResult : ', st.getOpenStatus(SearchResult[1][counter].OpenStatus,SearchResult[1][counter].wh));
 
                                                             SearchResult[1][counter]['OpenStatus'] = st.getOpenStatus(SearchResult[1][counter].OpenStatus,SearchResult[1][counter].wh);
@@ -339,7 +339,7 @@ Search.prototype.searchKeyword = function(req,res,next){
 
                                     if (SearchResult[1]) {
                                         for (var i = 0; i < SearchResult[1].length; i++) {
-
+                                            console.log('SearchResult[1][i]',SearchResult[1][i]);
                                             console.log('Open Status of SearchResult : ', st.getOpenStatus(SearchResult[1][i].OpenStatus,SearchResult[1][i].wh));
 
                                             SearchResult[1][i]['OpenStatus'] = st.getOpenStatus(SearchResult[1][i].OpenStatus,SearchResult[1][i].wh);
@@ -581,6 +581,7 @@ Search.prototype.searchInformation = function(req,res,next){
 
                                 UserInfoResult[0][0].dealbanner = (UserInfoResult[0][0].dealbanner) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[0][0].dealbanner) : '';
 
+                                console.log(' UserInfoResult[0][0]',UserInfoResult[0][0]);
                                 if(UserInfoResult[0][0]){
                                     UserInfoResult[0][0].OpenStatus = st.getOpenStatus(UserInfoResult[0][0].OpenStatus,UserInfoResult[0][0].wh);
                                     /**
