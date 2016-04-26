@@ -4633,7 +4633,7 @@ Job.prototype.activateJobPO = function(req,res,next){
                                     res.status(200).json(responseMessage);
                                     var userId = [];
                                     var emailArray = [];
-                                    var instituteArray = [];
+                                    var poEzeIdArray = [];
                                     var combineQuery = "";
                                     var combinePOquery = "";
                                     /**
@@ -4645,7 +4645,7 @@ Job.prototype.activateJobPO = function(req,res,next){
                                     if (parseInt(req.body.st) == 1){
                                         userId = (notificationResult[0][0].ids) ? notificationResult[0][0].ids.split(',') : '';
                                         emailArray = (notificationResult[0][0].emailids) ? notificationResult[0][0].emailids.split(',') : '';
-                                        instituteArray = (notificationResult[2][0].institues) ? notificationResult[2][0].institues.split(',') : '';
+                                        poEzeIdArray = (notificationResult[2][0].institues) ? notificationResult[2][0].institues.split(',') : '';
                                         console.log('instituteArray',instituteArray);
                                         console.log(userId);
                                         var path = require('path');
@@ -4705,8 +4705,8 @@ Job.prototype.activateJobPO = function(req,res,next){
                                                 console.log('postNotification : Error in sending notifications');
                                             }
                                         });
-                                        for (var ins = 0; ins < instituteArray.length; ins++ ){
-                                            var queryPOparams = st.db.escape(instituteArray[ins]) + ',' + st.db.escape(functionType);
+                                        for (var i = 0; i < poEzeIdArray.length; i++ ){
+                                            var queryPOparams = st.db.escape(instituteArray[i]) + ',' + st.db.escape(functionType);
                                             combinePOquery += 'CALL get_subuser_list(' + queryPOparams + ');';
                                         }
                                         st.db.query(combinePOquery, function (err, notDetailsRes) {
@@ -4773,8 +4773,8 @@ Job.prototype.activateJobPO = function(req,res,next){
                                         });
                                     }
                                     else {
-                                        for (var ins = 0; ins < instituteArray.length; ins++ ){
-                                            var queryPOparams = st.db.escape(instituteArray[ins]) + ',' + st.db.escape(functionType);
+                                        for (var i = 0; i < poEzeIdArray.length; i++ ){
+                                            var queryPOparams = st.db.escape(poEzeIdArray[i]) + ',' + st.db.escape(functionType);
                                             combinePOquery += 'CALL get_subuser_list(' + queryPOparams + ');';
                                         }
                                         st.db.query(combinePOquery, function (err, notDetailsRes) {

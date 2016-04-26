@@ -13,6 +13,7 @@ var Notification = require('./notification/notification-master.js');
 var NotificationQueryManager = require('./notification/notification-query.js');
 var notification = null;
 var notificationQmManager = null;
+var moment = require('moment');
 
 function Service(db,stdLib){
 
@@ -177,6 +178,7 @@ Service.prototype.getServiceProviders = function(req,res,next){
     var lat = req.query.lat ? req.query.lat : 0.00;
     var lng = req.query.lng ? req.query.lng : 0.00;
     var serviceType = parseInt(req.query.service_type);
+    req.query.datetime = (req.query.datetime) ? req.query.datetime : moment().format('YYYY-MM-DD,h:mm:ss a');
 
     var validateStatus = true, error = {};
 
@@ -190,7 +192,6 @@ Service.prototype.getServiceProviders = function(req,res,next){
         console.log('service_type is a integer value');
         validateStatus *= false;
     }
-
     if(!validateStatus){
         res.status(400).json(error);
     }
@@ -200,7 +201,8 @@ Service.prototype.getServiceProviders = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams =   st.db.escape(token) + ',' + st.db.escape(lat)
-                            + ',' + st.db.escape(lng)+ ',' + st.db.escape(serviceType) + ',' + st.db.escape(req.query.service_mid);
+                            + ',' + st.db.escape(lng)+ ',' + st.db.escape(serviceType) + ',' + st.db.escape(req.query.service_mid)
+                            + ',' + st.db.escape(req.query.datetime);
 
                         var query = 'CALL pgetserviceproviders(' + queryParams + ')';
                         console.log(query);
