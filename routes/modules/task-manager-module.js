@@ -55,7 +55,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
     var c_amount = req.body.ca;             // Conveyance Amount <float>
     var userIDs = (req.body.au) ? (req.body.au) : '';              // Additional User IDs (Comma separted MasterIDs of users) <string>
     var taskDate = req.body.ts;            // Task Date and Time (YYYY-MM-DD HH:mm:ss)
-    var ownerId = (isNaN(parseInt(req.body.ow))) ? parseInt(req.body.ow) : 0;   // Owner ID (Master ID of the task owner)
+    var ownerId = (isNaN(parseInt(req.body.ow))) ?  0 : parseInt(req.body.ow) ;   // Owner ID (Master ID of the task owner)
     var nextActionId = (isNaN(parseInt(req.body.nxid))) ? 0 : parseInt(req.body.nxid);
     var taskParticulars = (req.body.tp) ? req.body.tp  : ''; // Task particulars
     var tid,cd;

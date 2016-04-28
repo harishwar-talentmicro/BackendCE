@@ -486,4 +486,219 @@ router.get('/trans', function(req,res,next){
     }
 });
 
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @discription : API to get batch transactions
+ */
+router.get('/bdetails', function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if (isNaN(parseInt(req.query.smid))){
+        error.smid = 'Invalid batch id';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+                        var procParams = req.db.escape(req.query.smid);
+                        var procQuery = 'CALL pget_batch_details(' + procParams + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'batch details loaded successfully';
+                                            responseMessage.data = {
+                                                expenseType : results[0],
+                                                batchDetails : results[1]
+                                            }
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'batch details not available';
+                                            responseMessage.data = [];
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'batch details not available';
+                                        responseMessage.data = [];
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'batch details not available';
+                                    responseMessage.data = [];
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pget_batch_details ', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error pget_batch_details : ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+});
+
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @param token* <string> token of login user
+ * @param title* <string> title of group
+ * @param st <int> st is status of group
+ * @param desc <string> desc is description of group
+ * @param tid <int> tid of group in case of update
+ * @param pic <string> pic is path of image
+ * @param itemId <string> itemId is comma saprated ids of items
+ *
+ * @discription : API to create group with item
+ */
+
+router.post('/trans', function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var id = parseInt(req.body.smid);
+    var validationFlag = true;
+    var error = {};
+    if(req.is('json')) {
+        if (!req.body.token) {
+            error['token'] = 'Invalid token';
+            validationFlag *= false;
+        }
+        if (id) {
+            if (isNaN(id)) {
+                error.id = 'Invalid id of service_masterid';
+                validationFlag *= false;
+            }
+        }
+        else {
+            id = 0;
+        }
+        if (!validationFlag) {
+            responseMessage.error = error;
+            responseMessage.message = 'Please check the errors';
+            res.status(400).json(responseMessage);
+            console.log(responseMessage);
+        }
+        else {
+            try {
+                    /**
+                     * preparing query to update multiple items of group
+                     * getting comma separated item ids
+                     */
+                    var batchArrayList = req.body.batchArray;
+                    if (batchArrayList.length > 0){
+                        var combQuery = '';
+                        for (var i = 0; i < batchArrayList.length; i++ ){
+                            var batchQueryParams = req.db.escape(batchArrayList[i].typeId)
+                                + ',' + req.db.escape(batchArrayList[i].expenseDetails)
+                                + ',' + req.db.escape(batchArrayList[i].total);
+                            combQuery +=  ('CALL psave_batch_trans(' + batchQueryParams + ');');
+                        }
+                        console.log(combQuery);
+                        req.db.query(combQuery, function (err, batchResult) {
+                            if (!err) {
+                                if (batchResult) {
+                                    console.log(batchResult);
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'batch created successfully';
+                                    responseMessage.data = {
+                                        id : results[0][0].id
+                                    };
+                                    res.status(200).json(responseMessage);
+                                }
+                                else {
+                                    console.log('Item not save');
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                console.log('Item not save');
+                                console.log(err);
+                                res.status(200).json(responseMessage);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Group created successfully';
+                        responseMessage.data = {
+                            id : results[0][0].id
+                        };
+                        res.status(200).json(responseMessage);
+                    }
+            }
+            catch (ex) {
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'An error occurred !';
+                res.status(500).json(responseMessage);
+                console.log('Error psave_item_group :  ', ex);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+            }
+        }
+    }
+    else{
+        responseMessage.error = "Accepted content type is json only";
+        res.status(400).json(responseMessage);
+    }
+});
+
 module.exports = router;

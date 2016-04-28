@@ -10,6 +10,7 @@ var cvTempGenrate =  require('./cv_temp_genrate.js');
 var itemGroupV1 =  require('./item-group/item-group-master.js');
 var associationV1 =  require('./association/association-master.js');
 var batchV1 =  require('./batch/batch-master.js');
+var messaageBoxV1 =  require('./messagebox/messagebox_master.js');
 var apVersionV1 =  require('./ap-module/version.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
 
@@ -22,6 +23,7 @@ router.use('/cv_temp_genrate',cvTempGenrate);
 router.use('/item',itemGroupV1);
 router.use('/association',associationV1);
 router.use('/batch',batchV1);
+router.use('/message',messaageBoxV1);
 router.use('/versionCode',apVersionV1);
 //router.use('/association-ap',associationAPV1);
 

@@ -40,7 +40,11 @@ router.post('/cv_generate',function(req,res,next){
     if (req.body.career.length > 0){
         aoc = true;
     }
-    if (reference.ref_name && reference.ref_name1){
+    //if (reference.ref_name && reference.ref_name1){
+    //    ref = true;
+    //    if_not_ref = '';
+    //}
+    if (req.body.work_exp.length > 0){
         ref = true;
         if_not_ref = '';
     }
