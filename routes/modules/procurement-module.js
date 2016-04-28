@@ -398,7 +398,6 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                 }
                                             });
                                                     };
-
                                                     var saveEnqArrayFn = function(vendorArray){
                                                         var comSaveEnquiryVendor = "";
                                                         if(vendorArray){
