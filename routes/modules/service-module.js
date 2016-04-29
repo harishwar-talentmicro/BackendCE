@@ -174,11 +174,10 @@ var uploadDocumentToCloud = function(uniqueName,readStream,callback){
 Service.prototype.getServiceProviders = function(req,res,next){
 
     var token = req.query.token;
-    var dateTime = req.query.dt;
     var lat = req.query.lat ? req.query.lat : 0.00;
     var lng = req.query.lng ? req.query.lng : 0.00;
     var serviceType = parseInt(req.query.service_type);
-    req.query.datetime = (req.query.datetime) ? req.query.datetime : moment().format('YYYY-MM-DD,h:mm:ss a');
+    req.query.dt = (req.query.dt) ? req.query.dt : moment().format('YYYY-MM-DD,h:mm:ss a');
 
     var validateStatus = true, error = {};
 
@@ -202,7 +201,7 @@ Service.prototype.getServiceProviders = function(req,res,next){
                     if (result) {
                         var queryParams =   st.db.escape(token) + ',' + st.db.escape(lat)
                             + ',' + st.db.escape(lng)+ ',' + st.db.escape(serviceType) + ',' + st.db.escape(req.query.service_mid)
-                            + ',' + st.db.escape(req.query.datetime);
+                            + ',' + st.db.escape(req.query.dt);
 
                         var query = 'CALL pgetserviceproviders(' + queryParams + ')';
                         console.log(query);
