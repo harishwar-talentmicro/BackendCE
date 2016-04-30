@@ -4,6 +4,8 @@
 var express = require('express');
 var router = express.Router();
 var request = require('request');
+
+
 /**
  * Method : GET
  * @param req
@@ -180,7 +182,7 @@ router.get('/testbhavya',function(req,res,next){
     var error = {};
 
     //try {
-        var id = parseInt(req.query.id);
+       var id = parseInt(req.query.id);
         //var ownerId = req.query.owner_id;   // id=masterid when ownerid=0 and id=jobid when ownerid!=0
 
         var responseMessage = {
@@ -196,7 +198,7 @@ router.get('/testbhavya',function(req,res,next){
 
         if (id) {
             console.log(id);
-            var queryParams = req.db.escape(req.query.id);
+            var queryParams = req.db.escape(id);
             var query = 'CALL pgetCVInfo(' + queryParams + ')';
             console.log(query);
             req.db.query(query, function (err, MessagesResult) {
@@ -258,40 +260,6 @@ router.get('/testbhavya',function(req,res,next){
     //}
 });
 
-router.get('/testnew',function(req,res,next){
 
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: []
-    };
-    var validationFlag = true;
-    var error = {};
-
-    //try {
-    var id = parseInt(req.query.id);
-    //var ownerId = req.query.owner_id;   // id=masterid when ownerid=0 and id=jobid when ownerid!=0
-
-    var responseMessage = {
-        status: false,
-        data: null,
-        skillMatrix : [],
-        job_location : [],
-        line_of_career : [],
-        education : [],
-        error:{},
-        message:''
-    };
-
-    //}
-    //catch (ex) {
-    //    var errorDate = new Date();
-    //    console.log(errorDate.toTimeString() + ' ......... error ...........');
-    //    console.log('FnGetCVInfo error:' + ex.description);
-    //
-    //    res.status(400).json(responseMessage);
-    //}
-});
 
 module.exports = router;
