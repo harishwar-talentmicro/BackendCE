@@ -8,8 +8,22 @@
 
 var express = require('express');
 var router = express.Router();
+var Mailer = require('../../../mail/mailer.js');
+var mailerApi = new Mailer();
 var Ajv = require('ajv');
 var ajv = Ajv({allErrors: true});
+function alterEzeoneId(ezeoneId){
+    var alteredEzeoneId = '';
+    if(ezeoneId){
+        if(ezeoneId.toString().substr(0,1) == '@'){
+            alteredEzeoneId = ezeoneId;
+        }
+        else{
+            alteredEzeoneId = '@' + ezeoneId.toString();
+        }
+    }
+    return alteredEzeoneId;
+}
 
 /**
  * Method : POST
@@ -638,10 +652,7 @@ router.post('/trans', function(req,res,next){
         }
         else {
             try {
-                    /**
-                     * preparing query to update multiple items of group
-                     * getting comma separated item ids
-                     */
+
                     var batchArrayList = req.body.batchArray;
                         var combQuery = '';
                 console.log(batchArrayList.length,"batchArrayList.length");
@@ -693,6 +704,268 @@ router.post('/trans', function(req,res,next){
         }
 });
 
+/**
+ * Method : DELETE
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @discription : API to get reset batch transactions
+ */
+router.delete('/trans', function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if (isNaN(parseInt(req.query.sm_id)) || (req.query.sm_id) < 1 ) {
+        error.id = 'Invalid service_master id';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.query.batch_id)) || (req.query.batch_id) < 1 ) {
+        error.batch_id = 'Invalid batch id';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            var procParams = req.db.escape(req.query.batch_id) + ',' + req.db.escape(req.query.sm_id);
+            var procQuery = 'CALL preset_batch_trans(' + procParams + ')';
+            console.log(procQuery);
+            req.db.query(procQuery, function (err, results) {
+                if (!err) {
+                    console.log(results);
+                    if (results) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'batch reset successfully';
+                        responseMessage.data = {};
+                        res.status(200).json(responseMessage);
+                    }
+                    else {
+                        responseMessage.status = false;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Error in reset batch';
+                        responseMessage.data = null;
+                        res.status(200).json(responseMessage);
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error :', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error:', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+});
+
+
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @param ezeid* <string> ezeoneid for which admin wants to save receipts
+ * @param particulars <string> desc is description of group
+ * @param smid <int> smid is service master id
+ * @param amount <decimal>
+ *
+ * @discription : API to create batch receipts
+ */
+
+router.post('/bill_receipts', function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var id = parseInt(req.body.smid);
+    var validationFlag = true;
+    var error = {};
+        if (!req.body.ezeoneid) {
+            error.ezeoneid = 'Invalid ezeoneid';
+            validationFlag *= false;
+        }
+        if (!validationFlag) {
+            responseMessage.error = error;
+            responseMessage.message = 'Please check the errors';
+            res.status(400).json(responseMessage);
+            console.log(responseMessage);
+        }
+        else {
+            try {
+                var ezeoneid = alterEzeoneId(req.body.ezeoneid);
+                var procParams = req.db.escape(ezeoneid) + ',' + req.db.escape(id)+ ',' + req.db.escape(req.body.particulars)
+                    + ',' + req.db.escape(req.body.amount);
+                var procQuery = 'CALL psave_billing_receipts(' + procParams + ')';
+                req.db.query(procQuery, function (err, batchResult) {
+                    if (!err) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Receipt saved successfully';
+                        responseMessage.data = {};
+                        res.status(200).json(responseMessage);
+                    }
+                    else {
+                        console.log('Receipt not saved');
+                        console.log(err);
+                        res.status(200).json(responseMessage);
+                    }
+                });
+            }
+            catch (ex) {
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'An error occurred !';
+                res.status(500).json(responseMessage);
+                console.log('Error psave_billing_receipts :  ', ex);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+            }
+        }
+});
+
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @discription : API to get batch transactions
+ */
+router.get('/invoice', function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if (isNaN(parseInt(req.query.batch_id))){
+        error.batch_id = 'Invalid batch id';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            var procParams = req.db.escape(req.query.batch_id);
+            var procQuery = 'CALL pget_batch_trans(' + procParams + ')';
+            console.log(procQuery);
+            req.db.query(procQuery, function (err, results) {
+                if (!err) {
+                    console.log(results);
+                    if (results) {
+                        if (results[0]) {
+                            if (results[0].length > 0) {
+
+                                for (var batchCount = 0; batchCount < results[0].length; batchCount++) {
+                                    /**@todo send pdf to member of communtiy */
+                                    mailerApi.sendMail('proposal_template', {
+                                        Name : name,
+                                        RequirementDescription : req.body.message,
+                                        LoggedInName : logedinuser,
+                                        email : fromEmail,
+                                        mobile : mn
+
+                                    }, '', 'jain31192@gmail.com');
+
+                                }
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'batch details loaded successfully';
+                                responseMessage.data = {
+                                    expenseType : results[0],
+                                    batchDetails : results[1]
+                                }
+                                res.status(200).json(responseMessage);
+                            }
+                            else {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'batch details not available';
+                                responseMessage.data = [];
+                                res.status(200).json(responseMessage);
+                            }
+                        }
+                        else {
+                            responseMessage.status = false;
+                            responseMessage.error = null;
+                            responseMessage.message = 'batch details not available';
+                            responseMessage.data = [];
+                            res.status(200).json(responseMessage);
+                        }
+                    }
+                    else {
+                        responseMessage.status = false;
+                        responseMessage.error = null;
+                        responseMessage.message = 'batch details not available';
+                        responseMessage.data = [];
+                        res.status(200).json(responseMessage);
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : pget_batch_details ', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                }
+            });
+
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error pget_batch_details : ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+});
 
 /**
  * Method : GET
@@ -711,16 +984,14 @@ router.get('/test_details', function(req,res,next){
         data: []
     };
 
-    var schema = {
-        "properties": {
-            "req.query.smid": { "type": "integer" }
-        }
-    };
-    var validate = ajv.compile(schema);
-    //var validationFlag = true;
+    //var schema = {
+    //        "smid": { "type": "integer" }
+    //};
+    //var validate = ajv.compile(schema);
+    var validationFlag = true;
     var error = {};
-    var valid = validate(req.query.smid);
-    if (!valid) {
+    //var valid = validate(req.query.smid);
+    if (!validationFlag) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
         res.status(400).json(responseMessage);
@@ -733,45 +1004,29 @@ router.get('/test_details', function(req,res,next){
             console.log(procQuery);
             req.db.query(procQuery, function (err, results) {
                 if (!err) {
-                    console.log(results);
+                    //console.log(results);
                     if (results) {
                         if (results[0]) {
                             if (results[0].length > 0) {
-                                //var schema1 = {
-                                //    "type" : "object",
-                                //    "properties" : {
-                                //        "results" : {
-                                //            "type" : "array", // remember that arrays are objects
-                                //            "results[0]" : { // "items" represents the items within the "users" array
-                                //                "type" : "object",
-                                //                "properties" : {
-                                //                    "tid": { "type": "integer" },
-                                //                    "expensetype": { "type" : "string" },
-                                //                    "item_Tag": { "type" : "string",optional: true },
-                                //                    "calcType": { "type" : "integer" }
-                                //                }
-                                //            },
-                                //            "results[1]" : { // "items" represents the items within the "users" array
-                                //                "type" : "object",
-                                //                "properties" : {
-                                //                    "typeId": { "type": "integer" },
-                                //                    "type": { "type" : "string" },
-                                //                    "area": { "type" : "integer" },
-                                //                    "members": { "type" : "integer" }
-                                //                }
-                                //            }
-                                //        }
-                                //    }
-                                //};
-                                //var validate = ajv.compile(schema1);
-                                //var valid = validate(results[0],results[1]);
-                                //if (!valid) {
-                                //    responseMessage.error = error;
-                                //    responseMessage.message = 'Please check the errors';
-                                //    res.status(400).json(responseMessage);
-                                //    console.log(responseMessage);
-                                //}
+                                var schema1 = {
+                                    "tid": { "type": "integer" },
+                                    "expensetype": { "type" : "string" },
+                                    "item_Tag": { "type" : "string",optional: true },
+                                    "calcType": { "type" : "integer" },
+                                    "resuls[1].typeId": { "type": "integer" },
+                                    "type": { "type" : "string" },
+                                    "area": { "type" : "integer" },
+                                    "members": { "type" : "integer" }
 
+                                };
+                                ajv.validate(schema1,results[1]); // true
+                                if (!valid) {
+                                    responseMessage.error = validate.errors;
+                                    responseMessage.message = 'Please check the errors';
+                                    res.status(400).json(responseMessage);
+                                    console.log(ajv.errors,"validate.errors");
+                                }
+                                else{
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'batch details loaded successfully';
@@ -780,6 +1035,8 @@ router.get('/test_details', function(req,res,next){
                                         batchDetails : results[1]
                                     }
                                     res.status(200).json(responseMessage);
+                                }
+
 
 
                             }
@@ -833,4 +1090,5 @@ router.get('/test_details', function(req,res,next){
         }
     }
 });
+
 module.exports = router;
