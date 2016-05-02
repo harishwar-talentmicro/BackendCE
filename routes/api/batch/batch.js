@@ -180,7 +180,8 @@ router.post('/details', function(req,res,next){
  * @param req
  * @param res
  * @param next
- *
+ * @param token<string> token of login user
+ * @param smid<int> service master id
  * @discription : API to get batch
  */
 router.get('/list', function(req,res,next){
@@ -379,7 +380,7 @@ router.get('/details', function(req,res,next){
  * @param req
  * @param res
  * @param next
- *
+ * @param id<int> batch id
  * @discription : API to get batch transactions
  */
 router.get('/trans', function(req,res,next){
@@ -398,7 +399,7 @@ router.get('/trans', function(req,res,next){
         validationFlag *= false;
     }
     if (isNaN(parseInt(req.query.id))){
-        error.smid = 'Invalid batch id';
+        error.id = 'Invalid batch id';
         validationFlag *= false;
     }
     if (!validationFlag) {
@@ -508,8 +509,8 @@ router.get('/trans', function(req,res,next){
  * @param req
  * @param res
  * @param next
- *
- * @discription : API to get batch transactions
+ * @param smid<int> service master id
+ * @discription : API to get batch transactions detsil
  */
 router.get('/bdetails', function(req,res,next){
 
@@ -608,15 +609,12 @@ router.get('/bdetails', function(req,res,next){
  * @param req
  * @param res
  * @param next
- * @param token* <string> token of login user
- * @param title* <string> title of group
- * @param st <int> st is status of group
- * @param desc <string> desc is description of group
- * @param tid <int> tid of group in case of update
- * @param pic <string> pic is path of image
- * @param itemId <string> itemId is comma saprated ids of items
- *
- * @discription : API to create group with item
+ * @param smid* <int> service master id
+ * @param batchId* <int> batch id
+ * @param typeId* <int> type id(2bhk,3bhk id)
+ * @param expenseDetails* <string>
+ * @param total* <decimal> total member
+ * @discription : API to create batch transaction
  */
 
 router.post('/trans', function(req,res,next){
@@ -709,7 +707,8 @@ router.post('/trans', function(req,res,next){
  * @param req
  * @param res
  * @param next
- *
+ * @param sm_id* <int> service master id
+ * @param batch_id <int> batch id
  * @discription : API to get reset batch transactions
  */
 router.delete('/trans', function(req,res,next){
@@ -792,7 +791,7 @@ router.delete('/trans', function(req,res,next){
  * @param res
  * @param next
  * @param ezeid* <string> ezeoneid for which admin wants to save receipts
- * @param particulars <string> desc is description of group
+ * @param particulars <string> particulars is details of all bills
  * @param smid <int> smid is service master id
  * @param amount <decimal>
  *
@@ -860,7 +859,7 @@ router.post('/bill_receipts', function(req,res,next){
  * @param res
  * @param next
  *
- * @discription : API to get batch transactions
+ * @discription : API to generate invoice and send in to each member of community
  */
 router.get('/invoice', function(req,res,next){
 
@@ -897,29 +896,26 @@ router.get('/invoice', function(req,res,next){
 
                                 for (var batchCount = 0; batchCount < results[0].length; batchCount++) {
                                     /**@todo send pdf to member of communtiy */
-                                    mailerApi.sendMail('proposal_template', {
-                                        Name : name,
-                                        RequirementDescription : req.body.message,
-                                        LoggedInName : logedinuser,
-                                        email : fromEmail,
-                                        mobile : mn
-
-                                    }, '', 'jain31192@gmail.com');
+                                    //mailerApi.sendMail('proposal_template', {
+                                    //    Name : name,
+                                    //    RequirementDescription : req.body.message,
+                                    //    LoggedInName : logedinuser,
+                                    //    email : fromEmail,
+                                    //    mobile : mn
+                                    //
+                                    //}, '', 'jain31192@gmail.com');
 
                                 }
                                 responseMessage.status = true;
                                 responseMessage.error = null;
-                                responseMessage.message = 'batch details loaded successfully';
-                                responseMessage.data = {
-                                    expenseType : results[0],
-                                    batchDetails : results[1]
-                                }
+                                responseMessage.message = 'invoice send successfully';
+                                responseMessage.data = [];
                                 res.status(200).json(responseMessage);
                             }
                             else {
                                 responseMessage.status = true;
                                 responseMessage.error = null;
-                                responseMessage.message = 'batch details not available';
+                                responseMessage.message = 'invoice details not available';
                                 responseMessage.data = [];
                                 res.status(200).json(responseMessage);
                             }
@@ -927,7 +923,7 @@ router.get('/invoice', function(req,res,next){
                         else {
                             responseMessage.status = false;
                             responseMessage.error = null;
-                            responseMessage.message = 'batch details not available';
+                            responseMessage.message = 'invoice details not available';
                             responseMessage.data = [];
                             res.status(200).json(responseMessage);
                         }
@@ -935,7 +931,7 @@ router.get('/invoice', function(req,res,next){
                     else {
                         responseMessage.status = false;
                         responseMessage.error = null;
-                        responseMessage.message = 'batch details not available';
+                        responseMessage.message = 'invoice details not available';
                         responseMessage.data = [];
                         res.status(200).json(responseMessage);
                     }
@@ -946,7 +942,7 @@ router.get('/invoice', function(req,res,next){
                     };
                     responseMessage.message = 'An error occurred !';
                     res.status(500).json(responseMessage);
-                    console.log('Error : pget_batch_details ', err);
+                    console.log('Error : pget_batch_trans ', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
 
@@ -960,7 +956,7 @@ router.get('/invoice', function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error pget_batch_details : ', ex);
+            console.log('Error pget_batch_trans : ', ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
