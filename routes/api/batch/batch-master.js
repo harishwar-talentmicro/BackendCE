@@ -10,6 +10,10 @@ var batch = require('./batch.js');
 
 router.use('/process',batch);
 
+var billBatch = require('./bill-batch.js');
+
+
+router.use('/bill',billBatch);
 
 module.exports = router;
 
