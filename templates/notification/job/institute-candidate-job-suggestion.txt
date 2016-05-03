@@ -1,0 +1,1 @@
+A new <%=jobType%> job <%=jobTitle%> (<%=jobCode%>) posted by <%=companyName%> to your institute that matches your profile

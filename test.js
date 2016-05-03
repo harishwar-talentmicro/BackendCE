@@ -2,7 +2,7 @@
 ////console.log(crypto.getHashes());
 ////
 var crypto = require("crypto");
-var bcrypt = require("bcrypt");
+//var bcrypt = require("bcrypt");
 ////var algo = "ecdsa-with-SHA1"
 //var rand = crypto.randomBytes(128).toString('hex');
 //console.log(rand);
@@ -376,12 +376,30 @@ function decrypt(EncryptPassword){
 //var x =  hash.digest('hex') + crypto.randomBytes(30);
 //console.log(x);
 
-db.query('CALL pvalidatealumnicode('+db.escape('sjbit')+')',function(err,results){
-   if(err){
-       console.log(err);
-   }
+//db.query('CALL pvalidatealumnicode('+db.escape('sjbit')+')',function(err,results){
+//   if(err){
+//       console.log(err);
+//   }
+//    else{
+//       console.log(results);
+//   }
+//});
+
+
+var fs = require('fs');
+
+var docxBuffer = fs.readFileSync('./routes/api/cv_template.docx');
+
+var PDFClient = require('./routes/api/utilities/pdf-client.js');
+
+var pdfClient = new PDFClient();
+
+pdfClient.convertToPdf(docxBuffer,function(err,pdfBuffer){
+    if(err){
+        console.log('Error',err);
+    }
     else{
-       console.log(results);
-   }
+        fs.writeFileSync('converted-docx.pdf',pdfBuffer);
+    }
 });
 

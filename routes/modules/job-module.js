@@ -1,12 +1,15 @@
 /**
- *  @author Gowri shankar
+ *  @author Anjali Pandya
  *  @since July 22,2015  03:42PM
  *  @title Job module
  *  @description Handles Job functions
  */
 "use strict";
-
+var path = require('path');
 var util = require('util');
+var NotificationTemplater = require('../lib/NotificationTemplater.js');
+
+var notificationTemplater = new NotificationTemplater();
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -209,7 +212,7 @@ Job.prototype.create = function(req,res,next){
                             console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertResult) {
                                 if (!err) {
-                                    if (insertResult) {
+                                    if (insertResult && insertResult[0] && insertResult[0][0]) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Jobs save successfully';
@@ -228,7 +231,7 @@ Job.prototype.create = function(req,res,next){
                                             openings: openings,
                                             jobType: jobType,
                                             status: status,
-                                            contactName: contactName,
+                                            contactName: contactName, //Whom to contact for this job, don't confuse it with client and contact
                                             email_id: email,
                                             mobileNo: mobileNo,
                                             location_id: location_id,
@@ -238,7 +241,7 @@ Job.prototype.create = function(req,res,next){
                                             acode : alumniCode,
                                             institute_id : req.body.institute_id
                                         };
-                                        //res.status(200).json(responseMessage);
+
 
                                         var bigCombinedQuery = "";
                                         /**
@@ -259,7 +262,7 @@ Job.prototype.create = function(req,res,next){
                                                     scoreTo: locMatrix[i].score_to
                                                 };
 
-                                                var queryParams = st.db.escape(locSkills.jobId) + ',' + st.db.escape(locSkills.fid)
+                                                var queryParams = st.db.escape(locSkills.jobId)
                                                     + ',' + st.db.escape(locSkills.expFrom) + ',' + st.db.escape(locSkills.expTo)
                                                     + ',' + st.db.escape(locSkills.expertiseLevel) + ',' + st.db.escape(locSkills.careerId)
                                                     + ',' + st.db.escape(locSkills.scoreFrom) + ',' + st.db.escape(locSkills.scoreTo);
@@ -275,7 +278,7 @@ Job.prototype.create = function(req,res,next){
                                         if(educations) {
                                             var educationInsertQuery = "";
                                             for(var j=0; j < educations.length; j++) {
-                                                //async.each(educations, function iterator(eduDetails,callback) {
+
                                                 var educationData = {
                                                     jobId: insertResult[0][0].jobid,
                                                     eduId: educations[j].edu_id,
@@ -285,7 +288,7 @@ Job.prototype.create = function(req,res,next){
                                                     spcId: (educations[j].spc_id) ? educations[j].spc_id.toString() : "",
                                                     scoreFrom: educations[j].score_from,
                                                     scoreTo: educations[j].score_to,
-                                                    level: educations[j].expertiseLevel   // 0-ug, 1-pg
+                                                    level: educations[j].expertiseLevel
                                                 };
                                                 console.log(educationData);
                                                 var queryParams = st.db.escape(educationData.jobId) + ',' + st.db.escape(educationData.eduId)
@@ -297,11 +300,8 @@ Job.prototype.create = function(req,res,next){
                                             console.log(educationInsertQuery);
                                             bigCombinedQuery += educationInsertQuery;
                                         }
-                                        /**
-                                         * There is no SkillMatrix currently in front end so removing it from backend too
-                                         */
-                                        //matrix(insertResult[0][0].jobid);
-                                        console.log('FnSaveJobs: Jobs save successfully');
+
+
                                         if(bigCombinedQuery){
                                             st.db.query(bigCombinedQuery, function (err, notificationResult) {
                                                 if (!err) {
@@ -337,138 +337,123 @@ Job.prototype.create = function(req,res,next){
                                 }
                             });
                         };
-                        //var matrix = function(jobId_Result){
-                        //    jobID = jobId_Result;
-                        //    var count = skillMatrix1.length;
-                        //
-                        //    if(m < skillMatrix1.length) {
-                        //        var skills = {
-                        //            skillname: skillMatrix1[m].skillname,
-                        //            expertiseLevel: skillMatrix1[m].expertiseLevel,
-                        //            expFrom: skillMatrix1[m].exp_from,
-                        //            expTo: skillMatrix1[m].exp_to,
-                        //            active_status: skillMatrix1[m].active_status,
-                        //            jobId: jobID,
-                        //            fid: skillMatrix1[m].fid,
-                        //            type : skillMatrix1[m].type
-                        //        };
-                        //        FnSaveSkills(skills, function (err, Result) {
-                        //            if (!err) {
-                        //                if (Result) {
-                        //                    resultvalue = Result.SkillID;
-                        //                    var SkillItems = {
-                        //                        skillId: resultvalue,
-                        //                        expertlevel: skills.expertiseLevel,
-                        //                        expFrom: skills.expFrom,
-                        //                        expTo: skills.expTo,
-                        //                        skillStatusId: skills.active_status,
-                        //                        jobId: skills.jobId,
-                        //                        type : skills.type,
-                        //                        fid:skills.fid
-                        //                    };
-                        //
-                        //                    var queryParams = st.db.escape(SkillItems.jobId) + ',' + st.db.escape(SkillItems.skillId)
-                        //                        + ',' + st.db.escape(SkillItems.expFrom) + ',' + st.db.escape(SkillItems.expTo)
-                        //                        + ',' + st.db.escape(SkillItems.skillStatusId) + ',' + st.db.escape(SkillItems.expertlevel)
-                        //                        + ',' + st.db.escape(parseInt(SkillItems.fid))+ ',' + st.db.escape(SkillItems.type);
-                        //                    var query = 'CALL pSaveJobSkill(' + queryParams + ')';
-                        //
-                        //                    console.log(query);
-                        //                    st.db.query(query, function (err, result) {
-                        //                        if (!err) {
-                        //                            console.log('FnupdateSkill: skill matrix Updated successfully');
-                        //                            m = m + 1;
-                        //                            matrix(jobID);
-                        //                        }
-                        //                        else {
-                        //                            console.log('FnupdateSkill:  skill matrix not updated:'+err);
-                        //                        }
-                        //                    });
-                        //                }
-                        //                else {
-                        //                    console.log('FnSaveMessage: skillID not loaded');
-                        //                    //res.send(RtnMessage);
-                        //                }
-                        //            }
-                        //            else {
-                        //                console.log('FnSaveMessage:Error in getting skillID' + err);
-                        //                //res.send(RtnMessage);
-                        //            }
-                        //        });
-                        //    }
-                        //    else {
-                        //        if (instituteIdStr){
-                        //            postNotification(jobID);
-                        //        }
-                        //
-                        //    }
-                        //};
-
                         var postNotification = function(jobID){
                             var queryParams = st.db.escape(jobID) + ',' + st.db.escape(token);
                             /**
                              * send notification to eligible students
                              * @type {string}
                              */
+
+                            /**
+                             *
+                             */
                             var query = 'CALL PNotifyForCVsAfterJobPostedNew(' + queryParams + ')';
                             console.log(query);
                             st.db.query(query, function (err, notificationResult) {
                                 if (!err) {
                                     console.log(notificationResult);
-                                    if (notificationResult) {
-                                        if (notificationResult[0]) {
-                                            console.log('job post notification...');
-                                            userId = (notificationResult[0][0].ids) ? notificationResult[0][0].ids.split(',') : '';
-                                            emailArray = (notificationResult[0][0].emailids) ? notificationResult[0][0].emailids.split(',') : '';
-                                            instituteArray = (notificationResult[2][0].institues) ? notificationResult[2][0].institues.split(',') : '';
-                                            console.log('instituteArray',instituteArray);
-
-                                            var jobqueryParameters = st.db.escape(notificationResult[0][0].ids) + ',' + st.db.escape(jobID);
+                                    if (notificationResult && notificationResult[0]) {
                                             /**
-                                             * to create group of institute and studens for send notification and messages
-                                             * and save data
-                                             * @type {string}
+                                             * @TODO Now array of objects will come in notificationResult[0] having
+                                             * masterId
+                                             * groupId
+                                             * iphoneId
+                                             * email
+                                             * ezeoneId
+                                             * firstName
+                                             *
+                                             * @TODO Now array of objects will come in notificationResult[2] having
+                                             * masterId
+                                             * instiuteName
+                                             * isVerified
+                                             *
+                                             * @TODO send mail and notification to the students by getting information from notificationResult[0] array
+                                             * @TODO send mail and notification to verified college placement officers (and subusers) by seeing notificationResult[2]
+                                             * @TODO send mail to unverified college placement officers by seeing notificationResult[2]
+                                             *
                                              */
-                                            var jobQuery = 'CALL psavejobnotification(' + jobqueryParameters + ')';
-                                            console.log(jobQuery);
-                                            st.db.query(jobQuery, function (err, queryResult) {
-                                                console.log(queryResult);
-                                                if (!err) {
-                                                    console.log('no error in psavejobnotification');
+
+                                            var combinedSuggestedJobQuery = "";
+
+                                            for(var counter = 0; counter < notificationResult[0].length; counter++){
+                                                /**
+                                                 * Checking that job is posted to the institute or public portal
+                                                 * so based on that mail and notification template can be loaded conditionally
+                                                 */
+
+                                                var notificationTpl = 'individual_candidate_job_suggestion';
+
+                                                if(notificationResult[2].length){
+                                                    /**
+                                                     * Loading notification and mail template which is sent to students of an institute
+                                                     */
+
+                                                    notificationTpl = 'institute_candidate_job_suggestion';
                                                 }
-                                                else {
-                                                    console.log('error in psavejobnotification');
+
+                                                var notificationTemplaterRes = notificationTemplater.parse(notificationTpl,{
+                                                    jobType : jobTypeList[jobType],
+                                                    jobTitle : jobTitle,
+                                                    jobCode : jobCode,
+                                                    companyName : notificationResult[1][0].cn // Who posted the job
+                                                });
+
+                                                if(notificationTemplaterRes.parsedTpl){
+                                                    notification.publish(
+                                                        notificationResult[0][counter].groupId,
+                                                        ezeoneId,
+                                                        ezeoneId,
+                                                        notificationResult[0][counter].groupId,
+                                                        notificationTemplaterRes.parsedTpl,
+                                                        8,
+                                                        0, notificationResult[0][counter].iphoneId,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        1,
+                                                        moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                        '',
+                                                        0,
+                                                        jobID);
+                                                    console.log('postNotification : Job suggestion notification sent successfully');
                                                 }
-                                            });
-                                            console.log(userId);
-                                            var combineQuery = "";
+                                                else{
+                                                    console.log('Error in parsing notification '+notificationTpl+' template - ',
+                                                        notificationTemplaterRes.error);
+                                                    console.log('postNotification : Job suggestion notification not sent');
+                                                }
+
+
+
+
+
+                                                /**
+                                                 * To save suggested jobs for candidates to whom the posted job is matching
+                                                 * @param masterId of candidate [int]
+                                                 * @param jobId [int]
+                                                 */
+                                                var suggestedJobQueryParam = st.db.escape(notificationResult[0][0].masterId) + ',' + st.db.escape(jobID);
+                                                var suggestedJobQuery = 'CALL psavejobnotification(' + suggestedJobQueryParam + ');';
+                                                console.log(suggestedJobQuery);
+                                                combinedSuggestedJobQuery += suggestedJobQuery;
+
+                                            }
+
+                                            /**
+                                             * @TODO Start work from here
+                                             */
+
                                             var combinePOquery = "";
                                             /**
                                              * for recruitment function type is 4
                                              * @type {number}
                                              */
                                             var functionType = 4;
-                                            var path = require('path');
+
                                             for (var k = 0; k < userId.length; k++) {
-                                                var gidQuery = 'select tid from tmgroups where GroupType=1 and adminID=' + userId[k];
-                                                var iosIdQuery = 'select EZEID,IPhoneDeviceID as iphoneID, FirstName as fn from tmaster where tid=' + userId[k];
-                                                var sendMsgParams = st.db.escape(ezeoneId) + ',' + st.db.escape(userId[k]) + ',' + st.db.escape(0);
 
-                                                /**
-                                                 * Make connection of student(contact connected in messagebox) with this College ID
-                                                 * which is sending the notification (so that  it will appear in student contact list)
-                                                 */
 
-                                                var file = path.join(__dirname, '../../mail/templates/job_post.html');
-                                                var data = fs.readFileSync(file, "utf8");
-                                                    data = data.replace("[JobType]", jobTypeList[jobType]);
-                                                    data = data.replace("[JobTitle]", jobTitle);
-                                                    data = data.replace("[JobCode]", jobCode);
-                                                    data = data.replace("[CompanyName]", notificationResult[1][0].cn);
-                                                var composeMsgParams = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                    + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                    + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userId[k])
-                                                    + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0);
 
                                                 for (var e = 0; e < emailArray.length; e++){
                                                     mailerApi.sendMail('job_post_template', {
@@ -479,46 +464,8 @@ Job.prototype.create = function(req,res,next){
                                                         CompanyName : notificationResult[1][0].cn
                                                     }, '', emailArray[e]);
                                                 }
-                                                combineQuery += 'CALL pSendMsgRequestbyPO(' + sendMsgParams + ');' +
-                                                    'CALL pComposeMessage(' + composeMsgParams + '); '
-                                                    + gidQuery + ' ;'
-                                                    + iosIdQuery + ';'
-                                                console.log(combineQuery);
                                             }
-                                            st.db.query(combineQuery, function (err, messageResult) {
-                                                if (!err) {
-                                                    if (messageResult) {
-                                                        console.log(messageResult);
-                                                        for( var j = 0; j < userId.length; j++){
-                                                            receiverId = messageResult[j*(5)+3][0].tid;
-                                                            senderTitle = ezeoneId;
-                                                            groupTitle = ezeoneId;
-                                                            groupId = notificationResult[1][0].tid;
-                                                            messageText = data;
-                                                            messageType = 8;
-                                                            operationType = 0;
-                                                            iphoneId = (messageResult[j*(5)+4][0].iphoneID) ? messageResult[j*(5)+4][0].iphoneID : null ;
-                                                            var messageId = 0, masterid = 0, latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
-                                                            var msgUserid = 0, a_name = '';
-                                                            var jid = jobID;
-                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText,
-                                                                messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
-                                                                dateTime, a_name, msgUserid, jid);
-                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
-                                                                messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
-                                                                dateTime, a_name, msgUserid, jid);
-                                                            console.log('Job Post Notification Send Successfully');
-                                                        }
-                                                        console.log('postNotification : Job Post Notification Send Successfully');
-                                                    }
-                                                    else {
-                                                        console.log('postNotification : Error in sending notifications');
-                                                    }
-                                                }
-                                                else {
-                                                    console.log('postNotification : Error in sending notifications');
-                                                }
-                                            });
+
 
                                             for (var ins = 0; ins < instituteArray.length; ins++ ){
                                                 var queryPOparams = st.db.escape(instituteArray[ins]) + ',' + st.db.escape(functionType);
@@ -586,10 +533,8 @@ Job.prototype.create = function(req,res,next){
                                                     console.log('get_subuser_enquiry:user details not loaded');
                                                 }
                                             });
-                                        }
-                                        else {
-                                            console.log('postNotification : Result not loaded');
-                                        }
+
+
                                     }
                                     else {
                                         console.log('postNotification : Result not loaded');

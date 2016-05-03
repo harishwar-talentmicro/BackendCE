@@ -802,7 +802,8 @@ Auth.prototype.login = function(req,res,next){
         isAddressSaved:'',
         isinstitute_admin : '',
         cvid : 0,
-        profile_status:''
+        profile_status:'',
+        userDetails : []
 
     };
 
@@ -825,86 +826,91 @@ Auth.prototype.login = function(req,res,next){
                                     console.log('compare password..');
                                     if (comparePassword(password, loginDetails[0].Password)) {
                                         st.generateToken(ip, userAgent, ezeoneId, function (err, tokenResult) {
-                                            if (!err) {
-                                                if (tokenResult) {
-                                                    if (loginDetails[0]) {
-                                                        /**
-                                                         * Every time the user loads the website the browser sends the cookie back to the server to notify the user previous activity
-                                                         */
-                                                        res.cookie('Token', tokenResult, {
-                                                            maxAge: 900000,
-                                                            httpOnly: true
-                                                        });
-                                                        responseMessage.Token = tokenResult;
-                                                        responseMessage.IsAuthenticate = true;
-                                                        responseMessage.TID = loginDetails[0].TID;
-                                                        responseMessage.ezeone_id = loginDetails[0].EZEID;
-                                                        responseMessage.FirstName = loginDetails[0].FirstName;
-                                                        responseMessage.CompanyName = loginDetails[0].CompanyName;
-                                                        responseMessage.Type = loginDetails[0].IDTypeID;
-                                                        responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
-                                                        responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
-                                                        responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
-                                                        responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
-                                                        responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
-                                                        responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
-                                                        responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
-                                                        responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
-                                                        responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
-                                                        responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
-                                                        responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
-                                                        responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
-                                                        responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
-                                                        responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
-                                                        responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
-                                                        responseMessage.LastName = loginDetails[0].LastName;
-                                                        if (loginDetails[0].ParentMasterID == 0) {
-                                                            responseMessage.MasterID = loginDetails[0].TID;
-                                                        }
-                                                        else {
-                                                            responseMessage.MasterID = loginDetails[0].ParentMasterID;
-                                                        }
-                                                        responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
-                                                        responseMessage.VisibleModules = loginDetails[0].VisibleModules;
-                                                        responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
-                                                        responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
-                                                        responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
-                                                        responseMessage.mobilenumber = loginDetails[0].mobilenumber;
-                                                        responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
-                                                        responseMessage.group_id = loginDetails[0].group_id;
-                                                        responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
-                                                        responseMessage.cvid = loginDetails[0].cvid;
-                                                        responseMessage.profile_status = loginDetails[0].ps;
 
-                                                        console.log('FnLogin: Login success');
-                                                        // saving ios device id to database
-                                                        if (isIphone == 1) {
-                                                            var queryParams1 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
-                                                            var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
-                                                            //console.log(query);
-                                                            st.db.query(query1, function (err, deviceResult) {
-                                                                if (!err) {
-                                                                    console.log('FnLogin:Ios Device Id saved successfully');
+                                            if ((!err) && tokenResult && loginDetails[0]) {
+
+
+                                                    st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ')', function (err, UserDetailsResult) {
+                                                        if (!err) {
+                                                            //console.log('UserDetailsResult',UserDetailsResult);
+                                                            if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
+
+                                                                UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
+                                                                    (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
+
+                                                                /**
+                                                                 * Every time the user loads the website the browser sends the cookie back to the server to notify the user previous activity
+                                                                 */
+                                                                res.cookie('Token', tokenResult, {
+                                                                    maxAge: 900000,
+                                                                    httpOnly: true
+                                                                });
+                                                                responseMessage.Token = tokenResult;
+                                                                responseMessage.IsAuthenticate = true;
+                                                                responseMessage.TID = loginDetails[0].TID;
+                                                                responseMessage.ezeone_id = loginDetails[0].EZEID;
+                                                                responseMessage.FirstName = loginDetails[0].FirstName;
+                                                                responseMessage.CompanyName = loginDetails[0].CompanyName;
+                                                                responseMessage.Type = loginDetails[0].IDTypeID;
+                                                                responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                                                responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                                                responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                                                responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                                                responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                                                responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                                                responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                                                responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
+                                                                responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
+                                                                responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
+                                                                responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
+                                                                responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
+                                                                responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
+                                                                responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
+                                                                responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                                                responseMessage.LastName = loginDetails[0].LastName;
+                                                                if (loginDetails[0].ParentMasterID == 0) {
+                                                                    responseMessage.MasterID = loginDetails[0].TID;
                                                                 }
                                                                 else {
-                                                                    console.log(err);
+                                                                    responseMessage.MasterID = loginDetails[0].ParentMasterID;
                                                                 }
-                                                            });
-                                                        }
-                                                        res.send(responseMessage);
-                                                    }
-                                                    else {
-                                                        res.send(responseMessage);
-                                                        console.log('FnLogin:login result not found');
-                                                    }
-                                                }
-                                                else {
+                                                                responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
+                                                                responseMessage.VisibleModules = loginDetails[0].VisibleModules;
+                                                                responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
+                                                                responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                                                responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                                                responseMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                                                responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
+                                                                responseMessage.group_id = loginDetails[0].group_id;
+                                                                responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+                                                                responseMessage.cvid = loginDetails[0].cvid;
+                                                                responseMessage.profile_status = loginDetails[0].ps;
+                                                                responseMessage.userDetails = UserDetailsResult[0];
 
-                                                    res.send(responseMessage);
-                                                    console.log('FnLogin:failed to generate a token ');
-                                                }
+                                                                console.log('FnLogin: Login success');
+                                                                // saving ios device id to database
+                                                                if (isIphone == 1) {
+                                                                    var queryParams1 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
+                                                                    var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
+                                                                    //console.log(query);
+                                                                    st.db.query(query1, function (err, deviceResult) {
+                                                                        if (!err) {
+                                                                            console.log('FnLogin:Ios Device Id saved successfully');
+                                                                        }
+                                                                        else {
+                                                                            console.log(err);
+                                                                        }
+                                                                    });
+                                                                }
+                                                                res.send(responseMessage);
+                                                            }
+                                                        }
+                                                    });
+
+
                                             }
                                             else {
+
                                                 res.statusCode = 500;
                                                 res.send(responseMessage);
                                                 console.log('FnLogin:failed to generate a token ');

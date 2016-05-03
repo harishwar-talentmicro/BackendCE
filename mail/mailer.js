@@ -84,7 +84,6 @@ Ezeone.prototype.sendMail = function(type,parameters,subject,receiverEmail){
                     var mailOptions = {
                         from: _this.CONFIG.SENDER, // sender address
                         to: receiverEmail, // list of receivers
-                        //bcc : "aditya@gingerbite.com",
                         subject: (template.subject) ? template.subject : subject, // Subject line
                         text: htmlContent, // plaintext body
                         html: htmlContent // html body
