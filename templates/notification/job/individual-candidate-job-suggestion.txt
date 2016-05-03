@@ -1,0 +1,1 @@
+A new <%=jobType%> job <%=jobTitle%> (<%=jobCode%>) posted by <%=companyName%> that matches your profile

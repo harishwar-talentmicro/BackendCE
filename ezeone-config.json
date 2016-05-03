@@ -9,7 +9,7 @@
     "STATIC_URL": "/",
     "STORAGE_BUCKET":"ezeone",
     "GS_URL":"https://storage.googleapis.com/",
-    "ANDROID_AP_VERSION_CODE":1
+    "ANDROID_AP_VERSION_CODE":2
   },
   "SCHEME" : "https",
   "DOMAIN" : "www.ezeone.com",
@@ -34,6 +34,28 @@
     "PORT" : 61612,
     "USERNAME" : "indrajeet",
     "PASSWORD" : "indrajeet"
+  },
+  "NOTIFICATION" : {
+    "TEMPLATES": {
+      "institute_candidate_job_suggestion": {
+        "params": [
+          "jobType",
+          "jobTitle",
+          "jobCode",
+          "companyName"
+        ],
+        "file": "job/institute-candidate-job-suggestion.txt"
+      },
+      "individual_candidate_job_suggestion": {
+        "params": [
+          "jobType",
+          "jobTitle",
+          "jobCode",
+          "companyName"
+        ],
+        "file": "job/individual-candidate-job-suggestion.txt"
+      }
+    }
   },
   "MAIL": {
     "APP_NAME": "EZEOne",
