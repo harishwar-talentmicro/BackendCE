@@ -80,7 +80,8 @@ router.post('/verify_password', function(req,res,next){
             var procQuery = 'CALL pcheck_password(' + procParams + ')';
             console.log(procQuery);
             req.db.query(procQuery, function (err, results) {
-                if ((!err) && results && results[0] && results[0][0] && results[0][0].password &&
+                if(!err){
+                    if (results && results[0] && results[0][0] && results[0][0].password &&
                     (bcrypt.compareSync(req.body.password,results[0][0].password))) {
                     console.log(results);
                     responseMessage.status = true;
@@ -88,7 +89,16 @@ router.post('/verify_password', function(req,res,next){
                     responseMessage.message = 'Password matched successfully';
                     responseMessage.data = [];
                     res.status(200).json(responseMessage);
+                    }
+                    else{
+                        responseMessage.status = false;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Password did not match';
+                        responseMessage.data = null;
+                        res.status(200).json(responseMessage);
+                    }
                 }
+
                 else {
                     responseMessage.error = {
                         server: 'Internal Server Error'
@@ -164,11 +174,32 @@ router.get('/member_details', function(req,res,next){
                                 if (results) {
                                     if (results[0]) {
                                         if (results[0].length > 0) {
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Member details loaded successfully';
-                                            responseMessage.data = results[0]
-                                            res.status(200).json(responseMessage);
+                                            if(results[0][0]&&results[0][0].memberId){
+                                                console.log(results[0][0],"results[0][0]");
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Member details loaded successfully';
+                                                responseMessage.data = results[0]
+                                                res.status(200).json(responseMessage);
+                                            }
+                                            else{
+                                                var qMsg = {server: 'Internal Server Error'};
+                                                switch (results[0][0].e) {
+                                                    case 'member doesn’t exists' :
+                                                        qMsg =  'Member does not exist';
+                                                        break;
+                                                    case 'ezeone id doesn’t exists' :
+                                                        qMsg =  'EZEID does not exist';
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                                responseMessage.status = false;
+                                                responseMessage.error = qMsg;
+                                                responseMessage.data = [];
+                                                res.status(200).json(responseMessage);
+                                            }
+
                                         }
                                         else {
                                             responseMessage.status = true;

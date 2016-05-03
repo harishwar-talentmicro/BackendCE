@@ -127,6 +127,8 @@
       }
     }
   },
+  "RESERVED_EZEONE_LIST" : ["API","MEDIA","WWW","STATIC","SUPPORT","HELP","BETA","MAIL","MESSANGER","CHAT","NOTIFICATION","CDN",
+      "SERVER[0-9]+","NS[0-9]+","MS[0-9]"],
   "DB": {
 
   },

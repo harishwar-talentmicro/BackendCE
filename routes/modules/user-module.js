@@ -22,7 +22,6 @@ var moment = require('moment');
 var appConfig = require('../../ezeone-config.json');
 
 
-
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
     if(ezeoneId){
@@ -515,16 +514,38 @@ User.prototype.checkEzeid = function(req,res,next){
         };
         RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (EZEID) {
-            var Query = 'Select EZEID from tmaster where EZEID=' + st.db.escape(EZEID);
-            //var Query = 'CALL pcheckEzeid(' + st.db.escape(EZEID) + ')';
-            st.db.query(Query, function (err, EzeidExitsResult) {
-                //console.log(EzeidExitsResult);
-                if (!err) {
-                    if(EzeidExitsResult) {
-                        if (EzeidExitsResult.length > 0) {
-                            RtnMessage.IsIdAvailable = false;
-                            res.send(RtnMessage);
-                            console.log('FnCheckEzeid: tmaster: EzeId exists');
+
+            var list = req.CONFIG.RESERVED_EZEONE_LIST;
+            console.log(list,"list is there");
+            var testCase = EZEID.replace('@','');
+            var allowedFlag = true;
+
+            for(var i = 0; i < list.length; i++){
+                var reg = new RegExp(list[i],'g');
+                if(reg.test(testCase)){
+                    //console.log('Test pass : Should not be allowed',testCase);
+                    allowedFlag = false;
+                    break;
+                }
+            }
+            console.log(allowedFlag);
+            if(allowedFlag){
+                var Query = 'Select EZEID from tmaster where EZEID=' + st.db.escape(EZEID);
+                //var Query = 'CALL pcheckEzeid(' + st.db.escape(EZEID) + ')';
+                st.db.query(Query, function (err, EzeidExitsResult) {
+                    //console.log(EzeidExitsResult);
+                    if (!err) {
+                        if(EzeidExitsResult) {
+                            if (EzeidExitsResult.length > 0) {
+                                RtnMessage.IsIdAvailable = false;
+                                res.send(RtnMessage);
+                                console.log('FnCheckEzeid: tmaster: EzeId exists');
+                            }
+                            else {
+                                RtnMessage.IsIdAvailable = true;
+                                res.send(RtnMessage);
+                                console.log('FnCheckEzeid: tmaster:  EzeId available');
+                            }
                         }
                         else {
                             RtnMessage.IsIdAvailable = true;
@@ -533,18 +554,19 @@ User.prototype.checkEzeid = function(req,res,next){
                         }
                     }
                     else {
-                        RtnMessage.IsIdAvailable = true;
-                        res.send(RtnMessage);
-                        console.log('FnCheckEzeid: tmaster:  EzeId available');
-                    }
-                }
-                else {
 
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-                    console.log('FnCheckEzeid: tmaster: ' + err);
-                }
-            });
+                        res.statusCode = 500;
+                        res.send(RtnMessage);
+                        console.log('FnCheckEzeid: tmaster: ' + err);
+                    }
+                });
+        }
+        else{
+                res.statusCode = 400;
+                RtnMessage.IsIdAvailable = false;
+                res.send(RtnMessage);
+                console.log('FnCheckEzeid: tmaster:  EzeId not available');
+            }
         }
         else {
 
@@ -610,7 +632,6 @@ User.prototype.changePassword = function(req,res,next){
                                                     var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
                                                     var newPassword = hashPassword(NewPassword);
-
                                                     var passChangeQueryParams = st.db.escape(TokenNo) + st.db.escape(oldPassResult[0][0].Password)+ ','+
                                                         st.db.escape(newPassword) + ',' + st.db.escape(ip) +',' + st.db.escape(userAgent);
 

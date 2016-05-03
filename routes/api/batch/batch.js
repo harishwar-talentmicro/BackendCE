@@ -211,6 +211,10 @@ router.get('/list', function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+    if(!req.query.title){
+        error.token = 'Invalid title';
+        validationFlag *= false;
+    }
     if (isNaN(parseInt(req.query.smid))){
         error.smid = 'Invalid service master id';
         validationFlag *= false;
@@ -224,7 +228,7 @@ router.get('/list', function(req,res,next){
     else {
 
         try {
-            var procParams = req.db.escape(req.query.token) + ',' + req.db.escape(req.query.smid);
+            var procParams = req.db.escape(req.query.token) + ',' + req.db.escape(req.query.smid)+ ',' + req.db.escape(req.query.title);
             var procQuery = 'CALL get_batch_list(' + procParams + ')';
             console.log(procQuery);
             req.db.query(procQuery, function (err, results) {
