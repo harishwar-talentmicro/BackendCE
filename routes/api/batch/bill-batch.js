@@ -183,19 +183,8 @@ router.get('/member_details', function(req,res,next){
                                                 res.status(200).json(responseMessage);
                                             }
                                             else{
-                                                var qMsg = {server: 'Internal Server Error'};
-                                                switch (results[0][0].e) {
-                                                    case 'member doesn’t exists' :
-                                                        qMsg =  'Member does not exist';
-                                                        break;
-                                                    case 'ezeone id doesn’t exists' :
-                                                        qMsg =  'EZEID does not exist';
-                                                        break;
-                                                    default:
-                                                        break;
-                                                }
                                                 responseMessage.status = false;
-                                                responseMessage.error = qMsg;
+                                                responseMessage.error = results[0][0].e;
                                                 responseMessage.data = [];
                                                 res.status(200).json(responseMessage);
                                             }

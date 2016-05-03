@@ -252,7 +252,7 @@ router.get('/list', function(req,res,next){
                             }
                         }
                         else {
-                            responseMessage.status = false;
+                            responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Batch list not available';
                             responseMessage.data = null;
@@ -260,7 +260,7 @@ router.get('/list', function(req,res,next){
                         }
                     }
                     else {
-                        responseMessage.status = false;
+                        responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Batch list not available';
                         responseMessage.data = null;
@@ -292,105 +292,6 @@ router.get('/list', function(req,res,next){
         }
     }
 });
-
-
-
-/**
- * Method : GET
- * @param req
- * @param res
- * @param next
- *
- * @discription : API to get batch details
- */
-router.get('/details', function(req,res,next){
-
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: []
-    };
-    var validationFlag = true;
-
-    if (isNaN(parseInt(req.query.id))){
-        error.smid = 'Invalid batch id';
-        validationFlag *= false;
-    }
-    if(!validationFlag){
-        responseMessage.error = error;
-        responseMessage.message = 'Please check the errors';
-        res.status(400).json(responseMessage);
-        console.log(responseMessage);
-    }
-    else {
-
-        try {
-            var procParams = req.db.escape(req.query.id);
-            var procQuery = 'CALL get_batch_details(' + procParams + ')';
-            console.log(procQuery);
-            req.db.query(procQuery, function (err, results) {
-                if (!err) {
-                    console.log(results);
-                    if (results) {
-                        if (results[0]) {
-                            if (results[0].length > 0) {
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Batch details loaded successfully';
-                                responseMessage.data = results[0]
-                                res.status(200).json(responseMessage);
-                            }
-                            else {
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Batch details not available';
-                                responseMessage.data = [];
-                                res.status(200).json(responseMessage);
-                            }
-                        }
-                        else {
-                            responseMessage.status = false;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Batch details not available';
-                            responseMessage.data = null;
-                            res.status(200).json(responseMessage);
-                        }
-                    }
-                    else {
-                        responseMessage.status = false;
-                        responseMessage.error = null;
-                        responseMessage.message = 'Batch details not available';
-                        responseMessage.data = null;
-                        res.status(200).json(responseMessage);
-                    }
-                }
-                else {
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
-                    console.log('Error : get_batch_details ', err);
-                    var errorDate = new Date();
-                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-
-                }
-            });
-        }
-        catch (ex) {
-            responseMessage.error = {
-                server: 'Internal Server Error'
-            };
-            responseMessage.message = 'An error occurred !';
-            res.status(500).json(responseMessage);
-            console.log('Error get_batch_details : ', ex);
-            var errorDate = new Date();
-            console.log(errorDate.toTimeString() + ' ......... error ...........');
-        }
-    }
-});
-
 
 
 /**
@@ -458,7 +359,7 @@ router.get('/trans', function(req,res,next){
                                         }
                                     }
                                     else {
-                                        responseMessage.status = false;
+                                        responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'batch transaction details not available';
                                         responseMessage.data = [];
@@ -466,7 +367,7 @@ router.get('/trans', function(req,res,next){
                                     }
                                 }
                                 else {
-                                    responseMessage.status = false;
+                                    responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'batch transaction details not available';
                                     responseMessage.data = [];
@@ -580,7 +481,7 @@ router.get('/bdetails', function(req,res,next){
                                         }
                                     }
                                     else {
-                                        responseMessage.status = false;
+                                        responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'batch details not available';
                                         responseMessage.data = [];
@@ -588,7 +489,7 @@ router.get('/bdetails', function(req,res,next){
                                     }
                                 }
                                 else {
-                                    responseMessage.status = false;
+                                    responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'batch details not available';
                                     responseMessage.data = [];
