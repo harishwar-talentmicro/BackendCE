@@ -15,6 +15,8 @@
 
 var fs = require('fs');
 var path = require('path');
+var archiver = require('archiver');
+var request = require('request');
 
 var EZEIDEmail = 'noreply@ezeone.com';
 var moment = require('moment');
@@ -3108,6 +3110,133 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                 console.log('CALL  PGetSearchDocuments(' + query + ')');
                 st.db.query('CALL  PGetSearchDocuments(' + query + ')', function (err, results) {
 
+                    if((!err) && results && results[0] && results[0][0] && results[0][0].path){
+                        switch(results[0][0].type){
+                            /**
+                             * Type 0 : It is a document uploaded to cloud and needs to be served from cloud storage
+                             */
+                            case 0 :
+                                /**
+                                 * This is a document saved on google cloud ! Creating dynamic google storage bucket link
+                                 * and redirecting the user to there
+                                 */
+
+                                var documentUrl = (results[0][0].path) ?
+                                    (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][0].path) : 'https://www.ezeone.com';
+                                console.log('redirecting url..');
+                                console.log('documentUrl',documentUrl);
+
+                                if(results[0][0].pin) {
+                                    if (pin && pin == results[0][0].pin) {
+                                        res.redirect(documentUrl);
+                                    }
+                                    else{
+                                        next();
+                                    }
+                                }
+                                else{
+                                    res.redirect(documentUrl);
+                                }
+
+                                break;
+                            /**
+                             * Type 1 : It is a url and it needs to be redirected from here to open that website to whom the url belongs
+                             */
+                            case 1 :
+                                if(results[0][0].pin){
+                                    if(pin && pin == results[0][0].pin){
+                                        res.redirect(results[0][0].path);
+                                    }
+                                    else{
+                                        next();
+                                    }
+                                }
+                                else{
+                                    res.redirect(results[0][0].path);
+                                }
+
+                                break;
+                            /**
+                             * Type 2 : It is a folder which contains type 0 documents therefore
+                             * all the files needs to be archived which are in folder and served (downloaded) to the end user who requested it
+                             */
+                            case 2 :
+
+                                var archive = archiver('zip');
+
+                                archive.on('error', function(err) {
+                                    res.status(500).json({
+                                        status : false,
+                                        message : 'Unable to download folder',
+                                        data : null,
+                                        error : { server : 'Something went wrong'}
+                                    });
+                                });
+
+                                res.attachment(tag+ '.zip');
+
+                                archive.pipe(res);
+
+
+                                //request
+                                //    .get('http://mysite.com/doodle.png')
+                                //    .on('error', function(err) {
+                                //        console.log(err)
+                                //    })
+                                //    .pipe(fs.createWriteStream('doodle.png'))
+
+                                var tagFolderContentQuery = "CALL get_folder_content_list("+st.db.escape(results[0][0].folder_content) + ")";
+                                console.log(tagFolderContentQuery);
+
+                                st.db.query(tagFolderContentQuery,function(err,tagFolderContentRes){
+                                    if(err){
+                                        res.status(500).json({
+                                            status : false,
+                                            message : 'Unable to download folder',
+                                            data : null,
+                                            error : { server : 'Something went wrong'}
+                                        });
+                                    }
+                                    else{
+                                        if(tagFolderContentRes && tagFolderContentRes[0] && tagFolderContentRes[0].length){
+                                            for(var counter = 0; counter < tagFolderContentRes[0].length; counter++){
+                                                if(tagFolderContentRes[0][counter].type == 0){
+                                                    var pathComponents = tagFolderContentRes[0][counter].path.split('.');
+
+                                                    /**
+                                                     * Appending files to the archive
+                                                     * Downloading by using request module from google cloud
+                                                     */
+                                                    archive.append(request.get(req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + tagFolderContentRes[0][counter].path),{
+                                                            name : tagFolderContentRes[0][counter].tag + ((pathComponents.length > 1) ? pathComponents[pathComponents.length - 1] : '')
+                                                        });
+                                                }
+
+                                            }
+
+                                            archive.finalize();
+                                        }
+                                        else{
+                                            archive.finalize();
+                                        }
+                                    }
+
+                                });
+
+                                //archive
+                                //    .append(request.get(googleFilePathForDoc1), { name : doc1Title})
+                                //    .append(request.get(googleFilePathForDoc1),{ name : doc2Title})
+                                //    .append(request.get(googleFilePathForDoc1),{ name : doc3Title})
+                                //    .finalize();
+
+                                break;
+
+                            default :
+                                next();
+                                break;
+                        }
+                    }
+
                     if (!err) {
                         if (results) {
                             if (results[0]) {
@@ -3118,7 +3247,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                                     /**
                                      * This is a weblink redirect to this weblink
                                      */
-                                    if(results[0][0].type){
+                                    if(results[0][0].type == 1){
                                         if(results[0][0].pin){
                                             if(pin && pin == results[0][0].pin){
                                                 res.redirect(results[0][0].path);
@@ -3132,28 +3261,11 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                                         }
 
                                     }
+
+
+
                                     else{
-                                        /**
-                                         * This is a document saved on google cloud ! Creating dynamic google storage bucket link
-                                         * and redirecting the user to there
-                                         */
 
-                                        var s_url = (results[0][0].path) ?
-                                            (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][0].path) : 'https://www.ezeone.com';
-                                        console.log('redirecting url..');
-                                        console.log(s_url);
-
-                                        if(results[0][0].pin) {
-                                            if (pin && pin == results[0][0].pin) {
-                                                res.redirect(s_url);
-                                            }
-                                            else{
-                                                next();
-                                            }
-                                        }
-                                        else{
-                                            res.redirect(s_url);
-                                        }
 
                                     }
                                 }
@@ -3187,39 +3299,6 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                 });
             }
 
-            //else {
-            //
-            //    console.log('--------------');
-            //    console.log('URL Link Page');
-            //    console.log('---------------');
-            //
-            //    var urlBreaker = tag.split('');
-            //    if (urlBreaker.length > 1 && urlBreaker.length < 4) {
-            //        if (urlBreaker[0] === 'U') {
-            //
-            //            FnGetRedirectLink(ezeid, tag, function (url) {
-            //
-            //                if (url) {
-            //                    console.log('Redirecting......');
-            //                    res.redirect(url);
-            //                }
-            //                else {
-            //
-            //                    next();
-            //                }
-            //            });
-            //        }
-            //        else {
-            //            //console.log('document-not-found');
-            //            //var reload = 'https://www.ezeone.com/document-not-found';
-            //            //res.redirect(reload);
-            //            next();
-            //        }
-            //    }
-            //    else {
-            //        next();
-            //    }
-            //}
         }
         else{
             next();
