@@ -1,11 +1,5 @@
 "use strict";
 
-var FinalMessage = {
-    Message: '',
-    StatusCode: '',
-    Result: ''
-};
-var FinalMsgJson = JSON.parse(JSON.stringify(FinalMessage));
 
 function error(err, req, res, next) {
     // log it
@@ -29,16 +23,6 @@ function StdLib(db){
  */
 StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,callBack){
     var _this = this;
-    //console.log('generateToken');
-    //var crypto = require("crypto");
-    //var algo = "ecdsa-with-SHA1"
-    //var rand = crypto.randomBytes(64).toString('hex');;
-    //var token = crypto.createHmac(algo, rand)
-    //    .update(Date.now().toString())
-    //    .digest("hex");
-    //return token;
-
-
     /////////////////////////////////////////////////////////////////////
 
     var deviceType = 1;
@@ -274,100 +258,6 @@ StdLib.prototype.validateTokenAp = function(Token, CallBack){
         return 'error'
     }
 };
-
-StdLib.prototype.sendMail = function(req, res){
-    var _this = this;
-
-        try {
-            res.setHeader('content-type', 'application/json');
-            //user login
-            var From = req.body.From;
-            var To = req.body.To;
-            var Subject = req.body.Subject;
-            var Body = req.body.Body;
-
-            if (From && To && Subject != null) {
-
-                var fs = require('fs');
-
-                var path = require('path');
-                var file = path.join(__dirname,'../../mail/templates/SimpleMail.txt');
-
-                fs.readFile(file, "utf8", function (err, data) {
-                    if (err) throw err;
-                    data = data.replace("[Body]", Body);
-                    //console.log('Body:' + data);
-                    var mailOptions = {
-                        from: From,
-                        to: To,
-                        subject: Subject,
-                        html: data // html body
-                    };
-                    //console.log('Mail Option:' + mailOptions);
-                    // send mail with defined transport object
-                    //transporter.sendMail(mailOptions, function (error, info) {
-                    //    if (error) {
-                    //        console.log(error);
-                    //        res.json(null);
-                    //    } else {
-                    //        console.log('Message sent: ' + info.response);
-                    //        FinalMsgJson.Message = 'Mail send';
-                    //        FinalMsgJson.StatusCode = 200;
-                    //        FinalMsgJson.Result = 'Pass';
-                    //        res.send(FinalMsgJson);
-                    //    }
-                    //});
-                    FnSendMailEzeid(mailOptions, function (err, Result) {
-                        if (!err) {
-                            if (Result) {
-                                console.log('FnSendMail: Mail Sent Successfully');
-                                res.send(RtnMessage);
-                            }
-                            else {
-                                console.log('FnSendMail: Mail not Sent Successfully');
-                                res.json(null);
-                            }
-                        }
-                        else {
-                            console.log('FnSendMail: Error in sending mails' + err);
-                            res.json(null);
-                        }
-                    });
-
-
-                });
-            }
-            else {
-
-                if (From == null) {
-                    FinalMsgJson.Message = 'FnSendMail: From is empty';
-                    console.log('FnSendMail: From is empty');
-                }
-                else if (To == null) {
-                    FinalMsgJson.Message = 'FnSendMail : To is empty';
-                    console.log('FnSendMail: To is empty');
-                }
-                else if (Subject == null) {
-                    FinalMsgJson.Message = 'FnSendMail: Subject is empty';
-                    console.log('FnSendMail: Subject is empty');
-                }
-                else if (Body == null) {
-                    FinalMsgJson.Message = 'FnSendMail: Body is empty';
-                    console.log('FnSendMail: Body is empty');
-                }
-
-                res.statusCode = 400;
-                FinalMsgJson.StatusCode = res.statusCode;
-                res.send(FinalMsgJson);
-            }
-        }
-
-        catch (ex) {
-            console.log('Logoin error:' + ex.description);
-
-        }
-
-    };
 
 
 /**

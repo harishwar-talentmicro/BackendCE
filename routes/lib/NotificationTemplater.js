@@ -60,7 +60,7 @@ NotificationTemplater.prototype.parse = function(notificationTplType,notificatio
     var template = null;
 
     for(var prop in _this.CONFIG.TEMPLATES){
-        if(_this.CONFIG.TEMPLATES.hasOwnProperty(prop) && type == prop){
+        if(_this.CONFIG.TEMPLATES.hasOwnProperty(prop) && notificationTplType == prop){
             template = _this.CONFIG.TEMPLATES[prop];
             break;
         }

@@ -6,6 +6,7 @@
  */
 "use strict";
 var path = require('path');
+var chalk = require('chalk');
 var util = require('util');
 var NotificationTemplater = require('../lib/NotificationTemplater.js');
 
@@ -382,6 +383,7 @@ Job.prototype.create = function(req,res,next){
                                                  */
 
                                                 var notificationTpl = 'individual_candidate_job_suggestion';
+                                                var mailTpl = 'individual_candidate_job_suggestion';
 
                                                 if(notificationResult[2].length){
                                                     /**
@@ -389,6 +391,7 @@ Job.prototype.create = function(req,res,next){
                                                      */
 
                                                     notificationTpl = 'institute_candidate_job_suggestion';
+                                                    mailTpl = 'institute_candidate_job_suggestion';
                                                 }
 
                                                 var notificationTemplaterRes = notificationTemplater.parse(notificationTpl,{
@@ -424,6 +427,17 @@ Job.prototype.create = function(req,res,next){
                                                     console.log('postNotification : Job suggestion notification not sent');
                                                 }
 
+                                                console.log('mailTpl',mailTpl);
+
+                                                mailerApi.sendMailNew(mailTpl,{
+                                                    firstName : notificationResult[0][counter].firstName,
+                                                    jobType : jobTypeList[jobType],
+                                                    jobTitle : jobTitle,
+                                                    jobCode : jobCode,
+                                                    companyName : notificationResult[1][0].cn,
+                                                    keySkills : (keySkills) ? keySkills : '',
+                                                    jobId : jobID
+                                                },'New job alert',notificationResult[0][counter].email);
 
 
 
@@ -441,37 +455,215 @@ Job.prototype.create = function(req,res,next){
                                             }
 
                                             /**
-                                             * @TODO Start work from here
+                                             * Preparing a query to get mail and notification details of placement officers and
+                                             * subusers of their colleges
                                              */
 
                                             var combinePOquery = "";
+                                            for(counter = 0; counter < notificationResult[2].length; counter++){
+                                                var queryPOparamsList = [st.db.escape(notificationResult[2][counter].ezeoneId),  st.db.escape(4)];
+                                                combinePOquery += 'CALL get_subuser_list(' + queryPOparamsList.join(',') + ');';
+                                            }
+
+                                            console.log('combinePOquery',combinePOquery);
+
+                                            if(combinePOquery){
+                                                /**
+                                                 * Finding all the institute placement officers and their subusers to
+                                                 * get their mail IDs
+                                                 */
+                                                st.db.query(combinePOquery, function (err, notDetailsRes) {
+                                                    if((!err) && notDetailsRes && notDetailsRes.length){
+
+                                                        console.log('notDetailsRes',notDetailsRes);
+
+                                                        for(counter = 0; counter < notDetailsRes.length; counter++){
+                                                            if(counter%2 == 0){
+
+                                                                for(var counter1 = 0; counter1 < notDetailsRes[counter].length; counter1++){
+
+                                                                    var mailTpl = 'placement_officer_unverified_job_alert';
+                                                                    var pOnotificationTpl = 'placement_officer_unverified_job_alert';
+
+                                                                    /**
+                                                                     * Finding if the placement officer is the masterId or he is a subuser
+                                                                     * If he is a master then we will send him mail even if he has not
+                                                                     * enabled the recruitment module in his user section of settings(configuration)
+                                                                     */
+                                                                    var isMaster = notDetailsRes[counter][counter1].groupTitle ?
+                                                                        (notDetailsRes[counter][counter1].groupTitle.split('.').length <= 1) : false;
+
+
+                                                                    if(notDetailsRes[counter][counter1].isVerified){
+
+                                                                        console.log('\n Verified ID ',notDetailsRes[counter][counter1].groupId);
+                                                                        /**
+                                                                         * These colleges are verified so send them a notification and mail to this placement officer
+                                                                         * to change the status of this job
+                                                                         *
+                                                                         */
+                                                                        mailTpl = 'placement_officer_job_approval';
+                                                                        pOnotificationTpl = 'placement_officer_job_approval';
+
+
+                                                                    }
+
+                                                                    chalk.green('notDetailsRes[counter][counter1].groupId',notDetailsRes[counter][counter1].groupId);
+
+                                                                    if(isMaster){
+                                                                        if(notDetailsRes[counter][counter1].CVMailID){
+                                                                            mailerApi.sendMailNew(mailTpl,{
+                                                                                jobType : jobTypeList[jobType],
+                                                                                jobTitle : jobTitle,
+                                                                                jobCode : jobCode,
+                                                                                companyName : notificationResult[1][0].cn,
+                                                                                keySkills : (keySkills) ? keySkills : '',
+                                                                                jobId : jobID
+                                                                            },"New job posted for your institute",notDetailsRes[counter][counter1].CVMailID);
+                                                                        }
+
+                                                                        if(notDetailsRes[counter][counter1].AdminEmailID){
+                                                                            mailerApi.sendMailNew(mailTpl,{
+                                                                                jobType : jobTypeList[jobType],
+                                                                                jobTitle : jobTitle,
+                                                                                jobCode : jobCode,
+                                                                                companyName : notificationResult[1][0].cn,
+                                                                                keySkills : (keySkills) ? keySkills : '',
+                                                                                jobId : jobID
+                                                                            },"New job posted for your institute",notDetailsRes[counter][counter1].AdminEmailID);
+                                                                        }
+
+                                                                        notificationTemplaterRes = notificationTemplater.parse(pOnotificationTpl,{
+                                                                            jobType : jobTypeList[jobType],
+                                                                            jobTitle : jobTitle,
+                                                                            jobCode : jobCode,
+                                                                            companyName : notificationResult[1][0].cn // Who posted the job
+                                                                        });
+
+
+                                                                        if(notificationTemplaterRes.parsedTpl){
+                                                                            notification.publish(
+                                                                                notDetailsRes[counter][counter1].groupId,
+                                                                                ezeoneId,
+                                                                                ezeoneId,
+                                                                                notDetailsRes[counter][counter1].groupId,
+                                                                                notificationTemplaterRes.parsedTpl,
+                                                                                8,
+                                                                                0, notDetailsRes[counter][counter1].iphoneId,
+                                                                                0,
+                                                                                0,
+                                                                                0,
+                                                                                0,
+                                                                                1,
+                                                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                                                '',
+                                                                                0,
+                                                                                jobID);
+                                                                            console.log('postNotification : Job notification for Placement Officer is sent successfully');
+                                                                        }
+                                                                        else{
+                                                                            console.log('Error in parsing notification '+notificationTpl+' template - ',
+                                                                                notificationTemplaterRes.error);
+                                                                            console.log('postNotification : Job notification for Placement Officer is not sent');
+                                                                        }
+
+                                                                    }
+
+
+
+                                                                    /**
+                                                                     * If the placement officer is a subuser and is not master then we will check
+                                                                     * his user module rights to see whether he is having right to access user module or not
+                                                                     * If yes then only we will send him the mail and notification
+                                                                     */
+                                                                    else if(notDetailsRes[counter][counter1].userRights &&
+                                                                        notDetailsRes[counter][counter1].userRights.length == 5 &&
+                                                                        parseInt(notDetailsRes[counter][counter1].userRights[4]) > 0){
+
+
+
+                                                                        console.log('Coming to else if block00');
+
+                                                                        if(notDetailsRes[counter][counter1].CVMailID){
+                                                                            mailerApi.sendMailNew(mailTpl,{
+                                                                                jobType : jobTypeList[jobType],
+                                                                                jobTitle : jobTitle,
+                                                                                jobCode : jobCode,
+                                                                                companyName : notificationResult[1][0].cn,
+                                                                                keySkills : (keySkills) ? keySkills : '',
+                                                                                jobId : jobID
+                                                                            },"New job posted for your institute",notDetailsRes[counter][counter1].CVMailID);
+                                                                        }
+
+                                                                        if(notDetailsRes[counter][counter1].AdminEmailID){
+                                                                            mailerApi.sendMailNew(mailTpl,{
+                                                                                jobType : jobTypeList[jobType],
+                                                                                jobTitle : jobTitle,
+                                                                                jobCode : jobCode,
+                                                                                companyName : notificationResult[1][0].cn,
+                                                                                keySkills : (keySkills) ? keySkills : '',
+                                                                                jobId : jobID
+                                                                            },"New job posted for your institute",notDetailsRes[counter][counter1].AdminEmailID);
+                                                                        }
+
+
+                                                                        var notificationTemplaterRes = notificationTemplater.parse(pOnotificationTpl,{
+                                                                            jobType : jobTypeList[jobType],
+                                                                            jobTitle : jobTitle,
+                                                                            jobCode : jobCode,
+                                                                            companyName : notificationResult[1][0].cn // Who posted the job
+                                                                        });
+
+                                                                        if(notificationTemplaterRes.parsedTpl){
+                                                                            notification.publish(
+                                                                                notDetailsRes[counter][counter1].groupId,
+                                                                                ezeoneId,
+                                                                                ezeoneId,
+                                                                                notDetailsRes[counter][counter1].groupId,
+                                                                                notificationTemplaterRes.parsedTpl,
+                                                                                8,
+                                                                                0, notDetailsRes[counter][counter1].iphoneId,
+                                                                                0,
+                                                                                0,
+                                                                                0,
+                                                                                0,
+                                                                                1,
+                                                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                                                '',
+                                                                                0,
+                                                                                jobID);
+                                                                            console.log('postNotification : Job notification for Placement Officer is sent successfully');
+                                                                        }
+                                                                        else{
+                                                                            console.log('Error in parsing notification '+notificationTpl+' template - ',
+                                                                                notificationTemplaterRes.error);
+                                                                            console.log('postNotification : Job notification for Placement Officer is not sent');
+                                                                        }
+
+                                                                    }
+
+                                                                }
+
+                                                            }
+                                                        }
+
+                                                    }
+                                                    else{
+                                                        console.log('err',err);
+                                                        console.log('Something went wrong in executing combinedPOQuery',combinePOquery);
+                                                    }
+
+                                                });
+                                            }
+
                                             /**
-                                             * for recruitment function type is 4
-                                             * @type {number}
+                                             * @TODO Start work from here
                                              */
-                                            var functionType = 4;
 
-                                            for (var k = 0; k < userId.length; k++) {
-
+                                            if(false){
 
 
-                                                for (var e = 0; e < emailArray.length; e++){
-                                                    mailerApi.sendMail('job_post_template', {
-                                                        userName : 'abc',
-                                                        JobType : jobTypeList[jobType],
-                                                        JobTitle : jobTitle,
-                                                        JobCode : jobCode,
-                                                        CompanyName : notificationResult[1][0].cn
-                                                    }, '', emailArray[e]);
-                                                }
-                                            }
-
-
-                                            for (var ins = 0; ins < instituteArray.length; ins++ ){
-                                                var queryPOparams = st.db.escape(instituteArray[ins]) + ',' + st.db.escape(functionType);
-                                                combinePOquery += 'CALL get_subuser_list(' + queryPOparams + ');';
-                                            }
-                                            st.db.query(combinePOquery, function (err, notDetailsRes) {
+                                                st.db.query(combinePOquery, function (err, notDetailsRes) {
                                                 console.log(combinePOquery);
                                                 if (notDetailsRes && notDetailsRes[0]) {
                                                     console.log(notDetailsRes);
@@ -534,7 +726,7 @@ Job.prototype.create = function(req,res,next){
                                                 }
                                             });
 
-
+                                            }
                                     }
                                     else {
                                         console.log('postNotification : Result not loaded');
@@ -1682,7 +1874,7 @@ Job.prototype.appliedJobList = function(req,res,next){
  */
 Job.prototype.getJobDetails = function(req,res,next){
 
-    var token = req.query.token;
+    var token = (req.query.token) ? req.query.token : null;
     var jobId = req.query.job_id;
     var latitude = (req.query.lat) ? req.query.lat : '';
     var longitude = (req.query.lng) ? req.query.lng : '';
@@ -1709,9 +1901,9 @@ Job.prototype.getJobDetails = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
-                if (!err) {
-                    if (result) {
+            //st.validateToken(token, function (err, result) {
+            //    if (!err) {
+            //        if (result) {
                         var queryParams = st.db.escape(jobId) + ',' + st.db.escape(token)+ ',' + st.db.escape(latitude)
                             + ',' + st.db.escape(longitude);
                         var query = 'CALL pgetjobDetails(' + queryParams + ')';
@@ -1748,26 +1940,26 @@ Job.prototype.getJobDetails = function(req,res,next){
                                 console.log('FnGetJobDetails: error in getting Job Details :' + err);
                             }
                         });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid token';
-                        responseMessage.error = {
-                            token: 'invalid token'
-                        };
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('FnLoadMessages: Invalid token');
-                    }
-                }
-                else {
-                    responseMessage.error = {
-                        server : 'Internal server error'
-                    };
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnLoadMessages:Error in processing Token' + err);
-                }
-            });
+            //        }
+            //        else {
+            //            responseMessage.message = 'Invalid token';
+            //            responseMessage.error = {
+            //                token: 'invalid token'
+            //            };
+            //            responseMessage.data = null;
+            //            res.status(401).json(responseMessage);
+            //            console.log('FnLoadMessages: Invalid token');
+            //        }
+            //    }
+            //    else {
+            //        responseMessage.error = {
+            //            server : 'Internal server error'
+            //        };
+            //        responseMessage.message = 'Error in validating Token';
+            //        res.status(500).json(responseMessage);
+            //        console.log('FnLoadMessages:Error in processing Token' + err);
+            //    }
+            //});
         }
         catch (ex) {
             responseMessage.error = {

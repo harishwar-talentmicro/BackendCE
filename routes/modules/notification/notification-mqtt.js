@@ -26,18 +26,18 @@ MqttFalse.prototype.publish = function(){};
 MqttFalseClient.prototype.publish = function(topic,payload){};
 
 
-var mqttClient  = mqtt.connect("tcp://"+CONFIG.MQTT.HOST+":"+CONFIG.MQTT.PORT, {
-    clientId : "mqtt-8947983217"+Date.now(), clean : false,
-    username : 'indrajeet',
-    password : "indrajeet",
-    connectTimeout : 30000,
-    reconnectPeriod : 1000,
-    keepalive : 20
-});
-
-mqttClient.on('connect', function () {
-    console.log('mqtt connected');
-});
+//var mqttClient  = mqtt.connect("tcp://"+CONFIG.MQTT.HOST+":"+CONFIG.MQTT.PORT, {
+//    clientId : "mqtt-8947983217"+Date.now(), clean : false,
+//    username : 'indrajeet',
+//    password : "indrajeet",
+//    connectTimeout : 30000,
+//    reconnectPeriod : 1000,
+//    keepalive : 20
+//});
+//
+//mqttClient.on('connect', function () {
+//    console.log('mqtt connected');
+//});
 
 
 /*********************************************** AMQP upgraded code **************************************/
