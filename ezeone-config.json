@@ -54,6 +54,21 @@
           "companyName"
         ],
         "file": "job/individual-candidate-job-suggestion.txt"
+      },
+      "placement_officer_unverified_job_alert": {
+        "params": [
+          "companyName"
+        ],
+        "file": "job/placement-officer-unverified-job-alert.txt"
+      },
+      "placement_officer_job_approval": {
+        "params": [
+          "jobType",
+          "jobTitle",
+          "jobCode",
+          "companyName"
+        ],
+        "file": "job/placement-officer-job-approval.txt"
       }
     }
   },
@@ -65,6 +80,58 @@
     "DISCLAIMER": "Copyright &copy; Example",
     "OPTIONS": null,
     "TEMPLATES": {
+      "generic" : {
+        "params" : [
+          "innerTemplate"
+        ],
+        "file": "generic.html",
+        "subject": ""
+      },
+      "placement_officer_unverified_job_alert": {
+        "params": [
+          "companyName"
+        ],
+        "file": "job/placement-officer-unverified-job-alert.html",
+        "subject" : "New job posted for your institute - Get verified"
+      },
+      "placement_officer_job_approval": {
+        "params": [
+          "jobType",
+          "jobTitle",
+          "jobCode",
+          "companyName",
+          "keySkills",
+          "jobId"
+        ],
+        "file": "job/placement-officer-job-approval.html",
+        "subject" : "New job posted for your institute"
+      },
+      "individual_candidate_job_suggestion" : {
+        "params" : [
+          "firstName",
+          "jobType",
+          "jobTitle",
+          "jobCode",
+          "companyName",
+          "keySkills",
+          "jobId"
+        ],
+        "file": "job/individual-candidate-job-suggestion.html",
+        "subject": "New Job Alert from EZEOne"
+      },
+      "institute_candidate_job_suggestion" : {
+        "params" : [
+          "firstName",
+          "jobType",
+          "jobTitle",
+          "jobCode",
+          "companyName",
+          "keySkills",
+          "jobId"
+        ],
+        "file": "job/institute-candidate-job-suggestion.html",
+        "subject": "New Job Alert from your institute"
+      },
       "register": {
         "params": [
           "fullName",

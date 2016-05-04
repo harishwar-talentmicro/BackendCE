@@ -1,0 +1,1 @@
+A new job <b><%=jobTitle%> <% if(jobCode) { %> (<%=jobCode %>) <% } %></b> is posted by <%=companyName%> for your institute. Please manage the status of this job in your business manager by logging into <a href="https://www.ezeone.com">EZEOne</a>.
