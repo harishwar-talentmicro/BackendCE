@@ -572,7 +572,7 @@ router.post('/trans', function(req,res,next){
 
                     var batchArrayList = req.body.batchArray;
                         var combQuery = '';
-                console.log(batchArrayList.length,"batchArrayList.length");
+                //console.log(batchArrayList.length,"batchArrayList.length");
                         for (var i = 0; i < batchArrayList.length; i++ ){
                             var batchQueryParams = req.db.escape(batchArrayList[i].typeId)
                                 + ',' + req.db.escape(batchArrayList[i].expenseDetails)+ ',' + req.db.escape(id)
@@ -703,72 +703,6 @@ router.delete('/trans', function(req,res,next){
     }
 });
 
-/**
- * Method : POST
- * @param req
- * @param res
- * @param next
- * @param ezeid* <string> ezeoneid for which admin wants to save receipts
- * @param particulars <string> particulars is details of all bills
- * @param smid <int> smid is service master id
- * @param amount <decimal>
- *
- * @discription : API to create batch receipts
- */
-
-router.post('/bill_receipts', function(req,res,next){
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: null
-    };
-    var id = parseInt(req.body.smid);
-    var validationFlag = true;
-    var error = {};
-    if (!req.body.ezeoneid) {
-        error.ezeoneid = 'Invalid ezeoneid';
-        validationFlag *= false;
-    }
-    if (!validationFlag) {
-        responseMessage.error = error;
-        responseMessage.message = 'Please check the errors';
-        res.status(400).json(responseMessage);
-        console.log(responseMessage);
-    }
-    else {
-        try {
-            var ezeoneid = alterEzeoneId(req.body.ezeoneid);
-            var procParams = req.db.escape(ezeoneid) + ',' + req.db.escape(id)+ ',' + req.db.escape(req.body.particulars)
-                + ',' + req.db.escape(req.body.amount);
-            var procQuery = 'CALL psave_billing_receipts(' + procParams + ')';
-            req.db.query(procQuery, function (err, batchResult) {
-                if (!err) {
-                    responseMessage.status = true;
-                    responseMessage.error = null;
-                    responseMessage.message = 'Receipt saved successfully';
-                    responseMessage.data = {};
-                    res.status(200).json(responseMessage);
-                }
-                else {
-                    console.log('Receipt not saved');
-                    console.log(err);
-                    res.status(200).json(responseMessage);
-                }
-            });
-        }
-        catch (ex) {
-            responseMessage.error = {
-                server: 'Internal Server Error'
-            };
-            responseMessage.message = 'An error occurred !';
-            res.status(500).json(responseMessage);
-            console.log('Error psave_billing_receipts :  ', ex);
-            var errorDate = new Date();
-            console.log(errorDate.toTimeString() + ' ......... error ...........');
-        }
-    }
-});
 
 
 /**
@@ -779,7 +713,7 @@ router.post('/bill_receipts', function(req,res,next){
  *
  * @discription : API to generate invoice and send in to each member of community
  */
-router.get('/invoice', function(req,res,next){
+router.post('/testinvoice', function(req,res,next){
 
     var responseMessage = {
         status: false,
@@ -790,8 +724,16 @@ router.get('/invoice', function(req,res,next){
     var validationFlag = true;
     var error = {};
 
-    if (isNaN(parseInt(req.query.batch_id))){
-        error.batch_id = 'Invalid batch id';
+    if (isNaN(parseInt(req.body.batchId))){
+        error.batchId = 'Invalid batch id';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.body.serviceMasterId))){
+        error.serviceMasterId = 'Invalid batch id';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.body.memberId))){
+        error.memberId = 'Invalid batch id';
         validationFlag *= false;
     }
     if (!validationFlag) {
@@ -803,7 +745,7 @@ router.get('/invoice', function(req,res,next){
     else {
         try {
             var procParams = req.db.escape(req.query.batch_id);
-            var procQuery = 'CALL pget_batch_trans(' + procParams + ')';
+            var procQuery = 'CALL get_billing_invoice_details(' + procParams + ')';
             console.log(procQuery);
             req.db.query(procQuery, function (err, results) {
                 if (!err) {
@@ -881,5 +823,159 @@ router.get('/invoice', function(req,res,next){
     }
 });
 
+router.post('/invoice', function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if (!req.body.token) {
+        error['token'] = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.body.batchId))){
+        error.batchId = 'Invalid batch id';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.body.serviceMasterId))){
+        error.serviceMasterId = 'Invalid service master id';
+        validationFlag *= false;
+    }
+    if (!req.body.memberArray){
+        error.memberArray = 'Invalid member id';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            req.st.validateToken(req.body.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var memberArrayList =req.body.memberArray;
+                        console.log(memberArrayList,"memberArrayList");
+                        var combinedInvoieQuery = "";
+                        for (var batchCount = 0; batchCount < memberArrayList.length; batchCount++) {
+                            /**@todo send pdf to member of communtiy */
+                            //mailerApi.sendMail('proposal_template', {
+                            //    Name : name,
+                            //    RequirementDescription : req.body.message,
+                            //    LoggedInName : logedinuser,
+                            //    email : fromEmail,
+                            //    mobile : mn
+                            //
+                            //}, '', 'jain31192@gmail.com');
+                            var queryParams = req.db.escape(memberArrayList[batchCount]) + ',' + req.db.escape(req.body.batchId)
+                                + ',' + req.db.escape(req.body.serviceMasterId);
+                            var procQuery = 'CALL get_billing_invoice_details(' + queryParams + ');';
+                            combinedInvoieQuery += procQuery;
+                        }
+
+                        console.log(combinedInvoieQuery,"combinedInvoieQuery");
+                        req.db.query(combinedInvoieQuery, function (err, results) {
+                            if (!err) {
+                                //console.log(results,"results");
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0].length>0) {
+                                            for (var i = 1; i < (results.length-4); i++) {
+                                                i = (i>1)?i+4:1;
+                                                console.log(i,"count");
+                                                mailerApi.sendMail('invoice', {
+                                                    Name : 'bhavya',
+                                                    RequirementDescription : 'jdfhjhdj',
+                                                    LoggedInName : 'hdjhjhvd',
+                                                    email : 'bhavya@hirecraft.in',
+                                                    mobile : '9900687881'
+
+                                                }, '', results[i][0].email);
+                                                console.log(results[i],"results[i].email");
+                                            }
+
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'invoice send successfully';
+                                                responseMessage.data = {};
+                                                res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in creating batch';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in creating batch';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in creating batch';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : save_batch ', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('save_batch: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : save_batch ', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error save_batch :  ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+});
 
 module.exports = router;
