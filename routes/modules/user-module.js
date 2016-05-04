@@ -3109,8 +3109,9 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                 var query = st.db.escape(ezeid) + ',' + st.db.escape(tag);
                 console.log('CALL  PGetSearchDocuments(' + query + ')');
                 st.db.query('CALL  PGetSearchDocuments(' + query + ')', function (err, results) {
-
-                    if((!err) && results && results[0] && results[0][0] && results[0][0].path){
+                    console.log('err',err);
+                    console.log('results',results);
+                    if((!err) && results && results[0] && results[0][0]){
                         switch(results[0][0].type){
                             /**
                              * Type 0 : It is a document uploaded to cloud and needs to be served from cloud storage
@@ -3162,22 +3163,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                              */
                             case 2 :
 
-                                var archive = archiver('zip');
-
-                                archive.on('error', function(err) {
-                                    res.status(500).json({
-                                        status : false,
-                                        message : 'Unable to download folder',
-                                        data : null,
-                                        error : { server : 'Something went wrong'}
-                                    });
-                                });
-
-                                res.attachment(tag+ '.zip');
-
-                                archive.pipe(res);
-
-
+                                console.log('Coming to case 2');
                                 //request
                                 //    .get('http://mysite.com/doodle.png')
                                 //    .on('error', function(err) {
@@ -3190,14 +3176,18 @@ User.prototype.webLinkRedirect = function(req,res,next) {
 
                                 st.db.query(tagFolderContentQuery,function(err,tagFolderContentRes){
                                     if(err){
-                                        res.status(500).json({
-                                            status : false,
-                                            message : 'Unable to download folder',
-                                            data : null,
-                                            error : { server : 'Something went wrong'}
-                                        });
+                                        next();
                                     }
                                     else{
+                                        var archive = archiver('zip');
+
+                                        archive.on('error', function(err) {
+                                            next();
+                                        });
+
+                                        res.attachment(tag+ '.zip');
+
+                                        archive.pipe(res);
                                         if(tagFolderContentRes && tagFolderContentRes[0] && tagFolderContentRes[0].length){
                                             for(var counter = 0; counter < tagFolderContentRes[0].length; counter++){
                                                 if(tagFolderContentRes[0][counter].type == 0){
@@ -3208,7 +3198,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                                                      * Downloading by using request module from google cloud
                                                      */
                                                     archive.append(request.get(req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + tagFolderContentRes[0][counter].path),{
-                                                            name : tagFolderContentRes[0][counter].tag + ((pathComponents.length > 1) ? pathComponents[pathComponents.length - 1] : '')
+                                                            name : tagFolderContentRes[0][counter].tag + ((pathComponents.length > 1) ? '.' + pathComponents[pathComponents.length - 1] : '')
                                                         });
                                                 }
 
@@ -3236,66 +3226,69 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                                 break;
                         }
                     }
-
-                    if (!err) {
-                        if (results) {
-                            if (results[0]) {
-                                //console.log(results[0].length);
-                                console.log(results[0]);
-
-                                if(results[0][0]){
-                                    /**
-                                     * This is a weblink redirect to this weblink
-                                     */
-                                    if(results[0][0].type == 1){
-                                        if(results[0][0].pin){
-                                            if(pin && pin == results[0][0].pin){
-                                                res.redirect(results[0][0].path);
-                                            }
-                                            else{
-                                                next();
-                                            }
-                                        }
-                                        else{
-                                            res.redirect(results[0][0].path);
-                                        }
-
-                                    }
-
-
-
-                                    else{
-
-
-                                    }
-                                }
-                                else{
-                                    next();
-                                }
-
-
-
-
-                                //respMsg.status = true;
-                                //respMsg.data = {s_url: s_url};
-                                //respMsg.message = 'docs loaded successfully';
-                                //respMsg.error = null;
-                                //console.log(respMsg);
-
-                            }
-                            else {
-
-                                next();
-                            }
-                        }
-                        else {
-                            next();
-                        }
-                    }
-                    else {
-                        console.log(err);
+                    else{
                         next();
                     }
+
+                    //if (!err) {
+                    //    if (results) {
+                    //        if (results[0]) {
+                    //            //console.log(results[0].length);
+                    //            console.log(results[0]);
+                    //
+                    //            if(results[0][0]){
+                    //                /**
+                    //                 * This is a weblink redirect to this weblink
+                    //                 */
+                    //                if(results[0][0].type == 1){
+                    //                    if(results[0][0].pin){
+                    //                        if(pin && pin == results[0][0].pin){
+                    //                            res.redirect(results[0][0].path);
+                    //                        }
+                    //                        else{
+                    //                            next();
+                    //                        }
+                    //                    }
+                    //                    else{
+                    //                        res.redirect(results[0][0].path);
+                    //                    }
+                    //
+                    //                }
+                    //
+                    //
+                    //
+                    //                else{
+                    //
+                    //
+                    //                }
+                    //            }
+                    //            else{
+                    //                next();
+                    //            }
+                    //
+                    //
+                    //
+                    //
+                    //            //respMsg.status = true;
+                    //            //respMsg.data = {s_url: s_url};
+                    //            //respMsg.message = 'docs loaded successfully';
+                    //            //respMsg.error = null;
+                    //            //console.log(respMsg);
+                    //
+                    //        }
+                    //        else {
+                    //
+                    //            next();
+                    //        }
+                    //    }
+                    //    else {
+                    //        next();
+                    //    }
+                    //}
+                    //else {
+                    //    console.log(err);
+                    //    next();
+                    //}
                 });
             }
 
