@@ -1,4 +1,4 @@
-<table style="font-family:'Verdana',sans-serif;">
+<table style="font-family: 'Verdana',serif;font-size:14px;color: #444444;">
     <tr>
         <td>
             Hello <%=firstName%>,
@@ -7,21 +7,20 @@
             Greetings from EZEOne Team. <br/>
 
             Based on your details produced in the resume section <%=companyName%> has shortlisted you
-            for <%=jobTitle%> <% if(jobCode) { %> <%=jobCode %> <% } %> . The key requisites for the job is/are <%=keySkills%> and is based out of [job location].
+            for <%=jobTitle%> <% if(jobCode) { %> <%=jobCode %> <% } %> . The key requisites for the job is/are <%=keySkills%> .
 
             <br/>
             <br/>
             Please visit the following link to apply: <br/>
 
-            <a style="display: table-cell;height:40px;width: 150px;"></a>
+            <a style="display: table-cell;height:40px;width: 150px;color: #000;font-weight: bold;">
+                https://www.ezeone.com/jobdetail?jobid=<%=jobId%>
+            </a>
 
-            LINK
-
-            Please update your profile to get noticed by recruiters.
-
-            ***//IF APPLICABLE for non-verified candidates- Please download the EZEONE app to
-
-            grab better opportunities and increase your profile views //**
+            <br/>
+            <br/>
+            From<br/>
+            Team EZEOne
 
         </td>
     </tr>
