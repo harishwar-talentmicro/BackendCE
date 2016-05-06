@@ -138,17 +138,17 @@ Ezeone.prototype.sendMail = function(type,parameters,subject,receiverEmail){
 
 /**
  * Same as sendMail but implemented for container based mail templates having similar design
- * in all the layouts of mail
+ * in all the layouts of mail and supports attachment
  * @param type
  * @param parameters
  * @param subject
  * @param receiverEmail
+ * @param attachmentObjectsList
  */
-Ezeone.prototype.sendMailNew = function(type,parameters,subject,receiverEmail){
+Ezeone.prototype.sendMailNew = function(type,parameters,subject,receiverEmail,attachmentObjectsList){
     var _this = this;
     type = (type) ? type : '';
     /**
-     * @todo
      * Read types from configuration and attach parameter to the template
      * parse template and send mail
      */
@@ -184,14 +184,27 @@ Ezeone.prototype.sendMailNew = function(type,parameters,subject,receiverEmail){
             else{
                 var htmlContent = _this.renderTemplateNew(type,mParams);
                 if(htmlContent){
-                    var mailOptions = {
+                    var preparedEmail = new sendgrid.Email({
                         from: _this.CONFIG.SENDER, // sender address
                         to: receiverEmail, // list of receivers
                         subject: (template.subject) ? template.subject : subject, // Subject line
                         text: htmlContent, // plaintext body
                         html: htmlContent // html body
-                    };
-                    sendgrid.send(mailOptions,function(error,info){
+                    });
+                    if(attachmentObjectsList && attachmentObjectsList.length){
+                        for(var i=0; i < attachmentObjectsList.length; i++ ){
+                            if(attachmentObjectsList[i].filename && attachmentObjectsList[i].content){
+                                preparedEmail.addFile({
+                                    filename : attachmentObjectsList[i].filename,
+                                    content : attachmentObjectsList[i].content
+                                });
+                            }
+                            else{
+                                console.log('Attachment not added because filename or content of attachment is missing');
+                            }
+                        }
+                    }
+                    sendgrid.send(preparedEmail,function(error,info){
                         if(error){
                             console.log('Error in sending mail');
                             console.log(error);
