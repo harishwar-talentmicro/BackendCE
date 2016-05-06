@@ -15,6 +15,7 @@ var Ajv = require('ajv');
 var ajv = Ajv({allErrors: true});
 var ejs = require('ejs');
 var fs = require('fs');
+var moment = require('moment');
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
     if(ezeoneId){
@@ -389,7 +390,7 @@ router.get('/trans', function(req,res,next){
 
                             }
                         });
-                    }
+                    }//
                     else {
                         responseMessage.message = 'Invalid token';
                         responseMessage.error = {
@@ -868,7 +869,7 @@ router.post('/invoice', function(req,res,next){
                         for (var batchCount = 0; batchCount < memberArrayList.length; batchCount++) {
                             /**preparing query for getting all member results in a single shot */
                             var queryParams = req.db.escape(memberArrayList[batchCount]) + ',' + req.db.escape(req.body.batchId)
-                                + ',' + req.db.escape(req.body.serviceMasterId);
+                                + ',' + req.db.escape(req.body.serviceMasterId)+ ',' + req.db.escape(req.body.token);
                             var procQuery = 'CALL get_billing_invoice_details(' + queryParams + ');';
                             combinedInvoieQuery += procQuery;
                         }
@@ -961,27 +962,29 @@ router.post('/invoice', function(req,res,next){
 
                                                 }
                                             }
-                                            for(var i = 0; i < memberDemandNoteList.length; i++)
-                                            {
-                                                console.log(memberDemandNoteList[i],"memberDemandNoteList");
-                                                //console.log(memberDemandNoteList[memberDemandNoteList.length - 1].expenseList[i],"bjkjbkjf");
-                                            }
-
-                                            for(var i=0; i < memberDemandNoteList.length-1; i++){
+                                            //for(var i = 0; i < memberDemandNoteList.length; i++) {
+                                            //    console.log(memberDemandNoteList[i],"memberDemandNoteList");
+                                            //    //console.log(memberDemandNoteList[memberDemandNoteList.length - 1].expenseList[i],"bjkjbkjf");
+                                            //}
+                                            /**
+                                             * preparing template for each member
+                                             * */
+                                            for(var i=0; i < memberDemandNoteList.length; i++){
+                                                console.log(moment('2016-05-04 04:28:24').format(' MMMM ,YYYY'),"moment");
                                                 mailerApi.sendMail('invoice', {
-                                                    communityAddress : memberDemandNoteList[memberDemandNoteList.length - 1].communityAddress,
-                                                    memberName : memberDemandNoteList[memberDemandNoteList.length - 1].fullName,
-                                                    memberAddress : memberDemandNoteList[memberDemandNoteList.length - 1].communityAddress ,
-                                                    billDate : memberDemandNoteList[memberDemandNoteList.length - 1].batchCreationDate,
-                                                    startDate : memberDemandNoteList[memberDemandNoteList.length - 1].startDate,
-                                                    endDate : memberDemandNoteList[memberDemandNoteList.length - 1].endDate,
-                                                    totalAmount : memberDemandNoteList[memberDemandNoteList.length - 1].totalAmount,
-                                                    dueDate : memberDemandNoteList[memberDemandNoteList.length - 1].dueDate,
-                                                    adminName : memberDemandNoteList[memberDemandNoteList.length - 1].adminName,
-                                                    type : memberDemandNoteList[memberDemandNoteList.length - 1].typeTitle,
-                                                    area : memberDemandNoteList[memberDemandNoteList.length - 1].sqFt,
-                                                    refNo : memberDemandNoteList[memberDemandNoteList.length - 1].refNumber,
-                                                    expenseList: memberDemandNoteList[memberDemandNoteList.length - 1].expenseList
+                                                    communityAddress : memberDemandNoteList[i].communityAddress,
+                                                    memberName : memberDemandNoteList[i].fullName,
+                                                    memberAddress : memberDemandNoteList[i].communityAddress ,
+                                                    billDate : memberDemandNoteList[i].batchCreationDate,
+                                                    startDate : moment(memberDemandNoteList[i].startDate).format(' MMMM ,YYYY'),
+                                                    endDate : moment(memberDemandNoteList[i].endDate).format(' MMMM ,YYYY'),
+                                                    totalAmount : memberDemandNoteList[i].totalAmount,
+                                                    dueDate : moment(memberDemandNoteList[i].dueDate).format('Do MMMM ,YYYY'),
+                                                    adminName : memberDemandNoteList[i].adminName,
+                                                    type : memberDemandNoteList[i].typeTitle,
+                                                    area : memberDemandNoteList[i].sqFt,
+                                                    refNo : memberDemandNoteList[i].refNumber,
+                                                    expenseList: memberDemandNoteList[i].expenseList
                                                 }, '', 'jain31192@gmail.com');
 
                                             }
