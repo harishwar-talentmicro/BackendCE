@@ -209,6 +209,11 @@
         "file" : "job_apply_company.html",
         "subject" : "Candidate applied to Job "
       },
+      "invoice" : {
+        "params" : ["communityAddress","memberName","memberAddress","billDate","startDate","endDate","totalAmount","dueDate","adminName","type","area","refNo","expenseList"],
+        "file" : "invoice.html",
+        "subject" : "invoice Details"
+      },
       "default": {
         "params": ["HTML"],
         "file": "default.html",

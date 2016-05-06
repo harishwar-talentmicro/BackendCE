@@ -707,4 +707,126 @@ router.get('/pending_req', function(req,res,next){
     }
 });
 
+
+/**
+ * Method : PUT
+ * @param req
+ * @param res
+ * @param next
+ * @param token* <string> token of login user
+ * @param ezeone_Id <string> ezeid
+ * @param gid <int> is group id
+ *
+ * @discription : API to change admin of group
+ */
+router.post('/add_member_to_group', function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.body.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.body.groupId)) || (req.body.groupId) < 0 ) {
+        error.groupId = 'Invalid group id';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.body.relationType)) || (req.body.relationType) < 0 ) {
+        error.relationType = 'Invalid relationType';
+        validationFlag *= false;
+    }
+    if (!req.body.ezeoneId) {
+        error.ezeoneId = 'Invalid ezeoneid';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            req.st.validateToken(req.body.token, function (err, tokenResult) {
+                if (!err) {
+                    var ezeoneid = alterEzeoneId(req.body.ezeoneid);
+                    if (tokenResult) {
+                        var procParams = req.db.escape(req.body.groupId)+ ',' + req.db.escape(ezeoneid)
+                                        + ',' + req.db.escape(req.body.relationType);
+                        var procQuery = 'CALL p_v1_addmemberstogroup(' + procParams + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results && results[0] && results[0][0] && results[0][0].EZEOneId) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Member added to group successfully';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = results[0][0]._e;
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : update_service_member_status ', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error :', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error update_service_member_status : ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+});
+
 module.exports = router;
