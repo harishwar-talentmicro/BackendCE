@@ -908,7 +908,7 @@ router.post('/invoice', function(req,res,next){
 
                                             memberDemandNoteList.push(getNewDemandNote());
                                             ////////////////////////////////////////////////////
-                                            //console.log('results[0].length',results.length);
+
                                             for(var counter1 = 0; counter1 < results.length; counter1++){
                                                 /**
                                                  * Only take 4 consecutive result set for one member
@@ -962,32 +962,81 @@ router.post('/invoice', function(req,res,next){
 
                                                 }
                                             }
-                                            //for(var i = 0; i < memberDemandNoteList.length; i++) {
-                                            //    console.log(memberDemandNoteList[i],"memberDemandNoteList");
-                                            //    //console.log(memberDemandNoteList[memberDemandNoteList.length - 1].expenseList[i],"bjkjbkjf");
-                                            //}
+
+
+                                            /**
+                                             * Counter to keep track how much demand notes are send through mail till yet for
+                                             * recursive loop
+                                             */
+                                            var memberDemandNoteCounter = 0;
+
+                                            /**
+                                             * Sends demand note for the members of the community after
+                                             * generating PDF for that demand note and attaching it to mail
+                                             *
+                                             * Function is called recursively as we are performing async operation
+                                             * for generating PDF
+                                             */
+                                            var sendDemandNote = function(){
+                                                console.log('memberDemandNoteList',memberDemandNoteList[memberDemandNoteCounter]);
                                             /**
                                              * preparing template for each member
                                              * */
-                                            for(var i=0; i < memberDemandNoteList.length; i++){
-                                                console.log(moment('2016-05-04 04:28:24').format(' MMMM ,YYYY'),"moment");
-                                                mailerApi.sendMail('invoice', {
-                                                    communityAddress : memberDemandNoteList[i].communityAddress,
-                                                    memberName : memberDemandNoteList[i].fullName,
-                                                    memberAddress : memberDemandNoteList[i].communityAddress ,
-                                                    billDate : memberDemandNoteList[i].batchCreationDate,
-                                                    startDate : moment(memberDemandNoteList[i].startDate).format(' MMMM ,YYYY'),
-                                                    endDate : moment(memberDemandNoteList[i].endDate).format(' MMMM ,YYYY'),
-                                                    totalAmount : memberDemandNoteList[i].totalAmount,
-                                                    dueDate : moment(memberDemandNoteList[i].dueDate).format('Do MMMM ,YYYY'),
-                                                    adminName : memberDemandNoteList[i].adminName,
-                                                    type : memberDemandNoteList[i].typeTitle,
-                                                    area : memberDemandNoteList[i].sqFt,
-                                                    refNo : memberDemandNoteList[i].refNumber,
-                                                    expenseList: memberDemandNoteList[i].expenseList
-                                                }, '', 'jain31192@gmail.com');
+                                                var htmlMail = mailerApi.renderTemplate('invoice',{
+                                                    communityAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress,
+                                                    memberName : memberDemandNoteList[memberDemandNoteCounter].fullName,
+                                                    memberAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress ,
+                                                    billDate : memberDemandNoteList[memberDemandNoteCounter].batchCreationDate,
+                                                    startDate : moment(memberDemandNoteList[memberDemandNoteCounter].startDate).format(' MMMM ,YYYY'),
+                                                    endDate : moment(memberDemandNoteList[memberDemandNoteCounter].endDate).format(' MMMM ,YYYY'),
+                                                    totalAmount : memberDemandNoteList[memberDemandNoteCounter].totalAmount,
+                                                    dueDate : moment(memberDemandNoteList[memberDemandNoteCounter].dueDate).format('Do MMMM ,YYYY'),
+                                                    adminName : memberDemandNoteList[memberDemandNoteCounter].adminName,
+                                                    type : memberDemandNoteList[memberDemandNoteCounter].typeTitle,
+                                                    area : memberDemandNoteList[memberDemandNoteCounter].sqFt,
+                                                    refNo : memberDemandNoteList[memberDemandNoteCounter].refNumber,
+                                                    expenseList: memberDemandNoteList[memberDemandNoteCounter].expenseList
+                                                });
 
+                                                var pdf = require('html-pdf');
+                                                var options = { format: 'A4' };
+
+                                                pdf.create(htmlMail,options).toBuffer(function(err, pdfBuffer){
+                                                    if(!err){
+                                                        console.log('Sending mail');
+                                                        mailerApi.sendMailNew('invoice', {
+                                                            communityAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress,
+                                                            memberName : memberDemandNoteList[memberDemandNoteCounter].fullName,
+                                                            memberAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress ,
+                                                            billDate : memberDemandNoteList[memberDemandNoteCounter].batchCreationDate,
+                                                            startDate : moment(memberDemandNoteList[memberDemandNoteCounter].startDate).format(' MMMM ,YYYY'),
+                                                            endDate : moment(memberDemandNoteList[memberDemandNoteCounter].endDate).format(' MMMM ,YYYY'),
+                                                            totalAmount : memberDemandNoteList[memberDemandNoteCounter].totalAmount,
+                                                            dueDate : moment(memberDemandNoteList[memberDemandNoteCounter].dueDate).format('Do MMMM ,YYYY'),
+                                                            adminName : memberDemandNoteList[memberDemandNoteCounter].adminName,
+                                                            type : memberDemandNoteList[memberDemandNoteCounter].typeTitle,
+                                                            area : memberDemandNoteList[memberDemandNoteCounter].sqFt,
+                                                            refNo : memberDemandNoteList[memberDemandNoteCounter].refNumber,
+                                                            expenseList: memberDemandNoteList[memberDemandNoteCounter].expenseList
+                                                        }, '', 'jain31192@gmail.com',[{
+                                                            filename : "Demand Note - "+ memberDemandNoteList[memberDemandNoteCounter].batchCreationDate+'.pdf',
+                                                            content : pdfBuffer
+                                                        }]);
+
+                                                    }
+                                                    else{
+                                                        console.log('PDF Generation error for demand note : ',err);
+                                                    }
+
+                                                    if(memberDemandNoteCounter < memberDemandNoteList.length-1){
+                                                        memberDemandNoteCounter++;
+                                                        console.log('Sending mail');
+                                                        setImmediate(sendDemandNote);
+                                                    }
+                                                });
                                             }
+
+                                            sendDemandNote();
 
                                             ///////////////////////////////////////////////////
 
