@@ -1007,6 +1007,7 @@ router.post('/invoice', function(req,res,next){
                                                         mailerApi.sendMailNew('invoice', {
                                                             communityAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress,
                                                             memberName : memberDemandNoteList[memberDemandNoteCounter].fullName,
+                                                            imageUrl : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET +'/'+memberDemandNoteList[memberDemandNoteCounter].logo,
                                                             memberAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress ,
                                                             billDate : memberDemandNoteList[memberDemandNoteCounter].batchCreationDate,
                                                             startDate : moment(memberDemandNoteList[memberDemandNoteCounter].startDate).format(' MMMM ,YYYY'),
@@ -1018,7 +1019,7 @@ router.post('/invoice', function(req,res,next){
                                                             area : memberDemandNoteList[memberDemandNoteCounter].sqFt,
                                                             refNo : memberDemandNoteList[memberDemandNoteCounter].refNumber,
                                                             expenseList: memberDemandNoteList[memberDemandNoteCounter].expenseList
-                                                        }, '', 'jain31192@gmail.com',[{
+                                                        }, '', memberDemandNoteList[memberDemandNoteCounter].email,[{
                                                             filename : "Demand Note - "+ memberDemandNoteList[memberDemandNoteCounter].batchCreationDate+'.pdf',
                                                             content : pdfBuffer
                                                         }]);

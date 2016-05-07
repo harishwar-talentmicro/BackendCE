@@ -217,7 +217,7 @@
         "subject" : "Candidate applied to Job "
       },
       "invoice" : {
-        "params" : ["communityAddress","memberName","memberAddress","billDate","startDate","endDate","totalAmount","dueDate","adminName","type","area","refNo","expenseList"],
+        "params" : ["communityAddress","memberName","memberAddress","billDate","startDate","endDate","totalAmount","dueDate","adminName","type","area","refNo","expenseList","imageUrl"],
         "file" : "invoice.html",
         "subject" : "invoice Details"
       },
