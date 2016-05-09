@@ -1343,7 +1343,9 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                 if (toID) {
                                     compose();
                                 }
+                                console.log("bhavyajain");
                             });
+
                         };
                         var compose = function() {
 
@@ -2487,6 +2489,7 @@ MessageBox.prototype.getPendingRequest = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(token);
                         var query = 'CALL pGetPendingRequest(' + queryParams + ')';
+                        console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult) {

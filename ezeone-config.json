@@ -69,6 +69,13 @@
           "companyName"
         ],
         "file": "job/placement-officer-job-approval.txt"
+      },
+      "change_admin_messagebox": {
+        "params": [
+          "oldAdminName",
+          "newAdminName"
+        ],
+        "file": "message-box/change-admin.txt"
       }
     }
   },
@@ -208,6 +215,11 @@
         "params" : ["ezeoneId", "JobType", "JobTitle", "JobCode", "DateTime"],
         "file" : "job_apply_company.html",
         "subject" : "Candidate applied to Job "
+      },
+      "invoice" : {
+        "params" : ["communityAddress","memberName","memberAddress","billDate","startDate","endDate","totalAmount","dueDate","adminName","type","area","refNo","expenseList","imageUrl"],
+        "file" : "invoice.html",
+        "subject" : "invoice Details"
       },
       "default": {
         "params": ["HTML"],
