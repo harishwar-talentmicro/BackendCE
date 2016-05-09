@@ -9,9 +9,13 @@
 var express = require('express');
 var router = express.Router();
 var Mailer = require('../../../mail/mailer.js');
+var CONFIG = require('../../../ezeone-config.json');
 var mailerApi = new Mailer();
 var Ajv = require('ajv');
 var ajv = Ajv({allErrors: true});
+var ejs = require('ejs');
+var fs = require('fs');
+var moment = require('moment');
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
     if(ezeoneId){
@@ -24,7 +28,7 @@ function alterEzeoneId(ezeoneId){
     }
     return alteredEzeoneId;
 }
-
+var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 
 /**
  * Method : POST
@@ -252,7 +256,7 @@ router.get('/list', function(req,res,next){
                             }
                         }
                         else {
-                            responseMessage.status = false;
+                            responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Batch list not available';
                             responseMessage.data = null;
@@ -260,7 +264,7 @@ router.get('/list', function(req,res,next){
                         }
                     }
                     else {
-                        responseMessage.status = false;
+                        responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Batch list not available';
                         responseMessage.data = null;
@@ -292,105 +296,6 @@ router.get('/list', function(req,res,next){
         }
     }
 });
-
-
-
-/**
- * Method : GET
- * @param req
- * @param res
- * @param next
- *
- * @discription : API to get batch details
- */
-router.get('/details', function(req,res,next){
-
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: []
-    };
-    var validationFlag = true;
-
-    if (isNaN(parseInt(req.query.id))){
-        error.smid = 'Invalid batch id';
-        validationFlag *= false;
-    }
-    if(!validationFlag){
-        responseMessage.error = error;
-        responseMessage.message = 'Please check the errors';
-        res.status(400).json(responseMessage);
-        console.log(responseMessage);
-    }
-    else {
-
-        try {
-            var procParams = req.db.escape(req.query.id);
-            var procQuery = 'CALL get_batch_details(' + procParams + ')';
-            console.log(procQuery);
-            req.db.query(procQuery, function (err, results) {
-                if (!err) {
-                    console.log(results);
-                    if (results) {
-                        if (results[0]) {
-                            if (results[0].length > 0) {
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Batch details loaded successfully';
-                                responseMessage.data = results[0]
-                                res.status(200).json(responseMessage);
-                            }
-                            else {
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Batch details not available';
-                                responseMessage.data = [];
-                                res.status(200).json(responseMessage);
-                            }
-                        }
-                        else {
-                            responseMessage.status = false;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Batch details not available';
-                            responseMessage.data = null;
-                            res.status(200).json(responseMessage);
-                        }
-                    }
-                    else {
-                        responseMessage.status = false;
-                        responseMessage.error = null;
-                        responseMessage.message = 'Batch details not available';
-                        responseMessage.data = null;
-                        res.status(200).json(responseMessage);
-                    }
-                }
-                else {
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
-                    console.log('Error : get_batch_details ', err);
-                    var errorDate = new Date();
-                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-
-                }
-            });
-        }
-        catch (ex) {
-            responseMessage.error = {
-                server: 'Internal Server Error'
-            };
-            responseMessage.message = 'An error occurred !';
-            res.status(500).json(responseMessage);
-            console.log('Error get_batch_details : ', ex);
-            var errorDate = new Date();
-            console.log(errorDate.toTimeString() + ' ......... error ...........');
-        }
-    }
-});
-
 
 
 /**
@@ -458,7 +363,7 @@ router.get('/trans', function(req,res,next){
                                         }
                                     }
                                     else {
-                                        responseMessage.status = false;
+                                        responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'batch transaction details not available';
                                         responseMessage.data = [];
@@ -466,7 +371,7 @@ router.get('/trans', function(req,res,next){
                                     }
                                 }
                                 else {
-                                    responseMessage.status = false;
+                                    responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'batch transaction details not available';
                                     responseMessage.data = [];
@@ -485,7 +390,7 @@ router.get('/trans', function(req,res,next){
 
                             }
                         });
-                    }
+                    }//
                     else {
                         responseMessage.message = 'Invalid token';
                         responseMessage.error = {
@@ -580,7 +485,7 @@ router.get('/bdetails', function(req,res,next){
                                         }
                                     }
                                     else {
-                                        responseMessage.status = false;
+                                        responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'batch details not available';
                                         responseMessage.data = [];
@@ -588,7 +493,7 @@ router.get('/bdetails', function(req,res,next){
                                     }
                                 }
                                 else {
-                                    responseMessage.status = false;
+                                    responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'batch details not available';
                                     responseMessage.data = [];
@@ -671,7 +576,7 @@ router.post('/trans', function(req,res,next){
 
                     var batchArrayList = req.body.batchArray;
                         var combQuery = '';
-                console.log(batchArrayList.length,"batchArrayList.length");
+                //console.log(batchArrayList.length,"batchArrayList.length");
                         for (var i = 0; i < batchArrayList.length; i++ ){
                             var batchQueryParams = req.db.escape(batchArrayList[i].typeId)
                                 + ',' + req.db.escape(batchArrayList[i].expenseDetails)+ ',' + req.db.escape(id)
@@ -802,72 +707,6 @@ router.delete('/trans', function(req,res,next){
     }
 });
 
-/**
- * Method : POST
- * @param req
- * @param res
- * @param next
- * @param ezeid* <string> ezeoneid for which admin wants to save receipts
- * @param particulars <string> particulars is details of all bills
- * @param smid <int> smid is service master id
- * @param amount <decimal>
- *
- * @discription : API to create batch receipts
- */
-
-router.post('/bill_receipts', function(req,res,next){
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: null
-    };
-    var id = parseInt(req.body.smid);
-    var validationFlag = true;
-    var error = {};
-    if (!req.body.ezeoneid) {
-        error.ezeoneid = 'Invalid ezeoneid';
-        validationFlag *= false;
-    }
-    if (!validationFlag) {
-        responseMessage.error = error;
-        responseMessage.message = 'Please check the errors';
-        res.status(400).json(responseMessage);
-        console.log(responseMessage);
-    }
-    else {
-        try {
-            var ezeoneid = alterEzeoneId(req.body.ezeoneid);
-            var procParams = req.db.escape(ezeoneid) + ',' + req.db.escape(id)+ ',' + req.db.escape(req.body.particulars)
-                + ',' + req.db.escape(req.body.amount);
-            var procQuery = 'CALL psave_billing_receipts(' + procParams + ')';
-            req.db.query(procQuery, function (err, batchResult) {
-                if (!err) {
-                    responseMessage.status = true;
-                    responseMessage.error = null;
-                    responseMessage.message = 'Receipt saved successfully';
-                    responseMessage.data = {};
-                    res.status(200).json(responseMessage);
-                }
-                else {
-                    console.log('Receipt not saved');
-                    console.log(err);
-                    res.status(200).json(responseMessage);
-                }
-            });
-        }
-        catch (ex) {
-            responseMessage.error = {
-                server: 'Internal Server Error'
-            };
-            responseMessage.message = 'An error occurred !';
-            res.status(500).json(responseMessage);
-            console.log('Error psave_billing_receipts :  ', ex);
-            var errorDate = new Date();
-            console.log(errorDate.toTimeString() + ' ......... error ...........');
-        }
-    }
-});
 
 
 /**
@@ -878,7 +717,7 @@ router.post('/bill_receipts', function(req,res,next){
  *
  * @discription : API to generate invoice and send in to each member of community
  */
-router.get('/invoice', function(req,res,next){
+router.post('/testinvoice', function(req,res,next){
 
     var responseMessage = {
         status: false,
@@ -889,8 +728,16 @@ router.get('/invoice', function(req,res,next){
     var validationFlag = true;
     var error = {};
 
-    if (isNaN(parseInt(req.query.batch_id))){
-        error.batch_id = 'Invalid batch id';
+    if (isNaN(parseInt(req.body.batchId))){
+        error.batchId = 'Invalid batch id';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.body.serviceMasterId))){
+        error.serviceMasterId = 'Invalid batch id';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.body.memberId))){
+        error.memberId = 'Invalid batch id';
         validationFlag *= false;
     }
     if (!validationFlag) {
@@ -902,7 +749,7 @@ router.get('/invoice', function(req,res,next){
     else {
         try {
             var procParams = req.db.escape(req.query.batch_id);
-            var procQuery = 'CALL pget_batch_trans(' + procParams + ')';
+            var procQuery = 'CALL get_billing_invoice_details(' + procParams + ')';
             console.log(procQuery);
             req.db.query(procQuery, function (err, results) {
                 if (!err) {
@@ -980,5 +827,362 @@ router.get('/invoice', function(req,res,next){
     }
 });
 
+router.post('/invoice', function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if (!req.body.token) {
+        error['token'] = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.body.batchId))){
+        error.batchId = 'Invalid batch id';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.body.serviceMasterId))){
+        error.serviceMasterId = 'Invalid service master id';
+        validationFlag *= false;
+    }
+    if (!req.body.memberArray){
+        error.memberArray = 'Invalid member id';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            req.st.validateToken(req.body.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var memberArrayList =req.body.memberArray;
+                        console.log(memberArrayList,"memberArrayList");
+                        var combinedInvoieQuery = "";
+                        for (var batchCount = 0; batchCount < memberArrayList.length; batchCount++) {
+                            /**preparing query for getting all member results in a single shot */
+                            var queryParams = req.db.escape(memberArrayList[batchCount]) + ',' + req.db.escape(req.body.batchId)
+                                + ',' + req.db.escape(req.body.serviceMasterId)+ ',' + req.db.escape(req.body.token);
+                            var procQuery = 'CALL get_billing_invoice_details(' + queryParams + ');';
+                            combinedInvoieQuery += procQuery;
+                        }
+
+                        console.log(combinedInvoieQuery,"combinedInvoieQuery");
+                        /**execute the query */
+                        req.db.query(combinedInvoieQuery, function (err, results) {
+                            if (!err) {
+                                //console.log(results,"results");
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0].length>0) {
+
+                                            var memberDemandNoteList = [];
+
+                                            var getNewDemandNote = function(){
+                                                return {
+                                                    batchTilte : '',
+                                                    startDate : '',
+                                                    endDate : '',
+                                                    dueDate : '',
+                                                    logo : '',
+                                                    communityAddress : '',
+                                                    batchCreationDate : '',
+                                                    fullName : '',
+                                                    refNumber : '',
+                                                    sqFt : '',
+                                                    typeTitle : '',
+                                                    adminName : '',
+                                                    email : '',
+                                                    expenseList : [],
+                                                    totalAmount : 0.00
+                                                }
+                                            };
+
+
+                                            memberDemandNoteList.push(getNewDemandNote());
+                                            ////////////////////////////////////////////////////
+
+                                            for(var counter1 = 0; counter1 < results.length; counter1++){
+                                                /**
+                                                 * Only take 4 consecutive result set for one member
+                                                 * 5th result set is mysql system message
+                                                 * then from 6th again the result set start for next member
+                                                 */
+
+                                                var recordNumber = (counter1+1)%5;
+                                                if(recordNumber){
+                                                    //console.log('inside recordNumber if');
+                                                    //console.log('results[counter1]',results[counter1]);
+                                                    switch(recordNumber){
+                                                        case 1 :
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].batchTitle = results[counter1][0].batchTitle;
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].startDate = results[counter1][0].start_date;
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].endDate = results[counter1][0].end_date;
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].dueDate = results[counter1][0].due_date;
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].logo = results[counter1][0].logo;
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].communityAddress = results[counter1][0].comunityAddress;
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].batchCreationDate = results[counter1][0].batch_created_date;
+                                                            break;
+                                                        case 2 :
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].fullName = results[counter1][0].name;
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].refNumber = results[counter1][0].reference_name?results[counter1][0].reference_name:123;
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].sqFt = results[counter1][0].sft;
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].typeTitle = results[counter1][0].typeTitle;
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].adminName = results[counter1][0].adminName;
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].email = results[counter1][0].email;
+                                                            break;
+                                                        case 3 :
+                                                            for(var counter2 = 0; counter2 < results[counter1].length; counter2++){
+                                                                memberDemandNoteList[memberDemandNoteList.length - 1].expenseList.push({
+                                                                    expenseType : results[counter1][counter2].expensetype,
+                                                                    amount : results[counter1][counter2].Amount
+                                                                });
+                                                                //console.log(results[counter1][counter2].expensetype,"expenseList");
+                                                            }
+                                                            break;
+                                                        case 4 :
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].totalAmount = results[counter1][0].totalAmount;
+                                                            break;
+                                                        default :
+                                                            break;
+                                                    }
+                                                }
+                                                else{
+                                                    if(counter1 < (results.length - 1)){
+                                                        memberDemandNoteList.push(getNewDemandNote());
+                                                        console.log('testcase');
+                                                    }
+
+                                                }
+                                            }
+
+
+                                            /**
+                                             * Counter to keep track how much demand notes are send through mail till yet for
+                                             * recursive loop
+                                             */
+                                            var memberDemandNoteCounter = 0;
+
+                                            /**
+                                             * Sends demand note for the members of the community after
+                                             * generating PDF for that demand note and attaching it to mail
+                                             *
+                                             * Function is called recursively as we are performing async operation
+                                             * for generating PDF
+                                             */
+                                            var sendDemandNote = function(){
+                                                console.log('memberDemandNoteList',memberDemandNoteList[memberDemandNoteCounter]);
+                                            /**
+                                             * preparing template for each member
+                                             * */
+                                                var htmlMail = mailerApi.renderTemplate('invoice',{
+                                                    communityAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress,
+                                                    memberName : memberDemandNoteList[memberDemandNoteCounter].fullName,
+                                                    memberAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress ,
+                                                    billDate : memberDemandNoteList[memberDemandNoteCounter].batchCreationDate,
+                                                    startDate : moment(memberDemandNoteList[memberDemandNoteCounter].startDate).format(' MMMM ,YYYY'),
+                                                    endDate : moment(memberDemandNoteList[memberDemandNoteCounter].endDate).format(' MMMM ,YYYY'),
+                                                    totalAmount : memberDemandNoteList[memberDemandNoteCounter].totalAmount,
+                                                    dueDate : moment(memberDemandNoteList[memberDemandNoteCounter].dueDate).format('Do MMMM ,YYYY'),
+                                                    adminName : memberDemandNoteList[memberDemandNoteCounter].adminName,
+                                                    type : memberDemandNoteList[memberDemandNoteCounter].typeTitle,
+                                                    area : memberDemandNoteList[memberDemandNoteCounter].sqFt,
+                                                    refNo : memberDemandNoteList[memberDemandNoteCounter].refNumber,
+                                                    expenseList: memberDemandNoteList[memberDemandNoteCounter].expenseList
+                                                });
+
+                                                var pdf = require('html-pdf');
+                                                var options = { format: 'A4' };
+
+                                                pdf.create(htmlMail,options).toBuffer(function(err, pdfBuffer){
+                                                    if(!err){
+                                                        console.log('Sending mail');
+                                                        mailerApi.sendMailNew('invoice', {
+                                                            communityAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress,
+                                                            memberName : memberDemandNoteList[memberDemandNoteCounter].fullName,
+                                                            imageUrl : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET +'/'+memberDemandNoteList[memberDemandNoteCounter].logo,
+                                                            memberAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress ,
+                                                            billDate : memberDemandNoteList[memberDemandNoteCounter].batchCreationDate,
+                                                            startDate : moment(memberDemandNoteList[memberDemandNoteCounter].startDate).format(' MMMM ,YYYY'),
+                                                            endDate : moment(memberDemandNoteList[memberDemandNoteCounter].endDate).format(' MMMM ,YYYY'),
+                                                            totalAmount : memberDemandNoteList[memberDemandNoteCounter].totalAmount,
+                                                            dueDate : moment(memberDemandNoteList[memberDemandNoteCounter].dueDate).format('Do MMMM ,YYYY'),
+                                                            adminName : memberDemandNoteList[memberDemandNoteCounter].adminName,
+                                                            type : memberDemandNoteList[memberDemandNoteCounter].typeTitle,
+                                                            area : memberDemandNoteList[memberDemandNoteCounter].sqFt,
+                                                            refNo : memberDemandNoteList[memberDemandNoteCounter].refNumber,
+                                                            expenseList: memberDemandNoteList[memberDemandNoteCounter].expenseList
+                                                        }, '', memberDemandNoteList[memberDemandNoteCounter].email,[{
+                                                            filename : "Demand Note - "+ memberDemandNoteList[memberDemandNoteCounter].batchCreationDate+'.pdf',
+                                                            content : pdfBuffer
+                                                        }]);
+
+                                                    }
+                                                    else{
+                                                        console.log('PDF Generation error for demand note : ',err);
+                                                    }
+
+                                                    if(memberDemandNoteCounter < memberDemandNoteList.length-1){
+                                                        memberDemandNoteCounter++;
+                                                        console.log('Sending mail');
+                                                        setImmediate(sendDemandNote);
+                                                    }
+                                                });
+                                            }
+
+                                            sendDemandNote();
+
+                                            ///////////////////////////////////////////////////
+
+
+                                            //var arr = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
+                                           // var resArr = [];
+                                           // resArr[0] = [];
+                                           // var counter = 0;
+                                           // for(var i = 0;i < results.length; i++)
+                                           //// console.log(results[i],"results[i]");
+                                           // {
+                                           //     if(i%5 == 4)
+                                           //     {
+                                           //         counter++;
+                                           //         resArr[counter] = [];
+                                           //     }
+                                           //     else
+                                           //     {
+                                           //         resArr[counter].push(results[i])
+                                           //     }
+                                           //
+                                           // }
+                                           // for(var i = 0; i < resArr.length-1; i++)
+                                           // {
+                                           //     //console.log(resArr[i], "FATHER "+i);
+                                           //
+                                           //     for(var j = 0; j < resArr[i][j].length; j++)
+                                           //     {
+                                           //             //console.log(resArr[i][1][0],"[i][j]");
+                                           //         var communityAddress = resArr[i][0][0].comunityAddress;
+                                           //         var memberName = resArr[i][1][0].name;
+                                           //         var memberAddress = resArr[i][0][0].comunityAddress;
+                                           //         var billDate = resArr[i][0][0].start_date;
+                                           //         var startDate = resArr[i][0][0].start_date;
+                                           //         var endDate = resArr[i][0][0].end_date;
+                                           //         var totalAmount = resArr[i][3][0].totalAmount;
+                                           //         var dueDate = resArr[i][0][0].due_date;
+                                           //         var adminName = resArr[i][1][0].adminName;
+                                           //         var type = resArr[i][1][0].typeTitle;
+                                           //         var area = resArr[i][1][0].sft;
+                                           //         var refNo = (resArr[i][1][0].reference_name)?(resArr[i][1][0].reference_name):'123';
+                                           //         //var templateString = fs.readFileSync(__dirname+ "../../../../mail/templates/invoice.html", 'utf-8');
+                                           //         //ejs.render(templateString,{
+                                           //         //    expenseDetailsList:resArr[i][2][0].expensetype
+                                           //         //});
+                                           //         var expenseDetails = resArr[i][2][1].expensetype;
+                                           //         var expenseAmount = resArr[i][2][1].Amount;
+                                           //
+                                           //         console.log(expenseDetails,"expenseDetails");
+                                           //         console.log(expenseAmount,"expenseAmount");
+                                           //         mailerApi.sendMail('invoice', {
+                                           //             communityAddress : communityAddress,
+                                           //             memberName : memberName,
+                                           //             memberAddress : memberAddress,
+                                           //             billDate : billDate,
+                                           //             startDate : startDate,
+                                           //             endDate : endDate,
+                                           //             totalAmount : totalAmount,
+                                           //             dueDate : dueDate,
+                                           //             adminName : adminName,
+                                           //             type : type,
+                                           //             area : area,
+                                           //             refNo : refNo,
+                                           //             expenseDetails: expenseDetails,
+                                           //             expenseAmount: expenseAmount
+                                           //         }, '', 'jain31192@gmail.com');
+                                           //     }      }
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'invoice send successfully';
+                                            responseMessage.data = {};
+                                            res.status(200).json(responseMessage);
+
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in creating invoice';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in creating invoice';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in creating invoice';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : get_billing_invoice_details ', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('get_billing_invoice_details: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : get_billing_invoice_details ', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error get_billing_invoice_details :  ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+});
 
 module.exports = router;
