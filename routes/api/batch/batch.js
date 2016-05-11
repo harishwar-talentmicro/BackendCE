@@ -985,6 +985,7 @@ router.post('/invoice', function(req,res,next){
                                                 var htmlMail = mailerApi.renderTemplate('invoice',{
                                                     communityAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress,
                                                     memberName : memberDemandNoteList[memberDemandNoteCounter].fullName,
+                                                    imageUrl : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET +'/'+memberDemandNoteList[memberDemandNoteCounter].logo,
                                                     memberAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress ,
                                                     billDate : memberDemandNoteList[memberDemandNoteCounter].batchCreationDate,
                                                     startDate : moment(memberDemandNoteList[memberDemandNoteCounter].startDate).format(' MMMM ,YYYY'),
@@ -1019,10 +1020,12 @@ router.post('/invoice', function(req,res,next){
                                                             area : memberDemandNoteList[memberDemandNoteCounter].sqFt,
                                                             refNo : memberDemandNoteList[memberDemandNoteCounter].refNumber,
                                                             expenseList: memberDemandNoteList[memberDemandNoteCounter].expenseList
-                                                        }, '', memberDemandNoteList[memberDemandNoteCounter].email,[{
+                                                        }, '', memberDemandNoteList[memberDemandNoteCounter].email,[
+                                                            {
                                                             filename : "Demand Note - "+ memberDemandNoteList[memberDemandNoteCounter].batchCreationDate+'.pdf',
                                                             content : pdfBuffer
-                                                        }]);
+                                                        }
+                                                        ]);
 
                                                     }
                                                     else{

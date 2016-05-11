@@ -2630,7 +2630,7 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(token);
-                        var query = 'CALL pGetGroupAndIndividuals(' + queryParams + ')';4
+                        var query = 'CALL pGetGroupAndIndividuals(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
