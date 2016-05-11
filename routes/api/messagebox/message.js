@@ -154,17 +154,17 @@ router.get('/list', function(req,res,next){
                             }
                         });
                     }
-                            else {
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                responseMessage.message = 'An error occurred !';
-                                res.status(500).json(responseMessage);
-                                console.log('Error : pGetGroupAndIndividuals_new ', err);
-                                var errorDate = new Date();
-                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    else {
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'An error occurred !';
+                        res.status(500).json(responseMessage);
+                        console.log('Error : pGetGroupAndIndividuals_new ', err);
+                        var errorDate = new Date();
+                        console.log(errorDate.toTimeString() + ' ......... error ...........');
 
-                            }
+                    }
                 }
                 else {
                     responseMessage.error = {
