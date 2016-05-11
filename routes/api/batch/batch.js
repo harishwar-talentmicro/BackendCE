@@ -942,13 +942,13 @@ router.post('/invoice', function(req,res,next){
                                                             for(var counter2 = 0; counter2 < results[counter1].length; counter2++){
                                                                 memberDemandNoteList[memberDemandNoteList.length - 1].expenseList.push({
                                                                     expenseType : results[counter1][counter2].expensetype,
-                                                                    amount : results[counter1][counter2].Amount
+                                                                    amount : results[counter1][counter2].Amount.toFixed(2)
                                                                 });
                                                                 //console.log(results[counter1][counter2].expensetype,"expenseList");
                                                             }
                                                             break;
                                                         case 4 :
-                                                            memberDemandNoteList[memberDemandNoteList.length - 1].totalAmount = results[counter1][0].totalAmount;
+                                                            memberDemandNoteList[memberDemandNoteList.length - 1].totalAmount = results[counter1][0].totalAmount.toFixed(2);
                                                             break;
                                                         default :
                                                             break;
