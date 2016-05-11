@@ -25,7 +25,7 @@ router.use('/cv_temp_genrate',cvTempGenrate);
 router.use('/item',itemGroupV1);
 router.use('/association',associationV1);
 router.use('/batch',batchV1);
-router.use('/message',messaageBoxV1);
+router.use('/mbox',messaageBoxV1);
 router.use('/versionCode',apVersionV1);
 //router.use('/test_info',testInfoV1);
 //router.use('/association-ap',associationAPV1);

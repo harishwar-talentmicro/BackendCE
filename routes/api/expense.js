@@ -203,7 +203,7 @@ router.get('/expense_type', function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Expense type details loaded successfully';
-                                            responseMessage.data = results[0]
+                                            responseMessage.data = results[0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -629,7 +629,7 @@ router.get('/expense_type_amount', function(req,res,next){
                                         }
                                     }
                                     else {
-                                        responseMessage.status = false;
+                                        responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Expense type amount details not available';
                                         responseMessage.data = null;
@@ -637,7 +637,7 @@ router.get('/expense_type_amount', function(req,res,next){
                                     }
                                 }
                                 else {
-                                    responseMessage.status = false;
+                                    responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Expense type amount details not available';
                                     responseMessage.data = null;
