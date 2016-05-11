@@ -985,12 +985,13 @@ router.post('/invoice', function(req,res,next){
                                                 var htmlMail = mailerApi.renderTemplate('invoice',{
                                                     communityAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress,
                                                     memberName : memberDemandNoteList[memberDemandNoteCounter].fullName,
+                                                    imageUrl : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET +'/'+memberDemandNoteList[memberDemandNoteCounter].logo,
                                                     memberAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress ,
-                                                    billDate : memberDemandNoteList[memberDemandNoteCounter].batchCreationDate,
-                                                    startDate : moment(memberDemandNoteList[memberDemandNoteCounter].startDate).format(' MMMM ,YYYY'),
-                                                    endDate : moment(memberDemandNoteList[memberDemandNoteCounter].endDate).format(' MMMM ,YYYY'),
+                                                    billDate : moment(memberDemandNoteList[memberDemandNoteCounter].batchCreationDate).format('Do MMMM, YYYY'),
+                                                    startDate : moment(memberDemandNoteList[memberDemandNoteCounter].startDate).format(' MMMM, YYYY'),
+                                                    endDate : moment(memberDemandNoteList[memberDemandNoteCounter].endDate).format(' MMMM, YYYY'),
                                                     totalAmount : memberDemandNoteList[memberDemandNoteCounter].totalAmount,
-                                                    dueDate : moment(memberDemandNoteList[memberDemandNoteCounter].dueDate).format('Do MMMM ,YYYY'),
+                                                    dueDate : moment(memberDemandNoteList[memberDemandNoteCounter].dueDate).format('Do MMMM, YYYY'),
                                                     adminName : memberDemandNoteList[memberDemandNoteCounter].adminName,
                                                     type : memberDemandNoteList[memberDemandNoteCounter].typeTitle,
                                                     area : memberDemandNoteList[memberDemandNoteCounter].sqFt,
@@ -1009,20 +1010,22 @@ router.post('/invoice', function(req,res,next){
                                                             memberName : memberDemandNoteList[memberDemandNoteCounter].fullName,
                                                             imageUrl : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET +'/'+memberDemandNoteList[memberDemandNoteCounter].logo,
                                                             memberAddress : memberDemandNoteList[memberDemandNoteCounter].communityAddress ,
-                                                            billDate : memberDemandNoteList[memberDemandNoteCounter].batchCreationDate,
-                                                            startDate : moment(memberDemandNoteList[memberDemandNoteCounter].startDate).format(' MMMM ,YYYY'),
-                                                            endDate : moment(memberDemandNoteList[memberDemandNoteCounter].endDate).format(' MMMM ,YYYY'),
+                                                            billDate : moment(memberDemandNoteList[memberDemandNoteCounter].batchCreationDate).format('Do MMMM, YYYY'),
+                                                            startDate : moment(memberDemandNoteList[memberDemandNoteCounter].startDate).format(' MMMM, YYYY'),
+                                                            endDate : moment(memberDemandNoteList[memberDemandNoteCounter].endDate).format(' MMMM, YYYY'),
                                                             totalAmount : memberDemandNoteList[memberDemandNoteCounter].totalAmount,
-                                                            dueDate : moment(memberDemandNoteList[memberDemandNoteCounter].dueDate).format('Do MMMM ,YYYY'),
+                                                            dueDate : moment(memberDemandNoteList[memberDemandNoteCounter].dueDate).format('Do MMMM, YYYY'),
                                                             adminName : memberDemandNoteList[memberDemandNoteCounter].adminName,
                                                             type : memberDemandNoteList[memberDemandNoteCounter].typeTitle,
                                                             area : memberDemandNoteList[memberDemandNoteCounter].sqFt,
                                                             refNo : memberDemandNoteList[memberDemandNoteCounter].refNumber,
                                                             expenseList: memberDemandNoteList[memberDemandNoteCounter].expenseList
-                                                        }, '', memberDemandNoteList[memberDemandNoteCounter].email,[{
+                                                        }, '', memberDemandNoteList[memberDemandNoteCounter].email,[
+                                                            {
                                                             filename : "Demand Note - "+ memberDemandNoteList[memberDemandNoteCounter].batchCreationDate+'.pdf',
                                                             content : pdfBuffer
-                                                        }]);
+                                                        }
+                                                        ]);
 
                                                     }
                                                     else{

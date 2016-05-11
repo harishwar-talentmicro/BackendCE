@@ -172,8 +172,8 @@ router.get('/approval_list', function(req,res,next){
         error.status = 'Invalid status';
         validationFlag *= false;
     }
-    if (!req.query.code) {
-        error.code = 'Invalid ezeoneid';
+    if (isNaN(parseInt(req.query.smid))){
+        error.smid = 'Invalid service master id';
         validationFlag *= false;
     }
     if (!validationFlag) {
@@ -184,8 +184,8 @@ router.get('/approval_list', function(req,res,next){
     }
     else {
         try {
-            req.query.code = alterEzeoneId(req.query.code);
-            var procParams = req.db.escape(req.query.token)+ ',' + req.db.escape(req.query.status)+ ',' + req.db.escape(req.query.code);
+            //req.query.code = alterEzeoneId(req.query.code);
+            var procParams = req.db.escape(req.query.token)+ ',' + req.db.escape(req.query.status)+ ',' + req.db.escape(req.query.smid);
             var procQuery = 'CALL get_community_member_approval_list(' + procParams + ')';
             console.log(procQuery);
             req.db.query(procQuery, function (err, results) {

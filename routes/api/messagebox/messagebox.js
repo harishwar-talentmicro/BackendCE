@@ -8,6 +8,92 @@
 
 var express = require('express');
 var router = express.Router();
+var uuid = require('node-uuid');
+var gcloud = require('gcloud');
+var appConfig = require('../../../ezeone-config.json');
+
+var gcs = gcloud.storage({
+    projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
+    keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+});
+
+// Reference an existing bucket.
+var bucket = gcs.bucket(appConfig.CONSTANT.STORAGE_BUCKET);
+var stream = require( "stream" );
+bucket.acl.default.add({
+    entity: 'allUsers',
+    role: gcs.acl.READER_ROLE
+}, function (err, aclObject) {
+});
+var util = require( "util" );
+// I turn the given source Buffer into a Readable stream.
+function BufferStream( source ) {
+
+    if ( ! Buffer.isBuffer( source ) ) {
+
+        throw( new Error( "Source must be a buffer." ) );
+
+    }
+
+    // Super constructor.
+    stream.Readable.call( this );
+
+    this._source = source;
+
+    // I keep track of which portion of the source buffer is currently being pushed
+    // onto the internal stream buffer during read actions.
+    this._offset = 0;
+    this._length = source.length;
+
+    // When the stream has ended, try to clean up the memory references.
+    this.on( "end", this._destroy );
+
+}
+
+util.inherits( BufferStream, stream.Readable );
+
+
+// I attempt to clean up variable references once the stream has been ended.
+// --
+// NOTE: I am not sure this is necessary. But, I'm trying to be more cognizant of memory
+// usage since my Node.js apps will (eventually) never restart.
+BufferStream.prototype._destroy = function() {
+
+    this._source = null;
+    this._offset = null;
+    this._length = null;
+
+};
+
+
+// I read chunks from the source buffer into the underlying stream buffer.
+// --
+// NOTE: We can assume the size value will always be available since we are not
+// altering the readable state options when initializing the Readable stream.
+BufferStream.prototype._read = function( size ) {
+
+    // If we haven't reached the end of the source buffer, push the next chunk onto
+    // the internal stream buffer.
+    if ( this._offset < this._length ) {
+
+        this.push( this._source.slice( this._offset, ( this._offset + size ) ) );
+
+        this._offset += size;
+
+    }
+
+    // If we've consumed the entire source buffer, close the readable stream.
+    if ( this._offset >= this._length ) {
+
+        this.push( null );
+
+    }
+
+};
+
+
+var stream = require( "stream" );
+
 var messageModule = require('../.././modules/message-notification-module.js');
 var msgNotification = null;
 function alterEzeoneId(ezeoneId){
@@ -326,11 +412,11 @@ router.get('/list', function(req,res,next){
                                 if (getResult) {
                                     if (getResult[0]) {
                                         if (getResult[0].length > 0) {
-                                            for(var i = 0; i < getResult[0].length; i++){
-                                                getResult[0][i].CreatedDate = getFormattedDate(getResult[0][i].CreatedDate,req.query.dateObjectFlag);
-                                                getResult[0][i].LUDate = getFormattedDate(getResult[0][i].LUDate,req.query.dateObjectFlag);
-                                                getResult[0][i].date = getFormattedDate(getResult[0][i].date,req.query.dateObjectFlag);
-                                            }
+                                            //for(var i = 0; i < getResult[0].length; i++){
+                                            //    getResult[0][i].CreatedDate = getFormattedDate(getResult[0][i].CreatedDate,req.query.dateObjectFlag);
+                                            //    getResult[0][i].LUDate = getFormattedDate(getResult[0][i].LUDate,req.query.dateObjectFlag);
+                                            //    getResult[0][i].date = getFormattedDate(getResult[0][i].date,req.query.dateObjectFlag);
+                                            //}
                                             var queryParams1 = req.db.escape(token);
                                             var query1 = 'CALL PGetUnreadMessageCountofGroup(' + queryParams1 + ')';
                                             console.log(query1);
@@ -340,17 +426,20 @@ router.get('/list', function(req,res,next){
                                                         if (get_result[0]) {
                                                             if (get_result[0].length > 0) {
                                                                 for (var i = 0; i < getResult[0].length; i++) {
-                                                                    groupId = getResult[0][i].GroupID;
+                                                                    groupId = getResult[0][i].id;
+                                                                    //console.log(groupId,"get_result[0]");
                                                                     for (var j = 0; j < get_result[0].length; j++) {
                                                                         if (groupId == get_result[0][j].GroupID) {
                                                                             getResult[0][i].unreadcount = get_result[0][j].count;
                                                                             getResult[0][i].date = getFormattedDate(get_result[0][j].CreatedDate,req.query.dateObjectFlag);
                                                                             //res.status(200).json(responseMessage);
+                                                                            //console.log(getResult[0][i].unreadcount,"getResult[0][i].unreadcount");
                                                                         }
                                                                     }
                                                                 }
                                                                 var queryCount = 'CALL pGetPendingRequest(' + req.db.escape(token) + ')';
                                                                 req.db.query(queryCount, function (err, invitationResult) {
+                                                                    console.log(getResult[0],"getResult[0]");
                                                                     responseMessage.status = true;
                                                                     responseMessage.error = null;
                                                                     responseMessage.message = 'GroupList loaded successfully';
@@ -1393,7 +1482,7 @@ router.post('/compose_message', function(req,res,next){
                                 + ',' + req.db.escape(token) + ',' + req.db.escape(previousMessageID) + ',' + req.db.escape(toID)
                                 + ',' + req.db.escape(idType) + ',' + req.db.escape(mimeType) + ',' + req.db.escape(isJobseeker)
                                 + ',' + req.db.escape(istask);
-                            var query = 'CALL p_v1_ComposeMessage(' + queryParams + ')';
+                                var query = 'CALL p_v1_ComposeMessage(' + queryParams + ')';
 
                             console.log(query);
 
@@ -1579,10 +1668,10 @@ router.put('/update_status', function(req,res,next){
         error['groupId'] = 'Invalid groupId';
         validateStatus *= false;
     }
-    if(!masterId){
-        error['masterId'] = 'Invalid masterId';
-        validateStatus *= false;
-    }
+    //if(!masterId){
+    //    error['masterId'] = 'Invalid masterId';
+    //    validateStatus *= false;
+    //}
     if(parseInt(status) == NaN){
         error['status'] = 'Invalid status';
         validateStatus *= false;
@@ -1613,8 +1702,8 @@ router.put('/update_status', function(req,res,next){
                                         group_id: req.body.group_id,
                                         //masterId: masterId,
                                         status: status,
-                                        group_type : groupType,
-                                        requester : requester
+                                        group_type : groupType
+                                        //requester : requester
 
                                     };
 
