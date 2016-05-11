@@ -9,7 +9,10 @@ var messageBox = require('./messagebox.js');
 
 
 router.use('/contact',messageBox);
+var message = require('./message.js');
 
+
+router.use('/contacts',message);
 
 module.exports = router;
 
