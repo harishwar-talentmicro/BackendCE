@@ -290,7 +290,7 @@ StdLib.prototype.getOpenStatus = function(openStatusParam,workingHoursStrParam){
         /**
          * Current Time in minutes
          */
-        var currentTimeInMinutes = (currentDateObj.getHours() * 60) + currentDateObj.getMinutes;
+        var currentTimeInMinutes = (currentDateObj.getHours() * 60) + currentDateObj.getMinutes();
 
         var currentDay = currentDateObj.getDay();
 
@@ -313,7 +313,7 @@ StdLib.prototype.getOpenStatus = function(openStatusParam,workingHoursStrParam){
                     };
 
 
-                    if(currentTimeInMinutes >= workingHourComponentObj.startTime && currentTimeInMinutes <= workingHourComponentObj.endTime && workingHourComponentObj.days.indexOf(currentDay.toString) !== -1){
+                    if(currentTimeInMinutes >= workingHourComponentObj.startTime && currentTimeInMinutes <= workingHourComponentObj.endTime && workingHourComponentObj.days.indexOf(currentDay.toString()) !== -1){
                         openStatus = 1;
                         break;
                     }
