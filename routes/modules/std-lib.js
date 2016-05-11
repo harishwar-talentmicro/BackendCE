@@ -170,16 +170,10 @@ StdLib.prototype.validateToken = function(Token, CallBack){
 
                _this.db.query(Query, function (err, Result) {
                     if (!err) {
-                        if(Result){
-                            if (Result.length > 0) {
+                        if(Result && Result.length){
                                 // console.log(Result);
                                 console.log('FnValidateToken: Token found');
                                 CallBack(null, Result[0]);
-                            }
-                            else {
-                                CallBack(null, null);
-                                console.log('FnValidateToken:No Token found');
-                            }
                         }
                         else{
                             CallBack(null, null);
