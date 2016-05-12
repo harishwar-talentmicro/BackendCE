@@ -203,7 +203,7 @@ router.get('/', function(req,res,next){
  * @param token* <string> token of login user
  * @param messageType <int> (0-text,1-task,2-location,3-attachemnt)
  * @param priority <int> (0-Low, 1-Normal(Default), 2-High)
- *  @param receiverGroupId
+ *  @param receiverGroupId*
  *  @param taskTargetDate<datetime>
  *  @param taskExpiryDate<datetime>
  *  @param explicitMemberGroupIdList<text>(how many user A want to send messages to multiple users)
