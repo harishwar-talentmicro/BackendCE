@@ -306,94 +306,107 @@ router.post('/message', function(req,res,next){
                          * */
                         if (!err) {
                             /**
-                             * check that messageType is 0(text) then set message which we are getting from front end and set text message
-                             * into above declared variable name message
+                             * checking that grouptype(group) and groupRelationStatus is pending then user cant message
                              * */
+                            if(autoJoinResults[0][0].groupType == 0 && autoJoinResults[0][0].groupRelationStatus == 0){
+                                responseMessage.status = false;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Error in message sending';
+                                responseMessage.data = null;
+                                res.status(200).json(responseMessage);
+                            }
+                            else{
+                                /**
+                                 * check that messageType is 0(text) then set message which we are getting from front end and set text message
+                                 * into above declared variable name message
+                                 * */
 
-                            if (messageType == 0) {
-                                message = req.body.message;
-                            }
-                            /**
-                             * check that messageType is 2(location) then prepare json object of  latitude and longitude  which we are
-                             * getting from front end into above declared variable name message
-                             * */
-                            else if (messageType == 2) {
-                                var jsonDistanceObject = {
-                                    latitude: req.body.latitude,
-                                    longitude: req.body.longitude,
-                                    text: (req.body.text) ? (req.body.text) : ''
-                                }
-                                var jsonDistanceObject = JSON.stringify(jsonDistanceObject);
-                                message = jsonDistanceObject;
-                                console.log(jsonDistanceObject);
-                            }
-                            /**
-                             * check that messageType is 3(attachment) then prepare json object of attachmentLink,fileName and mimeType which we are
-                             * getting from front end into above declared variable name message
-                             * */
-                            else if (messageType == 3) {
-                                var jsonAttachObject = {
-                                    thumbnailLink:  "tn_" + req.body.attachmentLink,
-                                    attachmentLink: req.body.attachmentLink,
-                                    fileName: req.body.fileName,
-                                    mimeType: req.body.mimeType,
-                                    text: (req.body.text) ? (req.body.text) : ''
-                                }
-                                var jsonAttachObject = JSON.stringify(jsonAttachObject);
-                                message = jsonAttachObject;
-                                console.log(jsonAttachObject);
-                            }
-                            /**
-                             * call p_v1_ComposeMessage to compose message to anyone(group or individual)
-                             * */
-                            var procParams = req.db.escape(req.body.token) + ',' + req.db.escape(message)
-                                + ',' + req.db.escape(messageType) + ',' + req.db.escape(priority) + ',' + req.db.escape(taskTargetDate)
-                                + ',' + req.db.escape(taskExpiryDate) + ',' + req.db.escape(req.body.receiverGroupId)
-                                + ',' + req.db.escape(explicitMemberGroupIdList)+ ',' + req.db.escape(autoJoinResults[0][0].groupRelationStatus)
-                                + ',' + req.db.escape(autoJoinResults[0][0].luUser);
-                            var procQuery = 'CALL p_v1_ComposeMessage(' + procParams + ')';
-                            console.log(procQuery);
-                            req.db.query(procQuery, function (err, results) {
-                                if (!err) {
-                                    console.log(results);
-                                    /**
-                                     * if not getting any error from db and proc called successfully then send response with status true
-                                     * */
-                                    if (results) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Message send successfully';
-                                        responseMessage.data = {
-
-                                        };
-                                        res.status(200).json(responseMessage);
-                                    }
-                                    /**
-                                     * if getting no affected rows then send response with status false and gove error message
-                                     * */
-                                    else {
-                                        responseMessage.status = false;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Error in message sending';
-                                        responseMessage.data = null;
-                                        res.status(200).json(responseMessage);
-                                    }
+                                if (messageType == 0) {
+                                    message = req.body.message;
                                 }
                                 /**
-                                 * if getting any error from db and proc called unsuccessfully then send response with status false
+                                 * check that messageType is 2(location) then prepare json object of  latitude and longitude  which we are
+                                 * getting from front end into above declared variable name message
                                  * */
-                                else {
-                                    responseMessage.error = {
-                                        server: 'Internal Server Error'
-                                    };
-                                    responseMessage.message = 'An error occurred !';
-                                    res.status(500).json(responseMessage);
-                                    console.log('Error : p_v1_ComposeMessage ', err);
-                                    var errorDate = new Date();
-                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-
+                                else if (messageType == 2) {
+                                    var jsonDistanceObject = {
+                                        latitude: req.body.latitude,
+                                        longitude: req.body.longitude,
+                                        text: (req.body.text) ? (req.body.text) : ''
+                                    }
+                                    var jsonDistanceObject = JSON.stringify(jsonDistanceObject);
+                                    message = jsonDistanceObject;
+                                    console.log(jsonDistanceObject);
                                 }
-                            });
+                                /**
+                                 * check that messageType is 3(attachment) then prepare json object of attachmentLink,fileName and mimeType which we are
+                                 * getting from front end into above declared variable name message
+                                 * */
+                                else if (messageType == 3) {
+                                    var jsonAttachObject = {
+                                        thumbnailLink:  "tn_" + req.body.attachmentLink,
+                                        attachmentLink: req.body.attachmentLink,
+                                        fileName: req.body.fileName,
+                                        mimeType: req.body.mimeType,
+                                        text: (req.body.text) ? (req.body.text) : ''
+                                    }
+                                    var jsonAttachObject = JSON.stringify(jsonAttachObject);
+                                    message = jsonAttachObject;
+                                    console.log(jsonAttachObject);
+                                }
+                                /**
+                                 * call p_v1_ComposeMessage to compose message to anyone(group or individual)
+                                 * */
+                                var procParams = req.db.escape(req.body.token) + ',' + req.db.escape(message)
+                                    + ',' + req.db.escape(messageType) + ',' + req.db.escape(priority) + ',' + req.db.escape(taskTargetDate)
+                                    + ',' + req.db.escape(taskExpiryDate) + ',' + req.db.escape(req.body.receiverGroupId)
+                                    + ',' + req.db.escape(explicitMemberGroupIdList)+ ',' + req.db.escape(autoJoinResults[0][0].groupRelationStatus)
+                                    + ',' + req.db.escape(autoJoinResults[0][0].luUser);
+                                var procQuery = 'CALL p_v1_ComposeMessage(' + procParams + ')';
+                                console.log(procQuery);
+                                req.db.query(procQuery, function (err, results) {
+                                    if (!err) {
+                                        console.log(results);
+                                        /**
+                                         * if not getting any error from db and proc called successfully then send response with status true
+                                         * */
+                                        if (results) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Message send successfully';
+                                            responseMessage.data = {
+
+                                            };
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        /**
+                                         * if getting no affected rows then send response with status false and gove error message
+                                         * */
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in message sending';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    /**
+                                     * if getting any error from db and proc called unsuccessfully then send response with status false
+                                     * */
+                                    else {
+                                        responseMessage.error = {
+                                            server: 'Internal Server Error'
+                                        };
+                                        responseMessage.message = 'An error occurred !';
+                                        res.status(500).json(responseMessage);
+                                        console.log('Error : p_v1_ComposeMessage ', err);
+                                        var errorDate = new Date();
+                                        console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                                    }
+                                });
+                            }
+
                         }
                         else{
                             responseMessage.error = {
