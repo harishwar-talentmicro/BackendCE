@@ -2890,7 +2890,7 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                                             else{
                                                 responseMessage.count=0;
                                             }
-                                            //responseMessage.data = getResult[0];
+
                                             //console.log(getResult[0]);
                                             for(var ct = 0; ct < getResult[0].length; ct++){
                                                 getResult[0][ct].Attachment = (getResult[0][ct].Attachment) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][ct].Attachment) :'';

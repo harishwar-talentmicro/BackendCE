@@ -320,7 +320,8 @@ router.post('/message', function(req,res,next){
                             else if (messageType == 2) {
                                 var jsonDistanceObject = {
                                     latitude: req.body.latitude,
-                                    longitude: req.body.longitude
+                                    longitude: req.body.longitude,
+                                    text: (req.body.text) ? (req.body.text) : ''
                                 }
                                 var jsonDistanceObject = JSON.stringify(jsonDistanceObject);
                                 message = jsonDistanceObject;
@@ -332,9 +333,11 @@ router.post('/message', function(req,res,next){
                              * */
                             else if (messageType == 3) {
                                 var jsonAttachObject = {
+                                    thumbnailLink:  "tn_" + req.body.attachmentLink,
                                     attachmentLink: req.body.attachmentLink,
                                     fileName: req.body.fileName,
-                                    mimeType: req.body.mimeType
+                                    mimeType: req.body.mimeType,
+                                    text: (req.body.text) ? (req.body.text) : ''
                                 }
                                 var jsonAttachObject = JSON.stringify(jsonAttachObject);
                                 message = jsonAttachObject;
@@ -346,7 +349,8 @@ router.post('/message', function(req,res,next){
                             var procParams = req.db.escape(req.body.token) + ',' + req.db.escape(message)
                                 + ',' + req.db.escape(messageType) + ',' + req.db.escape(priority) + ',' + req.db.escape(taskTargetDate)
                                 + ',' + req.db.escape(taskExpiryDate) + ',' + req.db.escape(req.body.receiverGroupId)
-                                + ',' + req.db.escape(explicitMemberGroupIdList);
+                                + ',' + req.db.escape(explicitMemberGroupIdList)+ ',' + req.db.escape(autoJoinResults[0][0].groupRelationStatus)
+                                + ',' + req.db.escape(autoJoinResults[0][0].luUser);
                             var procQuery = 'CALL p_v1_ComposeMessage(' + procParams + ')';
                             console.log(procQuery);
                             req.db.query(procQuery, function (err, results) {
@@ -359,7 +363,9 @@ router.post('/message', function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Message send successfully';
-                                        responseMessage.data = null;
+                                        responseMessage.data = {
+
+                                        };
                                         res.status(200).json(responseMessage);
                                     }
                                     /**
@@ -450,23 +456,23 @@ router.post('/test', function(req,res,next){
     else {
         try {
             req.st.validateToken(req.query.token, function (err, tokenResult) {
-                if (!err && tokenResult) {
-                        console.log(req.files);
+                if (!err) {
+                    if (tokenResult) {
+                        console.log(req.files,"files");
                         if (req.files) {
                             var deleteTempFile = function(){
                                 fs.unlink('../bin/'+req.files.pr.path);
                                 console.log("Image Path is deleted from server");
                             };
                             var readStream = fs.createReadStream(req.files.pr.path);
-                            console.log(req.file.pr.mimetype,"mimetype");
                             var resizedReadStream = gm(req.files['pr'].path).resize(100,100).autoOrient().quality(0).stream(req.files.pr.extension);
                             var uniqueFileName = uuid.v4() + ((req.files.pr.extension) ? ('.' + req.files.pr.extension) : 'jpg');
                             var tnUniqueFileName = "tn_" + uniqueFileName;
                             console.log(uniqueFileName);
-                            uploadDocumentToCloud(uniqueFileName, readStream, function (err) {
+                            req.st.uploadDocumentToCloud(uniqueFileName, readStream, function (err) {
                                 if (!err) {
                                     deleteTempFile();
-                                    uploadDocumentToCloud(tnUniqueFileName, resizedReadStream, function (err) {
+                                    req.st.uploadDocumentToCloud(tnUniqueFileName, resizedReadStream, function (err) {
                                         if (!err) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
@@ -505,6 +511,16 @@ router.post('/test', function(req,res,next){
                             responseMessage.data = null;
                             res.status(500).json(responseMessage);
                         }
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('hrisSaveHRMimg: Invalid token');
+                    }
                 }
                 else {
                     responseMessage.error = {
@@ -512,7 +528,7 @@ router.post('/test', function(req,res,next){
                     };
                     responseMessage.message = 'An error occurred !';
                     res.status(500).json(responseMessage);
-                    console.log('Error : messageSaveImg ', err);
+                    console.log('Error : hrisSaveHRMimg ', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
@@ -524,14 +540,21 @@ router.post('/test', function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error messageSaveImg :  ',ex);
+            console.log('Error hrisSaveHRMimg :  ',ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
     }
 });
 
-
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @discription : API to get serach contacts
+ */
 router.get('/search', function(req,res,next){
     var ezeTerm = req.query.q;
     var title = null;
@@ -644,6 +667,163 @@ router.get('/search', function(req,res,next){
     }
 });
 
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @param token* <string> token of login user
+ * @param groupId <int> is group id
+ * @param tGrouptype <int> is group type
+ * @param pageNo <int> is page no
+ * @param limit <int> limit till that we will give results
+ * @discription : API to change admin of group
+ */
+router.get('/message', function(req,res,next){
+    var pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
+    var limit = (req.query.limit) ? (req.query.limit):10;
+    var dateTime = moment(req.query.timestamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+    var momentObj = moment(dateTime,'YYYY-MM-DD').isValid();
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.query.groupId)) || (req.query.groupId) < 0 ) {
+        error.groupId = 'Invalid group id';
+        validationFlag *= false;
+    }
+    if(req.query.timestamp){
+        if(!momentObj){
+            error.timestamp = 'Invalid date';
+            validationFlag *= false;
+        }
+    }
+    else{
+        dateTime = null;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    var message;
+                    var messageObj;
+                    var jsonAttachObject = {
+                        thumbnailLink:'',
+                        attachmentLink: '',
+                        fileName: '',
+                        mimeType: '',
+                        text: ''
+                    };
+                    if (tokenResult) {
+                        var procParams = req.db.escape(req.query.groupId) + ',' + req.db.escape(req.query.token)
+                            + ',' + req.db.escape(pageNo)+ ',' + req.db.escape(limit)+ ',' + req.db.escape(dateTime);
+                        var procQuery = 'CALL p_v1_LoadMessagesofGroup(' + procParams + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results,"results");
+                                if (results && results[0] && results[0].length>0) {
+                                    for(var messageCounter = 0;messageCounter < results[0].length;messageCounter++){
+                                        if(results[0][messageCounter].messageType==0){
+                                            message = results[0][messageCounter].message;
+                                        }
+                                        else if(results[0][messageCounter].messageType==3){
+                                            message = results[0][messageCounter].message;
+                                            messageObj = JSON.parse(message);
+                                            jsonAttachObject.attachmentLink = req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + messageObj.attachmentLink;
+                                            jsonAttachObject.thumbnailLink =  req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +messageObj.thumbnailLink;
+                                            jsonAttachObject.fileName = messageObj.fileName;
+                                            jsonAttachObject.mimeType = messageObj.mimeType;
+                                            jsonAttachObject.text = messageObj.text;
+                                            results[0][messageCounter].message = jsonAttachObject;
+                                            console.log(results[0][messageCounter].message ,"testmessage");
+                                        }
+                                    }
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Messages of group loaded successfully';
+                                    responseMessage.totalCount = results[1][0].count;
+                                    responseMessage.data = {
+                                        messageList : results[0]
+                                    };
+                                    res.status(200).json(responseMessage);
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Messages of group not available';
+                                    responseMessage.data = {
+                                        messageList : []
+                                    };
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : p_v1_LoadMessagesofGroup ', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error :', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error p_v1_LoadMessagesofGroup : ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+});
 
 module.exports = router;
 
