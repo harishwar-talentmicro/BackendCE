@@ -1,6 +1,6 @@
 "use strict";
 
-
+var appConfig = require('../../ezeone-config.json');
 function error(err, req, res, next) {
     // log it
     console.error(err.stack);
@@ -8,6 +8,21 @@ function error(err, req, res, next) {
     // respond with 500 "Internal Server Error".
     res.json(500,{ status : false, message : 'Internal Server Error', error : {server : 'Exception'}});
 };
+
+var gcloud = require('gcloud');
+var gcs = gcloud.storage({
+    projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
+    keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+});
+// Reference an existing bucket.
+var bucket = gcs.bucket(appConfig.CONSTANT.STORAGE_BUCKET);
+bucket.acl.default.add({
+    entity: 'allUsers',
+    role: gcs.acl.READER_ROLE
+}, function (err, aclObject) {
+});
+
+
 
 
 function StdLib(db){
@@ -320,6 +335,48 @@ StdLib.prototype.getOpenStatus = function(openStatusParam,workingHoursStrParam){
 
         return openStatus;
     }
+};
+
+
+/**
+ * method for upload image to cloud
+ * @param uniqueName
+ * @param readStream
+ * @param callback
+ */
+StdLib.prototype.uploadDocumentToCloud = function(uniqueName,readStream,callback){
+    var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
+    readStream.pipe(remoteWriteStream);
+
+    remoteWriteStream.on('finish', function(){
+        console.log('done');
+        if(callback){
+            if(typeof(callback)== 'function'){
+                callback(null);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+
+    remoteWriteStream.on('error', function(err){
+        if(callback){
+            if(typeof(callback)== 'function'){
+                console.log(err);
+                callback(err);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
 };
 
 function FnSendMailEzeid(MailContent, CallBack) {

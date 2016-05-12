@@ -11,7 +11,8 @@ var router = express.Router();
 var moment = require('moment');
 var gm = require('gm').subClass({ imageMagick: true });
 var uuid = require('node-uuid');
-var gcloud = require('gcloud');
+
+var fs = require('fs');
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
     if(ezeoneId){
@@ -25,53 +26,7 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-var gcs = gcloud.storage({
-    projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
-    keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
-});
-// Reference an existing bucket.
-var bucket = gcs.bucket(appConfig.CONSTANT.STORAGE_BUCKET);
-bucket.acl.default.add({
-    entity: 'allUsers',
-    role: gcs.acl.READER_ROLE
-}, function (err, aclObject) {
-});
 
-// method for upload image to cloud
-var uploadDocumentToCloud = function(uniqueName,readStream,callback){
-    var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
-    readStream.pipe(remoteWriteStream);
-
-    remoteWriteStream.on('finish', function(){
-        console.log('done');
-        if(callback){
-            if(typeof(callback)== 'function'){
-                callback(null);
-            }
-            else{
-                console.log('callback is required for uploadDocumentToCloud');
-            }
-        }
-        else{
-            console.log('callback is required for uploadDocumentToCloud');
-        }
-    });
-
-    remoteWriteStream.on('error', function(err){
-        if(callback){
-            if(typeof(callback)== 'function'){
-                console.log(err);
-                callback(err);
-            }
-            else{
-                console.log('callback is required for uploadDocumentToCloud');
-            }
-        }
-        else{
-            console.log('callback is required for uploadDocumentToCloud');
-        }
-    });
-};
 
 
 /**
@@ -240,24 +195,25 @@ router.get('/', function(req,res,next){
     }
 });
 
-
-
-
-
-
 /**
  * Method : POST
  * @param req
  * @param res
  * @param next
  * @param token* <string> token of login user
- * @param ezeone_Id <string> ezeid
- * @param gid <int> is group id(here requester is member)
- *
- * @discription : API to change admin of group
+ * @param messageType <int> (0-text,1-task,2-location,3-attachemnt)
+ * @param priority <int> (0-Low, 1-Normal(Default), 2-High)
+ *  @param receiverGroupId
+ *  @param taskTargetDate<datetime>
+ *  @param taskExpiryDate<datetime>
+ *  @param explicitMemberGroupIdList<text>(how many user A want to send messages to multiple users)
+ *  @param message<text>(text message otheriwse it will null)
+ * @discription : API to compose message
  */
-router.post('/compose_message', function(req,res,next){
-
+router.post('/message', function(req,res,next){
+    /**
+     * validation goes here
+     */
     var responseMessage = {
         status: false,
         error: {},
@@ -266,11 +222,16 @@ router.post('/compose_message', function(req,res,next){
     };
     var validationFlag = true;
     var error = {};
-
+/**
+ * checking whether token is exist or not,if not then error
+ **/
     if (!req.body.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+    /**
+     * checking messageType,priority is number or not,if not then error and set by default value
+     **/
     var messageType = (req.body.messageType) ? parseInt(req.body.messageType) : 0;
     if(isNaN(messageType)){
         messageType = 0;
@@ -279,10 +240,17 @@ router.post('/compose_message', function(req,res,next){
     if(isNaN(priority )){
         priority  = 1;
     }
+    /**
+     * checking receiverGroupId type is integer or not
+     **/
     if (isNaN(parseInt(req.body.receiverGroupId))) {
         error.receiverGroupId = 'Invalid id of receiver Group id';
         validationFlag *= false;
     }
+    /**
+     * checking taskTargetDate,taskExpiryDate type is datetime or not,if it exist and not in correct format
+     * then error else send null to db
+     **/
     var taskTargetDate = moment(req.body.taskTargetDate,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
     if(req.body.taskTargetDate){
         if(!taskTargetDate){
@@ -303,6 +271,9 @@ router.post('/compose_message', function(req,res,next){
     else{
         taskExpiryDate = null;
     }
+    /**
+     * checking explicitMemberGroupIdList is getting from front end or not if no then send empty string
+     **/
     var explicitMemberGroupIdList = (req.body.explicitMemberGroupIdList) ? (req.body.explicitMemberGroupIdList) : '';
     if (!validationFlag) {
         responseMessage.error = error;
@@ -312,17 +283,40 @@ router.post('/compose_message', function(req,res,next){
     }
     else {
         try {
+            /**
+             * declaring one variable
+             * */
             var message;
+            /**
+             * validating token for login user
+             * */
+
             req.st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err && tokenResult) {
+                    /**
+                     * call pautojoin_before_Composing to join to group or indidual automatically so that without sending request also
+                     * user can message to anyone
+                     * */
                     var autoJoinQueryParams = req.db.escape(req.body.token)+ ',' + req.db.escape(req.body.receiverGroupId);
                     var autoJoinQuery = 'CALL pautojoin_before_Composing(' + autoJoinQueryParams + ')';
                     console.log(autoJoinQuery);
                     req.db.query(autoJoinQuery, function (err, autoJoinResults) {
+                        /**
+                         * if not error from db then perform further conditions
+                         * */
                         if (!err) {
+                            /**
+                             * check that messageType is 0(text) then set message which we are getting from front end and set text message
+                             * into above declared variable name message
+                             * */
+
                             if (messageType == 0) {
                                 message = req.body.message;
                             }
+                            /**
+                             * check that messageType is 2(location) then prepare json object of  latitude and longitude  which we are
+                             * getting from front end into above declared variable name message
+                             * */
                             else if (messageType == 2) {
                                 var jsonDistanceObject = {
                                     latitude: req.body.latitude,
@@ -332,6 +326,10 @@ router.post('/compose_message', function(req,res,next){
                                 message = jsonDistanceObject;
                                 console.log(jsonDistanceObject);
                             }
+                            /**
+                             * check that messageType is 3(attachment) then prepare json object of attachmentLink,fileName and mimeType which we are
+                             * getting from front end into above declared variable name message
+                             * */
                             else if (messageType == 3) {
                                 var jsonAttachObject = {
                                     attachmentLink: req.body.attachmentLink,
@@ -342,6 +340,9 @@ router.post('/compose_message', function(req,res,next){
                                 message = jsonAttachObject;
                                 console.log(jsonAttachObject);
                             }
+                            /**
+                             * call p_v1_ComposeMessage to compose message to anyone(group or individual)
+                             * */
                             var procParams = req.db.escape(req.body.token) + ',' + req.db.escape(message)
                                 + ',' + req.db.escape(messageType) + ',' + req.db.escape(priority) + ',' + req.db.escape(taskTargetDate)
                                 + ',' + req.db.escape(taskExpiryDate) + ',' + req.db.escape(req.body.receiverGroupId)
@@ -351,13 +352,19 @@ router.post('/compose_message', function(req,res,next){
                             req.db.query(procQuery, function (err, results) {
                                 if (!err) {
                                     console.log(results);
-                                    if (results && results[0] && results[0][0] && results[0][0].messageId) {
+                                    /**
+                                     * if not getting any error from db and proc called successfully then send response with status true
+                                     * */
+                                    if (results) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Message send successfully';
-                                        responseMessage.data = results[0][0];
+                                        responseMessage.data = null;
                                         res.status(200).json(responseMessage);
                                     }
+                                    /**
+                                     * if getting no affected rows then send response with status false and gove error message
+                                     * */
                                     else {
                                         responseMessage.status = false;
                                         responseMessage.error = null;
@@ -366,6 +373,9 @@ router.post('/compose_message', function(req,res,next){
                                         res.status(200).json(responseMessage);
                                     }
                                 }
+                                /**
+                                 * if getting any error from db and proc called unsuccessfully then send response with status false
+                                 * */
                                 else {
                                     responseMessage.error = {
                                         server: 'Internal Server Error'
@@ -417,8 +427,6 @@ router.post('/compose_message', function(req,res,next){
     }
 });
 
-
-
 router.post('/test', function(req,res,next){
     var responseMessage = {
         status: false,
@@ -450,6 +458,7 @@ router.post('/test', function(req,res,next){
                                 console.log("Image Path is deleted from server");
                             };
                             var readStream = fs.createReadStream(req.files.pr.path);
+                            console.log(req.file.pr.mimetype,"mimetype");
                             var resizedReadStream = gm(req.files['pr'].path).resize(100,100).autoOrient().quality(0).stream(req.files.pr.extension);
                             var uniqueFileName = uuid.v4() + ((req.files.pr.extension) ? ('.' + req.files.pr.extension) : 'jpg');
                             var tnUniqueFileName = "tn_" + uniqueFileName;
@@ -521,6 +530,121 @@ router.post('/test', function(req,res,next){
         }
     }
 });
+
+
+router.get('/search', function(req,res,next){
+    var ezeTerm = req.query.q;
+    var title = null;
+    var pin = null;
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+
+    /**
+     * validation goes here for each param
+     */
+    if(!ezeTerm){
+        error.q = 'EZEOne ID not found';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            /**
+             * validating token for login user
+             * */
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err && tokenResult) {
+                    var ezeArr = ezeTerm.split('.');
+                    title = ezeArr;
+                    if (ezeArr.length > 1) {
+                        title = ezeArr[0];
+
+                        /**
+                         * If user may have passed the pin
+                         * and therefore validating pin using standard rules
+                         */
+                        if (!isNaN(parseInt(ezeArr[1])) && parseInt(ezeArr[1]) > 99 && parseInt(ezeArr[1]) < 1000) {
+                            pin = parseInt(ezeArr[1]).toString();
+                        }
+
+                    }
+                    var procParams = req.db.escape(title) + ',' + req.db.escape(pin) + ',' + req.db.escape(req.query.token);
+                    var procQuery = 'CALL get_v1_messagebox_contact(' + procParams + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, results) {
+                        if (!err) {
+                            console.log(results);
+                            if (results && results[0] && results[0].length > 0) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Message contacts loaded successfully';
+                                responseMessage.data = {
+                                    contactSuggestionList :results[0]
+                                };
+                                res.status(200).json(responseMessage);
+                            }
+                            else {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Message contacts not available';
+                                responseMessage.data = {
+                                    contactSuggestionList :[]
+                                };
+                                res.status(200).json(responseMessage);
+                            }
+                        }
+                        else {
+                            responseMessage.error = {
+                                server: 'Internal Server Error'
+                            };
+                            responseMessage.message = 'An error occurred !';
+                            res.status(500).json(responseMessage);
+                            console.log('Error : get_v1_messagebox_contact ', err);
+                            var errorDate = new Date();
+                            console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                        }
+                    });
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error :', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error pGetGroupAndIndividuals_new : ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+});
+
+
 module.exports = router;
 
 

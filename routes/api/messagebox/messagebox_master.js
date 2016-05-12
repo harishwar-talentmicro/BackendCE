@@ -8,7 +8,7 @@ var router = express.Router();
 var messageBox = require('./messagebox.js');
 
 
-router.use('/contact',messageBox);
+router.use('/contacts',messageBox);
 
 var message = require('./message.js');
 
