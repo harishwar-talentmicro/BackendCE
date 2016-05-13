@@ -298,5 +298,150 @@ router.get('/', function(req,res,next){
     }
 });
 
+/**
+ * Method : PUT
+ * @param req
+ * @param res
+ * @param next
+ * @param token* <string> token of login user
+ * @param groupId <int> group id(Group Id of an individual user or a group where the operation has to be done)
+ * @param status <int> is group id
+ * @param userGroupId <int> (Group Id of a user on whom operation is done)
+ *
+ * @discription : API to change status of contacts
+ */
+router.put('/status', function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    /**
+     * validation goes here for each param
+     */
+
+    var validationFlag = true;
+    var error = {};
+    req.body.groupId  = parseInt(req.body.groupId);   // groupid of receiver
+    req.body.status  = parseInt(req.body.status);      // Status 0 : Pending, 1: Accepted, 2 : Rejected, 3 : Leaved, 4 : Removed
+    req.body.userGroupId  = parseInt(req.body.userGroupId);
+    if (!req.body.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if(isNaN(req.body.groupId)){
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+    if(isNaN(req.body.userGroupId)){
+        error.userGroupId = 'Invalid userGroupId';
+        validationFlag *= false;
+    }
+    if(isNaN(req.body.status)){
+        error.status = 'Invalid status';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            req.st.validateToken(token, function (err, tokenResult) {
+                if (!err && tokenResult) {
+
+                        var queryParams = [req.db.escape(req.body.token) ,
+                            req.db.escape(req.body.groupId) ,
+                            req.db.escape(req.body.status) ,
+                            req.db.escape(req.body.userGroupId)
+                        ];
+
+                        var query = 'CALL p_v1_UpdateUserStatus(' + queryParams.join(',') + ')';
+                        console.log(query);
+                        req.db.query(query, function (err, updateResult) {
+                            if (!err) {
+                                if (updateResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'User status updated successfully';
+                                    responseMessage.data = {
+                                        group_id: req.body.group_id,
+                                        status: status,
+                                        group_type : groupType
+                                    };
+
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnUpdateUserStatus: User status updated successfully');
+
+                                    // send push notification update status
+                                    //var params = {
+                                    //    token: token,
+                                    //    groupId: groupId,
+                                    //    masterId: masterId,
+                                    //    status: status,
+                                    //    group_type: deleteStatus,
+                                    //    requester: requester
+                                    //};
+                                    //msgNotification.updateStatus(params,function(err,statusResult) {
+                                    //    console.log(statusResult);
+                                    //    if(!err) {
+                                    //        if (statusResult) {
+                                    //            console.log('UpdateStatus Notification send successfully');
+                                    //        }
+                                    //        else{
+                                    //            console.log('UpdateStatus Notification not send');
+                                    //        }
+                                    //    }
+                                    //    else{
+                                    //        console.log('Error in sending UpdateStatus notification');
+                                    //    }
+                                    //});
+
+                                }
+
+                                else {
+                                    responseMessage.message = 'User status is not updated';
+                                    res.status(200).json(responseMessage);
+                                    console.log('p_v1_UpdateUserStatus:User status is not updated');
+                                }
+                            }
+
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('p_v1_UpdateUserStatus: error in updating user status :' + err);
+                            }
+                        });
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('p_v1_UpdateUserStatus:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : p_v1_UpdateUserStatus ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+});
+
 module.exports = router;
 

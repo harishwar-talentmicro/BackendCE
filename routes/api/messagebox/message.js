@@ -45,6 +45,7 @@ function alterEzeoneId(ezeoneId){
  *  @param message<text>(text message otheriwse it will null)
  * @discription : API to compose message
  */
+
 router.post('/message', function(req,res,next){
     /**
      * validation goes here
@@ -57,9 +58,9 @@ router.post('/message', function(req,res,next){
     };
     var validationFlag = true;
     var error = {};
-/**
- * checking whether token is exist or not,if not then error
- **/
+    /**
+     * checking whether token is exist or not,if not then error
+     **/
     if (!req.body.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
@@ -124,6 +125,7 @@ router.post('/message', function(req,res,next){
              * declaring one variable
              * */
             var message;
+            var attachmentObject = '';
             /**
              * validating token for login user
              * */
@@ -134,9 +136,12 @@ router.post('/message', function(req,res,next){
                      * call pautojoin_before_Composing to join to group or indidual automatically so that without sending request also
                      * user can message to anyone
                      * */
-                    var autoJoinQueryParams = req.db.escape(req.body.token)+ ',' + req.db.escape(req.body.receiverGroupId);
-                    var autoJoinQuery = 'CALL pautojoin_before_Composing(' + autoJoinQueryParams + ')';
-                    console.log(autoJoinQuery);
+                    var autoJoinQueryParams = [
+                        req.db.escape(req.body.token) ,
+                        req.db.escape(req.body.receiverGroupId)
+                    ];
+                    var autoJoinQuery = 'CALL pautojoin_before_Composing(' + autoJoinQueryParams.join(',') + ')';
+                    //console.log(autoJoinQuery);
                     req.db.query(autoJoinQuery, function (err, autoJoinResults) {
                         /**
                          * if not error from db then perform further conditions
@@ -145,10 +150,11 @@ router.post('/message', function(req,res,next){
                             /**
                              * checking that grouptype(group) and groupRelationStatus is pending then user cant message
                              * */
+                            //console.log(autoJoinResults,"autoJoinResults");
                             if(autoJoinResults[0][0].groupType == 0 && autoJoinResults[0][0].groupRelationStatus == 0){
                                 responseMessage.status = false;
                                 responseMessage.error = null;
-                                responseMessage.message = 'Your group join request is ate pending state';
+                                responseMessage.message = 'Your group join request is at pending state';
                                 responseMessage.data = null;
                                 res.status(200).json(responseMessage);
                             }
@@ -169,11 +175,11 @@ router.post('/message', function(req,res,next){
                                     var jsonDistanceObject = {
                                         latitude: req.body.latitude,
                                         longitude: req.body.longitude,
-                                        text: (req.body.text) ? (req.body.text) : ''
+                                        text: (req.body.message) ? (req.body.message) : ''
                                     }
                                     var jsonDistanceObject = JSON.stringify(jsonDistanceObject);
                                     message = jsonDistanceObject;
-                                    console.log(jsonDistanceObject);
+                                    //console.log(jsonDistanceObject);
                                 }
                                 /**
                                  * check that messageType is 3(attachment) then prepare json object of attachmentLink,fileName and mimeType which we are
@@ -185,22 +191,29 @@ router.post('/message', function(req,res,next){
                                         attachmentLink: req.body.attachmentLink,
                                         fileName: req.body.fileName,
                                         mimeType: req.body.mimeType,
-                                        text: (req.body.text) ? (req.body.text) : ''
+                                        text: (req.body.message) ? (req.body.message) : ''
                                     }
                                     var jsonAttachObject = JSON.stringify(jsonAttachObject);
                                     message = jsonAttachObject;
-                                    console.log(jsonAttachObject);
+                                    //console.log(jsonAttachObject);
                                 }
                                 /**
                                  * call p_v1_ComposeMessage to compose message to anyone(group or individual)
                                  * */
-                                var procParams = req.db.escape(req.body.token) + ',' + req.db.escape(message)
-                                    + ',' + req.db.escape(req.body.messageType) + ',' + req.db.escape(req.body.priority) + ',' + req.db.escape(taskTargetDate)
-                                    + ',' + req.db.escape(taskExpiryDate) + ',' + req.db.escape(req.body.receiverGroupId)
-                                    + ',' + req.db.escape(explicitMemberGroupIdList)+ ',' + req.db.escape(autoJoinResults[0][0].groupRelationStatus)
-                                    + ',' + req.db.escape(autoJoinResults[0][0].luUser);
-                                var procQuery = 'CALL p_v1_ComposeMessage(' + procParams + ')';
-                                console.log(procQuery);
+                                var procParams = [
+                                    req.db.escape(req.body.token) ,
+                                    req.db.escape(message) ,
+                                    req.db.escape(req.body.messageType) ,
+                                    req.db.escape(req.body.priority) ,
+                                    req.db.escape(taskTargetDate) ,
+                                    req.db.escape(taskExpiryDate) ,
+                                    req.db.escape(req.body.receiverGroupId) ,
+                                    req.db.escape(explicitMemberGroupIdList) ,
+                                    req.db.escape(autoJoinResults[0][0].groupRelationStatus) ,
+                                    req.db.escape(autoJoinResults[0][0].luUser)
+                                ];
+                                var procQuery = 'CALL p_v1_ComposeMessage(' + procParams.join(',') + ')';
+                                //console.log(procQuery);
                                 req.db.query(procQuery, function (err, results) {
                                     if (!err) {
                                         console.log(results);
@@ -214,14 +227,17 @@ router.post('/message', function(req,res,next){
                                             var a = [];
                                             switch (results[0][0].messageType) {
                                                 case 3:
-                                                    results[0][0].message[attachmentLink] = req.CONFIG.CONSTANT.GS_URL +
-                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][0].message[attachmentLink];
-                                                    results[0][0].message[thumbnailLink] = req.CONFIG.CONSTANT.GS_URL +
-                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + "tn_"+results[0][0].message[attachmentLink];
-                                                    results[0][0].message[fileName] = results[0][0].message[fileName];
-                                                    results[0][0].message[mimeType] = results[0][0].message[mimeType];
-                                                    results[0][0].message[text] = results[0][0].message[text];
-
+                                                    attachmentObject = results[0][0].message;
+                                                    attachmentObject = JSON.parse(attachmentObject);
+                                                    attachmentObject.attachmentLink = req.CONFIG.CONSTANT.GS_URL +
+                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentObject.attachmentLink;
+                                                    attachmentObject.thumbnailLink = req.CONFIG.CONSTANT.GS_URL +
+                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +attachmentObject.thumbnailLink;
+                                                    attachmentObject.fileName = attachmentObject.fileName;
+                                                    attachmentObject.mimeType = attachmentObject.mimeType;
+                                                    attachmentObject.text = attachmentObject.text;
+                                                    console.log(attachmentObject,"attachmentObject");
+                                                    results[0][0].message = attachmentObject;
                                             }
                                             responseMessage.data = results[0];
 
@@ -415,7 +431,7 @@ router.post('/test', function(req,res,next){
  * @param res
  * @param next
  * @param token* <string> token of login user
- * @param groupId <int> is group id
+ * @param groupId* <int> is group id
  * @param tGrouptype <int> is group type
  * @param pageNo <int> is page no
  * @param limit <int> limit till that we will give results
@@ -424,8 +440,14 @@ router.post('/test', function(req,res,next){
 router.get('/message', function(req,res,next){
     var pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
     var limit = (req.query.limit) ? (req.query.limit):10;
-    var dateTime = moment(req.query.timestamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
-    var momentObj = moment(dateTime,'YYYY-MM-DD').isValid();
+    if(req.query.timestamp){
+        if(moment(req.query.timestamp,'YYYY-MM-DD HH:mm:ss').isValid()){
+            req.query.timestamp = moment(req.query.timestamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+        }
+    }
+    else{
+        req.query.timestamp = null;
+    }
     var responseMessage = {
         status: false,
         error: {},
@@ -443,15 +465,6 @@ router.get('/message', function(req,res,next){
         error.groupId = 'Invalid group id';
         validationFlag *= false;
     }
-    if(req.query.timestamp){
-        if(!momentObj){
-            error.timestamp = 'Invalid date';
-            validationFlag *= false;
-        }
-    }
-    else{
-        dateTime = null;
-    }
     if (!validationFlag) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
@@ -464,21 +477,18 @@ router.get('/message', function(req,res,next){
                 if (!err) {
                     var message;
                     var messageObj;
-                    var jsonAttachObject = {
-                        thumbnailLink:'',
-                        attachmentLink: '',
-                        fileName: '',
-                        mimeType: '',
-                        text: ''
-                    };
                     if (tokenResult) {
-                        var procParams = req.db.escape(req.query.groupId) + ',' + req.db.escape(req.query.token)
-                            + ',' + req.db.escape(pageNo)+ ',' + req.db.escape(limit)+ ',' + req.db.escape(dateTime);
-                        var procQuery = 'CALL p_v1_LoadMessagesofGroup(' + procParams + ')';
+                        var procParams = [
+                            req.db.escape(req.query.groupId) ,
+                            req.db.escape(req.query.token) ,
+                            req.db.escape(pageNo), req.db.escape(limit) ,
+                            req.db.escape(req.query.timestamp)
+                        ];
+                        var procQuery = 'CALL p_v1_LoadMessagesofGroup(' + procParams.join(',') + ')';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, results) {
                             if (!err) {
-                                console.log(results,"results");
+                                //console.log(results,"results");
                                 if (results && results[0] && results[0].length>0) {
                                     for(var messageCounter = 0;messageCounter < results[0].length;messageCounter++){
                                         if(results[0][messageCounter].messageType==0){
@@ -487,17 +497,19 @@ router.get('/message', function(req,res,next){
                                         else if(results[0][messageCounter].messageType==3){
                                             message = results[0][messageCounter].message;
                                             messageObj = JSON.parse(message);
-                                            jsonAttachObject.attachmentLink = req.CONFIG.CONSTANT.GS_URL +
+                                            messageObj.attachmentLink = req.CONFIG.CONSTANT.GS_URL +
                                                 req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + messageObj.attachmentLink;
-                                            jsonAttachObject.thumbnailLink =  req.CONFIG.CONSTANT.GS_URL +
+                                            messageObj.thumbnailLink =  req.CONFIG.CONSTANT.GS_URL +
                                                 req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +messageObj.thumbnailLink;
-                                            jsonAttachObject.fileName = messageObj.fileName;
-                                            jsonAttachObject.mimeType = messageObj.mimeType;
-                                            jsonAttachObject.text = messageObj.text;
-                                            results[0][messageCounter].message = jsonAttachObject;
-                                            console.log(results[0][messageCounter].message ,"testmessage");
+
+                                            messageObj.fileName = messageObj.fileName;
+                                            messageObj.mimeType = messageObj.mimeType;
+                                            messageObj.text = messageObj.text;
+                                            results[0][messageCounter].message = messageObj;
+                                            //console.log(results[0][messageCounter].message ,"testmessage");
                                         }
                                     }
+                                    //console.log(results[0],"results[0]");
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Messages of group loaded successfully';

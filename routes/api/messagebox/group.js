@@ -149,6 +149,11 @@ router.post('/', function(req,res,next){
     };
     var validationFlag = true;
     var error = {};
+    /** validation goes here
+     * checking that groupId,showMembers,restrictedReply,autoJoin we are getting from front end or not if no then default
+     * value is 0 and if getting then check that its integer or not,if not give error
+     *
+     * */
     req.body.groupId= (req.body.groupId) ? parseInt(req.body.groupId) : 0;
     req.body.showMembers= (req.body.showMembers) ? parseInt(req.body.showMembers) : 0;
     req.body.restrictedReply= (req.body.restrictedReply) ? parseInt(req.body.restrictedReply) : 0;
@@ -170,7 +175,10 @@ router.post('/', function(req,res,next){
         error.autoJoin = 'Invalid autoJoin flag';
         validationFlag *= false;
     }
-
+    /**
+     * validating token and groupName is mandatory field so cheking whether from front end we are getting or not
+     * if not getting then give error
+     * */
     if (!req.body.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
@@ -187,84 +195,110 @@ router.post('/', function(req,res,next){
     }
     else {
         try {
+            /**
+             * validating token of login user
+             * */
+
             req.st.validateToken(req.body.token, function (err, tokenResult) {
                 if ((!err) && tokenResult) {
                         /**
-                         * call procedure for validating groupname
+                         * created one function in which we are calling p_v1_createMessageGroup to create group
                          * */
-                        var procParams = req.db.escape(req.body.token) + ',' + req.db.escape(req.body.groupName);
-                        var procQuery = 'CALL p_v1_validateGroup(' + procParams + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, validateGroupResults) {
+                        var createGroup = function(){
+                            var queryParamsList = [
+                                req.db.escape(req.body.token) ,
+                                req.db.escape(req.body.groupId),
+                                req.db.escape(req.body.groupName) ,
+                                req.db.escape(req.body.aboutGroup),
+                                req.db.escape(req.body.showMembers) ,
+                                req.db.escape(req.body.restrictedReply),
+                                req.db.escape(req.body.autoJoin)
+                            ];
+
+                            var procQuery = 'CALL p_v1_createMessageGroup(' + queryParamsList.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, results) {
+                                if (!err) {
+                                    /**
+                                     * if from proc in response we are getting groupId then return response
+                                     * prepare response according to creation and updation time
+                                     * */
+                                    if (results && results[0] && results[0][0].groupId) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        if(req.body.groupId == 0){
+                                            responseMessage.message = 'group created successfully';
+                                        }
+                                        else{
+                                            responseMessage.message = 'group updated successfully';
+                                        }
+                                        responseMessage.data = {
+                                            groupId : results[0][0].groupId
+                                        };
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    /**
+                                     * if login user is not admin
+                                     * */
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = results[0][0]._e;
+                                        responseMessage.message = 'Error in creating group';
+                                        responseMessage.data = {
+
+                                        };
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    responseMessage.message = 'An error occurred !';
+                                    res.status(500).json(responseMessage);
+                                    console.log('Error : p_v1_createMessageGroup ', err);
+                                    var errorDate = new Date();
+                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                                }
+                            });
+                        };
+                        if(req.body.groupId == 0){
                             /**
-                             * while calling procedure if not getting any error and if get result then in response
-                             * if isAvailable is 0 then Group Name is not available to create else Group Name is available
-                             *
+                             * call procedure for validating groupname
                              * */
-                            if ((!err) && validateGroupResults &&
-                                validateGroupResults[0] &&
-                                validateGroupResults[0].length > 0 &&
-                                validateGroupResults[0][0].isAvailable == 1) {
-                                console.log(validateGroupResults[0][0].isAvailable,"validateGroupResults[0][0].isAvailable");
-
-                              var queryParamsList = [
-                                    req.db.escape(req.body.token) ,
-                                    req.db.escape(req.body.groupId),
-                                    req.db.escape(req.body.groupName) ,
-                                    req.db.escape(req.body.aboutGroup),
-                                    req.db.escape(req.body.showMembers) ,
-                                    req.db.escape(req.body.restrictedReply),
-                                    req.db.escape(req.body.autoJoin)
-                                ];;
-
-                               var procQuery = 'CALL p_v1_createMessageGroup(' + queryParamsList.join(',') + ')';
-                               console.log(procQuery);
-                               req.db.query(procQuery, function (err, results) {
-                                   if (!err) {
-                                       if (results && results[0] && results[0][0].groupId) {
-                                           responseMessage.status = true;
-                                           responseMessage.error = null;
-                                           responseMessage.message = 'group created successfully';
-                                           responseMessage.data = {
-                                               groupId : results[0][0].groupId
-                                           };
-                                           res.status(200).json(responseMessage);
-                                       }
-                                       else {
-                                           responseMessage.status = false;
-                                           responseMessage.error = null;
-                                           responseMessage.message = 'Error in creating group';
-                                           responseMessage.data = {
-
-                                           };
-                                           res.status(200).json(responseMessage);
-                                       }
-                                   }
-                                   else {
-                                       responseMessage.error = {
-                                           server: 'Internal Server Error'
-                                       };
-                                       responseMessage.message = 'An error occurred !';
-                                       res.status(500).json(responseMessage);
-                                       console.log('Error : p_v1_createMessageGroup ', err);
-                                       var errorDate = new Date();
-                                       console.log(errorDate.toTimeString() + ' ......... error ...........');
-
-                                   }
-                               });
-                           }
-
-                            else {
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                responseMessage.message = 'An error occurred !';
-                                res.status(500).json(responseMessage);
-                                console.log('Error :', err);
-                                var errorDate = new Date();
-                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                            var procParams = [
+                                req.db.escape(req.body.token) ,
+                                req.db.escape(req.body.groupName)
+                            ];
+                            var procQuery = 'CALL p_v1_validateGroup(' + procParams.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, validateGroupResults) {
+                                /**
+                                 * while calling procedure if not getting any error and if get result then in response
+                                 * if isAvailable is 0 then Group Name is not available to create else Group Name is available
+                                 *
+                                 * */
+                                if ((!err) && validateGroupResults &&
+                                    validateGroupResults[0] &&
+                                    validateGroupResults[0].length > 0 &&
+                                    validateGroupResults[0][0].isAvailable == 1) {
+                                    createGroup();
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Group Name is not available';
+                                    responseMessage.data = {
+                                    };
+                                    res.status(200).json(responseMessage);
+                                }
+                            });
+                        }
+                        else{
+                            createGroup();
                             }
-                        });
+
                 }
                 else {
                     responseMessage.error = {
@@ -291,5 +325,21 @@ router.post('/', function(req,res,next){
     }
 
 });
+
+
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @param token* <string> token of login user
+ * @param groupId <int> is group id
+ * @param tGrouptype <int> is group type
+ * @param pageNo <int> is page no
+ * @param limit <int> limit till that we will give results
+ * @discription : API to change admin of group
+ */
+
 
 module.exports = router;
