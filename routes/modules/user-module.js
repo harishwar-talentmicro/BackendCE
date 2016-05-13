@@ -3171,47 +3171,59 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                                 //    })
                                 //    .pipe(fs.createWriteStream('doodle.png'))
 
-                                var tagFolderContentQuery = "CALL get_folder_content_list("+st.db.escape(results[0][0].folder_content) + ")";
-                                console.log(tagFolderContentQuery);
+                                if(results[0][0].pin) {
+                                    if (pin && pin == results[0][0].pin) {
+                                        var tagFolderContentQuery = "CALL get_folder_content_list("+st.db.escape(results[0][0].folder_content) + ")";
+                                        console.log(tagFolderContentQuery);
+                                        st.db.query(tagFolderContentQuery,function(err,tagFolderContentRes){
+                                            if(err){
+                                                next();
+                                            }
+                                            else{
+                                                var archive = archiver('zip');
 
-                                st.db.query(tagFolderContentQuery,function(err,tagFolderContentRes){
-                                    if(err){
-                                        next();
-                                    }
-                                    else{
-                                        var archive = archiver('zip');
+                                                archive.on('error', function(err) {
+                                                    next();
+                                                });
 
-                                        archive.on('error', function(err) {
-                                            next();
-                                        });
+                                                res.attachment(tag+ '.zip');
 
-                                        res.attachment(tag+ '.zip');
+                                                archive.pipe(res);
+                                                if(tagFolderContentRes && tagFolderContentRes[0] && tagFolderContentRes[0].length){
+                                                    for(var counter = 0; counter < tagFolderContentRes[0].length; counter++){
+                                                        if(tagFolderContentRes[0][counter].type == 0){
+                                                            var pathComponents = tagFolderContentRes[0][counter].path.split('.');
 
-                                        archive.pipe(res);
-                                        if(tagFolderContentRes && tagFolderContentRes[0] && tagFolderContentRes[0].length){
-                                            for(var counter = 0; counter < tagFolderContentRes[0].length; counter++){
-                                                if(tagFolderContentRes[0][counter].type == 0){
-                                                    var pathComponents = tagFolderContentRes[0][counter].path.split('.');
+                                                            /**
+                                                             * Appending files to the archive
+                                                             * Downloading by using request module from google cloud
+                                                             */
+                                                            archive.append(request.get(req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + tagFolderContentRes[0][counter].path),{
+                                                                name : tagFolderContentRes[0][counter].tag + ((pathComponents.length > 1) ? '.' + pathComponents[pathComponents.length - 1] : '')
+                                                            });
+                                                        }
 
-                                                    /**
-                                                     * Appending files to the archive
-                                                     * Downloading by using request module from google cloud
-                                                     */
-                                                    archive.append(request.get(req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + tagFolderContentRes[0][counter].path),{
-                                                            name : tagFolderContentRes[0][counter].tag + ((pathComponents.length > 1) ? '.' + pathComponents[pathComponents.length - 1] : '')
-                                                        });
+                                                    }
+
+                                                    archive.finalize();
                                                 }
-
+                                                else{
+                                                    archive.finalize();
+                                                }
                                             }
 
-                                            archive.finalize();
-                                        }
-                                        else{
-                                            archive.finalize();
-                                        }
+                                        });
                                     }
+                                    else{
+                                        next();
+                                    }
+                                }
 
-                                });
+                                else{
+                                    next();
+                                }
+
+
 
                                 //archive
                                 //    .append(request.get(googleFilePathForDoc1), { name : doc1Title})
