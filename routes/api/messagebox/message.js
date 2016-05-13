@@ -232,13 +232,15 @@ router.post('/message', function(req,res,next){
     /**
      * checking messageType,priority is number or not,if not then error and set by default value
      **/
-    var messageType = (req.body.messageType) ? parseInt(req.body.messageType) : 0;
-    if(isNaN(messageType)){
-        messageType = 0;
+    req.body.messageType= (req.body.messageType) ? parseInt(req.body.messageType) : 0;
+    if(isNaN(req.body.messageType)){
+        error.messageType = 'Invalid messagetype';
+        validationFlag *= false;
     }
-    var priority  = (req.body.priority) ? parseInt(req.body.priority) : 1;
-    if(isNaN(priority )){
-        priority  = 1;
+    req.body.priority  = (req.body.priority) ? parseInt(req.body.priority) : 1;
+    if(isNaN(req.body.priority)){
+        error.priority  = 'Invalid priority';
+        validationFlag *= false;
     }
     /**
      * checking receiverGroupId type is integer or not
@@ -612,7 +614,7 @@ router.get('/search', function(req,res,next){
                          * If user may have passed the pin
                          * and therefore validating pin using standard rules
                          */
-                        if (!isNaN(parseInt(ezeArr[1])) && parseInt(ezeArr[1]) > 99 && parseInt(ezeArr[1]) < 1000) {
+                        if (!isNaN(parseInt(ezeArr[1])) && ezeArr[1].length > 2 && parseInt(ezeArr[1]) > 0 && parseInt(ezeArr[1]) < 1000) {
                             pin = parseInt(ezeArr[1]).toString();
                         }
 

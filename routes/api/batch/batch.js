@@ -1026,6 +1026,7 @@ router.post('/invoice', function(req,res,next){
                                                             content : pdfBuffer
                                                         }
                                                         ]);
+                                                        console.log(filename,"filename");
 
                                                     }
                                                     else{
