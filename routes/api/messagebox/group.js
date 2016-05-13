@@ -132,7 +132,7 @@ router.get('/validate', function(req,res,next){
  * @param next
  * @param token* <string> token of login user
  * @param groupId <int>
- * @param groupName  <string>
+ * @param groupName*  <string>
  * @param aboutGroup  <string>
  * @param showMembers  <int>(0 : false (default) , 1 : true)
  * @param restrictedReply  <int>(0 : false (default) , 1 : true)
@@ -189,42 +189,80 @@ router.post('/', function(req,res,next){
         try {
             req.st.validateToken(req.body.token, function (err, tokenResult) {
                 if ((!err) && tokenResult) {
-                        var queryParams = req.db.escape(req.body.token) + ',' + req.db.escape(req.body.groupId)
-                            + ',' + req.db.escape(req.body.GroupName) + ',' + req.db.escape(req.body.AboutGroup)
-                            + ',' + req.db.escape(req.body.showMembers) + ',' + req.db.escape(req.body.restrictedReply)
-                            + ',' + req.db.escape(req.body.autoJoin);
-
-                        var procQuery = 'CALL p_v1_createMessageGroup(' + queryParams + ')';
+                        /**
+                         * call procedure for validating groupname
+                         * */
+                        var procParams = req.db.escape(req.body.token) + ',' + req.db.escape(req.body.groupName);
+                        var procQuery = 'CALL p_v1_validateGroup(' + procParams + ')';
                         console.log(procQuery);
-                        req.db.query(procQuery, function (err, results) {
-                            if (!err) {
-                                console.log(results);
-                                if (results && results[0] && results[0][0].groupId) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'group created successfully';
-                                    responseMessage.data = {
-                                        groupId : results[0][0].groupId
-                                    };
-                                }
-                                else {
-                                    responseMessage.status = false;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Error in creating group';
-                                    responseMessage.data = null;
-                                    res.status(200).json(responseMessage);
-                                }
-                            }
+                        req.db.query(procQuery, function (err, validateGroupResults) {
+                            /**
+                             * while calling procedure if not getting any error and if get result then in response
+                             * if isAvailable is 0 then Group Name is not available to create else Group Name is available
+                             *
+                             * */
+                            if ((!err) && validateGroupResults &&
+                                validateGroupResults[0] &&
+                                validateGroupResults[0].length > 0 &&
+                                validateGroupResults[0][0].isAvailable == 1) {
+                                console.log(validateGroupResults[0][0].isAvailable,"validateGroupResults[0][0].isAvailable");
+
+                              var queryParamsList = [
+                                    req.db.escape(req.body.token) ,
+                                    req.db.escape(req.body.groupId),
+                                    req.db.escape(req.body.groupName) ,
+                                    req.db.escape(req.body.aboutGroup),
+                                    req.db.escape(req.body.showMembers) ,
+                                    req.db.escape(req.body.restrictedReply),
+                                    req.db.escape(req.body.autoJoin)
+                                ];;
+
+                               var procQuery = 'CALL p_v1_createMessageGroup(' + queryParamsList.join(',') + ')';
+                               console.log(procQuery);
+                               req.db.query(procQuery, function (err, results) {
+                                   if (!err) {
+                                       if (results && results[0] && results[0][0].groupId) {
+                                           responseMessage.status = true;
+                                           responseMessage.error = null;
+                                           responseMessage.message = 'group created successfully';
+                                           responseMessage.data = {
+                                               groupId : results[0][0].groupId
+                                           };
+                                           res.status(200).json(responseMessage);
+                                       }
+                                       else {
+                                           responseMessage.status = false;
+                                           responseMessage.error = null;
+                                           responseMessage.message = 'Error in creating group';
+                                           responseMessage.data = {
+
+                                           };
+                                           res.status(200).json(responseMessage);
+                                       }
+                                   }
+                                   else {
+                                       responseMessage.error = {
+                                           server: 'Internal Server Error'
+                                       };
+                                       responseMessage.message = 'An error occurred !';
+                                       res.status(500).json(responseMessage);
+                                       console.log('Error : p_v1_createMessageGroup ', err);
+                                       var errorDate = new Date();
+                                       console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                                   }
+                               });
+                           }
+
                             else {
                                 responseMessage.error = {
                                     server: 'Internal Server Error'
                                 };
                                 responseMessage.message = 'An error occurred !';
                                 res.status(500).json(responseMessage);
-                                console.log('Error : p_v1_createMessageGroup ', err);
+                                console.log('Error :', err);
                                 var errorDate = new Date();
                                 console.log(errorDate.toTimeString() + ' ......... error ...........');
-
                             }
                         });
                 }
