@@ -7,17 +7,12 @@ var router = express.Router();
 
 
 var message = require('./message.js');
-
-
-router.use('/',message);
-
 var contact = require('./contact.js');
-
-router.use('/contact',contact);
-
 var group = require('./group.js');
 
+router.use('/contact',contact);
 router.use('/group',group);
+router.use('/',message);
 
 module.exports = router;
 
