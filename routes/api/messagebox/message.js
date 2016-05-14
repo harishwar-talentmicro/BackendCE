@@ -15,10 +15,6 @@ var uuid = require('node-uuid');
 var fs = require('fs');
 
 
-
-
-
-
 /**
  * Method : POST
  * @param req
@@ -78,25 +74,22 @@ router.post('/message', function(req,res,next){
      * checking taskTargetDate,taskExpiryDate type is datetime or not,if it exist and not in correct format
      * then error else send null to db
      **/
-    var taskTargetDate = moment(req.body.taskTargetDate,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+
     if(req.body.taskTargetDate){
-        if(!taskTargetDate){
-            error.taskTargetDate = 'Invalid taskTargetDate';
-            validationFlag *= false;
+        if(moment(req.body.taskTargetDate,'YYYY-MM-DD HH:mm:ss').isValid()){
+            req.body.taskTargetDate = moment(req.body.taskTargetDate,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
         }
     }
     else{
-        taskTargetDate = null;
+        req.body.taskTargetDate = null;
     }
-    var taskExpiryDate = moment(req.body.taskExpiryDate,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
     if(req.body.taskExpiryDate){
-        if(!taskExpiryDate){
-            error.taskExpiryDate = 'Invalid taskExpiryDate';
-            validationFlag *= false;
+        if(moment(req.body.taskExpiryDate,'YYYY-MM-DD HH:mm:ss').isValid()){
+            req.body.taskExpiryDate = moment(req.body.taskExpiryDate,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
         }
     }
     else{
-        taskExpiryDate = null;
+        req.body.taskExpiryDate = null;
     }
     /**
      * checking explicitMemberGroupIdList is getting from front end or not if no then send empty string
@@ -213,7 +206,6 @@ router.post('/message', function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Message send successfully';
-                                            var a = [];
                                             switch (results[0][0].messageType) {
                                                 case 3:
                                                     attachmentObject = results[0][0].message;
