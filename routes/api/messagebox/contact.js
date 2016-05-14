@@ -351,6 +351,9 @@ router.put('/status', function(req,res,next){
     }
     else {
         try {
+            /**
+             * validation for token of login user
+             * */
             req.st.validateToken(token, function (err, tokenResult) {
                 if (!err && tokenResult) {
 
@@ -376,30 +379,6 @@ router.put('/status', function(req,res,next){
 
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateUserStatus: User status updated successfully');
-
-                                    // send push notification update status
-                                    //var params = {
-                                    //    token: token,
-                                    //    groupId: groupId,
-                                    //    masterId: masterId,
-                                    //    status: status,
-                                    //    group_type: deleteStatus,
-                                    //    requester: requester
-                                    //};
-                                    //msgNotification.updateStatus(params,function(err,statusResult) {
-                                    //    console.log(statusResult);
-                                    //    if(!err) {
-                                    //        if (statusResult) {
-                                    //            console.log('UpdateStatus Notification send successfully');
-                                    //        }
-                                    //        else{
-                                    //            console.log('UpdateStatus Notification not send');
-                                    //        }
-                                    //    }
-                                    //    else{
-                                    //        console.log('Error in sending UpdateStatus notification');
-                                    //    }
-                                    //});
 
                                 }
 
