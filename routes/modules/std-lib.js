@@ -379,6 +379,24 @@ StdLib.prototype.uploadDocumentToCloud = function(uniqueName,readStream,callback
     });
 };
 
+/**
+ * EZEOne ID conversion for adding @ if @ is not present in it by default
+ * @param ezeoneId
+ * @returns {string}
+ */
+StdLib.prototype.alterEzeoneId = function(ezeoneId){
+    var alteredEzeoneId = '';
+    if(ezeoneId){
+        if(ezeoneId.toString().substr(0,1) == '@'){
+            alteredEzeoneId = ezeoneId;
+        }
+        else{
+            alteredEzeoneId = '@' + ezeoneId.toString();
+        }
+    }
+    return alteredEzeoneId;
+};
+
 function FnSendMailEzeid(MailContent, CallBack) {
     var _this = this;
     try {

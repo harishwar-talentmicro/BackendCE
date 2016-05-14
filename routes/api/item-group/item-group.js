@@ -17,18 +17,7 @@ var router = express.Router();
  *
  * @discription : API to get group keyword details
  */
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 
 
@@ -143,7 +132,7 @@ router.get('/details', function(req,res,next){
     }
     else {
         try {
-            var ezeoneid = alterEzeoneId(req.query.ezeoneid);
+            var ezeoneid = req.st.alterEzeoneId(req.query.ezeoneid);
             var procParams = req.db.escape(ezeoneid);
             var procQuery = 'CALL pget_itemmaster(' + procParams + ')';
             console.log(procQuery);

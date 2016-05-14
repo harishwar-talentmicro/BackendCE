@@ -12,18 +12,7 @@
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 var st = null;
 
@@ -105,7 +94,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                             };
 
                             if (FindArray.length > 0) {
-                                EZEID = alterEzeoneId(FindArray[0]);
+                                EZEID = req.st.alterEzeoneId(FindArray[0]);
                                 //checking the fisrt condition
                                 if (FindArray.length > 1) {
                                     if (FindArray[1] != '') {
@@ -529,7 +518,7 @@ Search.prototype.searchInformation = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = (req.query.Token) ? req.query.Token : '';
-        var ezeTerm = alterEzeoneId(req.query.ezeTerm);
+        var ezeTerm = req.st.alterEzeoneId(req.query.ezeTerm);
         var CurrentDate = req.query.CurrentDate;
         var IPAddress = req._remoteAddress; //(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
         var latitude = (req.query.lat) ? req.query.lat : 0;
@@ -979,7 +968,7 @@ Search.prototype.getBanner = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var SeqNo = parseInt(req.query.SeqNo);
         var StateTitle = req.query.StateTitle;
-        var Ezeid = alterEzeoneId(req.query.Ezeid);
+        var Ezeid = req.st.alterEzeoneId(req.query.Ezeid);
         var LocID = req.query.LocID;
         // var TokenNo = req.query.Token;
 
@@ -1201,7 +1190,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var find = alterEzeoneId(req.query.Keywords);
+        var find = req.st.alterEzeoneId(req.query.Keywords);
         var token = req.query.Token;
         var tid;
         //console.log(token);

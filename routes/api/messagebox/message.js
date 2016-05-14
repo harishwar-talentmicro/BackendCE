@@ -13,18 +13,7 @@ var gm = require('gm').subClass({ imageMagick: true });
 var uuid = require('node-uuid');
 
 var fs = require('fs');
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 
 

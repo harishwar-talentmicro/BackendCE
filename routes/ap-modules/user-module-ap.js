@@ -10,18 +10,7 @@
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 var st = null;
 function User_AP(db,stdLib){
@@ -48,7 +37,7 @@ User_AP.prototype.getUserDetailsAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var EZEID = alterEzeoneId(req.query.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.query.EZEID);
         if (EZEID) {
             console.log("EZEID",EZEID);
             var query = 'Call pgetUserProfileAP('+st.db.escape(EZEID)+')';
@@ -260,7 +249,7 @@ User_AP.prototype.saveAPEZEID = function(req,res,next){
         var Description = req.body.Description;
         var Preferences = req.body.Preferences;
         var Rating = req.body.Rating;
-        var EZEID = alterEzeoneId(req.body.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.body.EZEID);
         var Latitude = req.body.Latitude;
         if (Latitude == null || Latitude == '') {
             Latitude = 0.0;
@@ -478,8 +467,8 @@ User_AP.prototype.updateEZEIDAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.body.Token;
-        var OldEZEID = alterEzeoneId(req.body.OldEZEID);
-        var NewEZEID = alterEzeoneId(req.body.NewEZEID);
+        var OldEZEID = req.st.alterEzeoneId(req.body.OldEZEID);
+        var NewEZEID = req.st.alterEzeoneId(req.body.NewEZEID);
         var RtnMessage = {
             IsChanged: false
         };

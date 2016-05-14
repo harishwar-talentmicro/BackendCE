@@ -132,18 +132,6 @@ var uploadDocumentToCloud = function(uniqueName,readStream,callback){
     });
 };
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 var st = null;
 function HrisHRM(db,stdLib){
@@ -301,7 +289,7 @@ HrisHRM.prototype.hrisSaveHRM = function(req,res,next){
     var validationFlag = true;
     var error = {};
 
-    var ezeOneID = alterEzeoneId(req.body.ezeoneid);
+    var ezeOneID = req.st.alterEzeoneId(req.body.ezeoneid);
     if(!req.body.token){
         error.token = 'Invalid token';
         validationFlag *= false;

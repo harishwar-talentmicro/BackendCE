@@ -9,18 +9,7 @@
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 var st = null;
 
 function Reservation(db,stdLib){
@@ -48,7 +37,7 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
         var Token = req.body.Token ;
         var TID = req.body.TID;
         var contactinfo = req.body.contactinfo;
-        var toEzeid = alterEzeoneId(req.body.toEzeid);
+        var toEzeid = req.st.alterEzeoneId(req.body.toEzeid);
         var resourceid = req.body.resourceid;
         var res_datetime = new Date(req.body.res_datetime);
         var duration = req.body.duration;
@@ -352,7 +341,7 @@ Reservation.prototype.getReservTrans = function(req,res,next){
 
         var resourceid = req.query.resourceid;
         var date = new Date(req.query.date);
-        var toEzeid = alterEzeoneId(req.query.toEzeid);
+        var toEzeid = req.st.alterEzeoneId(req.query.toEzeid);
 
         var responseMessage = {
             status: false,
@@ -447,7 +436,7 @@ Reservation.prototype.getMapedServices = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = alterEzeoneId(req.query.ezeid);
+        var ezeid = req.st.alterEzeoneId(req.query.ezeid);
         var resourceid = req.query.resourceid;
 
         var responseMessage = {
@@ -834,7 +823,7 @@ Reservation.prototype.getFeedback = function(req,res,next){
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-    var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+    var ezeone_id = req.st.alterEzeoneId(req.query.ezeone_id);
     var moduleType = req.query.module_type;
     var transId = req.query.trans_id ? req.query.trans_id : 0;
     var resourceId = req.query.resource_id ? req.query.resource_id : 0;
@@ -956,7 +945,7 @@ Reservation.prototype.saveFeedback = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = alterEzeoneId(req.body.ezeid);
+        var ezeid = req.st.alterEzeoneId(req.body.ezeid);
         var rating = req.body.rating;
         var comments = req.body.comments;
         var module = req.body.module;

@@ -17,18 +17,6 @@ var EZEIDEmail = 'noreply@ezeone.com';
 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 var util = require('util');
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 var Mailer = require('./mailer-ejs.js');
 var hussMailer = null;

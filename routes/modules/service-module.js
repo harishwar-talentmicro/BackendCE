@@ -24,18 +24,6 @@ function Service(db,stdLib){
     }
 };
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 var stream = require( "stream" );
 var chalk = require( "chalk" );
@@ -1243,7 +1231,7 @@ Service.prototype.addMembersToService = function(req,res,next){
          */
 
         var token = req.body.token;
-        var ezeid = alterEzeoneId(req.body.ezeid);
+        var ezeid = req.st.alterEzeoneId(req.body.ezeid);
 
         if(!(token)){
             error['token'] = 'token is Mandatory';
@@ -1486,7 +1474,7 @@ Service.prototype.getJoinedCommunity = function(req,res,next){
 Service.prototype.deleteCommunityMember = function(req,res,next){
 
     var token = req.query.token;
-    var ezeid = alterEzeoneId(req.query.ezeid);
+    var ezeid = req.st.alterEzeoneId(req.query.ezeid);
 
     var responseMessage = {
         status: false,

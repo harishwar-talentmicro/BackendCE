@@ -9,18 +9,6 @@
 var express = require('express');
 var router = express.Router();
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 /**
  * Method : GET
@@ -184,7 +172,7 @@ router.get('/approval_list', function(req,res,next){
     }
     else {
         try {
-            //req.query.code = alterEzeoneId(req.query.code);
+            //req.query.code = req.st.alterEzeoneId(req.query.code);
             var procParams = req.db.escape(req.query.token)+ ',' + req.db.escape(req.query.status)+ ',' + req.db.escape(req.query.smid);
             var procQuery = 'CALL get_community_member_approval_list(' + procParams + ')';
             console.log(procQuery);

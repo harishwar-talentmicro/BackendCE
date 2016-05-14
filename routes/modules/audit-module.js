@@ -11,18 +11,6 @@ var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 var st = null;
 
@@ -176,7 +164,7 @@ Audit.prototype.saveList = function(req,res,next){
         var List = req.body.List;
         var RelationType =parseInt(req.body.RelationType);
         var Tag = parseInt(req.body.Tag);
-        var EZEID = alterEzeoneId(req.body.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.body.EZEID);
         var Token = req.body.Token;
 
         var RtnMessage = {
@@ -450,7 +438,7 @@ Audit.prototype.getListCount = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var EZEID = alterEzeoneId(req.query.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.query.EZEID);
         var List=req.query.List;
         var RtnMessage = {
             WhiteListCount : 0

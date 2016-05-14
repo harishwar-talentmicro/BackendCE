@@ -26,18 +26,6 @@ catch(ex){
 
 
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 /**
  * Method : GET
@@ -165,7 +153,7 @@ router.get('/member_details', function(req,res,next){
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var ezeoneid = alterEzeoneId(req.query.ezeoneid);
+                        var ezeoneid = req.st.alterEzeoneId(req.query.ezeoneid);
                         var procParams = req.db.escape(req.query.smid)+ ',' + req.db.escape(ezeoneid);
                         var procQuery = 'CALL pget_community_member_details(' + procParams + ')';
                         console.log(procQuery);
@@ -299,7 +287,7 @@ router.post('/receipts', function(req,res,next){
     }
     else {
         try {
-            var ezeoneid = alterEzeoneId(req.body.ezeoneid);
+            var ezeoneid = req.st.alterEzeoneId(req.body.ezeoneid);
             var procParams = req.db.escape(ezeoneid) + ',' + req.db.escape(id)+ ',' + req.db.escape(req.body.particulars)
                 + ',' + req.db.escape(req.body.amount);
             var procQuery = 'CALL psave_billing_receipts(' + procParams + ')';

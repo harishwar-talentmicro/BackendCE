@@ -16,18 +16,7 @@ var EZEIDEmail = 'noreply@ezeone.com';
 var moment = require('moment');
 
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 //var NotificationMqtt = require('./notification/notification-mqtt.js');
 //var notificationMqtt = new NotificationMqtt();
@@ -755,7 +744,7 @@ Auth.prototype.login = function(req,res,next){
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
 
-    var ezeoneId = alterEzeoneId(req.body.UserName);
+    var ezeoneId = req.st.alterEzeoneId(req.body.UserName);
     var password = req.body.Password;
     var isIphone = req.body.device ? parseInt(req.body.device) : 0;
     var deviceToken = req.body.device_token ? req.body.device_token : '';
@@ -1145,7 +1134,7 @@ Auth.prototype.logout = function(req,res,next){
  */
 
 Auth.prototype.verifyResetCode = function(req,res,next){
-    var ezeoneId = alterEzeoneId(req.query.ezeone_id);
+    var ezeoneId = req.st.alterEzeoneId(req.query.ezeone_id);
     var resetCode = req.query.reset_code;
 
     var ip = req.headers['x-forwarded-for'] ||
@@ -1290,7 +1279,7 @@ Auth.prototype.verifySecretCode = function(req,res,next) {
 
     if (status) {
         try {
-            req.body.ezeone_id = alterEzeoneId(req.body.ezeone_id);
+            req.body.ezeone_id = req.st.alterEzeoneId(req.body.ezeone_id);
             var queryParams = st.db.escape(req.body.secret_code) + ',' + st.db.escape(req.body.ezeone_id) + ',' + st.db.escape(hashPassword(req.body.new_password));
             var verifyQuery = 'CALL pverifySecretcode(' + queryParams + ')';
 

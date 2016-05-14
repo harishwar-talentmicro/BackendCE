@@ -17,18 +17,7 @@ function error(err, req, res, next) {
     res.json(500,{ status : false, message : 'Internal Server Error', error : {server : 'Exception'}});
 };
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 var st = null;
 

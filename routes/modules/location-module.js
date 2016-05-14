@@ -10,18 +10,7 @@
 "use strict";
 
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 var Notification = require('./notification/notification-master.js');
 var NotificationQueryManager = require('./notification/notification-query.js');
@@ -628,7 +617,7 @@ Location.prototype.getLocationPicture = function(req,res,next){
 
         try{
             var ezeParts = req.query.ezeone_id.split('.');
-            ezeoneId = alterEzeoneId(ezeParts[0]);
+            ezeoneId = req.st.alterEzeoneId(ezeParts[0]);
             if(ezeParts.length > 1){
                 if(ezeParts[1].toString()){
 
@@ -754,7 +743,7 @@ Location.prototype.shareLocation = function(req,res,next){
     var fs = require("fs");
 
     var token = req.body.token;
-    var ezeone_id = alterEzeoneId(req.body.ezeone_id); // to ezeone_id
+    var ezeone_id = req.st.alterEzeoneId(req.body.ezeone_id); // to ezeone_id
     var locationTitle = (req.body.lm) ? req.body.lm : ''; // landmark
     var latitude = req.body.lat;
     var longitude = req.body.long;
@@ -948,7 +937,7 @@ Location.prototype.shareLocation = function(req,res,next){
  */
 Location.prototype.validateEZEOne = function(req,res,next){
 
-    var name = alterEzeoneId(req.query.ezeone_id);
+    var name = req.st.alterEzeoneId(req.query.ezeone_id);
     var ezeid;
     var pin = null ;
 
@@ -1063,7 +1052,7 @@ Location.prototype.validateEZEOne = function(req,res,next){
 
 Location.prototype.getLocationsofezeid = function(req,res,next){
 
-    var ezeid = alterEzeoneId(req.query.ezeone_id);
+    var ezeid = req.st.alterEzeoneId(req.query.ezeone_id);
 
     var validationFlag = true;
     var error = {};

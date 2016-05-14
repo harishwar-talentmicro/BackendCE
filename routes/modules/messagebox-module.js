@@ -142,18 +142,7 @@ var uploadDocumentToCloud = function(uniqueName,bufferData,callback){
 };
 
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 var Notification = require('./notification/notification-master.js');
 var NotificationQueryManager = require('./notification/notification-query.js');
@@ -1283,7 +1272,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var isJobseeker = req.body.isJobseeker ? req.body.isJobseeker : 0;
     var toIds= 0;
     var isBussinessChat = req.body.isBussinessChat ? req.body.isBussinessChat : 0;
-    var ezeid = alterEzeoneId(req.body.ezeid);
+    var ezeid = req.st.alterEzeoneId(req.body.ezeid);
     var istask = req.body.istask ? req.body.istask : 0;
     var memberVisible = req.body.member_visible ? req.body.member_visible : 0;
     var randomName;
@@ -1631,7 +1620,7 @@ MessageBox.prototype.getMembersList = function(req,res,next){
 MessageBox.prototype.loadMessageBox = function(req,res,next){
 
     var token = req.query.token;
-    var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+    var ezeone_id = req.st.alterEzeoneId(req.query.ezeone_id);
     var trash = (req.query.trash) ? req.query.trash : 0; //if 0 normal msg ,if u want trash msg send 1 , Default is 0..
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
@@ -1866,7 +1855,7 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
 MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
 
     var token = req.query.token;
-    var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+    var ezeone_id = req.st.alterEzeoneId(req.query.ezeone_id);
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
 

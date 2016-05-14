@@ -12,18 +12,7 @@ var NotificationTemplater = require('../lib/NotificationTemplater.js');
 
 var notificationTemplater = new NotificationTemplater();
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 
 var Notification = require('./notification/notification-master.js');
@@ -58,7 +47,7 @@ Job.prototype.create = function(req,res,next){
     var fs = require("fs");
     var token = req.body.token;
     var tid = req.body.tid;
-    var ezeoneId = alterEzeoneId(req.body.ezeone_id);
+    var ezeoneId = req.st.alterEzeoneId(req.body.ezeone_id);
     var jobCode = req.body.job_code;
     var jobTitle = req.body.job_title;
     var expFrom = req.body.exp_from ? req.body.exp_from : 0;
@@ -1912,7 +1901,7 @@ Job.prototype.getJobDetails = function(req,res,next){
  */
 Job.prototype.jobs = function(req,res,next){
 
-    var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+    var ezeone_id = req.st.alterEzeoneId(req.query.ezeone_id);
     var token = req.query.token;
     var keywordsForSearch = req.query.keywordsForSearch;
     var status = req.query.status;
@@ -3431,7 +3420,7 @@ Job.prototype.jobNotification = function(req,res,next) {
 
     var fs = require("fs");
     var token = req.body.token;
-    var ezeid = alterEzeoneId(req.body.ezeid);
+    var ezeid = req.st.alterEzeoneId(req.body.ezeid);
     var ids = req.body.ids;    // tid of student ids
     var templateId = req.body.template_id;
     var jobId = req.body.job_id;

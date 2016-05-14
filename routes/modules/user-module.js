@@ -24,18 +24,7 @@ var moment = require('moment');
 var appConfig = require('../../ezeone-config.json');
 
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 function FnEncryptPassword(Password) {
     try {
         console.log('encrypt...........');
@@ -510,7 +499,7 @@ User.prototype.checkEzeid = function(req,res,next){
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var EZEID = alterEzeoneId(req.query.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.query.EZEID);
         var RtnMessage = {
             IsIdAvailable: false
         };
@@ -725,7 +714,7 @@ User.prototype.forgetPassword = function(req,res,next){
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var EZEID = alterEzeoneId(req.body.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.body.EZEID);
 
         var resetCode = st.generateRandomHash(Date.now().toString());
 
@@ -934,7 +923,7 @@ User.prototype.verifyResetPasswordLink = function(req,res,next){
 
     if(status){
         try{
-            req.body.ezeone_id = alterEzeoneId(req.body.ezeone_id);
+            req.body.ezeone_id = req.st.alterEzeoneId(req.body.ezeone_id);
             var timestamp = moment(new Date()).format('YYYY-MM-DD HH:mm:ss').toString();
 
             var verifyQueryParams = st.db.escape(req.body.ezeone_id) + ','+ st.db.escape(req.body.reset_code);
@@ -1044,7 +1033,7 @@ User.prototype.verifySecretCode = function(req,res,next) {
 
     if (status) {
         try {
-            req.body.ezeone_id = alterEzeoneId(req.body.ezeone_id);
+            req.body.ezeone_id = req.st.alterEzeoneId(req.body.ezeone_id);
             var queryParams = st.db.escape(req.body.secret_code) + ',' + st.db.escape(req.body.ezeone_id) + ',' + st.db.escape(req.body.new_password);
             var verifyQuery = 'CALL pverifySecretcode(' + queryParams + ')';
 
@@ -1644,7 +1633,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        var EZEID = alterEzeoneId(req.query.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.query.EZEID);
         //console.log(req.query);
         if (Token && EZEID != null ) {
             st.validateToken(Token, function (err, tokenResult) {
@@ -3061,7 +3050,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
 
         console.log(arr);
 
-        ezeid = alterEzeoneId(arr[0]);
+        ezeid = req.st.alterEzeoneId(arr[0]);
         if (arr[1]) {
 
             tag = arr[1].toUpperCase();
@@ -4901,7 +4890,7 @@ User.prototype.getindustrycategory = function(req,res,next){
  */
 User.prototype.profilePicForEzeid = function(req,res,next){
 
-    var ezeid = alterEzeoneId(req.query.ezeid);
+    var ezeid = req.st.alterEzeoneId(req.query.ezeid);
 
     var responseMessage = {
         status: false,
@@ -5026,7 +5015,7 @@ User.prototype.getAlumniEducations = function(req,res,next) {
         validateStatus *= false;
     }
     else {
-        var alumniCode = alterEzeoneId(req.query.alumni_code);
+        var alumniCode = req.st.alterEzeoneId(req.query.alumni_code);
     }
     var validateStatus = true;
     var error = {};

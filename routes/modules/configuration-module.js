@@ -98,18 +98,6 @@ BufferStream.prototype._read = function( size ) {
 };
 
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 var st = null;
 
@@ -1517,7 +1505,7 @@ Configuration.prototype.createSubuser = function(req,res,next){
 
         var token = req.body.Token;
         var tid = req.body.TID;
-        var userName = alterEzeoneId(req.body.UserName);
+        var userName = req.st.alterEzeoneId(req.body.UserName);
         var status  = req.body.Status;
         var firstName = req.body.FirstName;
         var lastName = req.body.LastName;
@@ -1532,7 +1520,7 @@ Configuration.prototype.createSubuser = function(req,res,next){
         var homeDeliveryRules = req.body.HomeDeliveryRules;
         var serviceRules = req.body.ServiceRules;
         var resumeRules = req.body.ResumeRules;
-        var masterId = alterEzeoneId(req.body.PersonalID);
+        var masterId = req.st.alterEzeoneId(req.body.PersonalID);
         var templateId = (!isNaN(parseInt(req.body.templateID))) ? parseInt(req.body.templateID) : 0;
 
         var rtnMessage = {
@@ -1639,7 +1627,7 @@ Configuration.prototype.getReservationResources = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = alterEzeoneId(req.query.ezeid);
+        var ezeid = req.st.alterEzeoneId(req.query.ezeid);
         var type = (req.query.type) ? req.query.type : 0 ;
 
         var responseMessage = {
@@ -2023,7 +2011,7 @@ Configuration.prototype.getReservationServices = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = alterEzeoneId(req.query.ezeid);
+        var ezeid = req.st.alterEzeoneId(req.query.ezeid);
         var responseMessage = {
             status: false,
             data: null,
@@ -2393,7 +2381,7 @@ Configuration.prototype.getResourceServiceMaps = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = alterEzeoneId(req.query.ezeid);
+        var ezeid = req.st.alterEzeoneId(req.query.ezeid);
         var responseMessage = {
             status: false,
             data: null,

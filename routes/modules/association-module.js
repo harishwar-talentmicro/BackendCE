@@ -24,18 +24,7 @@ function Association(db,stdLib){
         notification = new Notification(db,stdLib);
     }
 };
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 var appConfig = require('../../ezeone-config.json');
 

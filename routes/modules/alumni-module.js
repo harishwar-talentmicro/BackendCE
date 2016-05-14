@@ -92,18 +92,7 @@ function Alumni(db,stdLib){
     }
 }
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 function isURl(str, callback) {
 
@@ -1637,7 +1626,7 @@ function FnCropImage(imageParams, callback){
  */
 Alumni.prototype.getAlumniContent = function(req,res,next){
 
-    var code = alterEzeoneId(req.query.code);   // college code
+    var code = req.st.alterEzeoneId(req.query.code);   // college code
 
     var responseMessage = {
         status: false,
@@ -1726,7 +1715,7 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
 Alumni.prototype.getAlumniTeam = function(req,res,next){
 
     var token = req.query.token;
-    var code = alterEzeoneId(req.query.code);   // college code
+    var code = req.st.alterEzeoneId(req.query.code);   // college code
     var type = parseInt(req.query.type);   // 0=core group 1=mentor 2=faculty
 
     var responseMessage = {
@@ -1956,7 +1945,7 @@ Alumni.prototype.deleteAlumniTeam = function(req,res,next){
  */
 Alumni.prototype.getAlumniContentImage = function(req,res,next){
 
-    var code = alterEzeoneId(req.query.code);   // college code
+    var code = req.st.alterEzeoneId(req.query.code);   // college code
 
     var responseMessage = {
         status: false,
@@ -2050,7 +2039,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     var education = parseInt(req.body.education);
     var specialization = parseInt(req.body.specialization);
     var batch = req.body.batch;
-    var code = alterEzeoneId(req.body.code);     // college code
+    var code = req.st.alterEzeoneId(req.body.code);     // college code
     var accesstype = req.body.access_type ? req.body.access_type : 2;  // 0-no relation, 1-is admin, 2-is member
     var ps='';
     var fn = (req.body.fn) ? (req.body.fn) : '';
@@ -2322,7 +2311,7 @@ Alumni.prototype.getAlumniTeamDetails = function(req,res,next){
 Alumni.prototype.getAlumniProfile = function(req,res,next){
 
     var token = req.query.token;
-    var code = alterEzeoneId(req.query.code);   // college code
+    var code = req.st.alterEzeoneId(req.query.code);   // college code
 
     var responseMessage = {
         status: false,
@@ -2448,7 +2437,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     var type = req.query.type;     // 1(training),2=event,3=news,4=knowledge
     var note = req.query.note;
     var venueId = req.query.venue_id;
-    var code = alterEzeoneId(req.query.code);
+    var code = req.st.alterEzeoneId(req.query.code);
     var capacity = (req.query.capacity) ? (req.query.capacity) : 0;
     var randomName='';
     var tenId=0;
@@ -2693,7 +2682,7 @@ function fnsavepic(picContent, callback) {
 Alumni.prototype.getTENDetails = function(req,res,next){
 
     var token = req.query.token ? req.query.token : '';
-    var code = alterEzeoneId(req.query.code);   // college code
+    var code = req.st.alterEzeoneId(req.query.code);   // college code
     var type = parseInt(req.query.type);   // 1(training),2=event,3=news,4=knowledge
     var status = parseInt(req.query.status);
     var pageSize = req.query.page_size ? parseInt(req.query.page_size) : 100;
@@ -2837,7 +2826,7 @@ Alumni.prototype.getTENDetails = function(req,res,next){
 Alumni.prototype.getMyTENDetails = function(req,res,next){
 
     var token = req.query.token ? req.query.token : '';
-    var code = alterEzeoneId(req.query.code);   // college code
+    var code = req.st.alterEzeoneId(req.query.code);   // college code
     var type = parseInt(req.query.type);   // 1(training),2=event,3=news,4=knowledge
     var status = parseInt(req.query.status);
     var pageSize = req.query.page_size ? parseInt(req.query.page_size) : 100;
@@ -2986,7 +2975,7 @@ Alumni.prototype.getMyTENDetails = function(req,res,next){
 Alumni.prototype.getProfileStatus = function(req,res,next){
 
     var token = req.query.token;
-    var code = alterEzeoneId(req.query.code);   // college code
+    var code = req.st.alterEzeoneId(req.query.code);   // college code
 
     var responseMessage = {
         status: false,
@@ -3636,7 +3625,7 @@ Alumni.prototype.getParticipantsList = function(req,res,next){
 Alumni.prototype.getAlumniApprovalList = function(req,res,next){
 
     var token = req.query.token;
-    var code = alterEzeoneId(req.query.code);  // college code
+    var code = req.st.alterEzeoneId(req.query.code);  // college code
     /**
      * Allowed codes for alumni are as follows
      * 0 : Not Verified
@@ -3764,7 +3753,7 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
  */
 Alumni.prototype.getTeamContent = function(req,res,next){
 
-    var code = alterEzeoneId(req.query.code);   // college code
+    var code = req.st.alterEzeoneId(req.query.code);   // college code
 
     var responseMessage = {
         status: false,
@@ -3858,7 +3847,7 @@ Alumni.prototype.getTeamContent = function(req,res,next){
  */
 Alumni.prototype.getTeamImage = function(req,res,next) {
 
-    var code = alterEzeoneId(req.query.code);   // college code
+    var code = req.st.alterEzeoneId(req.query.code);   // college code
     var type = parseInt(req.query.type);   // 0=core group 1=mentor 2=faculty
 
     var responseMessage = {
@@ -4433,7 +4422,7 @@ Alumni.prototype.getClientContacts = function(req,res,next){
 Alumni.prototype.getAll = function(req,res,next){
     var _this = this;
 
-    var ezeid = alterEzeoneId(req.query.ezeone_id);
+    var ezeid = req.st.alterEzeoneId(req.query.ezeone_id);
     var token = req.query.token;
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
@@ -4573,7 +4562,7 @@ Alumni.prototype.create = function(req,res,next){
 
     var token = req.body.token;
     var tid = req.body.tid;
-    var ezeone_id = alterEzeoneId(req.body.ezeone_id);
+    var ezeone_id = req.st.alterEzeoneId(req.body.ezeone_id);
     var job_code = req.body.job_code;
     var job_title = req.body.job_title;
     var exp_from = req.body.exp_from ? req.body.exp_from : 0;
@@ -5256,7 +5245,7 @@ Alumni.prototype.viewJobDetails = function(req,res,next){
 Alumni.prototype.getAlumniJobApprovalList = function(req,res,next){
 
     var token = req.query.token;
-    var code = alterEzeoneId(req.query.code);  // college code
+    var code = req.st.alterEzeoneId(req.query.code);  // college code
     var status = req.query.status; // 0-Pending,1-Active,2-inactive
 
 
@@ -5494,7 +5483,7 @@ Alumni.prototype.searchAlumniTEN = function(req,res,next){
     var title = req.query.keyword;
     var pageSize = req.query.ps ? parseInt(req.query.ps) : 1000;       // no of records per page (constant value) eg: 10
     var pageCount = req.query.pc ? parseInt(req.query.pc) : 0;     // first time its 0. start result count
-    var code = alterEzeoneId(req.query.code);
+    var code = req.st.alterEzeoneId(req.query.code);
 
     var responseMessage = {
         status: false,
@@ -6690,7 +6679,7 @@ Alumni.prototype.getAlumniEducations = function(req,res,next) {
     }
     else {
         try {
-            var alumniCode = alterEzeoneId(req.query.alumni_code);
+            var alumniCode = req.st.alterEzeoneId(req.query.alumni_code);
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
@@ -6795,7 +6784,7 @@ Alumni.prototype.getAlumniSpecialization = function(req,res,next) {
     }
     else {
         try {
-            var alumniCode = alterEzeoneId(req.query.alumni_code);
+            var alumniCode = req.st.alterEzeoneId(req.query.alumni_code);
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
@@ -6907,7 +6896,7 @@ Alumni.prototype.changeAlumniMemberType = function(req,res,next){
     }
     else {
         try {
-            var alumniCode = alterEzeoneId(req.body.alumni_code);
+            var alumniCode = req.st.alterEzeoneId(req.body.alumni_code);
             st.validateToken(req.body.token, function (err, result) {
                 if (!err) {
                     if (result) {

@@ -10,18 +10,6 @@
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 var st = null;
 
@@ -217,7 +205,7 @@ Image_AP.prototype.saveBannerPictureAP = function(req,res,next){
         var SeqNo = parseInt(req.body.SeqNo);
         var Picture = req.body.Picture;
         var Token = req.body.Token;
-        var Ezeid = alterEzeoneId(req.body.Ezeid);
+        var Ezeid = req.st.alterEzeoneId(req.body.Ezeid);
         var TID = req.body.TID;
         if(TID == null ){
             TID = 0;
@@ -312,7 +300,7 @@ Image_AP.prototype.getBannerPictureAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var SeqNo = parseInt(req.query.SeqNo);
         var Token = req.query.Token;
-        var Ezeid = alterEzeoneId(req.query.Ezeid);
+        var Ezeid = req.st.alterEzeoneId(req.query.Ezeid);
 
         if (Token != null  && SeqNo.toString() != 'NaN' && Ezeid != null) {
             st.validateTokenAp(Token, function (err, Result) {
@@ -397,7 +385,7 @@ Image_AP.prototype.getAllBannerPicsAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        var EZEID = alterEzeoneId(req.query.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.query.EZEID);
 
         if (Token != null && EZEID != null) {
             st.validateTokenAp(Token, function (err, Result) {
@@ -478,7 +466,7 @@ Image_AP.prototype.deleteBannerPictureAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.body.Token;
-        var EZEID = alterEzeoneId(req.body.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.body.EZEID);
         var SeqNo = req.body.SeqNo;
         var RtnMessage = {
             IsSuccessfull: false

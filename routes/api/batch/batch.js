@@ -16,18 +16,7 @@ var ajv = Ajv({allErrors: true});
 var ejs = require('ejs');
 var fs = require('fs');
 var moment = require('moment');
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 
 /**

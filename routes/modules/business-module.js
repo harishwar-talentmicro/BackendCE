@@ -30,18 +30,7 @@ function BusinessManager(db,stdLib){
     }
 };
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 /**
  *
@@ -538,7 +527,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
         }
         var DeliveryAddress = (req.body.DeliveryAddress) ? (req.body.DeliveryAddress) : '';
         var ItemIDList = '';
-        var ToEZEID = alterEzeoneId(req.body.ToEZEID);
+        var ToEZEID = req.st.alterEzeoneId(req.body.ToEZEID);
         var item_list_type = (req.body.item_list_type) ? (req.body.item_list_type) : 0;
         var companyName = (req.body.companyName) ? (req.body.companyName) : '';
         var company_id = (req.body.company_id) ? (req.body.company_id) : 0;
@@ -923,7 +912,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
 
         var DeliveryAddress = (req.body.DeliveryAddress) ? (req.body.DeliveryAddress) : '';
         var ItemIDList='';
-        var ToEZEID = alterEzeoneId(req.body.ToEZEID);
+        var ToEZEID = req.st.alterEzeoneId(req.body.ToEZEID);
         var item_list_type = (req.body.item_list_type) ? (req.body.item_list_type) : 0;
         var companyName = (req.body.companyName) ? (req.body.companyName) : '' ;
         var company_id = (req.body.company_id) ? (req.body.company_id) : 0 ;
@@ -2133,7 +2122,7 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
      * @param next
      * @constructor
      */
-    var ezeTerm = alterEzeoneId(req.query.ezeoneid);
+    var ezeTerm = req.st.alterEzeoneId(req.query.ezeoneid);
     var token = req.query.token;
     var locationSeq = 0;
     var pin = null;
@@ -2860,7 +2849,7 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
          */
 
         var token = req.body.token;
-        var toEzeid = alterEzeoneId(req.body.to_ezeid);
+        var toEzeid = req.st.alterEzeoneId(req.body.to_ezeid);
         var message = (req.body.requirement) ? req.body.requirement : '';
         var address = (req.body.address) ? req.body.address : '';
         var notes = (req.body.notes) ? req.body.notes : '';

@@ -10,18 +10,6 @@
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 var st = null;
 
@@ -135,7 +123,7 @@ IDCard_AP.prototype.getIdCardPrintAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        var EZEID = alterEzeoneId(req.query.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.query.EZEID);
         if (Token != null && EZEID != null) {
             st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
