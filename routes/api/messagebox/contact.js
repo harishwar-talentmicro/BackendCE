@@ -68,8 +68,12 @@ router.get('/query', function(req,res,next){
                         }
 
                     }
-                    var procParams = req.db.escape(title) + ',' + req.db.escape(pin) + ',' + req.db.escape(req.query.token);
-                    var procQuery = 'CALL get_v1_messagebox_contact(' + procParams + ')';
+                    var procParams = [
+                        req.db.escape(title) ,
+                        req.db.escape(pin) ,
+                        req.db.escape(req.query.token)
+                    ];
+                    var procQuery = 'CALL get_v1_messagebox_contact(' + procParams.join(',') + ')';
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, results) {
                         if (!err) {
@@ -189,8 +193,11 @@ router.get('/', function(req,res,next){
 
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if ((!err) && tokenResult) {
-                    var procParams = req.db.escape(req.query.token) + ',' + req.db.escape(dateTime);
-                    var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams + ')';
+                    var procParams = [
+                        req.db.escape(req.query.token) ,
+                        req.db.escape(dateTime)
+                    ];
+                    var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(',') + ')';
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, contactResults) {
                         if (!err) {
@@ -304,9 +311,9 @@ router.get('/', function(req,res,next){
  * @param res
  * @param next
  * @param token* <string> token of login user
- * @param groupId <int> group id(Group Id of an individual user or a group where the operation has to be done)
- * @param status <int> is group id
- * @param userGroupId <int> (Group Id of a user on whom operation is done)
+ * @param groupId* <int> group id(Group Id of an individual user or a group where the operation has to be done)
+ * @param status* <int> is group id
+ * @param userGroupId* <int> (Group Id of a user on whom operation is done)
  *
  * @discription : API to change status of contacts
  */
@@ -326,6 +333,10 @@ router.put('/status', function(req,res,next){
     req.body.groupId  = parseInt(req.body.groupId);   // groupid of receiver
     req.body.status  = parseInt(req.body.status);      // Status 0 : Pending, 1: Accepted, 2 : Rejected, 3 : Leaved, 4 : Removed
     req.body.userGroupId  = parseInt(req.body.userGroupId);
+
+    /**
+     * validating for token as token,groupId,userGroupId and status
+     * */
     if (!req.body.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
@@ -362,33 +373,38 @@ router.put('/status', function(req,res,next){
                             req.db.escape(req.body.status) ,
                             req.db.escape(req.body.userGroupId)
                         ];
-
+                        /**
+                         * call p_v1_UpdateUserStatus to change the status like accept/reject/block
+                         * */
                         var query = 'CALL p_v1_UpdateUserStatus(' + queryParams.join(',') + ')';
                         console.log(query);
                         req.db.query(query, function (err, updateResult) {
                             if (!err) {
+                                /**
+                                 * if proc executed successfully then give response true
+                                 * */
+
                                 if (updateResult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'User status updated successfully';
-                                    responseMessage.data = {
-                                        group_id: req.body.group_id,
-                                        status: status,
-                                        group_type : groupType
-                                    };
-
+                                    responseMessage.data = null;
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateUserStatus: User status updated successfully');
 
                                 }
-
+                                /**
+                                 * if proc executed unsuccessfully then give response false
+                                 * */
                                 else {
                                     responseMessage.message = 'User status is not updated';
                                     res.status(200).json(responseMessage);
                                     console.log('p_v1_UpdateUserStatus:User status is not updated');
                                 }
                             }
-
+                            /**
+                             * while executing proc if error comes then give error
+                             * */
                             else {
                                 responseMessage.message = 'An error occured ! Please try again';
                                 responseMessage.error = {
