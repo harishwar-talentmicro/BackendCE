@@ -989,9 +989,10 @@ router.post('/invoice', function(req,res,next){
                                                 });
 
                                                 var pdf = require('html-pdf');
-                                                var options = { format: 'A4' };
+                                                var options = {format: 'A4'};
 
                                                 pdf.create(htmlMail,options).toBuffer(function(err, pdfBuffer){
+                                                    console.log("pdfBuffer",pdfBuffer);
                                                     if(!err){
                                                         console.log('Sending mail');
                                                         mailerApi.sendMailNew('invoice', {
@@ -1015,7 +1016,6 @@ router.post('/invoice', function(req,res,next){
                                                             content : pdfBuffer
                                                         }
                                                         ]);
-                                                        console.log(filename,"filename");
 
                                                     }
                                                     else{

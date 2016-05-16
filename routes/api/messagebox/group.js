@@ -63,8 +63,11 @@ router.get('/validate', function(req,res,next){
                     /**
                      * call procedure for validating groupname
                      * */
-                    var procParams = req.db.escape(req.query.token) + ',' + req.db.escape(req.query.groupName);
-                    var procQuery = 'CALL p_v1_validateGroup(' + procParams + ')';
+                    var procParams = [
+                        req.db.escape(req.query.token) ,
+                        req.db.escape(req.query.groupName)
+                        ];
+                    var procQuery = 'CALL p_v1_validateGroup(' + procParams.join(',') + ')';
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, validateGroupResults) {
                         /**
