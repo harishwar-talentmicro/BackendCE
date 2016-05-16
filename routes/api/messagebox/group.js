@@ -330,19 +330,137 @@ router.post('/', function(req,res,next){
 });
 
 
-
 /**
- * Method : GET
+ * Method : POST
  * @param req
  * @param res
  * @param next
  * @param token* <string> token of login user
- * @param groupId <int> is group id
- * @param tGrouptype <int> is group type
- * @param pageNo <int> is page no
- * @param limit <int> limit till that we will give results
- * @discription : API to change admin of group
+ * @param groupId <int>
+ * @param groupName*  <string>
+ * @param aboutGroup  <string>
+ * @param showMembers  <int>(0 : false (default) , 1 : true)
+ * @param restrictedReply  <int>(0 : false (default) , 1 : true)
+ * @param autoJoin <int> (0 : false (default) , 1 : true)
+ * @discription : API to create group
  */
+
+router.post('/members', function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    /** validation goes here
+     * checking that groupId we are getting from front end or not if no then default
+     * value is 0 and if getting then check that its integer or not,if not give error
+     *
+     * */
+    req.body.groupId= (req.body.groupId) ? parseInt(req.body.groupId) : 0;
+    req.body.ezeoneId = req.st.alterEzeoneId(req.body.ezeoneId);
+    if(isNaN(req.body.groupId)){
+        error.groupId = 'Invalid group Id';
+        validationFlag *= false;
+    }
+    /**
+     * validating token and groupName is mandatory field so cheking whether from front end we are getting or not
+     * if not getting then give error
+     * */
+    if (!req.body.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            /**
+             * validating token of login user
+             * */
+
+            req.st.validateToken(req.body.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+
+                    var queryParams = [req.db.escape(req.body.token) ,
+                        req.db.escape(req.body.groupId) ,
+                        req.db.escape(req.body.status) ,
+                        req.db.escape(req.body.userGroupId)
+                    ];
+                    /**
+                     * call p_v1_addmembersbygroup to add members to the group
+                     * */
+                    var query = 'CALL p_v1_addmembersbygroup(' + queryParams.join(',') + ')';
+                    console.log(query);
+                    req.db.query(query, function (err, addMemberResult) {
+                        if (!err) {
+                            /**
+                             * if proc executed successfully then give response true
+                             * */
+
+                            if (addMemberResult && addMemberResult[0] && addMemberResult[0].length>0 && addMemberResult[0][0]) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Member added to group successfully';
+                                responseMessage.data = null;
+                                res.status(200).json(responseMessage);
+                                console.log('p_v1_addmembersbygroup: Member added to group successfully');
+
+                            }
+                            /**
+                             * if proc executed unsuccessfully then give response false
+                             * */
+                            else {
+                                responseMessage.message = 'Member added to group successfully';
+                                res.status(200).json(responseMessage);
+                                console.log('p_v1_addmembersbygroup:Member added to group successfully');
+                            }
+                        }
+                        /**
+                         * while executing proc if error comes then give error
+                         * */
+                        else {
+                            responseMessage.message = 'An error occured ! Please try again';
+                            responseMessage.error = {
+                                server: 'Internal Server Error'
+                            };
+                            res.status(500).json(responseMessage);
+                            console.log('p_v1_addmembersbygroup: error in updating user status :' + err);
+                        }
+                    });
+
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : p_v1_addmembersbygroup ', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error p_v1_addmembersbygroup :  ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+});
 
 
 module.exports = router;

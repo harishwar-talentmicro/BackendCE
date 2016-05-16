@@ -457,7 +457,6 @@ router.get('/message', function(req,res,next){
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     var message;
-                    var messageObj;
                     if (tokenResult) {
                         var procParams = [
                             req.db.escape(req.query.groupId) ,
@@ -532,6 +531,7 @@ router.get('/message', function(req,res,next){
                         res.status(401).json(responseMessage);
                         console.log('Invalid token');
                     }
+                    var messageObj;
                 }
                 else {
                     responseMessage.error = {
