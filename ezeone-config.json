@@ -70,6 +70,12 @@
         ],
         "file": "job/placement-officer-job-approval.txt"
       },
+      "add_members_to_group": {
+        "params": [
+          "groupName"
+        ],
+        "file": "message/members-to-group.txt"
+      },
       "change_admin_messagebox": {
         "params": [
           "oldAdminName",

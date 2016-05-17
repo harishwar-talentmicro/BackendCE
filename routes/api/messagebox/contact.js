@@ -365,7 +365,7 @@ router.put('/status', function(req,res,next){
             /**
              * validation for token of login user
              * */
-            req.st.validateToken(token, function (err, tokenResult) {
+            req.st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err && tokenResult) {
 
                         var queryParams = [req.db.escape(req.body.token) ,
@@ -384,22 +384,34 @@ router.put('/status', function(req,res,next){
                                  * if proc executed successfully then give response true
                                  * */
 
-                                if (updateResult) {
+                                if (updateResult
+                                    && updateResult[0]
+                                    && updateResult[0].length>0
+                                    && updateResult[0][0]._e) {
+                                    var qMsg = {server: 'Internal Server Error'};
+                                    switch (updateResult[0][0]._e) {
+                                        case 'ACCESS DENIED' :
+                                            qMsg = {_e: 'ACCESS DENIED'};
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = qMsg;
+                                    responseMessage.data = {};
+                                    res.status(200).json(responseMessage);
+                                }
+                                /**
+                                 * if proc executed unsuccessfully then give response false
+                                 * */
+                                else {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'User status updated successfully';
                                     responseMessage.data = null;
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateUserStatus: User status updated successfully');
-
-                                }
-                                /**
-                                 * if proc executed unsuccessfully then give response false
-                                 * */
-                                else {
-                                    responseMessage.message = 'User status is not updated';
-                                    res.status(200).json(responseMessage);
-                                    console.log('p_v1_UpdateUserStatus:User status is not updated');
                                 }
                             }
                             /**
