@@ -161,18 +161,15 @@ router.get('/', function(req,res,next){
      * isweb is flag if its 1 then req comes from web and if 0 then its from mobile
      */
 
-    var dateTime = moment(req.query.dateTime,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
-    var momentObj = moment(dateTime,'YYYY-MM-DD').isValid();
     var groupId;
     var isWeb   = (req.query.isWeb ) ? (req.query.isWeb ) :0;
     if(req.query.dateTime){
-        if(!momentObj){
-            error.dateTime = 'Invalid date';
-            validationFlag *= false;
+        if(moment(req.query.dateTime,'YYYY-MM-DD HH:mm:ss').isValid()){
+            req.query.dateTime = moment(req.query.dateTime,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
         }
     }
     else{
-        dateTime = null;
+        req.query.dateTime = null;
     }
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -195,7 +192,7 @@ router.get('/', function(req,res,next){
                 if ((!err) && tokenResult) {
                     var procParams = [
                         req.db.escape(req.query.token) ,
-                        req.db.escape(dateTime)
+                        req.db.escape(req.query.dateTime)
                     ];
                     var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(',') + ')';
                     console.log(procQuery);

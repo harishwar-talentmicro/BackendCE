@@ -28,7 +28,7 @@ var fs = require('fs');
  *  @param taskExpiryDate<datetime>
  *  @param explicitMemberGroupIdList<text>(how many user A want to send messages to multiple users)
  *  @param message<text>(text message otheriwse it will null)
- * @discription : API to compose message
+ *  @description : API to compose message
  */
 
 router.post('/message', function(req,res,next){
@@ -149,7 +149,9 @@ router.post('/message', function(req,res,next){
                                 if (req.body.messageType == 0) {
                                     message = req.body.message;
                                 }
-                                /**
+                                /**`1``````````````````````````````````````````````````````
+                                 *
+                                 * y
                                  * check that messageType is 2(location) then prepare json object of  latitude and longitude  which we are
                                  * getting from front end into above declared variable name message
                                  * */
