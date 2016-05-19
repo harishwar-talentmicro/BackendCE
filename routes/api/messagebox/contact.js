@@ -161,18 +161,15 @@ router.get('/', function(req,res,next){
      * isweb is flag if its 1 then req comes from web and if 0 then its from mobile
      */
 
-    var dateTime = moment(req.query.dateTime,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
-    var momentObj = moment(dateTime,'YYYY-MM-DD').isValid();
     var groupId;
     var isWeb   = (req.query.isWeb ) ? (req.query.isWeb ) :0;
     if(req.query.dateTime){
-        if(!momentObj){
-            error.dateTime = 'Invalid date';
-            validationFlag *= false;
+        if(moment(req.query.dateTime,'YYYY-MM-DD HH:mm:ss').isValid()){
+            req.query.dateTime = moment(req.query.dateTime,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
         }
     }
     else{
-        dateTime = null;
+        req.query.dateTime = null;
     }
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -195,7 +192,7 @@ router.get('/', function(req,res,next){
                 if ((!err) && tokenResult) {
                     var procParams = [
                         req.db.escape(req.query.token) ,
-                        req.db.escape(dateTime)
+                        req.db.escape(req.query.dateTime)
                     ];
                     var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(',') + ')';
                     console.log(procQuery);
@@ -365,7 +362,7 @@ router.put('/status', function(req,res,next){
             /**
              * validation for token of login user
              * */
-            req.st.validateToken(token, function (err, tokenResult) {
+            req.st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err && tokenResult) {
 
                         var queryParams = [req.db.escape(req.body.token) ,
@@ -384,22 +381,34 @@ router.put('/status', function(req,res,next){
                                  * if proc executed successfully then give response true
                                  * */
 
-                                if (updateResult) {
+                                if (updateResult
+                                    && updateResult[0]
+                                    && updateResult[0].length>0
+                                    && updateResult[0][0]._e) {
+                                    var qMsg = {server: 'Internal Server Error'};
+                                    switch (updateResult[0][0]._e) {
+                                        case 'ACCESS DENIED' :
+                                            qMsg = {_e: 'ACCESS DENIED'};
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = qMsg;
+                                    responseMessage.data = {};
+                                    res.status(200).json(responseMessage);
+                                }
+                                /**
+                                 * if proc executed unsuccessfully then give response false
+                                 * */
+                                else {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'User status updated successfully';
                                     responseMessage.data = null;
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateUserStatus: User status updated successfully');
-
-                                }
-                                /**
-                                 * if proc executed unsuccessfully then give response false
-                                 * */
-                                else {
-                                    responseMessage.message = 'User status is not updated';
-                                    res.status(200).json(responseMessage);
-                                    console.log('p_v1_UpdateUserStatus:User status is not updated');
                                 }
                             }
                             /**

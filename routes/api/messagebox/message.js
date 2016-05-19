@@ -28,7 +28,7 @@ var fs = require('fs');
  *  @param taskExpiryDate<datetime>
  *  @param explicitMemberGroupIdList<text>(how many user A want to send messages to multiple users)
  *  @param message<text>(text message otheriwse it will null)
- * @discription : API to compose message
+ *  @description : API to compose message
  */
 
 router.post('/message', function(req,res,next){
@@ -149,7 +149,9 @@ router.post('/message', function(req,res,next){
                                 if (req.body.messageType == 0) {
                                     message = req.body.message;
                                 }
-                                /**
+                                /**`1``````````````````````````````````````````````````````
+                                 *
+                                 * y
                                  * check that messageType is 2(location) then prepare json object of  latitude and longitude  which we are
                                  * getting from front end into above declared variable name message
                                  * */
@@ -187,8 +189,8 @@ router.post('/message', function(req,res,next){
                                     req.db.escape(message) ,
                                     req.db.escape(req.body.messageType) ,
                                     req.db.escape(req.body.priority) ,
-                                    req.db.escape(taskTargetDate) ,
-                                    req.db.escape(taskExpiryDate) ,
+                                    req.db.escape(req.body.taskTargetDate) ,
+                                    req.db.escape(req.body.taskExpiryDate) ,
                                     req.db.escape(req.body.receiverGroupId) ,
                                     req.db.escape(explicitMemberGroupIdList) ,
                                     req.db.escape(autoJoinResults[0][0].groupRelationStatus) ,
@@ -457,7 +459,6 @@ router.get('/message', function(req,res,next){
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     var message;
-                    var messageObj;
                     if (tokenResult) {
                         var procParams = [
                             req.db.escape(req.query.groupId) ,
@@ -532,6 +533,7 @@ router.get('/message', function(req,res,next){
                         res.status(401).json(responseMessage);
                         console.log('Invalid token');
                     }
+                    var messageObj;
                 }
                 else {
                     responseMessage.error = {
