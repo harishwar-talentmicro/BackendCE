@@ -72,9 +72,17 @@
       },
       "add_members_to_group": {
         "params": [
-          "groupName"
+          "groupName",
+          "adminName"
         ],
         "file": "message/members-to-group.txt"
+      },
+      "join_group": {
+        "params": [
+          "groupName",
+          "fullName"
+        ],
+        "file": "message/join-group.txt"
       },
       "change_admin_messagebox": {
         "params": [

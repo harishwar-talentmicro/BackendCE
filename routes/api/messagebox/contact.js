@@ -9,7 +9,11 @@
 var express = require('express');
 var router = express.Router();
 var moment = require('moment');
-
+var notification = null;
+var NotificationTemplater = require('../../lib/NotificationTemplater.js');
+var notificationTemplater = new NotificationTemplater();
+var Notification = require('../../modules/notification/notification-master.js');
+var notification = new Notification();
 
 /**
  * Method : GET
@@ -112,10 +116,10 @@ router.get('/query', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
                     console.log('Error :', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -279,10 +283,10 @@ router.get('/', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
                     console.log('Error :', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -427,11 +431,13 @@ router.put('/status', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
                     responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('p_v1_UpdateUserStatus:Error in processing Token' + err);
+                    res.status(401).json(responseMessage);
+                    console.log('Error :', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
             });
         }
