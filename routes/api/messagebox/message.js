@@ -502,7 +502,7 @@ router.get('/message', function(req,res,next){
                                     res.status(200).json(responseMessage);
                                 }
                                 else {
-                                    responseMessage.status = false;
+                                    responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Messages of group not available';
                                     responseMessage.data = {

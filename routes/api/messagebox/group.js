@@ -268,7 +268,6 @@ router.post('/', function(req,res,next){
                                     console.log('Error : p_v1_createMessageGroup ', err);
                                     var errorDate = new Date();
                                     console.log(errorDate.toTimeString() + ' ......... error ...........');
-
                                 }
                             });
                         };
@@ -344,7 +343,7 @@ router.post('/', function(req,res,next){
  * @param token* <string> token of login user
  * @param groupId <int>
  * @param ezeoneId <string>
- * @discription : API to add members to the group(admin willc all this api)
+ * @discription : API to add members to the group(admin will call this api)
  */
 
 router.post('/members', function(req,res,next){
@@ -360,16 +359,11 @@ router.post('/members', function(req,res,next){
      * checking that groupId,token we are getting from front end or not if no then give error
      *
      * */
-    req.body.groupId= (req.body.groupId) ? parseInt(req.body.groupId) : 0;
     req.body.ezeoneId = req.st.alterEzeoneId(req.body.ezeoneId);
-    if(isNaN(req.body.groupId)){
-        error.groupId = 'Invalid group Id';
+    if (isNaN(parseInt(req.body.groupId))) {
+        error.groupId = 'Invalid Group id';
         validationFlag *= false;
     }
-    /**
-     * validating token and groupName is mandatory field so cheking whether from front end we are getting or not
-     * if not getting then give error
-     * */
     if (!req.body.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
@@ -526,7 +520,7 @@ router.post('/members', function(req,res,next){
  * @discription : API to join group(members will call this api)
  */
 
-router.post('/join_group', function(req,res,next){
+router.post('/join', function(req,res,next){
     var responseMessage = {
         status: false,
         error: {},
@@ -544,10 +538,6 @@ router.post('/join_group', function(req,res,next){
         error.groupId = 'Invalid group Id';
         validationFlag *= false;
     }
-    /**
-     * validating token and groupName is mandatory field so cheking whether from front end we are getting or not
-     * if not getting then give error
-     * */
     if (!req.body.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
@@ -568,10 +558,11 @@ router.post('/join_group', function(req,res,next){
                 if ((!err) && tokenResult) {
 
                     var queryParams = [
-                        req.db.escape(req.body.groupId), req.db.escape(req.body.token)
+                        req.db.escape(req.body.groupId) ,
+                        req.db.escape(req.body.token)
                     ];
                     /**
-                     * call p_v1_addmembersbygroup to add members to the group
+                     * call p_v1_addmembersbygroup to add members to the group where member will send request to join the group
                      * */
                     var query = 'CALL p_v1_addmemberstogroup(' + queryParams.join(',') + ')';
                     console.log(query);
@@ -601,7 +592,7 @@ router.post('/join_group', function(req,res,next){
                                     isRequester : addMemberResult[0][0].isRequester,
                                     unreadCount : addMemberResult[0][0].unreadCount
                                 });
-
+                                console.log("output",output);
                                 responseMessage.data = {
                                     groupMemberList : output
                                 };

@@ -365,7 +365,8 @@ router.put('/status', function(req,res,next){
             req.st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err && tokenResult) {
 
-                        var queryParams = [req.db.escape(req.body.token) ,
+                        var queryParams = [
+                            req.db.escape(req.body.token) ,
                             req.db.escape(req.body.groupId) ,
                             req.db.escape(req.body.status) ,
                             req.db.escape(req.body.userGroupId)
