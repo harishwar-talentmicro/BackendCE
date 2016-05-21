@@ -1,0 +1,1 @@
+<%=adminName%> has accepted your request for <%=groupName%> group.
