@@ -84,12 +84,31 @@
         ],
         "file": "message/join-group.txt"
       },
-      "change_admin_messagebox": {
+      "change_admin": {
         "params": [
           "oldAdminName",
-          "newAdminName"
+          "groupName"
         ],
-        "file": "message-box/change-admin.txt"
+        "file": "message/change-group-admin.txt"
+      },
+      "leave_group": {
+        "params": [
+          "memberName",
+          "groupName"
+        ],
+        "file": "message/leave-group.txt"
+      },
+      "delete_group": {
+        "params": [
+          "groupName"
+        ],
+        "file": "message/delete-group.txt"
+      },
+      "accept_request": {
+        "params": [
+          "adminName"
+        ],
+        "file": "message/accept-request.txt"
       }
     }
   },

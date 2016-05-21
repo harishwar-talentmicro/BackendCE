@@ -389,7 +389,53 @@ router.put('/status', function(req,res,next){
                                 if (updateResult
                                     && updateResult[0]
                                     && updateResult[0].length>0
-                                    && updateResult[0][0]._e) {
+                                    && updateResult[0][0].userGroupId) {
+
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'User status updated successfully';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnUpdateUserStatus: User status updated successfully');
+
+                                    if(updateResult[0][0].status = 1){
+                                        var notificationTemplaterRes = notificationTemplater.parse('accept_request',{
+                                            adminName : updateResult[0][0].adminName,
+                                            groupName : updateResult[0][0].groupName
+                                        });
+                                        console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                        if(notificationTemplaterRes.parsedTpl){
+                                            notification.publish(
+                                                updateResult[0][0].userGroupId,
+                                                updateResult[0][0].groupName,
+                                                updateResult[0][0].groupName,
+                                                updateResult[0][0].senderId,
+                                                notificationTemplaterRes.parsedTpl,
+                                                36,
+                                                0, 0,
+                                                0,
+                                                0,
+                                                0,
+                                                0,
+                                                1,
+                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                '',
+                                                0,
+                                                0);
+                                            console.log('postNotification : notification for accept_request is sent successfully');
+                                        }
+                                        else{
+                                            console.log('Error in parsing notification accept_request template - ',
+                                                notificationTemplaterRes.error);
+                                            console.log('postNotification : notification for accept_request is sent successfully');
+                                        }
+                                    }
+
+                                }
+                                /**
+                                 * if proc executed unsuccessfully then give response false
+                                 * */
+                                else {
                                     var qMsg = {server: 'Internal Server Error'};
                                     switch (updateResult[0][0]._e) {
                                         case 'ACCESS DENIED' :
@@ -403,17 +449,6 @@ router.put('/status', function(req,res,next){
                                     responseMessage.message = qMsg;
                                     responseMessage.data = {};
                                     res.status(200).json(responseMessage);
-                                }
-                                /**
-                                 * if proc executed unsuccessfully then give response false
-                                 * */
-                                else {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'User status updated successfully';
-                                    responseMessage.data = null;
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnUpdateUserStatus: User status updated successfully');
                                 }
                             }
                             /**

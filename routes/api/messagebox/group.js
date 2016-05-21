@@ -1032,6 +1032,38 @@ router.post('/change_admin', function(req,res,next){
                                     responseMessage.message = 'Group details loaded successfully';
                                     responseMessage.data = changeAdminResults[0];
                                     res.status(200).json(responseMessage);
+
+                                    var notificationTemplaterRes = notificationTemplater.parse('change_admin',{
+                                        groupName : changeAdminResults[0][0].groupName,
+                                        oldAdminName : changeAdminResults[0][0].oldAdminName
+                                    });
+                                    console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                    if(notificationTemplaterRes.parsedTpl){
+                                        notification.publish(
+                                            changeAdminResults[0][0].adminUserGroupId,
+                                            changeAdminResults[0][0].groupName,
+                                            changeAdminResults[0][0].groupName,
+                                            changeAdminResults[0][0].senderId,
+                                            notificationTemplaterRes.parsedTpl,
+                                            33,
+                                            0, changeAdminResults[0][0].iphoneId,
+                                            0,
+                                            0,
+                                            0,
+                                            0,
+                                            1,
+                                            moment().format("YYYY-MM-DD HH:mm:ss"),
+                                            '',
+                                            0,
+                                            0);
+                                        console.log('postNotification : notification for join_group is sent successfully');
+                                    }
+                                    else{
+                                        console.log('Error in parsing notification join_group template - ',
+                                            notificationTemplaterRes.error);
+                                        console.log('postNotification : notification for join_group is sent successfully');
+                                    }
+
                                 }
                                 else{
                                     var qMsg = {server: 'Internal Server Error'};
@@ -1146,15 +1178,59 @@ router.delete('/:groupId', function(req,res,next){
                         req.db.escape(req.params.groupId) ,
                         req.db.escape(req.body.token)
                     ];
-                    var procQuery = 'CALL pDeleteGroup(' + procParams.join(',') + ')';
+                        var procQuery = 'CALL pDeleteGroup(' + procParams.join(',') + ')';
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, deleteGroupResults) {
-                        console.log(deleteGroupResults,"changeAdminResults");
                         if (!err){
                             if (deleteGroupResults
                                 && deleteGroupResults[0]
                                 && deleteGroupResults[0].length>0
-                                && deleteGroupResults[0][0]._e) {
+                                && deleteGroupResults[0][0].groupId) {
+
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Group deleted successfully';
+                                responseMessage.data = [];
+                                res.status(200).json(responseMessage);
+                                console.log(deleteGroupResults[1],"deleteGroupResults");
+                                if(deleteGroupResults[1] && deleteGroupResults[1].length>0){
+                                    for (var i = 0; i < deleteGroupResults[1].length; i++ ) {
+                                        var notificationTemplaterRes = notificationTemplater.parse('delete_group',{
+                                            groupName : deleteGroupResults[0][0].groupName
+                                        });
+                                        console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                        if(notificationTemplaterRes.parsedTpl){
+                                            notification.publish(
+                                                deleteGroupResults[1][i].memberGroupId,
+                                                deleteGroupResults[0][0].groupName,
+                                                deleteGroupResults[0][0].groupName,
+                                                deleteGroupResults[0][0].groupId,
+                                                notificationTemplaterRes.parsedTpl,
+                                                34,
+                                                0, 0,
+                                                0,
+                                                0,
+                                                0,
+                                                0,
+                                                1,
+                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                '',
+                                                0,
+                                                0);
+                                            console.log('postNotification : notification for delete_group is sent successfully');
+                                        }
+                                        else{
+                                            console.log('Error in parsing notification delete_group template - ',
+                                                notificationTemplaterRes.error);
+                                            console.log('postNotification : notification for delete_group is sent successfully');
+                                        }
+                                    }
+
+                                }
+
+
+                            }
+                            else{
                                 var qMsg = {server: 'Internal Server Error'};
                                 switch (deleteGroupResults[0][0]._e) {
                                     case 'ACCESS DENIED' :
@@ -1167,25 +1243,6 @@ router.delete('/:groupId', function(req,res,next){
                                 responseMessage.error = null;
                                 responseMessage.message = qMsg;
                                 responseMessage.data = {};
-                                res.status(200).json(responseMessage); var qMsg = {server: 'Internal Server Error'};
-                                switch (deleteGroupResults[0][0]._e) {
-                                    case 'ACCESS DENIED' :
-                                        qMsg = {_e: 'ACCESS DENIED'};
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                responseMessage.status = false;
-                                responseMessage.error = null;
-                                responseMessage.message = qMsg;
-                                responseMessage.data = {};
-                                res.status(200).json(responseMessage);
-                            }
-                            else{
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Group deleted successfully';
-                                responseMessage.data = [];
                                 res.status(200).json(responseMessage);
                             }
                         }
@@ -1286,10 +1343,52 @@ router.put('/leave', function(req,res,next){
                     console.log(query);
                     req.db.query(query, function (err, leaveGroupResult) {
                         if (!err) {
-                            if (leaveGroupResult
+                            if(leaveGroupResult
                                 && leaveGroupResult[0]
                                 && leaveGroupResult[0].length>0
-                                && leaveGroupResult[0][0]._e) {
+                            && leaveGroupResult[0][0].senderId)
+                            {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'leave group successfully';
+                                responseMessage.data = null;
+                                res.status(200).json(responseMessage);
+                                console.log('p_v1_leaveGroup: leave group successfully');
+
+                                var notificationTemplaterRes = notificationTemplater.parse('leave_group',{
+                                    groupName : leaveGroupResult[0][0].groupName,
+                                    memberName : leaveGroupResult[0][0].memberName
+                                });
+                                console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                if(notificationTemplaterRes.parsedTpl){
+                                    notification.publish(
+                                        leaveGroupResult[0][0].adminGroupId,
+                                        leaveGroupResult[0][0].groupName,
+                                        leaveGroupResult[0][0].groupName,
+                                        leaveGroupResult[0][0].senderId,
+                                        notificationTemplaterRes.parsedTpl,
+                                        35,
+                                        0, leaveGroupResult[0][0].iphoneId,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        1,
+                                        moment().format("YYYY-MM-DD HH:mm:ss"),
+                                        '',
+                                        0,
+                                        0);
+                                    console.log('postNotification : notification for leave_group is sent successfully');
+                                }
+                                else{
+                                    console.log('Error in parsing notification leave_group template - ',
+                                        notificationTemplaterRes.error);
+                                    console.log('postNotification : notification for leave_group is sent successfully');
+                                }
+
+                            }
+
+                            else {
                                 var qMsg = {server: 'Internal Server Error'};
                                 switch (leaveGroupResult[0][0]._e) {
                                     case 'ACCESS DENIED' :
@@ -1303,17 +1402,6 @@ router.put('/leave', function(req,res,next){
                                 responseMessage.message = qMsg;
                                 responseMessage.data = {};
                                 res.status(200).json(responseMessage);
-                            }
-                            /**
-                             * if proc executed unsuccessfully then give response false
-                             * */
-                            else {
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'leave group successfully';
-                                responseMessage.data = null;
-                                res.status(200).json(responseMessage);
-                                console.log('p_v1_leaveGroup: leave group successfully');
                             }
                         }
                         /**
