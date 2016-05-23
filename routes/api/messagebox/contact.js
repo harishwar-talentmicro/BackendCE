@@ -342,15 +342,15 @@ router.put('/status', function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if(isNaN(req.body.groupId)){
-        error.groupId = 'Invalid groupId';
+    if (isNaN(parseInt(req.body.groupId))) {
+        error.groupId = 'Invalid Group id';
         validationFlag *= false;
     }
-    if(isNaN(req.body.userGroupId)){
+    if(isNaN(parseInt(req.body.userGroupId))){
         error.userGroupId = 'Invalid userGroupId';
         validationFlag *= false;
     }
-    if(isNaN(req.body.status)){
+    if(isNaN(parseInt(req.body.status))){
         error.status = 'Invalid status';
         validationFlag *= false;
     }
@@ -411,7 +411,7 @@ router.put('/status', function(req,res,next){
                                                 updateResult[0][0].groupName,
                                                 updateResult[0][0].senderId,
                                                 notificationTemplaterRes.parsedTpl,
-                                                36,
+                                                32,
                                                 0, 0,
                                                 0,
                                                 0,
@@ -488,6 +488,9 @@ router.put('/status', function(req,res,next){
         }
     }
 });
+
+
+
 
 module.exports = router;
 

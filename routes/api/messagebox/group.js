@@ -426,7 +426,7 @@ router.post('/members', function(req,res,next){
                                         addMemberResult[0][0].groupName,
                                         addMemberResult[0][0].senderId,
                                         notificationTemplaterRes.parsedTpl,
-                                        31,
+                                        33,
                                         0, addMemberResult[0][0].iphoneId,
                                         0,
                                         0,
@@ -611,7 +611,7 @@ router.post('/join', function(req,res,next){
                                         addMemberResult[0][0].groupName,
                                         addMemberResult[0][0].senderId,
                                         notificationTemplaterRes.parsedTpl,
-                                        32,
+                                        34,
                                         0, addMemberResult[0][0].iphoneId,
                                         0,
                                         0,
@@ -1029,8 +1029,10 @@ router.post('/change_admin', function(req,res,next){
                                     changeAdminResults[0][0].adminUserGroupId) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
-                                    responseMessage.message = 'Group details loaded successfully';
-                                    responseMessage.data = changeAdminResults[0];
+                                    responseMessage.message = 'Admin changed successfully';
+                                    responseMessage.data = {
+                                        adminUserGroupId : changeAdminResults[0][0].adminUserGroupId
+                                    }
                                     res.status(200).json(responseMessage);
 
                                     var notificationTemplaterRes = notificationTemplater.parse('change_admin',{
@@ -1045,7 +1047,7 @@ router.post('/change_admin', function(req,res,next){
                                             changeAdminResults[0][0].groupName,
                                             changeAdminResults[0][0].senderId,
                                             notificationTemplaterRes.parsedTpl,
-                                            33,
+                                            35,
                                             0, changeAdminResults[0][0].iphoneId,
                                             0,
                                             0,
@@ -1056,12 +1058,12 @@ router.post('/change_admin', function(req,res,next){
                                             '',
                                             0,
                                             0);
-                                        console.log('postNotification : notification for join_group is sent successfully');
+                                        console.log('postNotification : notification for change_admin is sent successfully');
                                     }
                                     else{
-                                        console.log('Error in parsing notification join_group template - ',
+                                        console.log('Error in parsing notification change_admin template - ',
                                             notificationTemplaterRes.error);
-                                        console.log('postNotification : notification for join_group is sent successfully');
+                                        console.log('postNotification : notification for change_admin is sent successfully');
                                     }
 
                                 }
@@ -1206,7 +1208,7 @@ router.delete('/:groupId', function(req,res,next){
                                                 deleteGroupResults[0][0].groupName,
                                                 deleteGroupResults[0][0].groupId,
                                                 notificationTemplaterRes.parsedTpl,
-                                                34,
+                                                36,
                                                 0, 0,
                                                 0,
                                                 0,
@@ -1367,7 +1369,7 @@ router.put('/leave', function(req,res,next){
                                         leaveGroupResult[0][0].groupName,
                                         leaveGroupResult[0][0].senderId,
                                         notificationTemplaterRes.parsedTpl,
-                                        35,
+                                        37,
                                         0, leaveGroupResult[0][0].iphoneId,
                                         0,
                                         0,

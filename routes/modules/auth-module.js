@@ -103,7 +103,7 @@ Auth.prototype.register = function(req,res,next){
     var selectionType = (!isNaN(parseInt(req.body.SelectionType))) ?  parseInt(req.body.SelectionType) : 0;
     var idtypeId = parseInt(req.body.IDTypeID);
 
-    var ezeid = req.body.EZEID ? (alterEzeoneId(req.body.EZEID).toUpperCase()):'';
+    var ezeid = req.body.EZEID ? (req.st.alterEzeoneId(req.body.EZEID).toUpperCase()):'';
     var password = req.body.Password;
     var firstName = req.body.FirstName ? req.body.FirstName : '';
     var lastName = req.body.LastName ? req.body.LastName : '';
@@ -755,7 +755,7 @@ Auth.prototype.login = function(req,res,next){
         req.connection.socket.remoteAddress;
 
     var token = req.body.token ? req.body.token : '';
-    var code = req.body.code ? alterEzeoneId(req.body.code) : '';
+    var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
 
     // console.log(req.body);
 

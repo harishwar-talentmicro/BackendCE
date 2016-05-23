@@ -28,7 +28,7 @@ function Sos(db,stdLib){
  */
 Sos.prototype.saveSos = function(req,res,next) {
 
-    var ezeid = (req.body.ezeid) ? alterEzeoneId(req.body.ezeid) : '';
+    var ezeid = (req.body.ezeid) ? req.st.alterEzeoneId(req.body.ezeid) : '';
     var b1 = (req.body.b1) ? req.body.b1 : 0;   // 0-unselect 1-select
     var b2 = (req.body.b2) ? req.body.b2 : 0;
     var b3 = (req.body.b3) ? req.body.b3 : 0;
@@ -198,7 +198,7 @@ Sos.prototype.postSos = function(req,res,next) {
     var longitude = req.body.lng;
     var deviceId = req.body.device_id;
     var iphoneID='';
-    var ezeid = (req.body.ezeid) ? alterEzeoneId(req.body.ezeid) : '';
+    var ezeid = (req.body.ezeid) ? req.st.alterEzeoneId(req.body.ezeid) : '';
 
     var responseMessage = {
         status: false,

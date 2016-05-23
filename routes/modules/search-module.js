@@ -67,7 +67,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         var pagecount = (req.body.pagecount) ? parseInt(req.body.pagecount) : 0;
         var total = (req.body.total) ? parseInt(req.body.total) : 0;
         var promotionFlag = (req.body.promotion_flag) ? ((parseInt(req.body.promotion_flag) == 1) ? req.body.promotion_flag : 2) : 2;
-
+        var isVerified = (req.body.isVerified) ? parseInt(req.body.isVerified) : 0;
 
         if (type == "1") {
 
@@ -153,7 +153,8 @@ Search.prototype.searchKeyword = function(req,res,next){
                                 + ',' + st.db.escape(Longitude) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ',' + st.db.escape(Pin) + ',' + st.db.escape(SearchType) + ',' + st.db.escape(DocType)
                                 + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape(token)
                                 + ',' + st.db.escape(HomeDelivery) + ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                                st.db.escape(pagesize) + ',' + st.db.escape(pagecount) + ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag);
+                                st.db.escape(pagesize) + ',' + st.db.escape(pagecount) + ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag)
+                                + ',' + st.db.escape(isVerified);
 
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             st.db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
@@ -313,7 +314,8 @@ Search.prototype.searchKeyword = function(req,res,next){
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(1)
                     + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
                     + ',' + st.db.escape(token) + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ','+ st.db.escape(promotionFlag);
+                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ','+ st.db.escape(promotionFlag)
+                    + ',' + st.db.escape(isVerified);
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
@@ -419,7 +421,8 @@ Search.prototype.searchKeyword = function(req,res,next){
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(3)
                     + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
                     + ',' + st.db.escape(token)  + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag);
+                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag)
+                    + ',' + st.db.escape(isVerified);
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
@@ -518,7 +521,9 @@ Search.prototype.searchInformation = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = (req.query.Token) ? req.query.Token : '';
+        //console.log(Token,"Token");
         var ezeTerm = req.st.alterEzeoneId(req.query.ezeTerm);
+        //console.log(ezeTerm,"ezeTerm");
         var CurrentDate = req.query.CurrentDate;
         var IPAddress = req._remoteAddress; //(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
         var latitude = (req.query.lat) ? req.query.lat : 0;
@@ -665,6 +670,7 @@ Search.prototype.searchInformation = function(req,res,next){
         }
     }
     catch (ex) {
+        console.log('ex',ex);
         console.log('FnGetUserDetails error:' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');

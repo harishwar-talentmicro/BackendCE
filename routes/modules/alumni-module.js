@@ -239,7 +239,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
     var ipAddress = req.ip;
     var selectionType = (!isNaN(parseInt(req.body.SelectionType))) ?  parseInt(req.body.SelectionType) : 0;
     var idtypeId = parseInt(req.body.IDTypeID);
-    var ezeid = req.body.EZEID ? (alterEzeoneId(req.body.EZEID).toUpperCase()):'';
+    var ezeid = req.body.EZEID ? (req.st.alterEzeoneId(req.body.EZEID).toUpperCase()):'';
     var password = req.body.Password;
     var firstName = req.body.FirstName ? req.body.FirstName : '';
     var lastName = req.body.LastName ? req.body.LastName : '';
@@ -2515,7 +2515,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                                         ezeone_id: req.query.ezeone_id,
                                         note: req.query.note,
                                         venue_id: req.query.venue_id,
-                                        code: alterEzeoneId(req.query.code)
+                                        code: req.st.alterEzeoneId(req.query.code)
                                     };
                                     /**
                                      * @TODO change in image uploading code, response should
@@ -5945,7 +5945,7 @@ Alumni.prototype.getAlumniUserDetails = function(req,res,next){
 Alumni.prototype.searchAlumni = function(req,res,next){
 
     var token = req.query.token;
-    var title = req.query.title ? alterEzeoneId(req.query.title) : '';
+    var title = req.query.title ? req.st.alterEzeoneId(req.query.title) : '';
 
     var responseMessage = {
         status: false,

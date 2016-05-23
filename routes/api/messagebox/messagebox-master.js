@@ -9,10 +9,10 @@ var router = express.Router();
 var message = require('./message.js');
 var contact = require('./contact.js');
 var group = require('./group.js');
-
+router.use('/message',message);
 router.use('/contact',contact);
 router.use('/group',group);
-router.use('/',message);
+
 
 module.exports = router;
 

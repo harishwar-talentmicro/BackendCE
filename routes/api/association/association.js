@@ -373,4 +373,119 @@ router.put('/status', function(req,res,next){
     }
 });
 
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @param token* <string> token of login user
+ *@param opinionPollId* <INT> opinion poll id
+ * @discription : API to get opinion poll details
+ */
+router.get('/opinionResult/:opinionPollId', function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.params.opinionPollId))) {
+        error.opinionPollId = 'Invalid opinionPollId';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = [
+                            req.db.escape(req.query.token) ,
+                            req.db.escape(req.params.opinionPollId)
+                        ];
+                        var procQuery = 'CALL opinion_poll_details(' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results && results[0] && results[0].length > 0) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'opinion poll details loaded successfully';
+                                    responseMessage.totalMembers = results[0][0].totalMembers;
+                                    responseMessage.data = {
+                                        optionList:results[1]
+                                    };
+                                    res.status(200).json(responseMessage);
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'opinion poll details not available';
+                                    responseMessage.data = [];
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pget_type_master ', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error :', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error pget_type_master : ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+});
+
 module.exports = router;
