@@ -22,11 +22,19 @@ bucket.acl.default.add({
 }, function (err, aclObject) {
 });
 
+var thumbnailConfig = require('../../thumbnail-config.json');
+
 
 
 
 function StdLib(db){
     this.db = db;
+    this.libs = {
+        uuid : require('node-uuid'),
+        moment : require('moment'),
+        fs : require('fs'),
+        Promise : require("bluebird")
+    }
 };
 
 /**
@@ -395,6 +403,19 @@ StdLib.prototype.alterEzeoneId = function(ezeoneId){
         }
     }
     return alteredEzeoneId;
+};
+
+StdLib.prototype.getThumbnailLinkFromMime = function(mimeType){
+    if(!mimeType){
+        return thumbnailConfig.defaultThumbnail;
+    }
+    else{
+        /**
+         * @TODO Based on MIME type load the thumbnail
+         * Currently loading Default for testing
+         */
+        return thumbnailConfig.defaultThumbnail;
+    }
 };
 
 

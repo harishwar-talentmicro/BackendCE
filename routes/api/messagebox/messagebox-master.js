@@ -12,7 +12,7 @@ var group = require('./group.js');
 
 router.use('/contact',contact);
 router.use('/group',group);
-router.use('/',message);
+router.use('/message',message);
 
 module.exports = router;
 

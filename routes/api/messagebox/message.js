@@ -11,6 +11,7 @@ var router = express.Router();
 var moment = require('moment');
 var gm = require('gm').subClass({ imageMagick: true });
 var uuid = require('node-uuid');
+var thumbnailConfig = require('../../../thumbnail-config.json');
 
 var fs = require('fs');
 
@@ -31,7 +32,7 @@ var fs = require('fs');
  *  @description : API to compose message
  */
 
-router.post('/message', function(req,res,next){
+router.post('/', function(req,res,next){
     /**
      * validation goes here
      */
@@ -133,12 +134,16 @@ router.post('/message', function(req,res,next){
                              * checking that grouptype(group) and groupRelationStatus is pending then user cant message
                              * */
                             //console.log(autoJoinResults,"autoJoinResults");
-                            if(autoJoinResults[0][0].groupType == 0 && autoJoinResults[0][0].groupRelationStatus == 0){
+                            if(autoJoinResults && autoJoinResults[0] && autoJoinResults[0][0] && autoJoinResults[0][0].groupType == 0 && autoJoinResults[0][0].groupRelationStatus == 0){
                                 responseMessage.status = false;
                                 responseMessage.error = null;
                                 responseMessage.message = 'Your group join request is at pending state';
                                 responseMessage.data = null;
                                 res.status(200).json(responseMessage);
+                                /**
+                                 * @TODO Send Notification to the admin of the group to accept the request of this user
+                                 * who want to join this group
+                                 */
                             }
                             else{
                                 /**
@@ -200,7 +205,7 @@ router.post('/message', function(req,res,next){
                                 //console.log(procQuery);
                                 req.db.query(procQuery, function (err, results) {
                                     if (!err) {
-                                        console.log(results);
+                                        console.log(results && results[0] && results[0][0] && results[0][0].message);
                                         /**
                                          * if not getting any error from db and proc called successfully then send response with status true
                                          * */
@@ -216,9 +221,7 @@ router.post('/message', function(req,res,next){
                                                         req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentObject.attachmentLink;
                                                     attachmentObject.thumbnailLink = req.CONFIG.CONSTANT.GS_URL +
                                                         req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +attachmentObject.thumbnailLink;
-                                                    attachmentObject.fileName = attachmentObject.fileName;
-                                                    attachmentObject.mimeType = attachmentObject.mimeType;
-                                                    attachmentObject.text = attachmentObject.text;
+
                                                     console.log(attachmentObject,"attachmentObject");
                                                     results[0][0].message = attachmentObject;
                                             }
@@ -293,118 +296,153 @@ router.post('/message', function(req,res,next){
     }
 });
 
-router.post('/test', function(req,res,next){
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: null
-    };
-    var validationFlag = true;
-    var error = {};
+/**
+ * saveAttachment API for message
+ * @method POST
+ * @service-param token <string>
+ * @serivce-param attachmentFile <binaryFileObject>
+ *
+ * @resp Google cloud storage link of attachment file with thumbnail if it is an image
+ */
+router.post('/attachment',function(req,res,next){
 
-    if(!req.query.token){
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-    if(!validationFlag){
-        responseMessage.error = error;
-        responseMessage.message = 'Please check the errors';
-        res.status(400).json(responseMessage);
-        console.log(responseMessage);
-    }
-    else {
-        try {
-            req.st.validateToken(req.query.token, function (err, tokenResult) {
-                if (!err) {
-                    if (tokenResult) {
-                        console.log(req.files,"files");
-                        if (req.files) {
-                            var deleteTempFile = function(){
-                                fs.unlink('../bin/'+req.files.pr.path);
-                                console.log("Image Path is deleted from server");
-                            };
-                            var readStream = fs.createReadStream(req.files.pr.path);
-                            var resizedReadStream = gm(req.files['pr'].path).resize(100,100).autoOrient().quality(0).stream(req.files.pr.extension);
-                            var uniqueFileName = uuid.v4() + ((req.files.pr.extension) ? ('.' + req.files.pr.extension) : 'jpg');
-                            var tnUniqueFileName = "tn_" + uniqueFileName;
-                            console.log(uniqueFileName);
-                            req.st.uploadDocumentToCloud(uniqueFileName, readStream, function (err) {
-                                if (!err) {
-                                    deleteTempFile();
-                                    req.st.uploadDocumentToCloud(tnUniqueFileName, resizedReadStream, function (err) {
-                                        if (!err) {
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Image and thumbnail uploaded successfully';
-                                            responseMessage.data = {
-                                                pic: uniqueFileName,
-                                                thumnail : tnUniqueFileName
-                                            };
-                                            deleteTempFile();
-                                            res.status(200).json(responseMessage);
-                                        }
-                                        else {
-                                            responseMessage.status = false;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Error in uploading thumbnail';
-                                            responseMessage.data = null;
-                                            deleteTempFile();
-                                            res.status(500).json(responseMessage);
-                                        }
-                                    });
-                                }
-                                else {
-                                    responseMessage.status = false;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Error in uploading image';
-                                    responseMessage.data = null;
-                                    deleteTempFile();
-                                    res.status(500).json(responseMessage);
-                                }
-                            });
-                        }
-                        else{
-                            responseMessage.status = false;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Invalid input data';
-                            responseMessage.data = null;
-                            res.status(500).json(responseMessage);
-                        }
-                    }
-                    else {
-                        responseMessage.message = 'Invalid token';
-                        responseMessage.error = {
-                            token: 'invalid token'
+    var responseMessage = {
+        status : false,
+        message : "",
+        error : {},
+        data : null
+    };
+
+    /**
+     * Validating token
+     */
+    req.st.validateToken(req.query.token,function(err,tokeResult){
+        if(!err){
+            if(tokeResult && req.files &&  req.files.attachmentFile){
+
+
+                var attachmentFileName = req.st.libs.uuid.v4() +
+                    ((req.files.attachmentFile.extension) ? ('.' + req.files.attachmentFile.extension) : '');
+
+                /**
+                 * Checking MIME type and based on it only prepare a thumbnail link
+                 * If MIME type is other than image (parsable formats eg. JPG,PNG) than thumbnail will be picked from
+                 * the available list otherwise it will be generated
+                 */
+                if(thumbnailConfig.imageMimeList.indexOf(req.files.attachmentFile.mimetype) != -1){
+
+                    /**
+                     * Create a thumbnail here and upload originalFile as well as thumbnail to google cloud
+                     */
+
+
+                    req.st.uploadDocumentToCloud = req.st.libs.Promise.promisify(req.st.uploadDocumentToCloud);
+
+                    var uploadTaskList = [
+                        req.st.uploadDocumentToCloud(attachmentFileName,req.st.libs.fs.createReadStream(req.files.attachmentFile.path)),
+                        req.st.uploadDocumentToCloud('tn_'+attachmentFileName,gm(req.files.attachmentFile.path).resize(15,15).autoOrient().quality(0).stream(req.files.attachmentFile.extension))
+                    ];
+
+
+
+                    req.st.libs.Promise.all(uploadTaskList).then(function() {
+                        responseMessage.status = true;
+                        responseMessage.data = {
+                            attachmentLink : req.CONFIG.CONSTANT.GS_URL +
+                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentFileName,
+                            fileName : req.files.attachmentFile.originalname,
+                            mimeType : req.files.attachmentFile.mimetype,
+                            thumbnailLink : req.CONFIG.CONSTANT.GS_URL +
+                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + 'tn_'+attachmentFileName
                         };
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('hrisSaveHRMimg: Invalid token');
-                    }
+                        responseMessage.message = "File uploaded successfully";
+                        responseMessage.error = null;
+                        res.status(200).json(responseMessage);
+                    },function(){
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'An error occurred !';
+                        res.status(500).json(responseMessage);
+                        console.log('Error :', err);
+                        var errorDate = new Date();
+                        console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    });
+
+
+
+
+                    //req.st.uploadDocumentToCloud(attachmentFileName,gm(req.files.attachmentFile.path).resize(15,15).autoOrient().quality(0).stream(req.files.attachmentFile.extension),function(err){
+                    //    if(!err){
+                    //        responseMessage.error = {
+                    //            server: 'Internal Server Error'
+                    //        };
+                    //        responseMessage.message = 'An error occurred !';
+                    //        res.status(500).json(responseMessage);
+                    //        console.log('Error :', err);
+                    //        var errorDate = new Date();
+                    //        console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    //    }
+                    //});
+
+
+
                 }
                 else {
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
-                    console.log('Error : hrisSaveHRMimg ', err);
-                    var errorDate = new Date();
-                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                    //req.files.attachmentFile.mimetype
+                    //req.files.attachmentFile.originalname
+
+                    req.st.uploadDocumentToCloud(attachmentFileName, req.st.libs.fs.createReadStream(req.files.attachmentFile.path), function (err) {
+                        if (err) {
+                            responseMessage.error = {
+                                server: 'Internal Server Error'
+                            };
+                            responseMessage.message = 'An error occurred !';
+                            res.status(500).json(responseMessage);
+                            console.log('Error :', err);
+                            var errorDate = new Date();
+                            console.log(errorDate.toTimeString() + ' ......... error ...........');
+                        }
+                        else{
+                            responseMessage.status = true;
+                            responseMessage.data = {
+                                attachmentLink : req.CONFIG.CONSTANT.GS_URL +
+                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentFileName,
+                                fileName : req.files.attachmentFile.originalname,
+                                mimeType : req.files.attachmentFile.mimetype,
+                                thumbnailLink : req.st.getThumbnailLinkFromMime(req.files.attachmentFile.mimetype)
+                            };
+                            responseMessage.message = "File uploaded successfully";
+                            responseMessage.error = null;
+                            res.status(200).json(responseMessage);
+                        }
+                    });
                 }
-            });
+            }
+            else{
+                responseMessage.error = {
+                    token: 'Invalid token'
+                };
+                responseMessage.message = 'Please login to continue';
+                res.status(401).json(responseMessage);
+                console.log('Error :', err);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+            }
         }
-        catch(ex) {
+        else{
             responseMessage.error = {
                 server: 'Internal Server Error'
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error hrisSaveHRMimg :  ',ex);
+            console.log('Error :', err);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
-    }
+
+    });
 });
 
 
@@ -420,7 +458,7 @@ router.post('/test', function(req,res,next){
  * @param limit <int> limit till that we will give results
  * @discription : API to change admin of group
  */
-router.get('/message', function(req,res,next){
+router.get('/', function(req,res,next){
     var pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
     var limit = (req.query.limit) ? (req.query.limit):10;
     if(req.query.timestamp){
