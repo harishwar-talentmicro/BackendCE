@@ -1511,7 +1511,7 @@ Service.prototype.deleteCommunityMember = function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Community member deleted successfully';
-                                    responseMessage.data = {ezeid : alterEzeoneId(req.query.ezeid)};
+                                    responseMessage.data = {ezeid : req.st.alterEzeoneId(req.query.ezeid)};
                                     res.status(200).json(responseMessage);
                                     console.log('FnDeleteCommunityMember: Community member deleted successfully');
                                 }

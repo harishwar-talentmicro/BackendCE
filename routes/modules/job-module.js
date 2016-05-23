@@ -1010,8 +1010,8 @@ Job.prototype.searchJobs = function(req,res,next){
         var filter = (req.query.filter) ? req.query.filter : 0;
         var restrictToInstitue = (req.query.restrict) ? req.query.restrict : 0;
         var type = req.query.type ? parseInt(req.query.type) : 0;  //0-normal job search, 1-Show my institue jobs, 2-for matching jobs of my cv and Default is 0
-        var toEzeid = (req.query.to_ezeone) ? alterEzeoneId(req.query.to_ezeone) : '';
-        var isAlumniSearch = (req.query.isalumni_search) ? alterEzeoneId(req.query.isalumni_search) : '';
+        var toEzeid = (req.query.to_ezeone) ? req.st.alterEzeoneId(req.query.to_ezeone) : '';
+        var isAlumniSearch = (req.query.isalumni_search) ? req.st.alterEzeoneId(req.query.isalumni_search) : '';
 
         var responseMessage = {
             status: false,

@@ -31,7 +31,7 @@ var fs = require('fs');
  *  @description : API to compose message
  */
 
-router.post('/message', function(req,res,next){
+router.post('/', function(req,res,next){
     /**
      * validation goes here
      */
@@ -420,7 +420,7 @@ router.post('/test', function(req,res,next){
  * @param limit <int> limit till that we will give results
  * @discription : API to change admin of group
  */
-router.get('/message', function(req,res,next){
+router.get('/', function(req,res,next){
     var pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
     var limit = (req.query.limit) ? (req.query.limit):10;
     if(req.query.timestamp){
