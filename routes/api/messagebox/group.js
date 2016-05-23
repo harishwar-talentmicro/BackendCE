@@ -110,10 +110,10 @@ router.get('/validate', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
                     console.log('Error :', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -310,11 +310,11 @@ router.post('/', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
-                    console.log('Error : p_v1_createMessageGroup ', err);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
+                    console.log('Error :', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
@@ -415,7 +415,8 @@ router.post('/members', function(req,res,next){
                                 res.status(200).json(responseMessage);
                                 console.log('p_v1_addmembersbygroup: Member added to group successfully');
                                 var notificationTemplaterRes = notificationTemplater.parse('add_members_to_group',{
-                                    groupName : addMemberResult[0][0].groupName
+                                    groupName : addMemberResult[0][0].groupName,
+                                    adminName : addMemberResult[0][0].adminName
                                 });
                                 console.log(notificationTemplaterRes.parsedTpl,"notificationTemplaterRes.parsedTpl");
                                 if(notificationTemplaterRes.parsedTpl){
@@ -425,7 +426,7 @@ router.post('/members', function(req,res,next){
                                         addMemberResult[0][0].groupName,
                                         addMemberResult[0][0].senderId,
                                         notificationTemplaterRes.parsedTpl,
-                                        31,
+                                        33,
                                         0, addMemberResult[0][0].iphoneId,
                                         0,
                                         0,
@@ -486,11 +487,11 @@ router.post('/members', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
-                    console.log('Error : p_v1_addmembersbygroup ', err);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
+                    console.log('Error :', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
@@ -599,8 +600,9 @@ router.post('/join', function(req,res,next){
                                 res.status(200).json(responseMessage);
                                 console.log('p_v1_addmembersbygroup: Member added to group successfully');
 
-                                var notificationTemplaterRes = notificationTemplater.parse('add_members_to_group',{
-                                    groupName : addMemberResult[0][0].groupName
+                                var notificationTemplaterRes = notificationTemplater.parse('join_group',{
+                                    groupName : addMemberResult[0][0].groupName,
+                                    fullName : addMemberResult[0][0].fullName
                                 });
                                 if(notificationTemplaterRes.parsedTpl){
                                     notification.publish(
@@ -609,7 +611,7 @@ router.post('/join', function(req,res,next){
                                         addMemberResult[0][0].groupName,
                                         addMemberResult[0][0].senderId,
                                         notificationTemplaterRes.parsedTpl,
-                                        32,
+                                        34,
                                         0, addMemberResult[0][0].iphoneId,
                                         0,
                                         0,
@@ -620,12 +622,12 @@ router.post('/join', function(req,res,next){
                                         '',
                                         0,
                                         0);
-                                    console.log('postNotification : notification for add members to group is sent successfully');
+                                    console.log('postNotification : notification for join_group is sent successfully');
                                 }
                                 else{
-                                    console.log('Error in parsing notification add_members_to_group template - ',
+                                    console.log('Error in parsing notification join_group template - ',
                                         notificationTemplaterRes.error);
-                                    console.log('postNotification : notification for add members to group is sent successfully');
+                                    console.log('postNotification : notification for join_group is sent successfully');
                                 }
 
                             }
@@ -659,18 +661,18 @@ router.post('/join', function(req,res,next){
                                 server: 'Internal Server Error'
                             };
                             res.status(500).json(responseMessage);
-                            console.log('p_v1_addmembersbygroup: error in updating user status :' + err);
+                            console.log('p_v1_addmembersbygroup: error in adding members :' + err);
                         }
                     });
 
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
-                    console.log('Error : p_v1_addmembersbygroup ', err);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
+                    console.log('Error :', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
@@ -808,10 +810,10 @@ router.get('/members', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
                     console.log('Error :', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -927,10 +929,10 @@ router.get('/details', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
                     console.log('Error :', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -965,8 +967,6 @@ router.get('/details', function(req,res,next){
  * @param autoJoin <int> (0 : false (default) , 1 : true)
  * @discription : API to create group
  */
-
-
 
 router.post('/change_admin', function(req,res,next){
     var responseMessage = {
@@ -1025,12 +1025,47 @@ router.post('/change_admin', function(req,res,next){
                             if (!err){
                                 if (changeAdminResults &&
                                     changeAdminResults[0] &&
-                                    changeAdminResults[0].length > 0 && changeAdminResults[0][0].adminUserGroupId) {
+                                    changeAdminResults[0].length > 0 &&
+                                    changeAdminResults[0][0].adminUserGroupId) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
-                                    responseMessage.message = 'Group details loaded successfully';
-                                    responseMessage.data = changeAdminResults[0];
+                                    responseMessage.message = 'Admin changed successfully';
+                                    responseMessage.data = {
+                                        adminUserGroupId : changeAdminResults[0][0].adminUserGroupId
+                                    }
                                     res.status(200).json(responseMessage);
+
+                                    var notificationTemplaterRes = notificationTemplater.parse('change_admin',{
+                                        groupName : changeAdminResults[0][0].groupName,
+                                        oldAdminName : changeAdminResults[0][0].oldAdminName
+                                    });
+                                    console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                    if(notificationTemplaterRes.parsedTpl){
+                                        notification.publish(
+                                            changeAdminResults[0][0].adminUserGroupId,
+                                            changeAdminResults[0][0].groupName,
+                                            changeAdminResults[0][0].groupName,
+                                            changeAdminResults[0][0].senderId,
+                                            notificationTemplaterRes.parsedTpl,
+                                            35,
+                                            0, changeAdminResults[0][0].iphoneId,
+                                            0,
+                                            0,
+                                            0,
+                                            0,
+                                            1,
+                                            moment().format("YYYY-MM-DD HH:mm:ss"),
+                                            '',
+                                            0,
+                                            0);
+                                        console.log('postNotification : notification for change_admin is sent successfully');
+                                    }
+                                    else{
+                                        console.log('Error in parsing notification change_admin template - ',
+                                            notificationTemplaterRes.error);
+                                        console.log('postNotification : notification for change_admin is sent successfully');
+                                    }
+
                                 }
                                 else{
                                     var qMsg = {server: 'Internal Server Error'};
@@ -1066,11 +1101,11 @@ router.post('/change_admin', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
-                    console.log('Error : p_v1_createMessageGroup ', err);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
+                    console.log('Error :', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
@@ -1145,15 +1180,59 @@ router.delete('/:groupId', function(req,res,next){
                         req.db.escape(req.params.groupId) ,
                         req.db.escape(req.body.token)
                     ];
-                    var procQuery = 'CALL pDeleteGroup(' + procParams.join(',') + ')';
+                        var procQuery = 'CALL pDeleteGroup(' + procParams.join(',') + ')';
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, deleteGroupResults) {
-                        console.log(deleteGroupResults,"changeAdminResults");
                         if (!err){
                             if (deleteGroupResults
                                 && deleteGroupResults[0]
                                 && deleteGroupResults[0].length>0
-                                && deleteGroupResults[0][0]._e) {
+                                && deleteGroupResults[0][0].groupId) {
+
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Group deleted successfully';
+                                responseMessage.data = [];
+                                res.status(200).json(responseMessage);
+                                console.log(deleteGroupResults[1],"deleteGroupResults");
+                                if(deleteGroupResults[1] && deleteGroupResults[1].length>0){
+                                    for (var i = 0; i < deleteGroupResults[1].length; i++ ) {
+                                        var notificationTemplaterRes = notificationTemplater.parse('delete_group',{
+                                            groupName : deleteGroupResults[0][0].groupName
+                                        });
+                                        console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                        if(notificationTemplaterRes.parsedTpl){
+                                            notification.publish(
+                                                deleteGroupResults[1][i].memberGroupId,
+                                                deleteGroupResults[0][0].groupName,
+                                                deleteGroupResults[0][0].groupName,
+                                                deleteGroupResults[0][0].groupId,
+                                                notificationTemplaterRes.parsedTpl,
+                                                36,
+                                                0, 0,
+                                                0,
+                                                0,
+                                                0,
+                                                0,
+                                                1,
+                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                '',
+                                                0,
+                                                0);
+                                            console.log('postNotification : notification for delete_group is sent successfully');
+                                        }
+                                        else{
+                                            console.log('Error in parsing notification delete_group template - ',
+                                                notificationTemplaterRes.error);
+                                            console.log('postNotification : notification for delete_group is sent successfully');
+                                        }
+                                    }
+
+                                }
+
+
+                            }
+                            else{
                                 var qMsg = {server: 'Internal Server Error'};
                                 switch (deleteGroupResults[0][0]._e) {
                                     case 'ACCESS DENIED' :
@@ -1166,25 +1245,6 @@ router.delete('/:groupId', function(req,res,next){
                                 responseMessage.error = null;
                                 responseMessage.message = qMsg;
                                 responseMessage.data = {};
-                                res.status(200).json(responseMessage); var qMsg = {server: 'Internal Server Error'};
-                                switch (deleteGroupResults[0][0]._e) {
-                                    case 'ACCESS DENIED' :
-                                        qMsg = {_e: 'ACCESS DENIED'};
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                responseMessage.status = false;
-                                responseMessage.error = null;
-                                responseMessage.message = qMsg;
-                                responseMessage.data = {};
-                                res.status(200).json(responseMessage);
-                            }
-                            else{
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Group deleted successfully';
-                                responseMessage.data = [];
                                 res.status(200).json(responseMessage);
                             }
                         }
@@ -1203,11 +1263,11 @@ router.delete('/:groupId', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
-                    console.log('Error : pDeleteGroup ', err);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
+                    console.log('Error :', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
@@ -1235,7 +1295,7 @@ router.delete('/:groupId', function(req,res,next){
  * @param groupId* <int> group id(Group Id of an individual user or a group where the operation has to be done)
  * @discription : API to leave the group
  */
-router.put('/leave_group', function(req,res,next){
+router.put('/leave', function(req,res,next){
     var responseMessage = {
         status: false,
         error: {},
@@ -1285,10 +1345,52 @@ router.put('/leave_group', function(req,res,next){
                     console.log(query);
                     req.db.query(query, function (err, leaveGroupResult) {
                         if (!err) {
-                            if (leaveGroupResult
+                            if(leaveGroupResult
                                 && leaveGroupResult[0]
                                 && leaveGroupResult[0].length>0
-                                && leaveGroupResult[0][0]._e) {
+                            && leaveGroupResult[0][0].senderId)
+                            {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'leave group successfully';
+                                responseMessage.data = null;
+                                res.status(200).json(responseMessage);
+                                console.log('p_v1_leaveGroup: leave group successfully');
+
+                                var notificationTemplaterRes = notificationTemplater.parse('leave_group',{
+                                    groupName : leaveGroupResult[0][0].groupName,
+                                    memberName : leaveGroupResult[0][0].memberName
+                                });
+                                console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                if(notificationTemplaterRes.parsedTpl){
+                                    notification.publish(
+                                        leaveGroupResult[0][0].adminGroupId,
+                                        leaveGroupResult[0][0].groupName,
+                                        leaveGroupResult[0][0].groupName,
+                                        leaveGroupResult[0][0].senderId,
+                                        notificationTemplaterRes.parsedTpl,
+                                        37,
+                                        0, leaveGroupResult[0][0].iphoneId,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        1,
+                                        moment().format("YYYY-MM-DD HH:mm:ss"),
+                                        '',
+                                        0,
+                                        0);
+                                    console.log('postNotification : notification for leave_group is sent successfully');
+                                }
+                                else{
+                                    console.log('Error in parsing notification leave_group template - ',
+                                        notificationTemplaterRes.error);
+                                    console.log('postNotification : notification for leave_group is sent successfully');
+                                }
+
+                            }
+
+                            else {
                                 var qMsg = {server: 'Internal Server Error'};
                                 switch (leaveGroupResult[0][0]._e) {
                                     case 'ACCESS DENIED' :
@@ -1302,17 +1404,6 @@ router.put('/leave_group', function(req,res,next){
                                 responseMessage.message = qMsg;
                                 responseMessage.data = {};
                                 res.status(200).json(responseMessage);
-                            }
-                            /**
-                             * if proc executed unsuccessfully then give response false
-                             * */
-                            else {
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'leave group successfully';
-                                responseMessage.data = null;
-                                res.status(200).json(responseMessage);
-                                console.log('p_v1_leaveGroup: leave group successfully');
                             }
                         }
                         /**
@@ -1330,11 +1421,13 @@ router.put('/leave_group', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
                     responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('p_v1_leaveGroup:Error in processing Token' + err);
+                    res.status(401).json(responseMessage);
+                    console.log('Error :', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
             });
         }
@@ -1362,71 +1455,74 @@ router.put('/leave_group', function(req,res,next){
  * @discription : API to get pending request of group
  */
 router.get('/pending_request', function(req,res,next){
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: []
-    };
-    var validationFlag = true;
-    var error = {};
+var responseMessage = {
+    status: false,
+    error: {},
+    message: '',
+    data: []
+};
+var validationFlag = true;
+var error = {};
 
-    /**
-     * validation goes here
-     * validating token and group name as both are mandatory fields
-     * */
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-    if (isNaN(parseInt(req.query.groupId)) || (req.query.groupId) < 0 ) {
-        error.groupId = 'Invalid group id';
-        validationFlag *= false;
-    }
+/**
+ * validation goes here
+ * validating token and group name as both are mandatory fields
+ * */
+if (!req.query.token) {
+    error.token = 'Invalid token';
+    validationFlag *= false;
+}
+if (isNaN(parseInt(req.query.groupId)) || (req.query.groupId) < 0 ) {
+    error.groupId = 'Invalid group id';
+    validationFlag *= false;
+}
 
-    if (!validationFlag) {
-        responseMessage.error = error;
-        responseMessage.message = 'Please check the errors';
-        res.status(400).json(responseMessage);
-        console.log(responseMessage);
-    }
-    else {
-        try {
+if (!validationFlag) {
+    responseMessage.error = error;
+    responseMessage.message = 'Please check the errors';
+    res.status(400).json(responseMessage);
+    console.log(responseMessage);
+}
+else {
+    try {
+        /**
+         * validating token for login user
+         * */
+
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
             /**
-             * validating token for login user
+             * while validating token if not getting any error procees further otherwise give error
              * */
+            if ((!err) && tokenResult) {
 
-            req.st.validateToken(req.query.token, function (err, tokenResult) {
                 /**
-                 * while validating token if not getting any error procees further otherwise give error
+                 * call procedure for validating groupname
                  * */
-                if ((!err) && tokenResult) {
-
+                var procParams = [
+                    req.db.escape(req.query.groupId) ,
+                    req.db.escape(req.query.token)
+                ];
+                var procQuery = 'CALL p_v1_pending_requests(' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, pendingRequestResults) {
                     /**
-                     * call procedure for validating groupname
+                     * while calling procedure if not getting any error and if get result then in response
+                     *
                      * */
-                    var procParams = [
-                        req.db.escape(req.query.groupId) ,
-                        req.db.escape(req.query.token)
-                    ];
-                    var procQuery = 'CALL p_v1_pending_requests(' + procParams.join(',') + ')';
-                    console.log(procQuery);
-                    req.db.query(procQuery, function (err, pendingRequestResults) {
-                        /**
-                         * while calling procedure if not getting any error and if get result then in response
-                         *
-                         * */
-                        if (!err){
-                            if(pendingRequestResults && pendingRequestResults[0] && pendingRequestResults[0].length > 0
-                                && pendingRequestResults[0][0].groupId) {
+                    if (!err){
+                        //console.log(pendingRequestResults[0],"pendingRequestResults[0]");
+                        if(pendingRequestResults && pendingRequestResults[0] && pendingRequestResults[0].length > 0) {
+                            if (pendingRequestResults[0][0] && pendingRequestResults[0][0].groupId) {
                                 responseMessage.status = true;
                                 responseMessage.error = null;
                                 responseMessage.message = 'Pending request of group loaded successfully';
                                 responseMessage.data = {
-                                    memberInvitationList : pendingRequestResults[0]};
+                                    memberInvitationList: pendingRequestResults[0]
+                                };
                                 res.status(200).json(responseMessage);
                             }
-                            else{
+                            else {
+                                console.log(pendingRequestResults[0][0]._e,"pendingRequestResults[0][0]._e");
                                 var qMsg = {server: 'Internal Server Error'};
                                 switch (pendingRequestResults[0][0]._e) {
                                     case 'ACCESS DENIED' :
@@ -1443,41 +1539,51 @@ router.get('/pending_request', function(req,res,next){
 
                             }
                         }
-                        else {
-                            responseMessage.error = {
-                                server: 'Internal Server Error'
+                        else{
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Pending request of group is not available';
+                            responseMessage.data = {
+                                memberInvitationList: []
                             };
-                            responseMessage.message = 'An error occurred !';
-                            res.status(500).json(responseMessage);
-                            console.log('Error :', err);
-                            var errorDate = new Date();
-                            console.log(errorDate.toTimeString() + ' ......... error ...........');
+                            res.status(200).json(responseMessage);
                         }
-                    });
-                }
-                else {
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
-                    console.log('Error :', err);
-                    var errorDate = new Date();
-                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-                }
-            });
-        }
-        catch (ex) {
-            responseMessage.error = {
-                server: 'Internal Server Error'
-            };
-            responseMessage.message = 'An error occurred !';
-            res.status(500).json(responseMessage);
-            console.log('Error p_v1_validateGroup : ', ex);
-            var errorDate = new Date();
-            console.log(errorDate.toTimeString() + ' ......... error ...........');
-        }
+                    }
+                    else {
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'An error occurred !';
+                        res.status(500).json(responseMessage);
+                        console.log('Error :', err);
+                        var errorDate = new Date();
+                        console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    }
+                });
+            }
+            else {
+                responseMessage.error = {
+                    server: 'Invalid Token'
+                };
+                responseMessage.message = 'Error in validating Token';
+                res.status(401).json(responseMessage);
+                console.log('Error :', err);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+            }
+        });
     }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server Error'
+        };
+        responseMessage.message = 'An error occurred !';
+        res.status(500).json(responseMessage);
+        console.log('Error p_v1_validateGroup : ', ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+}
 });
 
 module.exports = router;

@@ -514,7 +514,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
         var FunctionType = req.body.FunctionType;
         var Latitude = (req.body.Latitude) ? (req.body.Latitude) : 0;
         var Longitude = (req.body.Longitude) ? (req.body.Longitude) : 0;
-        var EZEID = (req.body.EZEID) ? (alterEzeoneId(req.body.EZEID)) : '';
+        var EZEID = (req.body.EZEID) ? (req.st.alterEzeoneId(req.body.EZEID)) : '';
         var FolderRuleID = parseInt(req.body.FolderRuleID);
         var Duration = req.body.Duration;
         var DurationScales = req.body.DurationScales;
@@ -897,7 +897,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
         var FunctionType = (req.body.FunctionType) ? (req.body.FunctionType) : 0 ;
         var Latitude = (req.body.Latitude) ? (req.body.Latitude) : 0;
         var Longitude = (req.body.Longitude) ? (req.body.Longitude) : 0;
-        var EZEID = (req.body.EZEID) ? alterEzeoneId(req.body.EZEID) : '';
+        var EZEID = (req.body.EZEID) ? req.st.alterEzeoneId(req.body.EZEID) : '';
         var FolderRuleID = parseInt(req.body.FolderRuleID);
         var Duration = req.body.Duration;
         var DurationScales = req.body.DurationScales;
@@ -2455,7 +2455,8 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
             var query = st.db.escape(from_date) + ',' + st.db.escape(to_date) + ',' + st.db.escape(stages)
                 + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user);
             st.db.query('CALL pTransactionfilter(' + query +')', function (err, transResult) {
-
+                var testQuery = 'CALL pTransactionfilter(' + query +')';
+console.log(testQuery,"query");
                 var total_count = 0;
                 var total_qty = 0;
                 if (!err) {
@@ -2945,7 +2946,7 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                                             responseMessage.proposal_message = proposal_message;
                                             responseMessage.data = {
                                                 id: transResult[0][0].id,
-                                                to_ezeid: alterEzeoneId(req.body.to_ezeid),
+                                                to_ezeid: req.st.alterEzeoneId(req.body.to_ezeid),
                                                 message: (req.body.msg) ? req.body.msg : '',
                                                 address: req.body.address,
                                                 notes: (req.body.notes) ? req.body.notes : '',
@@ -3041,7 +3042,7 @@ BusinessManager.prototype.getCompanyName = function(req,res,next){
 
 
     var token = req.query.token;
-    var ezeid = (req.query.ezeid) ? alterEzeoneId(req.query.ezeid):'';
+    var ezeid = (req.query.ezeid) ? req.st.alterEzeoneId(req.query.ezeid):'';
 
     var responseMessage = {
         status: false,
@@ -3152,7 +3153,7 @@ BusinessManager.prototype.getContactDetails = function(req,res,next){
 
 
     var token = req.query.token;
-    var ezeid = (req.query.ezeid) ? alterEzeoneId(req.query.ezeid):'';
+    var ezeid = (req.query.ezeid) ? req.st.alterEzeoneId(req.query.ezeid):'';
 
     var responseMessage = {
         status: false,

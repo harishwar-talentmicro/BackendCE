@@ -9,7 +9,11 @@
 var express = require('express');
 var router = express.Router();
 var moment = require('moment');
-
+var notification = null;
+var NotificationTemplater = require('../../lib/NotificationTemplater.js');
+var notificationTemplater = new NotificationTemplater();
+var Notification = require('../../modules/notification/notification-master.js');
+var notification = new Notification();
 
 /**
  * Method : GET
@@ -112,10 +116,10 @@ router.get('/query', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
                     console.log('Error :', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -279,10 +283,10 @@ router.get('/', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
                     console.log('Error :', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -338,15 +342,15 @@ router.put('/status', function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if(isNaN(req.body.groupId)){
-        error.groupId = 'Invalid groupId';
+    if (isNaN(parseInt(req.body.groupId))) {
+        error.groupId = 'Invalid Group id';
         validationFlag *= false;
     }
-    if(isNaN(req.body.userGroupId)){
+    if(isNaN(parseInt(req.body.userGroupId))){
         error.userGroupId = 'Invalid userGroupId';
         validationFlag *= false;
     }
-    if(isNaN(req.body.status)){
+    if(isNaN(parseInt(req.body.status))){
         error.status = 'Invalid status';
         validationFlag *= false;
     }
@@ -385,7 +389,53 @@ router.put('/status', function(req,res,next){
                                 if (updateResult
                                     && updateResult[0]
                                     && updateResult[0].length>0
-                                    && updateResult[0][0]._e) {
+                                    && updateResult[0][0].userGroupId) {
+
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'User status updated successfully';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnUpdateUserStatus: User status updated successfully');
+
+                                    if(updateResult[0][0].status = 1){
+                                        var notificationTemplaterRes = notificationTemplater.parse('accept_request',{
+                                            adminName : updateResult[0][0].adminName,
+                                            groupName : updateResult[0][0].groupName
+                                        });
+                                        console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                        if(notificationTemplaterRes.parsedTpl){
+                                            notification.publish(
+                                                updateResult[0][0].userGroupId,
+                                                updateResult[0][0].groupName,
+                                                updateResult[0][0].groupName,
+                                                updateResult[0][0].senderId,
+                                                notificationTemplaterRes.parsedTpl,
+                                                32,
+                                                0, 0,
+                                                0,
+                                                0,
+                                                0,
+                                                0,
+                                                1,
+                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                '',
+                                                0,
+                                                0);
+                                            console.log('postNotification : notification for accept_request is sent successfully');
+                                        }
+                                        else{
+                                            console.log('Error in parsing notification accept_request template - ',
+                                                notificationTemplaterRes.error);
+                                            console.log('postNotification : notification for accept_request is sent successfully');
+                                        }
+                                    }
+
+                                }
+                                /**
+                                 * if proc executed unsuccessfully then give response false
+                                 * */
+                                else {
                                     var qMsg = {server: 'Internal Server Error'};
                                     switch (updateResult[0][0]._e) {
                                         case 'ACCESS DENIED' :
@@ -399,17 +449,6 @@ router.put('/status', function(req,res,next){
                                     responseMessage.message = qMsg;
                                     responseMessage.data = {};
                                     res.status(200).json(responseMessage);
-                                }
-                                /**
-                                 * if proc executed unsuccessfully then give response false
-                                 * */
-                                else {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'User status updated successfully';
-                                    responseMessage.data = null;
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnUpdateUserStatus: User status updated successfully');
                                 }
                             }
                             /**
@@ -427,11 +466,13 @@ router.put('/status', function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Invalid Token'
                     };
                     responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('p_v1_UpdateUserStatus:Error in processing Token' + err);
+                    res.status(401).json(responseMessage);
+                    console.log('Error :', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
             });
         }
@@ -447,6 +488,9 @@ router.put('/status', function(req,res,next){
         }
     }
 });
+
+
+
 
 module.exports = router;
 

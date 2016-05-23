@@ -3065,7 +3065,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
             if(arr[1].toUpperCase() == 'MAP'){
                 //res.redirect('/'+alterEzeoneId(arr[0]) + req.CONFIG.CONSTANT.MAP_REDIRECT_LINK);
 
-                var geolocationQuery = "SELECT Latitude, Longitude FROM tmaster WHERE ezeid = " + st.db.escape(alterEzeoneId(arr[0]));
+                var geolocationQuery = "SELECT Latitude, Longitude FROM tmaster WHERE ezeid = " + st.db.escape(req.st.alterEzeoneId(arr[0]));
 
                 st.db.query(geolocationQuery,function(err,geoResult){
                    if(err){
@@ -4256,7 +4256,7 @@ User.prototype.sendResume = function(req,res,next){
 
     var token = req.body.token;
     var cvid = (!isNaN(parseInt(req.body.cvid))) ? parseInt(req.body.cvid):0;
-    var ezeid =  alterEzeoneId(req.body.ezeid);
+    var ezeid =  req.st.alterEzeoneId(req.body.ezeid);
     var responseMessage = {
         status: false,
         error: {},

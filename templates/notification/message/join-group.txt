@@ -1,0 +1,1 @@
+<%=fullName%> has asked to join the <%=groupName%> group.

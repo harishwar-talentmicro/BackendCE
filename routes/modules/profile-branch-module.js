@@ -321,7 +321,7 @@ ProfileBranch.prototype.deleteBranch = function(req,res,next){
  *
  */
 ProfileBranch.prototype.getBranch = function(req,res,next){
-    req.query.ezeid = (req.query.ezeid) ? alterEzeoneId(req.query.ezeid) : ''
+    req.query.ezeid = (req.query.ezeid) ? req.st.alterEzeoneId(req.query.ezeid) : ''
 
     if(!req.query.ezeid){
         var responseMessage = {
@@ -448,7 +448,7 @@ ProfileBranch.prototype.getBranch = function(req,res,next){
         };
         var validationFlag = true;
 
-        req.query.ezeid = (req.query.ezeid) ? alterEzeoneId(req.query.ezeid) : ''
+        req.query.ezeid = (req.query.ezeid) ? req.st.alterEzeoneId(req.query.ezeid) : ''
 
         var error = {};
 

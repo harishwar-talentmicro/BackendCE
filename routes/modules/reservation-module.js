@@ -951,7 +951,7 @@ Reservation.prototype.saveFeedback = function(req,res,next){
         var module = req.body.module;
         var trans_id = req.body.trans_id ? req.body.trans_id : 0;
         var resourceid = req.body.resourceid ? req.body.resourceid : 0;
-        var toEzeid = req.body.toEzeid ? alterEzeoneId(req.body.toEzeid) : '';
+        var toEzeid = req.body.toEzeid ? req.st.alterEzeoneId(req.body.toEzeid) : '';
         var type = req.body.type;
 
         var responseMessage = {

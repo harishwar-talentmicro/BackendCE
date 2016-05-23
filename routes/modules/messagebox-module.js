@@ -182,7 +182,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
     var tid = req.body.tid ? req.body.tid : 0;
     var restrictReply = req.body.rr;
     var memberVisible = req.body.member_visible ? parseInt(req.body.member_visible) : 0;
-    var alumniCode = req.body.alumni_code ? alterEzeoneId(req.body.alumni_code) : '';
+    var alumniCode = req.body.alumni_code ? req.st.alterEzeoneId(req.body.alumni_code) : '';
 
     var responseMessage = {
         status: false,
@@ -428,7 +428,7 @@ MessageBox.prototype.validateGroupMember = function(req,res,next){
 
     var groupId = ((!isNaN(parseInt(req.query.group_id))) && (parseInt(req.query.group_id)) > 0) ? parseInt(req.query.group_id) : 0;
     var token = (req.query.token) ? (req.query.token) : null;
-    var ezeoneId = (req.query.ezeone_id) ? alterEzeoneId(req.query.ezeone_id) : null;
+    var ezeoneId = (req.query.ezeone_id) ? req.st.alterEzeoneId(req.query.ezeone_id) : null;
     var ezeid;
     var pin = null ;
     var ezeidArray;
@@ -1418,7 +1418,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                             idType: req.body.id_type ? req.body.id_type : '',
                                                             priority: (parseInt(req.body.priority) !== NaN) ? req.body.priority : 1,
                                                             mimeType: (req.body.mime_type) ? req.body.mime_type : '',
-                                                            ezeid: alterEzeoneId(req.body.ezeid)
+                                                            ezeid: req.st.alterEzeoneId(req.body.ezeid)
                                                         };
 
                                                         msgNotification.sendComposeMessage(msgContent, function (err, statusResult) {
