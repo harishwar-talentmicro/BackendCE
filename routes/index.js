@@ -16,6 +16,7 @@ var htmlIndexFile = ejs.render(maintainenceTemplate);
 var indexTemplate = '';
 
 router.all('*',function(req,res,next){
+    req.st = stdLib;
     try{
         var filePath = req.CONFIG.CONSTANT.INDEX_PATH;
         htmlIndexFile = fs.readFileSync(filePath);

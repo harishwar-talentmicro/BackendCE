@@ -109,6 +109,12 @@
           "adminName"
         ],
         "file": "message/accept-request.txt"
+      },
+      "compose_message": {
+        "params": [
+          "senderName"
+        ],
+        "file": "message/compose-message.txt"
       }
     }
   },
