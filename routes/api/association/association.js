@@ -426,9 +426,10 @@ router.get('/opinionResult/:opinionPollId', function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'opinion poll details loaded successfully';
-                                    responseMessage.totalMembers = results[0][0].totalMembers;
+
                                     responseMessage.data = {
-                                        optionList:results[1]
+                                        optionList:results[1],
+                                        totalMembers : results[0][0].totalMembers
                                     };
                                     res.status(200).json(responseMessage);
                                 }
