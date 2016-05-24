@@ -45,7 +45,7 @@ router.get('/type', function(req,res,next){
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var procParams = req.db.escape(req.query.token);
+                        var procParams = req.db.escape(req.query.token)+ ',' + req.db.escape(req.query.smid);
                         var procQuery = 'CALL pget_type_master(' + procParams + ')';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, results) {
@@ -426,9 +426,15 @@ router.get('/opinionResult/:opinionPollId', function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'opinion poll details loaded successfully';
+                                    if(results[1] && results[1].length>0){
+                                        results[1]=results[1];
+                                    }
+                                    else{
+                                        results[1]=[];
+                                    }
 
                                     responseMessage.data = {
-                                        optionList:results[1],
+                                        optionList :  results[1],
                                         totalMembers : results[0][0].totalMembers
                                     };
                                     res.status(200).json(responseMessage);

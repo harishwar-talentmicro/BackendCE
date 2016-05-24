@@ -3230,66 +3230,6 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                     else{
                         next();
                     }
-
-                    //if (!err) {
-                    //    if (results) {
-                    //        if (results[0]) {
-                    //            //console.log(results[0].length);
-                    //            console.log(results[0]);
-                    //
-                    //            if(results[0][0]){
-                    //                /**
-                    //                 * This is a weblink redirect to this weblink
-                    //                 */
-                    //                if(results[0][0].type == 1){
-                    //                    if(results[0][0].pin){
-                    //                        if(pin && pin == results[0][0].pin){
-                    //                            res.redirect(results[0][0].path);
-                    //                        }
-                    //                        else{
-                    //                            next();
-                    //                        }
-                    //                    }
-                    //                    else{
-                    //                        res.redirect(results[0][0].path);
-                    //                    }
-                    //
-                    //                }
-                    //
-                    //
-                    //
-                    //                else{
-                    //
-                    //
-                    //                }
-                    //            }
-                    //            else{
-                    //                next();
-                    //            }
-                    //
-                    //
-                    //
-                    //
-                    //            //respMsg.status = true;
-                    //            //respMsg.data = {s_url: s_url};
-                    //            //respMsg.message = 'docs loaded successfully';
-                    //            //respMsg.error = null;
-                    //            //console.log(respMsg);
-                    //
-                    //        }
-                    //        else {
-                    //
-                    //            next();
-                    //        }
-                    //    }
-                    //    else {
-                    //        next();
-                    //    }
-                    //}
-                    //else {
-                    //    console.log(err);
-                    //    next();
-                    //}
                 });
             }
 

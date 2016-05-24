@@ -12,7 +12,11 @@ var moment = require('moment');
 var gm = require('gm').subClass({ imageMagick: true });
 var uuid = require('node-uuid');
 var thumbnailConfig = require('../../../thumbnail-config.json');
-
+var notification = null;
+var NotificationTemplater = require('../../lib/NotificationTemplater.js');
+var notificationTemplater = new NotificationTemplater();
+var Notification = require('../../modules/notification/notification-master.js');
+var notification = new Notification();
 var fs = require('fs');
 
 
@@ -205,11 +209,11 @@ router.post('/', function(req,res,next){
                                 //console.log(procQuery);
                                 req.db.query(procQuery, function (err, results) {
                                     if (!err) {
-                                        console.log(results && results[0] && results[0][0] && results[0][0].message);
                                         /**
                                          * if not getting any error from db and proc called successfully then send response with status true
                                          * */
-                                        if (results) {
+
+                                        if (results && results[0] && results[0].length>0 && results[0][0].messageId) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Message send successfully';
@@ -217,17 +221,61 @@ router.post('/', function(req,res,next){
                                                 case 3:
                                                     attachmentObject = results[0][0].message;
                                                     attachmentObject = JSON.parse(attachmentObject);
-                                                    attachmentObject.attachmentLink = req.CONFIG.CONSTANT.GS_URL +
-                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentObject.attachmentLink;
-                                                    attachmentObject.thumbnailLink = req.CONFIG.CONSTANT.GS_URL +
-                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +attachmentObject.thumbnailLink;
+                                                    attachmentObject.attachmentLink = attachmentObject.attachmentLink ? req.CONFIG.CONSTANT.GS_URL +
+                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentObject.attachmentLink : '';
+                                                    attachmentObject.thumbnailLink = attachmentObject.thumbnailLink ? req.CONFIG.CONSTANT.GS_URL +
+                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +attachmentObject.thumbnailLink : '';
 
                                                     console.log(attachmentObject,"attachmentObject");
                                                     results[0][0].message = attachmentObject;
+                                                    break;
+                                                case 2:
+                                                    attachmentObject = results[0][0].message;
+                                                    attachmentObject = JSON.parse(attachmentObject);
+                                                    results[0][0].message = attachmentObject;
+                                                    break;
+                                                default:
+                                                    break;
                                             }
                                             responseMessage.data = results[0];
 
                                             res.status(200).json(responseMessage);
+                                            /**notification send to user to whome message is sending*/
+                                            if(results[1] && results[1].length>0){
+                                                //console.log(results[1],"results[1]");
+                                                for (var i = 0; i < results[1].length; i++ ) {
+                                                    var notificationTemplaterRes = notificationTemplater.parse('compose_message',{
+                                                        senderName : results[0][0].senderName
+                                                    });
+                                                    console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                                    if(notificationTemplaterRes.parsedTpl){
+                                                        notification.publish(
+                                                            results[1][i].receiverGroupId,
+                                                            results[0][0].groupName ? results[0][0].groupName : '',
+                                                            results[0][0].groupName ? results[0][0].groupName : '',
+                                                            results[0][0].senderId,
+                                                            notificationTemplaterRes.parsedTpl,
+                                                            31,
+                                                            0, results[1][i].iphoneId ? results[1][i].iphoneId : '',
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            1,
+                                                            moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                            '',
+                                                            0,
+                                                            0);
+                                                        console.log('postNotification : notification for compose_message is sent successfully');
+                                                    }
+                                                    else{
+                                                        console.log('Error in parsing notification compose_message template - ',
+                                                            notificationTemplaterRes.error);
+                                                        console.log('postNotification : notification for compose_message is sent successfully');
+                                                    }
+                                                }
+                                            }
+
                                         }
                                         /**
                                          * if getting no affected rows then send response with status false and gove error message
@@ -511,23 +559,40 @@ router.get('/', function(req,res,next){
                                 //console.log(results,"results");
                                 if (results && results[0] && results[0].length>0) {
                                     for(var messageCounter = 0;messageCounter < results[0].length;messageCounter++){
-                                        if(results[0][messageCounter].messageType==0){
-                                            message = results[0][messageCounter].message;
+                                        switch (results[0][messageCounter].messageType) {
+                                            case 0:
+                                                message = results[0][messageCounter].message;
+                                                break;
+                                            case 3:
+                                                message = results[0][messageCounter].message;
+                                                messageObj = JSON.parse(message);
+                                                messageObj.attachmentLink = messageObj.attachmentLink ? req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + messageObj.attachmentLink : '';
+                                                messageObj.thumbnailLink = messageObj.thumbnailLink ? req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +messageObj.thumbnailLink : '';
+                                                results[0][messageCounter].message = messageObj;
+                                                break;
+                                            case 2 :
+                                                message = results[0][messageCounter].message;
+                                                messageObj = JSON.parse(message);
+                                                results[0][messageCounter].message = messageObj;
+                                                break;
+                                            default:
+                                                break;
                                         }
-                                        else if(results[0][messageCounter].messageType==3){
-                                            message = results[0][messageCounter].message;
-                                            messageObj = JSON.parse(message);
-                                            messageObj.attachmentLink = req.CONFIG.CONSTANT.GS_URL +
-                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + messageObj.attachmentLink;
-                                            messageObj.thumbnailLink =  req.CONFIG.CONSTANT.GS_URL +
-                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +messageObj.thumbnailLink;
-
-                                            messageObj.fileName = messageObj.fileName;
-                                            messageObj.mimeType = messageObj.mimeType;
-                                            messageObj.text = messageObj.text;
-                                            results[0][messageCounter].message = messageObj;
-                                            //console.log(results[0][messageCounter].message ,"testmessage");
-                                        }
+                                        //if(results[0][messageCounter].messageType==0){
+                                        //    message = results[0][messageCounter].message;
+                                        //}
+                                        //else if(results[0][messageCounter].messageType==3){
+                                        //    message = results[0][messageCounter].message;
+                                        //    messageObj = JSON.parse(message);
+                                        //    messageObj.attachmentLink = messageObj.attachmentLink ? req.CONFIG.CONSTANT.GS_URL +
+                                        //        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + messageObj.attachmentLink : '';
+                                        //    messageObj.thumbnailLink = messageObj.thumbnailLink ? req.CONFIG.CONSTANT.GS_URL +
+                                        //        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +messageObj.thumbnailLink : '';
+                                        //    results[0][messageCounter].message = messageObj;
+                                        //    //console.log(results[0][messageCounter].message ,"testmessage");
+                                        //}
                                     }
                                     //console.log(results[0],"results[0]");
                                     responseMessage.status = true;

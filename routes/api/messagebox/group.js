@@ -9,11 +9,6 @@
 var express = require('express');
 var router = express.Router();
 var moment = require('moment');
-var notification = null;
-var NotificationTemplater = require('../../lib/NotificationTemplater.js');
-var notificationTemplater = new NotificationTemplater();
-var Notification = require('../../modules/notification/notification-master.js');
-var notification = new Notification();
 var st = null;
 
 /**
@@ -167,7 +162,7 @@ router.post('/', function(req,res,next){
     req.body.showMembers= (req.body.showMembers) ? parseInt(req.body.showMembers) : 0;
     req.body.restrictedReply= (req.body.restrictedReply) ? parseInt(req.body.restrictedReply) : 0;
     req.body.autoJoin= (req.body.autoJoin) ? parseInt(req.body.autoJoin) : 0;
-
+    req.body.aboutGroup = req.body.aboutGroup ? req.body.aboutGroup : ''
     if(isNaN(req.body.groupId)){
         error.groupId = 'Invalid group Id';
         validationFlag *= false;
@@ -242,7 +237,12 @@ router.post('/', function(req,res,next){
                                             responseMessage.message = 'group updated successfully';
                                         }
                                         responseMessage.data = {
-                                            groupId : results[0][0].groupId
+                                            groupId : results[0][0].groupId,
+                                            groupName : req.body.groupName,
+                                            aboutGroup : req.body.aboutGroup,
+                                            showMembers : req.body.showMembers,
+                                            restrictedReply : req.body.restrictedReply,
+                                            autoJoin : req.body.autoJoin
                                         };
                                         res.status(200).json(responseMessage);
                                     }

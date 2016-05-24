@@ -1,0 +1,1 @@
+<%=senderName%> has sent message.
