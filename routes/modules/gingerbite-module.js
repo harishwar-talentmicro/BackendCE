@@ -214,7 +214,7 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSendMailGingerbite:error ' + ex.description);
+            console.log('FnSendMailGingerbite:error ' + ex);
             console.log(ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
@@ -404,7 +404,7 @@ Gingerbite.prototype.sendMailTechplasma = function(req,res,next) {
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSendMailTechplasma:error ' + ex.description);
+            console.log('FnSendMailTechplasma:error ' + ex);
             console.log(ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
@@ -609,7 +609,7 @@ Gingerbite.prototype.sendFeedbackMailFomads = function(req,res,next) {
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSendFeedbackMailFomads:error ' + ex.description);
+            console.log('FnSendFeedbackMailFomads:error ' + ex);
             console.log(ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);

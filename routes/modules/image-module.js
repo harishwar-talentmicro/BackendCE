@@ -262,7 +262,7 @@ Image.prototype.cropImage = function(req,res,next){
                 catch(ex){
                     console.log(ex);
                     res.status(400).json(respMsg);
-                    console.log('FnCropImage : '+ ex.description);
+                    console.log('FnCropImage : '+ ex);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
@@ -371,7 +371,7 @@ Image.prototype.imageURL = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnImageURL:error ' + ex.description);
+        console.log('FnImageURL:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -426,7 +426,7 @@ Image.prototype.profileImageURL = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnImageURL:error ' + ex.description);
+        console.log('FnImageURL:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -536,7 +536,7 @@ Image.prototype.getPictureOfEzeid = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetPictureOfEzeid ' + ex.description);
+            console.log('Error : FnGetPictureOfEzeid ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

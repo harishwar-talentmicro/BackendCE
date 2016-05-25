@@ -581,7 +581,7 @@ Association.prototype.getAsscociationServices = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetServices ' + ex.description);
+            console.log('Error : FnGetServices ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');

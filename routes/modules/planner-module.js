@@ -127,7 +127,7 @@ Planner.prototype.getAllTask = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetAllTask ' + ex.description);
+            console.log('Error : FnGetAllTask ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -251,7 +251,7 @@ Planner.prototype.getTrans = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetTrans ' + ex.description);
+            console.log('Error : FnGetTrans ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

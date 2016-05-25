@@ -1437,7 +1437,7 @@ router.put('/leave', function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : p_v1_leaveGroup ' + ex.description);
+            console.log('Error : p_v1_leaveGroup ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

@@ -317,7 +317,7 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !';
-        console.log('FnSaveReservTransaction:error ' + ex.description);
+        console.log('FnSaveReservTransaction:error ' + ex);
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
@@ -412,7 +412,7 @@ Reservation.prototype.getReservTrans = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnGetReservTask:error ' + ex.description);
+        console.log('FnGetReservTask:error ' + ex);
 		var errorDate = new Date();
 		console.log(errorDate.toTimeString() + ' ......... error ...........');
 
@@ -507,7 +507,7 @@ Reservation.prototype.getMapedServices = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnGetMapedServices:error ' + ex.description);
+        console.log('FnGetMapedServices:error ' + ex);
 		var errorDate = new Date();
 		console.log(errorDate.toTimeString() + ' ......... error ...........');
 
@@ -602,7 +602,7 @@ Reservation.prototype.getTransDetails = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnGetResTransDetails:error ' + ex.description);
+        console.log('FnGetResTransDetails:error ' + ex);
 		var errorDate = new Date();
 		console.log(errorDate.toTimeString() + ' ......... error ...........');
 
@@ -800,7 +800,7 @@ Reservation.prototype.getworkinghoursList = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnGetworkinghoursList:error ' + ex.description);
+        console.log('FnGetworkinghoursList:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
 
@@ -922,7 +922,7 @@ Reservation.prototype.getFeedback = function(req,res,next){
             catch (ex) {
                 responseMessage.error = {};
                 responseMessage.message = 'An error occured !'
-                console.log('FnGetFeedback:error ' + ex.description);
+                console.log('FnGetFeedback:error ' + ex);
                 var errorDate = new Date();
                 console.log(errorDate.toTimeString() + ' ......... error ...........');
                 res.status(400).json(responseMessage);
@@ -1044,7 +1044,7 @@ Reservation.prototype.saveFeedback = function(req,res,next){
             catch (ex) {
                 responseMessage.error = {};
                 responseMessage.message = 'An error occured !'
-                console.log('FnSaveFeedback:error ' + ex.description);
+                console.log('FnSaveFeedback:error ' + ex);
                 var errorDate = new Date();
                 console.log(errorDate.toTimeString() + ' ....................');
                 res.status(400).json(responseMessage);
@@ -1180,7 +1180,7 @@ Reservation.prototype.getResourcePicture = function(req,res,next){
         catch(ex){
             responseMessage.error = {};
             responseMessage.message = 'An error occurred !'
-            console.log('FnResourcePicture:error ' + ex.description);
+            console.log('FnResourcePicture:error ' + ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
         }

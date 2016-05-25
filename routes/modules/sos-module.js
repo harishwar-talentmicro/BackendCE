@@ -176,7 +176,7 @@ Sos.prototype.saveSos = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
-        console.log('Error : FnSaveSosRequest ' + ex.description);
+        console.log('Error : FnSaveSosRequest ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -247,7 +247,7 @@ Sos.prototype.postSos = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
-        console.log('Error : FnPostSosRequest ' + ex.description);
+        console.log('Error : FnPostSosRequest ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -320,7 +320,7 @@ Sos.prototype.loadSosRequest = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
-        console.log('Error : FnLoadSosRequest ' + ex.description);
+        console.log('Error : FnLoadSosRequest ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -427,7 +427,7 @@ Sos.prototype.updateSosRequest = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
-        console.log('Error : FnUpdateSosRequest ' + ex.description);
+        console.log('Error : FnUpdateSosRequest ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -502,7 +502,7 @@ Sos.prototype.saveSosServiceProvider = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
-        console.log('Error : FnSaveSosServiceProvider ' + ex.description);
+        console.log('Error : FnSaveSosServiceProvider ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -571,7 +571,7 @@ Sos.prototype.getSosServiceProvider = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
-        console.log('Error : FnLoadSosRequest ' + ex.description);
+        console.log('Error : FnLoadSosRequest ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }

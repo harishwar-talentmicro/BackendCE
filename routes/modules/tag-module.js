@@ -475,7 +475,7 @@ Tag.prototype.saveStandardTags = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSaveStandardTags ' + ex.description);
+            console.log('Error : FnSaveStandardTags ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -690,7 +690,7 @@ function FnCropImage(imageParams, callback){
     catch(ex){
         console.log(ex);
         callback(null, null);
-        console.log('FnCropImage : '+ ex.description);
+        console.log('FnCropImage : '+ ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1015,7 +1015,7 @@ Tag.prototype.getStandardTags = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetStandardTags ' + ex.description);
+            console.log('Error : FnGetStandardTags ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1146,7 +1146,7 @@ Tag.prototype.getTags = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetTags ' + ex.description);
+            console.log('Error : FnGetTags ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1245,7 +1245,7 @@ Tag.prototype.deleteTag = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(500).json(responseMessage);
-        console.log('Error : FnDeleteTag ' + ex.description);
+        console.log('Error : FnDeleteTag ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1527,7 +1527,7 @@ Tag.prototype.savePictures = function(req,res,next) {
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnSavePictures ' + ex.description);
+            console.log('Error : FnSavePictures ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

@@ -167,7 +167,7 @@ ContactManager.prototype.getClientList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetClientList ' + ex.description);
+            console.log('Error : FnGetClientList ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -322,7 +322,7 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetClientContacts ' + ex.description);
+            console.log('Error : FnGetClientContacts ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -472,7 +472,7 @@ ContactManager.prototype.saveClient = function(req,res,next) {
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSaveClient:error ' + ex.description);
+            console.log('FnSaveClient:error ' + ex);
             console.log(ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
@@ -644,7 +644,7 @@ ContactManager.prototype.saveClientContact = function(req,res,next) {
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSaveClientContact:error ' + ex.description);
+            console.log('FnSaveClientContact:error ' + ex);
             console.log(ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);

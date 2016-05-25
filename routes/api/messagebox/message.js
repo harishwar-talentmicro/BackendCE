@@ -148,6 +148,37 @@ router.post('/', function(req,res,next){
                                  * @TODO Send Notification to the admin of the group to accept the request of this user
                                  * who want to join this group
                                  */
+
+                                var notificationTemplaterRes = notificationTemplater.parse('join_group',{
+                                    groupName : autoJoinResults[0][0].groupName,
+                                    fullName : autoJoinResults[0][0].fullName
+                                });
+                                if(notificationTemplaterRes.parsedTpl){
+                                    notification.publish(
+                                        autoJoinResults[0][0].adminGroupId,
+                                        autoJoinResults[0][0].groupName,
+                                        autoJoinResults[0][0].groupName,
+                                        autoJoinResults[0][0].senderId,
+                                        notificationTemplaterRes.parsedTpl,
+                                        38,
+                                        0, autoJoinResults[0][0].iphoneId,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        1,
+                                        moment().format("YYYY-MM-DD HH:mm:ss"),
+                                        '',
+                                        0,
+                                        0);
+                                    console.log('postNotification : notification for join_group is sent successfully');
+                                }
+                                else{
+                                    console.log('Error in parsing notification join_group template - ',
+                                        notificationTemplaterRes.error);
+                                    console.log('postNotification : notification for join_group is sent successfully');
+                                }
+
                             }
                             else{
                                 /**

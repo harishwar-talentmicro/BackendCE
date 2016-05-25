@@ -179,7 +179,7 @@ function FnSendMailEzeid(MailContent, CallBack) {
 
     }
     catch (ex) {
-        console.log('OTP FnSendMailEzeid error:' + ex.description);
+        console.log('OTP FnSendMailEzeid error:' + ex);
         throw new Error(ex);
         return 'error'
     }

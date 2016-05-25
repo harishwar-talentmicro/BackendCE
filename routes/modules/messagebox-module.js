@@ -289,7 +289,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnCreateMessageGroup ' + ex.description);
+            console.log('Error : FnCreateMessageGroup ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -407,7 +407,7 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnValidateGroupName ' + ex.description);
+            console.log('Error : FnValidateGroupName ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -695,7 +695,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnUpdateUserStatus ' + ex.description);
+            console.log('Error : FnUpdateUserStatus ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -815,7 +815,7 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnUpdateUserRelationship ' + ex.description);
+            console.log('Error : FnUpdateUserRelationship ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -918,7 +918,7 @@ MessageBox.prototype.deleteGroup = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnDeleteGroup ' + ex.description);
+            console.log('Error : FnDeleteGroup ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1103,7 +1103,7 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnSendMessageRequest ' + ex.description);
+            console.log('Error : FnSendMessageRequest ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1512,7 +1512,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnComposeMessage ' + ex.description);
+            console.log('Error : FnComposeMessage ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1602,7 +1602,7 @@ MessageBox.prototype.getMembersList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetMembersList ' + ex.description);
+            console.log('Error : FnGetMembersList ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1718,7 +1718,7 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnLoadMessageBox ' + ex.description);
+            console.log('Error : FnLoadMessageBox ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1837,7 +1837,7 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnChangeMessageActivity ' + ex.description);
+            console.log('Error : FnChangeMessageActivity ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1951,7 +1951,7 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnLoadOutBoxMessages ' + ex.description);
+            console.log('Error : FnLoadOutBoxMessages ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2065,7 +2065,7 @@ MessageBox.prototype.getSuggestionList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetSuggestionList ' + ex.description);
+            console.log('Error : FnGetSuggestionList ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2431,7 +2431,7 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnAddGroupMembers ' + ex.description);
+            console.log('Error : FnAddGroupMembers ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2546,7 +2546,7 @@ MessageBox.prototype.getPendingRequest = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetPendingRequest ' + ex.description);
+            console.log('Error : FnGetPendingRequest ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2784,7 +2784,7 @@ MessageBox.prototype.getGroupList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetGroupList ' + ex.description);
+            console.log('Error : FnGetGroupList ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2943,7 +2943,7 @@ MessageBox.prototype.loadMessages = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnLoadMessages ' + ex.description);
+            console.log('Error : FnLoadMessages ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3070,7 +3070,7 @@ MessageBox.prototype.viewMessage = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnViewMessage ' + ex.description);
+            console.log('Error : FnViewMessage ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3194,7 +3194,7 @@ MessageBox.prototype.getMessageAttachment = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetMessageAttachment ' + ex.description);
+            console.log('Error : FnGetMessageAttachment ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3318,7 +3318,7 @@ MessageBox.prototype.getGroupInfo = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetGroupInfo ' + ex.description);
+            console.log('Error : FnGetGroupInfo ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3426,7 +3426,7 @@ MessageBox.prototype.countOfUnreadMessage = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnCountOfUnreadMessage ' + ex.description);
+            console.log('Error : FnCountOfUnreadMessage ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3549,7 +3549,7 @@ MessageBox.prototype.viewMessageNew = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnViewMessage ' + ex.description);
+            console.log('Error : FnViewMessage ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3667,7 +3667,7 @@ MessageBox.prototype.changeGroupAdmin = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnChangeGroupAdmin ' + ex.description);
+            console.log('Error : FnChangeGroupAdmin ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3781,7 +3781,7 @@ MessageBox.prototype.updateTaskStatus = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnUpdateTaskStatus ' + ex.description);
+            console.log('Error : FnUpdateTaskStatus ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3902,7 +3902,7 @@ MessageBox.prototype.getLastMsgOfGroup = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetLastMsgOfGroup ' + ex.description);
+            console.log('Error : FnGetLastMsgOfGroup ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -4045,7 +4045,7 @@ MessageBox.prototype.forwardMessage = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnForwardMessage ' + ex.description);
+            console.log('Error : FnForwardMessage ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -4169,7 +4169,7 @@ MessageBox.prototype.getMessageList = function(req,res,next){
         catch (ex) {
             responseMessage.error = {};
             responseMessage.message = 'An error occured !';
-            console.log('getInstituteConfig:error ' + ex.description);
+            console.log('getInstituteConfig:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);

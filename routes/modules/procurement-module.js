@@ -2984,7 +2984,7 @@ Procurement.prototype.procurementGetPoDetails = function(req,res,next){
 //
 //    }
 //    catch (ex) {
-//        console.log('FnSendBulkMailer error:' + ex.description);
+//        console.log('FnSendBulkMailer error:' + ex);
 //        var errorDate = new Date();
 //        console.log(errorDate.toTimeString() + ' ......... error ...........');
 //    }
@@ -3456,7 +3456,7 @@ Procurement.prototype.procurementGetEnqDetails = function(req,res,next){
 //        }
 //    }
 //    catch (ex) {
-//        console.log('FnSendBulkMailer error:' + ex.description);
+//        console.log('FnSendBulkMailer error:' + ex);
 //        var errorDate = new Date();
 //        console.log(errorDate.toTimeString() + ' ......... error ...........');
 //    }
@@ -3666,7 +3666,7 @@ Procurement.prototype.sendPoMail = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('sendPoMail error:' + ex.description);
+        console.log('sendPoMail error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }

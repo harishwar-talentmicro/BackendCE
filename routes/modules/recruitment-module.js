@@ -166,7 +166,7 @@ Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetRecruitmentMasters ' + ex.description);
+            console.log('Error : FnGetRecruitmentMasters ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -297,7 +297,7 @@ Recruitment.prototype.getSalesMasters = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetSalesMasters ' + ex.description);
+            console.log('Error : FnGetSalesMasters ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

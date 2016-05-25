@@ -104,7 +104,7 @@ Mail.prototype.sendMail = function(req, res){
     }
 
     catch (ex) {
-        console.log('Logoin error:' + ex.description);
+        console.log('Logoin error:' + ex);
 
     }
 
@@ -150,7 +150,7 @@ function FnSendMailEzeid(MailContent, CallBack) {
 
     }
     catch (ex) {
-        console.log('OTP FnSendMailEzeid error:' + ex.description);
+        console.log('OTP FnSendMailEzeid error:' + ex);
 
         return 'error'
     }
@@ -731,7 +731,7 @@ Mail.prototype.fnMessageMail= function(messageContent, callBack) {
         }
     }
     catch (ex) {
-        console.log('OTP FnMessageMail Catch error:' + ex.description);
+        console.log('OTP FnMessageMail Catch error:' + ex);
         callBack(null, null);
         console.log(ex);
         var errorDate = new Date();
@@ -788,7 +788,7 @@ Mail.prototype.sendRegMail= function(mailContent, callBack) {
         }
     }
     catch (ex) {
-        console.log('OTP FnMessageMail Catch error:' + ex.description);
+        console.log('OTP FnMessageMail Catch error:' + ex);
         callBack(null, null);
         console.log(ex);
         var errorDate = new Date();
@@ -1019,7 +1019,7 @@ Mail.prototype.businessMail = function(req,res,next) {
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnBussinessMail ' + ex.description);
+            console.log('Error : FnBussinessMail ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
