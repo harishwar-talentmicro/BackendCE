@@ -177,7 +177,7 @@ Loc.prototype.saveLocMap = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSaveLocMap ' + ex.description);
+            console.log('Error : FnSaveLocMap ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -285,7 +285,7 @@ Loc.prototype.getLocMap = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetLOCMap ' + ex.description);
+            console.log('Error : FnGetLOCMap ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -433,7 +433,7 @@ Loc.prototype.loadLocDetailsEmployer = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnLoadLocDetails ' + ex.description);
+            console.log('Error : FnLoadLocDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -579,7 +579,7 @@ Loc.prototype.loadLocDetailsTrainer = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnLoadLocDetails ' + ex.description);
+            console.log('Error : FnLoadLocDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -709,7 +709,7 @@ Loc.prototype.loadLocDetailsSyllabus = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnLoadLocDetails ' + ex.description);
+            console.log('Error : FnLoadLocDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -796,7 +796,7 @@ Loc.prototype.getLoc = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetLoc ' + ex.description);
+            console.log('Error : FnGetLoc ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -912,7 +912,7 @@ Loc.prototype.saveLoc = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnSaveLoc ' + ex.description);
+            console.log('Error : FnSaveLoc ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1081,7 +1081,7 @@ Loc.prototype.getLocBasket = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetLocBasket ' + ex.description);
+            console.log('Error : FnGetLocBasket ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

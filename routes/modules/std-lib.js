@@ -222,7 +222,7 @@ StdLib.prototype.validateToken = function(Token, CallBack){
 
     }
     catch (ex) {
-        console.log('OTP FnValidateToken error:' + ex.description);
+        console.log('OTP FnValidateToken error:' + ex);
 
         return 'error'
     }
@@ -270,7 +270,7 @@ StdLib.prototype.validateTokenAp = function(Token, CallBack){
 
     }
     catch (ex) {
-        console.log('OTP FnValidateToken error:' + ex.description);
+        console.log('OTP FnValidateToken error:' + ex);
 
         return 'error'
     }
@@ -460,7 +460,7 @@ function FnSendMailEzeid(MailContent, CallBack) {
 
     }
     catch (ex) {
-        console.log('OTP FnSendMailEzeid error:' + ex.description);
+        console.log('OTP FnSendMailEzeid error:' + ex);
 
         return 'error'
     }

@@ -499,7 +499,7 @@ Search.prototype.searchKeyword = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnSearchByKeywords error:' + ex.description);
+        console.log('FnSearchByKeywords error:' + ex);
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
@@ -671,7 +671,7 @@ Search.prototype.searchInformation = function(req,res,next){
     }
     catch (ex) {
         console.log('ex',ex);
-        console.log('FnGetUserDetails error:' + ex.description);
+        console.log('FnGetUserDetails error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -751,7 +751,7 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
                                 });
                             }
                             catch (ex) {
-                                console.log('FnWorkingHours error:' + ex.description);
+                                console.log('FnWorkingHours error:' + ex);
                                 //throw new Error(ex);
                                 return 'error'
                                 var errorDate = new Date();
@@ -793,7 +793,7 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
                                 });
                             }
                             catch (ex) {
-                                console.log('FnHolidayList error:' + ex.description);
+                                console.log('FnHolidayList error:' + ex);
                                 //throw new Error(ex);
                                 return 'error'
                                 var errorDate = new Date();
@@ -841,7 +841,7 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
         }
     }
     catch (ex) {
-        console.log('FnGetWorkingHours error:' + ex.description);
+        console.log('FnGetWorkingHours error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -895,7 +895,7 @@ function FnWorkingHours(WorkingContent, CallBack) {
 
     }
     catch (ex) {
-        console.log('FnWorkingHours error:' + ex.description);
+        console.log('FnWorkingHours error:' + ex);
         //throw new Error(ex);
         return 'error'
         var errorDate = new Date();
@@ -950,7 +950,7 @@ function FnHolidayList(HolidayContent, CallBack) {
 
     }
     catch (ex) {
-        console.log('FnHolidayList error:' + ex.description);
+        console.log('FnHolidayList error:' + ex);
         //throw new Error(ex);
         return 'error'
         var errorDate = new Date();
@@ -1065,7 +1065,7 @@ Search.prototype.getBanner = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnGetBannerPicture error:' + ex.description);
+        console.log('FnGetBannerPicture error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1176,7 +1176,7 @@ Search.prototype.searchTracker = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSearchForTracker error:' + ex.description);
+        console.log('FnSearchForTracker error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1351,7 +1351,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetSearchDocuments error:' + ex.description);
+        console.log('FnGetSearchDocuments error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
 
@@ -1561,7 +1561,7 @@ Search.prototype.navigateSearch = function(req,res,next){
             server : 'Internal server error'
         };
         responseMessage.message = 'An error occurred !';
-        console.log('FnNavigateSearch:error ' + ex.description);
+        console.log('FnNavigateSearch:error ' + ex);
         console.log(ex);
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);

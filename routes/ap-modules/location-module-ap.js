@@ -96,7 +96,7 @@ Location_AP.prototype.getSecondaryLocationListAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetSecondaryLocationList:' + ex.description);
+        console.log('FnGetSecondaryLocationList:' + ex);
 
     }
 }
@@ -180,7 +180,7 @@ Location_AP.prototype.getSecondaryLocationAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetSecondaryLocationAP:' + ex.description);
+        console.log('FnGetSecondaryLocationAP:' + ex);
 
     }
 }
@@ -287,7 +287,7 @@ Location_AP.prototype.updateSecondaryLocationAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnUpdateSecondaryLocationAP:' + ex.description);
+        console.log('FnUpdateSecondaryLocationAP:' + ex);
 
     }
 }

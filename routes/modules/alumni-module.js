@@ -766,7 +766,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
-            console.log('FnRegistration error:' + ex.description);
+            console.log('FnRegistration error:' + ex);
             //throw new Error(ex);
         }
     }
@@ -877,7 +877,7 @@ Alumni.prototype.saveAlumniProfilePic = function(req,res,next) {
             server: 'Internal Server error'
         };
         responseMessage.message = 'An error occurred !';
-        console.log('FnSaveAlumniProfilePic:error ' + ex.description);
+        console.log('FnSaveAlumniProfilePic:error ' + ex);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ....................');
@@ -1206,7 +1206,7 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSaveAlumniContent:error ' + ex.description);
+            console.log('FnSaveAlumniContent:error ' + ex);
             console.log(ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
@@ -1404,7 +1404,7 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSaveAlumniTeam:error ' + ex.description);
+            console.log('FnSaveAlumniTeam:error ' + ex);
             console.log(ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
@@ -1610,7 +1610,7 @@ function FnCropImage(imageParams, callback){
     catch(ex){
         console.log(ex);
         callback(null, null);
-        console.log('FnCropImage : '+ ex.description);
+        console.log('FnCropImage : '+ ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1696,7 +1696,7 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetAlumniContent ' + ex.description);
+            console.log('Error : FnGetAlumniContent ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1820,7 +1820,7 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetAlumniTeam ' + ex.description);
+            console.log('Error : FnGetAlumniTeam ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1927,7 +1927,7 @@ Alumni.prototype.deleteAlumniTeam = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnDeleteAlumniTeam : ' + ex.description);
+            console.log('Error : FnDeleteAlumniTeam : ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -2015,7 +2015,7 @@ Alumni.prototype.getAlumniContentImage = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetAlumniContentImage ' + ex.description);
+            console.log('Error : FnGetAlumniContentImage ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -2180,7 +2180,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSaveAlumniProfile:error ' + ex.description);
+            console.log('FnSaveAlumniProfile:error ' + ex);
             console.log(ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
@@ -2292,7 +2292,7 @@ Alumni.prototype.getAlumniTeamDetails = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetAlumniTeamDetails ' + ex.description);
+            console.log('Error : FnGetAlumniTeamDetails ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -2408,7 +2408,7 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetAlumniProfile ' + ex.description);
+            console.log('Error : FnGetAlumniProfile ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -2611,7 +2611,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSaveTENMaster:error ' + ex.description);
+            console.log('FnSaveTENMaster:error ' + ex);
             console.log(ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
@@ -2805,7 +2805,7 @@ Alumni.prototype.getTENDetails = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetTENDetails ' + ex.description);
+            console.log('Error : FnGetTENDetails ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -2956,7 +2956,7 @@ Alumni.prototype.getMyTENDetails = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetTENDetails ' + ex.description);
+            console.log('Error : FnGetTENDetails ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -3091,7 +3091,7 @@ Alumni.prototype.getProfileStatus = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetProfileStatus ' + ex.description);
+            console.log('Error : FnGetProfileStatus ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -3210,7 +3210,7 @@ Alumni.prototype.saveTENUsers = function(req,res,next) {
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSaveTENUsers:error ' + ex.description);
+            console.log('FnSaveTENUsers:error ' + ex);
             console.log(ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
@@ -3319,7 +3319,7 @@ Alumni.prototype.approveTEN = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnApproveTEN ' + ex.description);
+            console.log('Error : FnApproveTEN ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -3407,7 +3407,7 @@ Alumni.prototype.saveComments = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSaveComments ' + ex.description);
+            console.log('Error : FnSaveComments ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -3493,7 +3493,7 @@ Alumni.prototype.getParticipatedEventsId = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetParticipatedEventsId ' + ex.description);
+            console.log('Error : FnGetParticipatedEventsId ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -3606,7 +3606,7 @@ Alumni.prototype.getParticipantsList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetParticipantsList ' + ex.description);
+            console.log('Error : FnGetParticipantsList ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -3735,7 +3735,7 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetAlumniApprovalList ' + ex.description);
+            console.log('Error : FnGetAlumniApprovalList ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -3829,7 +3829,7 @@ Alumni.prototype.getTeamContent = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetTeamContent ' + ex.description);
+            console.log('Error : FnGetTeamContent ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -3935,7 +3935,7 @@ Alumni.prototype.getTeamImage = function(req,res,next) {
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetTeamImage ' + ex.description);
+            console.log('Error : FnGetTeamImage ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -4029,7 +4029,7 @@ Alumni.prototype.getTENAttachment = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetTENAttachment ' + ex.description);
+            console.log('Error : FnGetTENAttachment ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -4163,7 +4163,7 @@ Alumni.prototype.saveTENVenue = function(req,res,next) {
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSaveTENVenue:error ' + ex.description);
+            console.log('FnSaveTENVenue:error ' + ex);
             console.log(ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
@@ -4280,7 +4280,7 @@ Alumni.prototype.getClientList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetClientList ' + ex.description);
+            console.log('Error : FnGetClientList ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -4401,7 +4401,7 @@ Alumni.prototype.getClientContacts = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetClientContacts ' + ex.description);
+            console.log('Error : FnGetClientContacts ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -4540,7 +4540,7 @@ Alumni.prototype.getAll = function(req,res,next){
                 server : 'Internal server error'
             };
             responseMessage.message = 'An error occured !';
-            console.log('FnGetJobs:error ' + ex.description);
+            console.log('FnGetJobs:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);
@@ -5042,7 +5042,7 @@ Alumni.prototype.create = function(req,res,next){
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSaveJobs:error ' + ex.description);
+            console.log('FnSaveJobs:error ' + ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
         }
@@ -5111,7 +5111,7 @@ function FnSaveSkills(skill, CallBack) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('OTP FnSendMailEzeid error:' + ex.description);
+        console.log('OTP FnSendMailEzeid error:' + ex);
 
         return 'error'
     }
@@ -5226,7 +5226,7 @@ Alumni.prototype.viewJobDetails = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnViewJobDetails ' + ex.description);
+            console.log('Error : FnViewJobDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -5347,7 +5347,7 @@ Alumni.prototype.getAlumniJobApprovalList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetAlumniJobApprovalList ' + ex.description);
+            console.log('Error : FnGetAlumniJobApprovalList ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -5457,7 +5457,7 @@ Alumni.prototype.approveAlumniJobs = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnApproveAlumniJobs ' + ex.description);
+            console.log('Error : FnApproveAlumniJobs ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -5591,7 +5591,7 @@ Alumni.prototype.searchAlumniTEN = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSearchAlumniTEN ' + ex.description);
+            console.log('Error : FnSearchAlumniTEN ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -5703,7 +5703,7 @@ Alumni.prototype.searchAlumniJobs = function(req,res,next){
             server : 'Internal server error'
         };
         responseMessage.message = 'An error occurred !';
-        console.log('FnSearchAlimniJobs:error ' + ex.description);
+        console.log('FnSearchAlimniJobs:error ' + ex);
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
@@ -5821,7 +5821,7 @@ Alumni.prototype.getMyAlumniJobs = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetMyAlumniJobs ' + ex.description);
+            console.log('Error : FnGetMyAlumniJobs ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -6034,7 +6034,7 @@ Alumni.prototype.searchAlumni = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSearchAlumni ' + ex.description);
+            console.log('Error : FnSearchAlumni ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -6143,7 +6143,7 @@ Alumni.prototype.leaveAlumni = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnLeaveAlumni ' + ex.description);
+            console.log('Error : FnLeaveAlumni ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -6287,7 +6287,7 @@ Alumni.prototype.testUrl = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
-        console.log('Error : FnSaveStandardTags ' + ex.description);
+        console.log('Error : FnSaveStandardTags ' + ex);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -6422,7 +6422,7 @@ Alumni.prototype.approveAlumnimembers = function(req,res,next) {
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnApproveAlumnimembers:error ' + ex.description);
+            console.log('FnApproveAlumnimembers:error ' + ex);
             console.log(ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
@@ -6526,7 +6526,7 @@ Alumni.prototype.deleteTenAttachment = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnDeleteTenAttachment : ' + ex.description);
+            console.log('Error : FnDeleteTenAttachment : ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -6637,7 +6637,7 @@ Alumni.prototype.deleteEvent = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnDeleteEvent : ' + ex.description);
+            console.log('Error : FnDeleteEvent : ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -6742,7 +6742,7 @@ Alumni.prototype.getAlumniEducations = function(req,res,next) {
         }
         catch (ex) {
             res.status(500).json(responseMsg);
-            console.log('Error : getAlumniEducations ' + ex.description);
+            console.log('Error : getAlumniEducations ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -6847,7 +6847,7 @@ Alumni.prototype.getAlumniSpecialization = function(req,res,next) {
         }
         catch (ex) {
             res.status(500).json(responseMsg);
-            console.log('Error : getAlumniEducations ' + ex.description);
+            console.log('Error : getAlumniEducations ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -6949,7 +6949,7 @@ Alumni.prototype.changeAlumniMemberType = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : changeAlumniMemberType ' + ex.description);
+            console.log('Error : changeAlumniMemberType ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');

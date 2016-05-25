@@ -294,7 +294,7 @@ Configuration.prototype.save = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnSaveConfig:error ' + ex.description);
+        console.log('FnSaveConfig:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -379,7 +379,7 @@ Configuration.prototype.get = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetConfig error:' + ex.description);
+        console.log('FnGetConfig error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -427,7 +427,7 @@ Configuration.prototype.getBusinessCategories = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnCategory error:' + ex.description);
+        console.log('FnCategory error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -518,7 +518,7 @@ Configuration.prototype.getStatusTypes = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetStatusType error:' + ex.description);
+        console.log('FnGetStatusType error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -638,7 +638,7 @@ Configuration.prototype.StatusTypes = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetStatusType error:' + ex.description);
+        console.log('FnGetStatusType error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -778,7 +778,7 @@ Configuration.prototype.saveStatusType = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSaveStatusType:error ' + ex.description);
+        console.log('FnSaveStatusType:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(500).json(rtnMessage);
@@ -867,7 +867,7 @@ Configuration.prototype.getActionTypes = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetActionType error:' + ex.description);
+        console.log('FnGetActionType error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -999,7 +999,7 @@ Configuration.prototype.saveActionType = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSaveActionType :error ' + ex.description);
+        console.log('FnSaveActionType :error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1084,7 +1084,7 @@ Configuration.prototype.getItems = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetItemList error:' + ex.description);
+        console.log('FnGetItemList error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1205,7 +1205,7 @@ Configuration.prototype.saveItems = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnSaveItem:error ' + ex.description);
+        console.log('FnSaveItem:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ....................');
     }
@@ -1292,7 +1292,7 @@ Configuration.prototype.getFolders = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetRoleList error:' + ex.description);
+        console.log('FnGetRoleList error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1396,7 +1396,7 @@ Configuration.prototype.saveFolder = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSaveFolderRules:error ' + ex.description);
+        console.log('FnSaveFolderRules:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1482,7 +1482,7 @@ Configuration.prototype.getSubusers = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetSubUserList error:' + ex.description);
+        console.log('FnGetSubUserList error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1605,7 +1605,7 @@ Configuration.prototype.createSubuser = function(req,res,next){
         });
     }
     catch (ex) {
-        console.log('FnCreateSubUser:error ' + ex.description);
+        console.log('FnCreateSubUser:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1693,7 +1693,7 @@ Configuration.prototype.getReservationResources = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !';
-        console.log('FnGetReservationResource:error ' + ex.description);
+        console.log('FnGetReservationResource:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -1843,7 +1843,7 @@ Configuration.prototype.saveReservationResource = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !';
-        console.log('FnSaveReservationResource:error ' + ex.description);
+        console.log('FnSaveReservationResource:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -1988,7 +1988,7 @@ Configuration.prototype.updateReservationResource = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnUpdateReservationResource:error ' + ex.description);
+        console.log('FnUpdateReservationResource:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2080,7 +2080,7 @@ Configuration.prototype.getReservationServices = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnGetReservationService:error ' + ex.description);
+        console.log('FnGetReservationService:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2227,7 +2227,7 @@ Configuration.prototype.saveReservationService = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnSaveReservationService:error ' + ex.description);
+        console.log('FnSaveReservationService:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2358,7 +2358,7 @@ Configuration.prototype.updateReservationService = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnUpdateReservationService:error ' + ex.description);
+        console.log('FnUpdateReservationService:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2452,7 +2452,7 @@ Configuration.prototype.getResourceServiceMaps = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnGetReservResourceServiceMap:error ' + ex.description);
+        console.log('FnGetReservResourceServiceMap:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2581,7 +2581,7 @@ Configuration.prototype.saveResourceServiceMap = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnSaveReservResServiceMap:error ' + ex.description);
+        console.log('FnSaveReservResServiceMap:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2668,7 +2668,7 @@ Configuration.prototype.getWorkingHoursTemplates = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetWorkingHours error:' + ex.description);
+        console.log('FnGetWorkingHours error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -2796,7 +2796,7 @@ Configuration.prototype.saveWorkingHoursTemplate = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnSaveWorkingHours:error ' + ex.description);
+        console.log('FnSaveWorkingHours:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -2860,7 +2860,7 @@ Configuration.prototype.getHolidays = function(req,res,next){
         });
     }
     catch (ex) {
-        console.log('FnGetHolidayList error:' + ex.description);
+        console.log('FnGetHolidayList error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -2958,7 +2958,7 @@ Configuration.prototype.saveHoliday = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnSaveHolidayCalendar:error ' + ex.description);
+        console.log('FnSaveHolidayCalendar:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -3044,7 +3044,7 @@ Configuration.prototype.deleteHoliday = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnDeleteHolidayList:error ' + ex.description);
+        console.log('FnDeleteHolidayList:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -3128,7 +3128,7 @@ Configuration.prototype.deleteWorkingHours = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnDeleteWorkingHours:error ' + ex.description);
+        console.log('FnDeleteWorkingHours:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -3244,7 +3244,7 @@ Configuration.prototype.getWorkingHoursDetails = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !';
-        console.log('FnWorkingHours:error ' + ex.description);
+        console.log('FnWorkingHours:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -3364,7 +3364,7 @@ Configuration.prototype.saveInstituteGroup = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSaveInstituteGroup ' + ex.description);
+            console.log('Error : FnSaveInstituteGroup ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3470,7 +3470,7 @@ Configuration.prototype.getInstituteGroup = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSaveInstituteGroup ' + ex.description);
+            console.log('Error : FnSaveInstituteGroup ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3596,7 +3596,7 @@ Configuration.prototype.getInstituteConfig = function(req,res,next){
         catch (ex) {
             responseMessage.error = {};
             responseMessage.message = 'An error occured !';
-            console.log('getInstituteConfig:error ' + ex.description);
+            console.log('getInstituteConfig:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);
@@ -3723,7 +3723,7 @@ Configuration.prototype.getInstituteGroupDetails = function(req,res,next){
         catch (ex) {
             responseMessage.error = {};
             responseMessage.message = 'An error occured !';
-            console.log('getInstituteGroupDetails : error ' + ex.description);
+            console.log('getInstituteGroupDetails : error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);
@@ -4064,7 +4064,7 @@ Configuration.prototype.getWorkingSchedule = function(req,res,next){
         catch (ex) {
             responseMessage.error = {};
             responseMessage.message = 'An error occured !';
-            console.log('getInstituteConfig:error ' + ex.description);
+            console.log('getInstituteConfig:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);

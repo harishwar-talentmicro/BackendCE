@@ -723,7 +723,7 @@ Auth.prototype.register = function(req,res,next){
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
-            console.log('FnRegistration error:' + ex.description);
+            console.log('FnRegistration error:' + ex);
             //throw new Error(ex);
         }
     }
@@ -1007,7 +1007,7 @@ Auth.prototype.login = function(req,res,next){
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log(ex);
-        console.log('FnLogin:: error:' + ex.description);
+        console.log('FnLogin:: error:' + ex);
 
     }
 };
@@ -1120,7 +1120,7 @@ Auth.prototype.logout = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnLogout error:' + ex.description);
+        console.log('FnLogout error:' + ex);
 
     }
 };
@@ -1354,7 +1354,7 @@ Auth.prototype.verifySecretCode = function(req,res,next) {
             });
         }
         catch (ex) {
-            console.log('Error : FnVerifySecretCode ' + ex.description);
+            console.log('Error : FnVerifySecretCode ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1442,7 +1442,7 @@ Auth.prototype.sendOtp = function(req,res,next) {
 
         }
         catch (ex) {
-            console.log('Error : FnSendOtp ' + ex.description);
+            console.log('Error : FnSendOtp ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');

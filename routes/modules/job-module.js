@@ -740,7 +740,7 @@ Job.prototype.create = function(req,res,next){
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSaveJobs:error ' + ex.description);
+            console.log('FnSaveJobs:error ' + ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
         }
@@ -799,7 +799,7 @@ function FnSaveSkills(skill, callBack) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('OTP FnSendMailEzeid error:' + ex.description);
+        console.log('OTP FnSendMailEzeid error:' + ex);
 
         return 'error'
     }
@@ -932,7 +932,7 @@ Job.prototype.getAll = function(req,res,next){
                 server : 'Internal server error'
             };
             responseMessage.message = 'An error occured !';
-            console.log('FnGetJobs:error ' + ex.description);
+            console.log('FnGetJobs:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);
@@ -979,7 +979,7 @@ Job.prototype.getJobLocations = function(req,res,next){
 
     catch(ex){
         res.status(500).json(responseMsg);
-        console.log('Error : FnGetJobLocations '+ ex.description);
+        console.log('Error : FnGetJobLocations '+ ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1095,7 +1095,7 @@ Job.prototype.searchJobs = function(req,res,next){
             server : 'Internal server error'
         };
         responseMessage.message = 'An error occurred !';
-        console.log('FnSearchJobs:error ' + ex.description);
+        console.log('FnSearchJobs:error ' + ex);
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
@@ -1474,7 +1474,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnJobSeekerSearch ' + ex.description);
+            console.log('Error : FnJobSeekerSearch ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1693,7 +1693,7 @@ Job.prototype.applyJob = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnApplyJob ' + ex.description);
+            console.log('Error : FnApplyJob ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1774,7 +1774,7 @@ Job.prototype.appliedJobList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnAppliedJobList ' + ex.description);
+            console.log('Error : FnAppliedJobList ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1884,7 +1884,7 @@ Job.prototype.getJobDetails = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetJobDetails ' + ex.description);
+            console.log('Error : FnGetJobDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2034,7 +2034,7 @@ Job.prototype.jobs = function(req,res,next){
                 server : 'Internal server error'
             };
             responseMessage.message = 'An error occured !';
-            console.log('FnJobs:error ' + ex.description);
+            console.log('FnJobs:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);
@@ -2162,7 +2162,7 @@ Job.prototype.getAppliedJob = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnAppliedJobList ' + ex.description);
+            console.log('Error : FnAppliedJobList ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2208,7 +2208,7 @@ Job.prototype.getJobcountry = function(req,res,next){
 
     catch(ex){
         res.status(500).json(responseMsg);
-        console.log('Error : FnGetJobcountry '+ ex.description);
+        console.log('Error : FnGetJobcountry '+ ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -2265,7 +2265,7 @@ Job.prototype.getjobcity = function(req,res,next){
 
     catch(ex){
         res.status(500).json(responseMsg);
-        console.log('Error : FnGetjobcity '+ ex.description);
+        console.log('Error : FnGetjobcity '+ ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -2641,7 +2641,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetJobSeekersMailDetails ' + ex.description);
+            console.log('Error : FnGetJobSeekersMailDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2747,7 +2747,7 @@ Job.prototype.getListOfJobs = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetListOfJobs ' + ex.description);
+            console.log('Error : FnGetListOfJobs ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2848,7 +2848,7 @@ Job.prototype.jobRefresh = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnJobRefresh ' + ex.description);
+            console.log('Error : FnJobRefresh ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2959,7 +2959,7 @@ Job.prototype.jobsMatch = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnJobsMatch ' + ex.description);
+            console.log('Error : FnJobsMatch ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3067,7 +3067,7 @@ Job.prototype.jobsMyInstitute = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnJobsMatch ' + ex.description);
+            console.log('Error : FnJobsMatch ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3175,7 +3175,7 @@ Job.prototype.notifyRelevantStudent = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnNotifyRelevantStudent ' + ex.description);
+            console.log('Error : FnNotifyRelevantStudent ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3282,7 +3282,7 @@ Job.prototype.viewApplicantList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnViewNotifiedCVDetails ' + ex.description);
+            console.log('Error : FnViewNotifiedCVDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3401,7 +3401,7 @@ Job.prototype.viewJobDetails = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnViewJobDetails ' + ex.description);
+            console.log('Error : FnViewJobDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3663,7 +3663,7 @@ Job.prototype.jobNotification = function(req,res,next) {
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnJobNotification ' + ex.description);
+            console.log('Error : FnJobNotification ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3770,7 +3770,7 @@ Job.prototype.findInstitute = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnSearchInstitute ' + ex.description);
+            console.log('Error : FnSearchInstitute ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3913,7 +3913,7 @@ Job.prototype.addtoSelectedJob = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnAddtoSelectedJob ' + ex.description);
+            console.log('Error : FnAddtoSelectedJob ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -4023,7 +4023,7 @@ Job.prototype.saveJobLocation = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSaveJobLoaction ' + ex.description);
+            console.log('Error : FnSaveJobLoaction ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -4107,7 +4107,7 @@ Job.prototype.getCandidatesList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetCandidatesList ' + ex.description);
+            console.log('Error : FnGetCandidatesList ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -4230,7 +4230,7 @@ Job.prototype.updateCandidateStatus = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnUpdateCandidateStatus ' + ex.description);
+            console.log('Error : FnUpdateCandidateStatus ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -4337,7 +4337,7 @@ Job.prototype.autoSearchJobs = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnAutoSearchJobs ' + ex.description);
+            console.log('Error : FnAutoSearchJobs ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -4455,7 +4455,7 @@ Job.prototype.applicantStatus = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnApplicantStatus ' + ex.description);
+            console.log('Error : FnApplicantStatus ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -5036,7 +5036,7 @@ Job.prototype.activateJobPO = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : activateJobPO ' + ex.description);
+            console.log('Error : activateJobPO ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -5258,7 +5258,7 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnNotifyRelevantStudent ' + ex.description);
+            console.log('Error : FnNotifyRelevantStudent ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

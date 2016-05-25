@@ -150,7 +150,7 @@ router.get('/institute',function(req,res,next){
         catch (ex) {
             responseMessage.error = {};
             responseMessage.message = 'An error occured !';
-            console.log('sugg_list_clgs:error ' + ex.description);
+            console.log('sugg_list_clgs:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);

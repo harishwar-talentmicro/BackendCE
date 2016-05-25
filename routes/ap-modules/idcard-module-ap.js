@@ -100,7 +100,7 @@ IDCard_AP.prototype.updateIdCardPrintAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnUpdateIdCardPrintAP:error ' + ex.description);
+        console.log('FnUpdateIdCardPrintAP:error ' + ex);
 
     }
 };
@@ -179,7 +179,7 @@ IDCard_AP.prototype.getIdCardPrintAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetEZEIDDetailsAP error:' + ex.description);
+        console.log('FnGetEZEIDDetailsAP error:' + ex);
 
     }
 };

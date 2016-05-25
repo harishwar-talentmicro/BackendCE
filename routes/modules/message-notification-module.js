@@ -189,7 +189,7 @@ msgNotification.prototype.sendComposeMessage= function(msgContent, callBack) {
 
     }
     catch (ex) {
-        console.log(' FnComposeMessage : Catch error:' + ex.description);
+        console.log(' FnComposeMessage : Catch error:' + ex);
         callBack(null, null);
         console.log(ex);
         var errorDate = new Date();
@@ -892,7 +892,7 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
         }
     }
     catch (ex) {
-        console.log(' Update Status Notification : Catch error:' + ex.description);
+        console.log(' Update Status Notification : Catch error:' + ex);
         callBack(null, null);
         console.log(ex);
         var errorDate = new Date();
@@ -1063,7 +1063,7 @@ msgNotification.prototype.sendForwardNotification = function(msgContent, callBac
         }
     }
     catch (ex) {
-        console.log(' FnSendForwardMsgNotification : Catch error:' + ex.description);
+        console.log(' FnSendForwardMsgNotification : Catch error:' + ex);
         callBack(null, null);
         console.log(ex);
         var errorDate = new Date();

@@ -178,7 +178,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
                 server: 'Internal Server error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnSaveTaskManager:error ' + ex.description);
+            console.log('FnSaveTaskManager:error ' + ex);
             console.log(ex);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
@@ -309,7 +309,7 @@ TaskManager.prototype.getTasks = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetTasks ' + ex.description);
+            console.log('Error : FnGetTasks ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');

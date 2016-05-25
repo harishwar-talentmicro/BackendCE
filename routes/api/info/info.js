@@ -65,7 +65,7 @@ router.get('/tag/:tag', function(req,res,next){
         catch (ex) {
             responseMessage.error = {};
             responseMessage.message = 'An error occured !';
-            console.log('get_tag:error ' + ex.description);
+            console.log('get_tag:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);
@@ -162,7 +162,7 @@ router.get('/working_schedule', function(req,res,next){
         catch (ex) {
             responseMessage.error = {};
             responseMessage.message = 'An error occured !';
-            console.log('getInstituteConfig:error ' + ex.description);
+            console.log('getInstituteConfig:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);
@@ -254,7 +254,7 @@ router.get('/testbhavya',function(req,res,next){
     //catch (ex) {
     //    var errorDate = new Date();
     //    console.log(errorDate.toTimeString() + ' ......... error ...........');
-    //    console.log('FnGetCVInfo error:' + ex.description);
+    //    console.log('FnGetCVInfo error:' + ex);
     //
     //    res.status(400).json(responseMessage);
     //}

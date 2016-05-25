@@ -253,7 +253,7 @@ Service.prototype.getServiceProviders = function(req,res,next){
         }
         catch (ex) {
             res.status(500).json(null);
-            console.log('Error : FnGetServiceProviders ' + ex.description);
+            console.log('Error : FnGetServiceProviders ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -374,7 +374,7 @@ Service.prototype.getServices = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetServices ' + ex.description);
+            console.log('Error : FnGetServices ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -487,7 +487,7 @@ Service.prototype.getServiceCategories= function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetServiceCategories ' + ex.description);
+            console.log('Error : FnGetServiceCategories ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -603,7 +603,7 @@ Service.prototype.getServiceDetails = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetServiceDetails ' + ex.description);
+            console.log('Error : FnGetServiceDetails ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -671,7 +671,7 @@ Service.prototype.saveServicePic = function(req,res,next) {
             server: 'Internal Server error'
         };
         responseMessage.message = 'An error occurred !';
-        console.log('FnSavePic:error ' + ex.description);
+        console.log('FnSavePic:error ' + ex);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ....................');
@@ -738,7 +738,7 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
             server: 'Internal Server error'
         };
         responseMessage.message = 'An error occurred !';
-        console.log('FnSaveServiceAttachment:error ' + ex.description);
+        console.log('FnSaveServiceAttachment:error ' + ex);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ....................');
@@ -806,7 +806,7 @@ Service.prototype.saveServiceVideo = function(req,res,next) {
             server: 'Internal Server error'
         };
         responseMessage.message = 'An error occurred !';
-        console.log('FnSaveServiceVideo:error ' + ex.description);
+        console.log('FnSaveServiceVideo:error ' + ex);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ....................');
@@ -994,7 +994,7 @@ Service.prototype.createService = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnCreateService ' + ex.description);
+            console.log('Error : FnCreateService ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1186,7 +1186,7 @@ Service.prototype.updateService = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnUpdateService ' + ex.description);
+            console.log('Error : FnUpdateService ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1349,7 +1349,7 @@ Service.prototype.addMembersToService = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnAddMembersToService ' + ex.description);
+            console.log('Error : FnAddMembersToService ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1455,7 +1455,7 @@ Service.prototype.getJoinedCommunity = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetJoinedCommunity ' + ex.description);
+            console.log('Error : FnGetJoinedCommunity ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1558,7 +1558,7 @@ Service.prototype.deleteCommunityMember = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnDeleteCommunityMember : ' + ex.description);
+            console.log('Error : FnDeleteCommunityMember : ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');

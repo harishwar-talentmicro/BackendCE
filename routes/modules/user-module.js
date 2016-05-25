@@ -41,7 +41,7 @@ function FnEncryptPassword(Password) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('OTP generate error:' + ex.description);
+        console.log('OTP generate error:' + ex);
 
         return 'error'
     }
@@ -103,7 +103,7 @@ function FnDecrypt(EncryptPassword){
         return dec;
     }
     catch(ex){
-        console.log('FnDecrypterror:' + ex.description);
+        console.log('FnDecrypterror:' + ex);
 
         return 'error'
     }
@@ -196,7 +196,7 @@ User.prototype.getLoginDetails = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetLoginDetails error:' + ex.description);
+        console.log('FnGetLoginDetails error:' + ex);
         console.log(ex);
         //throw new Error(ex);
     }
@@ -254,7 +254,7 @@ User.prototype.getCountry = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetCountry error:' + ex.description);
+        console.log('FnGetCountry error:' + ex);
 
     }
 };
@@ -340,7 +340,7 @@ User.prototype.getState = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetState error:' + ex.description);
+        console.log('FnGetState error:' + ex);
 
     }
 };
@@ -402,7 +402,7 @@ User.prototype.getCity = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetCity error:' + ex.description);
+        console.log('FnGetCity error:' + ex);
 
     }
 };
@@ -480,7 +480,7 @@ User.prototype.getUserDetails = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetUserDetails error:' + ex.description);
+        console.log('FnGetUserDetails error:' + ex);
 
     }
 };
@@ -569,7 +569,7 @@ User.prototype.checkEzeid = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnCheckEzeid error:' + ex.description);
+        console.log('FnCheckEzeid error:' + ex);
 
     }
 };
@@ -699,7 +699,7 @@ User.prototype.changePassword = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnChangePassword error:' + ex.description);
+        console.log('FnChangePassword error:' + ex);
         res.status(400).json(RtnMessage);
 
     }
@@ -881,7 +881,7 @@ User.prototype.forgetPassword = function(req,res,next){
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log(ex);
-        console.log('FnForgetPassword error:' + ex.description);
+        console.log('FnForgetPassword error:' + ex);
     }
 };
 
@@ -973,7 +973,7 @@ User.prototype.verifyResetPasswordLink = function(req,res,next){
             });
         }
         catch(ex){
-            console.log('Error : FnVerifyResetPasswordLink ' + ex.description);
+            console.log('Error : FnVerifyResetPasswordLink ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1080,7 +1080,7 @@ User.prototype.verifySecretCode = function(req,res,next) {
             });
         }
         catch (ex) {
-            console.log('Error : FnVerifySecretCode ' + ex.description);
+            console.log('Error : FnVerifySecretCode ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1128,7 +1128,7 @@ User.prototype.decryptPassword = function(req,res,next){
 
     }
     catch(ex){
-        console.log('FnDecrypterror:' + ex.description);
+        console.log('FnDecrypterror:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         return 'error'
@@ -1149,7 +1149,7 @@ function FnRandomPassword() {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('OTP generate error:' + ex.description);
+        console.log('OTP generate error:' + ex);
 
         return 'error'
     }
@@ -1239,7 +1239,7 @@ User.prototype.getCompanyProfile = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetCompanyProfile error:' + ex.description);
+        console.log('FnGetCompanyProfile error:' + ex);
 
     }
 };
@@ -1332,7 +1332,7 @@ User.prototype.saveCompanyProfile = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnSaveCompanyProfile: Error:' + ex.description);
+        console.log('FnSaveCompanyProfile: Error:' + ex);
 
     }
 };
@@ -1419,7 +1419,7 @@ User.prototype.getWebLink = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetWebLink error:' + ex.description);
+        console.log('FnGetWebLink error:' + ex);
 
     }
 };
@@ -1524,7 +1524,7 @@ User.prototype.saveWebLink = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnSaveWebLink:error ' + ex.description);
+        console.log('FnSaveWebLink:error ' + ex);
 
     }
 };
@@ -1612,7 +1612,7 @@ User.prototype.deleteWebLink = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnDeleteWebLink:error ' + ex.description);
+        console.log('FnDeleteWebLink:error ' + ex);
 
     }
 };
@@ -1716,7 +1716,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnEZEIDDetails error:' + ex.description);
+        console.log('FnEZEIDDetails error:' + ex);
 
     }
 };
@@ -1802,7 +1802,7 @@ User.prototype.getResume = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetCVInfo error:' + ex.description);
+        console.log('FnGetCVInfo error:' + ex);
 
         res.status(400).json(responseMessage);
     }
@@ -2226,7 +2226,7 @@ User.prototype.saveResume = function(req,res,next){
         var errorDate = new Date();
         console.log(ex);
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnSaveCVInfo error:' + ex.description);
+        console.log('FnSaveCVInfo error:' + ex);
 
     }
 };
@@ -2301,7 +2301,7 @@ function FnSaveSkills(skill, CallBack) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('OTP FnSendMailEzeid error:' + ex.description);
+        console.log('OTP FnSendMailEzeid error:' + ex);
 
         return 'error'
     }
@@ -2350,7 +2350,7 @@ User.prototype.getSkills = function(req,res,next){
 
     catch(ex){
         res.status(500).json(responseMsg);
-        console.log('Error : FnPGetSkills '+ ex.description);
+        console.log('Error : FnPGetSkills '+ ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -2429,7 +2429,7 @@ User.prototype.getDocPin = function(req,res,next) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetDocPin:  error:' + ex.description);
+        console.log('FnGetDocPin:  error:' + ex);
     }
 };
 
@@ -2514,7 +2514,7 @@ User.prototype.getDoc = function(req,res,next) {
 
     }
     catch (ex) {
-        console.log('FnGetDoc error:' + ex.description);
+        console.log('FnGetDoc error:' + ex);
 
     }
 };
@@ -2607,7 +2607,7 @@ User.prototype.getDocument = function(req,res,next) {
 
     }
     catch (ex) {
-        console.log('FnGetDocument error:' + ex.description);
+        console.log('FnGetDocument error:' + ex);
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
@@ -2696,7 +2696,7 @@ User.prototype.updateDocPin = function(req,res,next) {
         }
     }
     catch (ex) {
-        console.log('FnUpdateDocPin:  error:' + ex.description);
+        console.log('FnUpdateDocPin:  error:' + ex);
 
     }
 };
@@ -2789,7 +2789,7 @@ User.prototype.saveDoc = function(req,res,next) {
 
     }
     catch (ex) {
-        console.log('FnSaveDoc error:' + ex.description);
+        console.log('FnSaveDoc error:' + ex);
     }
 };
 
@@ -2842,7 +2842,7 @@ User.prototype.getFunctions = function(req,res,next) {
 
     }
     catch (ex) {
-        console.log('FnGetFunctions error:' + ex.description);
+        console.log('FnGetFunctions error:' + ex);
 
     }
 };
@@ -2970,7 +2970,7 @@ User.prototype.uploadDoc = function(req,res,next) {
         });
     }
     catch (ex) {
-        console.log('FnGetDocument error:' + ex.description);
+        console.log('FnGetDocument error:' + ex);
         //throw new Error(ex);
         deleteTempFile();
     }
@@ -3290,7 +3290,7 @@ User.prototype.getMTitle = function(req,res,next) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetMTitle error:' + ex.description);
+        console.log('FnGetMTitle error:' + ex);
 
     }
 };
@@ -3408,7 +3408,7 @@ User.prototype.updateProfilePicture = function(req,res,next) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnUpdateProfilePicture error:' + ex.description);
+        console.log('FnUpdateProfilePicture error:' + ex);
 
     }
 };
@@ -3467,7 +3467,7 @@ User.prototype.getLoginCheck = function(req,res,next) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetUserDetails error:' + ex.description);
+        console.log('FnGetUserDetails error:' + ex);
 
     }
 };
@@ -3515,7 +3515,7 @@ User.prototype.getProxmity = function(req,res,next) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetProxmity error:' + ex.description);
+        console.log('FnGetProxmity error:' + ex);
         //throw new Error(ex);
     }
 };
@@ -3600,7 +3600,7 @@ User.prototype.getInstitutes = function(req,res,next) {
         }
         catch (ex) {
             res.status(500).json(responseMsg);
-            console.log('Error : FnGetInstitutes ' + ex.description);
+            console.log('Error : FnGetInstitutes ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3688,7 +3688,7 @@ User.prototype.getEducations = function(req,res,next) {
         }
         catch (ex) {
             res.status(500).json(responseMsg);
-            console.log('Error : FnGetEducations ' + ex.description);
+            console.log('Error : FnGetEducations ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3776,7 +3776,7 @@ User.prototype.getSpecialization = function(req,res,next) {
         }
         catch (ex) {
             res.status(500).json(responseMsg);
-            console.log('Error : FnGetSpecialization ' + ex.description);
+            console.log('Error : FnGetSpecialization ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3864,7 +3864,7 @@ User.prototype.getVerifiedInstitutes = function(req,res,next) {
         }
         catch (ex) {
             res.status(500).json(responseMsg);
-            console.log('Error : FnGetVerifiedInstitutes ' + ex.description);
+            console.log('Error : FnGetVerifiedInstitutes ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -4075,7 +4075,7 @@ User.prototype.saveUserDetails = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnSaveUserDetails ' + ex.description);
+            console.log('Error : FnSaveUserDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -4291,7 +4291,7 @@ User.prototype.sendResume = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSendResume ' + ex.description);
+            console.log('Error : FnSendResume ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -4403,7 +4403,7 @@ User.prototype.downloadResume = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnDownloadResume ' + ex.description);
+            console.log('Error : FnDownloadResume ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -4685,7 +4685,7 @@ User.prototype.getConveyanceReport = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetConveyanceReport ' + ex.description);
+            console.log('Error : FnGetConveyanceReport ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -4742,7 +4742,7 @@ User.prototype.getindustryType = function(req,res,next) {
     }
     catch (ex) {
         res.status(500).json(responseMsg);
-        console.log('Error : FnGetindustryType ' + ex.description);
+        console.log('Error : FnGetindustryType ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -4813,7 +4813,7 @@ User.prototype.getindustrycategory = function(req,res,next){
         };
         responseMessage.message = 'An error occurred !';
         res.status(500).json(responseMessage);
-        console.log('Error : FnGetindustrycategory ' + ex.description);
+        console.log('Error : FnGetindustrycategory ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -4927,7 +4927,7 @@ User.prototype.profilePicForEzeid = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnProfilePicForEzeid ' + ex.description);
+            console.log('Error : FnProfilePicForEzeid ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -5021,7 +5021,7 @@ User.prototype.getAlumniEducations = function(req,res,next) {
         }
         catch (ex) {
             res.status(500).json(responseMsg);
-            console.log('Error : getAlumniEducations ' + ex.description);
+            console.log('Error : getAlumniEducations ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

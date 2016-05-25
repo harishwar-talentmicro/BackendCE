@@ -79,7 +79,7 @@ User_AP.prototype.getUserDetailsAP = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetUserDetails error:' + ex.description);
+        console.log('FnGetUserDetails error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -216,7 +216,7 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnUpdateUserProfileAP error:' + ex.description);
+        console.log('FnUpdateUserProfileAP error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -347,7 +347,7 @@ User_AP.prototype.saveAPEZEID = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('psaveRealEstateData error:' + ex.description);
+        console.log('psaveRealEstateData error:' + ex);
 
     }
 };
@@ -446,7 +446,7 @@ User_AP.prototype.updateRedFlagAP = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnUpdateRedFlagAP:error ' + ex.description);
+        console.log('FnUpdateRedFlagAP:error ' + ex);
 
     }
 }
@@ -529,7 +529,7 @@ User_AP.prototype.updateEZEIDAP = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnUpdateEZEIDAP error:' + ex.description);
+        console.log('FnUpdateEZEIDAP error:' + ex);
 
     }
 };
@@ -705,7 +705,7 @@ User_AP.prototype.savePaidBannersAp = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSavePaidBannersAp ' + ex.description);
+            console.log('Error : FnSavePaidBannersAp ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -927,7 +927,7 @@ function FnCropImage(imageParams, callback){
     catch(ex){
         console.log(ex);
         callback(null, null);
-        console.log('FnCropImage : '+ ex.description);
+        console.log('FnCropImage : '+ ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
