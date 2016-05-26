@@ -374,7 +374,8 @@ router.get('/receipts', function(req,res,next){
                                             //console.log(results[1][0].totalCount,"results[1].totalCount");
                                             var outputData = {
                                                 totalCount : results[1][0].totalCount,
-                                                records : results[0]
+                                                records : results[0],
+                                                outstandingAmount : results[2][0].outstandingAmount
                                             }
                                             responseMessage.status = true;
                                             responseMessage.error = null;
