@@ -767,40 +767,53 @@ router.get('/members', function(req,res,next){
                     ];
                     var procQuery = 'CALL p_v1_getGroupMembers(' + procParams.join(',') + ')';
                     console.log(procQuery);
-                    req.db.query(procQuery, function (err, GroupMemberResults) {
+                    req.db.query(procQuery, function (err, groupMemberResults) {
                         /**
                          * while calling procedure if not getting any error and if get result then in response
                          * if isAvailable is 0 then Group Name is not available to create else Group Name is available
                          *
                          * */
+                        console.log(groupMemberResults[0],"groupMemberResults[0]");
                         if (!err){
-                            if(GroupMemberResults && GroupMemberResults[0] && GroupMemberResults[0].length > 0
-                                && GroupMemberResults[0][0].groupId) {
+                            if(groupMemberResults && groupMemberResults[0] && groupMemberResults[0][0]){
+                                        if(groupMemberResults[0][0].groupId) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Group members list loaded successfully';
+                                            responseMessage.data = {
+                                                groupMemberList : groupMemberResults[0]
+                                            };
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else{
+                                            var qMsg = {server: 'Internal Server Error'};
+
+                                            switch (groupMemberResults[0][0]._e) {
+                                                case 'ACCESS DENIED' :
+                                                    qMsg = {_e: 'ACCESS DENIED'};
+                                                    break;
+
+                                                default:
+                                                    break;
+                                            }
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = qMsg;
+                                            responseMessage.data = {};
+                                            res.status(200).json(responseMessage);
+
+                                        }
+                            }
+                            else{
                                 responseMessage.status = true;
                                 responseMessage.error = null;
-                                responseMessage.message = 'Group members list loaded successfully';
+                                responseMessage.message = 'Group members list are not available';
                                 responseMessage.data = {
-                                    groupMemberList : GroupMemberResults[0]
+                                    groupMemberList : []
                                 };
                                 res.status(200).json(responseMessage);
-                             }
-                            else{
-                                var qMsg = {server: 'Internal Server Error'};
-                                switch (GroupMemberResults[0][0]._e) {
-                                    case 'ACCESS DENIED' :
-                                        qMsg = {_e: 'ACCESS DENIED'};
-                                        break;
-
-                                    default:
-                                        break;
-                                }
-                                responseMessage.status = false;
-                                responseMessage.error = null;
-                                responseMessage.message = qMsg;
-                                responseMessage.data = {};
-                                res.status(200).json(responseMessage);
-
                             }
+
                         }
                         else {
                             responseMessage.error = {
