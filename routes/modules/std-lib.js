@@ -185,35 +185,32 @@ StdLib.prototype.validateToken = function(Token, CallBack){
 
         //below query to check token exists for the users or not.
         if (Token) {
-            if(Token != 2){
-                /**
-                 * @info : Token is now queried from session table i.e. tloginout
-                 */
-                var Query = 'select masterid,token from tloginout where token=' + _this.db.escape(Token)+' AND status = 1';
 
-               _this.db.query(Query, function (err, Result) {
-                    if (!err) {
-                        if(Result && Result.length){
-                                // console.log(Result);
-                                console.log('FnValidateToken: Token found');
-                                CallBack(null, Result[0]);
-                        }
-                        else{
-                            CallBack(null, null);
-                            console.log('FnValidateToken:No Token found');
-                        }
-
+            /**
+             * @info : Token is now queried from session table i.e. tloginout
+             */
+            var Query = 'select masterid,token from tloginout where token=' + _this.db.escape(Token)+' AND status = 1';
+           _this.db.query(Query, function (err, Result) {
+                if (!err) {
+                    if(Result && Result.length){
+                            // console.log(Result);
+                            console.log('FnValidateToken: Token found');
+                            console.log('Result',Result);
+                            CallBack(null, Result[0]);
                     }
-                    else {
-                        CallBack(err, null);
-                        console.log('FnValidateToken:' + err);
-
+                    else{
+                        CallBack(null, null);
+                        console.log('FnValidateToken:No Token found');
                     }
-                });
-            }
-            else{
-                CallBack(null, 'Pass');
-            }
+
+                }
+                else {
+                    CallBack(err, null);
+                    console.log('FnValidateToken:' + err);
+
+                }
+            });
+
         }
         else {
             CallBack(null, null);

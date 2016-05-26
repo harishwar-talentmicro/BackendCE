@@ -426,40 +426,21 @@ Search.prototype.searchKeyword = function(req,res,next){
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
-                        if(SearchResult) {
-                            if (SearchResult[0]) {
-                                if (SearchResult[0].length > 0) {
-                                    if (SearchResult[1]) {
-                                        //res.send(SearchResult[0]);
+                        if(SearchResult && SearchResult[0] && SearchResult[0].length && SearchResult[1]) {
 
-                                        for(var counter = 0; counter < SearchResult[1].length; counter++ ){
-                                            console.log('Open Status of SearchResult : ', st.getOpenStatus(SearchResult[1][counter].OpenStatus,SearchResult[1][counter].wh));
+                            for(var counter = 0; counter < SearchResult[1].length; counter++ ){
+                                console.log('Open Status of SearchResult : ', st.getOpenStatus(SearchResult[1][counter].OpenStatus,SearchResult[1][counter].wh));
 
-                                            SearchResult[1][counter]['OpenStatus'] = st.getOpenStatus(SearchResult[1][counter].OpenStatus,SearchResult[1][counter].wh);
+                                SearchResult[1][counter]['OpenStatus'] = st.getOpenStatus(SearchResult[1][counter].OpenStatus,SearchResult[1][counter].wh);
 
-                                            /**
-                                             * Removing wh property from search results
-                                             */
-                                            SearchResult[1][counter]['wh'] = undefined;
-                                        }
-
-                                        res.json({totalcount: SearchResult[0][0].totalcount, Result: SearchResult[1]});
-                                        console.log('FnSearchByKeywords:  tmaster:Search Found');
-                                    }
-                                    else {
-                                        res.json(null);
-                                        console.log('FnSearchByKeywords: tmaster: no search found');
-                                    }
-                                }
-                                else {
-                                    res.json(null);
-                                    console.log('FnSearchByKeywords: tmaster: no search found');
-                                }
+                                /**
+                                 * Removing wh property from search results
+                                 */
+                                SearchResult[1][counter]['wh'] = undefined;
                             }
-                            else {
-                                res.json(null);
-                                console.log('FnSearchByKeywords:  tmaster: no search found');
-                            }
+
+                            res.json({totalcount: SearchResult[0][0].totalcount, Result: SearchResult[1]});
+                            console.log('FnSearchByKeywords:  tmaster:Search Found');
                         }
                         else {
                             res.json(null);
