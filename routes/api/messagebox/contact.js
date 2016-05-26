@@ -21,7 +21,7 @@ var notification = new Notification();
  * @param res
  * @param next
  *
- * @description : API to get search contacts
+ * @discription : API to get serach contacts
  */
 router.get('/query', function(req,res,next){
     var ezeTerm = req.query.q;
@@ -59,8 +59,10 @@ router.get('/query', function(req,res,next){
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err && tokenResult) {
                     var ezeArr = ezeTerm.split('.');
-                    title = ezeArr[0];
-                    if (ezeArr.length > 1 && ezeArr[1]) {
+                    title = ezeArr;
+                    if (ezeArr.length > 1) {
+                        title = ezeArr[0];
+
                         /**
                          * If user may have passed the pin
                          * and therefore validating pin using standard rules
@@ -145,7 +147,7 @@ router.get('/query', function(req,res,next){
  *@param token <string> token of user
  *@param dateTime <datetime> dateTime from this time modified contact we will give
  *@param isWeb <int> isWeb is just a flaf for web 1 and for mobile 0
- * @description : API to get messagebox contact list
+ * @discription : API to get messagebox contact list
  */
 router.get('/', function(req,res,next){
     var responseMessage = {
@@ -260,7 +262,7 @@ router.get('/', function(req,res,next){
                             else{
                                 responseMessage.status = true;
                                 responseMessage.error = null;
-                                responseMessage.message = 'Contact list is not available';
+                                responseMessage.message = 'Contact list not available';
                                 responseMessage.data = {
                                     contactList:[]
                                 };
@@ -383,80 +385,79 @@ router.put('/status', function(req,res,next){
                                 /**
                                  * if proc executed successfully then give response true
                                  * */
+                                console.log('updateResult',updateResult);
 
                                 if (updateResult
                                     && updateResult[0]
-                                    && updateResult[0][0]){
-                                    if(updateResult[0][0].userGroupId) {
+                                    && updateResult[0].length > 0
+                                    && updateResult[0][0].userGroupId) {
 
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'User status updated successfully';
-                                        responseMessage.data = null;
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnUpdateUserStatus: User status updated successfully');
-
-                                        if(updateResult[0][0].status = 1){
-                                            var notificationTemplaterRes = notificationTemplater.parse('accept_request',{
-                                                adminName : updateResult[0][0].adminName,
-                                                groupName : updateResult[0][0].groupName
-                                            });
-                                            console.log(notificationTemplaterRes,"notificationTemplaterRes");
-                                            if(notificationTemplaterRes.parsedTpl){
-                                                notification.publish(
-                                                    updateResult[0][0].userGroupId,
-                                                    updateResult[0][0].groupName,
-                                                    updateResult[0][0].groupName,
-                                                    updateResult[0][0].senderId,
-                                                    notificationTemplaterRes.parsedTpl,
-                                                    32,
-                                                    0, 0,
-                                                    0,
-                                                    0,
-                                                    0,
-                                                    0,
-                                                    1,
-                                                    moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                    '',
-                                                    0,
-                                                    0);
-                                                console.log('postNotification : notification for accept_request is sent successfully');
-                                            }
-                                            else{
-                                                console.log('Error in parsing notification accept_request template - ',
-                                                    notificationTemplaterRes.error);
-                                                console.log('postNotification : notification for accept_request is sent successfully');
-                                            }
-                                        }
-
-                                    }
-                                    /**
-                                     * if proc executed unsuccessfully then give response false
-                                     * */
-                                    else {
-                                        var qMsg = {server: 'Internal Server Error'};
-                                        switch (updateResult[0][0]._e) {
-                                            case 'ACCESS DENIED' :
-                                                qMsg = {_e: 'ACCESS DENIED'};
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                        responseMessage.status = false;
-                                        responseMessage.error = null;
-                                        responseMessage.message = qMsg;
-                                        responseMessage.data = {};
-                                        res.status(200).json(responseMessage);
-                                    }
-                                }
-                                else{
-                                    responseMessage.status = false;
+                                    responseMessage.status = true;
                                     responseMessage.error = null;
-                                    responseMessage.message = 'User status is not updated successfully';
-                                    responseMessage.data = {};
+                                    responseMessage.message = 'User status updated successfully';
+                                    responseMessage.data = null;
                                     res.status(200).json(responseMessage);
-                                }
+                                    console.log('FnUpdateUserStatus: User status updated successfully');
 
+                                    if(updateResult[0][0].status = 1){
+                                        var notificationTemplaterRes = notificationTemplater.parse('accept_request',{
+                                            adminName : updateResult[0][0].adminName,
+                                            groupName : updateResult[0][0].groupName
+                                        });
+                                        console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                        if(notificationTemplaterRes.parsedTpl){
+                                            notification.publish(
+                                                updateResult[0][0].userGroupId,
+                                                updateResult[0][0].groupName,
+                                                updateResult[0][0].groupName,
+                                                updateResult[0][0].senderId,
+                                                notificationTemplaterRes.parsedTpl,
+                                                32,
+                                                0, 0,
+                                                0,
+                                                0,
+                                                0,
+                                                0,
+                                                1,
+                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                '',
+                                                0,
+                                                0);
+                                            console.log('postNotification : notification for accept_request is sent successfully');
+                                        }
+                                        else{
+                                            console.log('Error in parsing notification accept_request template - ',
+                                                notificationTemplaterRes.error);
+                                            console.log('postNotification : notification for accept_request is sent successfully');
+                                        }
+                                    }
+
+                                }
+                                /**
+                                 * if proc executed unsuccessfully then give response false
+                                 * */
+                                else {
+                                    var qMsg = {server: 'Internal Server Error'};
+                                    switch (updateResult[0][0]._e) {
+                                    /**
+                                     * This error will only come when for the group any other user has called this API who
+                                     * is not a groupAdmin
+                                     */
+                                        case 'ACCESS DENIED' :
+                                            qMsg = {_e: 'ACCESS DENIED'};
+                                            responseMessage.message = "You don't have permission for the following action";
+                                            break;
+                                        case 'NO_RELATION_EXISTS' :
+                                            qMsg = {_e : 'NO_RELATION_EXISTS '};
+                                            responseMessage.message = "You don't have permission for the following action";
+                                            break;
+                                    }
+                                    responseMessage.status = false;
+                                    responseMessage.error = qMsg;
+
+                                    responseMessage.data = {};
+                                    res.status(400).json(responseMessage);
+                                }
                             }
                             /**
                              * while executing proc if error comes then give error

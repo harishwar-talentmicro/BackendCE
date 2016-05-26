@@ -120,7 +120,7 @@ router.post('/', function(req,res,next){
             req.st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err && tokenResult) {
                     /**
-                     * call pautojoin_before_Composing to join to group or indidual automatically so that without sending request also
+                     * call pautojoin_before_Composing to join to group or individual automatically so that without sending request also
                      * user can message to anyone
                      * */
                     var autoJoinQueryParams = [
@@ -138,14 +138,15 @@ router.post('/', function(req,res,next){
                              * checking that grouptype(group) and groupRelationStatus is pending then user cant message
                              * */
                             //console.log(autoJoinResults,"autoJoinResults");
-                            if(autoJoinResults && autoJoinResults[0] && autoJoinResults[0][0] && autoJoinResults[0][0].groupType == 0 && autoJoinResults[0][0].groupRelationStatus == 0){
+                            if(autoJoinResults && autoJoinResults[0] && autoJoinResults[0][0] &&
+                                autoJoinResults[0][0].groupType == 0 && autoJoinResults[0][0].groupRelationStatus == 0){
                                 responseMessage.status = false;
                                 responseMessage.error = null;
-                                responseMessage.message = 'Your group join request is at pending state';
+                                responseMessage.message = 'Your request for joining the group is pending';
                                 responseMessage.data = null;
                                 res.status(200).json(responseMessage);
                                 /**
-                                 * @TODO Send Notification to the admin of the group to accept the request of this user
+                                 * Send Notification to the admin of the group to accept the request of this user
                                  * who want to join this group
                                  */
 
@@ -186,40 +187,38 @@ router.post('/', function(req,res,next){
                                  * into above declared variable name message
                                  * */
 
-                                if (req.body.messageType == 0) {
-                                    message = req.body.message;
-                                }
-                                /**`1``````````````````````````````````````````````````````
-                                 *
-                                 * y
-                                 * check that messageType is 2(location) then prepare json object of  latitude and longitude  which we are
-                                 * getting from front end into above declared variable name message
-                                 * */
-                                else if (req.body.messageType == 2) {
-                                    var jsonDistanceObject = {
-                                        latitude: req.body.latitude,
-                                        longitude: req.body.longitude,
-                                        text: (req.body.message) ? (req.body.message) : ''
-                                    }
-                                    var jsonDistanceObject = JSON.stringify(jsonDistanceObject);
-                                    message = jsonDistanceObject;
-                                    //console.log(jsonDistanceObject);
-                                }
-                                /**
-                                 * check that messageType is 3(attachment) then prepare json object of attachmentLink,fileName and mimeType which we are
-                                 * getting from front end into above declared variable name message
-                                 * */
-                                else if (req.body.messageType == 3) {
-                                    var jsonAttachObject = {
-                                        thumbnailLink:  "tn_" + req.body.attachmentLink,
-                                        attachmentLink: req.body.attachmentLink,
-                                        fileName: req.body.fileName,
-                                        mimeType: req.body.mimeType,
-                                        text: (req.body.message) ? (req.body.message) : ''
-                                    }
-                                    var jsonAttachObject = JSON.stringify(jsonAttachObject);
-                                    message = jsonAttachObject;
-                                    //console.log(jsonAttachObject);
+                                switch(req.body.messageType) {
+                                    case 0 :
+                                        message = req.body.message;
+                                        break;
+
+                                    case 2 :
+                                        var jsonDistanceObject = {
+                                            latitude: req.body.latitude,
+                                            longitude: req.body.longitude,
+                                            text: (req.body.message) ? (req.body.message) : ''
+                                        };
+                                        message = JSON.stringify(jsonDistanceObject);
+                                        break;
+
+                                    case 3 :
+                                        var jsonAttachObject = {
+                                            thumbnailLink:  "tn_" + req.body.attachmentLink,
+                                            attachmentLink: req.body.attachmentLink,
+                                            fileName: req.body.fileName,
+                                            mimeType: req.body.mimeType,
+                                            text: (req.body.message) ? (req.body.message) : ''
+                                        };
+
+                                        message = JSON.stringify(jsonAttachObject);
+
+                                        break;
+
+                                    default :
+                                        message = "";
+                                        break;
+
+
                                 }
                                 /**
                                  * call p_v1_ComposeMessage to compose message to anyone(group or individual)
@@ -250,8 +249,8 @@ router.post('/', function(req,res,next){
                                             responseMessage.message = 'Message send successfully';
                                             switch (results[0][0].messageType) {
                                                 case 3:
-                                                    attachmentObject = results[0][0].message;
-                                                    attachmentObject = JSON.parse(attachmentObject);
+
+                                                    attachmentObject = JSON.parse(results[0][0].message);
                                                     attachmentObject.attachmentLink = attachmentObject.attachmentLink ? req.CONFIG.CONSTANT.GS_URL +
                                                         req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentObject.attachmentLink : '';
                                                     attachmentObject.thumbnailLink = attachmentObject.thumbnailLink ? req.CONFIG.CONSTANT.GS_URL +
@@ -261,18 +260,18 @@ router.post('/', function(req,res,next){
                                                     results[0][0].message = attachmentObject;
                                                     break;
                                                 case 2:
-                                                    attachmentObject = results[0][0].message;
-                                                    attachmentObject = JSON.parse(attachmentObject);
+                                                    attachmentObject = JSON.parse(results[0][0].message);
                                                     results[0][0].message = attachmentObject;
                                                     break;
                                                 default:
+                                                    results[0][0].message = results[0][0].message;
                                                     break;
                                             }
-                                            responseMessage.data = results[0];
+                                            responseMessage.data = results[0][0];
 
                                             res.status(200).json(responseMessage);
                                             /**notification send to user to whome message is sending*/
-                                            if(results[1] && results[1].length>0){
+                                            if(results[1] && results[1].length > 0){
                                                 //console.log(results[1],"results[1]");
                                                 for (var i = 0; i < results[1].length; i++ ) {
                                                     var notificationTemplaterRes = notificationTemplater.parse('compose_message',{
@@ -354,7 +353,7 @@ router.post('/', function(req,res,next){
                         server: 'Internal Server Error'
                     };
                     responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
+                    res.status(401).json(responseMessage);
                     console.log('Error :', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
