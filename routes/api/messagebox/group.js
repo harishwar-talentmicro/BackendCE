@@ -10,6 +10,11 @@ var express = require('express');
 var router = express.Router();
 var moment = require('moment');
 var st = null;
+var notification = null;
+var NotificationTemplater = require('../../lib/NotificationTemplater.js');
+var notificationTemplater = new NotificationTemplater();
+var Notification = require('../../modules/notification/notification-master.js');
+var notification = new Notification();
 
 /**
  * Method : GET
@@ -724,13 +729,14 @@ router.get('/members', function(req,res,next){
         error.groupId = 'Invalid group id';
         validationFlag *= false;
     }
-    if(req.query.timestamp){
-        if(moment(req.query.timestamp,'YYYY-MM-DD HH:mm:ss').isValid()){
-            req.query.timestamp = moment(req.query.timestamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+    console.log(req.query.timeStamp,"timestamp");
+    if(req.query.timeStamp){
+        if(moment(req.query.timeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
+            req.query.timeStamp = moment(req.query.timeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
         }
     }
     else{
-        req.query.timestamp = null;
+        req.query.timeStamp = null;
     }
 
     if (!validationFlag) {
@@ -757,7 +763,7 @@ router.get('/members', function(req,res,next){
                     var procParams = [
                         req.db.escape(req.query.token) ,
                         req.db.escape(req.query.groupId),
-                        req.db.escape(req.query.timestamp)
+                        req.db.escape(req.query.timeStamp)
                     ];
                     var procQuery = 'CALL p_v1_getGroupMembers(' + procParams.join(',') + ')';
                     console.log(procQuery);

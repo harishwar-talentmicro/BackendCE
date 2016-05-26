@@ -99,7 +99,7 @@ Loc.prototype.saveLocMap = function(req,res,next){
                                 console.log("locMap :"+locMap);
                                 var locDetails = {
 
-                                    fid: locMap[i].fid,
+                                    // fid: locMap[i].fid,
                                     locId: locMap[i].career_id,
                                     tid: locMap[i].tid,
                                     internshipCount: locMap[i].interns_count,
