@@ -469,7 +469,7 @@ router.post('/members', function(req,res,next){
                                     default:
                                         break;
                                 }
-                                responseMessage.status = true;
+                                responseMessage.status = false;
                                 responseMessage.error = null;
                                 responseMessage.message = qMsg;
                                 responseMessage.data = {};
