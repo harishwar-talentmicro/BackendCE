@@ -184,13 +184,13 @@ StdLib.prototype.validateToken = function(token, CallBack){
     try {
 
         //below query to check token exists for the users or not.
-        if (Token) {
+        if (token) {
 
             /**
              * @info : Token is now queried from session table i.e. tloginout
              */
 
-            var validateTokenQuery = 'pvalidate_token(' + _this.db.escape(token)+')';
+            var validateTokenQuery = 'CALL pvalidate_token(' + _this.db.escape(token)+')';
            _this.db.query(validateTokenQuery, function (err, sessionResult) {
                 if (!err) {
 
