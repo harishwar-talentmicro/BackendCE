@@ -2,6 +2,7 @@
  * Created by EZEID on 9/17/2015.
  */
 var express = require('express');
+var path = require('path');
 var fs = require('fs');
 var router = express.Router();
 var ejs = require('ejs');
@@ -11,7 +12,7 @@ var StdLib = require('./modules/std-lib.js');
 var stdLib = new StdLib(db);
 
 
-var maintainenceTemplate = fs.readFileSync('../views/maintainence.ejs','utf-8');
+var maintainenceTemplate = fs.readFileSync(path.join(__dirname, '../views/maintainence.ejs'),'utf-8');
 var htmlIndexFile = ejs.render(maintainenceTemplate);
 var indexTemplate = '';
 
