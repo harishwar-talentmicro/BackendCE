@@ -385,10 +385,11 @@ router.put('/status', function(req,res,next){
                                 /**
                                  * if proc executed successfully then give response true
                                  * */
+                                console.log('updateResult',updateResult);
 
                                 if (updateResult
                                     && updateResult[0]
-                                    && updateResult[0].length>0
+                                    && updateResult[0].length > 0
                                     && updateResult[0][0].userGroupId) {
 
                                     responseMessage.status = true;
@@ -438,17 +439,24 @@ router.put('/status', function(req,res,next){
                                 else {
                                     var qMsg = {server: 'Internal Server Error'};
                                     switch (updateResult[0][0]._e) {
+                                    /**
+                                     * This error will only come when for the group any other user has called this API who
+                                     * is not a groupAdmin
+                                     */
                                         case 'ACCESS DENIED' :
                                             qMsg = {_e: 'ACCESS DENIED'};
+                                            responseMessage.message = "You don't have permission for the following action";
                                             break;
-                                        default:
+                                        case 'NO_RELATION_EXISTS' :
+                                            qMsg = {_e : 'NO_RELATION_EXISTS '};
+                                            responseMessage.message = "You don't have permission for the following action";
                                             break;
                                     }
                                     responseMessage.status = false;
-                                    responseMessage.error = null;
-                                    responseMessage.message = qMsg;
+                                    responseMessage.error = qMsg;
+
                                     responseMessage.data = {};
-                                    res.status(200).json(responseMessage);
+                                    res.status(400).json(responseMessage);
                                 }
                             }
                             /**

@@ -177,7 +177,7 @@ StdLib.prototype.generateRandomHash = function(timeStamp){
     return hash.digest('hex') + crypto.randomBytes(30).toString('hex');
 }
 
-StdLib.prototype.validateToken = function(Token, CallBack){
+StdLib.prototype.validateToken = function(token, CallBack){
     var _this = this;
     console.log('validateToken');
 
@@ -189,20 +189,21 @@ StdLib.prototype.validateToken = function(Token, CallBack){
             /**
              * @info : Token is now queried from session table i.e. tloginout
              */
-            var Query = 'select masterid,token from tloginout where token=' + _this.db.escape(Token)+' AND status = 1';
-           _this.db.query(Query, function (err, Result) {
+
+            var validateTokenQuery = 'pvalidate_token(' + _this.db.escape(token)+')';
+           _this.db.query(validateTokenQuery, function (err, sessionResult) {
                 if (!err) {
-                    if(Result && Result.length){
-                            // console.log(Result);
+
+                    if(sessionResult && sessionResult.length){
+
                             console.log('FnValidateToken: Token found');
-                            console.log('Result',Result);
-                            CallBack(null, Result[0]);
+                            console.log('sessionResult',sessionResult);
+                            CallBack(null, sessionResult[0]);
                     }
                     else{
                         CallBack(null, null);
                         console.log('FnValidateToken:No Token found');
                     }
-
                 }
                 else {
                     CallBack(err, null);
@@ -210,7 +211,6 @@ StdLib.prototype.validateToken = function(Token, CallBack){
 
                 }
             });
-
         }
         else {
             CallBack(null, null);

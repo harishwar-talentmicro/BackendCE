@@ -1382,7 +1382,7 @@ Search.prototype.searchBusListing = function(req,res,next){
         'outbox'
     ];
 
-    var loginCookie = (req.cookies['login']) ? ((req.cookies['login'] === 'true') ? true : false ) : false;
+    var loginCookie = (req.cookies['login'] === 'true');
     if(!loginCookie){
         /**
          * Checks if ezeid parameter is existing and checks in the list that is it a
