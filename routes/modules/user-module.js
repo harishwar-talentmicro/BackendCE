@@ -3904,8 +3904,8 @@ User.prototype.saveUserDetails = function(req,res,next){
     var visiblePhone = (!isNaN(parseInt(req.body.vp))) ?  parseInt(req.body.vp) : 1;// 0-invisible, 1- visible
     var visibleAddress = (!isNaN(parseInt(req.body.va))) ?  parseInt(req.body.va) : 1;// 0-invisible, 1- visible
     var locTitle = (req.body.loc_title) ? req.body.loc_title : '';
-    var latitude = (req.body.lat) ? req.body.lat : '';
-    var longitude = (req.body.lng) ? req.body.lng : '';
+   // var latitude = (req.body.lat) ? req.body.lat : '';
+   // var longitude = (req.body.lng) ? req.body.lng : '';
     var address1 = (req.body.address_line1) ? req.body.address_line1 : '';
     var address2 = (req.body.address_line2) ? req.body.address_line2 : '';
     var city = (req.body.city) ? req.body.city : '';
@@ -3942,7 +3942,14 @@ User.prototype.saveUserDetails = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-
+    if(!req.body.lat){
+        error['lat'] = 'Invalid latitude';
+        validateStatus *= false;
+    }
+    if(!req.body.lng){
+        error['lng'] = 'Invalid longitude';
+        validateStatus *= false;
+    }
     if(!validateStatus){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
