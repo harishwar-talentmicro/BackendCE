@@ -160,7 +160,7 @@ router.post('/', function(req,res,next){
     var error = {};
     /** validation goes here
      * checking that groupId,showMembers,restrictedReply,autoJoin we are getting from front end or not if no then default
-     * value is 0 and if getting then check that its integer or not,if not give error
+     * value is 0 and if getting then check that its integer or not,if not give error and aboutGroup by default empty string
      *
      * */
     req.body.groupId= (req.body.groupId) ? parseInt(req.body.groupId) : 0;
@@ -259,9 +259,8 @@ router.post('/', function(req,res,next){
                                         responseMessage.error = results[0][0]._e;
                                         responseMessage.message = 'Error in creating group';
                                         responseMessage.data = {
-
                                         };
-                                        res.status(200).json(responseMessage);
+                                        res.status(400).json(responseMessage);
                                     }
                                 }
                                 else {
@@ -288,26 +287,42 @@ router.post('/', function(req,res,next){
                             console.log(procQuery);
                             req.db.query(procQuery, function (err, validateGroupResults) {
                                 /**
-                                 * while calling procedure if not getting any error and if get result then in response
-                                 * if isAvailable is 0 then Group Name is not available to create else Group Name is available
+                                 * while calling procedure if isAvailable = 1 then call function to create group
                                  *
                                  * */
-                                if ((!err) && validateGroupResults &&
-                                    validateGroupResults[0] &&
-                                    validateGroupResults[0].length > 0 &&
-                                    validateGroupResults[0][0].isAvailable == 1) {
-                                    createGroup();
+                                if (!err){
+                                    if (validateGroupResults &&
+                                        validateGroupResults[0] &&
+                                        validateGroupResults[0].length > 0 &&
+                                        validateGroupResults[0][0].isAvailable == 1) {
+                                        createGroup();
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Group Name is not available';
+                                        responseMessage.data = {
+                                        };
+                                        res.status(200).json(responseMessage);
+                                    }
                                 }
-                                else {
-                                    responseMessage.status = false;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Group Name is not available';
-                                    responseMessage.data = {
+                                else{
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
                                     };
-                                    res.status(200).json(responseMessage);
+                                    responseMessage.message = 'An error occurred !';
+                                    res.status(500).json(responseMessage);
+                                    console.log('Error :', err);
+                                    var errorDate = new Date();
+                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
                                 }
+
                             });
                         }
+                        /**
+                         * in case of individual directly call the function to create group without validating group name
+                         * */
+
                         else{
                             createGroup();
                             }
@@ -390,7 +405,8 @@ router.post('/members', function(req,res,next){
 
                     var queryParams = [
                         req.db.escape(req.body.groupId) ,
-                        req.db.escape(req.body.ezeoneId)
+                        req.db.escape(req.body.ezeoneId),
+                        req.db.escape(req.body.token)
                     ];
                     /**
                      * call p_v1_addmembersbygroup to add members to the group
@@ -404,77 +420,88 @@ router.post('/members', function(req,res,next){
                              * who is added by admin to accept the request to join the group
                              * */
 
-                            if (addMemberResult && addMemberResult[0] && addMemberResult[0].length>0 && addMemberResult[0][0].userGroupId) {
-                                console.log(addMemberResult,"addMemberResult");
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Member added to group successfully';
-                                responseMessage.data = {
-                                    userGroupId : addMemberResult[0][0].userGroupId,
-                                    groupName : addMemberResult[0][0].groupName,
-                                    fullName : addMemberResult[0][0].fullName,
-                                    groupStatus : addMemberResult[0][0].groupStatus,
-                                    groupRelationStatus : addMemberResult[0][0].groupRelationStatus,
-                                    luDate : addMemberResult[0][0].luDate
-                                };
-                                res.status(200).json(responseMessage);
-                                console.log('p_v1_addmembersbygroup: Member added to group successfully');
-                                var notificationTemplaterRes = notificationTemplater.parse('add_members_to_group',{
-                                    groupName : addMemberResult[0][0].groupName,
-                                    adminName : addMemberResult[0][0].adminName
-                                });
-                                console.log(notificationTemplaterRes.parsedTpl,"notificationTemplaterRes.parsedTpl");
-                                if(notificationTemplaterRes.parsedTpl){
-                                    notification.publish(
-                                        addMemberResult[0][0].userGroupId,
-                                        addMemberResult[0][0].fullName,
-                                        addMemberResult[0][0].groupName,
-                                        addMemberResult[0][0].senderId,
-                                        notificationTemplaterRes.parsedTpl,
-                                        33,
-                                        0, addMemberResult[0][0].iphoneId,
-                                        0,
-                                        0,
-                                        0,
-                                        0,
-                                        1,
-                                        moment().format("YYYY-MM-DD HH:mm:ss"),
-                                        '',
-                                        0,
-                                        0);
-                                    console.log('postNotification : notification for add members to group is sent successfully');
+                            if (addMemberResult && addMemberResult[0] && addMemberResult[0].length>0 && addMemberResult[0][0].userGroupId){
+                                    console.log(addMemberResult,"addMemberResult");
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Member added to group successfully';
+                                    responseMessage.data = {
+                                        userGroupId : addMemberResult[0][0].userGroupId,
+                                        groupName : addMemberResult[0][0].groupName,
+                                        fullName : addMemberResult[0][0].fullName,
+                                        groupStatus : addMemberResult[0][0].groupStatus,
+                                        groupRelationStatus : addMemberResult[0][0].groupRelationStatus,
+                                        luDate : addMemberResult[0][0].luDate,
+                                        isRequester : addMemberResult[0][0].isRequester
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('p_v1_addmembersbygroup: Member added to group successfully');
+                                    var notificationTemplaterRes = notificationTemplater.parse('add_members_to_group',{
+                                        groupName : addMemberResult[0][0].groupName,
+                                        adminName : addMemberResult[0][0].adminName
+                                    });
+                                    console.log(notificationTemplaterRes.parsedTpl,"notificationTemplaterRes.parsedTpl");
+                                    if(notificationTemplaterRes.parsedTpl){
+                                        notification.publish(
+                                            addMemberResult[0][0].userGroupId,
+                                            addMemberResult[0][0].fullName,
+                                            addMemberResult[0][0].groupName,
+                                            addMemberResult[0][0].senderId,
+                                            notificationTemplaterRes.parsedTpl,
+                                            33,
+                                            0, addMemberResult[0][0].iphoneId,
+                                            0,
+                                            0,
+                                            0,
+                                            0,
+                                            1,
+                                            moment().format("YYYY-MM-DD HH:mm:ss"),
+                                            '',
+                                            0,
+                                            0);
+                                        console.log('postNotification : notification for add members to group is sent successfully');
+                                    }
+                                    else{
+                                        /**
+                                         * it will come in this block when error in notification will come
+                                         * */
+                                        console.log('Error in parsing notification add_members_to_group template - ',
+                                            notificationTemplaterRes.error);
+                                        console.log('postNotification : notification for add members to group not sent');
+                                    }
+
                                 }
+                            /***
+                             * if member is not added in group successfully then come in this block to handle all this error
+                             * */
                                 else{
-                                    /**
-                                     * it will come in this block when error in notification will come
-                                     * */
-                                    console.log('Error in parsing notification add_members_to_group template - ',
-                                        notificationTemplaterRes.error);
-                                    console.log('postNotification : notification for add members to group not sent');
+                                    var qMsg = {server: 'Internal Server Error'};
+                                    switch (addMemberResult[0][0]._e) {
+                                        case 'EZEONEID_NOT_EXIST' :
+                                            qMsg = {_e: 'EZEONEID_NOT_EXIST'};
+                                            responseMessage.message = 'EZEOneId does not exists';
+                                            break;
+                                        case 'ALREADY_MEMBER' :
+                                            qMsg = {_e: 'ALREADY_MEMBER'};
+                                            responseMessage.message = 'User is already a member of this group';
+                                            break;
+                                        case 'PENDING_STATUS' :
+                                            qMsg = {_e: 'PENDING_STATUS'};
+                                            responseMessage.message = 'User has not yet accepted your request';
+                                            break;
+                                        case 'ACCESS_DENIED' :
+                                            qMsg = {_e: 'ACCESS_DENIED'};
+                                            responseMessage.message = "You don't have permission for the following action";
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    responseMessage.status = false;
+                                    responseMessage.error = qMsg;
+                                    responseMessage.data = {};
+                                    res.status(400).json(responseMessage);
                                 }
 
-                            }
-                            else{
-                                var qMsg = {server: 'Internal Server Error'};
-                                switch (addMemberResult[0][0]._e) {
-                                    case 'EZEOneId Does not exists' :
-                                        qMsg = {_e: 'EZEOneId Does not exists'};
-                                        break;
-                                    case 'Already a member of group' :
-                                        qMsg = {_e: 'Already a member of group'};
-                                        break;
-                                    case 'Your request is in pending status' :
-                                        qMsg = {_e: 'Your request is in pending state'};
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                responseMessage.status = false;
-                                responseMessage.error = null;
-                                responseMessage.message = qMsg;
-                                responseMessage.data = {};
-                                res.status(200).json(responseMessage);
-                            }
                         }
                         /**
                          * while executing proc if error comes then give error
@@ -485,7 +512,7 @@ router.post('/members', function(req,res,next){
                                 server: 'Internal Server Error'
                             };
                             res.status(500).json(responseMessage);
-                            console.log('p_v1_addmembersbygroup: error in updating user status :' + err);
+                            console.log('p_v1_addmembersbygroup: error in adding member in group :' + err);
                         }
                     });
 
@@ -525,7 +552,6 @@ router.post('/members', function(req,res,next){
  * @param groupId <int>
  * @discription : API to join group(members will call this api)
  */
-
 router.post('/join', function(req,res,next){
     var responseMessage = {
         status: false,
@@ -572,31 +598,31 @@ router.post('/join', function(req,res,next){
                      * */
                     var query = 'CALL p_v1_addmemberstogroup(' + queryParams.join(',') + ')';
                     console.log(query);
-                    req.db.query(query, function (err, addMemberResult) {
+                    req.db.query(query, function (err, joinGroupResult) {
                         if (!err) {
                             /**
                              * if proc executed successfully then give response true
                              * */
 
-                            if (addMemberResult && addMemberResult[0] && addMemberResult[0].length>0 && addMemberResult[0][0].groupId) {
+                            if (joinGroupResult && joinGroupResult[0] && joinGroupResult[0].length>0 && joinGroupResult[0][0].groupId) {
                                 var output =[];
                                 responseMessage.status = true;
                                 responseMessage.error = null;
                                 responseMessage.message = 'Member added to group successfully';
                                 output.push({
-                                    groupId : addMemberResult[0][0].groupId,
-                                    adminEzeId : addMemberResult[0][0].adminEzeId,
-                                    adminId : addMemberResult[0][0].adminId,
-                                    groupName : addMemberResult[0][0].groupName,
-                                    groupStatus : addMemberResult[0][0].groupStatus,
-                                    groupRelationStatus : addMemberResult[0][0].groupRelationStatus,
-                                    groupType : addMemberResult[0][0].groupType,
-                                    isAdmin : addMemberResult[0][0].isAdmin,
-                                    luDate : addMemberResult[0][0].luDate,
-                                    areMembersVisible : addMemberResult[0][0].areMembersVisible,
-                                    isReplyRestricted : addMemberResult[0][0].isReplyRestricted,
-                                    isRequester : addMemberResult[0][0].isRequester,
-                                    unreadCount : addMemberResult[0][0].unreadCount
+                                    groupId : joinGroupResult[0][0].groupId,
+                                    adminEzeId : joinGroupResult[0][0].adminEzeId,
+                                    adminId : joinGroupResult[0][0].adminId,
+                                    groupName : joinGroupResult[0][0].groupName,
+                                    groupStatus : joinGroupResult[0][0].groupStatus,
+                                    groupRelationStatus : joinGroupResult[0][0].groupRelationStatus,
+                                    groupType : joinGroupResult[0][0].groupType,
+                                    isAdmin : joinGroupResult[0][0].isAdmin,
+                                    luDate : joinGroupResult[0][0].luDate,
+                                    areMembersVisible : joinGroupResult[0][0].areMembersVisible,
+                                    isReplyRestricted : joinGroupResult[0][0].isReplyRestricted,
+                                    isRequester : joinGroupResult[0][0].isRequester,
+                                    unreadCount : joinGroupResult[0][0].unreadCount
                                 });
                                 console.log("output",output);
                                 responseMessage.data = {
@@ -606,18 +632,18 @@ router.post('/join', function(req,res,next){
                                 console.log('p_v1_addmembersbygroup: Member added to group successfully');
 
                                 var notificationTemplaterRes = notificationTemplater.parse('join_group',{
-                                    groupName : addMemberResult[0][0].groupName,
-                                    fullName : addMemberResult[0][0].fullName
+                                    groupName : joinGroupResult[0][0].groupName,
+                                    fullName : joinGroupResult[0][0].fullName
                                 });
                                 if(notificationTemplaterRes.parsedTpl){
                                     notification.publish(
-                                        addMemberResult[0][0].adminGroupId,
-                                        addMemberResult[0][0].groupName,
-                                        addMemberResult[0][0].groupName,
-                                        addMemberResult[0][0].senderId,
+                                        joinGroupResult[0][0].adminGroupId,
+                                        joinGroupResult[0][0].groupName,
+                                        joinGroupResult[0][0].groupName,
+                                        joinGroupResult[0][0].senderId,
                                         notificationTemplaterRes.parsedTpl,
                                         34,
-                                        0, addMemberResult[0][0].iphoneId,
+                                        0, joinGroupResult[0][0].iphoneId,
                                         0,
                                         0,
                                         0,
@@ -638,21 +664,22 @@ router.post('/join', function(req,res,next){
                             }
 
                             /**
-                             * if proc executed unsuccessfully then give response false
+                             * if proc executed unsuccessfully then give response false and handle the error which
+                             * we are getting from database
                              * */
                             else {
                                 var qMsg = {server: 'Internal Server Error'};
-                                switch (addMemberResult[0][0]._e) {
-                                    case 'Already a member of group' :
-                                        qMsg = {_e: 'Already a member of group'};
+                                switch (joinGroupResult[0][0]._e) {
+                                    case 'ALREADY_MEMBER' :
+                                        qMsg = {_e: 'ALREADY_MEMBER'};
+                                        responseMessage.message = 'Already a member of group' ;
                                         break;
 
                                     default:
                                         break;
                                 }
                                 responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = qMsg;
+                                responseMessage.error = qMsg;
                                 responseMessage.data = {};
                                 res.status(200).json(responseMessage);
                             }
@@ -666,7 +693,7 @@ router.post('/join', function(req,res,next){
                                 server: 'Internal Server Error'
                             };
                             res.status(500).json(responseMessage);
-                            console.log('p_v1_addmembersbygroup: error in adding members :' + err);
+                            console.log('p_v1_addmembersbygroup: error in join group :' + err);
                         }
                     });
 
@@ -729,7 +756,6 @@ router.get('/members', function(req,res,next){
         error.groupId = 'Invalid group id';
         validationFlag *= false;
     }
-    console.log(req.query.timeStamp,"timestamp");
     if(req.query.timeStamp){
         if(moment(req.query.timeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
             req.query.timeStamp = moment(req.query.timeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
@@ -769,41 +795,45 @@ router.get('/members', function(req,res,next){
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, groupMemberResults) {
                         /**
-                         * while calling procedure if not getting any error and if get result then in response
-                         * if isAvailable is 0 then Group Name is not available to create else Group Name is available
-                         *
+                         *if getting group member list with group id then give list of group members in response
                          * */
                         console.log(groupMemberResults[0],"groupMemberResults[0]");
                         if (!err){
-                            if(groupMemberResults && groupMemberResults[0] && groupMemberResults[0][0]){
-                                        if(groupMemberResults[0][0].groupId) {
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Group members list loaded successfully';
-                                            responseMessage.data = {
-                                                groupMemberList : groupMemberResults[0]
-                                            };
-                                            res.status(200).json(responseMessage);
+                            if(groupMemberResults && groupMemberResults[0] && groupMemberResults[0][0]) {
+                                    if(groupMemberResults[0][0].groupId) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Group members list loaded successfully';
+                                        responseMessage.data = {
+                                            groupMemberList : groupMemberResults[0]
+                                        };
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    /**
+                                     * if not grtting groupid then come to this block in which error is
+                                     * handled coming from database
+                                     * */
+                                    else{
+                                        var qMsg = {server: 'Internal Server Error'};
+
+                                        switch (groupMemberResults[0][0]._e) {
+                                            case 'ACCESS DENIED' :
+                                                qMsg = {_e: 'ACCESS DENIED'};
+                                                responseMessage.message = "You don't have permission for the following action";
+                                                break;
+                                            default:
+                                                break;
                                         }
-                                        else{
-                                            var qMsg = {server: 'Internal Server Error'};
+                                        responseMessage.status = false;
+                                        responseMessage.error = qMsg;
+                                        responseMessage.data = {};
+                                        res.status(400).json(responseMessage);
 
-                                            switch (groupMemberResults[0][0]._e) {
-                                                case 'ACCESS DENIED' :
-                                                    qMsg = {_e: 'ACCESS DENIED'};
-                                                    break;
-
-                                                default:
-                                                    break;
-                                            }
-                                            responseMessage.status = false;
-                                            responseMessage.error = null;
-                                            responseMessage.message = qMsg;
-                                            responseMessage.data = {};
-                                            res.status(200).json(responseMessage);
-
-                                        }
+                                    }
                             }
+                            /**
+                             * if no groupMemberList is not there then give in response empty array
+                             * */
                             else{
                                 responseMessage.status = true;
                                 responseMessage.error = null;
@@ -813,6 +843,7 @@ router.get('/members', function(req,res,next){
                                 };
                                 res.status(200).json(responseMessage);
                             }
+
 
                         }
                         else {
@@ -874,7 +905,7 @@ router.get('/details', function(req,res,next){
 
     /**
      * validation goes here
-     * validating token and group name as both are mandatory fields
+     * validating token and group id(checking that group id is integer or not) as both are mandatory fields
      * */
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -899,12 +930,12 @@ router.get('/details', function(req,res,next){
 
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 /**
-                 * while validating token if not getting any error procees further otherwise give error
+                 * while validating token if not getting any error proceed further otherwise give error
                  * */
                 if ((!err) && tokenResult) {
 
                     /**
-                     * call procedure for validating groupname
+                     * call procedure for getting group details
                      * */
                     var procParams = [
                         req.db.escape(req.query.groupId)
@@ -922,14 +953,14 @@ router.get('/details', function(req,res,next){
                                 responseMessage.status = true;
                                 responseMessage.error = null;
                                 responseMessage.message = 'Group details loaded successfully';
-                                responseMessage.data = groupDetailResults[0];
+                                responseMessage.data = groupDetailResults[0][0];
                                 res.status(200).json(responseMessage);
                             }
                             else{
                                 responseMessage.status = true;
                                 responseMessage.error = null;
                                 responseMessage.message = 'Group details are not available';
-                                responseMessage.data = [];
+                                responseMessage.data = {};
                                 res.status(200).json(responseMessage);
 
                             }
@@ -980,11 +1011,8 @@ router.get('/details', function(req,res,next){
  * @param token* <string> token of login user
  * @param groupId <int>
  * @param groupName*  <string>
- * @param aboutGroup  <string>
- * @param showMembers  <int>(0 : false (default) , 1 : true)
- * @param restrictedReply  <int>(0 : false (default) , 1 : true)
- * @param autoJoin <int> (0 : false (default) , 1 : true)
- * @discription : API to create group
+ * @param ezeoneId*<string>
+ * @discription : API to change admin of group(call by group admin)
  */
 
 router.post('/change_admin', function(req,res,next){
@@ -1006,7 +1034,7 @@ router.post('/change_admin', function(req,res,next){
     }
 
     /**
-     * validating token is mandatory field so cheking whether from front end we are getting or not
+     * validating token is mandatory field so checking whether from front end we are getting or not
      * if not getting then give error
      * */
     if (!req.body.token) {
@@ -1030,6 +1058,8 @@ router.post('/change_admin', function(req,res,next){
              * */
 
             req.st.validateToken(req.body.token, function (err, tokenResult) {
+                /**
+                 * */
                 if ((!err) && tokenResult) {
                     req.body.ezeoneId = req.st.alterEzeoneId(req.body.ezeoneId);
                         var procParams = [
@@ -1037,6 +1067,10 @@ router.post('/change_admin', function(req,res,next){
                             req.db.escape(req.body.groupId) ,
                             req.db.escape(req.body.token)
                         ];
+
+                    /**
+                     * calling p_v1_changegroupadmin to change the admin of the group
+                     * */
                         var procQuery = 'CALL p_v1_changegroupadmin(' + procParams.join(',') + ')';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, changeAdminResults) {
@@ -1086,23 +1120,28 @@ router.post('/change_admin', function(req,res,next){
                                     }
 
                                 }
+                                /**
+                                 * handled all error coming from database if member is try to change the admin,
+                                 * if ezeone not exist then return error
+                                 *  */
                                 else{
                                     var qMsg = {server: 'Internal Server Error'};
                                     switch (changeAdminResults[0][0]._e) {
-                                        case 'ACCESS DENIED' :
-                                            qMsg = {_e: 'ACCESS DENIED'};
+                                        case 'ACCESS_DENIED' :
+                                            qMsg = {_e: 'ACCESS_DENIED'};
+                                            responseMessage.message = "You don't have permission for the following action";
                                             break;
-                                        case 'EZEOneId does not exists' :
+                                        case 'EZEONEID_DOES_NOT_EXISTS' :
                                             qMsg = {_e: 'EZEOneId does not exists'};
+                                            responseMessage.message = "EZEOneId does not exists";
                                             break;
                                         default:
                                             break;
                                     }
                                     responseMessage.status = false;
-                                    responseMessage.error = null;
-                                    responseMessage.message = qMsg;
+                                    responseMessage.error = qMsg;
                                     responseMessage.data = {};
-                                    res.status(200).json(responseMessage);
+                                    res.status(400).json(responseMessage);
                                 }
                             }
                             else {
@@ -1116,7 +1155,6 @@ router.post('/change_admin', function(req,res,next){
                                 console.log(errorDate.toTimeString() + ' ......... error ...........');
                             }
                         });
-
                 }
                 else {
                     responseMessage.error = {
@@ -1150,10 +1188,10 @@ router.post('/change_admin', function(req,res,next){
  * @param req
  * @param res
  * @param next
- * @param id* <int> expense type id
+ * @param groupId* <int> group id
  * @param token* <string> token of login user
  *
- * @discription : API to delete group
+ * @discription : API to delete group(This API will be called only by group Admin)
  */
 router.delete('/:groupId', function(req,res,next){
     var responseMessage = {
@@ -1174,7 +1212,7 @@ router.delete('/:groupId', function(req,res,next){
     }
 
     /**
-     * validating token is mandatory field so cheking whether from front end we are getting or not
+     * validating token is mandatory field so checking whether from front end we are getting or not
      * if not getting then give error
      * */
     if (!req.body.token) {
@@ -1199,6 +1237,9 @@ router.delete('/:groupId', function(req,res,next){
                         req.db.escape(req.params.groupId) ,
                         req.db.escape(req.body.token)
                     ];
+                    /**
+                     * calling procedure to delete group by admin
+                     * */
                         var procQuery = 'CALL pDeleteGroup(' + procParams.join(',') + ')';
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, deleteGroupResults) {
@@ -1208,47 +1249,50 @@ router.delete('/:groupId', function(req,res,next){
                                 && deleteGroupResults[0].length>0
                                 && deleteGroupResults[0][0].groupId) {
 
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Group deleted successfully';
-                                responseMessage.data = [];
-                                res.status(200).json(responseMessage);
-                                console.log(deleteGroupResults[1],"deleteGroupResults");
-                                if(deleteGroupResults[1] && deleteGroupResults[1].length>0){
-                                    for (var i = 0; i < deleteGroupResults[1].length; i++ ) {
-                                        var notificationTemplaterRes = notificationTemplater.parse('delete_group',{
-                                            groupName : deleteGroupResults[0][0].groupName
-                                        });
-                                        console.log(notificationTemplaterRes,"notificationTemplaterRes");
-                                        if(notificationTemplaterRes.parsedTpl){
-                                            notification.publish(
-                                                deleteGroupResults[1][i].memberGroupId,
-                                                deleteGroupResults[0][0].groupName,
-                                                deleteGroupResults[0][0].groupName,
-                                                deleteGroupResults[0][0].groupId,
-                                                notificationTemplaterRes.parsedTpl,
-                                                36,
-                                                0, 0,
-                                                0,
-                                                0,
-                                                0,
-                                                0,
-                                                1,
-                                                moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                '',
-                                                0,
-                                                0);
-                                            console.log('postNotification : notification for delete_group is sent successfully');
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Group deleted successfully';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+
+                                    console.log(deleteGroupResults[1],"deleteGroupResults");
+                                    if(deleteGroupResults[1] && deleteGroupResults[1].length>0){
+                                        for (var i = 0; i < deleteGroupResults[1].length; i++ ) {
+                                            var notificationTemplaterRes = notificationTemplater.parse('delete_group',{
+                                                groupName : deleteGroupResults[0][0].groupName
+                                            });
+                                            console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                            if(notificationTemplaterRes.parsedTpl){
+                                                notification.publish(
+                                                    deleteGroupResults[1][i].memberGroupId,
+                                                    deleteGroupResults[0][0].groupName,
+                                                    deleteGroupResults[0][0].groupName,
+                                                    deleteGroupResults[0][0].groupId,
+                                                    notificationTemplaterRes.parsedTpl,
+                                                    36,
+                                                    0, 0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    1,
+                                                    moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                    '',
+                                                    0,
+                                                    0);
+                                                console.log('postNotification : notification for delete_group is sent successfully');
+                                            }
+                                            else{
+                                                console.log('Error in parsing notification delete_group template - ',
+                                                    notificationTemplaterRes.error);
+                                                console.log('postNotification : notification for delete_group is sent successfully');
+                                            }
                                         }
-                                        else{
-                                            console.log('Error in parsing notification delete_group template - ',
-                                                notificationTemplaterRes.error);
-                                            console.log('postNotification : notification for delete_group is sent successfully');
-                                        }
+
                                     }
-
-                                }
-
+                            /**
+                             * if admin is not calling this api then return error
+                             * */
 
                             }
                             else{
@@ -1256,15 +1300,15 @@ router.delete('/:groupId', function(req,res,next){
                                 switch (deleteGroupResults[0][0]._e) {
                                     case 'ACCESS DENIED' :
                                         qMsg = {_e: 'ACCESS DENIED'};
+                                        responseMessage.message = "You don't have permission for the following action";
                                         break;
                                     default:
                                         break;
                                 }
                                 responseMessage.status = false;
-                                responseMessage.error = null;
-                                responseMessage.message = qMsg;
-                                responseMessage.data = {};
-                                res.status(200).json(responseMessage);
+                                responseMessage.error = qMsg;
+                                responseMessage.data = null;
+                                res.status(400).json(responseMessage);
                             }
                         }
                         else {
@@ -1359,6 +1403,7 @@ router.put('/leave', function(req,res,next){
                     ];
                     /**
                      * call p_v1_UpdateUserStatus to change the status like accept/reject/block
+                     * if not admin then only able to leave group
                      * */
                     var query = 'CALL p_v1_leaveGroup(' + queryParams.join(',') + ')';
                     console.log(query);
@@ -1412,17 +1457,17 @@ router.put('/leave', function(req,res,next){
                             else {
                                 var qMsg = {server: 'Internal Server Error'};
                                 switch (leaveGroupResult[0][0]._e) {
-                                    case 'ACCESS DENIED' :
-                                        qMsg = {_e: 'ACCESS DENIED'};
+                                    case 'ACCESS_DENIED' :
+                                        qMsg = {_e: 'ACCESS_DENIED'};
+                                        responseMessage.message = "You don't have permission for the following action";
                                         break;
                                     default:
                                         break;
                                 }
                                 responseMessage.status = false;
-                                responseMessage.error = null;
-                                responseMessage.message = qMsg;
-                                responseMessage.data = {};
-                                res.status(200).json(responseMessage);
+                                responseMessage.error = qMsg;
+                                responseMessage.data = null;
+                                res.status(400).json(responseMessage);
                             }
                         }
                         /**
@@ -1471,7 +1516,7 @@ router.put('/leave', function(req,res,next){
  * @param next
  *@param token* <string> token of user
  *@param groupId* <int> group id
- * @discription : API to get pending request of group
+ * @discription : API to get pending request of group(This API will be called by group Admin only)
  */
 router.get('/pending_request', function(req,res,next){
 var responseMessage = {
@@ -1515,7 +1560,7 @@ else {
             if ((!err) && tokenResult) {
 
                 /**
-                 * call procedure for validating groupname
+                 * call procedure for getting pending request by admin only
                  * */
                 var procParams = [
                     req.db.escape(req.query.groupId) ,
@@ -1525,7 +1570,7 @@ else {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, pendingRequestResults) {
                     /**
-                     * while calling procedure if not getting any error and if get result then in response
+                     * while calling procedure if not getting any error and if get result then in response of all pending request
                      *
                      * */
                     if (!err){
@@ -1540,21 +1585,23 @@ else {
                                 };
                                 res.status(200).json(responseMessage);
                             }
+                            /**
+                             * if member is trying to get pending request then will get error
+                             * */
                             else {
-                                console.log(pendingRequestResults[0][0]._e,"pendingRequestResults[0][0]._e");
                                 var qMsg = {server: 'Internal Server Error'};
                                 switch (pendingRequestResults[0][0]._e) {
-                                    case 'ACCESS DENIED' :
-                                        qMsg = {_e: 'ACCESS DENIED'};
+                                    case 'ACCESS_DENIED' :
+                                        qMsg = {_e: 'ACCESS_DENIED'};
+                                        responseMessage.message = "You don't have permission for the following action";
                                         break;
                                     default:
                                         break;
                                 }
                                 responseMessage.status = false;
-                                responseMessage.error = null;
-                                responseMessage.message = qMsg;
+                                responseMessage.error = qMsg;
                                 responseMessage.data = {};
-                                res.status(200).json(responseMessage);
+                                res.status(400).json(responseMessage);
 
                             }
                         }
