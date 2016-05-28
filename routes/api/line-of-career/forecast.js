@@ -61,7 +61,7 @@ router.post('/', function(req,res,next){
 
                                 var comSaveLocQuery = "";
                                 for (var i = 0; i < locMap.length; i++) {
-                                    console.log("locMap :"+locMap);
+                                    //console.log("locMap :"+locMap);
                                     var locDetails = {
                                         // fid: locMap[i].fid,
                                         locId: locMap[i].career_id,
@@ -79,24 +79,42 @@ router.post('/', function(req,res,next){
                                         + ',' + req.db.escape(locDetails.fresherCount) + ',' + req.db.escape(locDetails.lateralCount)
                                         + ',' + req.db.escape(locDetails.tid) + ');';
                                     comSaveLocQuery += query;
-                                    console.log(comSaveLocQuery);
+                                   // console.log(comSaveLocQuery);
                                 }
                                 if(comSaveLocQuery){
                                     req.db.query(comSaveLocQuery, function (err, insertResult) {
                                         if (!err) {
-                                            console.log(insertResult);
+                                            //console.log(insertResult);
                                             if (insertResult) {
                                                 var outputArray=[];
                                                 //id = insertResult[0][0] ? insertResult[0][0].id : 0;
                                                 for(var i=0;i<insertResult.length/2;i++){
                                                     var result = {};
                                                     var count = (i) ? 2 * i : 0;
+
                                                     result.id = insertResult[count][0].id;
                                                     outputArray.push(result);
                                                 }
+                                                //console.log(locMap,"locMap");
+
+                                               // outputArray[1].career_id = locMap[1].career_id;
+                                                for (var j = 0; j < locMap.length; j++) {
+                                                    outputArray[j].careerId = locMap[j].career_id;
+                                                    outputArray[j].type = locMap[j].type;
+                                                    outputArray[j].fnTitle = locMap[j].fnTitle;
+                                                    outputArray[j].careerStr = locMap[j].careerStr;
+                                                    outputArray[j].internsCount = locMap[j].interns_count;
+                                                    outputArray[j].fresherCtc = locMap[j].fresher_ctc;
+                                                    outputArray[j].fresherCount = locMap[j].fresher_count;
+                                                    outputArray[j].lateralCount = locMap[j].lateral_count;
+                                                    outputArray[j].locCode = locMap[j].locCode;
+                                                }
+                                                console.log(outputArray,"outputArray");
                                                 responseMessage.status = true;
                                                 responseMessage.message = 'LocMap saved successfully';
-                                                responseMessage.data = outputArray;
+                                                responseMessage.data = {
+                                                    loc :outputArray
+                                                };
                                                 res.status(200).json(responseMessage);
                                                 console.log('FnSaveLocMap: LocMap saved successfully');
                                                 console.log('FnSaveLocMap: LocMap saved successfully');
@@ -119,10 +137,11 @@ router.post('/', function(req,res,next){
                                     });
                                 }
                                 else{
-
+                                    responseMessage.status = true;
+                                    responseMessage.message = 'LocMap saved successfully';
+                                    responseMessage.data = {loc :[]};
+                                    res.status(200).json(responseMessage);
                                 }
-
-
                             }
                             /**
                              * while executing proc if error comes then give error

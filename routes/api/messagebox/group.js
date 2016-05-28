@@ -133,7 +133,6 @@ router.get('/validate', function(req,res,next){
     }
 });
 
-
 /**
  * Method : POST
  * @param req
@@ -608,7 +607,7 @@ router.post('/join', function(req,res,next){
                                 var output =[];
                                 responseMessage.status = true;
                                 responseMessage.error = null;
-                                responseMessage.message = 'Member added to group successfully';
+                                responseMessage.message = 'Your request to join group made successfully';
                                 output.push({
                                     groupId : joinGroupResult[0][0].groupId,
                                     adminEzeId : joinGroupResult[0][0].adminEzeId,
