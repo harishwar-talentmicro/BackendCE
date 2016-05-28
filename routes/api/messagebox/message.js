@@ -237,7 +237,7 @@ router.post('/', function(req,res,next){
                                     req.db.escape(autoJoinResults[0][0].luUser)
                                 ];
                                 var procQuery = 'CALL p_v1_ComposeMessage(' + procParams.join(',') + ')';
-                                //console.log(procQuery);
+                               console.log(procQuery);
                                 req.db.query(procQuery, function (err, results) {
                                     if (!err) {
                                         /**
@@ -271,7 +271,16 @@ router.post('/', function(req,res,next){
 
                                                     break;
                                             }
-                                            responseMessage.data = results[0][0];
+                                            responseMessage.data = {
+                                                messageId : results[0][0].messageId,
+                                                message : results[0][0].message,
+                                                createdDate : results[0][0].createdDate,
+                                                messageType : results[0][0].messageType,
+                                                messageStatus : results[0][0].messageStatus,
+                                                priority : results[0][0].priority,
+                                                senderName : results[0][0].senderName,
+                                                senderId : results[0][0].senderId
+                                            };
 
                                             res.status(200).json(responseMessage);
                                             /**notification send to user to whome message is sending*/
@@ -312,7 +321,9 @@ router.post('/', function(req,res,next){
                                                                 priority : req.body.priority,
                                                                 senderName : results[0][0].senderName,
                                                                 senderId : results[0][0].senderId,
-                                                                receiverId : results[1][i].receiverGroupId
+                                                                receiverId : results[1][i].receiverGroupId,
+                                                                groupId : results[0][0].groupId,
+                                                                groupType : results[0][0].groupType
                                                             },
                                                             null);
                                                         console.log('postNotification : notification for compose_message is sent successfully');

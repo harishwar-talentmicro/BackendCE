@@ -106,7 +106,8 @@
       },
       "accept_request": {
         "params": [
-          "adminName"
+          "adminName",
+          "groupName"
         ],
         "file": "message/accept-request.txt"
       },
