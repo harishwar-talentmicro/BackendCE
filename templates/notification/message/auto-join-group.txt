@@ -1,0 +1,1 @@
+<%=fullName%> has successfully joined the <%=groupName%> group.
