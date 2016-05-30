@@ -546,83 +546,96 @@ Search.prototype.searchInformation = function(req,res,next){
             }
             var SearchParameter = st.db.escape(Token) + ',' + st.db.escape(WorkingDate) + ',' + st.db.escape(IPAddress)
                 + ',' + st.db.escape(EZEID) + ',' + st.db.escape(Pin)+ ',' + st.db.escape(latitude) + ',' + st.db.escape(longitude);
-            console.log('CALL pSearchInformationNew(' + SearchParameter + ')');
-            st.db.query('CALL pSearchInformationNew(' + SearchParameter + ')', function (err, UserInfoResult) {
+
+            var feedbackParam = st.db.escape(EZEID) + ',' + st.db.escape(5) + ',' + st.db.escape(0)
+                + ',' + st.db.escape(0) + ',' + st.db.escape(1)+ ',' + st.db.escape(1);
+            console.log('CALL pSearchInformationNew(' + SearchParameter + '); CALL pgetfeedbackDetails(' + feedbackParam + ');');
+            /**
+             * calling pgetfeedbackDetails to get one review/feedback for mobile users only
+             * */
+            st.db.query('CALL pSearchInformationNew(' + SearchParameter + '); CALL pgetfeedbackDetails(' + feedbackParam + ');', function (err, UserInfoResult) {
                 // st.db.query(searchQuery, function (err, SearchResult) {
                 if (!err) {
+
                     if(UserInfoResult) {
                         if (UserInfoResult[0]) {
                             if (UserInfoResult[0].length > 0) {
 
-                                UserInfoResult[0][0].dealbanner = (UserInfoResult[0][0].dealbanner) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[0][0].dealbanner) : '';
+                                   console.log(UserInfoResult[4],"feedbackResult[1]");
+                                    UserInfoResult[0][0].dealbanner = (UserInfoResult[0][0].dealbanner) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[0][0].dealbanner) : '';
 
-                                console.log(' UserInfoResult[0][0]',UserInfoResult[0][0]);
-                                if(UserInfoResult[0][0]){
-                                    UserInfoResult[0][0].OpenStatus = st.getOpenStatus(UserInfoResult[0][0].OpenStatus,UserInfoResult[0][0].wh);
-                                    /**
-                                     * Removing wh property
-                                     */
-                                    UserInfoResult[0][0].wh = undefined;
-                                }
+                                    console.log(' UserInfoResult[0][0]',UserInfoResult[0][0]);
+                                    if(UserInfoResult[0][0]){
+                                        UserInfoResult[0][0].OpenStatus = st.getOpenStatus(UserInfoResult[0][0].OpenStatus,UserInfoResult[0][0].wh);
+                                        /**
+                                         * Removing wh property
+                                         */
+                                        UserInfoResult[0][0].wh = undefined;
+                                    }
 
-                                //console.log(UserInfoResult[1]);
-                                if(UserInfoResult[1]) {
-                                    if (UserInfoResult[1].length) {
+                                    //console.log(UserInfoResult[1]);
+                                    if(UserInfoResult[1]) {
+                                        if (UserInfoResult[1].length) {
 
-                                        if (UserInfoResult[1][0].type == 0) {
+                                            if (UserInfoResult[1][0].type == 0) {
 
-                                            for (var i = 0; i < UserInfoResult[1].length; i++) {
+                                                for (var i = 0; i < UserInfoResult[1].length; i++) {
 
-                                                console.log('for loop..type..0');
-                                                var result = {};
+                                                    console.log('for loop..type..0');
+                                                    var result = {};
 
-                                                result.s_url1 = (UserInfoResult[1][0].pic) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].pic) : '';
-                                                result.s_url2 = (UserInfoResult[1][0].InfoBannerFile1) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile1) : '';
-                                                result.s_url3 = (UserInfoResult[1][0].InfoBannerFile2) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile2) : '';
-                                                result.s_url4 = (UserInfoResult[1][0].InfoBannerFile3) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile3) : '';
-                                                result.s_url5 = (UserInfoResult[1][0].InfoBannerFile4) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile4) : '';
-                                                result.s_url6 = (UserInfoResult[1][0].InfoBannerFile5) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile5) : '';
-                                                output.push(result);
+                                                    result.s_url1 = (UserInfoResult[1][0].pic) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].pic) : '';
+                                                    result.s_url2 = (UserInfoResult[1][0].InfoBannerFile1) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile1) : '';
+                                                    result.s_url3 = (UserInfoResult[1][0].InfoBannerFile2) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile2) : '';
+                                                    result.s_url4 = (UserInfoResult[1][0].InfoBannerFile3) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile3) : '';
+                                                    result.s_url5 = (UserInfoResult[1][0].InfoBannerFile4) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile4) : '';
+                                                    result.s_url6 = (UserInfoResult[1][0].InfoBannerFile5) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile5) : '';
+                                                    output.push(result);
+                                                }
+
+                                                var finalResult = {
+                                                    "banners": [
+                                                        {"s_url": output[0].s_url1},
+                                                        {"s_url": output[0].s_url2},
+                                                        {"s_url": output[0].s_url3},
+                                                        {"s_url": output[0].s_url4},
+                                                        {"s_url": output[0].s_url5},
+                                                        {"s_url": output[0].s_url6}]
+                                                };
+                                                output = finalResult.banners;
+
                                             }
+                                            else {
+                                                console.log('for loop..type..2');
+                                                for (var i = 0; i < UserInfoResult[1].length; i++) {
+                                                    var result = {};
 
-                                            var finalResult = {
-                                                "banners": [
-                                                    {"s_url": output[0].s_url1},
-                                                    {"s_url": output[0].s_url2},
-                                                    {"s_url": output[0].s_url3},
-                                                    {"s_url": output[0].s_url4},
-                                                    {"s_url": output[0].s_url5},
-                                                    {"s_url": output[0].s_url6}]
-                                            };
-                                            output = finalResult.banners;
-
+                                                    result.s_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][i].path;
+                                                    output.push(result);
+                                                }
+                                            }
+                                            res.json({result: UserInfoResult[0][0], banners: output, feedback: {
+                                                list : (UserInfoResult[4]) ? (UserInfoResult[4]) : [],
+                                                averageRating:(UserInfoResult[3][0].averagerating) ? (UserInfoResult[3][0].averagerating) : 0 }
+                                            });
+                                            console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
                                         }
                                         else {
-                                            console.log('for loop..type..2');
-                                            for (var i = 0; i < UserInfoResult[1].length; i++) {
-                                                var result = {};
-
-                                                result.s_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][i].path;
-                                                output.push(result);
-                                            }
+                                            res.json({result: UserInfoResult[0][0], banners: output, feedback: (UserInfoResult[4])?((UserInfoResult[4][0]) ? UserInfoResult[4][0] : {}):{},averageRating:(UserInfoResult[3][0].averagerating) ? (UserInfoResult[3][0].averagerating) : 0});
+                                            console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
                                         }
-                                        res.json({result: UserInfoResult[0][0], banners: output});
-                                        console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
                                     }
                                     else {
-                                        res.json({result: UserInfoResult[0][0], banners: output});
+                                        res.json({result: UserInfoResult[0][0], banners: output, feedback: (UserInfoResult[4])?((UserInfoResult[4][0]) ? UserInfoResult[4][0] : {}):{},averageRating:(UserInfoResult[3][0].averagerating) ? (UserInfoResult[3][0].averagerating) : 0});
                                         console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
                                     }
-                                }
-                                else {
-                                    res.json({result: UserInfoResult[0][0], banners: output});
-                                    console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
-                                }
+
                             }
                             else {
                                 res.send('null');
                                 console.log('FnGetSearchInformationNew: tmaster: no re search infromation1 ');
                             }
+
                         }
                         else {
                             res.send('null');

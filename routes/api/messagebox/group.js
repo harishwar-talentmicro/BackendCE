@@ -642,7 +642,7 @@ router.post('/join', function(req,res,next){
                                         joinGroupResult[0][0].senderId,
                                         notificationTemplaterRes.parsedTpl,
                                         34,
-                                        0, joinGroupResult[0][0].iphoneId,
+                                        0, (joinGroupResult[0][0].iphoneId) ? (joinGroupResult[0][0].iphoneId) : '',
                                         0,
                                         0,
                                         0,
@@ -651,7 +651,26 @@ router.post('/join', function(req,res,next){
                                         moment().format("YYYY-MM-DD HH:mm:ss"),
                                         '',
                                         0,
-                                        0);
+                                        0,
+                                        null,
+                                        '',
+                                        /** Data object property to be sent with notification **/
+                                        {
+                                            groupId : joinGroupResult[0][0].groupId,
+                                            adminEzeId : joinGroupResult[0][0].adminEzeId,
+                                            adminId : joinGroupResult[0][0].adminId,
+                                            groupName : joinGroupResult[0][0].groupName,
+                                            groupStatus : joinGroupResult[0][0].groupStatus,
+                                            groupRelationStatus : joinGroupResult[0][0].groupRelationStatus,
+                                            groupType : joinGroupResult[0][0].groupType,
+                                            isAdmin : joinGroupResult[0][0].isAdmin,
+                                            luDate : joinGroupResult[0][0].luDate,
+                                            areMembersVisible : joinGroupResult[0][0].areMembersVisible,
+                                            isReplyRestricted : joinGroupResult[0][0].isReplyRestricted,
+                                            isRequester : joinGroupResult[0][0].isRequester,
+                                            unreadCount : joinGroupResult[0][0].unreadCount
+                                        },
+                                        null);
                                     console.log('postNotification : notification for join_group is sent successfully');
                                 }
                                 else{

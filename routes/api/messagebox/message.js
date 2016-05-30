@@ -141,45 +141,45 @@ router.post('/', function(req,res,next){
                              **/
                              if(autoJoinResults && autoJoinResults[0] && autoJoinResults[0][0] &&
                                 autoJoinResults[0][0].groupType == 0 && autoJoinResults[0][0].groupRelationStatus == 0){
-                                responseMessage.status = false;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Your request for joining the group is pending';
-                                responseMessage.data = null;
-                                res.status(200).json(responseMessage);
-                                /**
-                                 * Send Notification to the admin of the group to accept the request of this user
-                                 * who want to join this group
-                                 */
+                                     responseMessage.status = true;
+                                     responseMessage.error = null;
+                                     responseMessage.message = 'Your request for joining the group is pending';
+                                     responseMessage.data = null;
+                                     res.status(200).json(responseMessage);
+                                     /**
+                                      * Send Notification to the admin of the group to accept the request of this user
+                                      * who want to join this group
+                                      */
 
-                                var notificationTemplaterRes = notificationTemplater.parse('join_group',{
-                                    groupName : autoJoinResults[0][0].groupName,
-                                    fullName : autoJoinResults[0][0].fullName
-                                });
-                                if(notificationTemplaterRes.parsedTpl){
-                                    notification.publish(
-                                        autoJoinResults[0][0].adminGroupId,
-                                        autoJoinResults[0][0].groupName,
-                                        autoJoinResults[0][0].groupName,
-                                        autoJoinResults[0][0].senderId,
-                                        notificationTemplaterRes.parsedTpl,
-                                        38,
-                                        0, autoJoinResults[0][0].iphoneId,
-                                        0,
-                                        0,
-                                        0,
-                                        0,
-                                        1,
-                                        moment().format("YYYY-MM-DD HH:mm:ss"),
-                                        '',
-                                        0,
-                                        0);
-                                    console.log('postNotification : notification for join_group is sent successfully');
-                                }
-                                else{
-                                    console.log('Error in parsing notification join_group template - ',
-                                        notificationTemplaterRes.error);
-                                    console.log('postNotification : notification for join_group is sent successfully');
-                                }
+                                     var notificationTemplaterRes = notificationTemplater.parse('join_group',{
+                                         groupName : autoJoinResults[0][0].groupName,
+                                         fullName : autoJoinResults[0][0].fullName
+                                     });
+                                     if(notificationTemplaterRes.parsedTpl){
+                                         notification.publish(
+                                             autoJoinResults[0][0].adminGroupId,
+                                             autoJoinResults[0][0].groupName,
+                                             autoJoinResults[0][0].groupName,
+                                             autoJoinResults[0][0].senderId,
+                                             notificationTemplaterRes.parsedTpl,
+                                             38,
+                                             0, autoJoinResults[0][0].iphoneId,
+                                             0,
+                                             0,
+                                             0,
+                                             0,
+                                             1,
+                                             moment().format("YYYY-MM-DD HH:mm:ss"),
+                                             '',
+                                             0,
+                                             0);
+                                         console.log('postNotification : notification for join_group is sent successfully');
+                                     }
+                                     else{
+                                         console.log('Error in parsing notification join_group template - ',
+                                             notificationTemplaterRes.error);
+                                         console.log('postNotification : notification for join_group is sent successfully');
+                                     }
 
                             }
                             else{
@@ -197,15 +197,17 @@ router.post('/', function(req,res,next){
                                         var jsonDistanceObject = {
                                             latitude: req.body.latitude,
                                             longitude: req.body.longitude,
-                                            text: (req.body.message) ? (req.body.message) : ''
+                                            text: (req.body.message) ? (req.body.message) : '',
+                                            attachmentLink: req.st.getOnlyAttachmentName(req.body.attachmentLink),
+                                            thumbnailLink:  "tn_" + req.st.getOnlyAttachmentName(req.body.attachmentLink)
                                         };
                                         message = JSON.stringify(jsonDistanceObject);
                                         break;
 
                                     case 3 :
                                         var jsonAttachObject = {
-                                            thumbnailLink:  "tn_" + req.body.attachmentLink,
-                                            attachmentLink: req.body.attachmentLink,
+                                            thumbnailLink:  "tn_" + req.st.getOnlyAttachmentName(req.body.attachmentLink),
+                                            attachmentLink: req.st.getOnlyAttachmentName(req.body.attachmentLink),
                                             fileName: req.body.fileName,
                                             mimeType: req.body.mimeType,
                                             text: (req.body.message) ? (req.body.message) : ''
@@ -255,10 +257,10 @@ router.post('/', function(req,res,next){
                                                      * @TODO Write a function in stdlib which see that attachment link is having bucket url or not if not having then add it otherwise remove and add it from EZEOne standard configuration
                                                      */
                                                     attachmentObject = JSON.parse(results[0][0].message);
-                                                    attachmentObject.attachmentLink = attachmentObject.attachmentLink ? req.CONFIG.CONSTANT.GS_URL +
-                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentObject.attachmentLink : '';
-                                                    attachmentObject.thumbnailLink = attachmentObject.thumbnailLink ? req.CONFIG.CONSTANT.GS_URL +
-                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +attachmentObject.thumbnailLink : '';
+                                                    attachmentObject.attachmentLink = (attachmentObject.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentObject.attachmentLink) : '';
+                                                    attachmentObject.thumbnailLink = (attachmentObject.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +attachmentObject.thumbnailLink) : '';
 
                                                     console.log(attachmentObject,"attachmentObject");
                                                     results[0][0].message = attachmentObject;
@@ -294,12 +296,12 @@ router.post('/', function(req,res,next){
                                                     if(notificationTemplaterRes.parsedTpl){
                                                         notification.publish(
                                                             results[1][i].receiverGroupId,
-                                                            results[0][0].groupName ? results[0][0].groupName : '',
-                                                            results[0][0].groupName ? results[0][0].groupName : '',
+                                                            (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                            (results[0][0].groupName) ? (results[0][0].groupName) : '',
                                                             results[0][0].senderId,
                                                             notificationTemplaterRes.parsedTpl,
                                                             31,
-                                                            0, results[1][i].iphoneId ? results[1][i].iphoneId : '',
+                                                            0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
                                                             0,
                                                             0,
                                                             0,
@@ -626,15 +628,19 @@ router.get('/', function(req,res,next){
                                             case 3:
                                                 message = results[0][messageCounter].message;
                                                 messageObj = JSON.parse(message);
-                                                messageObj.attachmentLink = messageObj.attachmentLink ? req.CONFIG.CONSTANT.GS_URL +
-                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + messageObj.attachmentLink : '';
-                                                messageObj.thumbnailLink = messageObj.thumbnailLink ? req.CONFIG.CONSTANT.GS_URL +
-                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +messageObj.thumbnailLink : '';
+                                                messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
+                                                messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
                                                 results[0][messageCounter].message = messageObj;
                                                 break;
                                             case 2 :
                                                 message = results[0][messageCounter].message;
                                                 messageObj = JSON.parse(message);
+                                                messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
+                                                messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
                                                 results[0][messageCounter].message = messageObj;
                                                 break;
                                             default:
