@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "cd ./bin &&  node www"
   },
   "dependencies": {
     "ajv": "^4.0.4",

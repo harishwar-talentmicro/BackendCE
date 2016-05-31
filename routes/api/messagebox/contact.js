@@ -323,7 +323,7 @@ router.put('/status', function(req,res,next){
         status: false,
         error: {},
         message: '',
-        data: []
+        data: null
     };
     /**
      * validation goes here for each param
@@ -350,7 +350,11 @@ router.put('/status', function(req,res,next){
         error.userGroupId = 'Invalid userGroupId';
         validationFlag *= false;
     }
-    if(isNaN(parseInt(req.body.status))){
+    /**
+     * If status is 0 it means user is trying to make this connection pending again and therefore it's not possible
+     * so show him error message
+     */
+    if(isNaN(parseInt(req.body.status)) || (!parseInt(req.body.status))){
         error.status = 'Invalid status';
         validationFlag *= false;
     }
@@ -389,20 +393,55 @@ router.put('/status', function(req,res,next){
 
                                 if (updateResult
                                     && updateResult[0]
-                                    && updateResult[0].length > 0
-                                    && updateResult[0][0].userGroupId) {
+                                    && updateResult[0].length > 0 && updateResult[0][0]) {
 
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'User status updated successfully';
-                                    responseMessage.data = null;
-                                    res.status(200).json(responseMessage);
+
+
+                                    switch (updateResult[0][0]._e) {
+                                    /**
+                                     * This error will only come when for the group any other user has called this API who
+                                     * is not a groupAdmin
+                                     */
+                                        case 'ACCESS_DENIED' :
+                                            qMsg = {_e: 'ACCESS_DENIED'};
+                                            responseMessage.message = "You don't have permission for the following action";
+                                            responseMessage.error = qMsg;
+                                            responseMessage.data = null;
+                                            res.status(400).json(responseMessage);
+                                            break;
+                                        case 'NO_RELATION_EXISTS' :
+                                            qMsg = {_e : 'NO_RELATION_EXISTS '};
+                                            responseMessage.message = "You don't have permission for the following action";
+                                            responseMessage.error = qMsg;
+                                            responseMessage.data = null;
+                                            res.status(400).json(responseMessage);
+                                            break;
+                                        default :
+                                            console.log('updateResult[0][0].userGroupId',updateResult[0][0].userGroupId);
+                                            if(updateResult[0][0].userGroupId){
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'User status updated successfully';
+                                                responseMessage.data = null;
+                                                res.status(200).json(responseMessage);
+                                            }
+                                            else{
+                                                responseMessage.status = false;
+                                                responseMessage.error = { server : 'Internal server error'};
+                                                responseMessage.message = 'Something went wrong!';
+                                                responseMessage.data = null;
+                                                res.status(400).json(responseMessage);
+                                            }
+                                            break;
+                                    }
+
+
                                     console.log('FnUpdateUserStatus: User status updated successfully');
 
                                     if(updateResult[0][0].status = 1){
                                         var notificationTemplaterRes = notificationTemplater.parse('accept_request',{
-                                            adminName : updateResult[0][0].adminName,
-                                            groupName : updateResult[0][0].groupName
+                                            adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
+                                            groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
                                         });
                                         console.log(notificationTemplaterRes,"notificationTemplaterRes");
                                         if(notificationTemplaterRes.parsedTpl){
@@ -438,22 +477,8 @@ router.put('/status', function(req,res,next){
                                  * */
                                 else {
                                     var qMsg = {server: 'Internal Server Error'};
-                                    switch (updateResult[0][0]._e) {
-                                    /**
-                                     * This error will only come when for the group any other user has called this API who
-                                     * is not a groupAdmin
-                                     */
-                                        case 'ACCESS DENIED' :
-                                            qMsg = {_e: 'ACCESS DENIED'};
-                                            responseMessage.message = "You don't have permission for the following action";
-                                            break;
-                                        case 'NO_RELATION_EXISTS' :
-                                            qMsg = {_e : 'NO_RELATION_EXISTS '};
-                                            responseMessage.message = "You don't have permission for the following action";
-                                            break;
-                                    }
                                     responseMessage.status = false;
-                                    responseMessage.error = qMsg;
+
 
                                     responseMessage.data = {};
                                     res.status(400).json(responseMessage);
