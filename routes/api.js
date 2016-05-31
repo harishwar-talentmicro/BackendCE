@@ -627,20 +627,6 @@ router.get('/association_op_option',AssociationtModule.associationGetOPoptions);
 //router.post('/_test',TestModule.imageResizeTest);
 
 
-router.get('/api_health',function(req,res){
-    res.status(200).json({status : true});
-});
-
-router.get('/error_test',function(req,res,next){
-    try {
-        b.toString();
-    }
-    catch(ex){
-        console.log(ex);
-    }
-    res.send('');
-});
-
 /**
  * Default error handler
  * Add every API call above this

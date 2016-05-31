@@ -92,21 +92,21 @@ router.post('/', function(req,res,next){
                                                     var result = {};
                                                     var count = (i) ? 2 * i : 0;
 
-                                                    result.id = insertResult[count][0].id;
+                                                    result.tid = insertResult[count][0].id;
                                                     outputArray.push(result);
                                                 }
                                                 //console.log(locMap,"locMap");
 
                                                // outputArray[1].career_id = locMap[1].career_id;
                                                 for (var j = 0; j < locMap.length; j++) {
-                                                    outputArray[j].careerId = locMap[j].career_id;
+                                                    outputArray[j].career_id = locMap[j].career_id;
                                                     outputArray[j].type = locMap[j].type;
                                                     outputArray[j].fnTitle = locMap[j].fnTitle;
                                                     outputArray[j].careerStr = locMap[j].careerStr;
-                                                    outputArray[j].internsCount = locMap[j].interns_count;
-                                                    outputArray[j].fresherCtc = locMap[j].fresher_ctc;
-                                                    outputArray[j].fresherCount = locMap[j].fresher_count;
-                                                    outputArray[j].lateralCount = locMap[j].lateral_count;
+                                                    outputArray[j].interns_count = locMap[j].interns_count;
+                                                    outputArray[j].fresher_ctc = locMap[j].fresher_ctc;
+                                                    outputArray[j].fresher_count = locMap[j].fresher_count;
+                                                    outputArray[j].lateral_count = locMap[j].lateral_count;
                                                     outputArray[j].locCode = locMap[j].locCode;
                                                 }
                                                 console.log(outputArray,"outputArray");
