@@ -136,9 +136,10 @@ router.post('/', function(req,res,next){
                         if (!err) {
                             /**
                              * checking that grouptype(group) and groupRelationStatus is pending then user cant message
-                             * */
-                            //console.log(autoJoinResults,"autoJoinResults");
-                            if(autoJoinResults && autoJoinResults[0] && autoJoinResults[0][0] &&
+                             * @TODO Validate if group is autojoin or not and if it is not autojoin then get an error message from DB as NO_RELATION_FOUND
+                             * So that user can't message in such group where he is not a member
+                             **/
+                             if(autoJoinResults && autoJoinResults[0] && autoJoinResults[0][0] &&
                                 autoJoinResults[0][0].groupType == 0 && autoJoinResults[0][0].groupRelationStatus == 0){
                                 responseMessage.status = false;
                                 responseMessage.error = null;
@@ -236,20 +237,23 @@ router.post('/', function(req,res,next){
                                     req.db.escape(autoJoinResults[0][0].luUser)
                                 ];
                                 var procQuery = 'CALL p_v1_ComposeMessage(' + procParams.join(',') + ')';
-                                //console.log(procQuery);
+                               console.log(procQuery);
                                 req.db.query(procQuery, function (err, results) {
                                     if (!err) {
                                         /**
                                          * if not getting any error from db and proc called successfully then send response with status true
-                                         * */
+                                         **/
 
-                                        if (results && results[0] && results[0].length>0 && results[0][0].messageId) {
+                                        if (results && results[0] && results[0].length > 0 && results[0][0].messageId) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Message send successfully';
                                             switch (results[0][0].messageType) {
                                                 case 3:
 
+                                                    /**
+                                                     * @TODO Write a function in stdlib which see that attachment link is having bucket url or not if not having then add it otherwise remove and add it from EZEOne standard configuration
+                                                     */
                                                     attachmentObject = JSON.parse(results[0][0].message);
                                                     attachmentObject.attachmentLink = attachmentObject.attachmentLink ? req.CONFIG.CONSTANT.GS_URL +
                                                         req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentObject.attachmentLink : '';
@@ -264,10 +268,19 @@ router.post('/', function(req,res,next){
                                                     results[0][0].message = attachmentObject;
                                                     break;
                                                 default:
-                                                    results[0][0].message = results[0][0].message;
+
                                                     break;
                                             }
-                                            responseMessage.data = results[0][0];
+                                            responseMessage.data = {
+                                                messageId : results[0][0].messageId,
+                                                message : results[0][0].message,
+                                                createdDate : results[0][0].createdDate,
+                                                messageType : results[0][0].messageType,
+                                                messageStatus : results[0][0].messageStatus,
+                                                priority : results[0][0].priority,
+                                                senderName : results[0][0].senderName,
+                                                senderId : results[0][0].senderId
+                                            };
 
                                             res.status(200).json(responseMessage);
                                             /**notification send to user to whome message is sending*/
@@ -277,7 +290,7 @@ router.post('/', function(req,res,next){
                                                     var notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                                         senderName : results[0][0].senderName
                                                     });
-                                                    console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                                    //console.log(notificationTemplaterRes,"notificationTemplaterRes");
                                                     if(notificationTemplaterRes.parsedTpl){
                                                         notification.publish(
                                                             results[1][i].receiverGroupId,
@@ -295,7 +308,24 @@ router.post('/', function(req,res,next){
                                                             moment().format("YYYY-MM-DD HH:mm:ss"),
                                                             '',
                                                             0,
-                                                            0);
+                                                            0,
+                                                            null,
+                                                            '',
+                                                            /** Data object property to be sent with notification **/
+                                                            {
+                                                                messageId : results[0][0].messageId,
+                                                                message : results[0][0].message,
+                                                                createdDate : moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                                messageType : req.body.messageType,
+                                                                messageStatus : 0,
+                                                                priority : req.body.priority,
+                                                                senderName : results[0][0].senderName,
+                                                                senderId : results[0][0].senderId,
+                                                                receiverId : results[1][i].receiverGroupId,
+                                                                groupId : results[0][0].groupId,
+                                                                groupType : results[0][0].groupType
+                                                            },
+                                                            null);
                                                         console.log('postNotification : notification for compose_message is sent successfully');
                                                     }
                                                     else{
@@ -313,9 +343,9 @@ router.post('/', function(req,res,next){
                                         else {
                                             responseMessage.status = false;
                                             responseMessage.error = null;
-                                            responseMessage.message = 'Error in message sending';
+                                            responseMessage.message = 'Something went wrong while sending message ! Please try again';
                                             responseMessage.data = null;
-                                            res.status(200).json(responseMessage);
+                                            res.status(400).json(responseMessage);
                                         }
                                     }
                                     /**
