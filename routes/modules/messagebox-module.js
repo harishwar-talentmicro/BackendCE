@@ -1262,8 +1262,8 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var attachment  = req.body.attachment ? req.body.attachment : '';
     var attachmentFilename  = req.body.attachment_filename ? req.body.attachment_filename : '';
     var priority  = (parseInt(req.body.priority) !== NaN) ? req.body.priority : 1;
-    var targetDate  = (req.body.target_date) ? (req.body.target_date) : '';
-    var expiryDate  =  (req.body.expiry_date) ? (req.body.expiry_date) : '';
+    var targetDate  = (req.body.target_date) ? (req.body.target_date) : null;
+    var expiryDate  =  (req.body.expiry_date) ? (req.body.expiry_date) : null;
     var token = req.body.token;
     var previousMessageID = req.body.previous_messageID ? req.body.previous_messageID : 0;
     var toID = req.body.to_id;                              // comma separated id of toID
