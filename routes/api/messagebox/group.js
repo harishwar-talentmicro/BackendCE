@@ -17,6 +17,242 @@ var Notification = require('../../modules/notification/notification-master.js');
 var notification = new Notification();
 
 /**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @param token* <string> token of login user
+ * @param groupId <int>
+ * @param groupName*  <string>
+ * @param aboutGroup  <string>
+ * @param showMembers  <int>(0 : false (default) , 1 : true)
+ * @param restrictedReply  <int>(0 : false (default) , 1 : true)
+ * @param autoJoin <int> (0 : false (default) , 1 : true)
+ * @discription : API to create group
+ */
+
+router.post('/', function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    /** validation goes here
+     * checking that groupId,showMembers,restrictedReply,autoJoin we are getting from front end or not if no then default
+     * value is 0 and if getting then check that its integer or not,if not give error and aboutGroup by default empty string
+     *
+     * */
+    req.body.groupId= (req.body.groupId) ? parseInt(req.body.groupId) : 0;
+    req.body.showMembers= (req.body.showMembers) ? parseInt(req.body.showMembers) : 0;
+    req.body.restrictedReply= (req.body.restrictedReply) ? parseInt(req.body.restrictedReply) : 0;
+    req.body.autoJoin= (req.body.autoJoin) ? parseInt(req.body.autoJoin) : 0;
+    req.body.aboutGroup = req.body.aboutGroup ? req.body.aboutGroup : ''
+    if(isNaN(req.body.groupId)){
+        error.groupId = 'Invalid group Id';
+        validationFlag *= false;
+    }
+    if(isNaN(req.body.showMembers)){
+        error.showMembers = 'Invalid show member flag';
+        validationFlag *= false;
+    }
+    if(isNaN(req.body.restrictedReply)){
+        error.restrictedReply = 'Invalid restrictedReply flag';
+        validationFlag *= false;
+    }
+    if(isNaN(req.body.autoJoin)){
+        error.autoJoin = 'Invalid autoJoin flag';
+        validationFlag *= false;
+    }
+    /**
+     * validating token and groupName is mandatory field so cheking whether from front end we are getting or not
+     * if not getting then give error
+     * */
+    if (!req.body.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.body.groupName ) {
+        error.groupName = 'Invalid group Name';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            /**
+             * validating token of login user
+             * */
+
+            req.st.validateToken(req.body.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    /**
+                     * created one function in which we are calling p_v1_createMessageGroup to create group
+                     * */
+                    var createGroup = function(){
+                        var queryParamsList = [
+                            req.db.escape(req.body.token) ,
+                            req.db.escape(req.body.groupId),
+                            req.db.escape(req.body.groupName) ,
+                            req.db.escape(req.body.aboutGroup),
+                            req.db.escape(req.body.showMembers) ,
+                            req.db.escape(req.body.restrictedReply),
+                            req.db.escape(req.body.autoJoin)
+                        ];
+
+                        var procQuery = 'CALL p_v1_createMessageGroup(' + queryParamsList.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                /**
+                                 * if from proc in response we are getting groupId then return response
+                                 * prepare response according to creation and updation time
+                                 * */
+                                if (results && results[0] && results[0][0].groupId) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    if(req.body.groupId == 0){
+                                        responseMessage.message = 'group created successfully';
+                                    }
+                                    else{
+                                        responseMessage.message = 'group updated successfully';
+                                    }
+                                    responseMessage.data = {
+                                        groupId : results[0][0].groupId,
+                                        groupName : req.body.groupName,
+                                        aboutGroup : req.body.aboutGroup,
+                                        areMembersVisible : req.body.showMembers,
+                                        isReplyRestricted : req.body.restrictedReply,
+                                        autoJoin : req.body.autoJoin,
+                                        adminEzeId : tokenResult[0].ezeoneId,
+                                        adminId : tokenResult[0].groupId,
+                                        groupStatus : 1,
+                                        groupRelationStatus : 1,
+                                        groupType : 0,
+                                        isAdmin : 1,
+                                        luDate : '',
+                                        isRequester : 1,
+                                        memberCount : 1,
+                                        unreadCount :0
+                                    };
+                                    res.status(200).json(responseMessage);
+                                }
+                                /**
+                                 * if login user is not admin
+                                 * */
+                                else {
+                                    var qMsg = {server: 'Internal Server Error'};
+                                    switch (results[0][0]._e) {
+                                        case 'ACCESS_DENIED' :
+                                            qMsg = {_e: 'ACCESS_DENIED'};
+                                            responseMessage.message = "You don't have permission for the following action";
+                                            break;
+                                    }
+                                    responseMessage.status = false;
+                                    responseMessage.error = qMsg;
+                                    responseMessage.data = {
+                                    };
+                                    res.status(400).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : p_v1_createMessageGroup ', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                            }
+                        });
+                    };
+                    if(req.body.groupId == 0){
+                        /**
+                         * call procedure for validating groupname
+                         * */
+                        var procParams = [
+                            req.db.escape(req.body.token) ,
+                            req.db.escape(req.body.groupName)
+                        ];
+                        var procQuery = 'CALL p_v1_validateGroup(' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, validateGroupResults) {
+                            /**
+                             * while calling procedure if isAvailable = 1 then call function to create group
+                             *
+                             * */
+                            if (!err){
+                                if (validateGroupResults &&
+                                    validateGroupResults[0] &&
+                                    validateGroupResults[0].length > 0 &&
+                                    validateGroupResults[0][0].isAvailable == 1) {
+                                    createGroup();
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Group Name is not available';
+                                    responseMessage.data = {
+                                    };
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else{
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error :', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                            }
+
+                        });
+                    }
+                    /**
+                     * in case of individual directly call the function to create group without validating group name
+                     * */
+
+                    else{
+                        createGroup();
+                    }
+
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Invalid Token'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
+                    console.log('Error :', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error p_v1_createMessageGroup :  ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+});
+
+/**
  * Method : GET
  * @param req
  * @param res
@@ -133,225 +369,7 @@ router.get('/validate', function(req,res,next){
     }
 });
 
-/**
- * Method : POST
- * @param req
- * @param res
- * @param next
- * @param token* <string> token of login user
- * @param groupId <int>
- * @param groupName*  <string>
- * @param aboutGroup  <string>
- * @param showMembers  <int>(0 : false (default) , 1 : true)
- * @param restrictedReply  <int>(0 : false (default) , 1 : true)
- * @param autoJoin <int> (0 : false (default) , 1 : true)
- * @discription : API to create group
- */
 
-router.post('/', function(req,res,next){
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: null
-    };
-    var validationFlag = true;
-    var error = {};
-    /** validation goes here
-     * checking that groupId,showMembers,restrictedReply,autoJoin we are getting from front end or not if no then default
-     * value is 0 and if getting then check that its integer or not,if not give error and aboutGroup by default empty string
-     *
-     * */
-    req.body.groupId= (req.body.groupId) ? parseInt(req.body.groupId) : 0;
-    req.body.showMembers= (req.body.showMembers) ? parseInt(req.body.showMembers) : 0;
-    req.body.restrictedReply= (req.body.restrictedReply) ? parseInt(req.body.restrictedReply) : 0;
-    req.body.autoJoin= (req.body.autoJoin) ? parseInt(req.body.autoJoin) : 0;
-    req.body.aboutGroup = req.body.aboutGroup ? req.body.aboutGroup : ''
-    if(isNaN(req.body.groupId)){
-        error.groupId = 'Invalid group Id';
-        validationFlag *= false;
-    }
-    if(isNaN(req.body.showMembers)){
-        error.showMembers = 'Invalid show member flag';
-        validationFlag *= false;
-    }
-    if(isNaN(req.body.restrictedReply)){
-        error.restrictedReply = 'Invalid restrictedReply flag';
-        validationFlag *= false;
-    }
-    if(isNaN(req.body.autoJoin)){
-        error.autoJoin = 'Invalid autoJoin flag';
-        validationFlag *= false;
-    }
-    /**
-     * validating token and groupName is mandatory field so cheking whether from front end we are getting or not
-     * if not getting then give error
-     * */
-    if (!req.body.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-    if (!req.body.groupName ) {
-        error.groupName = 'Invalid group Name';
-        validationFlag *= false;
-    }
-    if (!validationFlag) {
-        responseMessage.error = error;
-        responseMessage.message = 'Please check the errors';
-        res.status(400).json(responseMessage);
-        console.log(responseMessage);
-    }
-    else {
-        try {
-            /**
-             * validating token of login user
-             * */
-
-            req.st.validateToken(req.body.token, function (err, tokenResult) {
-                if ((!err) && tokenResult) {
-                        /**
-                         * created one function in which we are calling p_v1_createMessageGroup to create group
-                         * */
-                        var createGroup = function(){
-                            var queryParamsList = [
-                                req.db.escape(req.body.token) ,
-                                req.db.escape(req.body.groupId),
-                                req.db.escape(req.body.groupName) ,
-                                req.db.escape(req.body.aboutGroup),
-                                req.db.escape(req.body.showMembers) ,
-                                req.db.escape(req.body.restrictedReply),
-                                req.db.escape(req.body.autoJoin)
-                            ];
-
-                            var procQuery = 'CALL p_v1_createMessageGroup(' + queryParamsList.join(',') + ')';
-                            console.log(procQuery);
-                            req.db.query(procQuery, function (err, results) {
-                                if (!err) {
-                                    /**
-                                     * if from proc in response we are getting groupId then return response
-                                     * prepare response according to creation and updation time
-                                     * */
-                                    if (results && results[0] && results[0][0].groupId) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        if(req.body.groupId == 0){
-                                            responseMessage.message = 'group created successfully';
-                                        }
-                                        else{
-                                            responseMessage.message = 'group updated successfully';
-                                        }
-                                        responseMessage.data = {
-                                            groupId : results[0][0].groupId,
-                                            groupName : req.body.groupName,
-                                            aboutGroup : req.body.aboutGroup,
-                                            showMembers : req.body.showMembers,
-                                            restrictedReply : req.body.restrictedReply,
-                                            autoJoin : req.body.autoJoin
-                                        };
-                                        res.status(200).json(responseMessage);
-                                    }
-                                    /**
-                                     * if login user is not admin
-                                     * */
-                                    else {
-                                        responseMessage.status = false;
-                                        responseMessage.error = results[0][0]._e;
-                                        responseMessage.message = 'Error in creating group';
-                                        responseMessage.data = {
-                                        };
-                                        res.status(400).json(responseMessage);
-                                    }
-                                }
-                                else {
-                                    responseMessage.error = {
-                                        server: 'Internal Server Error'
-                                    };
-                                    responseMessage.message = 'An error occurred !';
-                                    res.status(500).json(responseMessage);
-                                    console.log('Error : p_v1_createMessageGroup ', err);
-                                    var errorDate = new Date();
-                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-                                }
-                            });
-                        };
-                        if(req.body.groupId == 0){
-                            /**
-                             * call procedure for validating groupname
-                             * */
-                            var procParams = [
-                                req.db.escape(req.body.token) ,
-                                req.db.escape(req.body.groupName)
-                            ];
-                            var procQuery = 'CALL p_v1_validateGroup(' + procParams.join(',') + ')';
-                            console.log(procQuery);
-                            req.db.query(procQuery, function (err, validateGroupResults) {
-                                /**
-                                 * while calling procedure if isAvailable = 1 then call function to create group
-                                 *
-                                 * */
-                                if (!err){
-                                    if (validateGroupResults &&
-                                        validateGroupResults[0] &&
-                                        validateGroupResults[0].length > 0 &&
-                                        validateGroupResults[0][0].isAvailable == 1) {
-                                        createGroup();
-                                    }
-                                    else {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Group Name is not available';
-                                        responseMessage.data = {
-                                        };
-                                        res.status(200).json(responseMessage);
-                                    }
-                                }
-                                else{
-                                    responseMessage.error = {
-                                        server: 'Internal Server Error'
-                                    };
-                                    responseMessage.message = 'An error occurred !';
-                                    res.status(500).json(responseMessage);
-                                    console.log('Error :', err);
-                                    var errorDate = new Date();
-                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-                                }
-
-                            });
-                        }
-                        /**
-                         * in case of individual directly call the function to create group without validating group name
-                         * */
-
-                        else{
-                            createGroup();
-                            }
-
-                }
-                else {
-                    responseMessage.error = {
-                        server: 'Invalid Token'
-                    };
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(401).json(responseMessage);
-                    console.log('Error :', err);
-                    var errorDate = new Date();
-                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-                }
-            });
-        }
-        catch (ex) {
-            responseMessage.error = {
-                server: 'Internal Server Error'
-            };
-            responseMessage.message = 'An error occurred !';
-            res.status(500).json(responseMessage);
-            console.log('Error p_v1_createMessageGroup :  ', ex);
-            var errorDate = new Date();
-            console.log(errorDate.toTimeString() + ' ......... error ...........');
-        }
-    }
-
-});
 
 
 /**
@@ -414,60 +432,103 @@ router.post('/members', function(req,res,next){
                     console.log(query);
                     req.db.query(query, function (err, addMemberResult) {
                         if (!err) {
+                            console.log(addMemberResult,"addMemberResult");
                             /**
                              * if proc executed successfully then give response true and send notification to mwember of a group
                              * who is added by admin to accept the request to join the group
                              * */
 
                             if (addMemberResult && addMemberResult[0] && addMemberResult[0].length>0 && addMemberResult[0][0].userGroupId){
-                                    console.log(addMemberResult,"addMemberResult");
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Member added to group successfully';
-                                    responseMessage.data = {
-                                        userGroupId : addMemberResult[0][0].userGroupId,
-                                        groupName : addMemberResult[0][0].groupName,
-                                        fullName : addMemberResult[0][0].fullName,
-                                        groupStatus : addMemberResult[0][0].groupStatus,
-                                        groupRelationStatus : addMemberResult[0][0].groupRelationStatus,
-                                        luDate : addMemberResult[0][0].luDate,
-                                        isRequester : addMemberResult[0][0].isRequester
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('p_v1_addmembersbygroup: Member added to group successfully');
-                                    var notificationTemplaterRes = notificationTemplater.parse('add_members_to_group',{
-                                        groupName : addMemberResult[0][0].groupName,
-                                        adminName : addMemberResult[0][0].adminName
-                                    });
-                                    console.log(notificationTemplaterRes.parsedTpl,"notificationTemplaterRes.parsedTpl");
-                                    if(notificationTemplaterRes.parsedTpl){
-                                        notification.publish(
-                                            addMemberResult[0][0].userGroupId,
-                                            addMemberResult[0][0].fullName,
-                                            addMemberResult[0][0].groupName,
-                                            addMemberResult[0][0].senderId,
-                                            notificationTemplaterRes.parsedTpl,
-                                            33,
-                                            0, addMemberResult[0][0].iphoneId,
-                                            0,
-                                            0,
-                                            0,
-                                            0,
-                                            1,
-                                            moment().format("YYYY-MM-DD HH:mm:ss"),
-                                            '',
-                                            0,
-                                            0);
-                                        console.log('postNotification : notification for add members to group is sent successfully');
+                                var contactParams = [
+                                    req.db.escape(addMemberResult[0][0].groupName) ,
+                                    req.db.escape(null) ,
+                                    req.db.escape(addMemberResult[0][0].userGroupId)
+                                ];
+                                var contactQuery = 'CALL get_v1_contact(' + contactParams.join(',') + ')';
+                                req.db.query(contactQuery, function (err, contactGroupResult) {
+                                    if(!err){
+                                        //console.log(addMemberResult[0][0].groupRelationStatus,"groupRelationStatus");
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Member added to group successfully';
+                                        responseMessage.data = {
+                                            userGroupId : addMemberResult[0][0].userGroupId,
+                                            groupName : addMemberResult[0][0].groupName,
+                                            fullName : addMemberResult[0][0].fullName,
+                                            groupStatus : addMemberResult[0][0].groupStatus,
+                                            groupRelationStatus : addMemberResult[0][0].groupRelationStatus,
+                                            luDate : addMemberResult[0][0].luDate,
+                                            isRequester : addMemberResult[0][0].isRequester
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('p_v1_addmembersbygroup: Member added to group successfully');
+                                        var notificationTemplaterRes = notificationTemplater.parse('add_members_to_group',{
+                                            groupName : addMemberResult[0][0].groupName,
+                                            adminName : addMemberResult[0][0].adminName
+                                        });
+                                        console.log(notificationTemplaterRes.parsedTpl,"notificationTemplaterRes.parsedTpl");
+                                        if(notificationTemplaterRes.parsedTpl){
+                                            notification.publish(
+                                                addMemberResult[0][0].userGroupId,
+                                                addMemberResult[0][0].fullName,
+                                                addMemberResult[0][0].groupName,
+                                                addMemberResult[0][0].senderId,
+                                                notificationTemplaterRes.parsedTpl,
+                                                33,
+                                                0, (addMemberResult[0][0].iphoneId) ? addMemberResult[0][0].iphoneId : '',
+                                                0,
+                                                0,
+                                                0,
+                                                0,
+                                                1,
+                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                '',
+                                                0,
+                                                0,
+                                                null,
+                                                '',
+                                                /** Data object property to be sent with notification **/
+                                                {
+                                                    groupId : contactGroupResult[0][0].groupId,
+                                                    adminEzeId : contactGroupResult[0][0].adminEzeId,
+                                                    adminId : contactGroupResult[0][0].adminId,
+                                                    groupName : contactGroupResult[0][0].groupName,
+                                                    groupStatus : contactGroupResult[0][0].groupStatus,
+                                                    isAdmin : contactGroupResult[0][0].isAdmin,
+                                                    areMembersVisible : contactGroupResult[0][0].areMembersVisible,
+                                                    isReplyRestricted : contactGroupResult[0][0].isReplyRestricted,
+                                                    groupRelationStatus : addMemberResult[0][0].groupRelationStatus,
+                                                    luDate : contactGroupResult[0][0].luDate,
+                                                    isRequester : contactGroupResult[0][0].isRequester,
+                                                    unreadCount : contactGroupResult[0][0].unreadCount,
+                                                    luUser : contactGroupResult[0][0].luUser,
+                                                    aboutGroup : contactGroupResult[0][0].aboutGroup,
+                                                    memberCount : contactGroupResult[0][0].memberCount,
+                                                    autoJoin : contactGroupResult[0][0].autoJoin
+                                                },
+                                                null);
+                                            console.log('postNotification : notification for add members to group is sent successfully');
+                                        }
+                                        else{
+                                            /**
+                                             * it will come in this block when error in notification will come
+                                             * */
+                                            console.log('Error in parsing notification add_members_to_group template - ',
+                                                notificationTemplaterRes.error);
+                                            console.log('postNotification : notification for add members to group not sent');
+                                        }
+
                                     }
                                     else{
-                                        /**
-                                         * it will come in this block when error in notification will come
-                                         * */
-                                        console.log('Error in parsing notification add_members_to_group template - ',
-                                            notificationTemplaterRes.error);
-                                        console.log('postNotification : notification for add members to group not sent');
+                                        responseMessage.message = 'An error occured ! Please try again';
+                                        responseMessage.error = {
+                                            server: 'Internal Server Error'
+                                        };
+                                        res.status(500).json(responseMessage);
+                                        console.log('get_v1_contact: error in getting group contact details :' + err);
                                     }
+                                });
+
 
                                 }
                             /***
@@ -598,6 +659,7 @@ router.post('/join', function(req,res,next){
                     var query = 'CALL p_v1_addmemberstogroup(' + queryParams.join(',') + ')';
                     console.log(query);
                     req.db.query(query, function (err, joinGroupResult) {
+                        console.log(joinGroupResult[1],"joinGroupResult[1]");
                         if (!err) {
                             /**
                              * if proc executed successfully then give response true
@@ -630,6 +692,7 @@ router.post('/join', function(req,res,next){
                                 res.status(200).json(responseMessage);
                                 console.log('p_v1_addmembersbygroup: Member added to group successfully');
                                 if(joinGroupResult[0][0].groupType == 0 && joinGroupResult[0][0].groupRelationStatus == 0){
+
                                     var notificationTemplaterRes = notificationTemplater.parse('join_group',{
                                         groupName : joinGroupResult[0][0].groupName,
                                         fullName : joinGroupResult[0][0].fullName
@@ -657,11 +720,12 @@ router.post('/join', function(req,res,next){
                                             /** Data object property to be sent with notification **/
                                             {
                                                 groupId : joinGroupResult[1][0].groupId,
-                                                fullName : joinGroupResult[0][0].fullName,
+                                                fullName : joinGroupResult[1][0].fullName,
                                                 groupName : joinGroupResult[1][0].groupName,
                                                 groupRelationStatus : joinGroupResult[1][0].groupRelationStatus,
                                                 groupType : joinGroupResult[1][0].groupType,
-                                                isRequester : joinGroupResult[1][0].isRequester
+                                                isRequester : joinGroupResult[1][0].isRequester,
+                                                receiverGroupId :joinGroupResult[0][0].groupId
                                             },
                                             null);
                                         console.log('postNotification : notification for join_group is sent successfully');
@@ -699,12 +763,13 @@ router.post('/join', function(req,res,next){
                                             '',
                                             /** Data object property to be sent with notification **/
                                             {
-                                                groupId : joinGroupResult[0][0].groupId,
-                                                fullName : joinGroupResult[0][0].fullName,
-                                                groupName : joinGroupResult[0][0].groupName,
-                                                groupRelationStatus : joinGroupResult[0][0].groupRelationStatus,
-                                                groupType : joinGroupResult[0][0].groupType,
-                                                isRequester : joinGroupResult[0][0].isRequester
+                                                groupId : joinGroupResult[1][0].groupId,
+                                                fullName : joinGroupResult[1][0].fullName,
+                                                groupName : joinGroupResult[1][0].groupName,
+                                                groupRelationStatus : joinGroupResult[1][0].groupRelationStatus,
+                                                groupType : joinGroupResult[1][0].groupType,
+                                                isRequester : joinGroupResult[1][0].isRequester,
+                                                receiverGroupId :joinGroupResult[0][0].groupId
                                             },
                                             null);
                                         console.log('postNotification : notification for join_group is sent successfully');
@@ -749,7 +814,7 @@ router.post('/join', function(req,res,next){
                                 server: 'Internal Server Error'
                             };
                             res.status(500).json(responseMessage);
-                            console.log('p_v1_addmembersbygroup: error in join group :' + err);
+                            console.log('p_v1_addmemberstogroup: error in join group :' + err);
                         }
                     });
 
@@ -772,7 +837,7 @@ router.post('/join', function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error p_v1_addmembersbygroup :  ', ex);
+            console.log('Error p_v1_addmemberstogroup :  ', ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
