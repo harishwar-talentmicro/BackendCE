@@ -123,6 +123,13 @@
           "senderName"
         ],
         "file": "message/compose-message.txt"
+      },
+      "compose_message_group": {
+        "params": [
+          "senderName",
+          "groupName"
+        ],
+        "file": "message/compose-message-group.txt"
       }
     }
   },

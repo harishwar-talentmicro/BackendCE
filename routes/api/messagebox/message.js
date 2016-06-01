@@ -304,18 +304,21 @@ router.post('/', function(req,res,next){
                                                 console.log(results[0][0].groupType,"groupType");
                                                 if(results[0][0].groupType == 0){
                                                     senderGroupId = results[0][0].groupId;
+                                                    var notificationTemplaterRes = notificationTemplater.parse('compose_message_group',{
+                                                        senderName : results[0][0].senderName,
+                                                        groupName : results[1][0].groupName
+                                                    });
+                                                    console.log(notificationTemplaterRes,"notificationTemplaterRes");
                                                 }
                                                 else{
                                                     senderGroupId = results[0][0].senderId;
+                                                    notificationTemplaterRes = notificationTemplater.parse('compose_message',{
+                                                        senderName : results[0][0].senderName
+                                                    });
                                                 }
                                                 for (var i = 0; i < results[1].length; i++ ) {
                                                     if(autoJoinResults[0][0].groupuserid == 0){
-                                                        var notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                                                            senderName : results[0][0].senderName
-                                                        });
 
-                                                        console.log(senderGroupId,"senderGroupId");
-                                                        //console.log(notificationTemplaterRes,"notificationTemplaterRes");
                                                         if(notificationTemplaterRes.parsedTpl){
                                                             notification.publish(
                                                                 results[1][i].receiverGroupId,
@@ -375,10 +378,6 @@ router.post('/', function(req,res,next){
                                                         }
                                                     }
                                                     else{
-                                                        var notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                                                            senderName : results[0][0].senderName
-                                                        });
-                                                        //console.log(notificationTemplaterRes,"notificationTemplaterRes");
                                                         if(notificationTemplaterRes.parsedTpl){
                                                             notification.publish(
                                                                 results[1][i].receiverGroupId,
@@ -538,6 +537,8 @@ router.post('/attachment',function(req,res,next){
                  * If MIME type is other than image (parsable formats eg. JPG,PNG) than thumbnail will be picked from
                  * the available list otherwise it will be generated
                  */
+
+                console.log('req.files.attachmentFile',req.files.attachmentFile);
                 if(thumbnailConfig.imageMimeList.indexOf(req.files.attachmentFile.mimetype) != -1){
 
                     /**
