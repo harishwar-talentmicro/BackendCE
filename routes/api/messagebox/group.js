@@ -748,7 +748,7 @@ router.post('/join', function(req,res,next){
                                             joinGroupResult[0][0].groupName,
                                             joinGroupResult[0][0].senderId,
                                             notificationTemplaterRes.parsedTpl,
-                                            39,
+                                            34,
                                             0, (joinGroupResult[0][0].iphoneId) ? (joinGroupResult[0][0].iphoneId) : '',
                                             0,
                                             0,
@@ -938,8 +938,8 @@ router.get('/members', function(req,res,next){
                                         var qMsg = {server: 'Internal Server Error'};
 
                                         switch (groupMemberResults[0][0]._e) {
-                                            case 'ACCESS DENIED' :
-                                                qMsg = {_e: 'ACCESS DENIED'};
+                                            case 'ACCESS_DENIED' :
+                                                qMsg = {_e: 'ACCESS_DENIED'};
                                                 responseMessage.message = "You don't have permission for the following action";
                                                 break;
                                             default:
@@ -1419,8 +1419,8 @@ router.delete('/:groupId', function(req,res,next){
                             else{
                                 var qMsg = {server: 'Internal Server Error'};
                                 switch (deleteGroupResults[0][0]._e) {
-                                    case 'ACCESS DENIED' :
-                                        qMsg = {_e: 'ACCESS DENIED'};
+                                    case 'ACCESS_DENIED' :
+                                        qMsg = {_e: 'ACCESS_DENIED'};
                                         responseMessage.message = "You don't have permission for the following action";
                                         break;
                                     default:
