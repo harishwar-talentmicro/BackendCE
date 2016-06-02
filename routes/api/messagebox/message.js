@@ -48,13 +48,7 @@ router.post('/', function(req,res,next){
     };
     var validationFlag = true;
     var error = {};
-    /**
-     * checking whether token is exist or not,if not then error
-     **/
-    if (!req.body.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
+
     /**
      * checking messageType,priority is number or not,if not then error and set by default value
      **/
@@ -688,10 +682,6 @@ router.get('/', function(req,res,next){
     var validationFlag = true;
     var error = {};
 
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
     if (isNaN(parseInt(req.query.groupId)) || (req.query.groupId) < 0 ) {
         error.groupId = 'Invalid group id';
         validationFlag *= false;

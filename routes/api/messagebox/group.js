@@ -70,10 +70,6 @@ router.post('/', function(req,res,next){
      * validating token and groupName is mandatory field so cheking whether from front end we are getting or not
      * if not getting then give error
      * */
-    if (!req.body.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
     if (!req.body.groupName ) {
         error.groupName = 'Invalid group Name';
         validationFlag *= false;
@@ -275,10 +271,6 @@ router.get('/validate', function(req,res,next){
  * validation goes here
  * validating token and group name as both are mandatory fields
  * */
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
     if (!req.query.groupName) {
         error.token = 'Invalid group name';
         validationFlag *= false;
@@ -399,10 +391,6 @@ router.post('/members', function(req,res,next){
     req.body.ezeoneId = req.st.alterEzeoneId(req.body.ezeoneId);
     if (isNaN(parseInt(req.body.groupId))) {
         error.groupId = 'Invalid Group id';
-        validationFlag *= false;
-    }
-    if (!req.body.token) {
-        error.token = 'Invalid token';
         validationFlag *= false;
     }
     if (!validationFlag) {
@@ -628,10 +616,6 @@ router.post('/join', function(req,res,next){
     req.body.groupId= (req.body.groupId) ? parseInt(req.body.groupId) : 0;
     if(isNaN(req.body.groupId)){
         error.groupId = 'Invalid group Id';
-        validationFlag *= false;
-    }
-    if (!req.body.token) {
-        error.token = 'Invalid token';
         validationFlag *= false;
     }
     if (!validationFlag) {
@@ -869,10 +853,6 @@ router.get('/members', function(req,res,next){
      * validation goes here
      * validating token and group name as both are mandatory fields
      * */
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
     if (isNaN(parseInt(req.query.groupId)) || (req.query.groupId) < 0 ) {
         error.groupId = 'Invalid group id';
         validationFlag *= false;
@@ -1028,10 +1008,7 @@ router.get('/details', function(req,res,next){
      * validation goes here
      * validating token and group id(checking that group id is integer or not) as both are mandatory fields
      * */
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
+
     if (isNaN(parseInt(req.query.groupId)) || (req.query.groupId) < 0 ) {
         error.groupId = 'Invalid group id';
         validationFlag *= false;
@@ -1158,10 +1135,6 @@ router.post('/change_admin', function(req,res,next){
      * validating token is mandatory field so checking whether from front end we are getting or not
      * if not getting then give error
      * */
-    if (!req.body.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
     if (!req.body.ezeoneId ) {
         error.ezeoneId = 'Invalid ezeoneId';
         validationFlag *= false;
@@ -1336,10 +1309,6 @@ router.delete('/:groupId', function(req,res,next){
      * validating token is mandatory field so checking whether from front end we are getting or not
      * if not getting then give error
      * */
-    if (!req.body.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
     if (!validationFlag) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
@@ -1500,11 +1469,6 @@ router.put('/leave', function(req,res,next){
     /**
      * validating for token as token,groupId,userGroupId and status
      * */
-    if (!req.body.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-
     if (!validationFlag) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
@@ -1653,10 +1617,7 @@ var error = {};
  * validation goes here
  * validating token and group name as both are mandatory fields
  * */
-if (!req.query.token) {
-    error.token = 'Invalid token';
-    validationFlag *= false;
-}
+
 if (isNaN(parseInt(req.query.groupId)) || (req.query.groupId) < 0 ) {
     error.groupId = 'Invalid group id';
     validationFlag *= false;
