@@ -84,6 +84,13 @@
         ],
         "file": "message/join-group.txt"
       },
+      "auto_join_group": {
+        "params": [
+          "groupName",
+          "fullName"
+        ],
+        "file": "message/auto-join-group.txt"
+      },
       "change_admin": {
         "params": [
           "oldAdminName",
@@ -116,6 +123,13 @@
           "senderName"
         ],
         "file": "message/compose-message.txt"
+      },
+      "compose_message_group": {
+        "params": [
+          "senderName",
+          "groupName"
+        ],
+        "file": "message/compose-message-group.txt"
       }
     }
   },

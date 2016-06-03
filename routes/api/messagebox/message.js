@@ -63,6 +63,11 @@ router.post('/', function(req,res,next){
         error.messageType = 'Invalid messagetype';
         validationFlag *= false;
     }
+    req.body.localMessageId= (req.body.localMessageId) ? parseInt(req.body.localMessageId) : 0;
+    if(isNaN(req.body.localMessageId)){
+        error.localMessageId = 'Invalid local message id';
+        validationFlag *= false;
+    }
     req.body.priority  = (req.body.priority) ? parseInt(req.body.priority) : 1;
     if(isNaN(req.body.priority)){
         error.priority  = 'Invalid priority';
@@ -111,12 +116,13 @@ router.post('/', function(req,res,next){
             /**
              * declaring one variable
              * */
+            var senderGroupId;
             var message;
             var attachmentObject = '';
             /**
              * validating token for login user
              * */
-
+            req.body.thumbnailLink = (req.body.thumbnailLink) ? req.body.thumbnailLink : req.st.getThumbnailLinkFromMime();
             req.st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err && tokenResult) {
                     /**
@@ -128,58 +134,58 @@ router.post('/', function(req,res,next){
                         req.db.escape(req.body.receiverGroupId)
                     ];
                     var autoJoinQuery = 'CALL pautojoin_before_Composing(' + autoJoinQueryParams.join(',') + ')';
-                    //console.log(autoJoinQuery);
+
                     req.db.query(autoJoinQuery, function (err, autoJoinResults) {
+                        console.log(autoJoinResults,"autoJoinResults");
                         /**
                          * if not error from db then perform further conditions
                          * */
                         if (!err) {
                             /**
                              * checking that grouptype(group) and groupRelationStatus is pending then user cant message
-                             * @TODO Validate if group is autojoin or not and if it is not autojoin then get an error message from DB as NO_RELATION_FOUND
                              * So that user can't message in such group where he is not a member
                              **/
                              if(autoJoinResults && autoJoinResults[0] && autoJoinResults[0][0] &&
                                 autoJoinResults[0][0].groupType == 0 && autoJoinResults[0][0].groupRelationStatus == 0){
-                                responseMessage.status = false;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Your request for joining the group is pending';
-                                responseMessage.data = null;
-                                res.status(200).json(responseMessage);
-                                /**
-                                 * Send Notification to the admin of the group to accept the request of this user
-                                 * who want to join this group
-                                 */
+                                     responseMessage.status = true;
+                                     responseMessage.error = null;
+                                     responseMessage.message = 'Your request for joining the group is pending';
+                                     responseMessage.data = null;
+                                     res.status(200).json(responseMessage);
+                                     /**
+                                      * Send Notification to the admin of the group to accept the request of this user
+                                      * who want to join this group
+                                      */
 
-                                var notificationTemplaterRes = notificationTemplater.parse('join_group',{
-                                    groupName : autoJoinResults[0][0].groupName,
-                                    fullName : autoJoinResults[0][0].fullName
-                                });
-                                if(notificationTemplaterRes.parsedTpl){
-                                    notification.publish(
-                                        autoJoinResults[0][0].adminGroupId,
-                                        autoJoinResults[0][0].groupName,
-                                        autoJoinResults[0][0].groupName,
-                                        autoJoinResults[0][0].senderId,
-                                        notificationTemplaterRes.parsedTpl,
-                                        38,
-                                        0, autoJoinResults[0][0].iphoneId,
-                                        0,
-                                        0,
-                                        0,
-                                        0,
-                                        1,
-                                        moment().format("YYYY-MM-DD HH:mm:ss"),
-                                        '',
-                                        0,
-                                        0);
-                                    console.log('postNotification : notification for join_group is sent successfully');
-                                }
-                                else{
-                                    console.log('Error in parsing notification join_group template - ',
-                                        notificationTemplaterRes.error);
-                                    console.log('postNotification : notification for join_group is sent successfully');
-                                }
+                                     var notificationTemplaterRes = notificationTemplater.parse('join_group',{
+                                         groupName : autoJoinResults[0][0].groupName,
+                                         fullName : autoJoinResults[0][0].fullName
+                                     });
+                                     if(notificationTemplaterRes.parsedTpl){
+                                         notification.publish(
+                                             autoJoinResults[0][0].adminGroupId,
+                                             autoJoinResults[0][0].groupName,
+                                             autoJoinResults[0][0].groupName,
+                                             autoJoinResults[0][0].senderId,
+                                             notificationTemplaterRes.parsedTpl,
+                                             38,
+                                             0, autoJoinResults[0][0].iphoneId,
+                                             0,
+                                             0,
+                                             0,
+                                             0,
+                                             1,
+                                             moment().format("YYYY-MM-DD HH:mm:ss"),
+                                             '',
+                                             0,
+                                             0);
+                                         console.log('postNotification : notification for join_group is sent successfully');
+                                     }
+                                     else{
+                                         console.log('Error in parsing notification join_group template - ',
+                                             notificationTemplaterRes.error);
+                                         console.log('postNotification : notification for join_group is sent successfully');
+                                     }
 
                             }
                             else{
@@ -197,15 +203,17 @@ router.post('/', function(req,res,next){
                                         var jsonDistanceObject = {
                                             latitude: req.body.latitude,
                                             longitude: req.body.longitude,
-                                            text: (req.body.message) ? (req.body.message) : ''
+                                            text: (req.body.message) ? (req.body.message) : '',
+                                            attachmentLink: req.st.getOnlyAttachmentName(req.body.attachmentLink),
+                                            thumbnailLink:  req.st.getOnlyAttachmentName(req.body.thumbnailLink)
                                         };
                                         message = JSON.stringify(jsonDistanceObject);
                                         break;
 
                                     case 3 :
                                         var jsonAttachObject = {
-                                            thumbnailLink:  "tn_" + req.body.attachmentLink,
-                                            attachmentLink: req.body.attachmentLink,
+                                            thumbnailLink:  req.st.getOnlyAttachmentName(req.body.thumbnailLink),
+                                            attachmentLink: req.st.getOnlyAttachmentName(req.body.attachmentLink),
                                             fileName: req.body.fileName,
                                             mimeType: req.body.mimeType,
                                             text: (req.body.message) ? (req.body.message) : ''
@@ -236,14 +244,19 @@ router.post('/', function(req,res,next){
                                     req.db.escape(autoJoinResults[0][0].groupRelationStatus) ,
                                     req.db.escape(autoJoinResults[0][0].luUser)
                                 ];
-                                var procQuery = 'CALL p_v1_ComposeMessage(' + procParams.join(',') + ')';
+                                 var contactParams = [
+                                     req.db.escape(req.st.alterEzeoneId(tokenResult[0].ezeoneId)) ,
+                                     req.db.escape(tokenResult[0].pin) ,
+                                     req.db.escape(req.body.receiverGroupId)
+                                     ];
+                                var procQuery = 'CALL p_v1_ComposeMessage(' + procParams.join(',') + ');CALL get_v1_contact(' + contactParams.join(',') + ')';
                                console.log(procQuery);
                                 req.db.query(procQuery, function (err, results) {
+                                    //console.log(results[3][0],"results[3][0]");
                                     if (!err) {
                                         /**
                                          * if not getting any error from db and proc called successfully then send response with status true
                                          **/
-
                                         if (results && results[0] && results[0].length > 0 && results[0][0].messageId) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
@@ -255,10 +268,10 @@ router.post('/', function(req,res,next){
                                                      * @TODO Write a function in stdlib which see that attachment link is having bucket url or not if not having then add it otherwise remove and add it from EZEOne standard configuration
                                                      */
                                                     attachmentObject = JSON.parse(results[0][0].message);
-                                                    attachmentObject.attachmentLink = attachmentObject.attachmentLink ? req.CONFIG.CONSTANT.GS_URL +
-                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentObject.attachmentLink : '';
-                                                    attachmentObject.thumbnailLink = attachmentObject.thumbnailLink ? req.CONFIG.CONSTANT.GS_URL +
-                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +attachmentObject.thumbnailLink : '';
+                                                    attachmentObject.attachmentLink = (attachmentObject.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentObject.attachmentLink) : '';
+                                                    attachmentObject.thumbnailLink = (attachmentObject.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +attachmentObject.thumbnailLink) : '';
 
                                                     console.log(attachmentObject,"attachmentObject");
                                                     results[0][0].message = attachmentObject;
@@ -279,60 +292,147 @@ router.post('/', function(req,res,next){
                                                 messageStatus : results[0][0].messageStatus,
                                                 priority : results[0][0].priority,
                                                 senderName : results[0][0].senderName,
-                                                senderId : results[0][0].senderId
+                                                senderId : results[0][0].senderId,
+                                                localMessageId : req.body.localMessageId
                                             };
 
                                             res.status(200).json(responseMessage);
                                             /**notification send to user to whome message is sending*/
                                             if(results[1] && results[1].length > 0){
-                                                //console.log(results[1],"results[1]");
-                                                for (var i = 0; i < results[1].length; i++ ) {
-                                                    var notificationTemplaterRes = notificationTemplater.parse('compose_message',{
+                                                console.log(results[0][0].groupId,"groupId");
+                                                console.log(results[0][0].senderId,"sender");
+                                                console.log(results[0][0].groupType,"groupType");
+                                                if(results[0][0].groupType == 0){
+                                                    senderGroupId = results[0][0].groupId;
+                                                    var notificationTemplaterRes = notificationTemplater.parse('compose_message_group',{
+                                                        senderName : results[0][0].senderName,
+                                                        groupName : results[1][0].groupName
+                                                    });
+                                                    console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                                }
+                                                else{
+                                                    senderGroupId = results[0][0].senderId;
+                                                    notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                                         senderName : results[0][0].senderName
                                                     });
-                                                    //console.log(notificationTemplaterRes,"notificationTemplaterRes");
-                                                    if(notificationTemplaterRes.parsedTpl){
-                                                        notification.publish(
-                                                            results[1][i].receiverGroupId,
-                                                            results[0][0].groupName ? results[0][0].groupName : '',
-                                                            results[0][0].groupName ? results[0][0].groupName : '',
-                                                            results[0][0].senderId,
-                                                            notificationTemplaterRes.parsedTpl,
-                                                            31,
-                                                            0, results[1][i].iphoneId ? results[1][i].iphoneId : '',
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            1,
-                                                            moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                            '',
-                                                            0,
-                                                            0,
-                                                            null,
-                                                            '',
-                                                            /** Data object property to be sent with notification **/
-                                                            {
-                                                                messageId : results[0][0].messageId,
-                                                                message : results[0][0].message,
-                                                                createdDate : moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                                messageType : req.body.messageType,
-                                                                messageStatus : 0,
-                                                                priority : req.body.priority,
-                                                                senderName : results[0][0].senderName,
-                                                                senderId : results[0][0].senderId,
-                                                                receiverId : results[1][i].receiverGroupId,
-                                                                groupId : results[0][0].groupId,
-                                                                groupType : results[0][0].groupType
-                                                            },
-                                                            null);
-                                                        console.log('postNotification : notification for compose_message is sent successfully');
+                                                }
+                                                for (var i = 0; i < results[1].length; i++ ) {
+                                                    if(autoJoinResults[0][0].groupuserid == 0){
+
+                                                        if(notificationTemplaterRes.parsedTpl){
+                                                            notification.publish(
+                                                                results[1][i].receiverGroupId,
+                                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                                results[0][0].senderId,
+                                                                notificationTemplaterRes.parsedTpl,
+                                                                31,
+                                                                0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                                                0,
+                                                                0,
+                                                                0,
+                                                                0,
+                                                                1,
+                                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                                '',
+                                                                0,
+                                                                0,
+                                                                null,
+                                                                '',
+                                                                /** Data object property to be sent with notification **/
+                                                                {
+                                                                    messageId : results[0][0].messageId,
+                                                                    message : results[0][0].message,
+                                                                    createdDate : results[0][0].createdDate,
+                                                                    messageType : results[0][0].messageType,
+                                                                    messageStatus : results[0][0].messageStatus,
+                                                                    priority : results[0][0].priority,
+                                                                    senderName : results[0][0].senderName,
+                                                                    senderId : results[0][0].senderId,
+                                                                    receiverId : results[1][i].receiverGroupId,
+                                                                    groupType : results[0][0].groupType,
+                                                                    groupId :senderGroupId,
+                                                                    adminEzeId : results[3][0].adminEzeId,
+                                                                    adminId : results[3][0].adminId,
+                                                                    groupName : results[3][0].groupName,
+                                                                    groupStatus : results[3][0].groupStatus,
+                                                                    isAdmin : results[3][0].isAdmin,
+                                                                    areMembersVisible : results[3][0].areMembersVisible,
+                                                                    isReplyRestricted : results[3][0].isReplyRestricted,
+                                                                    groupRelationStatus : results[3][0].groupRelationStatus,
+                                                                    luDate : results[3][0].luDate,
+                                                                    isRequester : results[3][0].isRequester,
+                                                                    unreadCount : results[3][0].unreadCount,
+                                                                    luUser : results[3][0].luUser,
+                                                                    aboutGroup : results[3][0].aboutGroup,
+                                                                    memberCount : results[3][0].memberCount,
+                                                                    autoJoin : results[3][0].autoJoin
+                                                                },
+                                                                null);
+                                                            console.log('postNotification : notification for compose_message is sent successfully');
+                                                        }
+                                                        else{
+                                                            console.log('Error in parsing notification compose_message template - ',
+                                                                notificationTemplaterRes.error);
+                                                            console.log('postNotification : notification for compose_message is sent successfully');
+                                                        }
                                                     }
                                                     else{
-                                                        console.log('Error in parsing notification compose_message template - ',
-                                                            notificationTemplaterRes.error);
-                                                        console.log('postNotification : notification for compose_message is sent successfully');
+                                                        if(notificationTemplaterRes.parsedTpl){
+                                                            notification.publish(
+                                                                results[1][i].receiverGroupId,
+                                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                                results[0][0].senderId,
+                                                                notificationTemplaterRes.parsedTpl,
+                                                                31,
+                                                                0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                                                0,
+                                                                0,
+                                                                0,
+                                                                0,
+                                                                1,
+                                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                                '',
+                                                                0,
+                                                                0,
+                                                                null,
+                                                                '',
+                                                                /** Data object property to be sent with notification **/
+                                                                {
+                                                                    //messageId : results[0][0].messageId,
+                                                                    //message : results[0][0].message,
+                                                                    //createdDate : results[0][0].createdDate,
+                                                                    //messageType : results[0][0].messageType,
+                                                                    //messageStatus : results[0][0].messageStatus,
+                                                                    //priority : results[0][0].priority,
+                                                                    //senderName : results[0][0].senderName,
+                                                                    //senderId : results[0][0].senderId,
+                                                                    //receiverId : results[1][i].receiverGroupId,
+                                                                    //groupId : results[0][0].groupId,
+                                                                    //groupType : results[0][0].groupType
+                                                                    messageId : results[0][0].messageId,
+                                                                    message : results[0][0].message,
+                                                                    createdDate : moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                                    messageType : req.body.messageType,
+                                                                    messageStatus : 0,
+                                                                    priority : req.body.priority,
+                                                                    senderName : results[0][0].senderName,
+                                                                    senderId : results[0][0].senderId,
+                                                                    receiverId : results[1][i].receiverGroupId,
+                                                                    groupId : senderGroupId,
+                                                                    groupType : results[0][0].groupType
+                                                                },
+                                                                null);
+                                                            console.log('postNotification : notification for compose_message is sent successfully');
+                                                        }
+                                                        else{
+                                                            console.log('Error in parsing notification compose_message template - ',
+                                                                notificationTemplaterRes.error);
+                                                            console.log('postNotification : notification for compose_message is sent successfully');
+                                                        }
                                                     }
+
                                                 }
                                             }
 
@@ -437,6 +537,8 @@ router.post('/attachment',function(req,res,next){
                  * If MIME type is other than image (parsable formats eg. JPG,PNG) than thumbnail will be picked from
                  * the available list otherwise it will be generated
                  */
+
+                console.log('req.files.attachmentFile',req.files.attachmentFile);
                 if(thumbnailConfig.imageMimeList.indexOf(req.files.attachmentFile.mimetype) != -1){
 
                     /**
@@ -626,15 +728,19 @@ router.get('/', function(req,res,next){
                                             case 3:
                                                 message = results[0][messageCounter].message;
                                                 messageObj = JSON.parse(message);
-                                                messageObj.attachmentLink = messageObj.attachmentLink ? req.CONFIG.CONSTANT.GS_URL +
-                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + messageObj.attachmentLink : '';
-                                                messageObj.thumbnailLink = messageObj.thumbnailLink ? req.CONFIG.CONSTANT.GS_URL +
-                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +messageObj.thumbnailLink : '';
+                                                messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
+                                                messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
                                                 results[0][messageCounter].message = messageObj;
                                                 break;
                                             case 2 :
                                                 message = results[0][messageCounter].message;
                                                 messageObj = JSON.parse(message);
+                                                messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
+                                                messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
                                                 results[0][messageCounter].message = messageObj;
                                                 break;
                                             default:

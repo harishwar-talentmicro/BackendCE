@@ -415,6 +415,12 @@ StdLib.prototype.getThumbnailLinkFromMime = function(mimeType){
     }
 };
 
+StdLib.prototype.getOnlyAttachmentName = function(attachmentLink){
+    var regex = new RegExp(appConfig.CONSTANT.GS_URL +
+        appConfig.CONSTANT.STORAGE_BUCKET + '/','g');
+    return (attachmentLink) ? attachmentLink.replace(regex,'') : '';
+};
+
 
 function FnSendMailEzeid(MailContent, CallBack) {
     var _this = this;

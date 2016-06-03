@@ -29,7 +29,8 @@ exports.getDBContext = function () {
         multipleStatements: true,
         waitForConnection : true,
         queueLimit : 0,
-        dateStrings : true
+        dateStrings : true,
+        charset : "utf8mb4"
     });
     return pool;
 
