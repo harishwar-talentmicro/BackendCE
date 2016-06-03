@@ -222,7 +222,7 @@ Auth.prototype.register = function(req,res,next){
             console.log('firstName is mandatory');
         }
     }
-    if(idtypeId == 2 && idtypeId == 3){
+    if(idtypeId == 2 && idtypeId == 3 && idtypeId == 4){
         error['companyName'] = 'companyName is mandatory';
         validateStatus *= false;
         console.log('companyName is mandatory');

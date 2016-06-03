@@ -205,7 +205,9 @@ router.post('/', function(req,res,next){
                                             longitude: req.body.longitude,
                                             text: (req.body.message) ? (req.body.message) : '',
                                             attachmentLink: req.st.getOnlyAttachmentName(req.body.attachmentLink),
-                                            thumbnailLink:  req.st.getOnlyAttachmentName(req.body.thumbnailLink)
+                                            thumbnailLink:  req.st.getOnlyAttachmentName(req.body.thumbnailLink),
+                                            fileName: req.body.fileName,
+                                            mimeType: req.body.mimeType
                                         };
                                         message = JSON.stringify(jsonDistanceObject);
                                         break;
@@ -725,15 +727,7 @@ router.get('/', function(req,res,next){
                                             case 0:
                                                 message = results[0][messageCounter].message;
                                                 break;
-                                            case 3:
-                                                message = results[0][messageCounter].message;
-                                                messageObj = JSON.parse(message);
-                                                messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
-                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
-                                                messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
-                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
-                                                results[0][messageCounter].message = messageObj;
-                                                break;
+
                                             case 2 :
                                                 message = results[0][messageCounter].message;
                                                 messageObj = JSON.parse(message);
@@ -743,22 +737,20 @@ router.get('/', function(req,res,next){
                                                 req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
                                                 results[0][messageCounter].message = messageObj;
                                                 break;
+                                            case 3:
+                                                message = results[0][messageCounter].message;
+                                                messageObj = JSON.parse(message);
+                                                messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
+                                                messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
+                                                results[0][messageCounter].message = messageObj;
+                                                break;
+
                                             default:
                                                 break;
                                         }
-                                        //if(results[0][messageCounter].messageType==0){
-                                        //    message = results[0][messageCounter].message;
-                                        //}
-                                        //else if(results[0][messageCounter].messageType==3){
-                                        //    message = results[0][messageCounter].message;
-                                        //    messageObj = JSON.parse(message);
-                                        //    messageObj.attachmentLink = messageObj.attachmentLink ? req.CONFIG.CONSTANT.GS_URL +
-                                        //        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + messageObj.attachmentLink : '';
-                                        //    messageObj.thumbnailLink = messageObj.thumbnailLink ? req.CONFIG.CONSTANT.GS_URL +
-                                        //        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +messageObj.thumbnailLink : '';
-                                        //    results[0][messageCounter].message = messageObj;
-                                        //    //console.log(results[0][messageCounter].message ,"testmessage");
-                                        //}
+
                                     }
                                     //console.log(results[0],"results[0]");
                                     responseMessage.status = true;
