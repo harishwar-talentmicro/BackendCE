@@ -48,13 +48,7 @@ router.post('/', function(req,res,next){
     };
     var validationFlag = true;
     var error = {};
-    /**
-     * checking whether token is exist or not,if not then error
-     **/
-    if (!req.body.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
+
     /**
      * checking messageType,priority is number or not,if not then error and set by default value
      **/
@@ -278,6 +272,10 @@ router.post('/', function(req,res,next){
                                                     break;
                                                 case 2:
                                                     attachmentObject = JSON.parse(results[0][0].message);
+                                                    attachmentObject.attachmentLink = (attachmentObject.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                    req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentObject.attachmentLink) : '';
+                                                    attachmentObject.thumbnailLink = (attachmentObject.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                    req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +attachmentObject.thumbnailLink) : '';
                                                     results[0][0].message = attachmentObject;
                                                     break;
                                                 default:
@@ -669,16 +667,11 @@ router.post('/attachment',function(req,res,next){
  * @discription : API to change admin of group
  */
 router.get('/', function(req,res,next){
-    var pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-    var limit = (req.query.limit) ? (req.query.limit):10;
-    if(req.query.timestamp){
-        if(moment(req.query.timestamp,'YYYY-MM-DD HH:mm:ss').isValid()){
-            req.query.timestamp = moment(req.query.timestamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
-        }
-    }
-    else{
-        req.query.timestamp = null;
-    }
+    /**
+     * pageNo and limit is for pagination
+     * flag: if flag is 0 then latest message will come according to pagination
+     * and if not 0 then older messages will come
+     * */
     var responseMessage = {
         status: false,
         error: {},
@@ -687,11 +680,43 @@ router.get('/', function(req,res,next){
     };
     var validationFlag = true;
     var error = {};
+    var timeStamp;
+    req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
+    req.query.limit = (req.query.limit) ? (req.query.limit):10;
+    req.query.flag = (req.query.flag) ? (req.query.flag):0;
 
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+    if(req.query.flag == 0){
+        if(req.query.timeStamp){
+            if(moment(req.query.timeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
+                 timeStamp = moment(req.query.timeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+            }
+            else{
+                error.timeStamp = 'Invalid timeStamp';
+                validationFlag *= false;
+            }
+        }
+        else{
+            timeStamp = null;
+
+        }
     }
+    else{
+        if(req.query.currentTimeStamp){
+            if(moment(req.query.currentTimeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
+                timeStamp = moment(req.query.currentTimeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+            }
+            else{
+                error.currentTimeStamp = 'Invalid timeStamp';
+                validationFlag *= false;
+            }
+        }
+        else{
+            timeStamp = null;
+
+        }
+    }
+
+
     if (isNaN(parseInt(req.query.groupId)) || (req.query.groupId) < 0 ) {
         error.groupId = 'Invalid group id';
         validationFlag *= false;
@@ -711,8 +736,9 @@ router.get('/', function(req,res,next){
                         var procParams = [
                             req.db.escape(req.query.groupId) ,
                             req.db.escape(req.query.token) ,
-                            req.db.escape(pageNo), req.db.escape(limit) ,
-                            req.db.escape(req.query.timestamp)
+                            req.db.escape(req.query.pageNo), req.db.escape(req.query.limit) ,
+                            req.db.escape(timeStamp),
+                            req.db.escape(req.query.flag)
                         ];
                         var procQuery = 'CALL p_v1_LoadMessagesofGroup(' + procParams.join(',') + ')';
                         console.log(procQuery);

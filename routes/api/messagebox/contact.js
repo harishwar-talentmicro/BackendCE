@@ -175,10 +175,6 @@ router.get('/', function(req,res,next){
     else{
         req.query.dateTime = null;
     }
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
 
     if (!validationFlag) {
         responseMessage.error = error;
@@ -338,10 +334,6 @@ router.put('/status', function(req,res,next){
     /**
      * validating for token as token,groupId,userGroupId and status
      * */
-    if (!req.body.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
     if (isNaN(parseInt(req.body.groupId))) {
         error.groupId = 'Invalid Group id';
         validationFlag *= false;
