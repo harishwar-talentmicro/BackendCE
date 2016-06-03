@@ -25,7 +25,7 @@ exports.getDBContext = function () {
         database: db_collection,
         user: 'root',
         //password: 'ezeid',
-        password: 'tesTEzeOneID*2016',
+        password: 'StesTEzeOneID*2016#S',
         multipleStatements: true,
         waitForConnection : true,
         queueLimit : 0,
