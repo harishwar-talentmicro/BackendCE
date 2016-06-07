@@ -130,7 +130,7 @@ router.post('/', function(req,res,next){
                     var autoJoinQuery = 'CALL pautojoin_before_Composing(' + autoJoinQueryParams.join(',') + ')';
 
                     req.db.query(autoJoinQuery, function (err, autoJoinResults) {
-                        console.log(autoJoinResults,"autoJoinResults");
+                        //console.log(autoJoinResults,"autoJoinResults");
                         /**
                          * if not error from db then perform further conditions
                          * */
@@ -245,7 +245,8 @@ router.post('/', function(req,res,next){
                                      req.db.escape(tokenResult[0].pin) ,
                                      req.db.escape(req.body.receiverGroupId)
                                      ];
-                                var procQuery = 'CALL p_v1_ComposeMessage(' + procParams.join(',') + ');CALL get_v1_contact(' + contactParams.join(',') + ')';
+                                 console.log(req.body.messageType,"req.body.messageType");
+                                var procQuery = 'CALL p_v1_ComposeMessage(' + procParams.join(', ') + ');CALL get_v1_contact(' + contactParams.join(', ') + ');';
                                console.log(procQuery);
                                 req.db.query(procQuery, function (err, results) {
                                     //console.log(results[3][0],"results[3][0]");
@@ -257,7 +258,8 @@ router.post('/', function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Message send successfully';
-                                            switch (results[0][0].messageType) {
+                                            //switch (results[0][0].messageType) {
+                                            switch (req.body.messageType) {
                                                 case 3:
 
                                                     /**
@@ -288,7 +290,7 @@ router.post('/', function(req,res,next){
                                                 messageId : results[0][0].messageId,
                                                 message : results[0][0].message,
                                                 createdDate : results[0][0].createdDate,
-                                                messageType : results[0][0].messageType,
+                                                messageType : req.body.messageType,
                                                 messageStatus : results[0][0].messageStatus,
                                                 priority : results[0][0].priority,
                                                 senderName : results[0][0].senderName,
@@ -316,7 +318,11 @@ router.post('/', function(req,res,next){
                                                         senderName : results[0][0].senderName
                                                     });
                                                 }
+                                                console.log(results[0][0].messageType,"messageType");
                                                 for (var i = 0; i < results[1].length; i++ ) {
+                                                    /**
+                                                     * if relation nopt exist then send all details to receiver of sender
+                                                     * */
                                                     if(autoJoinResults[0][0].groupuserid == 0){
 
                                                         if(notificationTemplaterRes.parsedTpl){
@@ -341,32 +347,38 @@ router.post('/', function(req,res,next){
                                                                 '',
                                                                 /** Data object property to be sent with notification **/
                                                                 {
-                                                                    messageId : results[0][0].messageId,
-                                                                    message : results[0][0].message,
-                                                                    createdDate : results[0][0].createdDate,
-                                                                    messageType : results[0][0].messageType,
-                                                                    messageStatus : results[0][0].messageStatus,
-                                                                    priority : results[0][0].priority,
-                                                                    senderName : results[0][0].senderName,
-                                                                    senderId : results[0][0].senderId,
-                                                                    receiverId : results[1][i].receiverGroupId,
-                                                                    groupType : results[0][0].groupType,
-                                                                    groupId :senderGroupId,
-                                                                    adminEzeId : results[3][0].adminEzeId,
-                                                                    adminId : results[3][0].adminId,
-                                                                    groupName : results[3][0].groupName,
-                                                                    groupStatus : results[3][0].groupStatus,
-                                                                    isAdmin : results[3][0].isAdmin,
-                                                                    areMembersVisible : results[3][0].areMembersVisible,
-                                                                    isReplyRestricted : results[3][0].isReplyRestricted,
-                                                                    groupRelationStatus : results[3][0].groupRelationStatus,
-                                                                    luDate : results[3][0].luDate,
-                                                                    isRequester : results[3][0].isRequester,
-                                                                    unreadCount : results[3][0].unreadCount,
-                                                                    luUser : results[3][0].luUser,
-                                                                    aboutGroup : results[3][0].aboutGroup,
-                                                                    memberCount : results[3][0].memberCount,
-                                                                    autoJoin : results[3][0].autoJoin
+                                                                    isRelationExist : 0,
+                                                                    messageList : {
+                                                                        messageId : results[0][0].messageId,
+                                                                        message : results[0][0].message,
+                                                                        createdDate : results[0][0].createdDate,
+                                                                        messageType : req.body.messageType,
+                                                                        messageStatus : results[0][0].messageStatus,
+                                                                        priority : results[0][0].priority,
+                                                                        senderName : results[0][0].senderName,
+                                                                        senderId : results[0][0].senderId,
+                                                                        receiverId : results[1][i].receiverGroupId,
+                                                                        groupType : results[0][0].groupType
+                                                                    },
+                                                                    contactList : {
+                                                                        groupId :senderGroupId,
+                                                                        adminEzeId : results[3][0].adminEzeId,
+                                                                        adminId : results[3][0].adminId,
+                                                                        groupName : results[3][0].groupName,
+                                                                        groupStatus : results[3][0].groupStatus,
+                                                                        isAdmin : results[3][0].isAdmin,
+                                                                        areMembersVisible : results[3][0].areMembersVisible,
+                                                                        isReplyRestricted : results[3][0].isReplyRestricted,
+                                                                        groupRelationStatus : results[3][0].groupRelationStatus,
+                                                                        luDate : results[3][0].luDate,
+                                                                        isRequester : results[3][0].isRequester,
+                                                                        unreadCount : results[3][0].unreadCount,
+                                                                        luUser : results[3][0].luUser,
+                                                                        aboutGroup : results[3][0].aboutGroup,
+                                                                        memberCount : results[3][0].memberCount,
+                                                                        autoJoin : results[3][0].autoJoin
+                                                                    }
+
                                                                 },
                                                                 null);
                                                             console.log('postNotification : notification for compose_message is sent successfully');
@@ -400,28 +412,22 @@ router.post('/', function(req,res,next){
                                                                 '',
                                                                 /** Data object property to be sent with notification **/
                                                                 {
-                                                                    //messageId : results[0][0].messageId,
-                                                                    //message : results[0][0].message,
-                                                                    //createdDate : results[0][0].createdDate,
-                                                                    //messageType : results[0][0].messageType,
-                                                                    //messageStatus : results[0][0].messageStatus,
-                                                                    //priority : results[0][0].priority,
-                                                                    //senderName : results[0][0].senderName,
-                                                                    //senderId : results[0][0].senderId,
-                                                                    //receiverId : results[1][i].receiverGroupId,
-                                                                    //groupId : results[0][0].groupId,
-                                                                    //groupType : results[0][0].groupType
-                                                                    messageId : results[0][0].messageId,
-                                                                    message : results[0][0].message,
-                                                                    createdDate : moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                                    messageType : req.body.messageType,
-                                                                    messageStatus : 0,
-                                                                    priority : req.body.priority,
-                                                                    senderName : results[0][0].senderName,
-                                                                    senderId : results[0][0].senderId,
-                                                                    receiverId : results[1][i].receiverGroupId,
-                                                                    groupId : senderGroupId,
-                                                                    groupType : results[0][0].groupType
+                                                                    isRelationExist : 1,
+                                                                    messageList:{
+                                                                        messageId : results[0][0].messageId,
+                                                                        message : results[0][0].message,
+                                                                        createdDate : results[0][0].createdDate,
+                                                                        messageType : req.body.messageType,
+                                                                        messageStatus : results[0][0].messageStatus,
+                                                                        priority : req.body.priority,
+                                                                        senderName : results[0][0].senderName,
+                                                                        senderId : results[0][0].senderId,
+                                                                        receiverId : results[1][i].receiverGroupId,
+                                                                        groupId : senderGroupId,
+                                                                        groupType : results[0][0].groupType
+                                                                    },
+                                                                    contactList : {
+                                                                    }
                                                                 },
                                                                 null);
                                                             console.log('postNotification : notification for compose_message is sent successfully');
@@ -684,7 +690,7 @@ router.get('/', function(req,res,next){
     var error = {};
     var timeStamp;
     req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-    req.query.limit = (req.query.limit) ? (req.query.limit):10;
+    req.query.limit = (req.query.limit) ? (req.query.limit):100;
     req.query.flag = (req.query.flag) ? (req.query.flag):0;
 
     if(req.query.flag == 0){
