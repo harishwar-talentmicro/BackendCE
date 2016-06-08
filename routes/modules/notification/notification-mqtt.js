@@ -11,19 +11,19 @@
 var fs = require('fs');
 var uuid = require('node-uuid');
 var amqp = require('amqp');
-var mqtt    = require('mqtt');
+//var mqtt    = require('mqtt');
 
 var CONFIG = require('../../../ezeone-config.json');
 
-function MqttFalse(){};
-function MqttFalseClient(){};
-
-MqttFalse.prototype.connect = function(){
-    var mqttFalseClient =  MqttFalseClient();
-    return mqttFalseClient;
-};
-MqttFalse.prototype.publish = function(){};
-MqttFalseClient.prototype.publish = function(topic,payload){};
+//function MqttFalse(){};
+//function MqttFalseClient(){};
+//
+//MqttFalse.prototype.connect = function(){
+//    var mqttFalseClient =  MqttFalseClient();
+//    return mqttFalseClient;
+//};
+//MqttFalse.prototype.publish = function(){};
+//MqttFalseClient.prototype.publish = function(topic,payload){};
 
 
 //var mqttClient  = mqtt.connect("tcp://"+CONFIG.MQTT.HOST+":"+CONFIG.MQTT.PORT, {
@@ -67,8 +67,12 @@ if(amqpConn){
     amqpConn.on('error',function(err){
         console.log(err);
         console.log('Connection generated an error event');
-        amqpConn.disconnect();
-        amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
+        setImmediate(function(){
+            setTimeout(function(){
+                amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
+
+            },500);
+        });
     });
 }
 
@@ -81,9 +85,11 @@ function NotificationMqtt(){
             });
 
             amqpConn.on('error',function(){
-                console.log('Connection generated an error event');
-                amqpConn.disconnect();
-                amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
+                setImmediate(function(){
+                    setTimeout(function(){
+                        amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
+                    },500);
+                });
             });
         }
     }
