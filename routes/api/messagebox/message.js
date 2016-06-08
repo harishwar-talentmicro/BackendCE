@@ -376,7 +376,8 @@ router.post('/', function(req,res,next){
                                                                         luUser : results[3][0].luUser,
                                                                         aboutGroup : results[3][0].aboutGroup,
                                                                         memberCount : results[3][0].memberCount,
-                                                                        autoJoin : results[3][0].autoJoin
+                                                                        autoJoin : results[3][0].autoJoin,
+                                                                        groupType : results[0][0].groupType
                                                                     }
 
                                                                 },

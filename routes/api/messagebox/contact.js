@@ -166,7 +166,6 @@ router.get('/', function(req,res,next){
      */
 
     var groupId;
-    var isWeb   = (req.query.isWeb ) ? (req.query.isWeb ) :0;
     if(req.query.dateTime){
         if(moment(req.query.dateTime,'YYYY-MM-DD HH:mm:ss').isValid()){
             req.query.dateTime = moment(req.query.dateTime,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
@@ -194,25 +193,24 @@ router.get('/', function(req,res,next){
                         req.db.escape(req.query.token) ,
                         req.db.escape(req.query.dateTime)
                     ];
-                    var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(',') + ')';
+                    var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(' ,') + ')';
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, contactResults) {
                         if (!err) {
-                            //console.log(results);
+                            console.log(contactResults,"contactResults");
                             /**
                              *if results are there then check for condition that its web or not
                              * */
                             if (contactResults && contactResults[0] && contactResults[0].length > 0) {
-                                var contactList  =[];
                                 /**
                                  *if request comes from web then call PGetUnreadMessageCountofGroup procedure
                                  * to get unread count of messages because mobile people will save this count in their local sqllite
                                  * */
-                                if (isWeb == 1) {
                                     var unreadCountqueryParams = req.db.escape(req.query.token);
                                     var unreadCountQuery = 'CALL PGetUnreadMessageCountofGroup(' + unreadCountqueryParams + ')';
-                                    //console.log(unreadCountQuery);
+                                    console.log(unreadCountQuery,"unreadCountQuery");
                                     req.db.query(unreadCountQuery, function (err, countResults) {
+                                        console.log(countResults,"countResults");
                                         if (countResults && countResults[0] && countResults[0].length > 0) {
                                             for (var i = 0; i < contactResults[0].length; i++) {
                                                 /**
@@ -239,21 +237,17 @@ router.get('/', function(req,res,next){
                                             };
                                             res.status(200).json(responseMessage);
                                         }
+                                        else{
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Contact list loaded successfully';
+                                            responseMessage.data = {
+                                                contactList:contactResults[0]
+                                            };
+                                            res.status(200).json(responseMessage);
+                                        }
                                     });
 
-                                }
-                                else{
-                                    /**
-                                     * if req is not for web then simply give the result from first proc i.e contact list
-                                     * */
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Contact list loaded successfully';
-                                    responseMessage.data = {
-                                        contactList:contactResults[0]
-                                    };
-                                    res.status(200).json(responseMessage);
-                                }
                             }
                             else{
                                 responseMessage.status = true;
