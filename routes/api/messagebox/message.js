@@ -128,9 +128,9 @@ router.post('/', function(req,res,next){
                         req.db.escape(req.body.receiverGroupId)
                     ];
                     var autoJoinQuery = 'CALL pautojoin_before_Composing(' + autoJoinQueryParams.join(',') + ')';
-
+                    console.log(autoJoinQuery,"autoJoinQuery");
                     req.db.query(autoJoinQuery, function (err, autoJoinResults) {
-                        //console.log(autoJoinResults,"autoJoinResults");
+                        console.log(autoJoinResults,"autoJoinResults");
                         /**
                          * if not error from db then perform further conditions
                          * */
@@ -321,10 +321,10 @@ router.post('/', function(req,res,next){
                                                 console.log(results[0][0].messageType,"messageType");
                                                 for (var i = 0; i < results[1].length; i++ ) {
                                                     /**
-                                                     * if relation nopt exist then send all details to receiver of sender
+                                                     * if relation not exist then send all sender details to receiver
                                                      * */
                                                     if(autoJoinResults[0][0].groupuserid == 0){
-
+                                                        console.log(autoJoinResults[0][0].groupuserid,"groupuserid");
                                                         if(notificationTemplaterRes.parsedTpl){
                                                             notification.publish(
                                                                 results[1][i].receiverGroupId,
@@ -391,6 +391,7 @@ router.post('/', function(req,res,next){
                                                         }
                                                     }
                                                     else{
+                                                        console.log(autoJoinResults[0][0].groupuserid,"groupuserid2");
                                                         if(notificationTemplaterRes.parsedTpl){
                                                             notification.publish(
                                                                 results[1][i].receiverGroupId,
@@ -428,6 +429,23 @@ router.post('/', function(req,res,next){
                                                                         groupType : results[0][0].groupType
                                                                     },
                                                                     contactList : {
+                                                                        groupId :senderGroupId,
+                                                                        adminEzeId : results[3][0].adminEzeId,
+                                                                        adminId : results[3][0].adminId,
+                                                                        groupName : results[3][0].groupName,
+                                                                        groupStatus : results[3][0].groupStatus,
+                                                                        isAdmin : results[3][0].isAdmin,
+                                                                        areMembersVisible : results[3][0].areMembersVisible,
+                                                                        isReplyRestricted : results[3][0].isReplyRestricted,
+                                                                        groupRelationStatus : results[3][0].groupRelationStatus,
+                                                                        luDate : results[3][0].luDate,
+                                                                        isRequester : results[3][0].isRequester,
+                                                                        unreadCount : results[3][0].unreadCount,
+                                                                        luUser : results[3][0].luUser,
+                                                                        aboutGroup : results[3][0].aboutGroup,
+                                                                        memberCount : results[3][0].memberCount,
+                                                                        autoJoin : results[3][0].autoJoin,
+                                                                        groupType : results[0][0].groupType
                                                                     }
                                                                 },
                                                                 null);
