@@ -329,7 +329,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                                 if (!(SearchResult[0][0].isLoggedIn)) {
 
                                     if (SearchResult[1]) {
-                                        var individualResList = [];
+                                        
                                         for (var i = 0; i < SearchResult[1].length; i++) {
                                             console.log('SearchResult[1][i]',SearchResult[1][i]);
                                             console.log('Open Status of SearchResult : ', st.getOpenStatus(SearchResult[1][i].OpenStatus,SearchResult[1][i].wh));
@@ -337,7 +337,8 @@ Search.prototype.searchKeyword = function(req,res,next){
                                             SearchResult[1][i]['OpenStatus'] = st.getOpenStatus(SearchResult[1][i].OpenStatus,SearchResult[1][i].wh);
 
                                             if(SearchResult[1][i].IDTypeID == 1){
-                                                individualResList.push(i);
+                                                //individualResList.push(i);
+                                                SearchResult[1].splice(i,1);
                                             }
 
 
