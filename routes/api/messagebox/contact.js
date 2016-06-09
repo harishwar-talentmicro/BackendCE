@@ -423,8 +423,8 @@ router.put('/status', function(req,res,next){
 
 
                                     console.log('FnUpdateUserStatus: User status updated successfully');
-
-                                    if(updateResult[0][0].status = 1){
+                                    console.log(updateResult[0][0].status,"updateResult[0][0].status");
+                                    if(updateResult[0][0].status == 1){
                                         var notificationTemplaterRes = notificationTemplater.parse('accept_request',{
                                             adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
                                             groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''

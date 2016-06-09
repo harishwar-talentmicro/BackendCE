@@ -329,7 +329,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                                 if (!(SearchResult[0][0].isLoggedIn)) {
 
                                     if (SearchResult[1]) {
-                                        
+
                                         for (var i = 0; i < SearchResult[1].length; i++) {
                                             console.log('SearchResult[1][i]',SearchResult[1][i]);
                                             console.log('Open Status of SearchResult : ', st.getOpenStatus(SearchResult[1][i].OpenStatus,SearchResult[1][i].wh));
@@ -508,8 +508,14 @@ Search.prototype.searchInformation = function(req,res,next){
         //console.log(ezeTerm,"ezeTerm");
         var CurrentDate = req.query.CurrentDate;
         var IPAddress = req._remoteAddress; //(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
-        var latitude = (req.query.lat) ? req.query.lat : 0;
-        var longitude = (req.query.lng) ? req.query.lng : 0;
+        var latitude = (req.query.lat) ? parseInt(req.query.lat) : 0.00;
+        if(isNaN(latitude)){
+            latitude =0.00;
+        }
+        var longitude = (req.query.lng) ? parseInt(req.query.lng) : 0.00;
+        if(isNaN(longitude)){
+            longitude =0.00;
+        }
         var output = [];
 
         var WorkingDate;

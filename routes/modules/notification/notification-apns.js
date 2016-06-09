@@ -33,7 +33,7 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos){
         note.alert = { "body" : payload.g_title +' : ' +payload.message, "action-loc-key" : "Play" ,
             "launch-image" :
                 "mysplash.png","JsonResult":JSON.stringify(payload)};
-        note.payload = payload;
+        note.payload = JSON.stringify(payload);
 
         note.device = myDevice;
 

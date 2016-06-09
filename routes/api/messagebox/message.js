@@ -153,7 +153,7 @@ router.post('/', function(req,res,next){
 
                                      var notificationTemplaterRes = notificationTemplater.parse('join_group',{
                                          groupName : autoJoinResults[0][0].groupName,
-                                         fullName : autoJoinResults[0][0].fullName
+                                         fullName : tokenResult[0].fullName
                                      });
                                      if(notificationTemplaterRes.parsedTpl){
                                          notification.publish(
@@ -325,6 +325,7 @@ router.post('/', function(req,res,next){
                                                      * */
                                                     if(autoJoinResults[0][0].groupuserid == 0){
                                                         console.log(autoJoinResults[0][0].groupuserid,"groupuserid");
+                                                        console.log((results[1][i].iphoneId),"iphoneId");
                                                         if(notificationTemplaterRes.parsedTpl){
                                                             notification.publish(
                                                                 results[1][i].receiverGroupId,
@@ -392,6 +393,7 @@ router.post('/', function(req,res,next){
                                                     }
                                                     else{
                                                         console.log(autoJoinResults[0][0].groupuserid,"groupuserid2");
+                                                        console.log((results[1][i].iphoneId),"iphoneId");
                                                         if(notificationTemplaterRes.parsedTpl){
                                                             notification.publish(
                                                                 results[1][i].receiverGroupId,

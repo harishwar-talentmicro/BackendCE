@@ -128,7 +128,7 @@ router.post('/', function(req,res,next){
                                         autoJoin : req.body.autoJoin,
                                         adminEzeId : tokenResult[0].ezeoneId,
                                         adminId : tokenResult[0].groupId,
-                                        groupStatus : 1,
+                                        groupStatus : 0,
                                         groupRelationStatus : 1,
                                         groupType : 0,
                                         isAdmin : 1,
@@ -1321,16 +1321,16 @@ router.delete('/:groupId', function(req,res,next){
              * validating token of login user
              * */
 
-            req.st.validateToken(req.body.token, function (err, tokenResult) {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if ((!err) && tokenResult) {
                     var procParams = [
                         req.db.escape(req.params.groupId) ,
-                        req.db.escape(req.body.token)
+                        req.db.escape(req.query.token)
                     ];
                     /**
                      * calling procedure to delete group by admin
                      * */
-                        var procQuery = 'CALL pDeleteGroup(' + procParams.join(',') + ')';
+                    var procQuery = 'CALL pDeleteGroup(' + procParams.join(',') + ')';
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, deleteGroupResults) {
                         if (!err){
@@ -1339,50 +1339,50 @@ router.delete('/:groupId', function(req,res,next){
                                 && deleteGroupResults[0].length>0
                                 && deleteGroupResults[0][0].groupId) {
 
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Group deleted successfully';
-                                    responseMessage.data = null;
-                                    res.status(200).json(responseMessage);
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Group deleted successfully';
+                                responseMessage.data = null;
+                                res.status(200).json(responseMessage);
 
-                                    console.log(deleteGroupResults[1],"deleteGroupResults");
-                                    if(deleteGroupResults[1] && deleteGroupResults[1].length>0){
-                                        for (var i = 0; i < deleteGroupResults[1].length; i++ ) {
-                                            var notificationTemplaterRes = notificationTemplater.parse('delete_group',{
-                                                groupName : deleteGroupResults[0][0].groupName
-                                            });
-                                            console.log(notificationTemplaterRes,"notificationTemplaterRes");
-                                            if(notificationTemplaterRes.parsedTpl){
-                                                notification.publish(
-                                                    deleteGroupResults[1][i].memberGroupId,
-                                                    deleteGroupResults[0][0].groupName,
-                                                    deleteGroupResults[0][0].groupName,
-                                                    deleteGroupResults[0][0].groupId,
-                                                    notificationTemplaterRes.parsedTpl,
-                                                    36,
-                                                    0, 0,
-                                                    0,
-                                                    0,
-                                                    0,
-                                                    0,
-                                                    1,
-                                                    moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                    '',
-                                                    0,
-                                                    0);
-                                                console.log('postNotification : notification for delete_group is sent successfully');
-                                            }
-                                            else{
-                                                console.log('Error in parsing notification delete_group template - ',
-                                                    notificationTemplaterRes.error);
-                                                console.log('postNotification : notification for delete_group is sent successfully');
-                                            }
+                                console.log(deleteGroupResults[1],"deleteGroupResults");
+                                if(deleteGroupResults[1] && deleteGroupResults[1].length>0){
+                                    for (var i = 0; i < deleteGroupResults[1].length; i++ ) {
+                                        var notificationTemplaterRes = notificationTemplater.parse('delete_group',{
+                                            groupName : deleteGroupResults[0][0].groupName
+                                        });
+                                        console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                        if(notificationTemplaterRes.parsedTpl){
+                                            notification.publish(
+                                                deleteGroupResults[1][i].memberGroupId,
+                                                deleteGroupResults[0][0].groupName,
+                                                deleteGroupResults[0][0].groupName,
+                                                deleteGroupResults[0][0].groupId,
+                                                notificationTemplaterRes.parsedTpl,
+                                                36,
+                                                0, 0,
+                                                0,
+                                                0,
+                                                0,
+                                                0,
+                                                1,
+                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                '',
+                                                0,
+                                                0);
+                                            console.log('postNotification : notification for delete_group is sent successfully');
                                         }
-
+                                        else{
+                                            console.log('Error in parsing notification delete_group template - ',
+                                                notificationTemplaterRes.error);
+                                            console.log('postNotification : notification for delete_group is sent successfully');
+                                        }
                                     }
-                            /**
-                             * if admin is not calling this api then return error
-                             * */
+
+                                }
+                                /**
+                                 * if admin is not calling this api then return error
+                                 * */
 
                             }
                             else{
