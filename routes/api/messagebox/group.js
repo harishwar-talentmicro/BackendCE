@@ -430,12 +430,14 @@ router.post('/members', function(req,res,next){
                                 var contactParams = [
                                     req.db.escape(addMemberResult[0][0].groupName) ,
                                     req.db.escape(null) ,
-                                    req.db.escape(addMemberResult[0][0].userGroupId)
+                                    req.db.escape(req.body.groupId)
                                 ];
                                 var contactQuery = 'CALL get_v1_contact(' + contactParams.join(',') + ')';
+                                console.log(contactQuery,"contactQuery");
                                 req.db.query(contactQuery, function (err, contactGroupResult) {
+                                    console.log(contactGroupResult,"contactGroupResult");
                                     if(!err){
-                                        //console.log(addMemberResult[0][0].groupRelationStatus,"groupRelationStatus");
+                                        //console.log(contactGroupResult,groupRelationStatus);
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Member added to group successfully';
@@ -482,10 +484,11 @@ router.post('/members', function(req,res,next){
                                                     adminId : contactGroupResult[0][0].adminId,
                                                     groupName : contactGroupResult[0][0].groupName,
                                                     groupStatus : contactGroupResult[0][0].groupStatus,
-                                                    isAdmin : contactGroupResult[0][0].isAdmin,
+                                                    isAdmin : contactGroupResult[0][0].isAdminNew,
                                                     areMembersVisible : contactGroupResult[0][0].areMembersVisible,
                                                     isReplyRestricted : contactGroupResult[0][0].isReplyRestricted,
                                                     groupRelationStatus : addMemberResult[0][0].groupRelationStatus,
+                                                    groupType : 0,
                                                     luDate : contactGroupResult[0][0].luDate,
                                                     isRequester : contactGroupResult[0][0].isRequester,
                                                     unreadCount : contactGroupResult[0][0].unreadCount,

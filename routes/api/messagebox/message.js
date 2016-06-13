@@ -254,6 +254,7 @@ router.post('/', function(req,res,next){
                                         /**
                                          * if not getting any error from db and proc called successfully then send response with status true
                                          **/
+                                        console.log(results,"results");
                                         if (results && results[0] && results[0].length > 0 && results[0][0].messageId) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
@@ -368,7 +369,7 @@ router.post('/', function(req,res,next){
                                                                         adminId : results[3][0].adminId,
                                                                         groupName : results[3][0].groupName,
                                                                         groupStatus : results[3][0].groupStatus,
-                                                                        isAdmin : results[3][0].isAdmin,
+                                                                        isAdmin : results[3][0].isAdminNew,
                                                                         areMembersVisible : results[3][0].areMembersVisible,
                                                                         isReplyRestricted : results[3][0].isReplyRestricted,
                                                                         groupRelationStatus : results[3][0].groupRelationStatus,
@@ -437,7 +438,7 @@ router.post('/', function(req,res,next){
                                                                         adminId : results[3][0].adminId,
                                                                         groupName : results[3][0].groupName,
                                                                         groupStatus : results[3][0].groupStatus,
-                                                                        isAdmin : results[3][0].isAdmin,
+                                                                        isAdmin : results[3][0].isAdminNew,
                                                                         areMembersVisible : results[3][0].areMembersVisible,
                                                                         isReplyRestricted : results[3][0].isReplyRestricted,
                                                                         groupRelationStatus : results[3][0].groupRelationStatus,
