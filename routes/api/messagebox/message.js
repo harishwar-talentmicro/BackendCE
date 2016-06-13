@@ -360,7 +360,7 @@ router.post('/', function(req,res,next){
                                                                         senderId : results[0][0].senderId,
                                                                         receiverId : results[1][i].receiverGroupId,
                                                                         groupType : results[0][0].groupType,
-                                                                        groupId : senderGroupId,
+                                                                        groupId : senderGroupId
                                                                     },
                                                                     contactList : {
                                                                         groupId :senderGroupId,
