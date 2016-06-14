@@ -32,14 +32,15 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos){
         //note.sound = "notification-beep.wav";
         note.alert = { "body" : payload.g_title +' : ' +payload.message, "action-loc-key" : "Play" ,
             "launch-image" :
-                "mysplash.png","JsonResult":JSON.stringify(payload)};
-        note.payload = JSON.stringify(payload);
+                //"mysplash.png","JsonResult":JSON.stringify(payload)};
+                "mysplash.png"};
+        note.payload = payload;
 
         note.device = myDevice;
 
         var callback = function(errorNum, notification){
             console.log('Error is: %s', errorNum);
-            console.log("Note " + notification);
+            console.log("Note ", notification);
         };
         var options = {
 
@@ -54,6 +55,7 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos){
             enhanced: true,
             cacheLength: 100
         };
+        console.log('options',options);
             var apnsConnection = new apn.Connection(options);
             apnsConnection.pushNotification(note, myDevice);
     }

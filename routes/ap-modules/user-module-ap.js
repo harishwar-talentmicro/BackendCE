@@ -102,7 +102,7 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
         res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
         res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
 
-        var EZEID = (req.body.EZEID) ? alterEzeoneId(req.body.EZEID) : '';
+        var EZEID = (req.body.EZEID) ? req.st.alterEzeoneId(req.body.EZEID) : '';
         var EZEIDVerifiedID = (req.body.EZEIDVerifiedID) ? (req.body.EZEIDVerifiedID) : '';
         var CategoryID = req.body.CategoryID;
         if (CategoryID == null || CategoryID == '') {
@@ -368,8 +368,8 @@ User_AP.prototype.updateRedFlagAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var RedFlag = req.body.RedFlag;
         var Token = req.body.Token;
-        var FromEZEID =alterEzeoneId(req.body.FromEZEID);
-        var ToEZEID =alterEzeoneId(req.body.ToEZEID);
+        var FromEZEID = req.st.alterEzeoneId(req.body.FromEZEID);
+        var ToEZEID = req.st.alterEzeoneId(req.body.ToEZEID);
         var Message =req.body.Message;
 
 

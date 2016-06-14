@@ -143,7 +143,7 @@ NotificationMqtt.prototype.checkQueue = function(topic,callback){
         topic,
         { passive : false,durable : true,exclusive : false,autoDelete : false},
         function(queRef){
-            var exchange = amqpConn.exchange();
+            //var exchange = amqpConn.exchange();
             if(callback){
                 callback();
             }
@@ -156,7 +156,7 @@ NotificationMqtt.prototype.createQueue = function(topic,callback){
         topic,
         { passive : false,durable : true,exclusive : false,autoDelete : false},
         function(queRef){
-            var exchange = amqpConn.exchange();
+            //var exchange = amqpConn.exchange();
             if(callback){
                 callback();
             }

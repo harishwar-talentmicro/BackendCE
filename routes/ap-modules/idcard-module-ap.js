@@ -36,7 +36,7 @@ IDCard_AP.prototype.updateIdCardPrintAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.body.Token;
-        var EZEID =alterEzeoneId(req.body.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.body.EZEID);
 
         var RtnMessage = {
             IsUpdated: false
