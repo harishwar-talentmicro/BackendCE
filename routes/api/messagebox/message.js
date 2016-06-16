@@ -877,6 +877,151 @@ router.get('/', function(req,res,next){
     }
 });
 
+
+
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @param token* <string> token of login user
+ * @param messageIdList <JSON Array of integers>
+ * @discription : API to delete message which can be multipe or single
+ */
+router.post('/delete', function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+    /**
+     * validating that input p
+     * */
+    if(req.is('json')){
+        var messageIdList = req.body.messageIdList;
+        console.log(req.body,"req.body");
+        if(!messageIdList){
+            error.messageIdList = 'Invalid message Id';
+            validationFlag *= false;
+        }
+        if (!validationFlag) {
+            responseMessage.error = error;
+            responseMessage.message = 'Please check the errors';
+            res.status(400).json(responseMessage);
+            console.log(responseMessage);
+        }
+        else {
+            try {
+                req.st.validateToken(req.body.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            var comDeleteMessageQuery = "";
+                            for (var i = 0; i < messageIdList.length; i++) {
+                                var procParams = [
+                                    req.db.escape(req.body.token) ,
+                                    req.db.escape(messageIdList[i].messageId)
+                                ];
+                                var procQuery = 'CALL p_v1_deletemessage(' + procParams.join(',') + ');';
+                                comDeleteMessageQuery += procQuery;
+                                console.log(comDeleteMessageQuery);
+                            }
+                            req.db.query(comDeleteMessageQuery, function (err, deleteMessageResults) {
+                                if (!err) {
+                                    //console.log(results,"results");
+                                    if (deleteMessageResults && deleteMessageResults[0] && deleteMessageResults[0].length>0) {
+                                        var outputArray=[];
+                                        //id = insertResult[0][0] ? insertResult[0][0].id : 0;
+                                        for(var j=0;j<deleteMessageResults.length/2;j++){
+                                            var result = {};
+                                            var count = (j) ? 2 * j : 0;
+                                            result.messageId = messageIdList[j].messageId;
+                                            if(deleteMessageResults[count][0]._e == 'DELETED'){
+                                                result.status = true;
+                                            }
+                                            else{
+                                                result.status = false;
+                                            }
+
+                                            outputArray.push(result);
+                                        }
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Message is deleted successfully';
+                                        responseMessage.data = {
+                                            messageIdList : outputArray
+                                        };
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Message is not deleted';
+                                        responseMessage.data = {
+                                            messageIdList : []
+                                        };
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    responseMessage.message = 'An error occurred !';
+                                    res.status(500).json(responseMessage);
+                                    console.log('Error : p_v1_deletemessage ', err);
+                                    var errorDate = new Date();
+                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                                }
+                            });
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'invalid token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('Invalid token');
+                        }
+                        var messageObj;
+                    }
+                    else {
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'An error occurred !';
+                        res.status(500).json(responseMessage);
+                        console.log('Error :', err);
+                        var errorDate = new Date();
+                        console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    }
+                });
+
+            }
+            catch (ex) {
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'An error occurred !';
+                res.status(500).json(responseMessage);
+                console.log('Error delete_message : ', ex);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+            }
+        }
+    }
+    else{
+        responseMessage.error = "Accepted content type is json only";
+        res.status(400).json(responseMessage);
+    }
+});
+
 module.exports = router;
 
 
