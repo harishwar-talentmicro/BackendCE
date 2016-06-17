@@ -929,6 +929,7 @@ router.post('/delete', function(req,res,next){
                                 var procQuery = 'CALL p_v1_deletemessage(' + procParams.join(',') + ');';
                                 comDeleteMessageQuery += procQuery;
                                 console.log(comDeleteMessageQuery);
+                                console.log(procQuery);
                             }
                             req.db.query(comDeleteMessageQuery, function (err, deleteMessageResults) {
                                 if (!err) {
