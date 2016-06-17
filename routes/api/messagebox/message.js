@@ -711,40 +711,37 @@ router.get('/', function(req,res,next){
     };
     var validationFlag = true;
     var error = {};
-    var timeStamp;
     req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
     req.query.limit = (req.query.limit) ? (req.query.limit):100;
     req.query.flag = (req.query.flag) ? (req.query.flag):0;
 
-    if(req.query.flag == 0){
-        if(req.query.timeStamp){
-            if(moment(req.query.timeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
-                 timeStamp = moment(req.query.timeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
-            }
-            else{
-                error.timeStamp = 'Invalid timeStamp';
-                validationFlag *= false;
-            }
+    if(req.query.lastSyncTimeStamp){
+        if(moment(req.query.lastSyncTimeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
+            req.query.lastSyncTimeStamp = moment(req.query.lastSyncTimeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
         }
         else{
-            timeStamp = null;
-
+            error.lastSyncTimeStamp = 'Invalid timeStamp';
+            validationFlag *= false;
         }
     }
     else{
-        if(req.query.currentTimeStamp){
-            if(moment(req.query.currentTimeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
-                timeStamp = moment(req.query.currentTimeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
-            }
-            else{
-                error.currentTimeStamp = 'Invalid timeStamp';
-                validationFlag *= false;
-            }
+        req.query.lastSyncTimeStamp = null;
+
+    }
+
+    if(req.query.currentTimeStamp){
+        if(moment(req.query.currentTimeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
+            req.query.currentTimeStamp = moment(req.query.currentTimeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
         }
         else{
-            timeStamp = null;
-
+            error.currentTimeStamp = 'Invalid timeStamp';
+            validationFlag *= false;
         }
+    }
+    else{
+        error.currentTimeStamp = 'Invalid timeStamp';
+        validationFlag *= false;
+
     }
 
 
@@ -768,8 +765,8 @@ router.get('/', function(req,res,next){
                             req.db.escape(req.query.groupId) ,
                             req.db.escape(req.query.token) ,
                             req.db.escape(req.query.pageNo), req.db.escape(req.query.limit) ,
-                            req.db.escape(timeStamp),
-                            req.db.escape(req.query.flag)
+                            req.db.escape( req.query.lastSyncTimeStamp),
+                            req.db.escape(req.query.currentTimeStamp)
                         ];
                         var procQuery = 'CALL p_v1_LoadMessagesofGroup(' + procParams.join(',') + ')';
                         console.log(procQuery);
