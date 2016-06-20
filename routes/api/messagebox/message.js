@@ -774,6 +774,7 @@ router.get('/', function(req,res,next){
                             if (!err) {
                                 //console.log(results,"results");
                                 if (results && results[0] && results[0].length > 0) {
+                                    var messageObj;
                                     for(var messageCounter = 0;messageCounter < results[0].length;messageCounter++){
                                         switch (results[0][messageCounter].messageType) {
                                             case 0:
@@ -820,7 +821,9 @@ router.get('/', function(req,res,next){
                                 else {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
+                                    responseMessage.totalCount = 0;
                                     responseMessage.message = 'Messages of group not available';
+
                                     responseMessage.data = {
                                         messageList : [],
                                         deleteMessageIdList : []
@@ -850,7 +853,7 @@ router.get('/', function(req,res,next){
                         res.status(401).json(responseMessage);
                         console.log('Invalid token');
                     }
-                    var messageObj;
+
                 }
                 else {
                     responseMessage.error = {
