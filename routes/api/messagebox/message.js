@@ -773,7 +773,7 @@ router.get('/', function(req,res,next){
                         req.db.query(procQuery, function (err, results) {
                             if (!err) {
                                 //console.log(results,"results");
-                                if (results && results[0] && results[0].length>0) {
+                                if (results && results[0] && results[0].length > 0) {
                                     for(var messageCounter = 0;messageCounter < results[0].length;messageCounter++){
                                         switch (results[0][messageCounter].messageType) {
                                             case 0:
@@ -808,10 +808,13 @@ router.get('/', function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Messages of group loaded successfully';
-                                    responseMessage.totalCount = results[1][0].count;
+                                    responseMessage.totalCount = (results[1] && results[1][0] && results[1][0].count) ? results[1][0].count : 0;
                                     responseMessage.data = {
-                                        messageList : results[0]
+                                        messageList : results[0],
+                                        deleteMessageIdList : (results[2]) ? results[2] : []
                                     };
+
+                                    console.log('deleteMessageIdList',results[2]);
                                     res.status(200).json(responseMessage);
                                 }
                                 else {
@@ -819,7 +822,8 @@ router.get('/', function(req,res,next){
                                     responseMessage.error = null;
                                     responseMessage.message = 'Messages of group not available';
                                     responseMessage.data = {
-                                        messageList : []
+                                        messageList : [],
+                                        deleteMessageIdList : []
                                     };
                                     res.status(200).json(responseMessage);
                                 }
@@ -931,22 +935,60 @@ router.post('/delete', function(req,res,next){
                             req.db.query(comDeleteMessageQuery, function (err, deleteMessageResults) {
                                 if (!err) {
                                     //console.log(results,"results");
-                                    if (deleteMessageResults && deleteMessageResults[0] && deleteMessageResults[0].length>0) {
+                                    if (deleteMessageResults && deleteMessageResults[0] && deleteMessageResults[0].length > 0) {
                                         var outputArray=[];
                                         //id = insertResult[0][0] ? insertResult[0][0].id : 0;
-                                        for(var j=0;j<deleteMessageResults.length/2;j++){
+                                        for(var j=0; j < deleteMessageResults.length/2; j++) {
                                             var result = {};
                                             var count = (j) ? 2 * j : 0;
                                             result.messageId = messageIdList[j].messageId;
-                                            if(deleteMessageResults[count][0]._e == 'DELETED'){
+                                            if (deleteMessageResults[count][0]._e == 'DELETED') {
                                                 result.status = true;
                                             }
-                                            else{
+                                            else {
                                                 result.status = false;
                                             }
 
                                             outputArray.push(result);
                                         }
+
+
+                                        var notificationTemplaterRes = notificationTemplater.parse('message_deleted', {
+                                            groupName: tokenResult.ezeoneId
+                                        });
+                                        console.log(notificationTemplaterRes.parsedTpl, "notificationTemplaterRes.parsedTpl");
+                                        if (notificationTemplaterRes.parsedTpl) {
+                                            notification.publish(
+                                                tokenResult.groupId,
+                                                '',
+                                                tokenResult.ezeoneId,
+                                                tokenResult.groupId,
+                                                notificationTemplaterRes.parsedTpl,
+                                                39,
+                                                0, '',
+                                                0,
+                                                0,
+                                                0,
+                                                0,
+                                                1,
+                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                '',
+                                                0,
+                                                0,
+                                                null,
+                                                '',
+                                                /** Data object property to be sent with notification **/
+                                                {
+                                                    deleteMessageIdList: outputArray
+                                                },
+                                                null);
+                                            console.log('postNotification : notification for delete messages sent successfully');
+
+
+                                        }
+
+
+
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Message is deleted successfully';

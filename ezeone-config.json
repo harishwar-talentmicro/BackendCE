@@ -135,6 +135,12 @@
           "groupName"
         ],
         "file": "message/compose-message-group.txt"
+      },
+      "message_deleted": {
+        "params" : [
+          "groupName"
+        ],
+        "file" : "message/message-deleted.txt"
       }
     }
   },
