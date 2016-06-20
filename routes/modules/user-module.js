@@ -427,7 +427,7 @@ User.prototype.getUserDetails = function(req,res,next){
             /**
              * If IOS version is not supported
              */
-            if(req.CONFIG.VERSION_LIST.IOS.indexOf(req.query.versionCode) == -1){
+            if(req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) == -1){
                 rtnMessage.versionStatus = 2;
                 rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
                 res.send(rtnMessage);
@@ -435,14 +435,14 @@ User.prototype.getUserDetails = function(req,res,next){
             }
             else{
                 rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.IOS.length ==
-                (req.CONFIG.VERSION_LIST.IOS.indexOf(req.query.versionCode) + 1)) ? 0 : 1;
+                (req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
             }
             break;
         case 'android':
             /**
              * If Android version is not supported
              */
-            if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(req.query.versionCode) == -1){
+            if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
                 rtnMessage.versionStatus = 2;
                 rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
                 res.send(rtnMessage);
@@ -450,14 +450,14 @@ User.prototype.getUserDetails = function(req,res,next){
             }
             else{
                 rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
-                (req.CONFIG.VERSION_LIST.ANDROID.indexOf(req.query.versionCode) + 1)) ? 0 : 1;
+                (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
             }
             break;
         case 'web':
             /**
              * If Web version is not supported
              */
-            if(req.CONFIG.VERSION_LIST.WEB.indexOf(req.query.versionCode) == -1){
+            if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
                 rtnMessage.versionStatus = 2;
                 rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
                 res.send(rtnMessage);
@@ -465,7 +465,7 @@ User.prototype.getUserDetails = function(req,res,next){
             }
             else{
                 rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
-                (req.CONFIG.VERSION_LIST.WEB.indexOf(req.query.versionCode) + 1)) ? 0 : 1;
+                (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
             }
             break;
         default:
@@ -796,7 +796,7 @@ User.prototype.forgetPassword = function(req,res,next){
                 /**
                  * If IOS version is not supported
                  */
-                if(req.CONFIG.VERSION_LIST.IOS.indexOf(req.query.versionCode) == -1){
+                if(req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) == -1){
                     RtnMessage.versionStatus = 2;
                     RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
                     res.send(RtnMessage);
@@ -804,14 +804,14 @@ User.prototype.forgetPassword = function(req,res,next){
                 }
                 else{
                     RtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.IOS.length ==
-                    (req.CONFIG.VERSION_LIST.IOS.indexOf(req.query.versionCode) + 1)) ? 0 : 1;
+                    (req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
                 }
                 break;
             case 'android':
                 /**
                  * If Android version is not supported
                  */
-                if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(req.query.versionCode) == -1){
+                if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
                     RtnMessage.versionStatus = 2;
                     RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
                     res.send(RtnMessage);
@@ -819,14 +819,14 @@ User.prototype.forgetPassword = function(req,res,next){
                 }
                 else{
                     RtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
-                    (req.CONFIG.VERSION_LIST.ANDROID.indexOf(req.query.versionCode) + 1)) ? 0 : 1;
+                    (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
                 }
                 break;
             case 'web':
                 /**
                  * If Web version is not supported
                  */
-                if(req.CONFIG.VERSION_LIST.WEB.indexOf(req.query.versionCode) == -1){
+                if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
                     RtnMessage.versionStatus = 2;
                     RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
                     res.send(RtnMessage);
@@ -834,7 +834,7 @@ User.prototype.forgetPassword = function(req,res,next){
                 }
                 else{
                     RtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
-                    (req.CONFIG.VERSION_LIST.WEB.indexOf(req.query.versionCode) + 1)) ? 0 : 1;
+                    (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
                 }
                 break;
             default:
