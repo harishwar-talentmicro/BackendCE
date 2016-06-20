@@ -417,6 +417,64 @@ User.prototype.getUserDetails = function(req,res,next){
     /**
      * @todo FnGetUserDetails
      */
+    var rtnMessage = {
+        versionStatus : 0,
+        versionMessage : "Your application is up to date"
+    };
+
+    switch(req.platform){
+        case 'ios':
+            /**
+             * If IOS version is not supported
+             */
+            if(req.CONFIG.VERSION_LIST.IOS.indexOf(req.query.versionCode) == -1){
+                rtnMessage.versionStatus = 2;
+                rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                res.send(rtnMessage);
+                return;
+            }
+            else{
+                rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.IOS.length ==
+                (req.CONFIG.VERSION_LIST.IOS.indexOf(req.query.versionCode) + 1)) ? 0 : 1;
+            }
+            break;
+        case 'android':
+            /**
+             * If Android version is not supported
+             */
+            if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(req.query.versionCode) == -1){
+                rtnMessage.versionStatus = 2;
+                rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                res.send(rtnMessage);
+                return;
+            }
+            else{
+                rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
+                (req.CONFIG.VERSION_LIST.ANDROID.indexOf(req.query.versionCode) + 1)) ? 0 : 1;
+            }
+            break;
+        case 'web':
+            /**
+             * If Web version is not supported
+             */
+            if(req.CONFIG.VERSION_LIST.WEB.indexOf(req.query.versionCode) == -1){
+                rtnMessage.versionStatus = 2;
+                rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                res.send(rtnMessage);
+                return;
+            }
+            else{
+                rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
+                (req.CONFIG.VERSION_LIST.WEB.indexOf(req.query.versionCode) + 1)) ? 0 : 1;
+            }
+            break;
+        default:
+            rtnMessage.versionStatus = 2;
+            rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+            res.send(rtnMessage);
+            return;
+            break;
+    }
 
     try {
 
@@ -438,6 +496,8 @@ User.prototype.getUserDetails = function(req,res,next){
                                         UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
                                             (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
                                         console.log('FnGetUserDetails : tmaster: User details sent successfully');
+                                        UserDetailsResult[0].versionStatus = rtnMessage.versionStatus;
+                                        UserDetailsResult[0].versionMessage = rtnMessage.versionMessage;
                                         res.send(UserDetailsResult[0]);
                                     }
                                     else {
@@ -729,6 +789,61 @@ User.prototype.forgetPassword = function(req,res,next){
             mailSend : false
         };
         RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+
+        switch(req.platform){
+            case 'ios':
+                /**
+                 * If IOS version is not supported
+                 */
+                if(req.CONFIG.VERSION_LIST.IOS.indexOf(req.query.versionCode) == -1){
+                    RtnMessage.versionStatus = 2;
+                    RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                    res.send(RtnMessage);
+                    return;
+                }
+                else{
+                    RtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.IOS.length ==
+                    (req.CONFIG.VERSION_LIST.IOS.indexOf(req.query.versionCode) + 1)) ? 0 : 1;
+                }
+                break;
+            case 'android':
+                /**
+                 * If Android version is not supported
+                 */
+                if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(req.query.versionCode) == -1){
+                    RtnMessage.versionStatus = 2;
+                    RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                    res.send(RtnMessage);
+                    return;
+                }
+                else{
+                    RtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
+                    (req.CONFIG.VERSION_LIST.ANDROID.indexOf(req.query.versionCode) + 1)) ? 0 : 1;
+                }
+                break;
+            case 'web':
+                /**
+                 * If Web version is not supported
+                 */
+                if(req.CONFIG.VERSION_LIST.WEB.indexOf(req.query.versionCode) == -1){
+                    RtnMessage.versionStatus = 2;
+                    RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                    res.send(RtnMessage);
+                    return;
+                }
+                else{
+                    RtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
+                    (req.CONFIG.VERSION_LIST.WEB.indexOf(req.query.versionCode) + 1)) ? 0 : 1;
+                }
+                break;
+            default:
+                RtnMessage.versionStatus = 2;
+                RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                res.send(RtnMessage);
+                return;
+                break;
+        }
 
         if (EZEID != null) {
             var resetQueryParams = st.db.escape(EZEID) + ',' + st.db.escape(resetCode) +

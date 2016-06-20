@@ -35,6 +35,11 @@
     "USERNAME" : "indrajeet",
     "PASSWORD" : "indrajeet"
   },
+  "VERSION_LIST" : {
+    "IOS" : [16],
+    "ANDROID" : [35],
+    "WEB" : [1]
+  },
   "NOTIFICATION" : {
     "TEMPLATES": {
       "institute_candidate_job_suggestion": {
