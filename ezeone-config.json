@@ -123,6 +123,20 @@
         ],
         "file": "message/accept-request.txt"
       },
+      "reject_request": {
+        "params": [
+          "adminName",
+          "groupName"
+        ],
+        "file": "message/reject-request.txt"
+      },
+      "removed_from_group": {
+      "params": [
+        "adminName",
+        "groupName"
+      ],
+      "file": "message/remove-member.txt"
+    },
       "compose_message": {
         "params": [
           "senderName"
