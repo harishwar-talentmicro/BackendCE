@@ -66,7 +66,7 @@ router.all('*',function(req,res,next){
     req.platform = platform;
     req.deviceId = deviceId;
     req.deviceAgent = deviceAgent;
-    req.ip = ip;
+    //req.ip = ip;
 
     next();
 });
