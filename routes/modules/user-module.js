@@ -430,7 +430,7 @@ User.prototype.getUserDetails = function(req,res,next){
             if(req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) == -1){
                 rtnMessage.versionStatus = 2;
                 rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-                res.send(rtnMessage);
+                res.send([rtnMessage]);
                 return;
             }
             else{
@@ -445,7 +445,7 @@ User.prototype.getUserDetails = function(req,res,next){
             if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
                 rtnMessage.versionStatus = 2;
                 rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-                res.send(rtnMessage);
+                res.send([rtnMessage]);
                 return;
             }
             else{
@@ -460,7 +460,7 @@ User.prototype.getUserDetails = function(req,res,next){
             if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
                 rtnMessage.versionStatus = 2;
                 rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-                res.send(rtnMessage);
+                res.send([rtnMessage]);
                 return;
             }
             else{
@@ -471,7 +471,7 @@ User.prototype.getUserDetails = function(req,res,next){
         default:
             rtnMessage.versionStatus = 2;
             rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-            res.send(rtnMessage);
+            res.send([rtnMessage]);
             return;
             break;
     }
@@ -496,8 +496,8 @@ User.prototype.getUserDetails = function(req,res,next){
                                         UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
                                             (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
                                         console.log('FnGetUserDetails : tmaster: User details sent successfully');
-                                        UserDetailsResult[0].versionStatus = rtnMessage.versionStatus;
-                                        UserDetailsResult[0].versionMessage = rtnMessage.versionMessage;
+                                        UserDetailsResult[0][0].versionStatus = rtnMessage.versionStatus;
+                                        UserDetailsResult[0][0].versionMessage = rtnMessage.versionMessage;
                                         res.send(UserDetailsResult[0]);
                                     }
                                     else {
