@@ -427,21 +427,22 @@ router.put('/status', function(req,res,next){
 
                                     console.log('FnUpdateUserStatus: User status updated successfully');
                                     console.log(updateResult[0][0].status,"updateResult[0][0].status");
+                                    var notificationTemplaterRes;
                                     switch (updateResult[0][0].status) {
                                         case 1 :
-                                            var notificationTemplaterRes = notificationTemplater.parse('accept_request',{
-                                                        adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
+                                            notificationTemplaterRes = notificationTemplater.parse('accept_request',{
+                                                        adminName : (updateResult[3][0].fullName) ? updateResult[3][0].fullName : '',
                                                         groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
                                                     });
                                             break;
                                         case 2 :
-                                            var notificationTemplaterRes = notificationTemplater.parse('reject_request',{
+                                            notificationTemplaterRes = notificationTemplater.parse('reject_request',{
                                                 adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
                                                 groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
                                             });
                                             break;
                                         case 3 :
-                                            var notificationTemplaterRes = notificationTemplater.parse('removed_from_group',{
+                                            notificationTemplaterRes = notificationTemplater.parse('removed_from_group',{
                                                 adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
                                                 groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
                                             });
