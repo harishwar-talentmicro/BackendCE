@@ -48,7 +48,7 @@ var connOpt = { defaultExchangeName: 'amq.topic',
         url : url,
     heartbeat: 20
     , reconnect: true
-    , connectionTimeout: 10000
+        , connectionTimeout: 10000
     , reconnectExponentialLimit: 120000
     , reconnectBackoffTime: 1000
 };
@@ -88,7 +88,7 @@ function NotificationMqtt(){
                 setImmediate(function(){
                     setTimeout(function(){
                         amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
-                    },50);
+                    },500);
                 });
             });
         }
