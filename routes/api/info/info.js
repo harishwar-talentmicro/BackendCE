@@ -4,7 +4,7 @@
 var express = require('express');
 var router = express.Router();
 var request = require('request');
-
+var Docxtemplater = require('docxtemplater');
 
 /**
  * Method : GET
@@ -170,6 +170,80 @@ router.get('/working_schedule', function(req,res,next){
     }
 });
 
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @discription :
+ */
+router.get('/contact', function(req,res,next){
+    var responseMessage  = {
+        status: true,
+        error: null,
+        message: '',
+        data: {
+            companyName : "TalentMicro Innovations Pvt. Ltd.",
+            email : "manager@ezeone.com",
+            address : "Sarjapur Road,Bellandur Gate, Bengaluru, India, 560103",
+            website : "https://www.ezeone.com",
+            latitude : 12.9231295,
+            longitude : 77.6039585
+        }
+    };
+
+    res.json(responseMessage);
+
+});
+
+/**
+ * Android crash report logging
+ */
+router.post('/crash_report',function(req,res,next){
+    var fileName = req.st.libs.moment().format("YYYY-MM-DD hh-mm-ss A") + ".txt";
+
+    var crashData = "";
+
+    var os = require('os');
+    var separator = '/';
+    if(os.platform == 'win32'){
+        separator = '\\';
+    }
+
+    var path = require('path');
+
+    for(var prop in req.body){
+        if(req.body.hasOwnProperty(prop)){
+            crashData += prop;
+            crashData += " = ";
+            crashData += req.body[prop];
+            crashData += " \n";
+        }
+    }
+
+    var checkCrashDirectory = function(directory,callback){
+        req.st.libs.fs.stat(directory,function(err,stats){
+           if(err && err.errno == 34){
+               req.st.libs.fs.mkdir(directory,callback);
+           }
+           else{
+               callback(err);
+           }
+        });
+    };
+
+    checkCrashDirectory(path.join('../' + req.CONFIG.CONSTANT.ANDROID_CRASH_REPORT_DIR),function(err){
+        if(!err){
+            req.st.libs.fs.appendFileSync(path.join('../' + req.CONFIG.CONSTANT.ANDROID_CRASH_REPORT_DIR + separator +fileName),crashData);
+            res.send('');
+        }
+        else{
+            console.log('Crash logged at ' + fileName + '\n\n' + crashData+ '\n\n' + 'Crash logged finished for ' + fileName);
+            res.send('');
+        }
+    });
+});
+
 router.get('/testbhavya',function(req,res,next){
 
     var responseMessage = {
@@ -259,7 +333,6 @@ router.get('/testbhavya',function(req,res,next){
     //    res.status(400).json(responseMessage);
     //}
 });
-
 
 
 module.exports = router;
