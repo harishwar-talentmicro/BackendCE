@@ -9,7 +9,8 @@
     "STATIC_URL": "/",
     "STORAGE_BUCKET":"ezeone",
     "GS_URL":"https://storage.googleapis.com/",
-    "ANDROID_AP_VERSION_CODE":2
+    "ANDROID_AP_VERSION_CODE":2,
+    "ANDROID_CRASH_REPORT_DIR" : "crash_report"
   },
   "SCHEME" : "https",
   "DOMAIN" : "www.ezeone.com",
