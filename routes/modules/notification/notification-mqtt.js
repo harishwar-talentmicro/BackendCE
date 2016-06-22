@@ -48,7 +48,7 @@ var connOpt = { defaultExchangeName: 'amq.topic',
         url : url,
     heartbeat: 20
     , reconnect: true
-    , connectionTimeout: 10000
+        , connectionTimeout: 10000
     , reconnectExponentialLimit: 120000
     , reconnectBackoffTime: 1000
 };
