@@ -88,7 +88,7 @@ function NotificationMqtt(){
                 setImmediate(function(){
                     setTimeout(function(){
                         amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
-                    },50);
+                    },500);
                 });
             });
         }
