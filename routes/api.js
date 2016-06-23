@@ -18,6 +18,56 @@ var stdLib = new StdLib(db);
 router.all('*',function(req,res,next){
     req.db = db;
     req.st = stdLib;
+
+
+    /**
+     * User Agent Detection Code
+     *
+     */
+    var deviceMapping = {
+        web : 1,
+        android : 2,
+        ios : 3,
+        windowsPhone : 4,
+        windowsApp :  5
+    };
+
+    var preUserAgents = {
+        android : '$__EZEONE_|_2015_|_ANDROID_|_APP__$',
+        ios : '$__EZEONE_|_2016_|_IPHONE_|_APP__$',
+        windowsPhone : '|gInGeRbItE_wInDoWs_pHoNe_2O!5|',
+        windowsApp : '$_gInGeRbItE_wiNDowS_pcAPp_2015_$',
+        web : 'EZEONE_WEB_CLIENT'
+    };
+
+    var deviceType = 1;
+    var platform = '';
+
+    var ip =  req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress;
+
+    var deviceId = (req.headers['device_id']) ?  req.headers['device_id'] : '';
+    var deviceAgent = (req.headers['device-agent']) ? req.headers['device-agent'] : '';
+
+    for(var agent in preUserAgents){
+        if(preUserAgents.hasOwnProperty(agent) && preUserAgents[agent] === deviceAgent){
+            deviceType = deviceMapping[agent];
+            platform = agent;
+            break;
+        }
+    }
+
+    /**
+     * If deviceType is greater than one then request is from mobile always
+     */
+    req.isMobile = (deviceType > 1) ? 1 : 0;
+    req.platform = platform;
+    req.deviceId = deviceId;
+    req.deviceAgent = deviceAgent;
+    //req.ip = ip;
+
     next();
 });
 var minorVersion1Api = require('./api/minor-api.js');

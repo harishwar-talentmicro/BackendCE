@@ -1,0 +1,1 @@
+Hello <%=groupName%>, few messages are deleted.

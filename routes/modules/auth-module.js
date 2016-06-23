@@ -89,12 +89,114 @@ function Auth(db,stdLib){
  * @param next
  */
 Auth.prototype.register = function(req,res,next){
-    /**
-     * @todo FnRegistration
-     */
 
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+
+    var rtnMessage = {
+        error:{},
+        Token: '',
+        IsAuthenticate: false,
+        FirstName: '',
+        CompanyName:'',
+        Type: 0,
+        Icon: '',
+        tid:'',
+        group_id:'',
+        ezeone_id:'',
+        ezeid:'',
+        Verified: 0,
+        SalesModuleTitle: '',
+        AppointmentModuleTitle: '',
+        HomeDeliveryModuleTitle : '',
+        ServiceModuleTitle: '',
+        CVModuleTitle: '',
+        SalesFormMsg: '',
+        ReservationFormMsg: '',
+        HomeDeliveryFormMsg: '',
+        ServiceFormMsg: '',
+        CVFormMsg: '',
+        SalesItemListType: '',
+        RefreshInterval:'',
+        MasterID: 0,
+        UserModuleRights: '',
+        FreshersAccepted: '',
+        HomeDeliveryItemListType : '',
+        PersonalEZEID:'',
+        ReservationDisplayFormat:'',
+        mobilenumber:'',
+        isAddressSaved:'',
+        isinstitute_admin : '',
+        cvid : '',
+        profile_status:'',
+        businesssize:'',
+        headcount:'',
+        branch:'',
+        ismnc:'',
+        versionStatus : 0,
+        versionMessage : "No update required for this application"
+    };
+
+    /**
+     * Commenting this section on request from Sujit sir
+     * @type {moment|exports|module.exports}
+     */
+
+    //switch(req.platform){
+    //    case 'ios':
+    //        /**
+    //         * If IOS version is not supported
+    //         */
+    //        if(req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) == -1){
+    //            rtnMessage.versionStatus = 2;
+    //            rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //            res.send(rtnMessage);
+    //            return;
+    //        }
+    //        else{
+    //            rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.IOS.length ==
+    //            (req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+    //        }
+    //        break;
+    //    case 'android':
+    //        /**
+    //         * If Android version is not supported
+    //         */
+    //        if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
+    //            rtnMessage.versionStatus = 2;
+    //            rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //            res.send(rtnMessage);
+    //            return;
+    //        }
+    //        else{
+    //            rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
+    //            (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+    //        }
+    //        break;
+    //    case 'web':
+    //        /**
+    //         * If Web version is not supported
+    //         */
+    //        if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
+    //            rtnMessage.versionStatus = 2;
+    //            rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //            res.send(rtnMessage);
+    //            return;
+    //        }
+    //        else{
+    //            rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
+    //            (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+    //        }
+    //        break;
+    //    default:
+    //        rtnMessage.versionStatus = 2;
+    //        rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //        res.send(rtnMessage);
+    //        return;
+    //        break;
+    //}
+
 
     var moment = require('moment');
 
@@ -169,48 +271,7 @@ Auth.prototype.register = function(req,res,next){
     var ismnc = (req.body.ismnc) ? req.body.ismnc : 0;
     var rating = (req.body.rating) ? req.body.rating : 1;
 
-    var rtnMessage = {
-        error:{},
-        Token: '',
-        IsAuthenticate: false,
-        FirstName: '',
-        CompanyName:'',
-        Type: 0,
-        Icon: '',
-        tid:'',
-        group_id:'',
-        ezeone_id:'',
-        ezeid:'',
-        Verified: 0,
-        SalesModuleTitle: '',
-        AppointmentModuleTitle: '',
-        HomeDeliveryModuleTitle : '',
-        ServiceModuleTitle: '',
-        CVModuleTitle: '',
-        SalesFormMsg: '',
-        ReservationFormMsg: '',
-        HomeDeliveryFormMsg: '',
-        ServiceFormMsg: '',
-        CVFormMsg: '',
-        SalesItemListType: '',
-        RefreshInterval:'',
-        MasterID: 0,
-        UserModuleRights: '',
-        FreshersAccepted: '',
-        HomeDeliveryItemListType : '',
-        PersonalEZEID:'',
-        ReservationDisplayFormat:'',
-        mobilenumber:'',
-        isAddressSaved:'',
-        isinstitute_admin : '',
-        cvid : '',
-        profile_status:'',
-        businesssize:'',
-        headcount:'',
-        branch:'',
-        ismnc:''
 
-    };
 
     var validateStatus = true;
     var error = {};
@@ -795,6 +856,60 @@ Auth.prototype.login = function(req,res,next){
         userDetails : []
 
     };
+
+    switch(req.platform){
+        case 'ios':
+            /**
+             * If IOS version is not supported
+             */
+            if(req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) == -1){
+                responseMessage.versionStatus = 2;
+                responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+                res.send(responseMessage);
+                return;
+            }
+            else{
+                responseMessage.versionStatus = (req.CONFIG.VERSION_LIST.IOS.length ==
+                (req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+            }
+            break;
+        case 'android':
+            /**
+             * If Android version is not supported
+             */
+            if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
+                responseMessage.versionStatus = 2;
+                responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+                res.send(responseMessage);
+                return;
+            }
+            else{
+                responseMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
+                (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+            }
+            break;
+        case 'web':
+            /**
+             * If Web version is not supported
+             */
+            if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
+                responseMessage.versionStatus = 2;
+                responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+                res.send(responseMessage);
+                return;
+            }
+            else{
+                responseMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
+                (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+            }
+            break;
+        default:
+            responseMessage.versionStatus = 2;
+            responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+            res.send(responseMessage);
+            return;
+            break;
+    }
 
     try{
         if (ezeoneId && password) {

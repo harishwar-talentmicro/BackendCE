@@ -9,7 +9,18 @@
     "STATIC_URL": "/",
     "STORAGE_BUCKET":"ezeone",
     "GS_URL":"https://storage.googleapis.com/",
-    "ANDROID_AP_VERSION_CODE":2
+    "ANDROID_AP_VERSION_CODE":3,
+    "ANDROID_CRASH_REPORT_DIR" : "crash_report",
+    "EZEONE_CRASH_REPORT_DIR" : "ezeone_crash_report",
+    "EZEONE_MAILING_LIST" : [
+      "jain31192@gmail.com",
+      "indrajeetnagda@gmail.com",
+      "himank1991@gmail.com",
+      "sujit.mishra3147@gmail.com",
+      "himank@hirecraft.in",
+      "sujitkumar@hirecraft.in",
+      "pal.aabhishek95@gmail.com"
+    ]
   },
   "SCHEME" : "https",
   "DOMAIN" : "www.ezeone.com",
@@ -34,6 +45,11 @@
     "PORT" : 61612,
     "USERNAME" : "indrajeet",
     "PASSWORD" : "indrajeet"
+  },
+  "VERSION_LIST" : {
+    "IOS" : [16],
+    "ANDROID" : [35],
+    "WEB" : [1]
   },
   "NOTIFICATION" : {
     "TEMPLATES": {
@@ -118,6 +134,20 @@
         ],
         "file": "message/accept-request.txt"
       },
+      "reject_request": {
+        "params": [
+          "adminName",
+          "groupName"
+        ],
+        "file": "message/reject-request.txt"
+      },
+      "removed_from_group": {
+      "params": [
+        "adminName",
+        "groupName"
+      ],
+      "file": "message/remove-member.txt"
+    },
       "compose_message": {
         "params": [
           "senderName"
@@ -130,6 +160,12 @@
           "groupName"
         ],
         "file": "message/compose-message-group.txt"
+      },
+      "message_deleted": {
+        "params" : [
+          "groupName"
+        ],
+        "file" : "message/message-deleted.txt"
       }
     }
   },
@@ -274,6 +310,11 @@
         "params" : ["communityAddress","memberName","memberAddress","billDate","startDate","endDate","totalAmount","dueDate","adminName","type","area","refNo","expenseList","imageUrl"],
         "file" : "invoice.html",
         "subject" : "invoice Details"
+      },
+      "crash_report" : {
+        "params" : ["crashReport", "projectName"],
+        "file" : "crash-report.html",
+        "subject" : "Crash Report Details"
       },
       "default": {
         "params": ["HTML"],

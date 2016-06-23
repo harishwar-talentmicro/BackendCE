@@ -711,41 +711,40 @@ router.get('/', function(req,res,next){
     };
     var validationFlag = true;
     var error = {};
-    var timeStamp;
     req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
     req.query.limit = (req.query.limit) ? (req.query.limit):100;
     req.query.flag = (req.query.flag) ? (req.query.flag):0;
 
-    if(req.query.flag == 0){
-        if(req.query.timeStamp){
-            if(moment(req.query.timeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
-                 timeStamp = moment(req.query.timeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
-            }
-            else{
-                error.timeStamp = 'Invalid timeStamp';
-                validationFlag *= false;
-            }
+    if(req.query.lastSyncTimeStamp){
+        if(moment(req.query.lastSyncTimeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
+            req.query.lastSyncTimeStamp = moment(req.query.lastSyncTimeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
         }
         else{
-            timeStamp = null;
-
+            error.lastSyncTimeStamp = 'Invalid timeStamp';
+            validationFlag *= false;
         }
     }
     else{
-        if(req.query.currentTimeStamp){
-            if(moment(req.query.currentTimeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
-                timeStamp = moment(req.query.currentTimeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
-            }
-            else{
-                error.currentTimeStamp = 'Invalid timeStamp';
-                validationFlag *= false;
-            }
+        req.query.lastSyncTimeStamp = null;
+
+    }
+
+    if(req.query.currentTimeStamp){
+        if(moment(req.query.currentTimeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
+            req.query.currentTimeStamp = moment(req.query.currentTimeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
         }
         else{
-            timeStamp = null;
-
+            error.currentTimeStamp = 'Invalid timeStamp';
+            validationFlag *= false;
         }
     }
+    else{
+        error.currentTimeStamp = 'Invalid timeStamp';
+        validationFlag *= false;
+
+    }
+
+
     if (isNaN(parseInt(req.query.groupId)) || (req.query.groupId) < 0 ) {
         error.groupId = 'Invalid group id';
         validationFlag *= false;
@@ -766,15 +765,16 @@ router.get('/', function(req,res,next){
                             req.db.escape(req.query.groupId) ,
                             req.db.escape(req.query.token) ,
                             req.db.escape(req.query.pageNo), req.db.escape(req.query.limit) ,
-                            req.db.escape(timeStamp),
-                            req.db.escape(req.query.flag)
+                            req.db.escape( req.query.lastSyncTimeStamp),
+                            req.db.escape(req.query.currentTimeStamp)
                         ];
                         var procQuery = 'CALL p_v1_LoadMessagesofGroup(' + procParams.join(',') + ')';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, results) {
                             if (!err) {
                                 //console.log(results,"results");
-                                if (results && results[0] && results[0].length>0) {
+                                if (results && results[0] && results[0].length > 0) {
+                                    var messageObj;
                                     for(var messageCounter = 0;messageCounter < results[0].length;messageCounter++){
                                         switch (results[0][messageCounter].messageType) {
                                             case 0:
@@ -809,18 +809,24 @@ router.get('/', function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Messages of group loaded successfully';
-                                    responseMessage.totalCount = results[1][0].count;
+                                    responseMessage.totalCount = (results[1] && results[1][0] && results[1][0].count) ? results[1][0].count : 0;
                                     responseMessage.data = {
-                                        messageList : results[0]
+                                        messageList : results[0],
+                                        deleteMessageIdList : (results[2]) ? results[2] : []
                                     };
+
+                                    console.log('deleteMessageIdList',results[2]);
                                     res.status(200).json(responseMessage);
                                 }
                                 else {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
+                                    responseMessage.totalCount = 0;
                                     responseMessage.message = 'Messages of group not available';
+
                                     responseMessage.data = {
-                                        messageList : []
+                                        messageList : [],
+                                        deleteMessageIdList : []
                                     };
                                     res.status(200).json(responseMessage);
                                 }
@@ -847,7 +853,7 @@ router.get('/', function(req,res,next){
                         res.status(401).json(responseMessage);
                         console.log('Invalid token');
                     }
-                    var messageObj;
+
                 }
                 else {
                     responseMessage.error = {
@@ -872,6 +878,190 @@ router.get('/', function(req,res,next){
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
+    }
+});
+
+
+
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @param token* <string> token of login user
+ * @param messageIdList <JSON Array of integers>
+ * @discription : API to delete message which can be multipe or single
+ */
+router.post('/delete', function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+    /**
+     * validating that input p
+     * */
+    if(req.is('json')){
+        var messageIdList = req.body.messageIdList;
+        console.log(req.body,"req.body");
+        if(!messageIdList){
+            error.messageIdList = 'Invalid message Id';
+            validationFlag *= false;
+        }
+        if (!validationFlag) {
+            responseMessage.error = error;
+            responseMessage.message = 'Please check the errors';
+            res.status(400).json(responseMessage);
+            console.log(responseMessage);
+        }
+        else {
+            try {
+                req.st.validateToken(req.body.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            var comDeleteMessageQuery = "";
+                            for (var i = 0; i < messageIdList.length; i++) {
+                                var procParams = [
+                                    req.db.escape(req.body.token) ,
+                                    req.db.escape(messageIdList[i].messageId)
+                                ];
+                                var procQuery = 'CALL p_v1_deletemessage(' + procParams.join(',') + ');';
+                                comDeleteMessageQuery += procQuery;
+                                console.log(comDeleteMessageQuery);
+                                console.log(procQuery);
+                            }
+                            req.db.query(comDeleteMessageQuery, function (err, deleteMessageResults) {
+                                if (!err) {
+                                    //console.log(results,"results");
+                                    if (deleteMessageResults && deleteMessageResults[0] && deleteMessageResults[0].length > 0) {
+                                        var outputArray=[];
+                                        //id = insertResult[0][0] ? insertResult[0][0].id : 0;
+                                        for(var j=0; j < deleteMessageResults.length/2; j++) {
+                                            var result = {};
+                                            var count = (j) ? 2 * j : 0;
+                                            result.messageId = messageIdList[j].messageId;
+                                            if (deleteMessageResults[count][0]._e == 'DELETED') {
+                                                result.status = true;
+                                            }
+                                            else {
+                                                result.status = false;
+                                            }
+
+                                            outputArray.push(result);
+                                        }
+
+
+                                        var notificationTemplaterRes = notificationTemplater.parse('message_deleted', {
+                                            groupName: tokenResult.ezeoneId
+                                        });
+                                        console.log(notificationTemplaterRes.parsedTpl, "notificationTemplaterRes.parsedTpl");
+                                        if (notificationTemplaterRes.parsedTpl) {
+                                            notification.publish(
+                                                tokenResult.groupId,
+                                                '',
+                                                tokenResult.ezeoneId,
+                                                tokenResult.groupId,
+                                                notificationTemplaterRes.parsedTpl,
+                                                39,
+                                                0, '',
+                                                0,
+                                                0,
+                                                0,
+                                                0,
+                                                1,
+                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                '',
+                                                0,
+                                                0,
+                                                null,
+                                                '',
+                                                /** Data object property to be sent with notification **/
+                                                {
+                                                    deleteMessageIdList: outputArray
+                                                },
+                                                null);
+                                            console.log('postNotification : notification for delete messages sent successfully');
+
+
+                                        }
+
+
+
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Message is deleted successfully';
+                                        responseMessage.data = {
+                                            messageIdList : outputArray
+                                        };
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Message is not deleted';
+                                        responseMessage.data = {
+                                            messageIdList : []
+                                        };
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    responseMessage.message = 'An error occurred !';
+                                    res.status(500).json(responseMessage);
+                                    console.log('Error : p_v1_deletemessage ', err);
+                                    var errorDate = new Date();
+                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                                }
+                            });
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'invalid token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('Invalid token');
+                        }
+                        var messageObj;
+                    }
+                    else {
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'An error occurred !';
+                        res.status(500).json(responseMessage);
+                        console.log('Error :', err);
+                        var errorDate = new Date();
+                        console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    }
+                });
+
+            }
+            catch (ex) {
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'An error occurred !';
+                res.status(500).json(responseMessage);
+                console.log('Error delete_message : ', ex);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+            }
+        }
+    }
+    else{
+        responseMessage.error = "Accepted content type is json only";
+        res.status(400).json(responseMessage);
     }
 });
 

@@ -365,10 +365,15 @@ router.put('/status', function(req,res,next){
                             req.db.escape(req.body.status) ,
                             req.db.escape(req.body.userGroupId)
                         ];
+                        var notifyParams = [
+                            req.db.escape(req.body.token) ,
+                            req.db.escape(req.body.groupId)
+                        ];
                         /**
                          * call p_v1_UpdateUserStatus to change the status like accept/reject/block
                          * */
-                        var query = 'CALL p_v1_UpdateUserStatus(' + queryParams.join(',') + ')';
+                        var query = 'CALL p_v1_UpdateUserStatus(' + queryParams.join(',') + ');' +
+                        '           CALL pnotify_on_status_change(' + notifyParams.join(',') + ');';
                         console.log(query);
                         req.db.query(query, function (err, updateResult) {
                             if (!err) {
@@ -376,13 +381,11 @@ router.put('/status', function(req,res,next){
                                  * if proc executed successfully then give response true
                                  * */
                                 console.log('updateResult',updateResult);
+                                console.log('updateResult[3]',updateResult[3]);
 
                                 if (updateResult
                                     && updateResult[0]
                                     && updateResult[0].length > 0 && updateResult[0][0]) {
-
-
-
                                     switch (updateResult[0][0]._e) {
                                     /**
                                      * This error will only come when for the group any other user has called this API who
@@ -424,38 +427,108 @@ router.put('/status', function(req,res,next){
 
                                     console.log('FnUpdateUserStatus: User status updated successfully');
                                     console.log(updateResult[0][0].status,"updateResult[0][0].status");
-                                    if(updateResult[0][0].status == 1){
-                                        var notificationTemplaterRes = notificationTemplater.parse('accept_request',{
-                                            adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
-                                            groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
-                                        });
-                                        console.log(notificationTemplaterRes,"notificationTemplaterRes");
-                                        if(notificationTemplaterRes.parsedTpl){
-                                            notification.publish(
-                                                updateResult[0][0].userGroupId,
-                                                updateResult[0][0].groupName,
-                                                updateResult[0][0].groupName,
-                                                updateResult[0][0].senderId,
-                                                notificationTemplaterRes.parsedTpl,
-                                                32,
-                                                0, 0,
-                                                0,
-                                                0,
-                                                0,
-                                                0,
-                                                1,
-                                                moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                '',
-                                                0,
-                                                0);
-                                            console.log('postNotification : notification for accept_request is sent successfully');
-                                        }
-                                        else{
-                                            console.log('Error in parsing notification accept_request template - ',
-                                                notificationTemplaterRes.error);
-                                            console.log('postNotification : notification for accept_request is sent successfully');
-                                        }
+                                    var notificationTemplaterRes;
+                                    switch (updateResult[0][0].status) {
+                                        case 1 :
+                                            notificationTemplaterRes = notificationTemplater.parse('accept_request',{
+                                                        adminName : (updateResult[3][0].fullName) ? updateResult[3][0].fullName : '',
+                                                        groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
+                                                    });
+                                            break;
+                                        case 2 :
+                                            notificationTemplaterRes = notificationTemplater.parse('reject_request',{
+                                                adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
+                                                groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
+                                            });
+                                            break;
+                                        case 3 :
+                                            notificationTemplaterRes = notificationTemplater.parse('removed_from_group',{
+                                                adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
+                                                groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
+                                            });
+                                            break;
+                                        default :
+                                            break;
                                     }
+                                    //if(updateResult[0][0].status == 1){
+                                    //    var notificationTemplaterRes = notificationTemplater.parse('accept_request',{
+                                    //        adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
+                                    //        groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
+                                    //    });
+                                    //}
+                                    //else{
+                                    //    var notificationTemplaterRes = notificationTemplater.parse('reject_request',{
+                                    //        adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
+                                    //        groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
+                                    //    });
+                                    //}
+                                        for(var i=0;i<updateResult[2].length;i++){
+                                            if(updateResult[0][0].status == 1){
+                                                console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                                if(notificationTemplaterRes.parsedTpl){
+                                                    notification.publish(
+                                                        updateResult[2][i].groupId,
+                                                        updateResult[0][0].groupName,
+                                                        updateResult[0][0].groupName,
+                                                        updateResult[0][0].senderId,
+                                                        notificationTemplaterRes.parsedTpl,
+                                                        32,
+                                                        0, '',
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        1,
+                                                        moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                        '',
+                                                        0,
+                                                        0,
+                                                        null,
+                                                        '',
+                                                        updateResult[3][0],
+                                                        null);
+                                                    console.log('postNotification : notification is sent successfully');
+                                                }
+                                                else{
+                                                    console.log('Error in parsing notification accept_request template - ',
+                                                        notificationTemplaterRes.error);
+                                                    console.log('postNotification : notification  is sent successfully');
+                                                }
+                                            }
+                                            else{
+                                                if(notificationTemplaterRes.parsedTpl){
+                                                    console.log(notificationTemplaterRes,"notificationTemplaterRes");
+                                                    notification.publish(
+                                                        updateResult[2][i].userGroupId,
+                                                        updateResult[0][0].groupName,
+                                                        updateResult[0][0].groupName,
+                                                        updateResult[0][0].senderId,
+                                                        notificationTemplaterRes.parsedTpl,
+                                                        32,
+                                                        0, '',
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        1,
+                                                        moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                        '',
+                                                        0,
+                                                        0,
+                                                        null,
+                                                        '',
+                                                        updateResult[3][0],
+                                                        null);
+                                                    console.log('postNotification : notification is sent successfully');
+                                                }
+                                                else{
+                                                    console.log('Error in parsing notification template - ',
+                                                        notificationTemplaterRes.error);
+                                                    console.log('postNotification : notification  is sent successfully');
+                                                }
+                                            }
+
+                                        }
 
                                 }
                                 /**

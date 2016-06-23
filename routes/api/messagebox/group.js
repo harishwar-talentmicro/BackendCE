@@ -437,7 +437,7 @@ router.post('/members', function(req,res,next){
                                         //console.log(contactGroupResult,groupRelationStatus);
                                         responseMessage.status = true;
                                         responseMessage.error = null;
-                                        responseMessage.message = 'Member added to group successfully';
+                                        responseMessage.message = 'Member invited to group successfully';
                                         responseMessage.data = {
                                             userGroupId : addMemberResult[0][0].userGroupId,
                                             groupName : addMemberResult[0][0].groupName,
