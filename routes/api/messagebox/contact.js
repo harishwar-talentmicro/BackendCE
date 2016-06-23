@@ -423,10 +423,6 @@ router.put('/status', function(req,res,next){
                                             }
                                             break;
                                     }
-
-
-                                    console.log('FnUpdateUserStatus: User status updated successfully');
-                                    console.log(updateResult[0][0].status,"updateResult[0][0].status");
                                     var notificationTemplaterRes;
                                     switch (updateResult[0][0].status) {
                                         case 1 :
@@ -441,9 +437,9 @@ router.put('/status', function(req,res,next){
                                                 groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
                                             });
                                             break;
-                                        case 3 :
+                                        case 4 :
                                             notificationTemplaterRes = notificationTemplater.parse('removed_from_group',{
-                                                adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
+                                                adminName : (updateResult[3][0].fullName) ? updateResult[3][0].fullName : '',
                                                 groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
                                             });
                                             break;
@@ -462,74 +458,175 @@ router.put('/status', function(req,res,next){
                                     //        groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
                                     //    });
                                     //}
+                                    console.log('FnUpdateUserStatus: User status updated successfully');
+
+                                    var sendDeleteNotificationFlag = false;
+                                    console.log(updateResult[0][0].status,"updateResult[0][0].status");
                                         for(var i=0;i<updateResult[2].length;i++){
-                                            if(updateResult[0][0].status == 1){
-                                                console.log(notificationTemplaterRes,"notificationTemplaterRes");
-                                                if(notificationTemplaterRes.parsedTpl){
-                                                    notification.publish(
-                                                        updateResult[2][i].groupId,
-                                                        updateResult[0][0].groupName,
-                                                        updateResult[0][0].groupName,
-                                                        updateResult[0][0].senderId,
-                                                        notificationTemplaterRes.parsedTpl,
-                                                        32,
-                                                        0, '',
-                                                        0,
-                                                        0,
-                                                        0,
-                                                        0,
-                                                        1,
-                                                        moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                        '',
-                                                        0,
-                                                        0,
-                                                        null,
-                                                        '',
-                                                        updateResult[3][0],
-                                                        null);
-                                                    console.log('postNotification : notification is sent successfully');
-                                                }
-                                                else{
-                                                    console.log('Error in parsing notification accept_request template - ',
-                                                        notificationTemplaterRes.error);
-                                                    console.log('postNotification : notification  is sent successfully');
-                                                }
-                                            }
-                                            else{
-                                                if(notificationTemplaterRes.parsedTpl){
-                                                    console.log(notificationTemplaterRes,"notificationTemplaterRes");
-                                                    notification.publish(
-                                                        updateResult[2][i].userGroupId,
-                                                        updateResult[0][0].groupName,
-                                                        updateResult[0][0].groupName,
-                                                        updateResult[0][0].senderId,
-                                                        notificationTemplaterRes.parsedTpl,
-                                                        32,
-                                                        0, '',
-                                                        0,
-                                                        0,
-                                                        0,
-                                                        0,
-                                                        1,
-                                                        moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                        '',
-                                                        0,
-                                                        0,
-                                                        null,
-                                                        '',
-                                                        updateResult[3][0],
-                                                        null);
-                                                    console.log('postNotification : notification is sent successfully');
-                                                }
-                                                else{
-                                                    console.log('Error in parsing notification template - ',
-                                                        notificationTemplaterRes.error);
-                                                    console.log('postNotification : notification  is sent successfully');
-                                                }
+                                            switch(updateResult[0][0].status){
+                                                case 1 :
+                                                    if(notificationTemplaterRes.parsedTpl){
+                                                        notification.publish(
+                                                            updateResult[2][i].groupId,
+                                                            updateResult[0][0].groupName,
+                                                            updateResult[0][0].groupName,
+                                                            updateResult[0][0].senderId,
+                                                            notificationTemplaterRes.parsedTpl,
+                                                            32,
+                                                            0, '',
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            1,
+                                                            moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                            '',
+                                                            0,
+                                                            0,
+                                                            null,
+                                                            '',
+                                                            updateResult[3][0],
+                                                            null);
+                                                        console.log('postNotification : notification is sent successfully');
+                                                    }
+                                                    else{
+                                                        console.log('Error in parsing notification accept_request template - ',
+                                                            notificationTemplaterRes.error);
+                                                        console.log('postNotification : notification  is sent successfully');
+                                                    }
+                                                    break;
+                                                case 2 :
+                                                    if(notificationTemplaterRes.parsedTpl){
+                                                        notification.publish(
+                                                            req.body.userGroupId,
+                                                            updateResult[0][0].groupName,
+                                                            updateResult[0][0].groupName,
+                                                            updateResult[0][0].senderId,
+                                                            notificationTemplaterRes.parsedTpl,
+                                                            32,
+                                                            0, '',
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            1,
+                                                            moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                            '',
+                                                            0,
+                                                            0,
+                                                            null,
+                                                            '',
+                                                            updateResult[3][0],
+                                                            null);
+                                                        console.log('postNotification : notification is sent successfully');
+                                                    }
+                                                    else{
+                                                        console.log('Error in parsing notification accept_request template - ',
+                                                            notificationTemplaterRes.error);
+                                                        console.log('postNotification : notification  is sent successfully');
+                                                    }
+                                                    break;
+                                                case 3 :
+                                                    if(notificationTemplaterRes.parsedTpl){
+                                                        notification.publish(
+                                                            updateResult[2][i].groupId,
+                                                            updateResult[0][0].groupName,
+                                                            updateResult[0][0].groupName,
+                                                            updateResult[0][0].senderId,
+                                                            notificationTemplaterRes.parsedTpl,
+                                                            32,
+                                                            0, '',
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            1,
+                                                            moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                            '',
+                                                            0,
+                                                            0,
+                                                            null,
+                                                            '',
+                                                            updateResult[3][0],
+                                                            null);
+                                                        console.log('postNotification : notification is sent successfully');
+                                                    }
+                                                    else{
+                                                        console.log('Error in parsing notification accept_request template - ',
+                                                            notificationTemplaterRes.error);
+                                                        console.log('postNotification : notification  is sent successfully');
+                                                    }
+                                                    break;
+                                                case 4:
+                                                    if(notificationTemplaterRes.parsedTpl){
+                                                        notification.publish(
+                                                            updateResult[2][i].groupId,
+                                                            updateResult[0][0].groupName,
+                                                            updateResult[0][0].groupName,
+                                                            updateResult[0][0].senderId,
+                                                            notificationTemplaterRes.parsedTpl,
+                                                            32,
+                                                            0, '',
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            1,
+                                                            moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                            '',
+                                                            0,
+                                                            0,
+                                                            null,
+                                                            '',
+                                                            updateResult[3][0],
+                                                            null);
+                                                        console.log('postNotification : notification is sent successfully');
+                                                    }
+                                                    else{
+                                                        console.log('Error in parsing notification accept_request template - ',
+                                                            notificationTemplaterRes.error);
+                                                        console.log('postNotification : notification  is sent successfully');
+                                                    }
+                                                    break;
+                                                default :
+                                                    break;
                                             }
 
                                         }
 
+                                    /**
+                                     * Sending notification to the member who is actually removed fromt this group
+                                     * It will be silent notification and he is now not an active member also
+                                     */
+                                        if(sendDeleteNotificationFlag && notificationTemplaterRes.parsedTpl){
+                                                notification.publish(
+                                                    req.body.userGroupId,
+                                                    updateResult[0][0].groupName,
+                                                    updateResult[0][0].groupName,
+                                                    updateResult[0][0].senderId,
+                                                    notificationTemplaterRes.parsedTpl,
+                                                    32,
+                                                    0, '',
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    1,
+                                                    moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                    '',
+                                                    0,
+                                                    0,
+                                                    null,
+                                                    '',
+                                                    updateResult[3][0],
+                                                    null);
+                                                console.log('postNotification : notification is sent successfully');
+                                            }
+                                            else{
+                                                console.log('Error in parsing notification accept_request template - ',
+                                                    notificationTemplaterRes.error);
+                                                console.log('postNotification : notification  is sent successfully');
+                                            }
                                 }
                                 /**
                                  * if proc executed unsuccessfully then give response false
