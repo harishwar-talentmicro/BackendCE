@@ -746,8 +746,6 @@ router.get('/', function(req,res,next){
 
         }
     }
-
-
     if (isNaN(parseInt(req.query.groupId)) || (req.query.groupId) < 0 ) {
         error.groupId = 'Invalid group id';
         validationFlag *= false;

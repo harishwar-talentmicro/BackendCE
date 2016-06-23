@@ -209,8 +209,6 @@ HrisHRM.prototype.hrisSaveHRMimg = function(req,res,next){
                                     }
                                 });
                             });
-
-
                         }
                         else{
                             responseMessage.status = false;

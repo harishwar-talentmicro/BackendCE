@@ -361,9 +361,6 @@ router.get('/validate', function(req,res,next){
     }
 });
 
-
-
-
 /**
  * Method : POST
  * @param req

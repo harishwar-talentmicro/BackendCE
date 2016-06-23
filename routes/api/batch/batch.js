@@ -79,7 +79,6 @@ router.post('/details', function(req,res,next){
                                     if (results[0]) {
                                         if (results[0][0]) {
                                             if (results[0][0].id) {
-
                                                 responseMessage.status = true;
                                                 responseMessage.error = null;
                                                 responseMessage.message = 'batch created successfully';
