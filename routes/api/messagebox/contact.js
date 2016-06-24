@@ -381,7 +381,7 @@ router.put('/status', function(req,res,next){
                                  * if proc executed successfully then give response true
                                  * */
                                 console.log('updateResult',updateResult);
-                                console.log('updateResult[3]',updateResult[3]);
+
 
                                 if (updateResult
                                     && updateResult[0]
@@ -424,20 +424,54 @@ router.put('/status', function(req,res,next){
                                             break;
                                     }
                                     var notificationTemplaterRes;
+                                    /**
+                                     *preparing template according to all status for rejecting/accepting/removed from group
+                                     * */
+                                    updateResult[3][0].requesterGroupId = req.body.groupId;
+                                    console.log('updateResult[3]',updateResult[3]);
                                     switch (updateResult[0][0].status) {
-                                        case 1 :
+                                        case req.CONFIG.CONSTANT.EZEONE_MESSAGE_ACCEPT_STATUS :
                                             notificationTemplaterRes = notificationTemplater.parse('accept_request',{
                                                         adminName : (updateResult[3][0].fullName) ? updateResult[3][0].fullName : '',
                                                         groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
                                                     });
                                             break;
-                                        case 2 :
+                                        case req.CONFIG.CONSTANT.EZEONE_MESSAGE_REJECT_STATUS :
                                             notificationTemplaterRes = notificationTemplater.parse('reject_request',{
                                                 adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
                                                 groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
                                             });
+                                            if(notificationTemplaterRes.parsedTpl){
+                                                notification.publish(
+                                                    req.body.userGroupId,
+                                                    updateResult[0][0].groupName,
+                                                    updateResult[0][0].groupName,
+                                                    updateResult[0][0].senderId,
+                                                    notificationTemplaterRes.parsedTpl,
+                                                    32,
+                                                    0, '',
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    1,
+                                                    moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                    '',
+                                                    0,
+                                                    0,
+                                                    null,
+                                                    '',
+                                                    updateResult[3][0],
+                                                    null);
+                                                console.log('postNotification : notification is sent successfully');
+                                            }
+                                            else{
+                                                console.log('Error in parsing notification accept_request template - ',
+                                                    notificationTemplaterRes.error);
+                                                console.log('postNotification : notification  is sent successfully');
+                                            }
                                             break;
-                                        case 4 :
+                                        case req.CONFIG.CONSTANT.EZEONE_MESSAGE_REMOVE_STATUS :
                                             notificationTemplaterRes = notificationTemplater.parse('removed_from_group',{
                                                 adminName : (updateResult[3][0].fullName) ? updateResult[3][0].fullName : '',
                                                 groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
@@ -462,9 +496,12 @@ router.put('/status', function(req,res,next){
 
                                     var sendDeleteNotificationFlag = false;
                                     console.log(updateResult[0][0].status,"updateResult[0][0].status");
+                                    /**
+                                     * all active member of group will get silent notification
+                                     * */
                                         for(var i=0;i<updateResult[2].length;i++){
                                             switch(updateResult[0][0].status){
-                                                case 1 :
+                                                case req.CONFIG.CONSTANT.EZEONE_MESSAGE_ACCEPT_STATUS :
                                                     if(notificationTemplaterRes.parsedTpl){
                                                         notification.publish(
                                                             updateResult[2][i].groupId,
@@ -495,69 +532,8 @@ router.put('/status', function(req,res,next){
                                                         console.log('postNotification : notification  is sent successfully');
                                                     }
                                                     break;
-                                                case 2 :
-                                                    if(notificationTemplaterRes.parsedTpl){
-                                                        notification.publish(
-                                                            req.body.userGroupId,
-                                                            updateResult[0][0].groupName,
-                                                            updateResult[0][0].groupName,
-                                                            updateResult[0][0].senderId,
-                                                            notificationTemplaterRes.parsedTpl,
-                                                            32,
-                                                            0, '',
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            1,
-                                                            moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                            '',
-                                                            0,
-                                                            0,
-                                                            null,
-                                                            '',
-                                                            updateResult[3][0],
-                                                            null);
-                                                        console.log('postNotification : notification is sent successfully');
-                                                    }
-                                                    else{
-                                                        console.log('Error in parsing notification accept_request template - ',
-                                                            notificationTemplaterRes.error);
-                                                        console.log('postNotification : notification  is sent successfully');
-                                                    }
-                                                    break;
-                                                case 3 :
-                                                    if(notificationTemplaterRes.parsedTpl){
-                                                        notification.publish(
-                                                            updateResult[2][i].groupId,
-                                                            updateResult[0][0].groupName,
-                                                            updateResult[0][0].groupName,
-                                                            updateResult[0][0].senderId,
-                                                            notificationTemplaterRes.parsedTpl,
-                                                            32,
-                                                            0, '',
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            1,
-                                                            moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                            '',
-                                                            0,
-                                                            0,
-                                                            null,
-                                                            '',
-                                                            updateResult[3][0],
-                                                            null);
-                                                        console.log('postNotification : notification is sent successfully');
-                                                    }
-                                                    else{
-                                                        console.log('Error in parsing notification accept_request template - ',
-                                                            notificationTemplaterRes.error);
-                                                        console.log('postNotification : notification  is sent successfully');
-                                                    }
-                                                    break;
-                                                case 4:
+                                                case req.CONFIG.CONSTANT.EZEONE_MESSAGE_REMOVE_STATUS:
+                                                    sendDeleteNotificationFlag = true;
                                                     if(notificationTemplaterRes.parsedTpl){
                                                         notification.publish(
                                                             updateResult[2][i].groupId,
@@ -595,10 +571,10 @@ router.put('/status', function(req,res,next){
                                         }
 
                                     /**
-                                     * Sending notification to the member who is actually removed fromt this group
+                                     * Sending notification to the member who is actually removed from this group
                                      * It will be silent notification and he is now not an active member also
                                      */
-                                        if(sendDeleteNotificationFlag && notificationTemplaterRes.parsedTpl){
+                                        if((!sendDeleteNotificationFlag) && notificationTemplaterRes.parsedTpl){
                                                 notification.publish(
                                                     req.body.userGroupId,
                                                     updateResult[0][0].groupName,
