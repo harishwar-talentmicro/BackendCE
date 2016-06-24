@@ -957,15 +957,15 @@ router.post('/delete', function(req,res,next){
 
 
                                         var notificationTemplaterRes = notificationTemplater.parse('message_deleted', {
-                                            groupName: tokenResult.ezeoneId
+                                            groupName: tokenResult[0].ezeoneId
                                         });
                                         console.log(notificationTemplaterRes.parsedTpl, "notificationTemplaterRes.parsedTpl");
                                         if (notificationTemplaterRes.parsedTpl) {
                                             notification.publish(
-                                                tokenResult.groupId,
+                                                tokenResult[0].groupId,
                                                 '',
-                                                tokenResult.ezeoneId,
-                                                tokenResult.groupId,
+                                                tokenResult[0].ezeoneId,
+                                                tokenResult[0].groupId,
                                                 notificationTemplaterRes.parsedTpl,
                                                 39,
                                                 0, '',
