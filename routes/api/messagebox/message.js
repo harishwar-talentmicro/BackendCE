@@ -320,6 +320,20 @@ router.post('/', function(req,res,next){
                                                     });
                                                 }
                                                 console.log(results[0][0].messageType,"messageType");
+
+                                                /**
+                                                 * Condtion should be like this in restricted reply case
+                                                 * (Already handled by vedha on DB side)
+                                                 *
+                                                 * When any other user is messaging in the restricted reply group
+                                                 * then notification and message should only go to admin and not to other persons
+                                                 * of that group
+                                                 *
+                                                 * If admin is messaging in restricted reply group then notification should go to all
+                                                 * the members if explicitMemberIdList is empty
+                                                 *
+                                                 */
+
                                                 for (var i = 0; i < results[1].length; i++ ) {
                                                     /**
                                                      * if relation not exist then send all sender details to receiver
