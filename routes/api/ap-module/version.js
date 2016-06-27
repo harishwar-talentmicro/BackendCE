@@ -23,7 +23,7 @@ router.get('/:versionCode', function(req,res,next){
         versionCode = 1;
         responseMessage.status = true;
         responseMessage.error = null;
-        responseMessage.message = 'Application vesion is valid';
+        responseMessage.message = 'Application version is valid';
         responseMessage.data = {
             isValid : versionCode
         };
@@ -32,7 +32,7 @@ router.get('/:versionCode', function(req,res,next){
     else {
         responseMessage.status = true;
         responseMessage.error = null;
-        responseMessage.message = 'Application vesion is not valid';
+        responseMessage.message = 'Application version is not valid';
         responseMessage.data = {
             isValid : versionCode
         };
