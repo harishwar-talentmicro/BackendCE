@@ -336,10 +336,10 @@ Search.prototype.searchKeyword = function(req,res,next){
 
                                             SearchResult[1][i]['OpenStatus'] = st.getOpenStatus(SearchResult[1][i].OpenStatus,SearchResult[1][i].wh);
 
-                                            if(SearchResult[1][i].IDTypeID == 1){
-                                                //individualResList.push(i);
-                                                SearchResult[1].splice(i,1);
-                                            }
+                                            //if(SearchResult[1][i].IDTypeID == 1){
+                                            //    //individualResList.push(i);
+                                            //    SearchResult[1].splice(i,1);
+                                            //}
 
 
                                             if (SearchResult[1][i].tilebanner == '') {
@@ -354,7 +354,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                                                 }
                                             }
                                             else{
-                                                SearchResult[1][i].tilebanner=req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + SearchResult[1][i].tilebanner;
+                                                SearchResult[1][i].tilebanner = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + SearchResult[1][i].tilebanner;
 
                                             }
                                         }
