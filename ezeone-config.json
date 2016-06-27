@@ -20,7 +20,11 @@
       "himank@hirecraft.in",
       "sujitkumar@hirecraft.in",
       "pal.aabhishek95@gmail.com"
-    ]
+    ],
+    "EZEONE_MESSAGE_ACCEPT_STATUS":1,
+    "EZEONE_MESSAGE_REJECT_STATUS":2,
+    "EZEONE_MESSAGE_LEAVE_STATUS":3,
+    "EZEONE_MESSAGE_REMOVE_STATUS":4
   },
   "SCHEME" : "https",
   "DOMAIN" : "www.ezeone.com",
