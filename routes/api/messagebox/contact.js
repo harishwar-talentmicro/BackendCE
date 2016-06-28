@@ -424,6 +424,20 @@ router.put('/status', function(req,res,next){
                                             break;
                                     }
                                     var notificationTemplaterRes;
+
+
+                                    /**
+                                     * @TODO Problem in case of rejection by either party
+                                     * @author Indra Jeet
+                                     * Problem Details :
+                                     * Individual Case : if @ABHI is blocking @MADHU then also @MADHU is getting notificaiton that @MADHU has blocked @ABHI
+                                     * Group Case : if Admin @VEDHA has blocked @SAMEER from group HSR still notification is coming like @SAMEER has blocked @VEDHA
+                                     *
+                                     * The cases are something like that only , data is going wrong in notification in the case
+                                     * so notifications have to be handled based on individual block and group leaving and removal of member from group
+                                     * or blocking a contact or rejecting request to join in group by admin or individual
+                                     */
+
                                     /**
                                      *preparing template according to all status for rejecting/accepting/removed from group
                                      * */
@@ -436,14 +450,60 @@ router.put('/status', function(req,res,next){
                                                         groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
                                                     });
                                             break;
+                                        
                                         case req.CONFIG.CONSTANT.EZEONE_MESSAGE_REJECT_STATUS :
+                                            
                                             notificationTemplaterRes = notificationTemplater.parse('reject_request',{
                                                 adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
                                                 groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
                                             });
                                             if(notificationTemplaterRes.parsedTpl){
+
+                                                /**
+                                                 * @LOGIC
+                                                 * When rejected notification should go to the either party for that
+                                                 * The publishing should happen in this manner
+                                                 * If either party (except this login user) is individual then directly publish to
+                                                 * groupId
+                                                 *
+                                                 * Otherwise if either party is a group then find his admin and publish this to his admin groupId
+                                                 */
+
+                                                var receiverId = 0;
+                                                /**
+                                                 * Individual Blocking here as groupType is 1
+                                                 */
+                                                if(updateResult[0][0].groupType == 1){
+                                                    if(tokenResult[0].groupId != req.body.groupId){
+                                                        receiverId = req.body.groupId;
+                                                    }
+                                                    else{
+                                                        receiverId = req.body.userGroupId;
+                                                    }
+                                                }
+                                                /**
+                                                 * Group request rejection case
+                                                 */
+                                                else{
+                                                    /**
+                                                     * If admin has rejected the request
+                                                     * Notification will go to the person whose request is rejected
+                                                     */
+                                                    if(updateResult[0][0].isAdmin){
+                                                        receiverId = req.body.userGroupId;
+                                                    }
+                                                    /**
+                                                     * If other person has rejected the invitation to join the group sent by admin
+                                                     * then notification will go to groupAdmin
+                                                     */
+                                                    else{
+                                                        receiverId = updateResult[0][0].senderId;
+                                                    }
+                                                }
+
+
                                                 notification.publish(
-                                                    req.body.userGroupId,
+                                                    receiverId, // @PROBLEM Problem
                                                     updateResult[0][0].groupName,
                                                     updateResult[0][0].groupName,
                                                     updateResult[0][0].senderId,
@@ -471,6 +531,7 @@ router.put('/status', function(req,res,next){
                                                 console.log('postNotification : notification  is sent successfully');
                                             }
                                             break;
+                                        
                                         case req.CONFIG.CONSTANT.EZEONE_MESSAGE_REMOVE_STATUS :
                                             notificationTemplaterRes = notificationTemplater.parse('removed_from_group',{
                                                 adminName : (updateResult[3][0].fullName) ? updateResult[3][0].fullName : '',
@@ -499,7 +560,7 @@ router.put('/status', function(req,res,next){
                                     /**
                                      * all active member of group will get silent notification
                                      * */
-                                        for(var i=0;i<updateResult[2].length;i++){
+                                        for(var i=0; i < updateResult[2].length;i++){
                                             switch(updateResult[0][0].status){
                                                 case req.CONFIG.CONSTANT.EZEONE_MESSAGE_ACCEPT_STATUS :
                                                     if(notificationTemplaterRes.parsedTpl){
