@@ -246,7 +246,7 @@ var crashReportGenerator = function(req,res,next){
     checkCrashDirectory(path.join('../' + crashReportDir),function(err){
         if(!err){
 
-            req.st.libs.fs.appendFileSync(path.join('../' + req.CONFIG.CONSTANT.ANDROID_CRASH_REPORT_DIR + separator +fileName),crashData);
+            req.st.libs.fs.appendFileSync(path.join('../' + crashReportDir + separator +fileName),crashData);
 
             res.send('');
 
