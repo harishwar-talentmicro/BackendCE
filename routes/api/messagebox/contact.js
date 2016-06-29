@@ -206,47 +206,47 @@ router.get('/', function(req,res,next){
                                  *if request comes from web then call PGetUnreadMessageCountofGroup procedure
                                  * to get unread count of messages because mobile people will save this count in their local sqllite
                                  * */
-                                    var unreadCountqueryParams = req.db.escape(req.query.token);
-                                    var unreadCountQuery = 'CALL PGetUnreadMessageCountofGroup(' + unreadCountqueryParams + ')';
-                                    console.log(unreadCountQuery,"unreadCountQuery");
-                                    req.db.query(unreadCountQuery, function (err, countResults) {
-                                        console.log(countResults,"countResults");
-                                        if (countResults && countResults[0] && countResults[0].length > 0) {
-                                            for (var i = 0; i < contactResults[0].length; i++) {
+                                var unreadCountqueryParams = req.db.escape(req.query.token);
+                                var unreadCountQuery = 'CALL PGetUnreadMessageCountofGroup(' + unreadCountqueryParams + ')';
+                                console.log(unreadCountQuery,"unreadCountQuery");
+                                req.db.query(unreadCountQuery, function (err, countResults) {
+                                    console.log(countResults,"countResults");
+                                    if (countResults && countResults[0] && countResults[0].length > 0) {
+                                        for (var i = 0; i < contactResults[0].length; i++) {
+                                            /**
+                                             * assign all values of group id in a variable
+                                             * */
+                                            groupId = contactResults[0][i].groupId;
+                                            for (var j = 0; j < countResults[0].length; j++) {
                                                 /**
-                                                 * assign all values of group id in a variable
+                                                 * compare both group id getting from both proc if equal then push unreadcount to first results
+                                                 * only in web condition
                                                  * */
-                                                groupId = contactResults[0][i].groupId;
-                                                for (var j = 0; j < countResults[0].length; j++) {
-                                                    /**
-                                                     * compare both group id getting from both proc if equal then push unreadcount to first results
-                                                     * only in web condition
-                                                     * */
-                                                    if (groupId == countResults[0][j].groupID) {
-                                                        //console.log(countResults[0][j].groupID,"countResults[0][j].groupID");
-                                                        contactResults[0][i].unreadCount = countResults[0][j].count;
-                                                    }
+                                                if (groupId == countResults[0][j].groupID) {
+                                                    //console.log(countResults[0][j].groupID,"countResults[0][j].groupID");
+                                                    contactResults[0][i].unreadCount = countResults[0][j].count;
                                                 }
                                             }
-                                            //contactList.push(results[0]);
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Contact list loaded successfully';
-                                            responseMessage.data = {
-                                                contactList:contactResults[0]
-                                            };
-                                            res.status(200).json(responseMessage);
                                         }
-                                        else{
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Contact list loaded successfully';
-                                            responseMessage.data = {
-                                                contactList:contactResults[0]
-                                            };
-                                            res.status(200).json(responseMessage);
-                                        }
-                                    });
+                                        //contactList.push(results[0]);
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Contact list loaded successfully';
+                                        responseMessage.data = {
+                                            contactList:contactResults[0]
+                                        };
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else{
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Contact list loaded successfully';
+                                        responseMessage.data = {
+                                            contactList:contactResults[0]
+                                        };
+                                        res.status(200).json(responseMessage);
+                                    }
+                                });
 
                             }
                             else{
@@ -359,285 +359,152 @@ router.put('/status', function(req,res,next){
             req.st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err && tokenResult) {
 
-                        var queryParams = [
-                            req.db.escape(req.body.token) ,
-                            req.db.escape(req.body.groupId) ,
-                            req.db.escape(req.body.status) ,
-                            req.db.escape(req.body.userGroupId)
-                        ];
-                        var notifyParams = [
-                            req.db.escape(req.body.token) ,
-                            req.db.escape(req.body.groupId)
-                        ];
-                        /**
-                         * call p_v1_UpdateUserStatus to change the status like accept/reject/block
-                         * */
-                        var query = 'CALL p_v1_UpdateUserStatus(' + queryParams.join(',') + ');' +
+                    var queryParams = [
+                        req.db.escape(req.body.token) ,
+                        req.db.escape(req.body.groupId) ,
+                        req.db.escape(req.body.status) ,
+                        req.db.escape(req.body.userGroupId)
+                    ];
+                    var notifyParams = [
+                        req.db.escape(req.body.token) ,
+                        req.db.escape(req.body.groupId)
+                    ];
+                    /**
+                     * call p_v1_UpdateUserStatus to change the status like accept/reject/block
+                     * */
+                    var query = 'CALL p_v1_UpdateUserStatus(' + queryParams.join(',') + ');' +
                         '           CALL pnotify_on_status_change(' + notifyParams.join(',') + ');';
-                        console.log(query);
-                        req.db.query(query, function (err, updateResult) {
-                            if (!err) {
-                                /**
-                                 * if proc executed successfully then give response true
-                                 * */
-                                console.log('updateResult',updateResult);
+                    console.log(query);
+                    req.db.query(query, function (err, updateResult) {
+                        if (!err) {
+                            /**
+                             * if proc executed successfully then give response true
+                             * */
+                            console.log('updateResult',updateResult);
 
 
-                                if (updateResult
-                                    && updateResult[0]
-                                    && updateResult[0].length > 0 && updateResult[0][0]) {
-                                    switch (updateResult[0][0]._e) {
+                            if (updateResult
+                                && updateResult[0]
+                                && updateResult[0].length > 0 && updateResult[0][0]) {
+                                switch (updateResult[0][0]._e) {
                                     /**
                                      * This error will only come when for the group any other user has called this API who
                                      * is not a groupAdmin
                                      */
-                                        case 'ACCESS_DENIED' :
-                                            qMsg = {_e: 'ACCESS_DENIED'};
-                                            responseMessage.message = "You don't have permission for the following action";
-                                            responseMessage.error = qMsg;
+                                    case 'ACCESS_DENIED' :
+                                        qMsg = {_e: 'ACCESS_DENIED'};
+                                        responseMessage.message = "You don't have permission for the following action";
+                                        responseMessage.error = qMsg;
+                                        responseMessage.data = null;
+                                        res.status(400).json(responseMessage);
+                                        break;
+                                    case 'NO_RELATION_EXISTS' :
+                                        qMsg = {_e : 'NO_RELATION_EXISTS '};
+                                        responseMessage.message = "You don't have permission for the following action";
+                                        responseMessage.error = qMsg;
+                                        responseMessage.data = null;
+                                        res.status(400).json(responseMessage);
+                                        break;
+                                    default :
+                                        console.log('updateResult[0][0].userGroupId',updateResult[0][0].userGroupId);
+                                        if(updateResult[0][0].userGroupId){
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'User status updated successfully';
                                             responseMessage.data = null;
-                                            res.status(400).json(responseMessage);
-                                            break;
-                                        case 'NO_RELATION_EXISTS' :
-                                            qMsg = {_e : 'NO_RELATION_EXISTS '};
-                                            responseMessage.message = "You don't have permission for the following action";
-                                            responseMessage.error = qMsg;
-                                            responseMessage.data = null;
-                                            res.status(400).json(responseMessage);
-                                            break;
-                                        default :
-                                            console.log('updateResult[0][0].userGroupId',updateResult[0][0].userGroupId);
-                                            if(updateResult[0][0].userGroupId){
-                                                responseMessage.status = true;
-                                                responseMessage.error = null;
-                                                responseMessage.message = 'User status updated successfully';
-                                                responseMessage.data = null;
-                                                res.status(200).json(responseMessage);
-                                            }
-                                            else{
-                                                responseMessage.status = false;
-                                                responseMessage.error = { server : 'Internal server error'};
-                                                responseMessage.message = 'Something went wrong!';
-                                                responseMessage.data = null;
-                                                res.status(400).json(responseMessage);
-                                            }
-                                            break;
-                                    }
-                                    var notificationTemplaterRes;
-
-
-                                    /**
-                                     * @TODO Problem in case of rejection by either party
-                                     * @author Indra Jeet
-                                     * Problem Details :
-                                     * Individual Case : if @ABHI is blocking @MADHU then also @MADHU is getting notificaiton that @MADHU has blocked @ABHI
-                                     * Group Case : if Admin @VEDHA has blocked @SAMEER from group HSR still notification is coming like @SAMEER has blocked @VEDHA
-                                     *
-                                     * The cases are something like that only , data is going wrong in notification in the case
-                                     * so notifications have to be handled based on individual block and group leaving and removal of member from group
-                                     * or blocking a contact or rejecting request to join in group by admin or individual
-                                     */
-
-                                    /**
-                                     *preparing template according to all status for rejecting/accepting/removed from group
-                                     * */
-                                    updateResult[3][0].requesterGroupId = req.body.groupId;
-                                    console.log('updateResult[3]',updateResult[3]);
-                                    switch (updateResult[0][0].status) {
-                                        case req.CONFIG.CONSTANT.EZEONE_MESSAGE_ACCEPT_STATUS :
-                                            notificationTemplaterRes = notificationTemplater.parse('accept_request',{
-                                                        adminName : (updateResult[3][0].fullName) ? updateResult[3][0].fullName : '',
-                                                        groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
-                                                    });
-                                            break;
-                                        
-                                        case req.CONFIG.CONSTANT.EZEONE_MESSAGE_REJECT_STATUS :
-                                            
-                                            notificationTemplaterRes = notificationTemplater.parse('reject_request',{
-                                                adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
-                                                groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
-                                            });
-                                            if(notificationTemplaterRes.parsedTpl){
-
-                                                /**
-                                                 * @LOGIC
-                                                 * When rejected notification should go to the either party for that
-                                                 * The publishing should happen in this manner
-                                                 * If either party (except this login user) is individual then directly publish to
-                                                 * groupId
-                                                 *
-                                                 * Otherwise if either party is a group then find his admin and publish this to his admin groupId
-                                                 */
-
-                                                var receiverId = 0;
-                                                /**
-                                                 * Individual Blocking here as groupType is 1
-                                                 */
-                                                if(updateResult[0][0].groupType == 1){
-                                                    if(tokenResult[0].groupId != req.body.groupId){
-                                                        receiverId = req.body.groupId;
-                                                    }
-                                                    else{
-                                                        receiverId = req.body.userGroupId;
-                                                    }
-                                                }
-                                                /**
-                                                 * Group request rejection case
-                                                 */
-                                                else{
-                                                    /**
-                                                     * If admin has rejected the request
-                                                     * Notification will go to the person whose request is rejected
-                                                     */
-                                                    if(updateResult[0][0].isAdmin){
-                                                        receiverId = req.body.userGroupId;
-                                                    }
-                                                    /**
-                                                     * If other person has rejected the invitation to join the group sent by admin
-                                                     * then notification will go to groupAdmin
-                                                     */
-                                                    else{
-                                                        receiverId = updateResult[0][0].senderId;
-                                                    }
-                                                }
-
-
-                                                notification.publish(
-                                                    receiverId, // @PROBLEM Problem
-                                                    updateResult[0][0].groupName,
-                                                    updateResult[0][0].groupName,
-                                                    updateResult[0][0].senderId,
-                                                    notificationTemplaterRes.parsedTpl,
-                                                    32,
-                                                    0, '',
-                                                    0,
-                                                    0,
-                                                    0,
-                                                    0,
-                                                    1,
-                                                    moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                    '',
-                                                    0,
-                                                    0,
-                                                    null,
-                                                    '',
-                                                    updateResult[3][0],
-                                                    null);
-                                                console.log('postNotification : notification is sent successfully');
-                                            }
-                                            else{
-                                                console.log('Error in parsing notification accept_request template - ',
-                                                    notificationTemplaterRes.error);
-                                                console.log('postNotification : notification  is sent successfully');
-                                            }
-                                            break;
-                                        
-                                        case req.CONFIG.CONSTANT.EZEONE_MESSAGE_REMOVE_STATUS :
-                                            notificationTemplaterRes = notificationTemplater.parse('removed_from_group',{
-                                                adminName : (updateResult[3][0].fullName) ? updateResult[3][0].fullName : '',
-                                                groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
-                                            });
-                                            break;
-                                        default :
-                                            break;
-                                    }
-                                    //if(updateResult[0][0].status == 1){
-                                    //    var notificationTemplaterRes = notificationTemplater.parse('accept_request',{
-                                    //        adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
-                                    //        groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
-                                    //    });
-                                    //}
-                                    //else{
-                                    //    var notificationTemplaterRes = notificationTemplater.parse('reject_request',{
-                                    //        adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
-                                    //        groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
-                                    //    });
-                                    //}
-                                    console.log('FnUpdateUserStatus: User status updated successfully');
-
-                                    var sendDeleteNotificationFlag = false;
-                                    console.log(updateResult[0][0].status,"updateResult[0][0].status");
-                                    /**
-                                     * all active member of group will get silent notification
-                                     * */
-                                        for(var i=0; i < updateResult[2].length;i++){
-                                            switch(updateResult[0][0].status){
-                                                case req.CONFIG.CONSTANT.EZEONE_MESSAGE_ACCEPT_STATUS :
-                                                    if(notificationTemplaterRes.parsedTpl){
-                                                        notification.publish(
-                                                            updateResult[2][i].groupId,
-                                                            updateResult[0][0].groupName,
-                                                            updateResult[0][0].groupName,
-                                                            updateResult[0][0].senderId,
-                                                            notificationTemplaterRes.parsedTpl,
-                                                            32,
-                                                            0, '',
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            1,
-                                                            moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                            '',
-                                                            0,
-                                                            0,
-                                                            null,
-                                                            '',
-                                                            updateResult[3][0],
-                                                            null);
-                                                        console.log('postNotification : notification is sent successfully');
-                                                    }
-                                                    else{
-                                                        console.log('Error in parsing notification accept_request template - ',
-                                                            notificationTemplaterRes.error);
-                                                        console.log('postNotification : notification  is sent successfully');
-                                                    }
-                                                    break;
-                                                case req.CONFIG.CONSTANT.EZEONE_MESSAGE_REMOVE_STATUS:
-                                                    sendDeleteNotificationFlag = true;
-                                                    if(notificationTemplaterRes.parsedTpl){
-                                                        notification.publish(
-                                                            updateResult[2][i].groupId,
-                                                            updateResult[0][0].groupName,
-                                                            updateResult[0][0].groupName,
-                                                            updateResult[0][0].senderId,
-                                                            notificationTemplaterRes.parsedTpl,
-                                                            32,
-                                                            0, '',
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            1,
-                                                            moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                            '',
-                                                            0,
-                                                            0,
-                                                            null,
-                                                            '',
-                                                            updateResult[3][0],
-                                                            null);
-                                                        console.log('postNotification : notification is sent successfully');
-                                                    }
-                                                    else{
-                                                        console.log('Error in parsing notification accept_request template - ',
-                                                            notificationTemplaterRes.error);
-                                                        console.log('postNotification : notification  is sent successfully');
-                                                    }
-                                                    break;
-                                                default :
-                                                    break;
-                                            }
-
+                                            res.status(200).json(responseMessage);
                                         }
+                                        else{
+                                            responseMessage.status = false;
+                                            responseMessage.error = { server : 'Internal server error'};
+                                            responseMessage.message = 'Something went wrong!';
+                                            responseMessage.data = null;
+                                            res.status(400).json(responseMessage);
+                                        }
+                                        break;
+                                }
+                                var notificationTemplaterRes;
+                                /**
+                                 *preparing template according to all status for rejecting/accepting/removed from group
+                                 * */
+                                updateResult[3][0].requesterGroupId = req.body.groupId;
+                                console.log('updateResult[3]',updateResult[3]);
+                                switch (updateResult[0][0].status) {
+                                    case req.CONFIG.CONSTANT.EZEONE_MESSAGE_ACCEPT_STATUS :
+                                        notificationTemplaterRes = notificationTemplater.parse('accept_request',{
+                                            adminName : (updateResult[3][0].fullName) ? updateResult[3][0].fullName : '',
+                                            groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
+                                        });
+                                        break;
+                                    case req.CONFIG.CONSTANT.EZEONE_MESSAGE_REJECT_STATUS :
+                                        notificationTemplaterRes = notificationTemplater.parse('reject_request',{
+                                            adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
+                                            groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
+                                        });
+                                        if(notificationTemplaterRes.parsedTpl){
+                                            notification.publish(
+                                                req.body.userGroupId,
+                                                updateResult[0][0].groupName,
+                                                updateResult[0][0].groupName,
+                                                updateResult[0][0].senderId,
+                                                notificationTemplaterRes.parsedTpl,
+                                                32,
+                                                0, '',
+                                                0,
+                                                0,
+                                                0,
+                                                0,
+                                                1,
+                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                '',
+                                                0,
+                                                0,
+                                                null,
+                                                '',
+                                                updateResult[3][0],
+                                                null);
+                                            console.log('postNotification : notification is sent successfully');
+                                        }
+                                        else{
+                                            console.log('Error in parsing notification accept_request template - ',
+                                                notificationTemplaterRes.error);
+                                            console.log('postNotification : notification  is sent successfully');
+                                        }
+                                        break;
+                                    case req.CONFIG.CONSTANT.EZEONE_MESSAGE_REMOVE_STATUS :
+                                        notificationTemplaterRes = notificationTemplater.parse('removed_from_group',{
+                                            adminName : (updateResult[3][0].fullName) ? updateResult[3][0].fullName : '',
+                                            groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
+                                        });
+                                        break;
+                                    default :
+                                        break;
+                                }
+                                //if(updateResult[0][0].status == 1){
+                                //    var notificationTemplaterRes = notificationTemplater.parse('accept_request',{
+                                //        adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
+                                //        groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
+                                //    });
+                                //}
+                                //else{
+                                //    var notificationTemplaterRes = notificationTemplater.parse('reject_request',{
+                                //        adminName : (updateResult[0][0].adminName) ? updateResult[0][0].adminName : '',
+                                //        groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
+                                //    });
+                                //}
+                                console.log('FnUpdateUserStatus: User status updated successfully');
 
-                                    /**
-                                     * Sending notification to the member who is actually removed from this group
-                                     * It will be silent notification and he is now not an active member also
-                                     */
-                                        if((!sendDeleteNotificationFlag) && notificationTemplaterRes.parsedTpl){
+                                var sendDeleteNotificationFlag = false;
+                                console.log(updateResult[0][0].status,"updateResult[0][0].status");
+                                /**
+                                 * all active member of group will get silent notification
+                                 * */
+                                for(var i=0;i<updateResult[2].length;i++){
+                                    switch(updateResult[0][0].status){
+                                        case req.CONFIG.CONSTANT.EZEONE_MESSAGE_ACCEPT_STATUS :
+                                            if(notificationTemplaterRes.parsedTpl){
                                                 notification.publish(
-                                                    req.body.userGroupId,
+                                                    updateResult[2][i].groupId,
                                                     updateResult[0][0].groupName,
                                                     updateResult[0][0].groupName,
                                                     updateResult[0][0].senderId,
@@ -664,31 +531,103 @@ router.put('/status', function(req,res,next){
                                                     notificationTemplaterRes.error);
                                                 console.log('postNotification : notification  is sent successfully');
                                             }
+                                            break;
+                                        case req.CONFIG.CONSTANT.EZEONE_MESSAGE_REMOVE_STATUS:
+                                            sendDeleteNotificationFlag = true;
+                                            if(notificationTemplaterRes.parsedTpl){
+                                                notification.publish(
+                                                    updateResult[2][i].groupId,
+                                                    updateResult[0][0].groupName,
+                                                    updateResult[0][0].groupName,
+                                                    updateResult[0][0].senderId,
+                                                    notificationTemplaterRes.parsedTpl,
+                                                    32,
+                                                    0, '',
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    1,
+                                                    moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                    '',
+                                                    0,
+                                                    0,
+                                                    null,
+                                                    '',
+                                                    updateResult[3][0],
+                                                    null);
+                                                console.log('postNotification : notification is sent successfully');
+                                            }
+                                            else{
+                                                console.log('Error in parsing notification accept_request template - ',
+                                                    notificationTemplaterRes.error);
+                                                console.log('postNotification : notification  is sent successfully');
+                                            }
+                                            break;
+                                        default :
+                                            break;
+                                    }
+
                                 }
+
                                 /**
-                                 * if proc executed unsuccessfully then give response false
-                                 * */
-                                else {
-                                    var qMsg = {server: 'Internal Server Error'};
-                                    responseMessage.status = false;
-
-
-                                    responseMessage.data = {};
-                                    res.status(400).json(responseMessage);
+                                 * Sending notification to the member who is actually removed from this group
+                                 * It will be silent notification and he is now not an active member also
+                                 */
+                                if((!sendDeleteNotificationFlag) && notificationTemplaterRes.parsedTpl){
+                                    notification.publish(
+                                        req.body.userGroupId,
+                                        updateResult[0][0].groupName,
+                                        updateResult[0][0].groupName,
+                                        updateResult[0][0].senderId,
+                                        notificationTemplaterRes.parsedTpl,
+                                        32,
+                                        0, '',
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        1,
+                                        moment().format("YYYY-MM-DD HH:mm:ss"),
+                                        '',
+                                        0,
+                                        0,
+                                        null,
+                                        '',
+                                        updateResult[3][0],
+                                        null);
+                                    console.log('postNotification : notification is sent successfully');
+                                }
+                                else{
+                                    console.log('Error in parsing notification accept_request template - ',
+                                        notificationTemplaterRes.error);
+                                    console.log('postNotification : notification  is sent successfully');
                                 }
                             }
                             /**
-                             * while executing proc if error comes then give error
+                             * if proc executed unsuccessfully then give response false
                              * */
                             else {
-                                responseMessage.message = 'An error occured ! Please try again';
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                res.status(500).json(responseMessage);
-                                console.log('p_v1_UpdateUserStatus: error in updating user status :' + err);
+                                var qMsg = {server: 'Internal Server Error'};
+                                responseMessage.status = false;
+
+
+                                responseMessage.data = {};
+                                res.status(400).json(responseMessage);
                             }
-                        });
+                        }
+                        /**
+                         * while executing proc if error comes then give error
+                         * */
+                        else {
+                            responseMessage.message = 'An error occured ! Please try again';
+                            responseMessage.error = {
+                                server: 'Internal Server Error'
+                            };
+                            res.status(500).json(responseMessage);
+                            console.log('p_v1_UpdateUserStatus: error in updating user status :' + err);
+                        }
+                    });
                 }
                 else {
                     responseMessage.error = {
@@ -719,4 +658,3 @@ router.put('/status', function(req,res,next){
 
 
 module.exports = router;
-

@@ -10,92 +10,78 @@
 
 var fs = require('fs');
 var uuid = require('node-uuid');
-var amqp = require('amqp');
-//var mqtt    = require('mqtt');
+
 
 var CONFIG = require('../../../ezeone-config.json');
 
-//function MqttFalse(){};
-//function MqttFalseClient(){};
-//
-//MqttFalse.prototype.connect = function(){
-//    var mqttFalseClient =  MqttFalseClient();
-//    return mqttFalseClient;
-//};
-//MqttFalse.prototype.publish = function(){};
-//MqttFalseClient.prototype.publish = function(topic,payload){};
-
-
-//var mqttClient  = mqtt.connect("tcp://"+CONFIG.MQTT.HOST+":"+CONFIG.MQTT.PORT, {
-//    clientId : "mqtt-8947983217"+Date.now(), clean : false,
-//    username : 'indrajeet',
-//    password : "indrajeet",
-//    connectTimeout : 30000,
-//    reconnectPeriod : 1000,
-//    keepalive : 20
-//});
-//
-//mqttClient.on('connect', function () {
-//    console.log('mqtt connected');
-//});
-
-
 /*********************************************** AMQP upgraded code **************************************/
 
-var url = 'amqp://indrajeet:indrajeet@'+CONFIG.MQTT.HOST+':5672/%2f';
+var messageList = [];
 
-var connOpt = { defaultExchangeName: 'amq.topic',
-        url : url,
-    heartbeat: 20
-    , reconnect: true
-        , connectionTimeout: 10000
-    , reconnectExponentialLimit: 120000
-    , reconnectBackoffTime: 1000
-};
+function createConnection(){
+    var open = require('amqplib').connect('amqp://'+CONFIG.MQTT.USERNAME+':'+CONFIG.MQTT.PASSWORD+'@'+CONFIG.MQTT.HOST+
+        ':'+CONFIG.MQTT.AMQP_PORT+'/'+CONFIG.MQTT.VHOST+'?heartbeat=500');
+    var openConn = open;
 
+    openConn.then(function(conn) {
 
-var amqpConn = null;
-amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
-console.log('.....................................................................');
-//console.log(amqpConn);
-console.log('.....................................................................');
-if(amqpConn){
-    amqpConn.on('ready',function(){
-        console.log('Connection established successfully to rabbitmq broker');
-    });
-
-    amqpConn.on('error',function(err){
-        console.log(err);
-        console.log('Connection generated an error event');
-        setImmediate(function(){
+        conn.on('error',function(){
             setTimeout(function(){
-                amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
-
-            },500);
+                createConnection();
+            },1000);
         });
+
+        conn.on('close',function(){
+            setTimeout(function(){
+                createConnection();
+            },1000);
+        });
+
+        var ok = conn.createChannel();
+
+        ok = ok.then(function(channel){
+            publishMessage(channel);
+        });
+        return ok;
+
+    }).then(function(){
+        console.log('ok');
+        // publishMessage();
+    },function(){
+        setTimeout(function(){
+            createConnection();
+        },1000);
     });
 }
 
-function NotificationMqtt(){
-    try{
-        if(!amqpConn){
-            amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
-            amqpConn.on('ready',function(){
-                console.log('Connection established successfully to rabbitmq broker');
-            });
+createConnection();
 
-            amqpConn.on('error',function(){
-                setImmediate(function(){
-                    setTimeout(function(){
-                        amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
-                    },500);
+
+
+
+var counter  = 0;
+function publishMessage(channel){
+    setImmediate(function() {
+        if (messageList.length) {
+            var msgObj = messageList.shift();
+            try{
+                channel.assertQueue(msgObj.topic).then(function(){
+                    channel.publish('amq.topic', msgObj.topic, new Buffer(JSON.stringify(msgObj.message)));
+                    console.log('Published message : ', ++counter );
+                },function(){
+                    messageList.unshift(msgObj);
                 });
-            });
+            }
+            catch(ex){
+                messageList.unshift(msgObj);
+            }
         }
-    }
-    catch(ex){
-        console.log('Unable to reach rabbitmq server!');
-    }
+        publishMessage(channel);
+    });
+}
+
+
+function NotificationMqtt(){
 };
 
 NotificationMqtt.prototype.limitMessage = function(message,limit){
@@ -111,22 +97,6 @@ NotificationMqtt.prototype.limitMessage = function(message,limit){
 
 
     function cutMessage(msgStr){
-        /**
-         * to get size of message and fix it at 1024 byte;
-         */
-
-
-
-        //var bufsize = Buffer.byteLength(msgStr);
-        //console.log('original message buffer size : '+bufsize);
-        //console.log(typeof(bufsize));
-        //if (bufsize > 1024){
-        //    var buf = new Buffer(1024);
-        //    buf.write(msgStr);
-        //    var stringMessage = buf.toString('utf8');
-        //    var stringbufsize = Buffer.byteLength(stringMessage);
-        //    msgStr = stringMessage;
-        //}
 
         return msgStr;
     };
@@ -139,29 +109,10 @@ NotificationMqtt.prototype.limitMessage = function(message,limit){
 };
 
 NotificationMqtt.prototype.checkQueue = function(topic,callback){
-    amqpConn.queue(
-        topic,
-        { passive : false,durable : true,exclusive : false,autoDelete : false},
-        function(queRef){
-            //var exchange = amqpConn.exchange();
-            if(callback){
-                callback();
-            }
-        }
-    );
 };
 
 NotificationMqtt.prototype.createQueue = function(topic,callback){
-    amqpConn.queue(
-        topic,
-        { passive : false,durable : true,exclusive : false,autoDelete : false},
-        function(queRef){
-            //var exchange = amqpConn.exchange();
-            if(callback){
-                callback();
-            }
-        }
-    );
+
 };
 
 NotificationMqtt.prototype.publish = function(topic,messagePayload){
@@ -184,25 +135,11 @@ NotificationMqtt.prototype.publish = function(topic,messagePayload){
        // console.log(messagePayload);
 
         try{
-            this.createQueue(topic.toString(),function(){
-                //mqttClient.publish(topic.toString(),JSON.stringify(messagePayload),{qos : 1, retain : true},function(){
-                //    console.log('Message published : '+ topic);
-                //});
-                var exchange = amqpConn.exchange();
-                exchange.publish(topic.toString(),
-                    JSON.stringify(messagePayload),
-                    { deliveryMode : 2, mandatory : true},
-                    function(){
-                        console.log('You are publishing to topic:'+'/'+topic);
-                    });
 
-
-            },function(){
-                console.log('Error publishing message to topic : '+topic);
-                console.log(JSON.stringify(messagePayload));
+            messageList.push({
+                topic : topic.toString(),
+                message : messagePayload
             });
-
-            //amqpConn.publish(topic.toString(), JSON.stringify(messagePayload));
         }
         catch(ex){
             console.log(ex);
