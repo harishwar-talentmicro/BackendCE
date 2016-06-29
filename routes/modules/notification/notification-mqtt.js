@@ -114,9 +114,6 @@ NotificationMqtt.prototype.limitMessage = function(message,limit){
         /**
          * to get size of message and fix it at 1024 byte;
          */
-
-
-
         //var bufsize = Buffer.byteLength(msgStr);
         //console.log('original message buffer size : '+bufsize);
         //console.log(typeof(bufsize));
