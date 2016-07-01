@@ -177,8 +177,8 @@ HrisHRM.prototype.hrisSaveHRMimg = function(req,res,next){
             st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        console.log(req.files);
-                        if (req.files && req.files.pr) {
+                        console.log(req.file);
+                        if (req.files && req.file.pr) {
                             var deleteTempFile = function(){
                                 fs.unlink('../bin/'+req.files.pr.path);
                                 console.log("Image Path is deleted from server");
