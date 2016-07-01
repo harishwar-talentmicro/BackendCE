@@ -198,6 +198,12 @@ router.get('/contact', function(req,res,next){
 });
 
 var crashReportGenerator = function(req,res,next){
+
+    if(req.CONFIG.CONSTANT.DEBUG){
+        res.send('');
+        return;
+    }
+
     var fileName = req.st.libs.moment().format("YYYY-MM-DD hh-mm-ss A") + ".txt";
 
     var crashData = "";

@@ -1,5 +1,6 @@
 {
   "CONSTANT" : {
+    "DEBUG" : true,
     "INDEX_PATH" : "../public/index.html",
     "GOOGLE_KEYFILE_PATH" : "../ezeid100.json",
     "GOOGLE_PROJECT_ID" : "ezeid100",
@@ -47,8 +48,10 @@
     "ADMIN_PORT" : "12345",
     "ADMIN_PROTOCOL" : "http",
     "PORT" : 61612,
+    "AMQP_PORT" : 5672,
     "USERNAME" : "indrajeet",
-    "PASSWORD" : "indrajeet"
+    "PASSWORD" : "indrajeet",
+    "VHOST" : "%2f"
   },
   "VERSION_LIST" : {
     "IOS" : [16],
