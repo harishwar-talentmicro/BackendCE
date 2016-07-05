@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var quickResumeCtrl = require('./quick-resume-ctrl');
-
+var registrationCtrl = require('./register-ctrl')
 /**
  * GET Methods
  */
@@ -26,4 +26,6 @@ router.get('/resume_detail',quickResumeCtrl.searchCandidate);
 router.post('/quick_resume',quickResumeCtrl.checkCandidate);
 
 router.post('/resume_detail',quickResumeCtrl.saveResumeDetail);
+
+router.post('/register',registrationCtrl.register)
 module.exports = router;

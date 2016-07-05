@@ -5,7 +5,7 @@
 var temp = function(res){
     res.send('');
 };
-
+var moment = require('moment');
 var ScheduleCtrl = {};
 ScheduleCtrl.getWorkingHours = function(req,res,next){
     var response = {
@@ -384,7 +384,7 @@ ScheduleCtrl.saveHolidayList = function(req,res,next){
     temp(res);
 };
 
-ScheduleCtrl.getHolidayTemplate = function(req,res,next){
+ScheduleCtrl.getHolidayTplList = function(req,res,next){
     temp(res);
 };
 module.exports = ScheduleCtrl;
