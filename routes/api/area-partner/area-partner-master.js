@@ -5,7 +5,7 @@
 
 var express = require('express');
 var router = express.Router();
-var areaPartnerListing = require('listing');
+var areaPartnerListing = require('./listing');
 
 router.use('/listing',areaPartnerListing);
-
+module.exports = router;

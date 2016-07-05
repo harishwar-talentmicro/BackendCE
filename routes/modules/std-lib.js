@@ -232,19 +232,13 @@ StdLib.prototype.validateTokenAp = function(Token, CallBack){
 
         //below query to check token exists for the users or not.
         if (Token) {
-            var Query = 'select Token from tapuser where Token=' +_this.db.escape(Token);
+            //var Query = 'select Token from tapuser where Token=' +_this.db.escape(Token);
+            var Query = 'Call pvalidate_token_AP('+ _this.db.escape(Token)+ ');';
            _this.db.query(Query, function (err, Result) {
                 if (!err) {
-                    if(Result) {
-                        if (Result.length > 0) {
-                            // console.log(Result);
-                            console.log('FnValidateToken: Token found');
-                            CallBack(null, Result[0]);
-                        }
-                        else {
-                            CallBack(null, null);
-                            console.log('FnValidateToken:No Token found');
-                        }
+                    if(Result && Result[0] && Result[0][0]) {
+                        console.log('FnValidateToken: Token found');
+                        CallBack(null, Result[0][0]);
                     }
                     else {
                         CallBack(null, null);

@@ -1426,7 +1426,7 @@ Tag.prototype.savePictures = function(req,res,next) {
                                         type: type,
                                         tag: tagType,
                                         pin: (!isNaN(parseInt(pin))) ? parseInt(pin) : null,
-                                        s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName,
+                                        s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSavePictures: Image Saved  successfully');
