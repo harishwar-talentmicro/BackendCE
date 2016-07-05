@@ -413,7 +413,34 @@ StdLib.prototype.getOnlyAttachmentName = function(attachmentLink){
     return (attachmentLink) ? attachmentLink.replace(regex,'') : '';
 };
 
+/**
+ * Hashes the password for saving into database
+ * @param password
+ * @returns {*}
+ */
 
+StdLib.prototype.hashPassword = function(password){
+    var bcrypt = null;
+
+    try{
+        bcrypt = require('bcrypt');
+    }
+    catch(ex){
+        console.log('Bcrypt not found, falling back to bcrypt-nodejs');
+        bcrypt = require('bcrypt-nodejs');
+    }
+
+    if(!password){
+        return null;
+    }
+    try{
+        var hash = bcrypt.hashSync(password, 12);
+        return hash;
+    }
+    catch(ex){
+        console.log(ex);
+    }
+}
 function FnSendMailEzeid(MailContent, CallBack) {
     var _this = this;
     try {

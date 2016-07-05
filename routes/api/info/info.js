@@ -311,7 +311,7 @@ router.get('/testbhavya',function(req,res,next){
                     if (!error && response.statusCode == 200) {
                         console.log(body) // Print
                     }
-                })
+                });
                 if (!err) {
                     if(MessagesResult) {
                         if (MessagesResult[0]) {
