@@ -429,6 +429,7 @@ router.put('/status', function(req,res,next){
                                  * */
                                 updateResult[3][0].requesterGroupId = req.body.groupId;
                                 console.log('updateResult[3]',updateResult[3]);
+                                var sendDeleteNotificationFlag = false;
                                 switch (updateResult[0][0].status) {
                                     case req.CONFIG.CONSTANT.EZEONE_MESSAGE_ACCEPT_STATUS :
                                         notificationTemplaterRes = notificationTemplater.parse('accept_request',{
@@ -466,12 +467,13 @@ router.put('/status', function(req,res,next){
                                             console.log('postNotification : notification is sent successfully');
                                         }
                                         else{
-                                            console.log('Error in parsing notification accept_request template - ',
+                                            console.log('Error in parsing notification reject_request template - ',
                                                 notificationTemplaterRes.error);
                                             console.log('postNotification : notification  is sent successfully');
                                         }
                                         break;
                                     case req.CONFIG.CONSTANT.EZEONE_MESSAGE_REMOVE_STATUS :
+                                        sendDeleteNotificationFlag = true;
                                         notificationTemplaterRes = notificationTemplater.parse('removed_from_group',{
                                             adminName : (updateResult[3][0].fullName) ? updateResult[3][0].fullName : '',
                                             groupName : (updateResult[0][0].groupName) ? updateResult[0][0].groupName : ''
@@ -494,7 +496,6 @@ router.put('/status', function(req,res,next){
                                 //}
                                 console.log('FnUpdateUserStatus: User status updated successfully');
 
-                                var sendDeleteNotificationFlag = false;
                                 console.log(updateResult[0][0].status,"updateResult[0][0].status");
                                 /**
                                  * all active member of group will get silent notification
@@ -533,7 +534,6 @@ router.put('/status', function(req,res,next){
                                             }
                                             break;
                                         case req.CONFIG.CONSTANT.EZEONE_MESSAGE_REMOVE_STATUS:
-                                            sendDeleteNotificationFlag = true;
                                             if(notificationTemplaterRes.parsedTpl){
                                                 notification.publish(
                                                     updateResult[2][i].groupId,
@@ -559,7 +559,7 @@ router.put('/status', function(req,res,next){
                                                 console.log('postNotification : notification is sent successfully');
                                             }
                                             else{
-                                                console.log('Error in parsing notification accept_request template - ',
+                                                console.log('Error in parsing notification removed_from_group template - ',
                                                     notificationTemplaterRes.error);
                                                 console.log('postNotification : notification  is sent successfully');
                                             }
@@ -574,7 +574,7 @@ router.put('/status', function(req,res,next){
                                  * Sending notification to the member who is actually removed from this group
                                  * It will be silent notification and he is now not an active member also
                                  */
-                                if((!sendDeleteNotificationFlag) && notificationTemplaterRes.parsedTpl){
+                                if(sendDeleteNotificationFlag && notificationTemplaterRes.parsedTpl){
                                     notification.publish(
                                         req.body.userGroupId,
                                         updateResult[0][0].groupName,
