@@ -233,8 +233,6 @@ StdLib.prototype.validateTokenAp = function(Token, CallBack){
         //below query to check token exists for the users or not.
         if (Token) {
             var Query = 'select Token from tapuser where Token=' +_this.db.escape(Token);
-            //var Query = 'select Token from tmaster';
-            //70084b50d3c43822fbef
            _this.db.query(Query, function (err, Result) {
                 if (!err) {
                     if(Result) {

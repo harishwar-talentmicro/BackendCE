@@ -242,7 +242,6 @@ router.get('/institute_group',configurationModule.getInstituteGroup);
 router.get('/institute_details',configurationModule.getInstituteConfig);
 router.get('/institute_group_details',configurationModule.getInstituteGroupDetails);
 router.delete('/job_institute/:job_id/:institute_id',configurationModule.deleteJobInstitute);
-router.post('/configuration/working_schedule',configurationModule.saveWorkingSchedule);
 
 //Search module methods
 var Search = require('./modules/search-module.js');
