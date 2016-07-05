@@ -26,3 +26,4 @@ router.get('/resume_detail',quickResumeCtrl.searchCandidate);
 router.post('/quick_resume',quickResumeCtrl.checkCandidate);
 
 router.post('/resume_detail',quickResumeCtrl.saveResumeDetail);
+module.exports = router;
