@@ -93,7 +93,7 @@ Auth.prototype.register = function(req,res,next){
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-
+    console.log("req.body",req.body);
     var rtnMessage = {
         error:{},
         Token: '',
@@ -334,7 +334,7 @@ Auth.prototype.register = function(req,res,next){
                         if (idtypeId && ezeid && password) {
                             if (password) {
                                 console.log(password);
-                                encryptPwd = hashPassword(password);
+                                encryptPwd = req.st.hashPassword(password);
                                 console.log("encryptPwd",encryptPwd);
                             }
 
@@ -585,7 +585,7 @@ Auth.prototype.register = function(req,res,next){
                         console.log('----------Operation type other than 1--------------');
                         if (idtypeId && ezeid) {
                             if (password) {
-                                encryptPwd = hashPassword(password);
+                                encryptPwd = req.st.hashPassword(password);
                             }
 
                             var queryParams = st.db.escape(idtypeId) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(encryptPwd)
@@ -1415,7 +1415,7 @@ Auth.prototype.verifySecretCode = function(req,res,next) {
     if (status) {
         try {
             req.body.ezeone_id = req.st.alterEzeoneId(req.body.ezeone_id);
-            var queryParams = st.db.escape(req.body.secret_code) + ',' + st.db.escape(req.body.ezeone_id) + ',' + st.db.escape(hashPassword(req.body.new_password));
+            var queryParams = st.db.escape(req.body.secret_code) + ',' + st.db.escape(req.body.ezeone_id) + ',' + st.db.escape(req.st.hashPassword(req.body.new_password));
             var verifyQuery = 'CALL pverifySecretcode(' + queryParams + ')';
 
             //console.log(verifyQuery);

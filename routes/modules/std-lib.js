@@ -232,21 +232,13 @@ StdLib.prototype.validateTokenAp = function(Token, CallBack){
 
         //below query to check token exists for the users or not.
         if (Token) {
-            var Query = 'select Token from tapuser where Token=' +_this.db.escape(Token);
-            //var Query = 'select Token from tmaster';
-            //70084b50d3c43822fbef
+            //var Query = 'select Token from tapuser where Token=' +_this.db.escape(Token);
+            var Query = 'Call pvalidate_token_AP('+ _this.db.escape(Token)+ ');';
            _this.db.query(Query, function (err, Result) {
                 if (!err) {
-                    if(Result) {
-                        if (Result.length > 0) {
-                            // console.log(Result);
-                            console.log('FnValidateToken: Token found');
-                            CallBack(null, Result[0]);
-                        }
-                        else {
-                            CallBack(null, null);
-                            console.log('FnValidateToken:No Token found');
-                        }
+                    if(Result && Result[0] && Result[0][0]) {
+                        console.log('FnValidateToken: Token found');
+                        CallBack(null, Result[0][0]);
                     }
                     else {
                         CallBack(null, null);
@@ -421,7 +413,34 @@ StdLib.prototype.getOnlyAttachmentName = function(attachmentLink){
     return (attachmentLink) ? attachmentLink.replace(regex,'') : '';
 };
 
+/**
+ * Hashes the password for saving into database
+ * @param password
+ * @returns {*}
+ */
 
+StdLib.prototype.hashPassword = function(password){
+    var bcrypt = null;
+
+    try{
+        bcrypt = require('bcrypt');
+    }
+    catch(ex){
+        console.log('Bcrypt not found, falling back to bcrypt-nodejs');
+        bcrypt = require('bcrypt-nodejs');
+    }
+
+    if(!password){
+        return null;
+    }
+    try{
+        var hash = bcrypt.hashSync(password, 12);
+        return hash;
+    }
+    catch(ex){
+        console.log(ex);
+    }
+}
 function FnSendMailEzeid(MailContent, CallBack) {
     var _this = this;
     try {

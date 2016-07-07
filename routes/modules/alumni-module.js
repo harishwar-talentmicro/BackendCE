@@ -897,7 +897,7 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
 
     var token = req.body.token;
     var tid = req.body.tid;      // while saving time 0 else id of user
-    var picture = req.body.pg_pic;
+    var picture = (req.body.pg_pic) ? req.st.getOnlyAttachmentName(req.body.pg_pic) : '';
     var pictureTitle = req.body.pg_picName;
     var pictureType = req.body.pg_picType;
     var title = req.body.pg_title;

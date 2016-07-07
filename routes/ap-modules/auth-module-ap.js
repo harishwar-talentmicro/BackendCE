@@ -156,50 +156,6 @@ Auth_AP.prototype.loginAP = function(req,res,next){
                 }
             });
 
-            //var Query = 'select TID, FullName,APMasterID from tapuser where APLoginID=' +
-            //    st.db.escape(UserName) + ' and APPassword=' + st.db.escape(encryptPassword);
-            //st.db.query(Query, function (err, loginResult) {
-            //    if (!err) {
-            //        if (loginResult.length > 0) {
-            //            var Encrypt = FnGenerateToken();
-            //            console.log(Encrypt);
-            //            var Query = 'update tapuser set Token=' + st.db.escape(Encrypt) + ' where TID=' + st.db.escape(loginResult[0].TID);
-            //            st.db.query(Query, function (err, TokenResult) {
-            //                console.log(TokenResult);
-            //                if (!err) {
-            //                    if (TokenResult.affectedRows > 0) {
-            //                        RtnMessage.Token = Encrypt;
-            //                        RtnMessage.IsAuthenticate = true;
-            //                        RtnMessage.FullName = loginResult[0].FullName;
-            //                        RtnMessage.TID = loginResult[0].TID;
-            //                        RtnMessage.APID = loginResult[0].APMasterID;
-            //                        res.send(RtnMessage);
-            //                        console.log('FnLoginAP:tmaster: Login success');
-            //                    }
-            //                    else {
-            //                        res.send(RtnMessage);
-            //                        console.log('FnLoginAP:tmaster:Fail to generate Token');
-            //                    }
-            //                }
-            //                else {
-            //
-            //                    res.send(RtnMessage);
-            //                    console.log('FnLoginAP:tmaster:' + err);
-            //                }
-            //            });
-            //        }
-            //        else {
-            //
-            //            res.send(RtnMessage);
-            //            console.log('FnLoginAP:tmaster: Invalid login credentials');
-            //        }
-            //    }
-            //    else {
-            //
-            //        res.send(RtnMessage);
-            //        console.log('FnLoginAP:tmaster:' + err);
-            //    }
-            //});
         }
         else {
             if (UserName == null || UserName == '') {
