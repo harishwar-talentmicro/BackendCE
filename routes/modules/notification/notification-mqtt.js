@@ -132,7 +132,7 @@ NotificationMqtt.prototype.publish = function(topic,messagePayload){
         messagePayload._id = Date.now() + '-' + uniqueMid;
 
         console.log('RabbitTopic : '+topic);
-       // console.log(messagePayload);
+        // console.log(messagePayload);
 
         try{
 
