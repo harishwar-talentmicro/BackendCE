@@ -58,7 +58,7 @@ RegisterCtrl.register = function(req,res,next){
 
     var moment = require('moment');
 
-    var operationType = parseInt(req.body.OperationType) ? req.body.OperationType : 0;
+    //var operationType = parseInt(req.body.OperationType) ? req.body.OperationType : 0;
     var ipAddress = req.ip;
     var selectionType = (!isNaN(parseInt(req.body.SelectionType))) ?  parseInt(req.body.SelectionType) : 0;
     var idtypeId = parseInt(req.body.IDTypeID);
@@ -238,8 +238,21 @@ RegisterCtrl.register = function(req,res,next){
                                         },
                                         function (error, response, body) {
                                             if (!error) {
-                                                console.log('Upload successful!  Server responded with:', body);
-                                                res.send(rtnMessage);
+                                                request({
+                                                        method: 'POST',
+                                                        uri: 'http://104.199.128.226:3001/api/v1.1/area_partner/listing/schedule/holiday_list?token='+req.query.token+'&masterId='+registerResult[0][0].TID,
+                                                        json : holidayList
+                                                    },
+                                                    function (error, response, body) {
+                                                        if (!error) {
+
+                                                            console.log('Upload successful!  Server responded with:', body);
+                                                            res.send(rtnMessage);
+                                                        }
+                                                        else{
+                                                            return console.error('upload failed:', error);
+                                                        }
+                                                    });
                                             }
                                             else{
                                                 return console.error('upload failed:', error);
