@@ -281,8 +281,6 @@ RegisterCtrl.register = function(req,res,next){
 
                     });
 
-
-
                 }
                 else{
                     /**
@@ -314,7 +312,6 @@ RegisterCtrl.register = function(req,res,next){
                 }
             });
         }
-
         catch (ex) {
             console.log(ex);
             var errorDate = new Date();

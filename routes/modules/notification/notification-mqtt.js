@@ -56,9 +56,6 @@ function createConnection(){
 
 createConnection();
 
-
-
-
 var counter  = 0;
 function publishMessage(channel){
     setImmediate(function() {
