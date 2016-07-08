@@ -154,24 +154,6 @@ ScheduleCtrl.getWorkingHours = function(req,res,next){
 ScheduleCtrl.saveWorkingHours = function(req,res,next){
     if(req.is('json')){
         try{
-            /**
-             * Sample data structure you will get from Client(Web)
-             * It will be accessible through req.body and req type will always be json
-             */
-            //var dataFromClient = [
-            //    {
-            //        id : 0,
-            //        days : [0,1,2],
-            //        st : "09:00",
-            //        et : "19:00"
-            //    },
-            //    {
-            //        id : 0,
-            //        days : [0,1,3],
-            //        st : "10:00",
-            //        et : "13:00"
-            //    }
-            //];
 
             var dataFromClient = req.body;
             var error = {
@@ -378,13 +360,297 @@ ScheduleCtrl.saveWorkingHours = function(req,res,next){
 };
 
 ScheduleCtrl.getHolidayList = function(req,res,next){
-    temp(res);
+    var response = {
+        status : false,
+        message : "Your session has expired please login to continue",
+        data : null,
+        error : {
+            token : "Token is expired"
+        }
+    };
+    var error = {};
+    try {
+        /**
+         * validating token
+         * */
+        req.st.validateTokenAp(req.query.token, function (err, tokenResult) {
+            if (!err) {
+                if (tokenResult) {
+                    /**
+                     * getting holiday template list
+                     * */
+                    var queryParams = req.db.escape(req.query.masterId);
+                    var query = 'CALL pGetHolidayList(' + queryParams + ')';
+                    console.log(query);
+                    req.db.query(query, function (err, results) {
+                        if (!err) {
+                            console.log(results);
+
+                            if (results && results[0] && results[0].length > 0) {
+
+                                response.status = true;
+                                response.data = results[0];
+                                response.error = null;
+                                response.message = 'Holiday list loaded successfully';
+                                res.status(200).json(response);
+
+                            }
+                            else {
+                                response.message = 'Holiday list are not available';
+                                res.json(response);
+                            }
+
+                        }
+                        else {
+                            response.data = null;
+                            response.message = 'Error in getting Holiday template List';
+                            console.log('pGetHolidayList: Error in getting Holiday template List' + err);
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                else {
+                    response.message = 'Invalid token';
+                    response.error = {
+                        token: 'Invalid Token'
+                    };
+                    response.data = null;
+                    res.status(401).json(response);
+                    console.log('pGetHolidayList: Invalid token');
+                }
+            }
+            else {
+                response.error = {
+                    server: 'Internal Server Error'
+                };
+                response.message = 'Error in validating Token';
+                res.status(500).json(response);
+                console.log('pGetHolidayList:Error in processing Token' + err);
+            }
+        });
+    }
+    catch (ex) {
+        response.error = {};
+        response.message = 'An error occured !';
+        console.log('pGetHolidayList:error ' + ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        res.status(400).json(response);
+    }
 };
 ScheduleCtrl.saveHolidayList = function(req,res,next){
-    temp(res);
+    if(req.is('json')){
+        try{
+
+            var dataFromClient = req.body;
+            var error = {
+            };
+            var validationFlag = true;
+
+            req.query.masterId = parseInt(req.query.masterId);
+            if(isNaN(req.query.masterId) || req.query.masterId < 1){
+                validationFlag *= false;
+                error['masterId'] = "Invalid TID";
+            }
+
+            var excludedIdList = [];
+
+            var combSaveQuery = "";
+            for(var i = 0; i < dataFromClient.length; i++){
+                var dateMoment = moment(dataFromClient[i].date,"YYYY MM DD");
+                error[i] = null;
+
+                /**
+                 * Validating date
+                 */
+                if(dateMoment){
+                    if(!dateMoment.isValid()){
+                        error[i] = { date : 'Invalid date format'};
+                        validationFlag *= false;
+                    }
+                }
+                else{
+                    error[i] = { date : 'Invalid date format'};
+                    validationFlag *= false;
+                }
+
+
+                dataFromClient[i].holidayId = parseInt(dataFromClient[i].holidayId);
+                if(isNaN(dataFromClient[i].holidayId) || dataFromClient[i].holidayId < 0){
+                    error[i] = { holidayId : 'Invalid holiday id'};
+                    validationFlag *= false;
+                }
+
+                if(error[i]){
+                    continue;
+                }
+
+                var queryParams = [
+                    req.db.escape(req.query.token),
+                    req.db.escape(dataFromClient[i].holidayId),
+                    req.db.escape(dateMoment),
+                    req.db.escape(dataFromClient[i].title),
+                    req.db.escape(req.db.escape(req.query.masterId))
+                ];
+
+                combSaveQuery += "CALL post_holiday_list_AP("+ queryParams.join(',')+");";
+
+            }
+
+            if(!validationFlag){
+                res.status(200).json({
+                    status : false,
+                    message : "Please check the errors",
+                    error : error,
+                    data : null
+                });
+            }
+            else{
+                req.db.query(combSaveQuery,function(err,results){
+                    if(err){
+                        console.log('Error ',' In saving new holiday list');
+                        console.log('Error message',err);
+                        res.status(500).json({
+                            status: false,
+                            message : 'Internal Server error',
+                            error : {
+                                server : 'Internal Server error'
+                            },
+                            data : null
+                        });
+                    }
+                    else{
+                        res.status(200).json({
+                            status : true,
+                            message : "holiday list updated successfully",
+                            error : null,
+                            data : dataFromClient
+                        });
+
+                    }
+                });
+            }
+        }
+        catch(ex){
+            console.log('Exception error ',' In saving new holiday list');
+            console.log('Exception message',ex);
+            res.status(500).json({
+                status: false,
+                message : 'Internal Server error',
+                error : {
+                    server : 'Internal Server error'
+                },
+                data : null
+            });
+        }
+    }
+    else{
+        res.status(400).json({
+            status: false,
+            message : 'Incompatible data type (JSON only supported)',
+            data : null,
+            error : {
+                server : 'Incompatible data type'
+            }
+        });
+    }
 };
 
 ScheduleCtrl.getHolidayTplList = function(req,res,next){
-    temp(res);
+    var response = {
+        status : false,
+        message : "Your session has expired please login to continue",
+        data : null,
+        error : {
+            token : "Token is expired"
+        }
+    };
+    var error = {};
+    try {
+        /**
+         * validating token
+         * */
+        req.st.validateTokenAp(req.query.token, function (err, tokenResult) {
+            if (!err) {
+                if (tokenResult) {
+                    /**
+                     * getting holiday template list
+                     * */
+                    var queryParams = req.db.escape(req.query.token);
+                    var query = 'CALL Pget_holiday_template_list(' + queryParams + ')';
+                    console.log(query);
+                    req.db.query(query, function (err, results) {
+                        if (!err) {
+                            console.log(results);
+                            var outputArray = [];
+                            /**
+                             * preparing json object by comparing template id from 2 array set got from database
+                             * */
+                            if (results && results[0] && results[0].length > 0) {
+                                for (var i = 0; i < results[0].length; i++) {
+                                    var tempObj={
+                                        id:results[0][i].tid,
+                                        title:results[0][i].title
+                                    };
+                                    var tempArray=[];
+
+                                    for (var j = 0; j < results[1].length; j++) {
+                                        if (results[0][i].tid == results[1][j].templateId) {
+                                            tempArray.push(results[1][j]);
+                                        }
+                                    }
+                                    tempObj.holidayList= tempArray;
+                                    outputArray.push(tempObj);
+                                }
+                                //console.log(outputArray,"outputArray");
+                                response.status = true;
+                                response.data = outputArray;
+                                response.error = null;
+                                response.message = 'Holiday template list loaded successfully';
+                                res.status(200).json(response);
+
+                            }
+                            else {
+                                response.message = 'Holiday template list are not available';
+                                res.json(response);
+                            }
+
+                        }
+                        else {
+                            response.data = null;
+                            response.message = 'Error in getting Holiday template List';
+                            console.log('Pget_holiday_template_list: Error in getting Holiday template List' + err);
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                else {
+                    response.message = 'Invalid token';
+                    response.error = {
+                        token: 'Invalid Token'
+                    };
+                    response.data = null;
+                    res.status(401).json(response);
+                    console.log('Pget_holiday_template_list: Invalid token');
+                }
+            }
+            else {
+                response.error = {
+                    server: 'Internal Server Error'
+                };
+                response.message = 'Error in validating Token';
+                res.status(500).json(response);
+                console.log('Pget_holiday_template_list:Error in processing Token' + err);
+            }
+        });
+    }
+    catch (ex) {
+        response.error = {};
+        response.message = 'An error occured !';
+        console.log('Pget_holiday_template_list:error ' + ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        res.status(400).json(response);
+    }
 };
 module.exports = ScheduleCtrl;
