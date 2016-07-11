@@ -29,7 +29,7 @@ function FnEncryptPassword(Password) {
         return crypted;
     }
     catch (ex) {
-        console.log('OTP generate error:' + ex.description);
+        console.log('OTP generate error:' + ex);
         //throw new Error(ex);
         return 'error'
     }
@@ -51,7 +51,7 @@ VES.prototype.loginVES = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var EZEID = alterEzeoneId(req.query.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.query.EZEID);
         var Password = req.query.Password;
         if (EZEID != null && EZEID != '' && Password != null && Password != '') {
             //var EncryptPWD = FnEncryptPassword(Password);
@@ -92,7 +92,7 @@ VES.prototype.loginVES = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnLoginVES error:' + ex.description);
+        console.log('FnLoginVES error:' + ex);
 
     }
 };
@@ -113,7 +113,7 @@ VES.prototype.saveContactVES = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.body.Token;
-        var EZEID = alterEzeoneId(req.body.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.body.EZEID);
         var Pic = req.body.Pic;
         var FirstName = req.body.FirstName;
         var LastName = req.body.LastName;
@@ -138,7 +138,7 @@ VES.prototype.saveContactVES = function(req,res,next){
         var Status = req.body.Status;
         var GateNo  = req.body.GateNo;
         var SyncedInout = req.body.SyncedInout;
-        var ContactEZEID = alterEzeoneId(req.body.ContactEZEID);
+        var ContactEZEID = req.st.alterEzeoneId(req.body.ContactEZEID);
         var ContactName = req.body.ContactName;
         var InTimeNew = new Date(InTime);
 
@@ -210,7 +210,7 @@ VES.prototype.saveContactVES = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSaveContactVES:error ' + ex.description);
+        console.log('FnSaveContactVES:error ' + ex);
 
     }
 };
@@ -300,7 +300,7 @@ VES.prototype.getAllContactsVES = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetAllContactsVES error:' + ex.description);
+        console.log('FnGetAllContactsVES error:' + ex);
 
     }
 };
@@ -352,7 +352,7 @@ VES.prototype.getDepartmentVES = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnGetDepartmentVES error:' + ex.description);
+        console.log('FnGetDepartmentVES error:' + ex);
 
     }
 };
@@ -436,7 +436,7 @@ VES.prototype.getContactVES = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetContactsVES error:' + ex.description);
+        console.log('FnGetContactsVES error:' + ex);
 
     }
 };
@@ -533,7 +533,7 @@ VES.prototype.searchContactsVES = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSearchContactsVES error:' + ex.description);
+        console.log('FnSearchContactsVES error:' + ex);
 
     }
 };
@@ -586,7 +586,7 @@ VES.prototype.checkPasswordVES = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnCheckPasswordVES : error:' + ex.description);
+        console.log('FnCheckPasswordVES : error:' + ex);
 
     }
 };
@@ -636,7 +636,7 @@ VES.prototype.getGatesVES = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnGetGatesVES error:' + ex.description);
+        console.log('FnGetGatesVES error:' + ex);
 
     }
 };
@@ -733,7 +733,7 @@ VES.prototype.saveDepartmentsVES = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSaveContactVES:error ' + ex.description);
+        console.log('FnSaveContactVES:error ' + ex);
 
     }
 };
@@ -829,7 +829,7 @@ VES.prototype.saveGatesVES = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSaveGatesVES:error ' + ex.description);
+        console.log('FnSaveGatesVES:error ' + ex);
 
     }
 };
@@ -913,7 +913,7 @@ VES.prototype.saveCitysVES = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSaveCitysVES:error ' + ex.description);
+        console.log('FnSaveCitysVES:error ' + ex);
 
     }
 };

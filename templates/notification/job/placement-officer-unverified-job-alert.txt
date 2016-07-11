@@ -1,0 +1,1 @@
+A new job is posted by <%=companyName%> for your institute.Please get your EZEOneID verified by EZEOne Area Partners to manage the status of the jobs posted for your institute.

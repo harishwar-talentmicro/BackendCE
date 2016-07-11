@@ -142,18 +142,7 @@ var uploadDocumentToCloud = function(uniqueName,bufferData,callback){
 };
 
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 var Notification = require('./notification/notification-master.js');
 var NotificationQueryManager = require('./notification/notification-query.js');
@@ -193,7 +182,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
     var tid = req.body.tid ? req.body.tid : 0;
     var restrictReply = req.body.rr;
     var memberVisible = req.body.member_visible ? parseInt(req.body.member_visible) : 0;
-    var alumniCode = req.body.alumni_code ? alterEzeoneId(req.body.alumni_code) : '';
+    var alumniCode = req.body.alumni_code ? req.st.alterEzeoneId(req.body.alumni_code) : '';
 
     var responseMessage = {
         status: false,
@@ -300,7 +289,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnCreateMessageGroup ' + ex.description);
+            console.log('Error : FnCreateMessageGroup ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -418,7 +407,7 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnValidateGroupName ' + ex.description);
+            console.log('Error : FnValidateGroupName ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -439,7 +428,7 @@ MessageBox.prototype.validateGroupMember = function(req,res,next){
 
     var groupId = ((!isNaN(parseInt(req.query.group_id))) && (parseInt(req.query.group_id)) > 0) ? parseInt(req.query.group_id) : 0;
     var token = (req.query.token) ? (req.query.token) : null;
-    var ezeoneId = (req.query.ezeone_id) ? alterEzeoneId(req.query.ezeone_id) : null;
+    var ezeoneId = (req.query.ezeone_id) ? req.st.alterEzeoneId(req.query.ezeone_id) : null;
     var ezeid;
     var pin = null ;
     var ezeidArray;
@@ -706,7 +695,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnUpdateUserStatus ' + ex.description);
+            console.log('Error : FnUpdateUserStatus ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -826,7 +815,7 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnUpdateUserRelationship ' + ex.description);
+            console.log('Error : FnUpdateUserRelationship ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -929,7 +918,7 @@ MessageBox.prototype.deleteGroup = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnDeleteGroup ' + ex.description);
+            console.log('Error : FnDeleteGroup ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1114,7 +1103,7 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnSendMessageRequest ' + ex.description);
+            console.log('Error : FnSendMessageRequest ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1273,8 +1262,8 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var attachment  = req.body.attachment ? req.body.attachment : '';
     var attachmentFilename  = req.body.attachment_filename ? req.body.attachment_filename : '';
     var priority  = (parseInt(req.body.priority) !== NaN) ? req.body.priority : 1;
-    var targetDate  = (req.body.target_date) ? (req.body.target_date) : '';
-    var expiryDate  =  (req.body.expiry_date) ? (req.body.expiry_date) : '';
+    var targetDate  = (req.body.target_date) ? (req.body.target_date) : null;
+    var expiryDate  =  (req.body.expiry_date) ? (req.body.expiry_date) : null;
     var token = req.body.token;
     var previousMessageID = req.body.previous_messageID ? req.body.previous_messageID : 0;
     var toID = req.body.to_id;                              // comma separated id of toID
@@ -1283,7 +1272,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var isJobseeker = req.body.isJobseeker ? req.body.isJobseeker : 0;
     var toIds= 0;
     var isBussinessChat = req.body.isBussinessChat ? req.body.isBussinessChat : 0;
-    var ezeid = alterEzeoneId(req.body.ezeid);
+    var ezeid = req.st.alterEzeoneId(req.body.ezeid);
     var istask = req.body.istask ? req.body.istask : 0;
     var memberVisible = req.body.member_visible ? req.body.member_visible : 0;
     var randomName;
@@ -1343,7 +1332,9 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                 if (toID) {
                                     compose();
                                 }
+                                console.log("bhavyajain");
                             });
+
                         };
                         var compose = function() {
 
@@ -1427,7 +1418,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                             idType: req.body.id_type ? req.body.id_type : '',
                                                             priority: (parseInt(req.body.priority) !== NaN) ? req.body.priority : 1,
                                                             mimeType: (req.body.mime_type) ? req.body.mime_type : '',
-                                                            ezeid: alterEzeoneId(req.body.ezeid)
+                                                            ezeid: req.st.alterEzeoneId(req.body.ezeid)
                                                         };
 
                                                         msgNotification.sendComposeMessage(msgContent, function (err, statusResult) {
@@ -1521,7 +1512,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnComposeMessage ' + ex.description);
+            console.log('Error : FnComposeMessage ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1611,7 +1602,7 @@ MessageBox.prototype.getMembersList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetMembersList ' + ex.description);
+            console.log('Error : FnGetMembersList ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1629,7 +1620,7 @@ MessageBox.prototype.getMembersList = function(req,res,next){
 MessageBox.prototype.loadMessageBox = function(req,res,next){
 
     var token = req.query.token;
-    var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+    var ezeone_id = req.st.alterEzeoneId(req.query.ezeone_id);
     var trash = (req.query.trash) ? req.query.trash : 0; //if 0 normal msg ,if u want trash msg send 1 , Default is 0..
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
@@ -1727,7 +1718,7 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnLoadMessageBox ' + ex.description);
+            console.log('Error : FnLoadMessageBox ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1846,7 +1837,7 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnChangeMessageActivity ' + ex.description);
+            console.log('Error : FnChangeMessageActivity ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1864,7 +1855,7 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
 MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
 
     var token = req.query.token;
-    var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+    var ezeone_id = req.st.alterEzeoneId(req.query.ezeone_id);
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
 
@@ -1960,7 +1951,7 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnLoadOutBoxMessages ' + ex.description);
+            console.log('Error : FnLoadOutBoxMessages ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2074,7 +2065,7 @@ MessageBox.prototype.getSuggestionList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetSuggestionList ' + ex.description);
+            console.log('Error : FnGetSuggestionList ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2440,7 +2431,7 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnAddGroupMembers ' + ex.description);
+            console.log('Error : FnAddGroupMembers ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2487,6 +2478,7 @@ MessageBox.prototype.getPendingRequest = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(token);
                         var query = 'CALL pGetPendingRequest(' + queryParams + ')';
+                        console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult) {
@@ -2554,7 +2546,7 @@ MessageBox.prototype.getPendingRequest = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetPendingRequest ' + ex.description);
+            console.log('Error : FnGetPendingRequest ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2627,7 +2619,7 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(token);
-                        var query = 'CALL pGetGroupAndIndividuals(' + queryParams + ')';4
+                        var query = 'CALL pGetGroupAndIndividuals(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
@@ -2792,7 +2784,7 @@ MessageBox.prototype.getGroupList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetGroupList ' + ex.description);
+            console.log('Error : FnGetGroupList ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2887,7 +2879,7 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                                             else{
                                                 responseMessage.count=0;
                                             }
-                                            //responseMessage.data = getResult[0];
+
                                             //console.log(getResult[0]);
                                             for(var ct = 0; ct < getResult[0].length; ct++){
                                                 getResult[0][ct].Attachment = (getResult[0][ct].Attachment) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][ct].Attachment) :'';
@@ -2951,7 +2943,7 @@ MessageBox.prototype.loadMessages = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnLoadMessages ' + ex.description);
+            console.log('Error : FnLoadMessages ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3078,7 +3070,7 @@ MessageBox.prototype.viewMessage = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnViewMessage ' + ex.description);
+            console.log('Error : FnViewMessage ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3202,7 +3194,7 @@ MessageBox.prototype.getMessageAttachment = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetMessageAttachment ' + ex.description);
+            console.log('Error : FnGetMessageAttachment ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3326,7 +3318,7 @@ MessageBox.prototype.getGroupInfo = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetGroupInfo ' + ex.description);
+            console.log('Error : FnGetGroupInfo ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3434,7 +3426,7 @@ MessageBox.prototype.countOfUnreadMessage = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnCountOfUnreadMessage ' + ex.description);
+            console.log('Error : FnCountOfUnreadMessage ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3557,7 +3549,7 @@ MessageBox.prototype.viewMessageNew = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnViewMessage ' + ex.description);
+            console.log('Error : FnViewMessage ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3675,7 +3667,7 @@ MessageBox.prototype.changeGroupAdmin = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnChangeGroupAdmin ' + ex.description);
+            console.log('Error : FnChangeGroupAdmin ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3789,7 +3781,7 @@ MessageBox.prototype.updateTaskStatus = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnUpdateTaskStatus ' + ex.description);
+            console.log('Error : FnUpdateTaskStatus ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3910,7 +3902,7 @@ MessageBox.prototype.getLastMsgOfGroup = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetLastMsgOfGroup ' + ex.description);
+            console.log('Error : FnGetLastMsgOfGroup ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -4053,7 +4045,7 @@ MessageBox.prototype.forwardMessage = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnForwardMessage ' + ex.description);
+            console.log('Error : FnForwardMessage ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -4177,7 +4169,7 @@ MessageBox.prototype.getMessageList = function(req,res,next){
         catch (ex) {
             responseMessage.error = {};
             responseMessage.message = 'An error occured !';
-            console.log('getInstituteConfig:error ' + ex.description);
+            console.log('getInstituteConfig:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);

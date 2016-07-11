@@ -19,18 +19,6 @@ function Auth_AP(db,stdLib){
     }
 };
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 
 function FnGenerateToken() {
@@ -53,7 +41,7 @@ function FnGenerateToken() {
         return crypted;
     }
     catch (ex) {
-        console.log('OTP generate error:' + ex.description);
+        console.log('OTP generate error:' + ex);
         throw new Error(ex);
         return 'error'
     }
@@ -73,7 +61,7 @@ function FnRandomPassword() {
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('OTP generate error:' + ex.description);
+        console.log('OTP generate error:' + ex);
         throw new Error(ex);
         return 'error'
     }
@@ -94,7 +82,7 @@ function FnEncryptPassword(Password) {
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('OTP generate error:' + ex.description);
+        console.log('OTP generate error:' + ex);
         //throw new Error(ex);
         return 'error'
     }
@@ -134,52 +122,40 @@ Auth_AP.prototype.loginAP = function(req,res,next){
             FullName: '',
             APID: 0
         };
+
+        var sessionDetails = {
+            deviceId : (req.headers['device_id']) ?  req.headers['device_id'] : '', // Device ID
+            deviceInfo : (req.headers['device_info']) ?  req.headers['device_info'] : '' //Device IMEI
+        };
+
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
             var encryptPassword= FnEncryptPassword(Password);
-            var Query = 'select TID, FullName,APMasterID from tapuser where APLoginID=' + st.db.escape(UserName) + ' and APPassword=' + st.db.escape(encryptPassword);
-            st.db.query(Query, function (err, loginResult) {
-                if (!err) {
-                    if (loginResult.length > 0) {
-                        var Encrypt = FnGenerateToken();
-                        console.log(Encrypt);
-                        var Query = 'update tapuser set Token=' + st.db.escape(Encrypt) + ' where TID=' + st.db.escape(loginResult[0].TID);
-                        st.db.query(Query, function (err, TokenResult) {
-                            console.log(TokenResult);
-                            if (!err) {
-                                if (TokenResult.affectedRows > 0) {
-                                    RtnMessage.Token = Encrypt;
-                                    RtnMessage.IsAuthenticate = true;
-                                    RtnMessage.FullName = loginResult[0].FullName;
-                                    RtnMessage.TID = loginResult[0].TID;
-                                    RtnMessage.APID = loginResult[0].APMasterID;
-                                    res.send(RtnMessage);
-                                    console.log('FnLoginAP:tmaster: Login success');
-                                }
-                                else {
-                                    res.send(RtnMessage);
-                                    console.log('FnLoginAP:tmaster:Fail to generate Token');
-                                }
-                            }
-                            else {
 
-                                res.send(RtnMessage);
-                                console.log('FnLoginAP:tmaster:' + err);
-                            }
-                        });
-                    }
-                    else {
+            var loginQueryParams = [
+                req.st.db.escape(UserName),
+                req.st.db.escape(encryptPassword),
+                req.st.db.escape(JSON.stringify(sessionDetails))
+            ];
 
-                        res.send(RtnMessage);
-                        console.log('FnLoginAP:tmaster: Invalid login credentials');
-                    }
-                }
-                else {
+            var loginQuery = "CALL ploginAP(" + loginQueryParams.join(',') + ")";
 
+            st.db.query(loginQuery,function(err,loginResult){
+                if((!err) && loginResult && loginResult[0] && loginResult[0][0] && loginResult[0][0].TID){
+                    RtnMessage.Token = loginResult[0][0].Token;
+                    RtnMessage.IsAuthenticate = true;
+                    RtnMessage.FullName = loginResult[0][0].FullName;
+                    RtnMessage.TID = loginResult[0][0].TID;
+                    RtnMessage.APID = loginResult[0][0].APMasterID;
                     res.send(RtnMessage);
-                    console.log('FnLoginAP:tmaster:' + err);
+                    console.log('FnLoginAP:tmaster: Login success');
+                }
+                else{
+                    res.send(RtnMessage);
+                    console.log('FnLoginAP:tmaster:Fail to generate Token');
                 }
             });
+
         }
         else {
             if (UserName == null || UserName == '') {
@@ -194,7 +170,7 @@ Auth_AP.prototype.loginAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnLogin error:' + ex.description);
+        console.log('FnLogin error:' + ex);
 
     }
 };
@@ -249,7 +225,7 @@ Auth_AP.prototype.logoutAP = function(req,res,next){
     }
 }
 catch (ex) {
-    console.log('FnLogoutAP error:' + ex.description);
+    console.log('FnLogoutAP error:' + ex);
 
 }
 };
@@ -359,7 +335,7 @@ try {
     }
 }
 catch (ex) {
-    console.log('FnForgetPasswordAP error:' + ex.description);
+    console.log('FnForgetPasswordAP error:' + ex);
 
 }
 };
@@ -385,6 +361,12 @@ Auth_AP.prototype.changePasswordAP = function(req,res,next){
         var RtnMessage = {
             IsChanged: false
         };
+
+        var sessionDetails = {
+            deviceId : (req.headers['device_id']) ?  req.headers['device_id'] : '', // Device ID
+            deviceInfo : (req.headers['device_info']) ?  req.headers['device_info'] : '' //Device IMEI
+        };
+
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (OldPassword != null && OldPassword != '' && NewPassword != null && NewPassword != '' && TokenNo != null) {
             st.validateTokenAp(TokenNo, function (err, Result) {
@@ -392,7 +374,8 @@ Auth_AP.prototype.changePasswordAP = function(req,res,next){
                     if (Result != null) {
                         var EncryptOldPWD = FnEncryptPassword(OldPassword);
                         var EncryptNewPWD = FnEncryptPassword(NewPassword);
-                        var Query = st.db.escape(TokenNo) + ',' + st.db.escape(EncryptOldPWD) + ',' + st.db.escape(EncryptNewPWD);
+                        var Query = st.db.escape(TokenNo) + ',' +
+                            st.db.escape(EncryptOldPWD) + ',' + st.db.escape(EncryptNewPWD) + ',' + st.db.escape(JSON.stringify(sessionDetails));
                         st.db.query('CALL pChangePasswordAP(' + Query + ')', function (err, ChangePasswordResult) {
                             if (!err) {
                                 //console.log(ChangePasswordResult);
@@ -445,7 +428,7 @@ Auth_AP.prototype.changePasswordAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnChangePassword error:' + ex.description);
+        console.log('FnChangePassword error:' + ex);
 
     }
 };

@@ -10,18 +10,6 @@
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 var st = null;
 
@@ -48,7 +36,7 @@ Location_AP.prototype.getSecondaryLocationListAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var Ezeid = alterEzeoneId(req.query.EZEID);
+        var Ezeid = req.st.alterEzeoneId(req.query.EZEID);
 
         if (Token != null && Ezeid != null) {
             st.validateTokenAp(Token, function (err, Result) {
@@ -108,7 +96,7 @@ Location_AP.prototype.getSecondaryLocationListAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetSecondaryLocationList:' + ex.description);
+        console.log('FnGetSecondaryLocationList:' + ex);
 
     }
 }
@@ -129,7 +117,7 @@ Location_AP.prototype.getSecondaryLocationAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var Ezeid = alterEzeoneId(req.query.EZEID);
+        var Ezeid = req.st.alterEzeoneId(req.query.EZEID);
         var Locid = req.query.LocID;
 
         if (Token != null && Ezeid != null && Locid!=null) {
@@ -192,7 +180,7 @@ Location_AP.prototype.getSecondaryLocationAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetSecondaryLocationAP:' + ex.description);
+        console.log('FnGetSecondaryLocationAP:' + ex);
 
     }
 }
@@ -299,7 +287,7 @@ Location_AP.prototype.updateSecondaryLocationAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnUpdateSecondaryLocationAP:' + ex.description);
+        console.log('FnUpdateSecondaryLocationAP:' + ex);
 
     }
 }

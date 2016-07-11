@@ -9,18 +9,6 @@ var url = require('url');
 var DbHelper = require('./../helpers/DatabaseHandler');
 var db = DbHelper.getDBContext();
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 
 router.get('*',function(req,res,next){
@@ -46,7 +34,7 @@ router.get('*',function(req,res,next){
 
                 var alumniName = hostNameParsed[0];
                 if(alumniName && (!(alumniName == 'www' || alumniName == '@www'))){
-                    alumniName = alterEzeoneId(alumniName);
+                    alumniName = req.st.alterEzeoneId(alumniName);
                     /**
                      * If browser tries to open a branch ezeid then split the branch code and just return master ezeid
                      * _ (underscore) is separator for branch code

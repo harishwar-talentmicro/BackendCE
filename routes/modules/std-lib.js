@@ -1,12 +1,6 @@
 "use strict";
 
-var FinalMessage = {
-    Message: '',
-    StatusCode: '',
-    Result: ''
-};
-var FinalMsgJson = JSON.parse(JSON.stringify(FinalMessage));
-
+var appConfig = require('../../ezeone-config.json');
 function error(err, req, res, next) {
     // log it
     console.error(err.stack);
@@ -15,9 +9,32 @@ function error(err, req, res, next) {
     res.json(500,{ status : false, message : 'Internal Server Error', error : {server : 'Exception'}});
 };
 
+var gcloud = require('gcloud');
+var gcs = gcloud.storage({
+    projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
+    keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+});
+// Reference an existing bucket.
+var bucket = gcs.bucket(appConfig.CONSTANT.STORAGE_BUCKET);
+bucket.acl.default.add({
+    entity: 'allUsers',
+    role: gcs.acl.READER_ROLE
+}, function (err, aclObject) {
+});
+
+var thumbnailConfig = require('../../thumbnail-config.json');
+
+
+
 
 function StdLib(db){
     this.db = db;
+    this.libs = {
+        uuid : require('node-uuid'),
+        moment : require('moment'),
+        fs : require('fs'),
+        Promise : require("bluebird")
+    }
 };
 
 /**
@@ -29,16 +46,6 @@ function StdLib(db){
  */
 StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,callBack){
     var _this = this;
-    //console.log('generateToken');
-    //var crypto = require("crypto");
-    //var algo = "ecdsa-with-SHA1"
-    //var rand = crypto.randomBytes(64).toString('hex');;
-    //var token = crypto.createHmac(algo, rand)
-    //    .update(Date.now().toString())
-    //    .digest("hex");
-    //return token;
-
-
     /////////////////////////////////////////////////////////////////////
 
     var deviceType = 1;
@@ -170,49 +177,40 @@ StdLib.prototype.generateRandomHash = function(timeStamp){
     return hash.digest('hex') + crypto.randomBytes(30).toString('hex');
 }
 
-StdLib.prototype.validateToken = function(Token, CallBack){
+StdLib.prototype.validateToken = function(token, CallBack){
     var _this = this;
     console.log('validateToken');
 
     try {
 
         //below query to check token exists for the users or not.
-        if (Token) {
-            if(Token != 2){
-                /**
-                 * @info : Token is now queried from session table i.e. tloginout
-                 */
-                var Query = 'select masterid,token from tloginout where token=' + _this.db.escape(Token)+' AND status = 1';
+        if (token) {
 
-               _this.db.query(Query, function (err, Result) {
-                    if (!err) {
-                        if(Result){
-                            if (Result.length > 0) {
-                                // console.log(Result);
-                                console.log('FnValidateToken: Token found');
-                                CallBack(null, Result[0]);
-                            }
-                            else {
-                                CallBack(null, null);
-                                console.log('FnValidateToken:No Token found');
-                            }
-                        }
-                        else{
-                            CallBack(null, null);
-                            console.log('FnValidateToken:No Token found');
-                        }
+            /**
+             * @info : Token is now queried from session table i.e. tloginout
+             */
 
+            var validateTokenQuery = 'CALL pvalidate_token(' + _this.db.escape(token)+')';
+           _this.db.query(validateTokenQuery, function (err, sessionResult) {
+                if (!err) {
+
+                    if(sessionResult && sessionResult.length){
+
+                            console.log('FnValidateToken: Token found');
+                            console.log('sessionResult',sessionResult);
+                            CallBack(null, sessionResult[0]);
                     }
-                    else {
-                        CallBack(err, null);
-                        console.log('FnValidateToken:' + err);
-
+                    else{
+                        CallBack(null, null);
+                        console.log('FnValidateToken:No Token found');
                     }
-                });
-            }
-            else{
-                CallBack(null, 'Pass');
-            }
+                }
+                else {
+                    CallBack(err, null);
+                    console.log('FnValidateToken:' + err);
+
+                }
+            });
         }
         else {
             CallBack(null, null);
@@ -221,7 +219,7 @@ StdLib.prototype.validateToken = function(Token, CallBack){
 
     }
     catch (ex) {
-        console.log('OTP FnValidateToken error:' + ex.description);
+        console.log('OTP FnValidateToken error:' + ex);
 
         return 'error'
     }
@@ -234,21 +232,13 @@ StdLib.prototype.validateTokenAp = function(Token, CallBack){
 
         //below query to check token exists for the users or not.
         if (Token) {
-            var Query = 'select Token from tapuser where Token=' +_this.db.escape(Token);
-            //var Query = 'select Token from tmaster';
-            //70084b50d3c43822fbef
+            //var Query = 'select Token from tapuser where Token=' +_this.db.escape(Token);
+            var Query = 'Call pvalidate_token_AP('+ _this.db.escape(Token)+ ');';
            _this.db.query(Query, function (err, Result) {
                 if (!err) {
-                    if(Result) {
-                        if (Result.length > 0) {
-                            // console.log(Result);
-                            console.log('FnValidateToken: Token found');
-                            CallBack(null, Result[0]);
-                        }
-                        else {
-                            CallBack(null, null);
-                            console.log('FnValidateToken:No Token found');
-                        }
+                    if(Result && Result[0] && Result[0][0]) {
+                        console.log('FnValidateToken: Token found');
+                        CallBack(null, Result[0][0]);
                     }
                     else {
                         CallBack(null, null);
@@ -269,105 +259,11 @@ StdLib.prototype.validateTokenAp = function(Token, CallBack){
 
     }
     catch (ex) {
-        console.log('OTP FnValidateToken error:' + ex.description);
+        console.log('OTP FnValidateToken error:' + ex);
 
         return 'error'
     }
 };
-
-StdLib.prototype.sendMail = function(req, res){
-    var _this = this;
-
-        try {
-            res.setHeader('content-type', 'application/json');
-            //user login
-            var From = req.body.From;
-            var To = req.body.To;
-            var Subject = req.body.Subject;
-            var Body = req.body.Body;
-
-            if (From && To && Subject != null) {
-
-                var fs = require('fs');
-
-                var path = require('path');
-                var file = path.join(__dirname,'../../mail/templates/SimpleMail.txt');
-
-                fs.readFile(file, "utf8", function (err, data) {
-                    if (err) throw err;
-                    data = data.replace("[Body]", Body);
-                    //console.log('Body:' + data);
-                    var mailOptions = {
-                        from: From,
-                        to: To,
-                        subject: Subject,
-                        html: data // html body
-                    };
-                    //console.log('Mail Option:' + mailOptions);
-                    // send mail with defined transport object
-                    //transporter.sendMail(mailOptions, function (error, info) {
-                    //    if (error) {
-                    //        console.log(error);
-                    //        res.json(null);
-                    //    } else {
-                    //        console.log('Message sent: ' + info.response);
-                    //        FinalMsgJson.Message = 'Mail send';
-                    //        FinalMsgJson.StatusCode = 200;
-                    //        FinalMsgJson.Result = 'Pass';
-                    //        res.send(FinalMsgJson);
-                    //    }
-                    //});
-                    FnSendMailEzeid(mailOptions, function (err, Result) {
-                        if (!err) {
-                            if (Result) {
-                                console.log('FnSendMail: Mail Sent Successfully');
-                                res.send(RtnMessage);
-                            }
-                            else {
-                                console.log('FnSendMail: Mail not Sent Successfully');
-                                res.json(null);
-                            }
-                        }
-                        else {
-                            console.log('FnSendMail: Error in sending mails' + err);
-                            res.json(null);
-                        }
-                    });
-
-
-                });
-            }
-            else {
-
-                if (From == null) {
-                    FinalMsgJson.Message = 'FnSendMail: From is empty';
-                    console.log('FnSendMail: From is empty');
-                }
-                else if (To == null) {
-                    FinalMsgJson.Message = 'FnSendMail : To is empty';
-                    console.log('FnSendMail: To is empty');
-                }
-                else if (Subject == null) {
-                    FinalMsgJson.Message = 'FnSendMail: Subject is empty';
-                    console.log('FnSendMail: Subject is empty');
-                }
-                else if (Body == null) {
-                    FinalMsgJson.Message = 'FnSendMail: Body is empty';
-                    console.log('FnSendMail: Body is empty');
-                }
-
-                res.statusCode = 400;
-                FinalMsgJson.StatusCode = res.statusCode;
-                res.send(FinalMsgJson);
-            }
-        }
-
-        catch (ex) {
-            console.log('Logoin error:' + ex.description);
-
-        }
-
-    };
 
 
 /**
@@ -400,7 +296,7 @@ StdLib.prototype.getOpenStatus = function(openStatusParam,workingHoursStrParam){
         /**
          * Current Time in minutes
          */
-        var currentTimeInMinutes = (currentDateObj.getHours() * 60) + currentDateObj.getMinutes;
+        var currentTimeInMinutes = (currentDateObj.getHours() * 60) + currentDateObj.getMinutes();
 
         var currentDay = currentDateObj.getDay();
 
@@ -423,7 +319,7 @@ StdLib.prototype.getOpenStatus = function(openStatusParam,workingHoursStrParam){
                     };
 
 
-                    if(currentTimeInMinutes >= workingHourComponentObj.startTime && currentTimeInMinutes <= workingHourComponentObj.endTime && workingHourComponentObj.days.indexOf(currentDay.toString) !== -1){
+                    if(currentTimeInMinutes >= workingHourComponentObj.startTime && currentTimeInMinutes <= workingHourComponentObj.endTime && workingHourComponentObj.days.indexOf(currentDay.toString()) !== -1){
                         openStatus = 1;
                         break;
                     }
@@ -438,6 +334,113 @@ StdLib.prototype.getOpenStatus = function(openStatusParam,workingHoursStrParam){
     }
 };
 
+
+/**
+ * method for upload image to cloud
+ * @param uniqueName
+ * @param readStream
+ * @param callback
+ */
+StdLib.prototype.uploadDocumentToCloud = function(uniqueName,readStream,callback){
+    var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
+    readStream.pipe(remoteWriteStream);
+
+    remoteWriteStream.on('finish', function(){
+        console.log('done');
+        if(callback){
+            if(typeof(callback)== 'function'){
+                callback(null);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+
+    remoteWriteStream.on('error', function(err){
+        if(callback){
+            if(typeof(callback)== 'function'){
+                console.log(err);
+                callback(err);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+};
+
+/**
+ * EZEOne ID conversion for adding @ if @ is not present in it by default
+ * @param ezeoneId
+ * @returns {string}
+ */
+StdLib.prototype.alterEzeoneId = function(ezeoneId){
+    var alteredEzeoneId = '';
+    if(ezeoneId){
+        if(ezeoneId.toString().substr(0,1) == '@'){
+            alteredEzeoneId = ezeoneId;
+        }
+        else{
+            alteredEzeoneId = '@' + ezeoneId.toString();
+        }
+    }
+    return alteredEzeoneId;
+};
+
+StdLib.prototype.getThumbnailLinkFromMime = function(mimeType){
+    if(!mimeType){
+        return thumbnailConfig.defaultThumbnail;
+    }
+    else{
+        /**
+         * @TODO Based on MIME type load the thumbnail
+         * Currently loading Default for testing
+         */
+        return thumbnailConfig.defaultThumbnail;
+    }
+};
+
+StdLib.prototype.getOnlyAttachmentName = function(attachmentLink){
+    var regex = new RegExp(appConfig.CONSTANT.GS_URL +
+        appConfig.CONSTANT.STORAGE_BUCKET + '/','g');
+    return (attachmentLink) ? attachmentLink.replace(regex,'') : '';
+};
+
+/**
+ * Hashes the password for saving into database
+ * @param password
+ * @returns {*}
+ */
+
+StdLib.prototype.hashPassword = function(password){
+    var bcrypt = null;
+
+    try{
+        bcrypt = require('bcrypt');
+    }
+    catch(ex){
+        console.log('Bcrypt not found, falling back to bcrypt-nodejs');
+        bcrypt = require('bcrypt-nodejs');
+    }
+
+    if(!password){
+        return null;
+    }
+    try{
+        var hash = bcrypt.hashSync(password, 12);
+        return hash;
+    }
+    catch(ex){
+        console.log(ex);
+    }
+}
 function FnSendMailEzeid(MailContent, CallBack) {
     var _this = this;
     try {
@@ -479,7 +482,7 @@ function FnSendMailEzeid(MailContent, CallBack) {
 
     }
     catch (ex) {
-        console.log('OTP FnSendMailEzeid error:' + ex.description);
+        console.log('OTP FnSendMailEzeid error:' + ex);
 
         return 'error'
     }

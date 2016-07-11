@@ -10,18 +10,7 @@
 "use strict";
 
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 var Notification = require('./notification/notification-master.js');
 var NotificationQueryManager = require('./notification/notification-query.js');
@@ -74,7 +63,7 @@ Location.prototype.getAll = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetSecondaryLocation error:' + ex.description);
+        console.log('FnGetSecondaryLocation error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -229,7 +218,7 @@ Location.prototype.save = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnAddLocation error:' + ex.description);
+        console.log('FnAddLocation error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -310,7 +299,7 @@ Location.prototype.deleteLocation = function(req,res,next) {
         }
     }
     catch (ex) {
-        console.log('FnDeleteLocation error:' + ex.description);
+        console.log('FnDeleteLocation error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -408,7 +397,7 @@ Location.prototype.getAllForEzeid = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetLocationListForEZEID error:' + ex.description);
+        console.log('FnGetLocationListForEZEID error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -488,7 +477,7 @@ Location.prototype.getLoactionList = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetLocationList error:' + ex.description);
+        console.log('FnGetLocationList error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -572,7 +561,7 @@ Location.prototype.getLocationDetails = function(req,res,next){
             });
         }
         catch(ex){
-            console.log('FnGetLocationDetails error:' + ex.description);
+            console.log('FnGetLocationDetails error:' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
 
@@ -628,7 +617,7 @@ Location.prototype.getLocationPicture = function(req,res,next){
 
         try{
             var ezeParts = req.query.ezeone_id.split('.');
-            ezeoneId = alterEzeoneId(ezeParts[0]);
+            ezeoneId = req.st.alterEzeoneId(ezeParts[0]);
             if(ezeParts.length > 1){
                 if(ezeParts[1].toString()){
 
@@ -723,7 +712,7 @@ Location.prototype.getLocationPicture = function(req,res,next){
         }
 
         catch(ex){
-            console.log('FnGetLocationPicture error:' + ex.description);
+            console.log('FnGetLocationPicture error:' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
 
@@ -754,7 +743,7 @@ Location.prototype.shareLocation = function(req,res,next){
     var fs = require("fs");
 
     var token = req.body.token;
-    var ezeone_id = alterEzeoneId(req.body.ezeone_id); // to ezeone_id
+    var ezeone_id = req.st.alterEzeoneId(req.body.ezeone_id); // to ezeone_id
     var locationTitle = (req.body.lm) ? req.body.lm : ''; // landmark
     var latitude = req.body.lat;
     var longitude = req.body.long;
@@ -931,7 +920,7 @@ Location.prototype.shareLocation = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnShareLocation ' + ex.description);
+            console.log('Error : FnShareLocation ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -948,7 +937,7 @@ Location.prototype.shareLocation = function(req,res,next){
  */
 Location.prototype.validateEZEOne = function(req,res,next){
 
-    var name = alterEzeoneId(req.query.ezeone_id);
+    var name = req.st.alterEzeoneId(req.query.ezeone_id);
     var ezeid;
     var pin = null ;
 
@@ -1044,7 +1033,7 @@ Location.prototype.validateEZEOne = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnValidateEZEOne ' + ex.description);
+            console.log('Error : FnValidateEZEOne ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1063,7 +1052,7 @@ Location.prototype.validateEZEOne = function(req,res,next){
 
 Location.prototype.getLocationsofezeid = function(req,res,next){
 
-    var ezeid = alterEzeoneId(req.query.ezeone_id);
+    var ezeid = req.st.alterEzeoneId(req.query.ezeone_id);
 
     var validationFlag = true;
     var error = {};
@@ -1133,7 +1122,7 @@ Location.prototype.getLocationsofezeid = function(req,res,next){
             });
         }
         catch(ex){
-            console.log('FnGetLocationsofezeid error:' + ex.description);
+            console.log('FnGetLocationsofezeid error:' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
 
@@ -1253,7 +1242,7 @@ Location.prototype.saveLocationforEmployers = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnSaveLocationforEmployers ' + ex.description);
+            console.log('Error : FnSaveLocationforEmployers ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

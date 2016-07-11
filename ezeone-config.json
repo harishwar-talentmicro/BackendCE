@@ -1,5 +1,6 @@
 {
   "CONSTANT" : {
+    "DEBUG" : true,
     "INDEX_PATH" : "../public/index.html",
     "GOOGLE_KEYFILE_PATH" : "../ezeid100.json",
     "GOOGLE_PROJECT_ID" : "ezeid100",
@@ -9,7 +10,22 @@
     "STATIC_URL": "/",
     "STORAGE_BUCKET":"ezeone",
     "GS_URL":"https://storage.googleapis.com/",
-    "ANDROID_AP_VERSION_CODE":1
+    "ANDROID_AP_VERSION_CODE":3,
+    "ANDROID_CRASH_REPORT_DIR" : "crash_report",
+    "EZEONE_CRASH_REPORT_DIR" : "ezeone_crash_report",
+    "EZEONE_MAILING_LIST" : [
+      "jain31192@gmail.com",
+      "indrajeetnagda@gmail.com",
+      "himank1991@gmail.com",
+      "sujit.mishra3147@gmail.com",
+      "himank@hirecraft.in",
+      "sujitkumar@hirecraft.in",
+      "pal.aabhishek95@gmail.com"
+    ],
+    "EZEONE_MESSAGE_ACCEPT_STATUS":1,
+    "EZEONE_MESSAGE_REJECT_STATUS":2,
+    "EZEONE_MESSAGE_LEAVE_STATUS":3,
+    "EZEONE_MESSAGE_REMOVE_STATUS":4
   },
   "SCHEME" : "https",
   "DOMAIN" : "www.ezeone.com",
@@ -32,8 +48,133 @@
     "ADMIN_PORT" : "12345",
     "ADMIN_PROTOCOL" : "http",
     "PORT" : 61612,
+    "AMQP_PORT" : 5672,
     "USERNAME" : "indrajeet",
-    "PASSWORD" : "indrajeet"
+    "PASSWORD" : "indrajeet",
+    "VHOST" : "%2f"
+  },
+  "VERSION_LIST" : {
+    "IOS" : [16],
+    "ANDROID" : [35],
+    "WEB" : [1]
+  },
+  "NOTIFICATION" : {
+    "TEMPLATES": {
+      "institute_candidate_job_suggestion": {
+        "params": [
+          "jobType",
+          "jobTitle",
+          "jobCode",
+          "companyName"
+        ],
+        "file": "job/institute-candidate-job-suggestion.txt"
+      },
+      "individual_candidate_job_suggestion": {
+        "params": [
+          "jobType",
+          "jobTitle",
+          "jobCode",
+          "companyName"
+        ],
+        "file": "job/individual-candidate-job-suggestion.txt"
+      },
+      "placement_officer_unverified_job_alert": {
+        "params": [
+          "companyName"
+        ],
+        "file": "job/placement-officer-unverified-job-alert.txt"
+      },
+      "placement_officer_job_approval": {
+        "params": [
+          "jobType",
+          "jobTitle",
+          "jobCode",
+          "companyName"
+        ],
+        "file": "job/placement-officer-job-approval.txt"
+      },
+      "add_members_to_group": {
+        "params": [
+          "groupName",
+          "adminName"
+        ],
+        "file": "message/members-to-group.txt"
+      },
+      "join_group": {
+        "params": [
+          "groupName",
+          "fullName"
+        ],
+        "file": "message/join-group.txt"
+      },
+      "auto_join_group": {
+        "params": [
+          "groupName",
+          "fullName"
+        ],
+        "file": "message/auto-join-group.txt"
+      },
+      "change_admin": {
+        "params": [
+          "oldAdminName",
+          "groupName"
+        ],
+        "file": "message/change-group-admin.txt"
+      },
+      "leave_group": {
+        "params": [
+          "memberName",
+          "groupName"
+        ],
+        "file": "message/leave-group.txt"
+      },
+      "delete_group": {
+        "params": [
+          "groupName"
+        ],
+        "file": "message/delete-group.txt"
+      },
+      "accept_request": {
+        "params": [
+          "adminName",
+          "groupName"
+        ],
+        "file": "message/accept-request.txt"
+      },
+      "reject_request": {
+        "params": [
+          "adminName",
+          "groupName"
+        ],
+        "file": "message/reject-request.txt"
+      },
+      "removed_from_group": {
+      "params": [
+        "adminName",
+        "groupName"
+      ],
+      "file": "message/remove-member.txt"
+    },
+      "compose_message": {
+        "params": [
+          "senderName"
+        ],
+        "file": "message/compose-message.txt"
+      },
+      "compose_message_group": {
+        "params": [
+          "senderName",
+          "groupName"
+        ],
+        "file": "message/compose-message-group.txt"
+      },
+      "message_deleted": {
+        "params" : [
+          "groupName"
+        ],
+        "file" : "message/message-deleted.txt"
+      }
+    }
   },
   "MAIL": {
     "APP_NAME": "EZEOne",
@@ -43,6 +184,58 @@
     "DISCLAIMER": "Copyright &copy; Example",
     "OPTIONS": null,
     "TEMPLATES": {
+      "generic" : {
+        "params" : [
+          "innerTemplate"
+        ],
+        "file": "generic.html",
+        "subject": ""
+      },
+      "placement_officer_unverified_job_alert": {
+        "params": [
+          "companyName"
+        ],
+        "file": "job/placement-officer-unverified-job-alert.html",
+        "subject" : "New job posted for your institute - Get verified"
+      },
+      "placement_officer_job_approval": {
+        "params": [
+          "jobType",
+          "jobTitle",
+          "jobCode",
+          "companyName",
+          "keySkills",
+          "jobId"
+        ],
+        "file": "job/placement-officer-job-approval.html",
+        "subject" : "New job posted for your institute"
+      },
+      "individual_candidate_job_suggestion" : {
+        "params" : [
+          "firstName",
+          "jobType",
+          "jobTitle",
+          "jobCode",
+          "companyName",
+          "keySkills",
+          "jobId"
+        ],
+        "file": "job/individual-candidate-job-suggestion.html",
+        "subject": "New Job Alert from EZEOne"
+      },
+      "institute_candidate_job_suggestion" : {
+        "params" : [
+          "firstName",
+          "jobType",
+          "jobTitle",
+          "jobCode",
+          "companyName",
+          "keySkills",
+          "jobId"
+        ],
+        "file": "job/institute-candidate-job-suggestion.html",
+        "subject": "New Job Alert from your institute"
+      },
       "register": {
         "params": [
           "fullName",
@@ -120,6 +313,16 @@
         "file" : "job_apply_company.html",
         "subject" : "Candidate applied to Job "
       },
+      "invoice" : {
+        "params" : ["communityAddress","memberName","memberAddress","billDate","startDate","endDate","totalAmount","dueDate","adminName","type","area","refNo","expenseList","imageUrl"],
+        "file" : "invoice.html",
+        "subject" : "invoice Details"
+      },
+      "crash_report" : {
+        "params" : ["crashReport", "projectName"],
+        "file" : "crash-report.html",
+        "subject" : "Crash Report Details"
+      },
       "default": {
         "params": ["HTML"],
         "file": "default.html",
@@ -127,6 +330,8 @@
       }
     }
   },
+  "RESERVED_EZEONE_LIST" : ["API","MEDIA","WWW","STATIC","SUPPORT","HELP","BETA","MAIL","MESSANGER","CHAT","NOTIFICATION","CDN",
+      "SERVER[0-9]+","NS[0-9]+","MS[0-9]"],
   "DB": {
 
   },

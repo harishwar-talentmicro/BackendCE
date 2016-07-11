@@ -203,7 +203,7 @@ router.get('/expense_type', function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Expense type details loaded successfully';
-                                            responseMessage.data = results[0]
+                                            responseMessage.data = results[0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -323,7 +323,7 @@ router.delete('/expense_type/:id', function(req,res,next){
                         req.db.query(procQuery, function (err, results) {
                             if (!err) {
                                 console.log(results);
-                                if (results) {
+                                if (results && results[0] && results[0][0] && results[0][0].tid) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Expense type deleteded successfully';
@@ -597,11 +597,14 @@ router.get('/expense_type_amount', function(req,res,next){
         try {
             req.query.f_date = (req.query.f_date) ? req.query.f_date : null;
             req.query.t_date = (req.query.t_date) ? req.query.t_date : null;
+            var pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+            var limit = (req.query.limit) ? (req.query.limit) : 10;
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
                         var procParams = req.db.escape(req.query.service_mid)+ ',' + req.db.escape(req.query.exp_typ_id)
-                            + ',' + req.db.escape(req.query.f_date)+ ',' + req.db.escape(req.query.t_date);
+                            + ',' + req.db.escape(req.query.f_date)+ ',' + req.db.escape(req.query.t_date)
+                            + ',' + req.db.escape(pageNo)+ ',' + req.db.escape(limit);
                         var procQuery = 'CALL get_expense_type_amt(' + procParams + ')';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, results) {
@@ -613,7 +616,8 @@ router.get('/expense_type_amount', function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Expense type amount details loaded successfully';
-                                            responseMessage.data = results[0]
+                                            responseMessage.data = results[0];
+                                            responseMessage.totalCount = results[1][0].totalCount;
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -625,7 +629,7 @@ router.get('/expense_type_amount', function(req,res,next){
                                         }
                                     }
                                     else {
-                                        responseMessage.status = false;
+                                        responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Expense type amount details not available';
                                         responseMessage.data = null;
@@ -633,7 +637,7 @@ router.get('/expense_type_amount', function(req,res,next){
                                     }
                                 }
                                 else {
-                                    responseMessage.status = false;
+                                    responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Expense type amount details not available';
                                     responseMessage.data = null;
@@ -733,7 +737,7 @@ router.delete('/expense_type_amount/:id', function(req,res,next){
                         req.db.query(procQuery, function (err, results) {
                             if (!err) {
                                 console.log(results);
-                                if (results) {
+                                if (results && results[0] && results[0][0] && results[0][0].tid) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Amount expense type deleted successfully';

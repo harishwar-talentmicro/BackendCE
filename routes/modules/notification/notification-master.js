@@ -241,7 +241,7 @@ Notification.prototype.authVHost = function(req,res,next){
         //        }
         //    }
         //});
-        res.send('allow')
+        res.send('allow');
     }
     catch(ex){
         console.log('Error : Notification Module authUser');

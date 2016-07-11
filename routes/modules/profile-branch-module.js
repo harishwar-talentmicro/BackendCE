@@ -10,18 +10,7 @@ var util = require('util');
 var validator = require('validator');
 
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 var st = null;
 function ProfileBranch(db,stdLib){
@@ -332,7 +321,7 @@ ProfileBranch.prototype.deleteBranch = function(req,res,next){
  *
  */
 ProfileBranch.prototype.getBranch = function(req,res,next){
-    req.query.ezeid = (req.query.ezeid) ? alterEzeoneId(req.query.ezeid) : ''
+    req.query.ezeid = (req.query.ezeid) ? req.st.alterEzeoneId(req.query.ezeid) : ''
 
     if(!req.query.ezeid){
         var responseMessage = {
@@ -459,7 +448,7 @@ ProfileBranch.prototype.getBranch = function(req,res,next){
         };
         var validationFlag = true;
 
-        req.query.ezeid = (req.query.ezeid) ? alterEzeoneId(req.query.ezeid) : ''
+        req.query.ezeid = (req.query.ezeid) ? req.st.alterEzeoneId(req.query.ezeid) : ''
 
         var error = {};
 

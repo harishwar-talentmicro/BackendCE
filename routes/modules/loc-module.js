@@ -14,18 +14,6 @@ function Loc(db,stdLib){
     }
 };
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 /**
  * @todo FnSaveLocMap
@@ -99,6 +87,8 @@ Loc.prototype.saveLocMap = function(req,res,next){
                             if (!err) {
                                 console.log(deleteResult);
                                 console.log('LocMap Deleted Sucessfully');
+
+
                             }
                             else {
                                 console.log('error from delete locmap');
@@ -106,12 +96,12 @@ Loc.prototype.saveLocMap = function(req,res,next){
                         });
 
                         if(isJson){
-
+                            var comSaveLocQuery = "";
                             for (var i = 0; i < locMap.length; i++) {
                                 console.log("locMap :"+locMap);
                                 var locDetails = {
 
-                                    fid: locMap[i].fid,
+                                    // fid: locMap[i].fid,
                                     locId: locMap[i].career_id,
                                     tid: locMap[i].tid,
                                     internshipCount: locMap[i].interns_count,
@@ -121,41 +111,46 @@ Loc.prototype.saveLocMap = function(req,res,next){
                                     type: locMap[i].type
                                 };
                                 console.log("locDetails :"+locDetails);
-                                var queryParams = st.db.escape(req.body.token) + ',' + st.db.escape(locDetails.locId) + ',' + st.db.escape(locDetails.type)
+                                //var queryParams = st.db.escape(req.body.token) + ',' + st.db.escape(locDetails.locId) + ',' + st.db.escape(locDetails.type)
+                                //    + ',' + st.db.escape(locDetails.internshipCount) + ',' + st.db.escape(locDetails.fresherCtc)
+                                //    + ',' + st.db.escape(locDetails.fresherCount) + ',' + st.db.escape(locDetails.lateralCount)
+                                //    + ',' + st.db.escape(locDetails.tid);
+
+                                var query = 'CALL pSaveLocMap(' + st.db.escape(req.body.token) + ',' + st.db.escape(locDetails.locId) + ',' + st.db.escape(locDetails.type)
                                     + ',' + st.db.escape(locDetails.internshipCount) + ',' + st.db.escape(locDetails.fresherCtc)
                                     + ',' + st.db.escape(locDetails.fresherCount) + ',' + st.db.escape(locDetails.lateralCount)
-                                    + ',' + st.db.escape(locDetails.tid);
-                                var query = 'CALL pSaveLocMap(' + queryParams + ')';
-                                console.log(query);
-                                st.db.query(query, function (err, insertResult) {
-                                    if (!err) {
-                                        console.log(insertResult);
-                                        if (insertResult) {
-                                            id = insertResult[0][0] ? insertResult[0][0].id : 0;
-                                            console.log('FnSaveLocMap: LocMap saved successfully');
-                                        }
-                                        else {
-                                            responseMessage.message = 'LocMap not saved';
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnSaveLocMap:LocMap not saved');
-                                        }
+                                    + ',' + st.db.escape(locDetails.tid) + ');';
+                                comSaveLocQuery += query;
+                                console.log(comSaveLocQuery);
+                            }
+                            st.db.query(comSaveLocQuery, function (err, insertResult) {
+                                if (!err) {
+                                    console.log(insertResult);
+                                    if (insertResult) {
+                                        id = insertResult[0][0] ? insertResult[0][0].id : 0;
+                                        responseMessage.status = true;
+                                        responseMessage.message = 'LocMap saved successfully';
+                                        responseMessage.data = id;
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveLocMap: LocMap saved successfully');
+                                        console.log('FnSaveLocMap: LocMap saved successfully');
                                     }
                                     else {
-                                        responseMessage.message = 'An error occured ! Please try again';
-                                        responseMessage.error = {
-                                            server: 'Internal Server Error'
-                                        };
-                                        res.status(500).json(responseMessage);
-                                        console.log('FnSaveLocMap: error in saving LocMap  :' + err);
+                                        responseMessage.message = 'LocMap not saved';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveLocMap:LocMap not saved');
                                     }
+                                }
+                                else {
+                                    responseMessage.message = 'An error occured ! Please try again';
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    res.status(500).json(responseMessage);
+                                    console.log('FnSaveLocMap: error in saving LocMap  :' + err);
+                                }
 
-                                });
-                            }
-                            responseMessage.status = true;
-                            responseMessage.message = 'LocMap saved successfully';
-                            responseMessage.data = id;
-                            res.status(200).json(responseMessage);
-                            console.log('FnSaveLocMap: LocMap saved successfully');
+                            });
                         }
                         else {
                             responseMessage.message = 'Invalid Input Content Type';
@@ -189,7 +184,7 @@ Loc.prototype.saveLocMap = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSaveLocMap ' + ex.description);
+            console.log('Error : FnSaveLocMap ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -297,7 +292,7 @@ Loc.prototype.getLocMap = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetLOCMap ' + ex.description);
+            console.log('Error : FnGetLOCMap ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -445,7 +440,7 @@ Loc.prototype.loadLocDetailsEmployer = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnLoadLocDetails ' + ex.description);
+            console.log('Error : FnLoadLocDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -591,7 +586,7 @@ Loc.prototype.loadLocDetailsTrainer = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnLoadLocDetails ' + ex.description);
+            console.log('Error : FnLoadLocDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -721,7 +716,7 @@ Loc.prototype.loadLocDetailsSyllabus = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnLoadLocDetails ' + ex.description);
+            console.log('Error : FnLoadLocDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -808,7 +803,7 @@ Loc.prototype.getLoc = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetLoc ' + ex.description);
+            console.log('Error : FnGetLoc ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -924,7 +919,7 @@ Loc.prototype.saveLoc = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnSaveLoc ' + ex.description);
+            console.log('Error : FnSaveLoc ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1093,7 +1088,7 @@ Loc.prototype.getLocBasket = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetLocBasket ' + ex.description);
+            console.log('Error : FnGetLocBasket ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

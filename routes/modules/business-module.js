@@ -30,18 +30,7 @@ function BusinessManager(db,stdLib){
     }
 };
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 /**
  *
@@ -335,7 +324,7 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
                 server: 'Internal server error'
             };
             responseMessage.message = 'An error occured !';
-            console.log('FnGetTransaction:error ' + ex.description);
+            console.log('FnGetTransaction:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);
@@ -488,7 +477,7 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
                 server: 'Internal server error'
             };
             responseMessage.message = 'An error occured !';
-            console.log('FnGetSalesTransaction:error ' + ex.description);
+            console.log('FnGetSalesTransaction:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);
@@ -525,7 +514,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
         var FunctionType = req.body.FunctionType;
         var Latitude = (req.body.Latitude) ? (req.body.Latitude) : 0;
         var Longitude = (req.body.Longitude) ? (req.body.Longitude) : 0;
-        var EZEID = (req.body.EZEID) ? (alterEzeoneId(req.body.EZEID)) : '';
+        var EZEID = (req.body.EZEID) ? (req.st.alterEzeoneId(req.body.EZEID)) : '';
         var FolderRuleID = parseInt(req.body.FolderRuleID);
         var Duration = req.body.Duration;
         var DurationScales = req.body.DurationScales;
@@ -538,7 +527,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
         }
         var DeliveryAddress = (req.body.DeliveryAddress) ? (req.body.DeliveryAddress) : '';
         var ItemIDList = '';
-        var ToEZEID = alterEzeoneId(req.body.ToEZEID);
+        var ToEZEID = req.st.alterEzeoneId(req.body.ToEZEID);
         var item_list_type = (req.body.item_list_type) ? (req.body.item_list_type) : 0;
         var companyName = (req.body.companyName) ? (req.body.companyName) : '';
         var company_id = (req.body.company_id) ? (req.body.company_id) : 0;
@@ -872,7 +861,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSaveTranscation:error ' + ex.description);
+        console.log('FnSaveTranscation:error ' + ex);
         console.log(ex);
         console.log(ex.line);
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
@@ -908,7 +897,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
         var FunctionType = (req.body.FunctionType) ? (req.body.FunctionType) : 0 ;
         var Latitude = (req.body.Latitude) ? (req.body.Latitude) : 0;
         var Longitude = (req.body.Longitude) ? (req.body.Longitude) : 0;
-        var EZEID = (req.body.EZEID) ? alterEzeoneId(req.body.EZEID) : '';
+        var EZEID = (req.body.EZEID) ? req.st.alterEzeoneId(req.body.EZEID) : '';
         var FolderRuleID = parseInt(req.body.FolderRuleID);
         var Duration = req.body.Duration;
         var DurationScales = req.body.DurationScales;
@@ -923,7 +912,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
 
         var DeliveryAddress = (req.body.DeliveryAddress) ? (req.body.DeliveryAddress) : '';
         var ItemIDList='';
-        var ToEZEID = alterEzeoneId(req.body.ToEZEID);
+        var ToEZEID = req.st.alterEzeoneId(req.body.ToEZEID);
         var item_list_type = (req.body.item_list_type) ? (req.body.item_list_type) : 0;
         var companyName = (req.body.companyName) ? (req.body.companyName) : '' ;
         var company_id = (req.body.company_id) ? (req.body.company_id) : 0 ;
@@ -1078,7 +1067,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSaveTranscation:error ' + ex.description);
+        console.log('FnSaveTranscation:error ' + ex);
         console.log(ex);
         console.log(ex.line);
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
@@ -1149,7 +1138,7 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !';
-        console.log('FnUpdateTransaction:error ' + ex.description);
+        console.log('FnUpdateTransaction:error ' + ex);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1232,7 +1221,7 @@ BusinessManager.prototype.getTransactionItems = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetTranscationItems error:' + ex.description);
+        console.log('FnGetTranscationItems error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1344,7 +1333,7 @@ BusinessManager.prototype.saveTransactionItems = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnSaveTranscationItems:error ' + ex.description);
+        console.log('FnSaveTranscationItems:error ' + ex);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1449,7 +1438,7 @@ BusinessManager.prototype.getOutboxTransactions = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !';
-        console.log('FnGetOutboxMessages:error ' + ex.description);
+        console.log('FnGetOutboxMessages:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -1532,7 +1521,7 @@ BusinessManager.prototype.getTransAutoComplete = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !';
-        console.log('FnGetTransAutoComplete:error ' + ex.description);
+        console.log('FnGetTransAutoComplete:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -1615,7 +1604,7 @@ BusinessManager.prototype.getItemListForEZEID = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetItemListForEZEID error:' + ex.description);
+        console.log('FnGetItemListForEZEID error:' + ex);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1701,7 +1690,7 @@ BusinessManager.prototype.deleteTransaction = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnDeleteTranscation:error ' + ex.description);
+        console.log('FnDeleteTranscation:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1781,7 +1770,7 @@ BusinessManager.prototype.itemList = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetItemList error:' + ex.description);
+        console.log('FnGetItemList error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1860,7 +1849,7 @@ BusinessManager.prototype.itemDetails = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnItemDetails error:' + ex.description);
+        console.log('FnItemDetails error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1936,7 +1925,7 @@ BusinessManager.prototype.getUserwiseFolderList = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetUserwiseFolderList error:' + ex.description);
+        console.log('FnGetUserwiseFolderList error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -2023,7 +2012,7 @@ BusinessManager.prototype.updateBussinessList = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnUpdateMessageStatus:  error:' + ex.description);
+        console.log('FnUpdateMessageStatus:  error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -2104,7 +2093,7 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
     }
     catch (ex) {
         responseMessage.message = 'An error occured !';
-        console.log('FnGetCompanyDetails:error ' + ex.description);
+        console.log('FnGetCompanyDetails:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2133,7 +2122,7 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
      * @param next
      * @constructor
      */
-    var ezeTerm = alterEzeoneId(req.query.ezeoneid);
+    var ezeTerm = req.st.alterEzeoneId(req.query.ezeoneid);
     var token = req.query.token;
     var locationSeq = 0;
     var pin = null;
@@ -2296,7 +2285,7 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
             });
         }
         catch(ex){
-            console.log('Error : FnGetEZEOneIDInfo' + ex.description);
+            console.log('Error : FnGetEZEOneIDInfo' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2405,7 +2394,7 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !';
-        console.log('FnGetTransAttachment:error ' + ex.description);
+        console.log('FnGetTransAttachment:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2466,7 +2455,8 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
             var query = st.db.escape(from_date) + ',' + st.db.escape(to_date) + ',' + st.db.escape(stages)
                 + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user);
             st.db.query('CALL pTransactionfilter(' + query +')', function (err, transResult) {
-
+                var testQuery = 'CALL pTransactionfilter(' + query +')';
+console.log(testQuery,"query");
                 var total_count = 0;
                 var total_qty = 0;
                 if (!err) {
@@ -2546,7 +2536,7 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !';
-        console.log('FnSalesStatistics:error ' + ex.description);
+        console.log('FnSalesStatistics:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2711,7 +2701,7 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnCreateTransactionHistory ' + ex.description);
+            console.log('Error : FnCreateTransactionHistory ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2819,7 +2809,7 @@ BusinessManager.prototype.getTransactionHistory = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetTransactionHistory ' + ex.description);
+            console.log('Error : FnGetTransactionHistory ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -2860,7 +2850,7 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
          */
 
         var token = req.body.token;
-        var toEzeid = alterEzeoneId(req.body.to_ezeid);
+        var toEzeid = req.st.alterEzeoneId(req.body.to_ezeid);
         var message = (req.body.requirement) ? req.body.requirement : '';
         var address = (req.body.address) ? req.body.address : '';
         var notes = (req.body.notes) ? req.body.notes : '';
@@ -2956,7 +2946,7 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                                             responseMessage.proposal_message = proposal_message;
                                             responseMessage.data = {
                                                 id: transResult[0][0].id,
-                                                to_ezeid: alterEzeoneId(req.body.to_ezeid),
+                                                to_ezeid: req.st.alterEzeoneId(req.body.to_ezeid),
                                                 message: (req.body.msg) ? req.body.msg : '',
                                                 address: req.body.address,
                                                 notes: (req.body.notes) ? req.body.notes : '',
@@ -3032,7 +3022,7 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSaveSalesRequest ' + ex.description);
+            console.log('Error : FnSaveSalesRequest ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -3052,7 +3042,7 @@ BusinessManager.prototype.getCompanyName = function(req,res,next){
 
 
     var token = req.query.token;
-    var ezeid = (req.query.ezeid) ? alterEzeoneId(req.query.ezeid):'';
+    var ezeid = (req.query.ezeid) ? req.st.alterEzeoneId(req.query.ezeid):'';
 
     var responseMessage = {
         status: false,
@@ -3144,7 +3134,7 @@ BusinessManager.prototype.getCompanyName = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetCompanyName ' + ex.description);
+            console.log('Error : FnGetCompanyName ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3163,7 +3153,7 @@ BusinessManager.prototype.getContactDetails = function(req,res,next){
 
 
     var token = req.query.token;
-    var ezeid = (req.query.ezeid) ? alterEzeoneId(req.query.ezeid):'';
+    var ezeid = (req.query.ezeid) ? req.st.alterEzeoneId(req.query.ezeid):'';
 
     var responseMessage = {
         status: false,
@@ -3255,7 +3245,7 @@ BusinessManager.prototype.getContactDetails = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetContactDetails ' + ex.description);
+            console.log('Error : FnGetContactDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3366,7 +3356,7 @@ BusinessManager.prototype.getRoles = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetRoles ' + ex.description);
+            console.log('Error : FnGetRoles ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3543,7 +3533,7 @@ BusinessManager.prototype.getTransactionOfSales = function(req,res,next){
                 server: 'Internal server error'
             };
             responseMessage.message = 'An error occured !';
-            console.log('FnGetSalesTransaction:error ' + ex.description);
+            console.log('FnGetSalesTransaction:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);

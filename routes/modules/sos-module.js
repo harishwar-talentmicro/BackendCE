@@ -3,18 +3,6 @@
  */
 "use strict";
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 var st = null;
 var Notification = require('./notification/notification-master.js');
@@ -40,7 +28,7 @@ function Sos(db,stdLib){
  */
 Sos.prototype.saveSos = function(req,res,next) {
 
-    var ezeid = (req.body.ezeid) ? alterEzeoneId(req.body.ezeid) : '';
+    var ezeid = (req.body.ezeid) ? req.st.alterEzeoneId(req.body.ezeid) : '';
     var b1 = (req.body.b1) ? req.body.b1 : 0;   // 0-unselect 1-select
     var b2 = (req.body.b2) ? req.body.b2 : 0;
     var b3 = (req.body.b3) ? req.body.b3 : 0;
@@ -188,7 +176,7 @@ Sos.prototype.saveSos = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
-        console.log('Error : FnSaveSosRequest ' + ex.description);
+        console.log('Error : FnSaveSosRequest ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -210,7 +198,7 @@ Sos.prototype.postSos = function(req,res,next) {
     var longitude = req.body.lng;
     var deviceId = req.body.device_id;
     var iphoneID='';
-    var ezeid = (req.body.ezeid) ? alterEzeoneId(req.body.ezeid) : '';
+    var ezeid = (req.body.ezeid) ? req.st.alterEzeoneId(req.body.ezeid) : '';
 
     var responseMessage = {
         status: false,
@@ -259,7 +247,7 @@ Sos.prototype.postSos = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
-        console.log('Error : FnPostSosRequest ' + ex.description);
+        console.log('Error : FnPostSosRequest ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -332,7 +320,7 @@ Sos.prototype.loadSosRequest = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
-        console.log('Error : FnLoadSosRequest ' + ex.description);
+        console.log('Error : FnLoadSosRequest ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -439,7 +427,7 @@ Sos.prototype.updateSosRequest = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
-        console.log('Error : FnUpdateSosRequest ' + ex.description);
+        console.log('Error : FnUpdateSosRequest ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -514,7 +502,7 @@ Sos.prototype.saveSosServiceProvider = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
-        console.log('Error : FnSaveSosServiceProvider ' + ex.description);
+        console.log('Error : FnSaveSosServiceProvider ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -583,7 +571,7 @@ Sos.prototype.getSosServiceProvider = function(req,res,next) {
         };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
-        console.log('Error : FnLoadSosRequest ' + ex.description);
+        console.log('Error : FnLoadSosRequest ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }

@@ -98,18 +98,6 @@ BufferStream.prototype._read = function( size ) {
 };
 
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 var st = null;
 
@@ -306,7 +294,7 @@ Configuration.prototype.save = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnSaveConfig:error ' + ex.description);
+        console.log('FnSaveConfig:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -391,7 +379,7 @@ Configuration.prototype.get = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetConfig error:' + ex.description);
+        console.log('FnGetConfig error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -439,7 +427,7 @@ Configuration.prototype.getBusinessCategories = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnCategory error:' + ex.description);
+        console.log('FnCategory error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -530,7 +518,7 @@ Configuration.prototype.getStatusTypes = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetStatusType error:' + ex.description);
+        console.log('FnGetStatusType error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -650,7 +638,7 @@ Configuration.prototype.StatusTypes = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetStatusType error:' + ex.description);
+        console.log('FnGetStatusType error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -790,7 +778,7 @@ Configuration.prototype.saveStatusType = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSaveStatusType:error ' + ex.description);
+        console.log('FnSaveStatusType:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(500).json(rtnMessage);
@@ -879,7 +867,7 @@ Configuration.prototype.getActionTypes = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetActionType error:' + ex.description);
+        console.log('FnGetActionType error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1011,7 +999,7 @@ Configuration.prototype.saveActionType = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSaveActionType :error ' + ex.description);
+        console.log('FnSaveActionType :error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1096,7 +1084,7 @@ Configuration.prototype.getItems = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetItemList error:' + ex.description);
+        console.log('FnGetItemList error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1217,7 +1205,7 @@ Configuration.prototype.saveItems = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnSaveItem:error ' + ex.description);
+        console.log('FnSaveItem:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ....................');
     }
@@ -1304,7 +1292,7 @@ Configuration.prototype.getFolders = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetRoleList error:' + ex.description);
+        console.log('FnGetRoleList error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1408,7 +1396,7 @@ Configuration.prototype.saveFolder = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSaveFolderRules:error ' + ex.description);
+        console.log('FnSaveFolderRules:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1494,7 +1482,7 @@ Configuration.prototype.getSubusers = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetSubUserList error:' + ex.description);
+        console.log('FnGetSubUserList error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1517,7 +1505,7 @@ Configuration.prototype.createSubuser = function(req,res,next){
 
         var token = req.body.Token;
         var tid = req.body.TID;
-        var userName = alterEzeoneId(req.body.UserName);
+        var userName = req.st.alterEzeoneId(req.body.UserName);
         var status  = req.body.Status;
         var firstName = req.body.FirstName;
         var lastName = req.body.LastName;
@@ -1532,7 +1520,7 @@ Configuration.prototype.createSubuser = function(req,res,next){
         var homeDeliveryRules = req.body.HomeDeliveryRules;
         var serviceRules = req.body.ServiceRules;
         var resumeRules = req.body.ResumeRules;
-        var masterId = alterEzeoneId(req.body.PersonalID);
+        var masterId = req.st.alterEzeoneId(req.body.PersonalID);
         var templateId = (!isNaN(parseInt(req.body.templateID))) ? parseInt(req.body.templateID) : 0;
 
         var rtnMessage = {
@@ -1617,7 +1605,7 @@ Configuration.prototype.createSubuser = function(req,res,next){
         });
     }
     catch (ex) {
-        console.log('FnCreateSubUser:error ' + ex.description);
+        console.log('FnCreateSubUser:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1639,7 +1627,7 @@ Configuration.prototype.getReservationResources = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = alterEzeoneId(req.query.ezeid);
+        var ezeid = req.st.alterEzeoneId(req.query.ezeid);
         var type = (req.query.type) ? req.query.type : 0 ;
 
         var responseMessage = {
@@ -1705,7 +1693,7 @@ Configuration.prototype.getReservationResources = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !';
-        console.log('FnGetReservationResource:error ' + ex.description);
+        console.log('FnGetReservationResource:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -1855,7 +1843,7 @@ Configuration.prototype.saveReservationResource = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !';
-        console.log('FnSaveReservationResource:error ' + ex.description);
+        console.log('FnSaveReservationResource:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2000,7 +1988,7 @@ Configuration.prototype.updateReservationResource = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnUpdateReservationResource:error ' + ex.description);
+        console.log('FnUpdateReservationResource:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2023,7 +2011,7 @@ Configuration.prototype.getReservationServices = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = alterEzeoneId(req.query.ezeid);
+        var ezeid = req.st.alterEzeoneId(req.query.ezeid);
         var responseMessage = {
             status: false,
             data: null,
@@ -2092,7 +2080,7 @@ Configuration.prototype.getReservationServices = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnGetReservationService:error ' + ex.description);
+        console.log('FnGetReservationService:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2239,7 +2227,7 @@ Configuration.prototype.saveReservationService = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnSaveReservationService:error ' + ex.description);
+        console.log('FnSaveReservationService:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2370,7 +2358,7 @@ Configuration.prototype.updateReservationService = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnUpdateReservationService:error ' + ex.description);
+        console.log('FnUpdateReservationService:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2393,7 +2381,7 @@ Configuration.prototype.getResourceServiceMaps = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = alterEzeoneId(req.query.ezeid);
+        var ezeid = req.st.alterEzeoneId(req.query.ezeid);
         var responseMessage = {
             status: false,
             data: null,
@@ -2464,7 +2452,7 @@ Configuration.prototype.getResourceServiceMaps = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnGetReservResourceServiceMap:error ' + ex.description);
+        console.log('FnGetReservResourceServiceMap:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2593,7 +2581,7 @@ Configuration.prototype.saveResourceServiceMap = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnSaveReservResServiceMap:error ' + ex.description);
+        console.log('FnSaveReservResServiceMap:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -2680,7 +2668,7 @@ Configuration.prototype.getWorkingHoursTemplates = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetWorkingHours error:' + ex.description);
+        console.log('FnGetWorkingHours error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -2808,7 +2796,7 @@ Configuration.prototype.saveWorkingHoursTemplate = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnSaveWorkingHours:error ' + ex.description);
+        console.log('FnSaveWorkingHours:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -2872,7 +2860,7 @@ Configuration.prototype.getHolidays = function(req,res,next){
         });
     }
     catch (ex) {
-        console.log('FnGetHolidayList error:' + ex.description);
+        console.log('FnGetHolidayList error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -2970,7 +2958,7 @@ Configuration.prototype.saveHoliday = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnSaveHolidayCalendar:error ' + ex.description);
+        console.log('FnSaveHolidayCalendar:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -3056,7 +3044,7 @@ Configuration.prototype.deleteHoliday = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnDeleteHolidayList:error ' + ex.description);
+        console.log('FnDeleteHolidayList:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -3140,7 +3128,7 @@ Configuration.prototype.deleteWorkingHours = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnDeleteWorkingHours:error ' + ex.description);
+        console.log('FnDeleteWorkingHours:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -3256,7 +3244,7 @@ Configuration.prototype.getWorkingHoursDetails = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !';
-        console.log('FnWorkingHours:error ' + ex.description);
+        console.log('FnWorkingHours:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
@@ -3376,7 +3364,7 @@ Configuration.prototype.saveInstituteGroup = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSaveInstituteGroup ' + ex.description);
+            console.log('Error : FnSaveInstituteGroup ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3482,7 +3470,7 @@ Configuration.prototype.getInstituteGroup = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSaveInstituteGroup ' + ex.description);
+            console.log('Error : FnSaveInstituteGroup ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3608,7 +3596,7 @@ Configuration.prototype.getInstituteConfig = function(req,res,next){
         catch (ex) {
             responseMessage.error = {};
             responseMessage.message = 'An error occured !';
-            console.log('getInstituteConfig:error ' + ex.description);
+            console.log('getInstituteConfig:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);
@@ -3735,7 +3723,7 @@ Configuration.prototype.getInstituteGroupDetails = function(req,res,next){
         catch (ex) {
             responseMessage.error = {};
             responseMessage.message = 'An error occured !';
-            console.log('getInstituteGroupDetails : error ' + ex.description);
+            console.log('getInstituteGroupDetails : error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);
@@ -3768,199 +3756,7 @@ Configuration.prototype.getInstituteGroupDetails = function(req,res,next){
      }
     ]
  */
-Configuration.prototype.saveWorkingSchedule = function(req,res,next){
-    try{
-        /**
-         * Sample data structure you will get from Client(Web)
-         * It will be accessible through req.body and req type will always be json
-         */
-        var dataFromClient = [
-            {
-                id : 0,
-                days : [0,1,2],
-                st : "09:00",
-                et : "19:00"
-            },
-            {
-                id : 0,
-                days : [0,1,3],
-                st : "10:00",
-                et : "13:00"
-            }
-        ];
 
-        var error = {
-        };
-        var validationFlag = true;
-
-        /**
-         * TID of tmaster wherer you want to update working hours schedule
-         * It can be main business TID or it can be a branch TID (i.e. also in tmaster but pointing to some other TID which is it's parent)
-         */
-        req.query.tid = parseInt(req.query.tid);
-        if(isNaN(req.query.tid) || req.query.tid < 1){
-            validationFlag *= false;
-            error['tid'] = "Invalid TID";
-        }
-
-        /**
-         * Slots which should not be deleted for working hours
-         */
-        var excludedIdList = [];
-
-        var combSaveQuery = "";
-        for(var i = 0; i < dataFromClient.length; i++){
-            var startMoment = moment(dataFromClient.st,"HH:mm");
-            var endMoment = moment(dataFromClient.et,"HH:mm");
-            error[i] = null;
-
-            /**
-             * Validating start time
-             */
-            if(startMoment){
-                if(!startMoment.isValid()){
-                    error[i] = { st : 'Invalid time format'};
-                    validationFlag *= false;
-                }
-            }
-            else{
-                error[i] = { st : 'Invalid time format'};
-                validationFlag *= false;
-            }
-            /**
-             * Validating end time
-             */
-            if(endMoment){
-                if(!endMoment.isValid()){
-                    error[i] = { et : 'Invalid time format'};
-                    validationFlag *= false;
-                }
-            }
-            else{
-                error[i] = { et : 'Invalid time format'};
-                validationFlag *= false;
-            }
-
-            /**
-             * Validating days
-             */
-            if(dataFromClient[i].days){
-                if(dataFromClient[i].days.length < 1) {
-                    error[i] = {days: 'Days are empty'};
-                    validationFlag *= false;
-                }
-                else{
-                    for(var j = 0; j < dataFromClient[i].days.length; j++){
-                        dataFromClient[i].days = parseInt(dataFromClient[i].days);
-                        if(dataFromClient[i].days[j] > 6 || dataFromClient[i].days[j] < 0 || isNaN(dataFromClient[i].days[j])){
-                            if(dataFromClient[i].days[j] > 6){
-                                dataFromClient[i].days[j] = dataFromClient[i].days[j] % 6;
-                            }
-                            if(isNaN(dataFromClient[i].days[j]) || dataFromClient[i].days[j] < 0){
-                                dataFromClient[i].days.splice(j,1);
-                            }
-                        }
-                    }
-
-                    if(!dataFromClient[i].days.length){
-                        error[i] = { days : 'Days are empty'};
-                        validationFlag *= false;
-                    }
-                }
-            }
-            else {
-                error[i] = { days : 'Days are empty'};
-                validationFlag *= false;
-            }
-            dataFromClient[i].id = parseInt(dataFromClient[i].id);
-            if(isNaN(dataFromClient[i].id) || dataFromClient[i].id < 1){
-                error[i] = { days : 'Invalid slot id'};
-                validationFlag *= false;
-            }
-
-            if(error[i]){
-                continue;
-            }
-
-            if(dataFromClient[i].id){
-                excludedIdList.push(dataFromClient[i].id);
-            }
-
-            var queryParams = [
-                st.db.escape(req.query.token),
-                st.db.escape(dataFromClient[i].id),
-                st.db.escape(dataFromClient[i].days.join(',')),
-                st.db.escape((startMoment.hours() * 60)+startMoment.minutes()),
-                st.db.escape((endMoment.hours() * 60)+endMoment.minutes()),
-                st.db.escape(st.db.escape(req.query.tid))
-            ];
-
-            combSaveQuery += "CALL post_working_hour("+ queryParams.join(',')+");";
-
-        }
-
-        /**
-         * The slots which are not to be deleted are pushed into excluded list
-         */
-        if(excludedIdList.length){
-            var delQueryParams = [
-                st.db.escape(req.query.token),
-                st.db.escape(excludedIdList.join(',')),
-                st.db.escape(st.db.escape(req.query.tid))
-            ];
-            /**
-             * The slots other than the passed slots will get deleted with this procedure
-             */
-            combSaveQuery += "CALL delete_working_hours("+ delQueryParams.join(',')+");";
-        }
-
-        if(!validationFlag){
-            res.status(200).json({
-                status : false,
-                message : "Please check the errors",
-                error : error,
-                data : null
-            });
-        }
-        else{
-            st.db.query(combSaveQuery,function(err,results){
-                if(err){
-                    console.debug('Error ',' In saving new working hours slot');
-                    console.debug('Error message',err);
-                    res.status(500).json({
-                        status: false,
-                        message : 'Internal Server error',
-                        error : {
-                            server : 'Internal Server error'
-                        },
-                        data : null
-                    });
-                }
-                else{
-                    res.status(200).json({
-                        status : true,
-                        message : "Working hours updated successfully",
-                        error : null,
-                        data : dataFromClient,
-                        results : results
-                    });
-                }
-            });
-        }
-    }
-    catch(ex){
-        console.debug('Exception error ',' In saving new working hours slot');
-        console.debug('Exception message',ex);
-        res.status(500).json({
-            status: false,
-            message : 'Internal Server error',
-            error : {
-                server : 'Internal Server error'
-            },
-            data : null
-        });
-    }
-};
 
 /**
  * Method : GET
@@ -4076,7 +3872,7 @@ Configuration.prototype.getWorkingSchedule = function(req,res,next){
         catch (ex) {
             responseMessage.error = {};
             responseMessage.message = 'An error occured !';
-            console.log('getInstituteConfig:error ' + ex.description);
+            console.log('getInstituteConfig:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);

@@ -403,7 +403,7 @@ router.get('/working_schedule', function(req,res,next){
         catch (ex) {
             responseMessage.error = {};
             responseMessage.message = 'An error occured !';
-            console.log('getInstituteConfig:error ' + ex.description);
+            console.log('getInstituteConfig:error ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);

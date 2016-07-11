@@ -10,18 +10,6 @@
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 var st = null;
 
@@ -118,7 +106,7 @@ Image_AP.prototype.saveAPEZEIDPicture = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnSaveAPEZEIDPicture error:' + ex.description);
+        console.log('FnSaveAPEZEIDPicture error:' + ex);
 
     }
 };
@@ -195,7 +183,7 @@ Image_AP.prototype.getAPEZEIDPicture = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetAPEZEIDPicture error:' + ex.description);
+        console.log('FnGetAPEZEIDPicture error:' + ex);
 
     }
 };
@@ -217,7 +205,7 @@ Image_AP.prototype.saveBannerPictureAP = function(req,res,next){
         var SeqNo = parseInt(req.body.SeqNo);
         var Picture = req.body.Picture;
         var Token = req.body.Token;
-        var Ezeid = alterEzeoneId(req.body.Ezeid);
+        var Ezeid = req.st.alterEzeoneId(req.body.Ezeid);
         var TID = req.body.TID;
         if(TID == null ){
             TID = 0;
@@ -291,7 +279,7 @@ Image_AP.prototype.saveBannerPictureAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnSaveBannerPicture error:' + ex.description);
+        console.log('FnSaveBannerPicture error:' + ex);
 
     }
 }
@@ -312,7 +300,7 @@ Image_AP.prototype.getBannerPictureAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var SeqNo = parseInt(req.query.SeqNo);
         var Token = req.query.Token;
-        var Ezeid = alterEzeoneId(req.query.Ezeid);
+        var Ezeid = req.st.alterEzeoneId(req.query.Ezeid);
 
         if (Token != null  && SeqNo.toString() != 'NaN' && Ezeid != null) {
             st.validateTokenAp(Token, function (err, Result) {
@@ -377,7 +365,7 @@ Image_AP.prototype.getBannerPictureAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetBannerPicsAP error:' + ex.description);
+        console.log('FnGetBannerPicsAP error:' + ex);
 
     }
 }
@@ -397,7 +385,7 @@ Image_AP.prototype.getAllBannerPicsAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        var EZEID = alterEzeoneId(req.query.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.query.EZEID);
 
         if (Token != null && EZEID != null) {
             st.validateTokenAp(Token, function (err, Result) {
@@ -457,7 +445,7 @@ Image_AP.prototype.getAllBannerPicsAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetAllBannerPicsAP error:' + ex.description);
+        console.log('FnGetAllBannerPicsAP error:' + ex);
 
     }
 };
@@ -478,7 +466,7 @@ Image_AP.prototype.deleteBannerPictureAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.body.Token;
-        var EZEID = alterEzeoneId(req.body.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.body.EZEID);
         var SeqNo = req.body.SeqNo;
         var RtnMessage = {
             IsSuccessfull: false
@@ -541,7 +529,7 @@ Image_AP.prototype.deleteBannerPictureAP = function(req,res,next){
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnDeleteBannerPictureAP:error ' + ex.description);
+        console.log('FnDeleteBannerPictureAP:error ' + ex);
 
     }
 };
@@ -748,7 +736,7 @@ Image_AP.prototype.cropImageAP = function(req,res,next){
                         }
                         else{
                             res.status(400).json(respMsg);
-                            throw new Error('FnCropImage : Error in reading file '+ ex.description);
+                            throw new Error('FnCropImage : Error in reading file '+ ex);
                         }
                     });
 
@@ -756,7 +744,7 @@ Image_AP.prototype.cropImageAP = function(req,res,next){
                 catch(ex){
                     console.log(ex);
                     res.status(400).json(respMsg);
-                    throw new Error('FnCropImage : '+ ex.description);
+                    throw new Error('FnCropImage : '+ ex);
                 }
             }
             else{
@@ -795,7 +783,7 @@ exports.Base64Data = function (req, res) {
     catch (ex) {
 	var errorDate = new Date();
 	console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('OTP fnCreateFile error:' + ex.description);
+        console.log('OTP fnCreateFile error:' + ex);
 
         return 'error'
     }

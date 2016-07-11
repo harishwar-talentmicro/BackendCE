@@ -17,18 +17,7 @@ function error(err, req, res, next) {
     res.json(500,{ status : false, message : 'Internal Server Error', error : {server : 'Exception'}});
 };
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 var st = null;
 
@@ -177,7 +166,7 @@ Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetRecruitmentMasters ' + ex.description);
+            console.log('Error : FnGetRecruitmentMasters ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -308,7 +297,7 @@ Recruitment.prototype.getSalesMasters = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetSalesMasters ' + ex.description);
+            console.log('Error : FnGetSalesMasters ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

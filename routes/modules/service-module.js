@@ -24,18 +24,6 @@ function Service(db,stdLib){
     }
 };
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 var stream = require( "stream" );
 var chalk = require( "chalk" );
@@ -265,7 +253,7 @@ Service.prototype.getServiceProviders = function(req,res,next){
         }
         catch (ex) {
             res.status(500).json(null);
-            console.log('Error : FnGetServiceProviders ' + ex.description);
+            console.log('Error : FnGetServiceProviders ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -386,7 +374,7 @@ Service.prototype.getServices = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetServices ' + ex.description);
+            console.log('Error : FnGetServices ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -499,7 +487,7 @@ Service.prototype.getServiceCategories= function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetServiceCategories ' + ex.description);
+            console.log('Error : FnGetServiceCategories ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -615,7 +603,7 @@ Service.prototype.getServiceDetails = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetServiceDetails ' + ex.description);
+            console.log('Error : FnGetServiceDetails ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -683,7 +671,7 @@ Service.prototype.saveServicePic = function(req,res,next) {
             server: 'Internal Server error'
         };
         responseMessage.message = 'An error occurred !';
-        console.log('FnSavePic:error ' + ex.description);
+        console.log('FnSavePic:error ' + ex);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ....................');
@@ -750,7 +738,7 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
             server: 'Internal Server error'
         };
         responseMessage.message = 'An error occurred !';
-        console.log('FnSaveServiceAttachment:error ' + ex.description);
+        console.log('FnSaveServiceAttachment:error ' + ex);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ....................');
@@ -818,7 +806,7 @@ Service.prototype.saveServiceVideo = function(req,res,next) {
             server: 'Internal Server error'
         };
         responseMessage.message = 'An error occurred !';
-        console.log('FnSaveServiceVideo:error ' + ex.description);
+        console.log('FnSaveServiceVideo:error ' + ex);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ....................');
@@ -1006,7 +994,7 @@ Service.prototype.createService = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnCreateService ' + ex.description);
+            console.log('Error : FnCreateService ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1198,7 +1186,7 @@ Service.prototype.updateService = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnUpdateService ' + ex.description);
+            console.log('Error : FnUpdateService ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1243,7 +1231,7 @@ Service.prototype.addMembersToService = function(req,res,next){
          */
 
         var token = req.body.token;
-        var ezeid = alterEzeoneId(req.body.ezeid);
+        var ezeid = req.st.alterEzeoneId(req.body.ezeid);
 
         if(!(token)){
             error['token'] = 'token is Mandatory';
@@ -1361,7 +1349,7 @@ Service.prototype.addMembersToService = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnAddMembersToService ' + ex.description);
+            console.log('Error : FnAddMembersToService ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1467,7 +1455,7 @@ Service.prototype.getJoinedCommunity = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetJoinedCommunity ' + ex.description);
+            console.log('Error : FnGetJoinedCommunity ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1486,7 +1474,7 @@ Service.prototype.getJoinedCommunity = function(req,res,next){
 Service.prototype.deleteCommunityMember = function(req,res,next){
 
     var token = req.query.token;
-    var ezeid = alterEzeoneId(req.query.ezeid);
+    var ezeid = req.st.alterEzeoneId(req.query.ezeid);
 
     var responseMessage = {
         status: false,
@@ -1523,7 +1511,7 @@ Service.prototype.deleteCommunityMember = function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Community member deleted successfully';
-                                    responseMessage.data = {ezeid : alterEzeoneId(req.query.ezeid)};
+                                    responseMessage.data = {ezeid : req.st.alterEzeoneId(req.query.ezeid)};
                                     res.status(200).json(responseMessage);
                                     console.log('FnDeleteCommunityMember: Community member deleted successfully');
                                 }
@@ -1570,7 +1558,7 @@ Service.prototype.deleteCommunityMember = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnDeleteCommunityMember : ' + ex.description);
+            console.log('Error : FnDeleteCommunityMember : ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');

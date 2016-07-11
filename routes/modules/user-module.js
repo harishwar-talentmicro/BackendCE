@@ -15,6 +15,8 @@
 
 var fs = require('fs');
 var path = require('path');
+var archiver = require('archiver');
+var request = require('request');
 
 var EZEIDEmail = 'noreply@ezeone.com';
 var moment = require('moment');
@@ -23,18 +25,6 @@ var appConfig = require('../../ezeone-config.json');
 
 
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 function FnEncryptPassword(Password) {
     try {
         console.log('encrypt...........');
@@ -51,7 +41,7 @@ function FnEncryptPassword(Password) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('OTP generate error:' + ex.description);
+        console.log('OTP generate error:' + ex);
 
         return 'error'
     }
@@ -113,7 +103,7 @@ function FnDecrypt(EncryptPassword){
         return dec;
     }
     catch(ex){
-        console.log('FnDecrypterror:' + ex.description);
+        console.log('FnDecrypterror:' + ex);
 
         return 'error'
     }
@@ -206,7 +196,7 @@ User.prototype.getLoginDetails = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetLoginDetails error:' + ex.description);
+        console.log('FnGetLoginDetails error:' + ex);
         console.log(ex);
         //throw new Error(ex);
     }
@@ -264,7 +254,7 @@ User.prototype.getCountry = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetCountry error:' + ex.description);
+        console.log('FnGetCountry error:' + ex);
 
     }
 };
@@ -350,7 +340,7 @@ User.prototype.getState = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetState error:' + ex.description);
+        console.log('FnGetState error:' + ex);
 
     }
 };
@@ -412,7 +402,7 @@ User.prototype.getCity = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetCity error:' + ex.description);
+        console.log('FnGetCity error:' + ex);
 
     }
 };
@@ -427,6 +417,64 @@ User.prototype.getUserDetails = function(req,res,next){
     /**
      * @todo FnGetUserDetails
      */
+    var rtnMessage = {
+        versionStatus : 0,
+        versionMessage : "Your application is up to date"
+    };
+
+    switch(req.platform){
+        case 'ios':
+            /**
+             * If IOS version is not supported
+             */
+            if(req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) == -1){
+                rtnMessage.versionStatus = 2;
+                rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                res.send([rtnMessage]);
+                return;
+            }
+            else{
+                rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.IOS.length ==
+                (req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+            }
+            break;
+        case 'android':
+            /**
+             * If Android version is not supported
+             */
+            if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
+                rtnMessage.versionStatus = 2;
+                rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                res.send([rtnMessage]);
+                return;
+            }
+            else{
+                rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
+                (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+            }
+            break;
+        case 'web':
+            /**
+             * If Web version is not supported
+             */
+            if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
+                rtnMessage.versionStatus = 2;
+                rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                res.send([rtnMessage]);
+                return;
+            }
+            else{
+                rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
+                (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+            }
+            break;
+        default:
+            rtnMessage.versionStatus = 2;
+            rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+            res.send([rtnMessage]);
+            return;
+            break;
+    }
 
     try {
 
@@ -448,6 +496,8 @@ User.prototype.getUserDetails = function(req,res,next){
                                         UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
                                             (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
                                         console.log('FnGetUserDetails : tmaster: User details sent successfully');
+                                        UserDetailsResult[0][0].versionStatus = rtnMessage.versionStatus;
+                                        UserDetailsResult[0][0].versionMessage = rtnMessage.versionMessage;
                                         res.send(UserDetailsResult[0]);
                                     }
                                     else {
@@ -490,7 +540,7 @@ User.prototype.getUserDetails = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetUserDetails error:' + ex.description);
+        console.log('FnGetUserDetails error:' + ex);
 
     }
 };
@@ -509,22 +559,44 @@ User.prototype.checkEzeid = function(req,res,next){
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var EZEID = alterEzeoneId(req.query.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.query.EZEID);
         var RtnMessage = {
             IsIdAvailable: false
         };
         RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (EZEID) {
-            var Query = 'Select EZEID from tmaster where EZEID=' + st.db.escape(EZEID);
-            //var Query = 'CALL pcheckEzeid(' + st.db.escape(EZEID) + ')';
-            st.db.query(Query, function (err, EzeidExitsResult) {
-                //console.log(EzeidExitsResult);
-                if (!err) {
-                    if(EzeidExitsResult) {
-                        if (EzeidExitsResult.length > 0) {
-                            RtnMessage.IsIdAvailable = false;
-                            res.send(RtnMessage);
-                            console.log('FnCheckEzeid: tmaster: EzeId exists');
+
+            var list = req.CONFIG.RESERVED_EZEONE_LIST;
+            console.log(list,"list is there");
+            var testCase = EZEID.replace('@','');
+            var allowedFlag = true;
+
+            for(var i = 0; i < list.length; i++){
+                var reg = new RegExp(list[i],'g');
+                if(reg.test(testCase)){
+                    //console.log('Test pass : Should not be allowed',testCase);
+                    allowedFlag = false;
+                    break;
+                }
+            }
+            console.log(allowedFlag);
+            if(allowedFlag){
+                var Query = 'Select EZEID from tmaster where EZEID=' + st.db.escape(EZEID);
+                //var Query = 'CALL pcheckEzeid(' + st.db.escape(EZEID) + ')';
+                st.db.query(Query, function (err, EzeidExitsResult) {
+                    //console.log(EzeidExitsResult);
+                    if (!err) {
+                        if(EzeidExitsResult) {
+                            if (EzeidExitsResult.length > 0) {
+                                RtnMessage.IsIdAvailable = false;
+                                res.send(RtnMessage);
+                                console.log('FnCheckEzeid: tmaster: EzeId exists');
+                            }
+                            else {
+                                RtnMessage.IsIdAvailable = true;
+                                res.send(RtnMessage);
+                                console.log('FnCheckEzeid: tmaster:  EzeId available');
+                            }
                         }
                         else {
                             RtnMessage.IsIdAvailable = true;
@@ -533,18 +605,19 @@ User.prototype.checkEzeid = function(req,res,next){
                         }
                     }
                     else {
-                        RtnMessage.IsIdAvailable = true;
-                        res.send(RtnMessage);
-                        console.log('FnCheckEzeid: tmaster:  EzeId available');
-                    }
-                }
-                else {
 
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-                    console.log('FnCheckEzeid: tmaster: ' + err);
-                }
-            });
+                        res.statusCode = 500;
+                        res.send(RtnMessage);
+                        console.log('FnCheckEzeid: tmaster: ' + err);
+                    }
+                });
+        }
+        else{
+                res.statusCode = 400;
+                RtnMessage.IsIdAvailable = false;
+                res.send(RtnMessage);
+                console.log('FnCheckEzeid: tmaster:  EzeId not available');
+            }
         }
         else {
 
@@ -556,7 +629,7 @@ User.prototype.checkEzeid = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnCheckEzeid error:' + ex.description);
+        console.log('FnCheckEzeid error:' + ex);
 
     }
 };
@@ -610,7 +683,6 @@ User.prototype.changePassword = function(req,res,next){
                                                     var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
                                                     var newPassword = hashPassword(NewPassword);
-
                                                     var passChangeQueryParams = st.db.escape(TokenNo) + st.db.escape(oldPassResult[0][0].Password)+ ','+
                                                         st.db.escape(newPassword) + ',' + st.db.escape(ip) +',' + st.db.escape(userAgent);
 
@@ -687,7 +759,7 @@ User.prototype.changePassword = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnChangePassword error:' + ex.description);
+        console.log('FnChangePassword error:' + ex);
         res.status(400).json(RtnMessage);
 
     }
@@ -702,7 +774,7 @@ User.prototype.forgetPassword = function(req,res,next){
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var EZEID = alterEzeoneId(req.body.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.body.EZEID);
 
         var resetCode = st.generateRandomHash(Date.now().toString());
 
@@ -717,6 +789,61 @@ User.prototype.forgetPassword = function(req,res,next){
             mailSend : false
         };
         RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+
+        switch(req.platform){
+            case 'ios':
+                /**
+                 * If IOS version is not supported
+                 */
+                if(req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) == -1){
+                    RtnMessage.versionStatus = 2;
+                    RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                    res.send(RtnMessage);
+                    return;
+                }
+                else{
+                    RtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.IOS.length ==
+                    (req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+                }
+                break;
+            case 'android':
+                /**
+                 * If Android version is not supported
+                 */
+                if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
+                    RtnMessage.versionStatus = 2;
+                    RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                    res.send(RtnMessage);
+                    return;
+                }
+                else{
+                    RtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
+                    (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+                }
+                break;
+            case 'web':
+                /**
+                 * If Web version is not supported
+                 */
+                if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
+                    RtnMessage.versionStatus = 2;
+                    RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                    res.send(RtnMessage);
+                    return;
+                }
+                else{
+                    RtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
+                    (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+                }
+                break;
+            default:
+                RtnMessage.versionStatus = 2;
+                RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                res.send(RtnMessage);
+                return;
+                break;
+        }
 
         if (EZEID != null) {
             var resetQueryParams = st.db.escape(EZEID) + ',' + st.db.escape(resetCode) +
@@ -869,7 +996,7 @@ User.prototype.forgetPassword = function(req,res,next){
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log(ex);
-        console.log('FnForgetPassword error:' + ex.description);
+        console.log('FnForgetPassword error:' + ex);
     }
 };
 
@@ -911,7 +1038,7 @@ User.prototype.verifyResetPasswordLink = function(req,res,next){
 
     if(status){
         try{
-            req.body.ezeone_id = alterEzeoneId(req.body.ezeone_id);
+            req.body.ezeone_id = req.st.alterEzeoneId(req.body.ezeone_id);
             var timestamp = moment(new Date()).format('YYYY-MM-DD HH:mm:ss').toString();
 
             var verifyQueryParams = st.db.escape(req.body.ezeone_id) + ','+ st.db.escape(req.body.reset_code);
@@ -961,7 +1088,7 @@ User.prototype.verifyResetPasswordLink = function(req,res,next){
             });
         }
         catch(ex){
-            console.log('Error : FnVerifyResetPasswordLink ' + ex.description);
+            console.log('Error : FnVerifyResetPasswordLink ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1021,7 +1148,7 @@ User.prototype.verifySecretCode = function(req,res,next) {
 
     if (status) {
         try {
-            req.body.ezeone_id = alterEzeoneId(req.body.ezeone_id);
+            req.body.ezeone_id = req.st.alterEzeoneId(req.body.ezeone_id);
             var queryParams = st.db.escape(req.body.secret_code) + ',' + st.db.escape(req.body.ezeone_id) + ',' + st.db.escape(req.body.new_password);
             var verifyQuery = 'CALL pverifySecretcode(' + queryParams + ')';
 
@@ -1068,7 +1195,7 @@ User.prototype.verifySecretCode = function(req,res,next) {
             });
         }
         catch (ex) {
-            console.log('Error : FnVerifySecretCode ' + ex.description);
+            console.log('Error : FnVerifySecretCode ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1116,7 +1243,7 @@ User.prototype.decryptPassword = function(req,res,next){
 
     }
     catch(ex){
-        console.log('FnDecrypterror:' + ex.description);
+        console.log('FnDecrypterror:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         return 'error'
@@ -1137,7 +1264,7 @@ function FnRandomPassword() {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('OTP generate error:' + ex.description);
+        console.log('OTP generate error:' + ex);
 
         return 'error'
     }
@@ -1227,7 +1354,7 @@ User.prototype.getCompanyProfile = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetCompanyProfile error:' + ex.description);
+        console.log('FnGetCompanyProfile error:' + ex);
 
     }
 };
@@ -1320,7 +1447,7 @@ User.prototype.saveCompanyProfile = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnSaveCompanyProfile: Error:' + ex.description);
+        console.log('FnSaveCompanyProfile: Error:' + ex);
 
     }
 };
@@ -1407,7 +1534,7 @@ User.prototype.getWebLink = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetWebLink error:' + ex.description);
+        console.log('FnGetWebLink error:' + ex);
 
     }
 };
@@ -1512,7 +1639,7 @@ User.prototype.saveWebLink = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnSaveWebLink:error ' + ex.description);
+        console.log('FnSaveWebLink:error ' + ex);
 
     }
 };
@@ -1600,7 +1727,7 @@ User.prototype.deleteWebLink = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnDeleteWebLink:error ' + ex.description);
+        console.log('FnDeleteWebLink:error ' + ex);
 
     }
 };
@@ -1621,7 +1748,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        var EZEID = alterEzeoneId(req.query.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.query.EZEID);
         //console.log(req.query);
         if (Token && EZEID != null ) {
             st.validateToken(Token, function (err, tokenResult) {
@@ -1704,7 +1831,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnEZEIDDetails error:' + ex.description);
+        console.log('FnEZEIDDetails error:' + ex);
 
     }
 };
@@ -1790,7 +1917,7 @@ User.prototype.getResume = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetCVInfo error:' + ex.description);
+        console.log('FnGetCVInfo error:' + ex);
 
         res.status(400).json(responseMessage);
     }
@@ -2214,7 +2341,7 @@ User.prototype.saveResume = function(req,res,next){
         var errorDate = new Date();
         console.log(ex);
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnSaveCVInfo error:' + ex.description);
+        console.log('FnSaveCVInfo error:' + ex);
 
     }
 };
@@ -2289,7 +2416,7 @@ function FnSaveSkills(skill, CallBack) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('OTP FnSendMailEzeid error:' + ex.description);
+        console.log('OTP FnSendMailEzeid error:' + ex);
 
         return 'error'
     }
@@ -2338,7 +2465,7 @@ User.prototype.getSkills = function(req,res,next){
 
     catch(ex){
         res.status(500).json(responseMsg);
-        console.log('Error : FnPGetSkills '+ ex.description);
+        console.log('Error : FnPGetSkills '+ ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -2417,7 +2544,7 @@ User.prototype.getDocPin = function(req,res,next) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetDocPin:  error:' + ex.description);
+        console.log('FnGetDocPin:  error:' + ex);
     }
 };
 
@@ -2502,7 +2629,7 @@ User.prototype.getDoc = function(req,res,next) {
 
     }
     catch (ex) {
-        console.log('FnGetDoc error:' + ex.description);
+        console.log('FnGetDoc error:' + ex);
 
     }
 };
@@ -2595,7 +2722,7 @@ User.prototype.getDocument = function(req,res,next) {
 
     }
     catch (ex) {
-        console.log('FnGetDocument error:' + ex.description);
+        console.log('FnGetDocument error:' + ex);
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
@@ -2684,7 +2811,7 @@ User.prototype.updateDocPin = function(req,res,next) {
         }
     }
     catch (ex) {
-        console.log('FnUpdateDocPin:  error:' + ex.description);
+        console.log('FnUpdateDocPin:  error:' + ex);
 
     }
 };
@@ -2777,7 +2904,7 @@ User.prototype.saveDoc = function(req,res,next) {
 
     }
     catch (ex) {
-        console.log('FnSaveDoc error:' + ex.description);
+        console.log('FnSaveDoc error:' + ex);
     }
 };
 
@@ -2830,7 +2957,7 @@ User.prototype.getFunctions = function(req,res,next) {
 
     }
     catch (ex) {
-        console.log('FnGetFunctions error:' + ex.description);
+        console.log('FnGetFunctions error:' + ex);
 
     }
 };
@@ -2958,7 +3085,7 @@ User.prototype.uploadDoc = function(req,res,next) {
         });
     }
     catch (ex) {
-        console.log('FnGetDocument error:' + ex.description);
+        console.log('FnGetDocument error:' + ex);
         //throw new Error(ex);
         deleteTempFile();
     }
@@ -3038,7 +3165,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
 
         console.log(arr);
 
-        ezeid = alterEzeoneId(arr[0]);
+        ezeid = req.st.alterEzeoneId(arr[0]);
         if (arr[1]) {
 
             tag = arr[1].toUpperCase();
@@ -3053,7 +3180,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
             if(arr[1].toUpperCase() == 'MAP'){
                 //res.redirect('/'+alterEzeoneId(arr[0]) + req.CONFIG.CONSTANT.MAP_REDIRECT_LINK);
 
-                var geolocationQuery = "SELECT Latitude, Longitude FROM tmaster WHERE ezeid = " + st.db.escape(alterEzeoneId(arr[0]));
+                var geolocationQuery = "SELECT Latitude, Longitude FROM tmaster WHERE ezeid = " + st.db.escape(req.st.alterEzeoneId(arr[0]));
 
                 st.db.query(geolocationQuery,function(err,geoResult){
                    if(err){
@@ -3086,119 +3213,141 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                 var query = st.db.escape(ezeid) + ',' + st.db.escape(tag);
                 console.log('CALL  PGetSearchDocuments(' + query + ')');
                 st.db.query('CALL  PGetSearchDocuments(' + query + ')', function (err, results) {
+                    console.log('err',err);
+                    console.log('results',results);
+                    if((!err) && results && results[0] && results[0][0]){
+                        switch(results[0][0].type){
+                            /**
+                             * Type 0 : It is a document uploaded to cloud and needs to be served from cloud storage
+                             */
+                            case 0 :
+                                /**
+                                 * This is a document saved on google cloud ! Creating dynamic google storage bucket link
+                                 * and redirecting the user to there
+                                 */
 
-                    if (!err) {
-                        if (results) {
-                            if (results[0]) {
-                                //console.log(results[0].length);
-                                console.log(results[0]);
+                                var documentUrl = (results[0][0].path) ?
+                                    (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][0].path) : 'https://www.ezeone.com';
+                                console.log('redirecting url..');
+                                console.log('documentUrl',documentUrl);
 
-                                if(results[0][0]){
-                                    /**
-                                     * This is a weblink redirect to this weblink
-                                     */
-                                    if(results[0][0].type){
-                                        if(results[0][0].pin){
-                                            if(pin && pin == results[0][0].pin){
-                                                res.redirect(results[0][0].path);
-                                            }
-                                            else{
-                                                next();
-                                            }
-                                        }
-                                        else{
-                                            res.redirect(results[0][0].path);
-                                        }
-
+                                if(results[0][0].pin) {
+                                    if (pin && pin == results[0][0].pin) {
+                                        res.redirect(documentUrl);
                                     }
                                     else{
-                                        /**
-                                         * This is a document saved on google cloud ! Creating dynamic google storage bucket link
-                                         * and redirecting the user to there
-                                         */
-
-                                        var s_url = (results[0][0].path) ?
-                                            (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][0].path) : 'https://www.ezeone.com';
-                                        console.log('redirecting url..');
-                                        console.log(s_url);
-
-                                        if(results[0][0].pin) {
-                                            if (pin && pin == results[0][0].pin) {
-                                                res.redirect(s_url);
-                                            }
-                                            else{
-                                                next();
-                                            }
-                                        }
-                                        else{
-                                            res.redirect(s_url);
-                                        }
-
+                                        next();
                                     }
                                 }
+                                else{
+                                    res.redirect(documentUrl);
+                                }
+
+                                break;
+                            /**
+                             * Type 1 : It is a url and it needs to be redirected from here to open that website to whom the url belongs
+                             */
+                            case 1 :
+                                if(results[0][0].pin){
+                                    if(pin && pin == results[0][0].pin){
+                                        res.redirect(results[0][0].path);
+                                    }
+                                    else{
+                                        next();
+                                    }
+                                }
+                                else{
+                                    res.redirect(results[0][0].path);
+                                }
+
+                                break;
+                            /**
+                             * Type 2 : It is a folder which contains type 0 documents therefore
+                             * all the files needs to be archived which are in folder and served (downloaded) to the end user who requested it
+                             */
+                            case 2 :
+
+                                console.log('Coming to case 2');
+                                //request
+                                //    .get('http://mysite.com/doodle.png')
+                                //    .on('error', function(err) {
+                                //        console.log(err)
+                                //    })
+                                //    .pipe(fs.createWriteStream('doodle.png'))
+
+                                if(results[0][0].pin) {
+                                    if (pin && pin == results[0][0].pin) {
+                                        var tagFolderContentQuery = "CALL get_folder_content_list("+st.db.escape(results[0][0].folder_content) + ")";
+                                        console.log(tagFolderContentQuery);
+                                        st.db.query(tagFolderContentQuery,function(err,tagFolderContentRes){
+                                            if(err){
+                                                next();
+                                            }
+                                            else{
+                                                var archive = archiver('zip');
+
+                                                archive.on('error', function(err) {
+                                                    next();
+                                                });
+
+                                                res.attachment(tag+ '.zip');
+
+                                                archive.pipe(res);
+                                                if(tagFolderContentRes && tagFolderContentRes[0] && tagFolderContentRes[0].length){
+                                                    for(var counter = 0; counter < tagFolderContentRes[0].length; counter++){
+                                                        if(tagFolderContentRes[0][counter].type == 0){
+                                                            var pathComponents = tagFolderContentRes[0][counter].path.split('.');
+
+                                                            /**
+                                                             * Appending files to the archive
+                                                             * Downloading by using request module from google cloud
+                                                             */
+                                                            archive.append(request.get(req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + tagFolderContentRes[0][counter].path),{
+                                                                name : tagFolderContentRes[0][counter].tag + ((pathComponents.length > 1) ? '.' + pathComponents[pathComponents.length - 1] : '')
+                                                            });
+                                                        }
+
+                                                    }
+
+                                                    archive.finalize();
+                                                }
+                                                else{
+                                                    archive.finalize();
+                                                }
+                                            }
+
+                                        });
+                                    }
+                                    else{
+                                        next();
+                                    }
+                                }
+
                                 else{
                                     next();
                                 }
 
 
 
+                                //archive
+                                //    .append(request.get(googleFilePathForDoc1), { name : doc1Title})
+                                //    .append(request.get(googleFilePathForDoc1),{ name : doc2Title})
+                                //    .append(request.get(googleFilePathForDoc1),{ name : doc3Title})
+                                //    .finalize();
 
-                                //respMsg.status = true;
-                                //respMsg.data = {s_url: s_url};
-                                //respMsg.message = 'docs loaded successfully';
-                                //respMsg.error = null;
-                                //console.log(respMsg);
+                                break;
 
-                            }
-                            else {
-
+                            default :
                                 next();
-                            }
-                        }
-                        else {
-                            next();
+                                break;
                         }
                     }
-                    else {
-                        console.log(err);
+                    else{
                         next();
                     }
                 });
             }
 
-            //else {
-            //
-            //    console.log('--------------');
-            //    console.log('URL Link Page');
-            //    console.log('---------------');
-            //
-            //    var urlBreaker = tag.split('');
-            //    if (urlBreaker.length > 1 && urlBreaker.length < 4) {
-            //        if (urlBreaker[0] === 'U') {
-            //
-            //            FnGetRedirectLink(ezeid, tag, function (url) {
-            //
-            //                if (url) {
-            //                    console.log('Redirecting......');
-            //                    res.redirect(url);
-            //                }
-            //                else {
-            //
-            //                    next();
-            //                }
-            //            });
-            //        }
-            //        else {
-            //            //console.log('document-not-found');
-            //            //var reload = 'https://www.ezeone.com/document-not-found';
-            //            //res.redirect(reload);
-            //            next();
-            //        }
-            //    }
-            //    else {
-            //        next();
-            //    }
-            //}
         }
         else{
             next();
@@ -3256,7 +3405,7 @@ User.prototype.getMTitle = function(req,res,next) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetMTitle error:' + ex.description);
+        console.log('FnGetMTitle error:' + ex);
 
     }
 };
@@ -3374,7 +3523,7 @@ User.prototype.updateProfilePicture = function(req,res,next) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnUpdateProfilePicture error:' + ex.description);
+        console.log('FnUpdateProfilePicture error:' + ex);
 
     }
 };
@@ -3433,7 +3582,7 @@ User.prototype.getLoginCheck = function(req,res,next) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetUserDetails error:' + ex.description);
+        console.log('FnGetUserDetails error:' + ex);
 
     }
 };
@@ -3481,7 +3630,7 @@ User.prototype.getProxmity = function(req,res,next) {
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetProxmity error:' + ex.description);
+        console.log('FnGetProxmity error:' + ex);
         //throw new Error(ex);
     }
 };
@@ -3566,7 +3715,7 @@ User.prototype.getInstitutes = function(req,res,next) {
         }
         catch (ex) {
             res.status(500).json(responseMsg);
-            console.log('Error : FnGetInstitutes ' + ex.description);
+            console.log('Error : FnGetInstitutes ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3654,7 +3803,7 @@ User.prototype.getEducations = function(req,res,next) {
         }
         catch (ex) {
             res.status(500).json(responseMsg);
-            console.log('Error : FnGetEducations ' + ex.description);
+            console.log('Error : FnGetEducations ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3742,7 +3891,7 @@ User.prototype.getSpecialization = function(req,res,next) {
         }
         catch (ex) {
             res.status(500).json(responseMsg);
-            console.log('Error : FnGetSpecialization ' + ex.description);
+            console.log('Error : FnGetSpecialization ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3830,7 +3979,7 @@ User.prototype.getVerifiedInstitutes = function(req,res,next) {
         }
         catch (ex) {
             res.status(500).json(responseMsg);
-            console.log('Error : FnGetVerifiedInstitutes ' + ex.description);
+            console.log('Error : FnGetVerifiedInstitutes ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -3870,8 +4019,8 @@ User.prototype.saveUserDetails = function(req,res,next){
     var visiblePhone = (!isNaN(parseInt(req.body.vp))) ?  parseInt(req.body.vp) : 1;// 0-invisible, 1- visible
     var visibleAddress = (!isNaN(parseInt(req.body.va))) ?  parseInt(req.body.va) : 1;// 0-invisible, 1- visible
     var locTitle = (req.body.loc_title) ? req.body.loc_title : '';
-    var latitude = (req.body.lat) ? req.body.lat : '';
-    var longitude = (req.body.lng) ? req.body.lng : '';
+   // var latitude = (req.body.lat) ? req.body.lat : '';
+   // var longitude = (req.body.lng) ? req.body.lng : '';
     var address1 = (req.body.address_line1) ? req.body.address_line1 : '';
     var address2 = (req.body.address_line2) ? req.body.address_line2 : '';
     var city = (req.body.city) ? req.body.city : '';
@@ -3908,7 +4057,14 @@ User.prototype.saveUserDetails = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-
+    if(!req.body.lat){
+        error['lat'] = 'Invalid latitude';
+        validateStatus *= false;
+    }
+    if(!req.body.lng){
+        error['lng'] = 'Invalid longitude';
+        validateStatus *= false;
+    }
     if(!validateStatus){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
@@ -3925,7 +4081,7 @@ User.prototype.saveUserDetails = function(req,res,next){
                             + ',' + st.db.escape(dob + ' 00:00') + ',' + st.db.escape(companyTagline)+ ',' + st.db.escape(email)
                             + ',' + st.db.escape(token)+ ',' + st.db.escape(visibleEmail)+ ',' + st.db.escape(visibleMobile)
                             + ',' + st.db.escape(visiblePhone)+ ',' + st.db.escape(visibleAddress)+ ',' + st.db.escape(locTitle)
-                            + ',' + st.db.escape(latitude)+ ',' + st.db.escape(longitude)+ ',' + st.db.escape(address1)
+                            + ',' + st.db.escape(req.body.lat)+ ',' + st.db.escape(req.body.lng)+ ',' + st.db.escape(address1)
                             + ',' + st.db.escape(address2)+ ',' + st.db.escape(city)+ ',' + st.db.escape(stateId)
                             + ',' + st.db.escape(countryId)+ ',' + st.db.escape(postalCode)+ ',' + st.db.escape(phone)
                             + ',' + st.db.escape(mobile)+ ',' + st.db.escape(website)+ ',' + st.db.escape(isdPhone)
@@ -4041,7 +4197,7 @@ User.prototype.saveUserDetails = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnSaveUserDetails ' + ex.description);
+            console.log('Error : FnSaveUserDetails ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -4162,7 +4318,7 @@ User.prototype.sendResume = function(req,res,next){
 
     var token = req.body.token;
     var cvid = (!isNaN(parseInt(req.body.cvid))) ? parseInt(req.body.cvid):0;
-    var ezeid =  alterEzeoneId(req.body.ezeid);
+    var ezeid =  req.st.alterEzeoneId(req.body.ezeid);
     var responseMessage = {
         status: false,
         error: {},
@@ -4257,7 +4413,7 @@ User.prototype.sendResume = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSendResume ' + ex.description);
+            console.log('Error : FnSendResume ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -4369,7 +4525,7 @@ User.prototype.downloadResume = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnDownloadResume ' + ex.description);
+            console.log('Error : FnDownloadResume ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -4651,7 +4807,7 @@ User.prototype.getConveyanceReport = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetConveyanceReport ' + ex.description);
+            console.log('Error : FnGetConveyanceReport ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -4708,7 +4864,7 @@ User.prototype.getindustryType = function(req,res,next) {
     }
     catch (ex) {
         res.status(500).json(responseMsg);
-        console.log('Error : FnGetindustryType ' + ex.description);
+        console.log('Error : FnGetindustryType ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -4779,7 +4935,7 @@ User.prototype.getindustrycategory = function(req,res,next){
         };
         responseMessage.message = 'An error occurred !';
         res.status(500).json(responseMessage);
-        console.log('Error : FnGetindustrycategory ' + ex.description);
+        console.log('Error : FnGetindustrycategory ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -4796,7 +4952,7 @@ User.prototype.getindustrycategory = function(req,res,next){
  */
 User.prototype.profilePicForEzeid = function(req,res,next){
 
-    var ezeid = alterEzeoneId(req.query.ezeid);
+    var ezeid = req.st.alterEzeoneId(req.query.ezeid);
 
     var responseMessage = {
         status: false,
@@ -4893,7 +5049,7 @@ User.prototype.profilePicForEzeid = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnProfilePicForEzeid ' + ex.description);
+            console.log('Error : FnProfilePicForEzeid ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -4921,7 +5077,7 @@ User.prototype.getAlumniEducations = function(req,res,next) {
         validateStatus *= false;
     }
     else {
-        var alumniCode = alterEzeoneId(req.query.alumni_code);
+        var alumniCode = req.st.alterEzeoneId(req.query.alumni_code);
     }
     var validateStatus = true;
     var error = {};
@@ -4987,7 +5143,7 @@ User.prototype.getAlumniEducations = function(req,res,next) {
         }
         catch (ex) {
             res.status(500).json(responseMsg);
-            console.log('Error : getAlumniEducations ' + ex.description);
+            console.log('Error : getAlumniEducations ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

@@ -24,18 +24,7 @@ function Association(db,stdLib){
         notification = new Notification(db,stdLib);
     }
 };
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 var appConfig = require('../../ezeone-config.json');
 
@@ -592,7 +581,7 @@ Association.prototype.getAsscociationServices = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetServices ' + ex.description);
+            console.log('Error : FnGetServices ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1678,7 +1667,7 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                 req.body.s_date = (req.body.s_date) ? (req.body.s_date) : null;
                 req.body.e_date = (req.body.e_date) ? (req.body.e_date) : null;
                 req.body.reg_lastdate = (req.body.reg_lastdate) ? (req.body.reg_lastdate) : null;
-                req.body.code = (req.body.code) ? alterEzeoneId(req.body.code) : '';
+                req.body.code = (req.body.code) ? req.st.alterEzeoneId(req.body.code) : '';
                 req.body.venueId = (req.body.venueId) ? req.body.venueId : 0;
                 req.body.status = (req.body.status) ? req.body.status : 1;
                 req.body.note = (req.body.note) ? req.body.note : '';
@@ -1991,7 +1980,7 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                 req.body.s_date = (req.body.s_date) ? (req.body.s_date) : null;
                 req.body.e_date = (req.body.e_date) ? (req.body.e_date) : null;
                 req.body.reg_lastdate = (req.body.reg_lastdate) ? (req.body.reg_lastdate) : null;
-                req.body.code = (req.body.code) ? alterEzeoneId(req.body.code) : '';
+                req.body.code = (req.body.code) ? req.st.alterEzeoneId(req.body.code) : '';
                 req.body.venueId = (req.body.venueId) ? req.body.venueId : 0;
                 req.body.status = (req.body.status) ? req.body.status : 1;
                 req.body.note = (req.body.note) ? req.body.note : '';

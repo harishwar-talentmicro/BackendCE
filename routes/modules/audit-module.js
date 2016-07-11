@@ -11,18 +11,6 @@ var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
 
 var st = null;
 
@@ -152,7 +140,7 @@ Audit.prototype.getAccessHistory = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnGetAccessHistory error:' + ex.description);
+        console.log('FnGetAccessHistory error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -176,7 +164,7 @@ Audit.prototype.saveList = function(req,res,next){
         var List = req.body.List;
         var RelationType =parseInt(req.body.RelationType);
         var Tag = parseInt(req.body.Tag);
-        var EZEID = alterEzeoneId(req.body.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.body.EZEID);
         var Token = req.body.Token;
 
         var RtnMessage = {
@@ -250,7 +238,7 @@ Audit.prototype.saveList = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnSaveWhiteBlackList:error ' + ex.description);
+        console.log('FnSaveWhiteBlackList:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -333,7 +321,7 @@ Audit.prototype.getList = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetWhiteBlackList error:' + ex.description);
+        console.log('FnGetWhiteBlackList error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -427,7 +415,7 @@ Audit.prototype.deleteList = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnDeleteWhiteBlackList:error ' + ex.description);
+        console.log('FnDeleteWhiteBlackList:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -450,7 +438,7 @@ Audit.prototype.getListCount = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var EZEID = alterEzeoneId(req.query.EZEID);
+        var EZEID = req.st.alterEzeoneId(req.query.EZEID);
         var List=req.query.List;
         var RtnMessage = {
             WhiteListCount : 0
@@ -530,7 +518,7 @@ Audit.prototype.getListCount = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetWhiteListCount error:' + ex.description);
+        console.log('FnGetWhiteListCount error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -587,7 +575,7 @@ Audit.prototype.getRelation = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnGetRelationType error:' + ex.description);
+        console.log('FnGetRelationType error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -692,7 +680,7 @@ Audit.prototype.saveMailTemplate = function(req,res,next){
 
     }
     catch (ex) {
-        console.log('FnSaveMailTemplate:error ' + ex.description);
+        console.log('FnSaveMailTemplate:error ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -774,7 +762,7 @@ Audit.prototype.getMailTemplate = function(req,res,next) {
         }
     }
     catch (ex) {
-        console.log('FnGetTemplateList error:' + ex.description);
+        console.log('FnGetTemplateList error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -857,7 +845,7 @@ Audit.prototype.getTemplateDetails = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnGetTemplateDetails error:' + ex.description);
+        console.log('FnGetTemplateDetails error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1230,7 +1218,7 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnSendBulkMailer error:' + ex.description);
+        console.log('FnSendBulkMailer error:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }

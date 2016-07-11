@@ -1,0 +1,189 @@
+<div style="width:100%; border:none">
+
+    <table style="width:100%;">
+        <tr style="width:100%;">
+		<% if(imageUrl) { %>
+            <td style=" padding-left:5px; width:50%;">
+                <img
+                        alt="Image"
+                        src="http://drop.ndtv.com/TECH/product_database/images/112201541031PM_635_gionee_s_plus.jpeg"
+                        style="height: 120px;
+                                            max-width: 440px;">
+            </td>
+		<% } %>
+            <td valign="top" style="width:50%; padding-right:5px; text-align: right">
+                <table style="width:100%;">
+                    <tr style="width:100%;">
+                        <td style="width:10%;"></td>
+                        <td style="width:90%; text-align: left;font-family:'Verdana',sans-serif;">
+                            <%=communityAddress%>
+                        </td>
+
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr style="width:100%; height: 20px;">
+            <td></td>
+            <td valign="top"></td>
+        </tr>
+
+        <tr style="width:100%;">
+            <td style="width:50%; padding-left:5px;">
+                <table style="width:100%;">
+                    <tr style="width:100%;">
+                        <td style="width:40%; text-align: left; text-align: left;font-family:'Verdana',sans-serif;">
+                            <%=memberName%><%=memberAddress%>,
+                        </td>
+                        <td style="width:60%;"></td>
+                    </tr>
+                </table>
+            </td>
+            <td valign="top" style="width:50%; padding-right:5px; text-align:right; text-align: left;font-family:'Verdana',sans-serif;">
+                <%=billDate%>
+            </td>
+        </tr>
+
+        <tr style="width:100%; height: 20px;">
+            <td></td>
+            <td valign="top"></td>
+        </tr>
+        <tr style="width:100%;">
+            <td colspan="2" style="width:100%; padding-left:5px; padding-right:5px; text-align: left;font-family:'Verdana',sans-serif;">
+                Dear <%=memberName%>,
+            </td>
+        </tr>
+
+        <tr style="width:100%; height: 20px;">
+            <td></td>
+            <td valign="top"></td>
+        </tr>
+        <tr style="width:100%;">
+            <td colspan="2" style="width:100%; padding-left:5px; padding-right:5px; text-align: left;font-family:'Verdana',sans-serif;">
+                We are presenting our Demand Notes for the collection of payment for period <b><%=startDate%> </b> to <b><%=endDate%> </b> expenses and demand towards approved sinking fund. Enclosed are demand
+                notes for the said period. You are requested to make One Payment for <b><%=totalAmount%></b> on or before <b><%=dueDate%></b>. The details for the payment are as follows:
+            </td>
+        </tr>
+
+        <tr style="width:100%; height: 20px; text-align: left;font-family:'Verdana',sans-serif;">
+            <td></td>
+            <td valign="top"></td>
+        </tr>
+        <tr style="width:100%; height: 20px;">
+            <td></td>
+            <td valign="top"></td>
+        </tr>
+        <tr style="width:100%;">
+            <td colspan="2" style="width:100%; padding-left:5px; padding-right:5px; text-align: left;font-family:'Verdana',sans-serif;">
+                <%=adminName%>
+            </td>
+        </tr>
+        <tr style="width:100%;">
+            <td colspan="2" style="width:100%; padding-left:5px; padding-right:5px;padding-top:10px; text-align: left;font-family:'Verdana',sans-serif;font-size:13px;">
+                Billing Admin
+                <hr style="border:none;border-bottom:1px solid #000;margin-top:20px;"/>
+            </td>
+        </tr>
+        <tr style="width:100%; height: 20px;">
+            <td></td>
+            <td valign="top"></td>
+        </tr>
+        <tr style="width:100%; height: 20px;">
+            <td></td>
+            <td valign="top"></td>
+        </tr>
+    </table>
+
+    <div style="width: 100%; text-align: center; text-align: left;font-family:'Verdana',sans-serif;">
+        Demand Note for <%=startDate%> to <%=endDate%>
+    </div>
+    <table style="width:100%; border-collapse:separate; border-spacing: 0px 0px;" border="1">
+        <tr style="width:100%;">
+            <td style=" padding-left:5px; width:50%;">
+                <table style="width:100%;">
+                    <tr style="width:100%;">
+                        <td style="width:100%; text-align: left;font-family:'Verdana',sans-serif;">
+                            Name :  <%=memberName%>
+                        </td>
+                    </tr>
+                    <tr style="width:100%;">
+                        <td style="width:100%; text-align: left;font-family:'Verdana',sans-serif;">
+                            Apartment:  (Chargeable Area : <%=type%>(<%=area%>) sqft.)
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td valign="top" style="width:50%; padding-right:5px; text-align: left">
+                <table style="width:100%;">
+                    <tr style="width:100%;">
+                        <td style="width:100%; text-align: left;font-family:'Verdana',sans-serif;">
+                            Date : <%=billDate%>
+                        </td>
+                    </tr>
+                    <tr style="width:100%;">
+                        <td style="width:100%; text-align: left;font-family:'Verdana',sans-serif;">
+                            Ref: <%=refNo%>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <table style="width:100%; margin-top: 20px; border-collapse:separate; border-spacing: 0px 0px;" border="1">
+        <% for(var i=0; i< expenseList.length; i++) { %>
+        <tr style="width:100%;">
+            <td style=" padding-left:5px; width:50%; text-align: left;font-family:'Verdana',sans-serif;">
+                        <%= expenseList[i].expenseType%>
+
+            </td>
+            <td valign="top" style="width:50%; padding-right:5px; text-align: right; font-family:'Verdana',sans-serif;">
+
+                <%= expenseList[i].amount%>
+            </td>
+        </tr>
+        <% } %>
+        <!--<tr style="width:100%;">-->
+            <!--<td style=" padding-left:5px; width:50%;">-->
+                <!--Sinking Fund-->
+            <!--</td>-->
+            <!--<td valign="top" style="width:50%; padding-right:5px; text-align: right">-->
+                <!--1100-->
+            <!--</td>-->
+        <!--</tr>-->
+        <!--<tr style="width:100%;">-->
+            <!--<td style=" padding-left:5px; width:50%;">-->
+                <!--Security-->
+            <!--</td>-->
+            <!--<td valign="top" style="width:50%; padding-right:5px; text-align: right">-->
+                <!--500-->
+            <!--</td>-->
+        <!--</tr>-->
+    </table>
+
+
+    <table style="width:100%; margin-top: 20px; border-collapse:separate; border-spacing: 0px 0px;" border="1">
+        <tr style="width:100%;">
+            <td style=" padding-left:5px; width:50%; text-align: left;font-family:'Verdana',sans-serif;">
+                Total Dues
+            </td>
+            <td valign="top" style="width:50%; padding-right:5px; text-align: right; font-family:'Verdana',sans-serif;">
+                
+                <b><%=totalAmount%><b>
+           
+            </td>
+        </tr>
+        <tr style="width:100%;">
+            <td style=" padding-left:5px; width:50%; text-align: left;font-family:'Verdana',sans-serif;">
+                DUE DATE
+            </td>
+            <td valign="top" style="width:50%; padding-right:5px; text-align: left; text-align: left;font-family:'Verdana',sans-serif;">
+                <%=dueDate%>
+            </td>
+        </tr>
+    </table>
+
+
+
+</div>

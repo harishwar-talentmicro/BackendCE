@@ -1,0 +1,32 @@
+<table style="font-family: 'Verdana',serif;font-size:14px;color: #444444;">
+    <tr>
+        <td>
+            Hello,
+            <br/>
+            <br/>
+            Greetings from EZEOne Team. <br/>
+
+            A new job is posted by <%=companyName%> for your institute with the following details.
+            Please manage the status of this job in your business manager by logging into <a href="https://www.ezeone.com">EZEOne</a>.
+            <br/>
+            <br/>
+            Job Title : <b><%=jobTitle%> <% if(jobCode) { %> (<%=jobCode %>) <% } %></b>
+            <br/>
+            <% if(keySkills) { %> Key Skills : <b><%=keySkills%> </b><% } %>
+
+            <br/>
+            <br/>
+            Please visit the following link to view the job details: <br/>
+
+            <a href="https://www.ezeone.com/jobdetail?jobid=<%=jobId%>" style="display: table-cell;height:40px;color: #000;font-weight: bold;">
+                https://www.ezeone.com/jobdetail?jobid=<%=jobId%>
+            </a>
+
+            <br/>
+            <br/>
+            From<br/>
+            Team EZEOne
+
+        </td>
+    </tr>
+</table>

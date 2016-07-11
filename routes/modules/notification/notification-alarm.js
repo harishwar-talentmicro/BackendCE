@@ -58,7 +58,7 @@ function FnGetAlarmMessages(){
         };
         responseMessage.message = 'An error occurred !';
         res.status(500).json(responseMessage);
-        console.log('Error : FnGetAlarmMessages ' + ex.description);
+        console.log('Error : FnGetAlarmMessages ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }

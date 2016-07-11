@@ -22,6 +22,7 @@ router.post('/cv_generate',function(req,res,next){
     var reference = req.body.reference;
     var imageFullPath = 'https://storage.googleapis.com/ezeone/';
     var imagePath = (req.body.imagePath) ? imageFullPath + req.body.imagePath : imageFullPath;
+    req.body.saveFlag = (req.body.saveFlag) ? 1 : 0;
     if (req.body.hobbies){
         hob = true;
     }
@@ -40,7 +41,11 @@ router.post('/cv_generate',function(req,res,next){
     if (req.body.career.length > 0){
         aoc = true;
     }
-    if (reference.ref_name && reference.ref_name1){
+    //if (reference.ref_name && reference.ref_name1){
+    //    ref = true;
+    //    if_not_ref = '';
+    //}
+    if (req.body.work_exp.length > 0){
         ref = true;
         if_not_ref = '';
     }
@@ -68,7 +73,7 @@ router.post('/cv_generate',function(req,res,next){
                     opts.getImage = function () {
                         return bufImg;
                     };
-                    content = fs.readFileSync(__dirname + "/cv_template.docx", "binary");
+                    var content = fs.readFileSync(__dirname + "/cv_template.docx", "binary");
                     var doc = new Docxtemplater(content);
                     var imageModule=new ImageModule(opts);
                     doc.attachModule(imageModule);
@@ -123,9 +128,51 @@ router.post('/cv_generate',function(req,res,next){
 
                     var bufferStream = new stream.PassThrough();
                     bufferStream.end(buf);
-                    res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
-                    res.setHeader('Content-type', "application/octet-stream");
-                    bufferStream.pipe(res);
+                    //res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
+                    //res.setHeader('Content-type', "application/octet-stream");
+                    //bufferStream.pipe(res);
+                    //console.log(bufferStream,"bufferStream1");
+
+                    if(req.body.saveFlag == 0){
+                        res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
+                        res.setHeader('Content-type', "application/octet-stream");
+                        bufferStream.pipe(res);
+                    }
+                    else{
+                        var attachmentFileName = req.st.libs.uuid.v4()+'.docx';
+                        req.st.uploadDocumentToCloud(attachmentFileName,bufferStream,function(err){
+                            if (!err) {
+                                var procParams = [
+                                    req.db.escape(req.body.token) ,
+                                    req.db.escape(attachmentFileName),
+                                ];
+                                var procQuery = 'CALL psave_resumeurl(' + procParams.join(',') + ')';
+                                console.log("procQuery",procQuery);
+                                req.db.query(procQuery, function (err, saveResumeResults){
+                                    if (!err) {
+                                        //var attachmentLink = req.CONFIG.CONSTANT.GS_URL +
+                                        //    req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentFileName;
+                                        console.log("resume saved successfully");
+                                        res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
+                                        res.setHeader('Content-type', "application/octet-stream");
+                                        var bufferStream1 = new stream.PassThrough();
+                                        bufferStream1.end(buf);
+                                        bufferStream1.pipe(res);
+                                    }
+                                    else{
+                                        console.log("resume not saved successfully");
+                                    }
+                                });
+
+                            }
+                            else{
+                                console.log("resume not uploaded on cloud");
+                            }
+                        });
+
+
+                    }
+
 
                 }
                 else{
@@ -170,9 +217,49 @@ router.post('/cv_generate',function(req,res,next){
                     console.log(buf.length);
                     var bufferStream = new stream.PassThrough();
                     bufferStream.end(buf);
-                    res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
-                    res.setHeader('Content-type', "application/octet-stream");
-                    bufferStream.pipe(res);
+
+                    if(req.body.saveFlag == 0){
+                        res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
+                        res.setHeader('Content-type', "application/octet-stream");
+                        bufferStream.pipe(res);
+                    }
+                    else{
+                        var attachmentFileName = req.st.libs.uuid.v4()+'.docx';
+                        req.st.uploadDocumentToCloud(attachmentFileName,bufferStream,function(err){
+                            if (!err) {
+                                var procParams = [
+                                    req.db.escape(req.body.token) ,
+                                    req.db.escape(attachmentFileName),
+                                ];
+                                var procQuery = 'CALL psave_resumeurl(' + procParams.join(',') + ')';
+                                console.log("procQuery",procQuery);
+                                req.db.query(procQuery, function (err, saveResumeResults){
+                                    if (!err) {
+                                        //var attachmentLink = req.CONFIG.CONSTANT.GS_URL +
+                                        //    req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentFileName;
+                                       console.log("resume saved successfully");
+                                        res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
+                                        res.setHeader('Content-type', "application/octet-stream");
+                                        var bufferStream1 = new stream.PassThrough();
+                                        bufferStream1.end(buf);
+                                        bufferStream1.pipe(res);
+                                    }
+                                    else{
+                                        console.log("resume not saved successfully");
+                                    }
+                                });
+
+                            }
+                            else{
+                                console.log("resume not uploaded on cloud");
+                            }
+                        });
+
+
+                    }
+
+
+
                     //var pdfClient = new PDFClient(req.CONFIG);
                     //pdfClient.convertToPdf(buf,function(err,pdfBuffer){
                     //    if(err){
@@ -193,7 +280,7 @@ router.post('/cv_generate',function(req,res,next){
             });
         });
         response.on('error',function(){
-            content = fs.readFileSync(__dirname + "/cv_template.docx", "binary");
+            var content = fs.readFileSync(__dirname + "/cv_template.docx", "binary");
             var doc = new Docxtemplater(content);
             doc.setData({
                 "name": req.body.name,
@@ -232,9 +319,53 @@ router.post('/cv_generate',function(req,res,next){
             console.log(buf.length);
             var bufferStream = new stream.PassThrough();
             bufferStream.end(buf);
-            res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
-            res.setHeader('Content-type', "application/octet-stream");
-            bufferStream.pipe(res);
+
+
+            if(req.body.saveFlag == 0){
+                res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
+                res.setHeader('Content-type', "application/octet-stream");
+                bufferStream.pipe(res);
+            }
+            else{
+                var attachmentFileName = req.st.libs.uuid.v4()+'.docx';
+                req.st.uploadDocumentToCloud(attachmentFileName,bufferStream,function(err){
+                    if (!err) {
+                        var procParams = [
+                            req.db.escape(req.body.token) ,
+                            req.db.escape(attachmentFileName),
+                        ];
+                        var procQuery = 'CALL psave_resumeurl(' + procParams.join(',') + ')';
+                        console.log("procQuery",procQuery);
+                        req.db.query(procQuery, function (err, saveResumeResults){
+                            if (!err) {
+                                //var attachmentLink = req.CONFIG.CONSTANT.GS_URL +
+                                //    req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentFileName;
+                                console.log("resume saved successfully");
+                                res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
+                                res.setHeader('Content-type', "application/octet-stream");
+                                var bufferStream1 = new stream.PassThrough();
+                                bufferStream1.end(buf);
+                                bufferStream1.pipe(res);
+                            }
+                            else{
+                                console.log("resume not saved successfully");
+                            }
+                        });
+
+                    }
+                    else{
+                        console.log("resume not uploaded on cloud");
+                    }
+                });
+
+
+            }
+
+
+            //res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
+            //res.setHeader('Content-type', "application/octet-stream");
+            //bufferStream.pipe(res);
+            //console.log(bufferStream,"bufferStream3");
             //var pdfClient = new PDFClient(req.CONFIG);
             //pdfClient.convertToPdf(buf,function(err,pdfBuffer){
             //    if(err){

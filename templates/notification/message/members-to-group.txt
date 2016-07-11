@@ -1,0 +1,1 @@
+<%=adminName%> invited you to join the <%=groupName%> group.

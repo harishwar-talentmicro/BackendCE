@@ -1,0 +1,31 @@
+<table style="font-family: 'Verdana',serif;font-size:14px;color: #444444;">
+    <tr>
+        <td>
+            Hello <%=firstName%>,
+            <br/>
+            <br/>
+            Greetings from EZEOne Team. <br/>
+
+            Based on the details produced in the resume section, we have found a job matching to your profile posted by <b><%=companyName%></b> to EZEOne. Job details are mentioned below
+            <br/>
+            <br/>
+            Job Title : <b><%=jobTitle%> <% if(jobCode) { %> (<%=jobCode %>) <% } %></b>
+            <br/>
+            <% if(keySkills) { %> Key Skills : <b><%=keySkills%> </b><% } %>
+
+            <br/>
+            <br/>
+            Please visit the following link to apply: <br/>
+
+            <a href="https://www.ezeone.com/jobdetail?jobid=<%=jobId%>" style="display: table-cell;height:40px;color: #000;font-weight: bold;">
+                https://www.ezeone.com/jobdetail?jobid=<%=jobId%>
+            </a>
+
+            <br/>
+            <br/>
+            From<br/>
+            Team EZEOne
+
+        </td>
+    </tr>
+</table>

@@ -4,18 +4,7 @@
 
 "use strict";
 
-function alterEzeoneId(ezeoneId){
-    var alteredEzeoneId = '';
-    if(ezeoneId){
-        if(ezeoneId.toString().substr(0,1) == '@'){
-            alteredEzeoneId = ezeoneId;
-        }
-        else{
-            alteredEzeoneId = '@' + ezeoneId.toString();
-        }
-    }
-    return alteredEzeoneId;
-}
+
 
 var st = null;
 var Notification = require('./notification/notification-master.js');
@@ -200,7 +189,7 @@ msgNotification.prototype.sendComposeMessage= function(msgContent, callBack) {
 
     }
     catch (ex) {
-        console.log(' FnComposeMessage : Catch error:' + ex.description);
+        console.log(' FnComposeMessage : Catch error:' + ex);
         callBack(null, null);
         console.log(ex);
         var errorDate = new Date();
@@ -903,7 +892,7 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
         }
     }
     catch (ex) {
-        console.log(' Update Status Notification : Catch error:' + ex.description);
+        console.log(' Update Status Notification : Catch error:' + ex);
         callBack(null, null);
         console.log(ex);
         var errorDate = new Date();
@@ -1074,7 +1063,7 @@ msgNotification.prototype.sendForwardNotification = function(msgContent, callBac
         }
     }
     catch (ex) {
-        console.log(' FnSendForwardMsgNotification : Catch error:' + ex.description);
+        console.log(' FnSendForwardMsgNotification : Catch error:' + ex);
         callBack(null, null);
         console.log(ex);
         var errorDate = new Date();
