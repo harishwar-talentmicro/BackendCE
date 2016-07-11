@@ -238,21 +238,23 @@ RegisterCtrl.register = function(req,res,next){
                                         },
                                         function (error, response, body) {
                                             if (!error) {
-                                                request({
-                                                        method: 'POST',
-                                                        uri: 'http://104.199.128.226:3001/api/v1.1/area_partner/listing/schedule/holiday_list?token='+req.query.token+'&masterId='+registerResult[0][0].TID,
-                                                        json : holidayList
-                                                    },
-                                                    function (error, response, body) {
-                                                        if (!error) {
-
-                                                            console.log('Upload successful!  Server responded with:', body);
-                                                            res.send(rtnMessage);
-                                                        }
-                                                        else{
-                                                            return console.error('upload failed:', error);
-                                                        }
-                                                    });
+                                                //request({
+                                                //        method: 'POST',
+                                                //        uri: 'http://104.199.128.226:3001/api/v1.1/area_partner/listing/schedule/holiday_list?token='+req.query.token+'&masterId='+registerResult[0][0].TID,
+                                                //        json : holidayList
+                                                //    },
+                                                //    function (error, response, body) {
+                                                //        if (!error) {
+                                                //
+                                                //            console.log('Upload successful!  Server responded with:', body);
+                                                //            res.send(rtnMessage);
+                                                //        }
+                                                //        else{
+                                                //            return console.error('upload failed:', error);
+                                                //        }
+                                                //    });
+                                                console.log('Upload successful!  Server responded with:', body);
+                                                res.send(rtnMessage);
                                             }
                                             else{
                                                 return console.error('upload failed:', error);
@@ -269,7 +271,20 @@ RegisterCtrl.register = function(req,res,next){
                                 /**
                                  * Send mail after checking mail based on which ID gets registered
                                  */
+                                if (firstName && lastName) {
+                                    fullName = firstName + ' ' + lastName;
+                                }
+                                else if(firstName) {
+                                    fullName = firstName;
+                                }
+                                else{
+                                    fullName = companyName;
+                                }
 
+                                mailerApi.sendMailNew('register', {
+                                    fullName: fullName,
+                                    ezeoneId: ezeid
+                                },'Welcome to EZEOneID',email);
                             }
                         }
                         else {
@@ -280,8 +295,6 @@ RegisterCtrl.register = function(req,res,next){
 
 
                     });
-
-
 
                 }
                 else{
@@ -314,7 +327,6 @@ RegisterCtrl.register = function(req,res,next){
                 }
             });
         }
-
         catch (ex) {
             console.log(ex);
             var errorDate = new Date();

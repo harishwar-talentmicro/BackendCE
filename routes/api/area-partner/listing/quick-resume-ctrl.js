@@ -135,8 +135,6 @@ QuickResumeCtrl.checkCandidate = function(req,res,next){
                         var jobTypeList = (registrationResult[1][0].jobType) ?
                             registrationResult[1][0].jobType.split('') : [];
 
-
-
                         var jobTypeMap = [
                             'Full Time',
                             'Part Time',

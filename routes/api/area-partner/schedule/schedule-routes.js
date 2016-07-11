@@ -13,6 +13,7 @@ router.get('/holiday_list',scheduleCtrl.getHolidayList);
 router.post('/holiday_list',scheduleCtrl.saveHolidayList);
 
 router.get('/holiday_tpl_list',scheduleCtrl.getHolidayTplList);
+router.get('/holiday_tpl_details',scheduleCtrl.getHolidayTplDtl);
 //router.get('/working_hours_tpl_list',scheduleCtrl.getWorkingHoursTplList);
 
 
