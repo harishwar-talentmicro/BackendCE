@@ -556,7 +556,7 @@ ScheduleCtrl.saveHolidayList = function(req,res,next){
     }
 };
 
-ScheduleCtrl.getHolidayTplList = function(req,res,next){
+ScheduleCtrl.getHolidayTplListOLD = function(req,res,next){
     var response = {
         status : false,
         message : "Your session has expired please login to continue",
@@ -653,4 +653,270 @@ ScheduleCtrl.getHolidayTplList = function(req,res,next){
         res.status(400).json(response);
     }
 };
+
+ScheduleCtrl.getHolidayTplList = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Your session has expired please login to continue",
+        data : null,
+        error : {
+            token : "Token is expired"
+        }
+    };
+    var error = {};
+    try {
+        /**
+         * validating token
+         * */
+        req.st.validateTokenAp(req.query.token, function (err, tokenResult) {
+            if (!err) {
+                if (tokenResult) {
+                    /**
+                     * getting holiday template list
+                     * */
+                    var queryParams = req.db.escape(req.query.token);
+                    var query = 'CALL Pget_holiday_template_list(' + queryParams + ')';
+                    console.log(query);
+                    req.db.query(query, function (err, results) {
+                        if (!err) {
+                            console.log(results);
+                            if (results && results[0] && results[0].length > 0) {
+
+                                response.status = true;
+                                response.data = {
+                                    holidayTplList : results[0]
+                                };
+                                response.error = null;
+                                response.message = 'Holiday template list loaded successfully';
+                                res.status(200).json(response);
+
+                            }
+                            else {
+                                response.message = 'Holiday template list are not available';
+                                res.json(response);
+                            }
+
+                        }
+                        else {
+                            response.data = null;
+                            response.message = 'Error in getting Holiday template List';
+                            console.log('Pget_holiday_template_list: Error in getting Holiday template List' + err);
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                else {
+                    response.message = 'Invalid token';
+                    response.error = {
+                        token: 'Invalid Token'
+                    };
+                    response.data = null;
+                    res.status(401).json(response);
+                    console.log('Pget_holiday_template_list: Invalid token');
+                }
+            }
+            else {
+                response.error = {
+                    server: 'Internal Server Error'
+                };
+                response.message = 'Error in validating Token';
+                res.status(500).json(response);
+                console.log('Pget_holiday_template_list:Error in processing Token' + err);
+            }
+        });
+    }
+    catch (ex) {
+        response.error = {};
+        response.message = 'An error occured !';
+        console.log('Pget_holiday_template_list:error ' + ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        res.status(400).json(response);
+    }
+};
+
+ScheduleCtrl.getHolidayTplDtl = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Your session has expired please login to continue",
+        data : null,
+        error : {
+            token : "Token is expired"
+        }
+    };
+    var error = {};
+    try {
+        /**
+         * validating token
+         * */
+        req.st.validateTokenAp(req.query.token, function (err, tokenResult) {
+            if (!err) {
+                if (tokenResult) {
+                    /**
+                     * getting holiday template list
+                     * */
+                    var queryParams = [req.db.escape(req.query.token),req.db.escape(req.query.templateId)];
+                    var query = 'CALL ploadholidaytemplate_details_ap(' + queryParams.join(',') + ')';
+                    console.log(query);
+                    req.db.query(query, function (err, results) {
+                        if (!err) {
+                            console.log(results);
+                            var workingHrList = [];
+                            if (results && results[0] && results[0].length > 0) {
+                                if (results[1] && results[1].length > 0 ){
+                                    workingHrList = results[1];
+                                }
+
+                                response.status = true;
+                                response.data = {
+                                    holidayTplDtl : results[0],
+                                    workingHrList : workingHrList
+                                };
+                                response.error = null;
+                                response.message = 'Holiday template details loaded successfully';
+                                res.status(200).json(response);
+
+                            }
+                            else {
+                                response.message = 'Holiday template details are not available';
+                                res.json(response);
+                            }
+
+                        }
+                        else {
+                            response.data = null;
+                            response.message = 'Error in getting Holiday template Details';
+                            console.log('Pploadholidaytemplate_details_ap: Error in getting Holiday template Details' + err);
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                else {
+                    response.message = 'Invalid token';
+                    response.error = {
+                        token: 'Invalid Token'
+                    };
+                    response.data = null;
+                    res.status(401).json(response);
+                    console.log('ploadholidaytemplate_details_ap: Invalid token');
+                }
+            }
+            else {
+                response.error = {
+                    server: 'Internal Server Error'
+                };
+                response.message = 'Error in validating Token';
+                res.status(500).json(response);
+                console.log('ploadholidaytemplate_details_ap:Error in processing Token' + err);
+            }
+        });
+    }
+    catch (ex) {
+        response.error = {};
+        response.message = 'An error occured !';
+        console.log('ploadholidaytemplate_details_ap:error ' + ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        res.status(400).json(response);
+    }
+};
+
+ScheduleCtrl.saveHolidayTpl = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Your session has expired please login to continue",
+        data : null,
+        error : {
+            token : "Token is expired"
+        }
+    };
+    var error = {};
+    try {
+        var holidayCalendar = (req.body.holidayCalendar) ? req.body.holidayCalendar : [];
+        var workinghours = (req.body.workinghours) ? req.body.workinghours : [];
+        /**
+         * validating token
+         * */
+        req.st.validateTokenAp(req.query.token, function (err, tokenResult) {
+            if (!err) {
+                if (tokenResult) {
+                    /**
+                     * getting holiday template list
+                     * */
+                    var queryParams = [req.db.escape(req.query.token),req.db.escape(req.query.templateId),
+                        req.db.escape(req.query.title)];
+                    var query = 'CALL psaveholiday_template_ap(' + queryParams.join(',') + ')';
+                    console.log(query);
+                    req.db.query(query, function (err, results) {
+                        if (!err) {
+                            console.log(results);
+                            var combSaveQuery = '';
+                            if (results && results[0] && results[0][0] && results[0][0].id) {
+
+                                for ( var i = 0; i < holidayCalendar.length; i++){
+                                    var queryParams = [
+                                        req.db.escape(req.query.token),
+                                        req.db.escape(holidayCalendar[i].date),
+                                        req.db.escape(holidayCalendar[i].title),
+                                        req.db.escape(results[0][0].id),
+                                    ];
+
+                                    combSaveQuery += "psaveholidaycalendar_ap("+ queryParams.join(',')+");";
+                                }
+
+                                response.status = true;
+                                response.data = {
+                                    holidayTplDtl : results[0],
+                                    workingHrList : workingHrList
+                                };
+                                response.error = null;
+                                response.message = 'Holiday template details loaded successfully';
+                                res.status(200).json(response);
+
+                            }
+                            else {
+                                response.message = 'Holiday template details are not available';
+                                res.json(response);
+                            }
+
+                        }
+                        else {
+                            response.data = null;
+                            response.message = 'Error in getting Holiday template Details';
+                            console.log('Pploadholidaytemplate_details_ap: Error in getting Holiday template Details' + err);
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                else {
+                    response.message = 'Invalid token';
+                    response.error = {
+                        token: 'Invalid Token'
+                    };
+                    response.data = null;
+                    res.status(401).json(response);
+                    console.log('ploadholidaytemplate_details_ap: Invalid token');
+                }
+            }
+            else {
+                response.error = {
+                    server: 'Internal Server Error'
+                };
+                response.message = 'Error in validating Token';
+                res.status(500).json(response);
+                console.log('ploadholidaytemplate_details_ap:Error in processing Token' + err);
+            }
+        });
+    }
+    catch (ex) {
+        response.error = {};
+        response.message = 'An error occured !';
+        console.log('ploadholidaytemplate_details_ap:error ' + ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        res.status(400).json(response);
+    }
+};
+
+
 module.exports = ScheduleCtrl;
