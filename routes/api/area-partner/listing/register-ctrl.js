@@ -165,9 +165,7 @@ RegisterCtrl.register = function(req,res,next){
     }
     else {
         try {
-
             var list = req.CONFIG.RESERVED_EZEONE_LIST;
-
             var testCase = ezeid.replace('@','');
             var allowedFlag = true;
 
@@ -228,72 +226,84 @@ RegisterCtrl.register = function(req,res,next){
                             var queryParams1 = req.st.db.escape(pin) + ',' + req.st.db.escape(ezeid)
                                 + ',' + req.st.db.escape('')+ ',' + req.st.db.escape(addressLine1);
                             var query1 = 'CALL pupdateEZEoneKeywords(' + queryParams1 + ')';
-                            req.db.query(query1, function (err, updateResult) {
-                                if (!err) {
-                                    console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
-                                    request({
-                                            method: 'POST',
-                                            uri: 'http://104.199.128.226:3001/api/v1.1/area_partner/listing/schedule/working_hours?token='+req.query.token+'&masterId='+registerResult[0][0].TID,
-                                           json : workingHourList
-                                        },
-                                        function (error, response, body) {
-                                            if (!error) {
-                                                //request({
-                                                //        method: 'POST',
-                                                //        uri: 'http://104.199.128.226:3001/api/v1.1/area_partner/listing/schedule/holiday_list?token='+req.query.token+'&masterId='+registerResult[0][0].TID,
-                                                //        json : holidayList
-                                                //    },
-                                                //    function (error, response, body) {
-                                                //        if (!error) {
-                                                //
-                                                //            console.log('Upload successful!  Server responded with:', body);
-                                                //            res.send(rtnMessage);
-                                                //        }
-                                                //        else{
-                                                //            return console.error('upload failed:', error);
-                                                //        }
-                                                //    });
-                                                console.log('Upload successful!  Server responded with:', body);
-                                                res.send(rtnMessage);
-                                            }
-                                            else{
-                                                return console.error('upload failed:', error);
-                                            }
-                                        });
 
-                                }
-                                else {
-                                    console.log('FnUpdateEZEoneKeywords: Keywords not updated');
+                            var ip = req.headers['x-forwarded-for'] ||
+                                req.connection.remoteAddress ||
+                                req.socket.remoteAddress ||
+                                req.connection.socket.remoteAddress;
+                            var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+
+                            req.st.generateToken(ip, userAgent, ezeid, function (err, token) {
+                                if (err) {
+                                    console.log('FnRegistration: Token Generation Error');
                                     console.log(err);
                                 }
-                            });
-                            if (email) {
-                                /**
-                                 * Send mail after checking mail based on which ID gets registered
-                                 */
-                                if (firstName && lastName) {
-                                    fullName = firstName + ' ' + lastName;
-                                }
-                                else if(firstName) {
-                                    fullName = firstName;
-                                }
-                                else{
-                                    fullName = companyName;
-                                }
+                                else {
+                                    console.log(token);
+                                    rtnMessage.Token = token;
 
-                                mailerApi.sendMailNew('register', {
-                                    fullName: fullName,
-                                    ezeoneId: ezeid
-                                },'Welcome to EZEOneID',email);
-                            }
+                                    /**
+                                     * Now update the keywords and then send the response
+                                     */
+
+                                    req.db.query(query1, function (err, updateResult) {
+                                        if (!err) {
+                                            console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
+                                            request({
+                                                    method: 'POST',
+                                                    uri: req.CONFIG.CONSTANT.API_URL + 'v1.1/area_partner/listing/schedule/working_hours?token='+req.query.token+'&masterId='+registerResult[0][0].TID,
+                                                    json : workingHourList
+                                                },
+                                                function (error, response, body) {
+                                                    if (!error) {
+                                                        if (holidayList.length){
+                                                            request({
+                                                                    method: 'POST',
+                                                                    uri: req.CONFIG.CONSTANT.API_URL +'v1.1/area_partner/listing/schedule/holiday_list?token='+req.query.token+'&masterId='+registerResult[0][0].TID,
+                                                                    json : holidayList
+                                                                },
+                                                                function (error, response, body) {
+                                                                    if (!error) {
+
+                                                                        console.log('Upload successful!  Server responded with:', body);
+
+                                                                        res.send(rtnMessage);
+                                                                    }
+                                                                    else{
+                                                                        return console.error('upload failed:', error);
+                                                                        res.send(rtnMessage);
+                                                                    }
+                                                                });
+
+                                                        }
+                                                        else {
+                                                            console.log('Upload successful!  Server responded with:', body);
+                                                            res.send(rtnMessage);
+                                                        }
+                                                    }
+                                                    else{
+                                                        return console.error('upload failed:', error);
+                                                        res.send(rtnMessage);
+                                                    }
+                                                });
+
+                                        }
+                                        else {
+                                            res.send(rtnMessage);
+                                            console.log('FnUpdateEZEoneKeywords: Keywords not updated');
+                                            console.log(err);
+                                        }
+                                    });
+
+                                }
+                            });
+
                         }
                         else {
                             //console.log(rtnMessage);
                             res.send(rtnMessage);
                             console.log('FnRegistration:tmaster: Registration Failed..4');
                         }
-
-
                     });
 
                 }

@@ -31,8 +31,9 @@ var moment = require('moment');
  ]
  */
 router.post('/working_schedule', function(req,res,next){
-
+        console.log(req.body);
     if(req.is('json')){
+
         try{
             /**
              * Sample data structure you will get from Client(Web)
@@ -157,13 +158,13 @@ router.post('/working_schedule', function(req,res,next){
                     req.db.escape(dataFromClient[i].days.join(',')),
                     req.db.escape((startMoment.hours() * 60)+startMoment.minutes()),
                     req.db.escape((endMoment.hours() * 60)+endMoment.minutes()),
-                    req.db.escape(req.db.escape(req.query.tid))
+                    req.db.escape(req.query.tid)
                 ];
 
                 combSaveQuery += "CALL post_working_hour("+ queryParams.join(',')+");";
 
             }
-            //console.log("combSaveQuery1",combSaveQuery);
+            console.log("combSaveQuery1",combSaveQuery);
             /**
              * The slots which are not to be deleted are pushed into excluded list
              */
@@ -171,7 +172,7 @@ router.post('/working_schedule', function(req,res,next){
             var delQueryParams = [
                 req.db.escape(req.query.token),
                 req.db.escape(excludedIdList.join(',')),
-                req.db.escape(req.db.escape(req.query.tid))
+                req.db.escape(req.query.tid)
             ];
             /**
              * The slots other than the passed slots will get deleted with this procedure

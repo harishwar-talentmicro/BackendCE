@@ -1,9 +1,12 @@
 var express = require('express');
 var router = express.Router();
-var quickResume = require('./listing/listing-routes');
+var quickResume = require('./listing/quick-resume-routes');
 var schedule = require('./schedule/schedule-routes');
-router.use('/listing',quickResume);
+var registrationCtrl = require('./listing/register-ctrl');
+
+router.use('/quick_resume',quickResume);
 router.use('/schedule',schedule);
+router.post('/register',registrationCtrl.register)
 
 
 

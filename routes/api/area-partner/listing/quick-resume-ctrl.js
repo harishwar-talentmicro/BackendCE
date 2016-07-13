@@ -81,11 +81,186 @@ QuickResumeCtrl.searchCandidate = function(req,res,next){
     });
 };
 
-
 QuickResumeCtrl.getResumeDetail = function(req,res,next){
     
 };
 
+
+/**
+ * @method GET
+ * @param req
+ * @param res
+ * @param next
+ *
+ */
+QuickResumeCtrl.getMasterDetail = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Your session has expired please login to continue",
+        data : null,
+        error : {
+            token : "Token is expired"
+        }
+    };
+    var error = {};
+    try {
+
+        var jobTypeOutput = [];
+        var specializationOutput = [];
+        /**
+         * creating jobTypeList from array of job type
+         * @type {string[]}
+         */
+
+        var jobType = [
+            'Full Time',
+            'Part Time',
+            'Work from Home',
+            'Internship',
+            'Apprenticeship',
+            'Job Oriented Training',
+            'Consultant',
+            'Freelancer'
+        ];
+        for (var m = 0; m < jobType.length; m++){
+            jobObject = {};
+            jobObject.jobTypeId = m;
+            jobObject.jobTypeTitle = jobType[m];
+            jobTypeOutput.push(jobObject);
+        }
+        /**
+         * validating token
+         * */
+        /**
+         * to get all available results education id and loc id passing as 0
+         * @type {string}
+         */
+
+        req.st.validateTokenAp(req.query.token, function (err, tokenResult) {
+            if (!err) {
+                if (tokenResult) {
+                    var locationParams = req.db.escape(req.query.token);
+                    /**
+                     * to get all available results education id and loc id passing as 0
+                     * @type {string}
+                     */
+                    var query = 'CALL pGetEducations('+ 0 +'); CALL pgetcitys_ap('+ locationParams +');CALL pgetLOC('+ 0 +');'
+                    req.db.query(query, function (err, results) {
+                        if (!err) {
+                            if (results && results[0] && results[0].length > 0) {
+
+                                /**
+                                 * preparing query to get all specialisation of education id
+                                 * after that making object for multiple specialization for multiple education
+                                 * @type {string}
+                                 */
+                                var specializationQuery = '';
+                                for (var i = 0; i < results[0].length; i++){
+                                    var specialisationParams = req.db.escape(results[0][i].TID);
+                                    specializationQuery += "CALL pGetSpecialization("+ specialisationParams +");"
+                                }
+                                var outputSpecialiszation = [];
+                                req.db.query(specializationQuery, function (err, specializationResult) {
+                                    if (!err) {
+                                        if (specializationResult && specializationResult.length) {
+                                            for(var j = 0; j < specializationResult.length/2; j++){
+                                                for (var k = 0; k < specializationResult[j*2].length; k++){
+                                                    var result = {};
+                                                    result.tid = specializationResult[j*2][k].TID;
+                                                    result.title = specializationResult[j*2][k].Title;
+                                                    result.educationId = results[0][j].TID;
+                                                    outputSpecialiszation.push(result);
+                                                }
+                                            }
+                                            console.log(outputSpecialiszation);
+                                            response.status = true;
+                                            response.data = {
+                                                educationList : results[0],
+                                                educationSplList : outputSpecialiszation,
+                                                jobTypeList : jobTypeOutput,
+                                                preferredLocationList : results[2],
+                                                lineOfCareerList : results[4]
+                                            };
+                                            response.error = null;
+                                            response.message = 'Template list loaded successfully';
+                                            res.status(200).json(response);
+                                        }
+                                        else {
+                                            console.log('Error while getting specialization');
+                                            response.status = true;
+                                            response.data = {
+                                                educationList : results[0],
+                                                educationSplList : outputSpecialiszation,
+                                                jobTypeList : jobTypeOutput,
+                                                preferredLocationList : results[2],
+                                                lineOfCareerList : results[4]
+                                            };
+                                            response.error = null;
+                                            response.message = 'Template list loaded successfully';
+                                            res.status(200).json(response);
+                                        }
+                                    }
+                                    else {
+                                        response.status = true;
+                                        response.data = {
+                                            educationList : results[0],
+                                            educationSplList : outputSpecialiszation,
+                                            jobTypeList : jobTypeOutput,
+                                            preferredLocationList : results[2],
+                                            lineOfCareerList : results[4]
+                                        };
+                                        response.error = null;
+                                        response.message = 'Template list loaded successfully';
+                                        res.status(200).json(response);
+
+                                        console.log('Error while getting specialization');
+                                        console.log(err);
+                                    }
+                                });
+                            }
+                            else {
+                                response.message = 'Template list are not available';
+                                res.json(response);
+                            }
+
+                        }
+                        else {
+                            response.data = null;
+                            response.message = 'Error in getting Holiday template List';
+                            console.log('Pget_holiday_template_list: Error in getting Template List' + err);
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                else {
+                    response.message = 'Invalid token';
+                    response.error = {
+                        token: 'Invalid Token'
+                    };
+                    response.data = null;
+                    res.status(401).json(response);
+                    console.log('Pget_holiday_template_list: Invalid token');
+                }
+            }
+            else {
+                response.error = {
+                    server: 'Internal Server Error'
+                };
+                response.message = 'Error in validating Token';
+                res.status(500).json(response);
+                console.log('Pget_holiday_template_list:Error in processing Token' + err);
+            }
+        });
+    }
+    catch (ex) {
+        response.error = {};
+        response.message = 'An error occured !';
+        console.log('Pget_holiday_template_list:error ' + ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        res.status(400).json(response);
+    }
+};
 
 QuickResumeCtrl.checkCandidate = function(req,res,next){
     var response = {
@@ -259,8 +434,6 @@ QuickResumeCtrl.saveResumeDetail = function(req,res,next){
 
                         var jobTypeList = (registrationResult[1][0].jobType) ?
                             registrationResult[1][0].jobType.split('') : [];
-
-
 
                         var jobTypeMap = [
                             'Full Time',
