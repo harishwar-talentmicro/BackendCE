@@ -9,7 +9,6 @@
 var express = require('express');
 var router = express.Router();
 
-
 /**
  * Method : GET
  * @param req

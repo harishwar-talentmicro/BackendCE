@@ -9,6 +9,7 @@
 
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
+var moment = require('moment');
 
 
 
@@ -33,7 +34,6 @@ User_AP.prototype.getUserDetailsAP = function(req,res,next){
      */
     var _this = this;
     try {
-
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
@@ -44,14 +44,67 @@ User_AP.prototype.getUserDetailsAP = function(req,res,next){
             console.log("query",query);
             st.db.query(query, function (err, UserDetailsResult) {
                 if (!err) {
-                    console.log(UserDetailsResult);
+                    //console.log(UserDetailsResult);
                     if (UserDetailsResult != null) {
                         if (UserDetailsResult[0].length > 0) {
                             UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
                                 (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
                             console.log('FnGetUserDetailsAP : pgetUserProfileAP: User details sent successfully');
+                            var ProcParam = [req.db.escape(req.query.token),req.db.escape(UserDetailsResult[0][0].MasterID)];
+                            var procQuery = 'CALL PGetworkinghours_AP ( '+ ProcParam.join(',') +' )';
+                            console.log(procQuery);
+                            st.db.query(procQuery, function (err, templateResult) {
+                                if (!err) {
+                                    if (templateResult && templateResult.length){
+                                        console.log(templateResult);
+                                        if (templateResult[1]){
+                                            /**
+                                             * converting comma saprated day id's into
+                                             * array of day id's
+                                             */
+                                            for(var i = 0; i < templateResult[1].length; i++){
+                                                templateResult[1][i].days = templateResult[1][i].days.split(',');
 
-                            res.send(UserDetailsResult[0]);
+                                                for(var j = 0; j < templateResult[1][i].days.length; j++){
+                                                    templateResult[1][i].days[j] = parseInt(templateResult[1][i].days[j]);
+                                                }
+                                                /**
+                                                 * converting seconds into hours of start time
+                                                 * and time of working hours
+                                                 */
+                                                templateResult[1][i].et = (((parseInt(templateResult[1][i].et) / 60) < 10) ?
+                                                    '0'+(parseInt(templateResult[1][i].et / 60)).toString() :
+                                                        parseInt(templateResult[1][i].et / 60)) + ':'+
+                                                    (((templateResult[1][i].et % 60) < 10) ?
+                                                    '0'+(templateResult[1][i].et % 60).toString() :
+                                                        parseInt(templateResult[1][i].et % 60));
+
+                                                templateResult[1][i].st = (((parseInt(templateResult[1][i].st) / 60) < 10) ?
+                                                    '0'+(parseInt(templateResult[1][i].st / 60)).toString() :
+                                                        parseInt(templateResult[1][i].st / 60)) + ':'+
+                                                    (((templateResult[1][i].st % 60) < 10) ?
+                                                    '0'+(templateResult[1][i].st % 60).toString() :
+                                                        parseInt(templateResult[1][i].st % 60));
+                                            }
+                                        }
+                                        console.log(templateResult[0]);
+                                        console.log(templateResult[1]);
+
+                                        UserDetailsResult[0][0].holidayList = templateResult[0];
+                                            UserDetailsResult[0][0].workingHourList = templateResult[1];
+                                        res.send(UserDetailsResult[0]);
+
+                                    }
+                                    else {
+                                        console.log('Error while getting template');
+                                        res.send(UserDetailsResult[0]);
+                                    }
+                                }
+                                else {
+                                    console.log('Error while getting template');
+                                    res.send(UserDetailsResult[0]);
+                                }
+                            });
                         }
                         else {
                             res.json(null);
@@ -97,6 +150,8 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
      */
     var _this = this;
     try {
+       var error = {};
+       var validationFlag = true;
         res.header('Access-Control-Allow-Credentials', true);
         res.header('Access-Control-Allow-Origin', "*");
         res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
@@ -130,11 +185,14 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
         var RtnMessage = {
             IsSuccessful: false
         };
+        var holidayList = (req.body.holidayList) ? (req.body.holidayList) : [];
+        var workingHourList = (req.body.workingHourList) ? (req.body.workingHourList) : [];
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (EZEID != null && Token != null && IDTypeId != null) {
             st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
+                        console.log(IDTypeId);
                         if(IDTypeId == 1){
                             var InsertQuery = st.db.escape(CategoryID) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude)
                                 + ',' + st.db.escape(EZEIDVerifiedID) + ',' + st.db.escape(Token) + ',' + st.db.escape(Keywords)
@@ -149,7 +207,6 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
                                         RtnMessage.IsSuccessful = true;
                                         res.send(RtnMessage);
                                         console.log('FnUpdateUserProfileAP: User Profile update successfully');
-
                                     }
                                     else {
                                         //console.log(RtnMessage);
@@ -176,8 +233,193 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
                                     console.log(InsertResult);
                                     if (InsertResult != null) {
                                         RtnMessage.IsSuccessful = true;
-                                        res.send(RtnMessage);
-                                        console.log('FnUpdateUserProfileAP: User Profile update successfully');
+                                        /**
+                                         * if not individual use have to add working hour and holiday list
+                                         * @type {string}
+                                         */
+                                        var combSaveBigQuery = '';
+                                        var combSaveHolidayQuery = '';
+                                        var combSaveWorkingHoureQuery = '';
+                                        var excludedHolidayIdList = [];
+                                        var excludedIdList = [];
+                                        if ( holidayList.length || workingHourList.length){
+
+                                            /**
+                                             * preparing query statement for updating holiday list
+                                             */
+                                            for (var j = 0; j < holidayList.length; j++){
+
+                                                if(holidayList[j].tid){
+                                                    excludedHolidayIdList.push(holidayList[j].tid);
+                                                }
+                                                var queryParams = [
+                                                    req.db.escape(holidayList[j].tid),
+                                                    req.db.escape(req.body.masterId),
+                                                    req.db.escape(holidayList[j].date),
+                                                    req.db.escape(holidayList[j].title),
+                                                ];
+
+                                                combSaveHolidayQuery += "CALL psaveholidaycalendar_ezeone_ap("+ queryParams.join(',')+");";
+                                            }
+
+                                            /**
+                                             * The slots which are not to be deleted are pushed into excluded list
+                                             */
+
+                                            var delQueryParams = [
+                                                req.db.escape(req.body.Token),
+                                                req.db.escape(excludedHolidayIdList.join(',')),
+                                                req.db.escape(req.body.masterId)
+                                            ];
+
+                                            /**
+                                             * The slots other than the passed slots will get deleted with this procedure
+                                             */
+
+                                            combSaveHolidayQuery = "CALL pdelete_holiday_ap ("+ delQueryParams.join(',')+");"  + combSaveHolidayQuery;
+
+                                            /**
+                                             * preparing query statment for updating working hour list
+                                             */
+                                            for ( var i = 0; i < workingHourList.length; i++){
+
+
+                                                /**
+                                                 * Slots which should not be deleted for working hours
+                                                 */
+
+                                                var startMoment = moment(workingHourList[i].st,"HH:mm");
+                                                var endMoment = moment(workingHourList[i].et,"HH:mm");
+                                                error[i] = null;
+
+                                                /**
+                                                 * Validating start time
+                                                 */
+                                                if(startMoment){
+                                                    if(!startMoment.isValid()){
+                                                        error[i] = { st : 'Invalid time format'};
+                                                        validationFlag *= false;
+                                                    }
+                                                }
+                                                else{
+                                                    error[i] = { st : 'Invalid time format'};
+                                                    validationFlag *= false;
+                                                }
+                                                /**
+                                                 * Validating end time
+                                                 */
+                                                if(endMoment){
+                                                    if(!endMoment.isValid()){
+                                                        error[i] = { et : 'Invalid time format'};
+                                                        validationFlag *= false;
+                                                    }
+                                                }
+                                                else{
+                                                    error[i] = { et : 'Invalid time format'};
+                                                    validationFlag *= false;
+                                                }
+
+                                                /**
+                                                 * Validating days
+                                                 */
+                                                if(workingHourList[i].days){
+                                                    if(workingHourList[i].days.length < 1) {
+                                                        error[i] = {days: 'Days are empty'};
+                                                        validationFlag *= false;
+                                                    }
+                                                    else{
+
+                                                        for(var j = 0; j < workingHourList[i].days.length; j++){
+                                                            workingHourList[i].days[j] = parseInt(workingHourList[i].days[j]);
+                                                            if(workingHourList[i].days[j] > 6 || workingHourList[i].days[j] < 0 || isNaN(workingHourList[i].days[j])){
+                                                                if(workingHourList[i].days[j] > 6){
+                                                                    workingHourList[i].days[j] = workingHourList[i].days[j] % 6;
+                                                                }
+                                                                if(isNaN(workingHourList[i].days[j]) || workingHourList[i].days[j] < 0){
+                                                                    workingHourList[i].days.splice(j,1);
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if(!workingHourList[i].days.length){
+                                                            error[i] = { days : 'Days are empty'};
+                                                            validationFlag *= false;
+                                                        }
+                                                    }
+                                                }
+                                                else {
+                                                    error[i] = { days : 'Days are empty'};
+                                                    validationFlag *= false;
+                                                }
+
+                                                if(error[i]){
+                                                    continue;
+                                                }
+
+                                                if(workingHourList[i].tid){
+                                                    excludedIdList.push(workingHourList[i].tid);
+                                                }
+                                                /**
+                                                 * converting stat time and end time hours in minuts
+                                                 * @type {*[]}
+                                                 */
+                                                var queryParams = [
+                                                    req.db.escape(req.body.Token),
+                                                    req.db.escape(workingHourList[i].tid),
+                                                    req.db.escape(workingHourList[i].days.join(',')),
+                                                    req.db.escape((startMoment.hours() * 60)+startMoment.minutes()),
+                                                    req.db.escape((endMoment.hours() * 60)+endMoment.minutes()),
+                                                    req.db.escape(req.body.masterId)
+                                                ];
+
+                                                combSaveWorkingHoureQuery += "CALL post_working_hour_AP("+ queryParams.join(',')+");";
+
+                                            }
+
+                                            /**
+                                             * The slots which are not to be deleted are pushed into excluded list
+                                             */
+
+                                            var delQueryParams = [
+                                                req.db.escape(req.body.Token),
+                                                req.db.escape(excludedIdList.join(',')),
+                                                req.db.escape(req.body.masterId)
+                                            ];
+
+                                            /**
+                                             * The slots other than the passed slots will get deleted with this procedure
+                                             */
+
+                                            combSaveWorkingHoureQuery = "CALL delete_working_hours_AP("+ delQueryParams.join(',')+");"  + combSaveWorkingHoureQuery;
+                                            /**
+                                             * combining holiday list query and working hour query and exicuting
+                                             * @type {string}
+                                             */
+                                            combSaveBigQuery = combSaveHolidayQuery + combSaveWorkingHoureQuery;
+                                            console.log(combSaveBigQuery);
+                                            req.db.query(combSaveBigQuery, function (err, templateResults) {
+                                                if(!err){
+                                                    console.log(templateResults);
+                                                    if (templateResults){
+                                                        res.send(RtnMessage);
+                                                        console.log('FnUpdateUserProfileAP: User Profile update successfully');
+                                                    }
+                                                    else {
+                                                        console.log('FnUpdateUserProfileAP:tmaster: User Profile update Failed');
+                                                        res.send(RtnMessage);
+                                                    }
+                                                }
+                                                else {
+                                                    console.log('FnUpdateUserProfileAP:tmaster: User Profile update Failed');
+                                                    res.send(RtnMessage);
+                                                }
+
+                                            });
+                                        }
+                                        else {
+                                            res.send(RtnMessage);
+                                            console.log('FnUpdateUserProfileAP: User Profile update successfully');
+                                        }
 
                                     }
                                     else {
@@ -193,7 +435,6 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
                                 }
                             });
                         }
-
                     }
                     else
                     {

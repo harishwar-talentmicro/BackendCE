@@ -7,6 +7,7 @@ var temp = function(res){
 };
 var moment = require('moment');
 var ScheduleCtrl = {};
+
 ScheduleCtrl.getWorkingHours = function(req,res,next){
     var response = {
         status : false,
@@ -151,10 +152,10 @@ ScheduleCtrl.getWorkingHours = function(req,res,next){
         }
     }
 };
+
 ScheduleCtrl.saveWorkingHours = function(req,res,next){
     if(req.is('json')){
         try{
-
             var dataFromClient = req.body;
             var error = {
             };
@@ -249,9 +250,9 @@ ScheduleCtrl.saveWorkingHours = function(req,res,next){
                     continue;
                 }
 
-                if(dataFromClient[i].id){
-                    excludedIdList.push(dataFromClient[i].id);
-                }
+                //if(dataFromClient[i].id){
+                //    excludedIdList.push(dataFromClient[i].id);
+                //}
 
                 var queryParams = [
                     req.db.escape(req.query.token),
@@ -270,15 +271,15 @@ ScheduleCtrl.saveWorkingHours = function(req,res,next){
              * The slots which are not to be deleted are pushed into excluded list
              */
 
-            var delQueryParams = [
-                req.db.escape(req.query.token),
-                req.db.escape(excludedIdList.join(',')),
-                req.db.escape(req.db.escape(req.query.masterId))
-            ];
-            /**
-             * The slots other than the passed slots will get deleted with this procedure
-             */
-            combSaveQuery = "CALL delete_working_hours_AP("+ delQueryParams.join(',')+");"  + combSaveQuery;
+            //var delQueryParams = [
+            //    req.db.escape(req.query.token),
+            //    req.db.escape(excludedIdList.join(',')),
+            //    req.db.escape(req.db.escape(req.query.masterId))
+            //];
+            ///**
+            // * The slots other than the passed slots will get deleted with this procedure
+            // */
+            //combSaveQuery = "CALL delete_working_hours_AP("+ delQueryParams.join(',')+");"  + combSaveQuery;
             console.log("combSaveQuery",combSaveQuery);
             if(!validationFlag){
                 res.status(200).json({
@@ -438,6 +439,7 @@ ScheduleCtrl.getHolidayList = function(req,res,next){
         res.status(400).json(response);
     }
 };
+
 ScheduleCtrl.saveHolidayList = function(req,res,next){
     if(req.is('json')){
         try{
@@ -475,25 +477,25 @@ ScheduleCtrl.saveHolidayList = function(req,res,next){
                 }
 
 
-                dataFromClient[i].holidayId = parseInt(dataFromClient[i].holidayId);
-                if(isNaN(dataFromClient[i].holidayId) || dataFromClient[i].holidayId < 0){
-                    error[i] = { holidayId : 'Invalid holiday id'};
-                    validationFlag *= false;
-                }
+                //dataFromClient[i].holidayId = parseInt(dataFromClient[i].holidayId);
+                //if(isNaN(dataFromClient[i].holidayId) || dataFromClient[i].holidayId < 0){
+                //    error[i] = { holidayId : 'Invalid holiday id'};
+                //    validationFlag *= false;
+                //}
 
                 if(error[i]){
                     continue;
                 }
-
+                //dataFromClient[i].holidayId = (dataFromClient[i].holidayId) ? dataFromClient[i].holidayId : 0;
                 var queryParams = [
-                    req.db.escape(req.query.token),
-                    req.db.escape(dataFromClient[i].holidayId),
-                    req.db.escape(dateMoment),
+                    req.db.escape(0),
+                    req.db.escape(req.query.masterId),
+                    req.db.escape(dateMoment.format('YYYY-MM-DD')),
                     req.db.escape(dataFromClient[i].title),
-                    req.db.escape(req.db.escape(req.query.masterId))
-                ];
 
-                combSaveQuery += "CALL post_holiday_list_AP("+ queryParams.join(',')+");";
+                ];
+                console.log(queryParams);
+                combSaveQuery += "CALL psaveholidaycalendar_ezeone_ap ("+ queryParams.join(',') +");";
 
             }
 
@@ -654,7 +656,18 @@ ScheduleCtrl.getHolidayTplListOLD = function(req,res,next){
     }
 };
 
-ScheduleCtrl.getHolidayTplList = function(req,res,next){
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description This will fetch all the templates
+ * @accepts json
+ *
+ * @param token <string> token of login user
+ *
+ */
+ScheduleCtrl.getTemplateList = function(req,res,next){
     var response = {
         status : false,
         message : "Your session has expired please login to continue",
@@ -672,8 +685,8 @@ ScheduleCtrl.getHolidayTplList = function(req,res,next){
             if (!err) {
                 if (tokenResult) {
                     /**
-                     * getting holiday template list
-                     * */
+                     * getting list of all template
+                     */
                     var queryParams = req.db.escape(req.query.token);
                     var query = 'CALL Pget_holiday_template_list(' + queryParams + ')';
                     console.log(query);
@@ -684,15 +697,15 @@ ScheduleCtrl.getHolidayTplList = function(req,res,next){
 
                                 response.status = true;
                                 response.data = {
-                                    holidayTplList : results[0]
+                                    templateList : results[0]
                                 };
                                 response.error = null;
-                                response.message = 'Holiday template list loaded successfully';
+                                response.message = 'Template list loaded successfully';
                                 res.status(200).json(response);
 
                             }
                             else {
-                                response.message = 'Holiday template list are not available';
+                                response.message = 'Template list are not available';
                                 res.json(response);
                             }
 
@@ -700,7 +713,7 @@ ScheduleCtrl.getHolidayTplList = function(req,res,next){
                         else {
                             response.data = null;
                             response.message = 'Error in getting Holiday template List';
-                            console.log('Pget_holiday_template_list: Error in getting Holiday template List' + err);
+                            console.log('Pget_holiday_template_list: Error in getting Template List' + err);
                             res.status(500).json(response);
                         }
                     });
@@ -735,7 +748,19 @@ ScheduleCtrl.getHolidayTplList = function(req,res,next){
     }
 };
 
-ScheduleCtrl.getHolidayTplDtl = function(req,res,next){
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description  Load the selected template details
+ * @accepts json
+ *
+ * @param token <string> token of login user
+ * @param templateId <int> tid of template
+ *
+ */
+ScheduleCtrl.getTemplateDetails = function(req,res,next){
     var response = {
         status : false,
         message : "Your session has expired please login to continue",
@@ -753,32 +778,60 @@ ScheduleCtrl.getHolidayTplDtl = function(req,res,next){
             if (!err) {
                 if (tokenResult) {
                     /**
-                     * getting holiday template list
-                     * */
+                     * geting details of template (geting list of holidays and working hours)
+                     * @type {*[]}
+                     */
                     var queryParams = [req.db.escape(req.query.token),req.db.escape(req.query.templateId)];
                     var query = 'CALL ploadholidaytemplate_details_ap(' + queryParams.join(',') + ')';
                     console.log(query);
                     req.db.query(query, function (err, results) {
                         if (!err) {
                             console.log(results);
-                            var workingHrList = [];
-                            if (results && results[0] && results[0].length > 0) {
-                                if (results[1] && results[1].length > 0 ){
-                                    workingHrList = results[1];
+                            if (results && results.length) {
+                                if (results[1]){
+                                    /**
+                                     * converting comma saprated day id's into
+                                     * array of day id's
+                                     */
+                                    for(var i = 0; i < results[1].length; i++){
+                                        results[1][i].days = results[1][i].days.split(',');
+
+                                        for(var j = 0; j < results[1][i].days.length; j++){
+                                            results[1][i].days[j] = parseInt(results[1][i].days[j]);
+                                        }
+                                        /**
+                                         * converting seconds into hours of start time
+                                         * and time of working hours
+                                         */
+
+                                        results[1][i].et = (((parseInt(results[1][i].et) / 60) < 10) ?
+                                            '0'+(parseInt(results[1][i].et / 60)).toString() :
+                                                parseInt(results[1][i].et / 60)) + ':'+
+                                            (((results[1][i].et % 60) < 10) ?
+                                            '0'+(results[1][i].et % 60).toString() :
+                                                parseInt(results[1][i].et % 60));
+
+                                        results[1][i].st = (((parseInt(results[1][i].st) / 60) < 10) ?
+                                            '0'+(parseInt(results[1][i].st / 60)).toString() :
+                                                parseInt(results[1][i].st / 60)) + ':'+
+                                            (((results[1][i].st % 60) < 10) ?
+                                            '0'+(results[1][i].st % 60).toString() :
+                                                parseInt(results[1][i].st % 60));
+                                    }
                                 }
 
                                 response.status = true;
                                 response.data = {
-                                    holidayTplDtl : results[0],
-                                    workingHrList : workingHrList
+                                    holidayList : results[0],
+                                    workingHourList : results[1]
                                 };
                                 response.error = null;
-                                response.message = 'Holiday template details loaded successfully';
+                                response.message = 'Template details loaded successfully';
                                 res.status(200).json(response);
 
                             }
                             else {
-                                response.message = 'Holiday template details are not available';
+                                response.message = 'Template details are not available';
                                 res.json(response);
                             }
 
@@ -786,7 +839,7 @@ ScheduleCtrl.getHolidayTplDtl = function(req,res,next){
                         else {
                             response.data = null;
                             response.message = 'Error in getting Holiday template Details';
-                            console.log('Pploadholidaytemplate_details_ap: Error in getting Holiday template Details' + err);
+                            console.log('Pploadholidaytemplate_details_ap: Error in getting Template Details' + err);
                             res.status(500).json(response);
                         }
                     });
@@ -821,101 +874,266 @@ ScheduleCtrl.getHolidayTplDtl = function(req,res,next){
     }
 };
 
-ScheduleCtrl.saveHolidayTpl = function(req,res,next){
-    var response = {
-        status : false,
-        message : "Your session has expired please login to continue",
-        data : null,
-        error : {
-            token : "Token is expired"
-        }
-    };
-    var error = {};
-    try {
-        var holidayCalendar = (req.body.holidayCalendar) ? req.body.holidayCalendar : [];
-        var workinghours = (req.body.workinghours) ? req.body.workinghours : [];
-        /**
-         * validating token
-         * */
-        req.st.validateTokenAp(req.query.token, function (err, tokenResult) {
-            if (!err) {
-                if (tokenResult) {
-                    /**
-                     * getting holiday template list
-                     * */
-                    var queryParams = [req.db.escape(req.query.token),req.db.escape(req.query.templateId),
-                        req.db.escape(req.query.title)];
-                    var query = 'CALL psaveholiday_template_ap(' + queryParams.join(',') + ')';
-                    console.log(query);
-                    req.db.query(query, function (err, results) {
-                        if (!err) {
-                            console.log(results);
-                            var combSaveQuery = '';
-                            if (results && results[0] && results[0][0] && results[0][0].id) {
+/**
+ * @type : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description  Save template
+ * @accepts json
+ *
+ * @param token <string> token of login user
+ * @param title <string> title of template
+ * @param templateId <int> tid of template (0 for saving)
+ * @param holidayList <array>
+ * @param workingHourList <array>
+ *
+ */
+ScheduleCtrl.saveTemplate = function(req,res,next){
+    console.log(req.body);
+    if(req.is('json')){
+       var response = {
+           status : false,
+           message : "",
+           data : null,
+           error : {
 
-                                for ( var i = 0; i < holidayCalendar.length; i++){
-                                    var queryParams = [
-                                        req.db.escape(req.query.token),
-                                        req.db.escape(holidayCalendar[i].date),
-                                        req.db.escape(holidayCalendar[i].title),
-                                        req.db.escape(results[0][0].id),
-                                    ];
+           }
+       };
+       var error = {};
+        var validationFlag = false;
 
-                                    combSaveQuery += "psaveholidaycalendar_ap("+ queryParams.join(',')+");";
-                                }
+        try {
+            req.body.templateId = (req.body.templateId) ? req.body.templateId : 0;
+           var holidayList = (req.body.holidayList) ? req.body.holidayList : [];
+           var workingHourList = (req.body.workingHourList) ? req.body.workingHourList : [];
+           var excludedIdList = [];
+           /**
+            * validating token
+            * */
+           req.st.validateTokenAp(req.query.token, function (err, tokenResult) {
+               if (!err) {
+                   if (tokenResult) {
+                       /**
+                        * saving template
+                        * */
+                       var queryParams = [req.db.escape(req.query.token),req.db.escape(req.body.templateId),
+                           req.db.escape(req.body.title)];
+                       var query = 'CALL psaveholiday_template_ap(' + queryParams.join(',') + ')';
+                       console.log(query);
+                       req.db.query(query, function (err, results) {
+                           if (!err) {
+                               console.log(results);
+                               var combSaveBigQuery = '';
+                               var combSaveHolidayQuery = '';
+                               var combSaveWorkingHoureQuery = '';
+                               if (results && results[0] && results[0][0] && results[0][0].id) {
+                                   if ( holidayList.length || workingHourList.length){
+                                       /**
+                                        * preparing query statement for saving holiday list
+                                        */
+                                       for ( var j = 0; j < holidayList.length; j++){
+                                           var queryParams = [
+                                               req.db.escape(req.query.token),
+                                               req.db.escape(holidayList[j].date),
+                                               req.db.escape(holidayList[j].title),
+                                               req.db.escape(results[0][0].id),
+                                           ];
 
-                                response.status = true;
-                                response.data = {
-                                    holidayTplDtl : results[0],
-                                    workingHrList : workingHrList
-                                };
-                                response.error = null;
-                                response.message = 'Holiday template details loaded successfully';
-                                res.status(200).json(response);
+                                           combSaveHolidayQuery += "CALL psaveholidaycalendar_ap("+ queryParams.join(',')+");";
+                                       }
 
-                            }
-                            else {
-                                response.message = 'Holiday template details are not available';
-                                res.json(response);
-                            }
+                                       /**
+                                        * preparing query statment for saving working hour list
+                                        */
+                                       for ( var i = 0; i < workingHourList.length; i++){
+                                           var startMoment = moment(workingHourList[i].st,"HH:mm");
+                                           var endMoment = moment(workingHourList[i].et,"HH:mm");
+                                           error[i] = null;
 
-                        }
-                        else {
-                            response.data = null;
-                            response.message = 'Error in getting Holiday template Details';
-                            console.log('Pploadholidaytemplate_details_ap: Error in getting Holiday template Details' + err);
-                            res.status(500).json(response);
-                        }
-                    });
-                }
-                else {
-                    response.message = 'Invalid token';
-                    response.error = {
-                        token: 'Invalid Token'
-                    };
-                    response.data = null;
-                    res.status(401).json(response);
-                    console.log('ploadholidaytemplate_details_ap: Invalid token');
-                }
-            }
-            else {
-                response.error = {
-                    server: 'Internal Server Error'
-                };
-                response.message = 'Error in validating Token';
-                res.status(500).json(response);
-                console.log('ploadholidaytemplate_details_ap:Error in processing Token' + err);
-            }
-        });
-    }
-    catch (ex) {
-        response.error = {};
-        response.message = 'An error occured !';
-        console.log('ploadholidaytemplate_details_ap:error ' + ex);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
-        res.status(400).json(response);
-    }
+                                           /**
+                                            * Validating start time
+                                            */
+                                           if(startMoment){
+                                               if(!startMoment.isValid()){
+                                                   error[i] = { st : 'Invalid time format'};
+                                                   validationFlag *= false;
+                                               }
+                                           }
+                                           else{
+                                               error[i] = { st : 'Invalid time format'};
+                                               validationFlag *= false;
+                                           }
+                                           /**
+                                            * Validating end time
+                                            */
+                                           if(endMoment){
+                                               if(!endMoment.isValid()){
+                                                   error[i] = { et : 'Invalid time format'};
+                                                   validationFlag *= false;
+                                               }
+                                           }
+                                           else{
+                                               error[i] = { et : 'Invalid time format'};
+                                               validationFlag *= false;
+                                           }
+
+                                           /**
+                                            * Validating days
+                                            */
+                                           if(workingHourList[i].days){
+                                               if(workingHourList[i].days.length < 1) {
+                                                   error[i] = {days: 'Days are empty'};
+                                                   validationFlag *= false;
+                                               }
+                                               else{
+
+                                                   for(var j = 0; j < workingHourList[i].days.length; j++){
+                                                       workingHourList[i].days[j] = parseInt(workingHourList[i].days[j]);
+                                                       if(workingHourList[i].days[j] > 6 || workingHourList[i].days[j] < 0 || isNaN(workingHourList[i].days[j])){
+                                                           if(workingHourList[i].days[j] > 6){
+                                                               workingHourList[i].days[j] = workingHourList[i].days[j] % 6;
+                                                           }
+                                                           if(isNaN(workingHourList[i].days[j]) || workingHourList[i].days[j] < 0){
+                                                               workingHourList[i].days.splice(j,1);
+                                                           }
+                                                       }
+                                                   }
+
+                                                   if(!workingHourList[i].days.length){
+                                                       error[i] = { days : 'Days are empty'};
+                                                       validationFlag *= false;
+                                                   }
+                                               }
+                                           }
+                                           else {
+                                               error[i] = { days : 'Days are empty'};
+                                               validationFlag *= false;
+                                           }
+                                           //workingHourList[i].id = parseInt(workingHourList[i].id);
+                                           //if(isNaN(workingHourList[i].id) || workingHourList[i].id < 0){
+                                           //    error[i] = { days : 'Invalid slot id'};
+                                           //    validationFlag *= false;
+                                           //}
+
+                                           if(error[i]){
+                                               continue;
+                                           }
+
+                                           //if(workingHourList[i].id){
+                                           //    excludedIdList.push(workingHourList[i].id);
+                                           //}
+                                           /**
+                                            * converting stat time and end time hours in minuts
+                                            * @type {*[]}
+                                            */
+                                           var queryParams = [
+                                               req.db.escape(req.query.token),
+                                               req.db.escape(workingHourList[i].days.join(',')),
+                                               req.db.escape((startMoment.hours() * 60)+startMoment.minutes()),
+                                               req.db.escape((endMoment.hours() * 60)+endMoment.minutes()),
+                                               req.db.escape(results[0][0].id)
+                                           ];
+
+                                           combSaveWorkingHoureQuery += "CALL PSaveworkinghourstemplatedetails_ap("+ queryParams.join(',')+");";
+
+                                       }
+                                       /**
+                                        * combining holiday list query and working hour query and exicuting
+                                        * @type {string}
+                                        */
+                                       combSaveBigQuery = combSaveHolidayQuery + combSaveWorkingHoureQuery;
+                                       console.log("combSaveWorkingHoureQuery",combSaveWorkingHoureQuery);
+                                       console.log("combSaveHolidayQuery",combSaveHolidayQuery);
+                                       console.log(combSaveBigQuery);
+                                       req.db.query(combSaveBigQuery, function (err, templateResults) {
+
+                                           if(!err){
+                                               console.log(templateResults);
+                                               if (templateResults){
+                                                   response.status = true;
+                                                   response.data = {
+                                                       templateId : results[0][0].id
+                                                   };
+                                                   response.error = null;
+                                                   response.message = 'Template saved successfully';
+                                                   res.status(200).json(response);
+                                               }
+                                               else {
+                                                   response.message = 'Error while saving holiday list or working hour list';
+                                                   res.json(response);
+                                               }
+                                           }
+                                           else {
+                                               response.message = 'Error while saving holiday list or working hour list';
+                                               res.json(response);
+                                           }
+
+                                       });
+                                   }
+                                   else {
+                                       response.status = true;
+                                       response.data = {
+                                           templateId : results[0][0].id
+                                       };
+                                       response.error = null;
+                                       response.message = 'Template saved successfully';
+                                       res.status(200).json(response);
+                                   }
+                               }
+                               else {
+                                   response.message = 'Holiday template details are not available';
+                                   res.json(response);
+                               }
+
+                           }
+                           else {
+                               response.data = null;
+                               response.message = 'Error in getting Holiday template Details';
+                               console.log('Pploadholidaytemplate_details_ap: Error in getting Holiday template Details' + err);
+                               res.status(500).json(response);
+                           }
+                       });
+                   }
+                   else {
+                       response.message = 'Invalid token';
+                       response.error = {
+                           token: 'Invalid Token'
+                       };
+                       response.data = null;
+                       res.status(401).json(response);
+                       console.log('ploadholidaytemplate_details_ap: Invalid token');
+                   }
+               }
+               else {
+                   response.error = {
+                       server: 'Internal Server Error'
+                   };
+                   response.message = 'Error in validating Token';
+                   res.status(500).json(response);
+                   console.log('ploadholidaytemplate_details_ap:Error in processing Token' + err);
+               }
+           });
+       }
+       catch (ex) {
+           response.error = {};
+           response.message = 'An error occured !';
+           console.log('ploadholidaytemplate_details_ap:error ' + ex);
+           var errorDate = new Date();
+           console.log(errorDate.toTimeString() + ' ......... error ...........');
+           res.status(400).json(response);
+       }
+   }
+    else {
+       res.status(400).json({
+           status: false,
+           message : 'Incompatible data type (JSON only supported)',
+           data : null,
+           error : {
+               server : 'Incompatible data type'
+           }
+       });
+   }
 };
 
 
