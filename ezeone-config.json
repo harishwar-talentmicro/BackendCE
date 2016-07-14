@@ -10,7 +10,7 @@
     "STATIC_URL": "/",
     "STORAGE_BUCKET":"ezeone",
     "GS_URL":"https://storage.googleapis.com/",
-    "ANDROID_AP_VERSION_CODE":3,
+    "ANDROID_AP_VERSION_CODE":4,
     "ANDROID_CRASH_REPORT_DIR" : "crash_report",
     "EZEONE_CRASH_REPORT_DIR" : "ezeone_crash_report",
     "EZEONE_MAILING_LIST" : [
@@ -24,7 +24,7 @@
     ],
     "EZEONE_MESSAGE_ACCEPT_STATUS":1,
     "EZEONE_MESSAGE_REJECT_STATUS":2,
-    "EZEONE_MESSAGE_LEAVE_STATUS":3,
+    "EZEONE_MESSAGE_LEAVE_STATUS": 3,
     "EZEONE_MESSAGE_REMOVE_STATUS":4,
     "API_URL" : "http://104.199.128.226:3001/api/"
   },

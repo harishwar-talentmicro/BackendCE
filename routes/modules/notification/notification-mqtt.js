@@ -58,7 +58,7 @@ createConnection();
 
 var counter  = 0;
 function publishMessage(channel){
-    setImmediate(function() {
+    setTimeout(function() {
         if (messageList.length) {
             var msgObj = messageList.shift();
             try{
@@ -74,7 +74,7 @@ function publishMessage(channel){
             }
         }
         publishMessage(channel);
-    });
+    },500);
 }
 
 

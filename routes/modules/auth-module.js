@@ -891,6 +891,8 @@ Auth.prototype.login = function(req,res,next){
             else{
                 responseMessage.versionStatus = (req.CONFIG.VERSION_LIST.IOS.length ==
                 (req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+                responseMessage.versionMessage = (responseMessage.versionStatus)
+                    ? "New update available. Please update your application to latest version" : responseMessage.versionMessage;
             }
             break;
         case 'android':
@@ -906,6 +908,9 @@ Auth.prototype.login = function(req,res,next){
             else{
                 responseMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
                 (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+                responseMessage.versionMessage = (responseMessage.versionStatus)
+                    ? "New update available. Please update your application to latest version" : responseMessage.versionMessage;
+
             }
             break;
         case 'web':
@@ -921,6 +926,8 @@ Auth.prototype.login = function(req,res,next){
             else{
                 responseMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
                 (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+                responseMessage.versionMessage = (responseMessage.versionStatus)
+                    ? "New update available. Please update your application to latest version" : responseMessage.versionMessage;
             }
             break;
         default:

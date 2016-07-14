@@ -249,6 +249,9 @@ RegisterCtrl.register = function(req,res,next){
                                     req.db.query(query1, function (err, updateResult) {
                                         if (!err) {
                                             console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
+                                            /**
+                                             * to save working hour at the time of registration calling api usig request
+                                             */
                                             request({
                                                     method: 'POST',
                                                     uri: req.CONFIG.CONSTANT.API_URL + 'v1.1/area_partner/listing/schedule/working_hours?token='+req.query.token+'&masterId='+registerResult[0][0].TID,
@@ -257,6 +260,10 @@ RegisterCtrl.register = function(req,res,next){
                                                 function (error, response, body) {
                                                     if (!error) {
                                                         if (holidayList.length){
+                                                            /**
+                                                             * to save holiday list at the time of registration calling api usig request
+                                                             * if holiday list will come
+                                                             */
                                                             request({
                                                                     method: 'POST',
                                                                     uri: req.CONFIG.CONSTANT.API_URL +'v1.1/area_partner/listing/schedule/holiday_list?token='+req.query.token+'&masterId='+registerResult[0][0].TID,
