@@ -260,7 +260,7 @@ ScheduleCtrl.saveWorkingHours = function(req,res,next){
                     req.db.escape(dataFromClient[i].days.join(',')),
                     req.db.escape((startMoment.hours() * 60)+startMoment.minutes()),
                     req.db.escape((endMoment.hours() * 60)+endMoment.minutes()),
-                    req.db.escape(req.db.escape(req.query.masterId))
+                    req.db.escape(req.query.masterId)
                 ];
 
                 combSaveQuery += "CALL post_working_hour_AP("+ queryParams.join(',')+");";
