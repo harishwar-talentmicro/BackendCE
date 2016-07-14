@@ -87,10 +87,12 @@ QuickResumeCtrl.getResumeDetail = function(req,res,next){
 
 
 /**
+ * Getting all options of fields related to resume which user will get at the time of saving resume
  * @method GET
  * @param req
  * @param res
  * @param next
+ * @service-param q {string)
  *
  */
 QuickResumeCtrl.getMasterDetail = function(req,res,next){

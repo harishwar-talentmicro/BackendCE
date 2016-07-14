@@ -33,6 +33,8 @@ EzeoneAttrbt.prototype.signUpData = function(req,res,next){
             else{
                 rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.IOS.length ==
                 (req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+                rtnMessage.versionMessage = (rtnMessage.versionStatus)
+                    ? "New update available. Please update your application to latest version" : rtnMessage.versionMessage;
             }
             break;
         case 'android':
@@ -48,6 +50,8 @@ EzeoneAttrbt.prototype.signUpData = function(req,res,next){
             else{
                 rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
                 (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+                rtnMessage.versionMessage = (rtnMessage.versionStatus)
+                    ? "New update available. Please update your application to latest version" : rtnMessage.versionMessage;
             }
             break;
         case 'web':
@@ -63,6 +67,8 @@ EzeoneAttrbt.prototype.signUpData = function(req,res,next){
             else{
                 rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
                 (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+                rtnMessage.versionMessage = (rtnMessage.versionStatus)
+                    ? "New update available. Please update your application to latest version" : rtnMessage.versionMessage;
             }
             break;
         default:
