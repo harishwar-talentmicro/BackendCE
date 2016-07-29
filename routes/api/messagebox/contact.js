@@ -216,12 +216,22 @@ router.get('/', function(req,res,next){
                                             /**
                                              * assign all values of group id in a variable
                                              * */
+
+
+
+                                            contactResults[0][i].thumbnailImage = (contactResults[0][i].groupType == 1) ?
+                                                ((contactResults[0][i].thumbnailImage) ?
+                                                req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(contactResults[0][i].thumbnailImage) : '') :
+                                                req.CONFIG.CONSTANT.GROUP_ICON_URL;
+                                            console.log('contactResults[0][i].thumbnailImage',contactResults[0][i].thumbnailImage);
                                             groupId = contactResults[0][i].groupId;
                                             for (var j = 0; j < countResults[0].length; j++) {
                                                 /**
                                                  * compare both group id getting from both proc if equal then push unreadcount to first results
                                                  * only in web condition
                                                  * */
+
+
                                                 if (groupId == countResults[0][j].groupID) {
                                                     //console.log(countResults[0][j].groupID,"countResults[0][j].groupID");
                                                     contactResults[0][i].unreadCount = countResults[0][j].count;
@@ -238,6 +248,14 @@ router.get('/', function(req,res,next){
                                         res.status(200).json(responseMessage);
                                     }
                                     else{
+
+                                        for(var i = 0; i < contactResults[0].length; i++){
+                                            contactResults[0][i].thumbnailImage = (contactResults[0][i].groupType == 1) ?
+                                                ((contactResults[0][i].thumbnailImage) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(contactResults[0][i].thumbnailImage) : '') :
+                                                req.CONFIG.CONSTANT.GROUP_ICON_URL;
+                                            console.log('contactResults[0][i].thumbnailImage',contactResults[0][i].thumbnailImage);
+                                        }
+
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Contact list loaded successfully';

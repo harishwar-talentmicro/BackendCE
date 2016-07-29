@@ -13,6 +13,7 @@
     "ANDROID_AP_VERSION_CODE":4,
     "ANDROID_CRASH_REPORT_DIR" : "crash_report",
     "EZEONE_CRASH_REPORT_DIR" : "ezeone_crash_report",
+    "GROUP_ICON_URL" : "http://icons.iconarchive.com/icons/blackvariant/button-ui-system-folders-alt/512/Group-icon.png",
     "EZEONE_MAILING_LIST" : [
       "jain31192@gmail.com",
       "indrajeetnagda@gmail.com",
@@ -55,7 +56,7 @@
     "VHOST" : "%2f"
   },
   "VERSION_LIST" : {
-    "IOS" : [16],
+    "IOS" : [16,17],
     "ANDROID" : [36],
     "WEB" : [1]
   },

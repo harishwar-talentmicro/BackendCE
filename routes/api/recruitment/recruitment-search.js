@@ -171,7 +171,7 @@ router.post('/job_seeker',function(req,res,next){
 
     var skillKeywordsQueryParts = [];
     if(skillKeywordsList.length){
-        skillKeywordsQueryParts.push(" MATCH (tcv.KeySkills) AGAINST ("+ req.db.escape(skillKeywordsList.join(' ')) + "  IN BOOLEAN MODE ) ");
+        skillKeywordsQueryParts.push(" MATCH (tcv.KeySkills,tcv.lockeywords,tcv.searchFields) AGAINST ("+ req.db.escape(skillKeywordsList.join(' ')) + "  IN BOOLEAN MODE ) ");
     }
     //var skillKeywords = "";
     var start = req.body.page_count;
@@ -284,6 +284,23 @@ router.post('/job_seeker',function(req,res,next){
     else {
         filterQuery = " AND FIND_IN_SET(tcv.tid,ifnull((SELECT GROUP_CONCAT(cvid) FROM tapplicant_hidden WHERE masterid=" + '@masterid' + "),''))";
         status = ","+ 0 + " as status";
+    }
+
+    /**
+     * checking condition for notice period, rating and marital status
+     */
+    var noticePeriodQuery = '';
+    var ratingQuery = '';
+    var maritalStatusQuery = '';
+
+    if (parseInt(req.body.noticePeriod) != 0){
+        noticePeriodQuery = '';
+    }
+    if (parseInt(req.body.rating) != 0){
+        ratingQuery = '';
+    }
+    if (parseInt(req.body.maritalStatus) != 0){
+        maritalStatusQuery = '';
     }
 
     /**

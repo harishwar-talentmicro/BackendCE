@@ -772,16 +772,15 @@ Auth.prototype.login = function(req,res,next){
 
             var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code)+ ',' + st.db.escape(token);
             var query = 'CALL PLoginNew(' + queryParams + ')';
+            console.log('query',query);
             st.db.query(query, function (err, loginResult) {
-                //console.log(loginResult);
+                console.log(loginResult);
                 if (!err) {
                     if(loginResult && password) {
+                        //console.log('loginDetails',loginDetails);
                         if (loginResult[0]) {
                             if (loginResult[0].length > 0) {
-
                                 var loginDetails = loginResult[0];
-                                //console.log(loginDetails);
-
                                 if (!token) {
                                     console.log('compare password..');
                                     if (comparePassword(password, loginDetails[0].Password)) {
