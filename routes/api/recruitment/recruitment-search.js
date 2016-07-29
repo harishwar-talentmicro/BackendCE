@@ -244,7 +244,6 @@ router.post('/job_seeker',function(req,res,next){
         if (locMatrix.length > 0){
             for ( var k = 0; k < locMatrix.length; k++){
                 var locSkills = {
-
                     locIds: locMatrix[k].career_id ? locMatrix[k].career_id.toString() : '',
                     exp_from: locMatrix[k].exp_from ? locMatrix[k].exp_from.toString() : 0,
                     exp_to: locMatrix[k].exp_to ? locMatrix[k].exp_to.toString() : 50,
@@ -257,7 +256,7 @@ router.post('/job_seeker',function(req,res,next){
                 ' AND loc.Exp>=' + req.db.escape(locSkills.exp_from) + ' AND loc.Exp<=' + req.db.escape(locSkills.exp_to) +
                 ' AND loc.Score >=' + req.db.escape(locSkills.scoreFrom) + ' AND loc.Score <=' + req.db.escape(locSkills.scoreTo) + ')');
             }
-            locdata += (locMatrixArray.length) ? " AND ( "+ locMatrixArray.join(" OR ") +") " : "";
+            locdata += (locMatrixArray.length) ? " AND ( "+ locMatrixArray.join(" OR ") +")" : "";
             locjoin = ' LEFT OUTER JOIN tcv_loc loc ON loc.cvid=tcv.tid ';
         }
     }
