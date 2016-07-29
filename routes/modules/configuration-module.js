@@ -392,45 +392,7 @@ Configuration.prototype.get = function(req,res,next){
  * @param next
  */
 Configuration.prototype.getBusinessCategories = function(req,res,next){
-    /**
-     * @todo FnGetCategory
-     */
-    try {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var LangID = parseInt(req.query.LangID);
-        if (!isNaN(LangID)) {
-            var query = 'Select CategoryID, CategoryTitle from mcategory where LangID=' + st.db.escape(LangID);
-            st.db.query(query, function (err, categoryResult) {
-                if (!err) {
-                    if (categoryResult) {
-                        res.send(categoryResult);
-                        console.log('FnGetCategory: mcategory: Category sent successfully');
-                    }
-                    else {
-                        res.json(null);
-                        console.log('FnGetCategory: mcategory: No category found');
-                    }
-                }
-                else {
-                    res.json(null);
-                    res.statusCode = 500;
-                    console.log('FnGetCategory: mcategory: ' + err);
-                }
-            });
-        }
-        else {
-            res.json(null);
-            res.statusCode = 400;
-            console.log('FnGetCategory: LangId is empty');
-        }
-    }
-    catch (ex) {
-        console.log('FnCategory error:' + ex);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
-    }
 };
 
 /**

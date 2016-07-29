@@ -18,7 +18,7 @@ var quickResumeCtrl = require('./quick-resume-ctrl');
 router.get('/resume_detail/:userId',quickResumeCtrl.getResumeDetail);
 
 router.get('/resume_detail',quickResumeCtrl.searchCandidate);
-router.get('/master',quickResumeCtrl.getMasterDetail);
+//router.get('/master',quickResumeCtrl.getMasterDetail);
 
 
 /**

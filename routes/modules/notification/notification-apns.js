@@ -15,7 +15,6 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos){
 
     var myPhone =  iphoneId;
 
-
     try{
         var myDevice = new apn.Device(myPhone);
 
@@ -28,6 +27,7 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos){
             note.sound = "notification-beep.wav";
         }
 
+        note['content-available'] = 1;
         note.badge = 1;
         //note.sound = "notification-beep.wav";
         note.alert = { "body" : payload.g_title +' : ' +payload.message, "action-loc-key" : "Play" ,
@@ -37,6 +37,8 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos){
         note.payload = payload;
 
         note.device = myDevice;
+
+
 
         var callback = function(errorNum, notification){
             console.log('Error is: %s', errorNum);
@@ -48,8 +50,8 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos){
             //gateway: 'gateway.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
             gateway : (CONFIG.APNS.GATEWAY) ? CONFIG.APNS.GATEWAY : 'gateway.sandbox.push.apple.com',
             errorCallback: callback,
-            cert: 'cert.pem',
-            key:  'key.pem',
+            cert: (CONFIG.CONSTANT.DEBUG) ?  'cert.pem' : 'apple_cert.pem',
+            key:  (CONFIG.CONSTANT.DEBUG) ?  'key.pem' : 'apple_key.pem',
             passphrase: (CONFIG.APNS.PASSPHRASE) ? CONFIG.APNS.PASSPHRASE : 'hire@123',
             port: (CONFIG.APNS.PORT) ? CONFIG.APNS.PORT : 2195,
             enhanced: true,

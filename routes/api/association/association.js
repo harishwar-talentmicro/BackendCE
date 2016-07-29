@@ -372,7 +372,6 @@ router.put('/status', function(req,res,next){
     }
 });
 
-
 /**
  * Method : GET
  * @param req

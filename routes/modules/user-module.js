@@ -2244,7 +2244,6 @@ User.prototype.saveResume = function(req,res,next){
                                             }
                                         }
                                     }
-
                                     RtnMessage.IsSuccessfull = true;
                                     RtnMessage.id = InsertResult[0][0].ID;
                                     console.log('FnSaveCVInfo: CV Info Saved successfully');
@@ -2646,6 +2645,7 @@ User.prototype.getDoc = function(req,res,next) {
 
     }
 };
+
 /**
  * Method : GET
  * @param req
@@ -2739,6 +2739,7 @@ User.prototype.getDocument = function(req,res,next) {
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
+
 /**
  * Method : POST
  * @param req
@@ -3378,49 +3379,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
  * @param next
  */
 User.prototype.getMTitle = function(req,res,next) {
-    /**
-     * @todo FnGetMTitle
-     */
 
-    try {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var LangID = parseInt(req.query.LangID);
-
-        if (!(isNaN(LangID))) {
-            var Query = 'Select TitleID,Title from mtitle where LangID=' + st.db.escape(LangID);
-            st.db.query(Query, function (err, MTitleResult) {
-                if (!err) {
-                        if (MTitleResult) {
-                            res.send(MTitleResult);
-                            console.log('FnGetMTitle: mtitle: MTitle sent successfully');
-                        }
-                        else {
-                            res.json(null);
-                            console.log('FnGetMTitle: mtitle: No MTitle found');
-                        }
-                }
-                else {
-                    res.json(null);
-                    res.statusCode = 500;
-                    console.log('FnGetMTitle: mtitle: ' + err);
-                }
-            });
-        }
-        else {
-
-            console.log('FnGetMTitle: LangId is empty');
-            res.statusCode = 400;
-            res.json(null);
-        }
-    }
-    catch (ex) {
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnGetMTitle error:' + ex);
-
-    }
 };
 
 /**
