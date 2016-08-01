@@ -437,14 +437,14 @@ User.prototype.getUserDetails = function(req,res,next){
 
                 rtnMessage.versionStatus = 1;
                 rtnMessage.versionMessage = "New update available. Please update your application to latest version";
-                res.send([rtnMessage]);
-                return;
+                //res.send([rtnMessage]);
+                //return;
             }
             else{
-                rtnMessage.versionStatus = 1;
+                rtnMessage.versionStatus = 0;
                 rtnMessage.versionMessage = "Applications is up to date";
-                res.send([rtnMessage]);
-                return;
+                //res.send([rtnMessage]);
+                //return;
             }
             break;
         case 'android':
@@ -820,14 +820,14 @@ User.prototype.forgetPassword = function(req,res,next){
 
                     RtnMessage.versionStatus = 1;
                     RtnMessage.versionMessage = "New update available. Please update your application to latest version";
-                    res.send(RtnMessage);
-                    return;
+                    //res.send(RtnMessage);
+                    //return;
                 }
                 else{
                     RtnMessage.versionStatus = 0;
                     RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-                    res.send(RtnMessage);
-                    return;
+                    //res.send(RtnMessage);
+                    //return;
                 }
                 break;
             case 'android':

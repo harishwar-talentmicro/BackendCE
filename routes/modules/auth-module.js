@@ -720,13 +720,13 @@ Auth.prototype.login = function(req,res,next){
             else if(req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1){
                 responseMessage.versionStatus = 1;
                 responseMessage.versionMessage = "New update available. Please update your application to latest version";
-                res.send(responseMessage);
-                return;
+                //res.send(responseMessage);
+                //return;
             }
             else{
                 responseMessage.versionStatus = 0;
                 responseMessage.versionMessage = "Applications is up to date";
-                res.send(responseMessage);
+                //res.send(responseMessage);
             }
             break;
         case 'android':
