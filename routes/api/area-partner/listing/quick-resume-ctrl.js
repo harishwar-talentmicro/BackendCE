@@ -528,12 +528,12 @@ QuickResumeCtrl.saveResumeDetail = function(req,res,next){
                      */
                     data.experience = (data.experience) ? data.experience : 0.00;
                     data.dateOfBirth = (data.dateOfBirth) ? data.dateOfBirth : null;
-                    //data.gender = (data.gender) ? data.gender : 2;
-                    //data.maritalStatus = (data.maritalStatus) ? data.maritalStatus : 1;
+                    data.gender = (data.gender) ? data.gender : 0;
+                    data.maritalStatus = (data.maritalStatus) ? data.maritalStatus : 0;
                     data.address = (data.address) ? data.address : '';
                     data.latitude = (data.latitude) ? data.latitude : null;
                     data.longitude = (data.longitude) ? data.longitude : null;
-                    //data.rating = (data.rating) ? data.rating : 1;
+                    data.rating = (data.rating) ? data.rating : 0;
                     data.presentSalary = (data.presentSalary) ? data.presentSalary : 0;
                     data.presentSalaryType = (data.presentSalaryType) ? data.presentSalaryType : 0;
                     data.expectedSalary = (data.expectedSalary) ? data.expectedSalary : 0;
