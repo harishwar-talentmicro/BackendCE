@@ -259,7 +259,6 @@ router.post('/cv_generate',function(req,res,next){
                     }
 
 
-
                     //var pdfClient = new PDFClient(req.CONFIG);
                     //pdfClient.convertToPdf(buf,function(err,pdfBuffer){
                     //    if(err){
