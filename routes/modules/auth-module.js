@@ -711,17 +711,22 @@ Auth.prototype.login = function(req,res,next){
             /**
              * If IOS version is not supported
              */
-            if(req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) == -1){
+            if(req.CONFIG.VERSION_LIST.IOS[0].indexOf(parseInt(req.query.versionCode)) == -1 && req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1 ){
                 responseMessage.versionStatus = 2;
                 responseMessage.versionMessage = "Please update your application to latest version to continue using it";
                 res.send(responseMessage);
                 return;
             }
+            else if(req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1){
+                responseMessage.versionStatus = 1;
+                responseMessage.versionMessage = "New update available. Please update your application to latest version";
+                res.send(responseMessage);
+                return;
+            }
             else{
-                responseMessage.versionStatus = (req.CONFIG.VERSION_LIST.IOS.length ==
-                (req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
-                responseMessage.versionMessage = (responseMessage.versionStatus)
-                    ? "New update available. Please update your application to latest version" : responseMessage.versionMessage;
+                responseMessage.versionStatus = 0;
+                responseMessage.versionMessage = "Applications is up to date";
+                res.send(responseMessage);
             }
             break;
         case 'android':

@@ -427,18 +427,24 @@ User.prototype.getUserDetails = function(req,res,next){
             /**
              * If IOS version is not supported
              */
-            if(req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) == -1){
+            if(req.CONFIG.VERSION_LIST.IOS[0].indexOf(parseInt(req.query.versionCode)) == -1 && req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1 ){
                 rtnMessage.versionStatus = 2;
                 rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
                 res.send([rtnMessage]);
                 return;
             }
-            else{
-                rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.IOS.length ==
-                (req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+            else if(req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1){
 
-                rtnMessage.versionMessage = (rtnMessage.versionStatus)
-                    ? "New update available. Please update your application to latest version" : rtnMessage.versionMessage;
+                rtnMessage.versionStatus = 1;
+                rtnMessage.versionMessage = "New update available. Please update your application to latest version";
+                res.send([rtnMessage]);
+                return;
+            }
+            else{
+                rtnMessage.versionStatus = 1;
+                rtnMessage.versionMessage = "Applications is up to date";
+                res.send([rtnMessage]);
+                return;
             }
             break;
         case 'android':
@@ -799,21 +805,29 @@ User.prototype.forgetPassword = function(req,res,next){
 
 
         switch(req.platform){
+
             case 'ios':
                 /**
                  * If IOS version is not supported
                  */
-                if(req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) == -1){
+                if(req.CONFIG.VERSION_LIST.IOS[0].indexOf(parseInt(req.query.versionCode)) == -1 && req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1 ){
                     RtnMessage.versionStatus = 2;
                     RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
                     res.send(RtnMessage);
                     return;
                 }
+                else if(req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1){
+
+                    RtnMessage.versionStatus = 1;
+                    RtnMessage.versionMessage = "New update available. Please update your application to latest version";
+                    res.send(RtnMessage);
+                    return;
+                }
                 else{
-                    RtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.IOS.length ==
-                    (req.CONFIG.VERSION_LIST.IOS.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
-                    RtnMessage.versionMessage = (RtnMessage.versionStatus)
-                        ? "New update available. Please update your application to latest version" : RtnMessage.versionMessage;
+                    RtnMessage.versionStatus = 0;
+                    RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+                    res.send(RtnMessage);
+                    return;
                 }
                 break;
             case 'android':
