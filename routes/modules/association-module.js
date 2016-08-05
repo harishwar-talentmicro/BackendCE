@@ -364,6 +364,7 @@ Association.prototype.associSaveComments = function(req,res,next){
  * @param next
  * @description api code for get services
  */
+
 Association.prototype.getAsscociationServices = function(req,res,next){
 
     var token = req.query.token;
