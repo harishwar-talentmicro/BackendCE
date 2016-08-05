@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 
-
 /**
  * Method : GET
  * @param req
@@ -159,7 +158,7 @@ router.get('/institute',function(req,res,next){
 });
 
 
-router.post('/job_seeker',function(req,res,next){
+router.post('/job_seeker_old',function(req,res,next){
 
     //var token = "1e505ef5-f1ab-11e5-9ed2-42010af0ea4e";
     var token = req.body.token;
@@ -167,12 +166,13 @@ router.post('/job_seeker',function(req,res,next){
 // 2 means ezeone db
 //    var source = "1";
     var source = (req.body.source) ? req.body.source : "1,2";
-    var skillKeywordsList = (req.body.skillKeywords) ? req.body.skillKeywords.split(',') : [];
+    var skillKeywordsList = (req.body.skillKeywords) ?  req.body.skillKeywords.split(',') : [];
 
     var skillKeywordsQueryParts = [];
     if(skillKeywordsList.length){
-        skillKeywordsQueryParts.push(" MATCH (tcv.KeySkills,tcv.lockeywords,tcv.searchFields) AGAINST ("+ req.db.escape(skillKeywordsList.join(' ')) + "  IN BOOLEAN MODE ) ");
+        skillKeywordsQueryParts.push(" MATCH (tcv.KeySkills,tcv.lockeywords,tcv.searchFields) AGAINST (" +  req.db.escape(skillKeywordsList.join(' +')) + "  IN BOOLEAN MODE ) ");
     }
+    console.log("--------skillKeywordsQueryParts=---------------",skillKeywordsQueryParts);
     //var skillKeywords = "";
     var start = req.body.page_count;
     var limit = req.body.page_size;
@@ -192,6 +192,9 @@ router.post('/job_seeker',function(req,res,next){
     var locMatrixArray = [];
     var locdata = '';
     var locjoin = '';
+    var langMatrixArray = [];
+    var langdata = '';
+    var langjoin = '';
 
     if(req.body.experience_from && req.body.experience_to){
         expQuery = " AND tcv.Exp>=" + req.db.escape(req.body.experience_from) + "AND tcv.Exp <= " + req.db.escape(req.body.experience_to);
@@ -260,7 +263,25 @@ router.post('/job_seeker',function(req,res,next){
             locjoin = ' LEFT OUTER JOIN tcv_loc loc ON loc.cvid=tcv.tid ';
         }
     }
-
+    /**
+     * preparing query for Languages
+     */
+    var languageMatrix = req.body.languageMatrix;
+    if (languageMatrix){
+        if (languageMatrix.length > 0){
+            for ( var m = 0; m < languageMatrix.length; m++){
+                var langParam = {
+                    langId: languageMatrix[m].languageId ? languageMatrix[m].languageId.toString() : '',
+                    readLevel: languageMatrix[m].readLevel ? languageMatrix[m].readLevel.toString() : '',
+                    writeLevel: languageMatrix[m].writeLevel ? languageMatrix[m].writeLevel.toString() : ''
+                };
+                langMatrixArray.push(' lang.langid=' + req.db.escape(langParam.langId)  +
+                    ' AND lang.level=' + req.db.escape(langParam.readLevel) + ' AND lang.writeLevel=' + req.db.escape(langParam.writeLevel));
+            }
+            langdata += (langMatrixArray.length) ? " AND ( "+ langMatrixArray.join(" OR ") +")" : "";
+            langjoin = ' LEFT OUTER JOIN tcv_language lang ON lang.cvid=tcv.tid ';
+        }
+    }
     /**
      * checking condition for status (hidden or visible)
      */
@@ -270,7 +291,7 @@ router.post('/job_seeker',function(req,res,next){
     var filterQuery1='';
 
     var masterID = "SET @masterid = (SELECT masterid FROM tloginout WHERE token =" +req.db.escape(token)+");";
-    console.log("req.body.filter_type",req.body.filter_type);
+
     if (parseInt(req.body.filter_type) == 0){
         filterQuery = " AND NOT FIND_IN_SET(tcv.tid,ifnull((SELECT GROUP_CONCAT(cvid) FROM tapplicant_hidden WHERE masterid=" + '@masterid' + "),''))";
         status = "," + 1 +" as status";
@@ -291,21 +312,31 @@ router.post('/job_seeker',function(req,res,next){
     var noticePeriodQuery = '';
     var ratingQuery = '';
     var maritalStatusQuery = '';
+    var masterJoin = '';
 
-    if (parseInt(req.body.noticePeriod) != 0){
-        noticePeriodQuery = '';
+    if (parseInt(req.body.noticePeriodTo) != 0){
+        noticePeriodQuery = ' and tcv.noticeperiod>='+req.db.escape(req.body.noticePeriodFrom) +' and tcv.noticeperiod<='+
+            req.db.escape(req.body.noticePeriodTo);
     }
     if (parseInt(req.body.rating) != 0){
-        ratingQuery = '';
+        masterJoin  = ' JOIN tmaster m ON m.tid=tcv.masterid ';
+        ratingQuery = ' and find_in_set(m.Rating,'+ req.db.escape(req.body.rating)+')';
     }
+
+
+
     if (parseInt(req.body.maritalStatus) != 0){
-        maritalStatusQuery = '';
+        if (masterJoin == ''){
+            masterJoin = ' JOIN tmaster m ON m.tid=tcv.masterid ';
+        }
+        maritalStatusQuery = ' and find_in_set(m.maritalStatus,'+ req.db.escape(req.body.maritalStatus)+')';
     }
 
     /**
      * concatenating all above prepared query
      */
-    var subQuery = expQuery + salQuery + instituteQuery + eduMatrix + locdata + filterQuery;
+    var subQuery = expQuery + salQuery + instituteQuery + eduMatrix + locdata + filterQuery + ratingQuery
+        + maritalStatusQuery + noticePeriodQuery + langdata;
     //console.log("subQuery",subQuery);
 
 
@@ -316,6 +347,8 @@ router.post('/job_seeker',function(req,res,next){
         "SET @user_ids = (SELECT get_account_users("+req.db.escape(token)+"));";
     jobSeekerQuery+=masterID;
 
+    console.log('ratingQuery',ratingQuery);
+
     if(source){
         switch (source){
             case "1,2" :
@@ -325,7 +358,8 @@ router.post('/job_seeker',function(req,res,next){
                      tcv.OID,tcv.MasterID, \
                      CONCAT(tcv.firstname,' ',tcv.lastName) AS Name,\
                 tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                tcv.KeySkills, tcv.mobile_no, IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +
+                tcv.KeySkills, tcv.mobile_no, IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc " + status + " FROM tcv AS tcv "
+                    + edujoin + locjoin + filterQuery1 + masterJoin + langjoin
                     "   WHERE  FIND_IN_SET(tcv.OID,@user_ids) and tcv.Status=1 AND tcv.jobid = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
                 jobSeekerQuery+=subQuery   ;
@@ -336,14 +370,15 @@ router.post('/job_seeker',function(req,res,next){
                 tcv.OID,tcv.MasterID,\
                     (SELECT CONCAT(FirstName,' ',LastName) FROM tmaster WHERE tmaster.TID = tcv.MasterID) AS Name, \
                     tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                    tcv.KeySkills, tcv.mobile_no,IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +"  \
+                    tcv.KeySkills, tcv.mobile_no,IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc " + status + " FROM tcv AS tcv "
+                    + edujoin + locjoin + filterQuery1 + masterJoin + langjoin +"  \
                     WHERE tcv.MasterID > 0 and tcv.Status=1 and tcv.jobid=0 AND OID = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") "  : "";
-                jobSeekerQuery+=subQuery ;
+                jobSeekerQuery +=subQuery ;
 
                 jobSeekerQuery +=    " ORDER BY cvid DESC )  data  LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+" ;"
 
-                jobSeekerQuery+=" select FOUND_ROWS() as count; ";
+                jobSeekerQuery +=" select FOUND_ROWS() as count; ";
 
                 //var countQuery = "SELECT COUNT(*) AS count FROM (SELECT TID FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)" + source1GenderQuery ;
                 //countQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
@@ -368,10 +403,10 @@ router.post('/job_seeker',function(req,res,next){
                      CONCAT(tcv.firstname,' ',tcv.lastName) AS Name,\
                 tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
                 tcv.KeySkills, tcv.mobile_no, IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc "
-                    + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +
+                    + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1  + masterJoin + langjoin
                     "   WHERE  FIND_IN_SET(tcv.OID,@user_ids) and tcv.Status=1 AND tcv.jobid = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
-                jobSeekerQuery+=subQuery   ;
+                jobSeekerQuery +=subQuery   ;
                 jobSeekerQuery +=
                     " UNION " +
                     " SELECT tcv.TID AS cvid,(SELECT GROUP_CONCAT(Locname) FROM mjobloc WHERE \
@@ -380,14 +415,14 @@ router.post('/job_seeker',function(req,res,next){
                     (SELECT CONCAT(FirstName,' ',LastName) FROM tmaster WHERE tmaster.TID = tcv.MasterID) AS Name, \
                     tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
                     tcv.KeySkills, tcv.mobile_no,IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc "
-                    + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +"  \
+                    + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 + masterJoin + langjoin +"  \
                     WHERE tcv.MasterID > 0 and tcv.Status=1 and tcv.jobid=0 AND OID = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") "  : "";
-                jobSeekerQuery+=subQuery ;
+                jobSeekerQuery +=subQuery ;
 
                 jobSeekerQuery +=    " ORDER BY cvid DESC )  data  LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+" ;"
 
-                jobSeekerQuery+=" select FOUND_ROWS() as count; ";
+                jobSeekerQuery +=" select FOUND_ROWS() as count; ";
 
                 break;
 
@@ -399,13 +434,13 @@ router.post('/job_seeker',function(req,res,next){
                     (SELECT CONCAT(FirstName,' ',LastName) FROM tmaster WHERE tmaster.TID = tcv.MasterID) AS Name, \
                     tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
                     tcv.KeySkills, tcv.mobile_no, IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc "
-                    + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +" \
+                    + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 + masterJoin + langjoin +" \
                     WHERE tcv.MasterID > 0 and tcv.Status=1 and tcv.jobid=0  AND OID = 0  " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
-                jobSeekerQuery+=subQuery ;
+                jobSeekerQuery +=subQuery ;
 
                 jobSeekerQuery +=    " ORDER BY cvid DESC )  data  LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+" ;"
-                jobSeekerQuery+=" select FOUND_ROWS() as count; ";
+                jobSeekerQuery +=" select FOUND_ROWS() as count; ";
 
                 //var countQuery =     "SELECT COUNT(*) AS count FROM tcv AS tcv \
                 //    WHERE MasterID > 0 AND (OID = 0 OR  FIND_IN_SET(tcv.OID,@user_ids)) " + source1GenderQuery ;
@@ -426,12 +461,12 @@ router.post('/job_seeker',function(req,res,next){
                      CONCAT(tcv.firstname,' ',tcv.lastName) AS Name, \
                 tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
                 tcv.KeySkills, tcv.mobile_no,  IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc "
-                    + status + " FROM tcv AS tcv " + edujoin + locjoin + filterQuery1 +
+                    + status + " FROM tcv AS tcv " + masterJoin + edujoin + locjoin + filterQuery1  + langjoin
                     " WHERE  FIND_IN_SET(tcv.OID,@user_ids) and tcv.Status=1 AND tcv.jobid = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") ": "";
-                jobSeekerQuery+=subQuery   ;
+                jobSeekerQuery +=subQuery   ;
                 jobSeekerQuery +=    " ORDER BY cvid DESC )  data  LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+" ;"
-                jobSeekerQuery+=" select FOUND_ROWS() as count; ";
+                jobSeekerQuery +=" select FOUND_ROWS() as count; ";
 
                 //var countQuery = "SELECT COUNT(*) AS count FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)"
                 //countQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") ;": ";";
@@ -447,8 +482,272 @@ router.post('/job_seeker',function(req,res,next){
 
 
 console.log('jobSeekerQuery',jobSeekerQuery);
-    //res.send(jobSeekerQuery);
-    //return;
+    res.send(jobSeekerQuery);
+    return;
+
+    req.db.query(jobSeekerQuery,function(err,results){
+        if(err){
+            console.log('err',err);
+            res.status(400).json(err);
+        }
+        else{
+            console.error('results',results);
+            var respMsg = {
+                status : true,
+                message : "Job seeker result loaded successfully",
+                data : [],
+                count : 0
+            };
+            if(results[2]){
+                for(var i=0; i < results[2].length; i++){
+                    results[2][i].surl = (results[2][i].CVDoc) ?
+                    req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[2][i].CVDoc : '';
+                }
+                respMsg.data = results[2];
+            }
+            if(results[3]){
+                respMsg.count = (results[3][0]) ? ((results[3][0].count) ? results[3][0].count : 0) : 0;
+            }
+            res.json(respMsg);
+        }
+    });
+});
+
+
+router.post('/job_seeker',function(req,res,next){
+
+    //var token = "1e505ef5-f1ab-11e5-9ed2-42010af0ea4e";
+    var token = req.body.token;
+// 1 means internal (own db)
+// 2 means ezeone db
+//    var source = "1";
+    var isAreaPartner = (req.body.isAreaPartner) ? req.body.isAreaPartner : 0;
+    var source = (req.body.source) ? req.body.source : "1,2";
+    var skillKeywordsList = (req.body.skillKeywords) ? (" +" + req.body.skillKeywords).split(',') : [];
+
+    var skillKeywordsQueryParts = [];
+    if(skillKeywordsList.length){
+        skillKeywordsQueryParts.push(" and MATCH (tcv.KeySkills,tcv.lockeywords,tcv.searchFields) AGAINST ("+ req.db.escape(skillKeywordsList.join(' +')) + "  IN BOOLEAN MODE ) ");
+    }
+    //var skillKeywords = "";
+    var start = req.body.page_count;
+    var limit = req.body.page_size;
+
+    //var gender = "0";
+    var gender = req.body.gender;
+
+    gender = (gender == 2) ? "0,1,2" : ((gender) ? ""+gender+ "": "0,1,2");
+    var source1GenderQuery = " AND FIND_IN_SET(tcv.Gender,"+req.db.escape(gender)+") ";
+
+    var expQuery = '';
+    var salQuery  = '';
+    var instituteQuery = '';
+    var eduMatrixArray = [];
+    var eduMatrix = '';
+    var edujoin = '';
+    var locMatrixArray = [];
+    var locdata = '';
+    var locjoin = '';
+    var langMatrixArray = [];
+    var langdata = '';
+    var langjoin = '';
+
+    if(req.body.experience_from && req.body.experience_to){
+        expQuery = " AND tcv.Exp>=" + req.db.escape(req.body.experience_from) + "AND tcv.Exp <= " + req.db.escape(req.body.experience_to);
+    }
+    /**
+     * converting salary to annual bases
+     */
+    if (req.body.salary_from && req.body.salary_to){
+        if (parseInt(req.body.salary_type) == 1){
+            req.body.salary_from = Math.round( (req.body.salary_from) * 2112.00) ;
+            req.body.salary_to = Math.round( (req.body.salary_to) * 2112.00 );
+        }
+        if (parseInt(req.body.salary_type) == 2){
+            req.body.salary_from = Math.round( ((req.body.salary_from) * 2112.00)/176);
+            req.body.salary_to = Math.round( ((req.body.salary_to) * 2112.00)/176) ;
+        }
+        salQuery = " AND tcv.salary >= " + req.db.escape(req.body.salary_from)+ " AND tcv.salary <=" +req.db.escape(req.body.salary_to);
+    }
+    if (req.body.institute_id) {
+        instituteQuery = ' AND (SELECT concat(",(",GROUP_CONCAT(Instituteid),"),") FROM tcv_education WHERE CVID=tcv.TID) ' +
+            ' REGEXP ' + '"' + req.db.escape(req.body.institute_id) + '"';
+    }
+
+    /**
+     * preparing query for education
+     */
+    var educations = req.body.jobEducations;
+    if (educations){
+        if (educations.length > 0){
+            for ( var j = 0; j < educations.length; j++){
+                var eduSkills = {
+                    education: (educations[j].edu_id) ? educations[j].edu_id.toString() : '',
+                    spc: educations[j].spc_id ? educations[j].spc_id.toString() : '',
+                    score_from: educations[j].score_from ? educations[j].score_from.toString() : '',
+                    score_to: educations[j].score_to ? educations[j].score_to.toString() : ''
+                };
+                eduMatrixArray.push(' (FIND_IN_SET(edu.Educationid,' + req.db.escape(eduSkills.education) + ') ' +
+                    ' AND FIND_IN_SET(edu.Specializationids,' +  req.db.escape(eduSkills.spc) + ') ' +
+                    ' AND edu.Score>=' + req.db.escape(eduSkills.score_from) + ' AND edu.Score<=' + req.db.escape(eduSkills.score_to) + ')');
+            }
+            eduMatrix += (eduMatrixArray.length) ? " AND ( "+ eduMatrixArray.join(" OR ") +") " : "";
+            edujoin = ' LEFT OUTER JOIN tcv_education edu ON edu.cvid=tcv.tid ';
+        }
+    }
+    /**
+     * preparing query for Line of career
+     */
+    var locMatrix = req.body.locMatrix;
+    if (locMatrix){
+        if (locMatrix.length > 0){
+            for ( var k = 0; k < locMatrix.length; k++){
+                var locSkills = {
+                    locIds: locMatrix[k].career_id ? locMatrix[k].career_id.toString() : ''
+                    //exp_from: locMatrix[k].exp_from ? locMatrix[k].exp_from.toString() : 0,
+                    //exp_to: locMatrix[k].exp_to ? locMatrix[k].exp_to.toString() : 50,
+                    //level: locMatrix[k].expertiseLevel ? locMatrix[k].expertiseLevel.toString() : '',
+                    //scoreFrom: locMatrix[k].score_from ? locMatrix[k].score_from.toString() : 0,
+                    //scoreTo: locMatrix[k].score_to ? locMatrix[k].score_to.toString() : 100
+                };
+                locMatrixArray.push(' (FIND_IN_SET(loc.LOCid,' + req.db.escape(locSkills.locIds) + ') )');
+                //locMatrixArray.push(' (FIND_IN_SET(loc.LOCid,' + req.db.escape(locSkills.locIds) + ') '+
+                //    ' AND FIND_IN_SET(loc.Level,' + req.db.escape(locSkills.level) + ') ' +
+                //    ' AND loc.Exp>=' + req.db.escape(locSkills.exp_from) + ' AND loc.Exp<=' + req.db.escape(locSkills.exp_to) +
+                //    ' AND loc.Score >=' + req.db.escape(locSkills.scoreFrom) + ' AND loc.Score <=' + req.db.escape(locSkills.scoreTo) + ')');
+            }
+            locdata += (locMatrixArray.length) ? " AND ( "+ locMatrixArray.join(" OR ") +")" : "";
+            locjoin = ' LEFT OUTER JOIN tcv_loc loc ON loc.cvid=tcv.tid ';
+        }
+    }
+    /**
+     * preparing query for Languages
+     */
+    var languageMatrix = req.body.languageMatrix;
+    if (languageMatrix){
+        if (languageMatrix.length > 0){
+            for ( var m = 0; m < languageMatrix.length; m++){
+                var langParam = {
+                    langId: languageMatrix[m].languageId ? languageMatrix[m].languageId.toString() : '',
+                    readLevelFrom: languageMatrix[m].readLevelFrom ? languageMatrix[m].readLevelFrom.toString() : '',
+                    readLevelTo: languageMatrix[m].readLevelTo ? languageMatrix[m].readLevelTo.toString() : '',
+                    writeLevelFrom: languageMatrix[m].writeLevelFrom ? languageMatrix[m].writeLevelFrom.toString() : '',
+                    writeLevelTo: languageMatrix[m].writeLevelTo ? languageMatrix[m].writeLevelTo.toString() : ''
+
+                };
+                langMatrixArray.push(' (FIND_IN_SET(lang.langid,' + req.db.escape(langParam.langId) + ')'   +
+                    ' AND lang.level>=' + req.db.escape(langParam.readLevelFrom) + '  AND lang.level<=' + req.db.escape(langParam.readLevelTo)
+                    + ' AND lang.writeLevel>=' + req.db.escape(langParam.writeLevelFrom) + ' AND lang.writeLevel<=' + req.db.escape(langParam.writeLevelTo) + ' )');
+            }
+            langdata += (langMatrixArray.length) ? " AND ( "+ langMatrixArray.join(" OR ") +")" : "";
+            langjoin = ' LEFT OUTER JOIN tcv_language lang ON lang.cvid=tcv.tid ';
+        }
+    }
+    /**
+     * checking condition for status (hidden or visible)
+     */
+
+    var filterQuery = '';
+    var status;
+    var filterQuery1='';
+
+    var masterID = "SET @masterid = (SELECT masterid FROM tloginout WHERE token =" +req.db.escape(token)+");";
+
+    if (parseInt(req.body.filter_type) == 0){
+        filterQuery = " AND NOT FIND_IN_SET(tcv.tid,ifnull((SELECT GROUP_CONCAT(cvid) FROM tapplicant_hidden WHERE masterid=" + '@masterid' + "),''))";
+        status = "," + 1 +" as status";
+    }
+    else if (parseInt(req.body.filter_type) == 1){
+        filterQuery1 = " left outer join tapplicant_hidden z on z.cvid=tcv.tid";
+        filterQuery = " or z.cvid=tcv.tid";
+        status = " ,if(z.tid is null," + 1 + "," + 0 + ") as status";
+    }
+    else {
+        filterQuery = " AND FIND_IN_SET(tcv.tid,ifnull((SELECT GROUP_CONCAT(cvid) FROM tapplicant_hidden WHERE masterid=" + '@masterid' + "),''))";
+        status = ","+ 0 + " as status";
+    }
+
+    /**
+     * checking condition for notice period, rating and marital status
+     */
+    var noticePeriodQuery = '';
+    var ratingQuery = '';
+    var maritalStatusQuery = '';
+    var masterJoin = '';
+
+    if (parseInt(req.body.noticePeriodTo) != 0){
+        noticePeriodQuery = ' and tcv.noticeperiod>='+req.db.escape(req.body.noticePeriodFrom) +' and tcv.noticeperiod<='+
+            req.db.escape(req.body.noticePeriodTo);
+    }
+    if (parseInt(req.body.rating) != 0){
+        ratingQuery = ' and find_in_set(m.Rating,'+ req.db.escape(req.body.rating)+')';
+    }
+
+
+
+    if (parseInt(req.body.maritalStatus) != 0){
+        maritalStatusQuery = ' and find_in_set(m.maritalStatus,'+ req.db.escape(req.body.maritalStatus)+')';
+    }
+
+    /**
+     * concatenating all above prepared query
+     */
+
+    /**
+     * @login_tid TID of a user who is logged in (from tmaster)
+     */
+    var jobSeekerQuery =
+        "SET @user_ids = (SELECT get_account_users("+req.db.escape(token)+"));";
+    jobSeekerQuery+=masterID;
+
+
+    var apUserCvs='';
+    var sourceQry='';
+    if (isAreaPartner == 1)
+    {
+        apUserCvs=' and m.apuserid!=0 and tcv.OID=0 and tcv.jobid=0 ';
+    }
+    else if(isAreaPartner==0 && source=='1,2' && source=="2,1")
+    {
+        sourceQry=' and tcv.jobid=0 ';
+    }
+    else if(isAreaPartner==0 && source=='1')
+    {
+        sourceQry=' and find_in_set(tcv.OID,@user_ids) and tcv.jobid=0 ';
+    }
+    else if(isAreaPartner==0 && source=='2')
+    {
+        sourceQry=' and tcv.OID=0 and tcv.jobid=0 ';
+    }
+
+    var subQuery = expQuery + salQuery + instituteQuery + eduMatrix + locdata + filterQuery + ratingQuery
+        + maritalStatusQuery + noticePeriodQuery + langdata + apUserCvs;
+
+    console.log('ratingQuery',ratingQuery);
+
+    jobSeekerQuery +=
+        " SELECT SQL_CALC_FOUND_ROWS * from (SELECT tcv.TID AS cvid,CONCAT(tcv.firstname,' ',tcv.lastName) AS Name,\
+        (SELECT GROUP_CONCAT(Locname) FROM mjobloc WHERE \
+         find_in_set(mjobloc.tid,(SELECT GROUP_CONCAT(CityID) FROM tprefferedcities WHERE CVID=tcv.TID))) as location,\
+         concat(m.ISDMobileNumber,' ',m.mobileNumber) as mobileNumber,\
+    concat(m.ISDPhoneNumber,' ',m.PhoneNumber) as phoneNumber ,m.AdminEmailID as emailId ,tcv.Exp as experience, \
+    datediff(UTC_TIMESTAMP(),tcv.LUdate) as cvAge,tcv.salary AS ctc,ifnull((SELECT GROUP_CONCAT(EducationTitle) FROM meducations \
+    WHERE find_in_set(meducations.TID,ifnull((SELECT GROUP_CONCAT(Educationid) FROM tcv_education WHERE tcv_education.cvid=tcv.tid),''))),'') as education, \
+    ifnull((SELECT tapuser.APLoginID FROM tapuser WHERE tapuser.TID=m.APUserid),'') as cvSource , \
+     IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc "
+        + status + " FROM  tcv AS tcv LEFT JOIN tmaster m on m.tid=tcv.MasterID "
+        + edujoin + locjoin + filterQuery1  + langjoin +
+    "   WHERE m.tid=tcv.masterid and tcv.availableForJobAfter<=UTC_TIMESTAMP() and tcv.Status=1  " + sourceQry + source1GenderQuery + skillKeywordsQueryParts + subQuery;
+    jobSeekerQuery +=
+        "  group by tcv.tid )  data ORDER BY cvAge asc  LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+" ;"
+
+    jobSeekerQuery +=" select FOUND_ROWS() as count; ";
+
+    jobSeekerQuery += " SELECT @user_ids AS users;";
+
+    console.log('jobSeekerQuery',jobSeekerQuery);
+    res.send(jobSeekerQuery);
+    return;
 
     req.db.query(jobSeekerQuery,function(err,results){
         if(err){

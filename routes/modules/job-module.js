@@ -3297,7 +3297,7 @@ Job.prototype.viewApplicantList = function(req,res,next){
  * @param next
  * @description api code for view job details
  */
-Job.prototype.viewJobDetails = function(req,res,next){
+    Job.prototype.viewJobDetails = function(req,res,next){
 
     var token = req.query.token;
     var jobId = req.query.job_id;

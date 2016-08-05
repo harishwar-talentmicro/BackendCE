@@ -623,8 +623,6 @@ router.post('/attachment',function(req,res,next){
                     });
 
 
-
-
                     //req.st.uploadDocumentToCloud(attachmentFileName,gm(req.files.attachmentFile.path).resize(15,15).autoOrient().quality(0).stream(req.files.attachmentFile.extension),function(err){
                     //    if(!err){
                     //        responseMessage.error = {
@@ -637,8 +635,6 @@ router.post('/attachment',function(req,res,next){
                     //        console.log(errorDate.toTimeString() + ' ......... error ...........');
                     //    }
                     //});
-
-
 
                 }
                 else {
