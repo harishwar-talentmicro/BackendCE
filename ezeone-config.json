@@ -1,6 +1,7 @@
 {
   "CONSTANT" : {
     "DEBUG" : true,
+    "EZEONE_URL" : "https://www.ezeone.com",
     "INDEX_PATH" : "../public/index.html",
     "GOOGLE_KEYFILE_PATH" : "../ezeid100.json",
     "GOOGLE_PROJECT_ID" : "ezeid100",
