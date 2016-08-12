@@ -10,7 +10,8 @@ var DbHelper = require('./../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
 var StdLib = require('./modules/std-lib.js');
 var stdLib = new StdLib(db);
-
+var User = require('./modules/user-module.js');
+var userModule = new User(db,stdLib);
 
 var maintainenceTemplate = fs.readFileSync(path.join(__dirname, '../views/maintainence.ejs'),'utf-8');
 var htmlIndexFile = ejs.render(maintainenceTemplate);
@@ -43,8 +44,7 @@ router.get('/:page/:subpage',function(req,res){
     res.render(indexTemplate,{htmlContent : htmlIndexFile});
 });
 
-var User = require('./modules/user-module.js');
-var userModule = new User(db,stdLib);
+
 router.get('/:id',userModule.webLinkRedirect);
 
 router.get('/:page',function(req,res){
