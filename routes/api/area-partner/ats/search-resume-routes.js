@@ -8,7 +8,8 @@ var router = express.Router();
 var searchResumeCtrl = require('./search-resume-ctrl');
 
 router.get('/job',searchResumeCtrl.searchJob);
-router.get('/job_details',searchResumeCtrl.jobDetails);
+router.get('/job/:jobId',searchResumeCtrl.jobDetails);
+router.post('/job_seeker',searchResumeCtrl.searchResume);
 
 
 module.exports = router;

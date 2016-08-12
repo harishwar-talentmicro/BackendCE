@@ -4273,9 +4273,10 @@ Job.prototype.autoSearchJobs = function(req,res,next){
     else {
         try {
             st.validateToken(token, function (err, result) {
+                req.query.isAreaPartner = (req.query.isAreaPartner) ? req.query.isAreaPartner : 0;
                 if (!err) {
                     if (result) {
-                        var queryParams =  st.db.escape(title);
+                        var queryParams =  st.db.escape(title) + ',' + st.db.escape(req.query.isAreaPartner);
                         var query = 'CALL pfindjobs(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, searchResult) {
