@@ -78,7 +78,7 @@ function setHeaders(res, path) {
 var api = require('./routes/api.js');
 var index = require('./routes/index.js');
 var redirectMiddleware = require('./routes/middleware/redirect-middleware');
-//app.use(redirectMiddleware);
+app.use(redirectMiddleware);
 
 app.use('/api',api);
 
