@@ -555,7 +555,7 @@ Search.prototype.searchInformation = function(req,res,next){
                 + ',' + st.db.escape(EZEID) + ',' + st.db.escape(Pin)+ ',' + st.db.escape(latitude) + ',' + st.db.escape(longitude);
 
             var feedbackParam = st.db.escape(EZEID) + ',' + st.db.escape(5) + ',' + st.db.escape(0)
-                + ',' + st.db.escape(0) + ',' + st.db.escape(1)+ ',' + st.db.escape(1);
+                + ',' + st.db.escape(0) + ',' + st.db.escape(1)+ ',' + st.db.escape(0);
             console.log('CALL pSearchInformationNew(' + SearchParameter + '); CALL pgetfeedbackDetails(' + feedbackParam + ');');
             /**
              * calling pgetfeedbackDetails to get one review/feedback for mobile users only

@@ -696,7 +696,7 @@ User.prototype.changePassword = function(req,res,next){
                                                     var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
                                                     var newPassword = hashPassword(NewPassword);
-                                                    var passChangeQueryParams = st.db.escape(TokenNo) + st.db.escape(oldPassResult[0][0].Password)+ ','+
+                                                    var passChangeQueryParams = st.db.escape(TokenNo) + ',' +
                                                         st.db.escape(newPassword) + ',' + st.db.escape(ip) +',' + st.db.escape(userAgent);
 
                                                     var passChangeQuery = 'CALL pChangePassword('+passChangeQueryParams + ')';
