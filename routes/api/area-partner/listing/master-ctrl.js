@@ -59,19 +59,34 @@ MasterCtrl.getMasterDetail = function(req,res,next){
         req.st.validateTokenAp(req.query.token, function (err, tokenResult) {
             if (!err) {
                 if (tokenResult) {
+                    /**
+                     * isAreaPatner is flag to differentiate that request is coming from ezeone
+                     * application or area partner application for pgetinstituelist procedure
+                     */
+                    var isAreaPatner = 1;
                     var locationParams = req.db.escape(req.query.token);
                     var countryCodeParams = req.db.escape(req.query.langId);
+                    var instituteParams = [req.db.escape(req.query.token),req.db.escape(isAreaPatner)];
                     /**
                      * to get all available results education id and loc id passing as 0
                      * @type {string}
                      */
                     var query = 'CALL pGetEducations('+ 0 +'); CALL pgetcitys_ap('+ locationParams +');CALL pgetLOC('+ 0 +');' +
                         'CALL Pgetindustrycategory(' + 0 + '); CALL pGetindustryType(); CALL pget_country_code('+ countryCodeParams +');' +
-                        'CALL pgetlanguages();';
+                        'CALL pgetlanguages();' + 'CALL pgetinstituelist(' + instituteParams.join(',') + ');';
                     console.log(query);
                     req.db.query(query, function (err, results) {
                         if (!err) {
                             if (results && results[0] && results[0].length > 0) {
+                                var outputInstitute = [];
+                                if (results[14]){
+                                    for (var k = 0; k < results[14].length; k++ ){
+                                        var instituteResult = {};
+                                        instituteResult.title = results[14][k].title,
+                                        instituteResult.instituteId = results[14][k].institute_id
+                                        outputInstitute.push(instituteResult);
+                                    }
+                                }
 
                                 /**
                                  * preparing query to get all specialisation of education id
@@ -99,6 +114,7 @@ MasterCtrl.getMasterDetail = function(req,res,next){
                                             //console.log(outputSpecialization);
                                             response.status = true;
                                             response.data = {
+                                                instituteList : outputInstitute,
                                                 languageList : results[12],
                                                 industryCategoryList : results[6],
                                                 industryTypeList : results[8],
@@ -117,6 +133,7 @@ MasterCtrl.getMasterDetail = function(req,res,next){
                                             console.log('Error while getting specialization');
                                             response.status = true;
                                             response.data = {
+                                                instituteList : outputInstitute,
                                                 languageList : results[12],
                                                 industryCategoryList : results[6],
                                                 industryTypeList : results[8],
@@ -135,6 +152,7 @@ MasterCtrl.getMasterDetail = function(req,res,next){
                                     else {
                                         response.status = true;
                                         response.data = {
+                                            instituteList : outputInstitute,
                                             languageList : results[12],
                                             industryCategoryList : results[6],
                                             industryTypeList : results[8],
@@ -199,8 +217,8 @@ MasterCtrl.getMasterDetail = function(req,res,next){
 };
 
 
-var NodeGeocoder = require('node-geocoder');
-var geocoder = require('geocoder');
+//var NodeGeocoder = require('node-geocoder');
+//var geocoder = require('geocoder');
 
 /*MasterCtrl.getLatLong = function(req,res,next){
 

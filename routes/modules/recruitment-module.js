@@ -331,11 +331,14 @@ Recruitment.prototype.getInstitutesList = function(req,res,next){
             if (!err) {
 
                 if (tokenResult) {
-                    var instituteListQuery = "CALL pgetinstituelist(" + st.db.escape(req.query.token) + ")";
+                    /**
+                     * isAreaPatner is flag to differentiate that request is coming from ezeone
+                     * application or area partner application
+                     */
+                    var isAreaPatner = 0;
+                    var instituteListQuery = "CALL pgetinstituelist(" + st.db.escape(req.query.token) + "," + st.db.escape(isAreaPatner) + ")";
                     console.log(instituteListQuery);
-
                     st.db.query(instituteListQuery, function (err, instituteListResult) {
-
                         if (!err) {
                             if (instituteListResult) {
                                // console.log('instituteListResult', instituteListResult);

@@ -44,7 +44,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         if (type == 1){
             type = 2;
         }
-        var find = req.body.Keywords;
+        var find = (req.body.Keywords) ? req.body.Keywords : '';
         var token = req.body.Token ? req.body.Token : 2;
         //var CategoryID = req.body.SCategory;
         //var Proximity = parseInt(req.body.Proximity);
@@ -286,10 +286,10 @@ Search.prototype.searchKeyword = function(req,res,next){
 
             }
             else {
-                if (!find) {
-                    console.log('FnSearchByKeywords: keyword is empty');
-                }
-                else if (CurrentDate == null || CurrentDate == '') {
+                //if (!find) {
+                //    console.log('FnSearchByKeywords: keyword is empty');
+                //}
+                if (CurrentDate == null || CurrentDate == '') {
                     console.log('FnSearchByKeywords: CurrentDate is empty');
                 }
                 else if (pagesize == null) {
@@ -390,10 +390,10 @@ Search.prototype.searchKeyword = function(req,res,next){
                 });
             }
             else {
-                if (!find) {
-                    console.log('FnSearchByKeywords: keyword is empty');
-                }
-                else if (isNaN(Latitude)) {
+                //if (!find) {
+                //    console.log('FnSearchByKeywords: keyword is empty');
+                //}
+                if (isNaN(Latitude)) {
                     console.log('FnSearchByKeywords: Latitude is empty');
                 }
                 else if (isNaN(Longitude)) {
@@ -456,10 +456,10 @@ Search.prototype.searchKeyword = function(req,res,next){
                 });
             }
             else {
-                if (!find) {
-                    console.log('FnSearchByKeywords: keyword is empty');
-                }
-                else if (CurrentDate) {
+                //if (!find) {
+                //    console.log('FnSearchByKeywords: keyword is empty');
+                //}
+                if (CurrentDate) {
                     console.log('FnSearchByKeywords: CurrentDate is empty');
                 }
                 else if (isNaN(Latitude)) {

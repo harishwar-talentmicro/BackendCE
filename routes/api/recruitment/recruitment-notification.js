@@ -97,7 +97,6 @@ var notification = new Notification();
                                             responseMessage.message = 'No data available';
                                             res.json(responseMessage);
                                         }
-
                                     }
                                     else {
                                         responseMessage.data = null;

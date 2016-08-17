@@ -3297,7 +3297,7 @@ Job.prototype.viewApplicantList = function(req,res,next){
  * @param next
  * @description api code for view job details
  */
-Job.prototype.viewJobDetails = function(req,res,next){
+    Job.prototype.viewJobDetails = function(req,res,next){
 
     var token = req.query.token;
     var jobId = req.query.job_id;
@@ -4273,9 +4273,10 @@ Job.prototype.autoSearchJobs = function(req,res,next){
     else {
         try {
             st.validateToken(token, function (err, result) {
+                req.query.isAreaPartner = (req.query.isAreaPartner) ? req.query.isAreaPartner : 0;
                 if (!err) {
                     if (result) {
-                        var queryParams =  st.db.escape(title);
+                        var queryParams =  st.db.escape(title) + ',' + st.db.escape(req.query.isAreaPartner);
                         var query = 'CALL pfindjobs(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, searchResult) {

@@ -601,10 +601,10 @@ QuickResumeCtrl.saveResumeDetail = function(req,res,next){
                                         req.st.db.escape(advanceDataResult[0][0].cvId),
                                         req.st.db.escape(educationList[i].educationId),
                                         req.st.db.escape(educationList[i].specializationId),
+                                        req.st.db.escape(educationList[i].score),
+                                        req.st.db.escape(educationList[i].yearOfPassing),
                                         req.st.db.escape(0),
-                                        req.st.db.escape(0),
-                                        req.st.db.escape(0),
-                                        req.st.db.escape(0),
+                                        req.st.db.escape(educationList[i].instituteId),
                                         req.st.db.escape('')
                                     ];
                                     educationQuery += 'CALL psavecveducation(' + procEducationParam.join(',') + ');';

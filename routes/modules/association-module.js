@@ -89,6 +89,8 @@ var uploadDocumentToCloud = function(uniqueName,readStream,callback){
  * @param limit <int> limit
  * @param status <int> status (in case of admin)
  *
+ * note : registration
+ *
  */
 Association.prototype.associGetEventDtl = function(req,res,next){
     var responseMessage = {
@@ -396,10 +398,17 @@ Association.prototype.getAsscociationServices = function(req,res,next){
     }
     else {
         try {
+            req.query.pageNo = (req.query.pageNo) ? req.query.pageNo : 1;
+            req.query.limit = (req.query.limit) ? req.query.limit : 100;
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =   st.db.escape(masterId) + ',' + st.db.escape(token)+ ',' + st.db.escape(status);
+                        /**
+                         * pagination added
+                         * @type {string}
+                         */
+                        var queryParams =   st.db.escape(masterId) + ',' + st.db.escape(token)+ ',' + st.db.escape(status)
+                            +',' + st.db.escape(req.query.pageNo)+ ',' + st.db.escape(req.query.limit);
                         var query = 'CALL get_service_list(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, serviceResult) {
@@ -409,6 +418,7 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                     if(serviceResult[0]){
                                         if(serviceResult[1]){
                                             responseMessage.data1 = serviceResult[0];
+                                            responseMessage.count = serviceResult[1][0].count;
                                         }
                                         responseMessage.status = true;
                                         responseMessage.error = null;
@@ -601,7 +611,6 @@ Association.prototype.getAsscociationServices = function(req,res,next){
  * @param message <string> message
  * @param cid <int> category id
  * @param image_path <string> image_path comma saprated strings of image
-
  */
 Association.prototype.saveAssociationServices = function(req,res,next){
 
@@ -1650,6 +1659,10 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
             error['title'] = 'Invalid title';
             validationFlag *= false;
         }
+        if (!req.body.startDate) {
+            error['s_date'] = 'Start date can not be empty';
+            validationFlag *= false;
+        }
         if (!req.body.code) {
             error['code'] = 'Invalid code';
             validationFlag *= false;
@@ -1664,7 +1677,6 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
             try {
                 var tenType = ['poster','event','poster','poster','opinion-poll','poster'];
                 req.body.ten_id = (req.body.ten_id) ? req.body.ten_id : 0;      // while saving time 0 else id of user
-                req.body.s_date = (req.body.s_date) ? (req.body.s_date) : null;
                 req.body.e_date = (req.body.e_date) ? (req.body.e_date) : null;
                 req.body.reg_lastdate = (req.body.reg_lastdate) ? (req.body.reg_lastdate) : null;
                 req.body.code = (req.body.code) ? req.st.alterEzeoneId(req.body.code) : '';
@@ -1958,6 +1970,10 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
         }
         if (!req.body.code) {
             error['code'] = 'Invalid code';
+            validationFlag *= false;
+        }
+        if (!req.body.regLastDate) {
+            error['reg_lastdate'] = 'Registration last date can not be empty';
             validationFlag *= false;
         }
         if (!req.body.title) {

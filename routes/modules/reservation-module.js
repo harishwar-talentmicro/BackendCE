@@ -8,8 +8,7 @@
 "use strict";
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
-
-
+var moment = require('moment');
 var st = null;
 
 function Reservation(db,stdLib){
@@ -1012,7 +1011,9 @@ Reservation.prototype.saveFeedback = function(req,res,next){
                                     trans_id: trans_id,
                                     resourceid: resourceid,
                                     toEzeid: toEzeid,
-                                    type: type
+                                    type: type,
+                                    reviewDate : moment().format('YYYY-MM-DD hh:mm:ss')
+
                                 };
                                 res.status(200).json(responseMessage);
                                 console.log('FnSaveFeedback: Feedback details saved successfully');
