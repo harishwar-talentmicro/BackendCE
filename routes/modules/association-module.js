@@ -611,7 +611,6 @@ Association.prototype.getAsscociationServices = function(req,res,next){
  * @param message <string> message
  * @param cid <int> category id
  * @param image_path <string> image_path comma saprated strings of image
-
  */
 Association.prototype.saveAssociationServices = function(req,res,next){
 

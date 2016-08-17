@@ -1012,7 +1012,7 @@ Reservation.prototype.saveFeedback = function(req,res,next){
                                     resourceid: resourceid,
                                     toEzeid: toEzeid,
                                     type: type,
-                                    createdDate : moment().format('DD MMM YYYY hh:mm:ss A')
+                                    reviewDate : moment().format('YYYY-MM-DD hh:mm:ss')
 
                                 };
                                 res.status(200).json(responseMessage);

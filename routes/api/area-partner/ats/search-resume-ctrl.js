@@ -468,6 +468,10 @@ SearchResumeCtrl.searchResume = function(req,res,next){
                 ' and ifnull((timestampdiff(YEAR,m.DOB,UTC_TIMESTAMP())),0)<=' + req.db.escape(ageTo) ;
         }
     var locList = [];
+    /**
+     * calling prepared query in function to avoid callback issues
+     * after
+     */
     var preparedQuery = function (){
         var subQuery = jobTypeQuery + expQuery + salQuery + expectedSalQuery  + eduMatrix + locQuery  + ratingQuery
             + maritalStatusQuery + source1GenderQuery + noticePeriodQuery + langdata + apUserCvs + filterQuery + locationData + ageQuery ;
