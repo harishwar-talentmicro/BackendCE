@@ -208,7 +208,7 @@ Service.prototype.getServiceProviders = function(req,res,next){
                                                 serviceResult[0][i].wh = undefined;
 
                                                 serviceResult[0][i].tilebanner = serviceResult[0][i].tilebanner ?
-                                                req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[1][i].tilebanner: '';
+                                                req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].tilebanner: '';
                                             }
                                             res.status(200).json({
                                                 totalcount : (serviceResult[1][0]) ? serviceResult[1][0].totalcount : 0,
