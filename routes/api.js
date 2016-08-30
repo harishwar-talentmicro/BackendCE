@@ -650,6 +650,7 @@ router.get('/branch',ProfileBranchModule.getBranch);
 var EzeoneAttrbt = require('./modules/ezeone-attribute-module.js');
 var EzeoneAttrbtModule = new EzeoneAttrbt(db,stdLib);
 router.get('/signup_data',EzeoneAttrbtModule.signUpData);
+router.get('/version_code',EzeoneAttrbtModule.versionCode);
 
 //association-ap-module
 var Association = require('./modules/association-module.js');
@@ -670,10 +671,10 @@ router.delete('/association_service_img/:id',AssociationtModule.associationDelet
 router.put('/association_ten_status',AssociationtModule.associationUpdateTenStatus);
 router.get('/association_op_option',AssociationtModule.associationGetOPoptions);
 
-////test-module
+//test-module
 //var Test = require('./modules/test-module.js');
 //var TestModule = new Test(db,stdLib);
-//router.post('/_test',TestModule.imageResizeTest);
+//router.get('/_test',TestModule.createThumnail);
 
 
 /**
