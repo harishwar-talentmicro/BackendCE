@@ -92,8 +92,7 @@ Auth.prototype.register = function(req,res,next){
 
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-    console.log("req.body",req.body);
+    console.log(req.body);
     var rtnMessage = {
         error:{},
         Token: '',
@@ -203,7 +202,7 @@ Auth.prototype.register = function(req,res,next){
     var moment = require('moment');
 
     var operationType = parseInt(req.body.OperationType) ? req.body.OperationType : 0;
-    console.log('operationType',operationType);
+
     var ipAddress = req.ip;
     var selectionType = (!isNaN(parseInt(req.body.SelectionType))) ?  parseInt(req.body.SelectionType) : 0;
     var idtypeId = parseInt(req.body.IDTypeID);
@@ -250,8 +249,6 @@ Auth.prototype.register = function(req,res,next){
     if(idtypeId != 1){
         dob = moment().format('YYYY-MM-DD');
     }
-
-    console.log(dob);
 
     var momentObj = moment(dob,'YYYY-MM-DD').isValid();
     var templateId = req.body.TemplateID ? parseInt(req.body.TemplateID) : 0;
@@ -315,14 +312,18 @@ Auth.prototype.register = function(req,res,next){
             var testCase = ezeid.replace('@','');
             var allowedFlag = true;
 
+            console.log('testCase',testCase);
+
             for(var i = 0; i < list.length; i++){
                 var reg = new RegExp(list[i],'g');
                 if(reg.test(testCase)){
-                    //console.log('Test pass : Should not be allowed',testCase);
+                    console.log('Test pass : Should not be allowed',testCase);
                     allowedFlag = false;
                     break;
                 }
             }
+
+            console.log('allowedFlag after change',allowedFlag);
 
             /**
              * If user is having token we assume he is updating the data
@@ -341,7 +342,7 @@ Auth.prototype.register = function(req,res,next){
                         if (password) {
                             encryptPwd = req.st.hashPassword(password);
                         }
-
+                        console.log('masterid testing1');
                         var queryParams = st.db.escape(idtypeId) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(encryptPwd)
                             + ',' + st.db.escape(firstName) + ',' + st.db.escape(lastName) + ',' + st.db.escape(companyName)
                             + ',' + st.db.escape(jobTitle) + ',' + st.db.escape(functionId) + ',' + st.db.escape(roleId)
@@ -365,6 +366,7 @@ Auth.prototype.register = function(req,res,next){
                         console.log(query);
                         st.db.query(query, function (err, registerResult) {
                             if (!err) {
+                                console.log('registerResult',registerResult);
                                 if (registerResult) {
                                     if (registerResult[0]) {
                                         if (registerResult[0].length > 0) {
@@ -381,8 +383,7 @@ Auth.prototype.register = function(req,res,next){
                                                 rtnMessage.tid = registerResult[0][0].TID;
                                                 rtnMessage.TID = registerResult[0][0].TID;
                                                 rtnMessage.group_id = registerResult[0][0].group_id;
-
-                                                if (registerResult[0][0].ParentMasterID == 0) {
+                                                if (!registerResult[0][0].ParentMasterID) {
                                                     rtnMessage.MasterID = registerResult[0][0].TID;
                                                 }
                                                 else {
@@ -409,7 +410,6 @@ Auth.prototype.register = function(req,res,next){
                                                 rtnMessage.isinstitute_admin = registerResult[0][0].isinstituteadmin;
                                                 rtnMessage.cvid = registerResult[0][0].cvid;
                                                 rtnMessage.profile_status = registerResult[0][0].ps;
-
 
                                                 if (operation == 'I') {
 
@@ -525,7 +525,7 @@ Auth.prototype.register = function(req,res,next){
                                                 }
                                             }
                                             else {
-                                                //console.log(rtnMessage);
+                                                console.log('rtnMessage',rtnMessage);
                                                 res.send(rtnMessage);
                                                 console.log('FnRegistration:tmaster: Registration Failed..1');
                                             }
@@ -774,7 +774,6 @@ Auth.prototype.login = function(req,res,next){
 
     try{
         if (ezeoneId && password) {
-
             var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code)+ ',' + st.db.escape(token);
             var query = 'CALL PLoginNew(' + queryParams + ')';
             console.log('query',query);
@@ -792,86 +791,82 @@ Auth.prototype.login = function(req,res,next){
                                         st.generateToken(ip, userAgent, ezeoneId, function (err, tokenResult) {
 
                                             if ((!err) && tokenResult && loginDetails[0]) {
+                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ')', function (err, UserDetailsResult) {
+                                                    if (!err) {
 
+                                                        if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
 
-                                                    st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ')', function (err, UserDetailsResult) {
-                                                        if (!err) {
-                                                            //console.log('UserDetailsResult',UserDetailsResult);
-                                                            if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
+                                                            UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
+                                                                (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
 
-                                                                UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
-                                                                    (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
-
-                                                                /**
-                                                                 * Every time the user loads the website the browser sends the cookie back to the server to notify the user previous activity
-                                                                 */
-                                                                res.cookie('Token', tokenResult, {
-                                                                    maxAge: 900000,
-                                                                    httpOnly: true
-                                                                });
-                                                                responseMessage.Token = tokenResult;
-                                                                responseMessage.IsAuthenticate = true;
-                                                                responseMessage.TID = loginDetails[0].TID;
-                                                                responseMessage.ezeone_id = loginDetails[0].EZEID;
-                                                                responseMessage.FirstName = loginDetails[0].FirstName;
-                                                                responseMessage.CompanyName = loginDetails[0].CompanyName;
-                                                                responseMessage.Type = loginDetails[0].IDTypeID;
-                                                                responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
-                                                                responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
-                                                                responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
-                                                                responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
-                                                                responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
-                                                                responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
-                                                                responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
-                                                                responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
-                                                                responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
-                                                                responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
-                                                                responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
-                                                                responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
-                                                                responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
-                                                                responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
-                                                                responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
-                                                                responseMessage.LastName = loginDetails[0].LastName;
-                                                                if (loginDetails[0].ParentMasterID == 0) {
-                                                                    responseMessage.MasterID = loginDetails[0].TID;
-                                                                }
-                                                                else {
-                                                                    responseMessage.MasterID = loginDetails[0].ParentMasterID;
-                                                                }
-                                                                responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
-                                                                responseMessage.VisibleModules = loginDetails[0].VisibleModules;
-                                                                responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
-                                                                responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
-                                                                responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
-                                                                responseMessage.mobilenumber = loginDetails[0].mobilenumber;
-                                                                responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
-                                                                responseMessage.group_id = loginDetails[0].group_id;
-                                                                responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
-                                                                responseMessage.cvid = loginDetails[0].cvid;
-                                                                responseMessage.profile_status = loginDetails[0].ps;
-                                                                responseMessage.userDetails = UserDetailsResult[0];
-
-                                                                console.log('FnLogin: Login success');
-                                                                // saving ios device id to database
-                                                                if (isIphone == 1) {
-                                                                    var queryParams1 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
-                                                                    var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
-                                                                    //console.log(query);
-                                                                    st.db.query(query1, function (err, deviceResult) {
-                                                                        if (!err) {
-                                                                            console.log('FnLogin:Ios Device Id saved successfully');
-                                                                        }
-                                                                        else {
-                                                                            console.log(err);
-                                                                        }
-                                                                    });
-                                                                }
-                                                                res.send(responseMessage);
+                                                            /**
+                                                             * Every time the user loads the website the browser sends the cookie back to the server to notify the user previous activity
+                                                             */
+                                                            res.cookie('Token', tokenResult, {
+                                                                maxAge: 900000,
+                                                                httpOnly: true
+                                                            });
+                                                            responseMessage.Token = tokenResult;
+                                                            responseMessage.IsAuthenticate = true;
+                                                            responseMessage.TID = loginDetails[0].TID;
+                                                            responseMessage.ezeone_id = loginDetails[0].EZEID;
+                                                            responseMessage.FirstName = loginDetails[0].FirstName;
+                                                            responseMessage.CompanyName = loginDetails[0].CompanyName;
+                                                            responseMessage.Type = loginDetails[0].IDTypeID;
+                                                            responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                                            responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                                            responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                                            responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                                            responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                                            responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                                            responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                                            responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
+                                                            responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
+                                                            responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
+                                                            responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
+                                                            responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
+                                                            responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
+                                                            responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
+                                                            responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                                            responseMessage.LastName = loginDetails[0].LastName;
+                                                            if (loginDetails[0].ParentMasterID == 0) {
+                                                                responseMessage.MasterID = loginDetails[0].TID;
                                                             }
+                                                            else {
+                                                                responseMessage.MasterID = loginDetails[0].ParentMasterID;
+                                                            }
+                                                            responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
+                                                            responseMessage.VisibleModules = loginDetails[0].VisibleModules;
+                                                            responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
+                                                            responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                                            responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                                            responseMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                                            responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
+                                                            responseMessage.group_id = loginDetails[0].group_id;
+                                                            responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+                                                            responseMessage.cvid = loginDetails[0].cvid;
+                                                            responseMessage.profile_status = loginDetails[0].ps;
+                                                            responseMessage.userDetails = UserDetailsResult[0];
+
+                                                            console.log('FnLogin: Login success');
+                                                            // saving ios device id to database
+                                                            if (isIphone == 1) {
+                                                                var queryParams1 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
+                                                                var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
+                                                                //console.log(query);
+                                                                st.db.query(query1, function (err, deviceResult) {
+                                                                    if (!err) {
+                                                                        console.log('FnLogin:Ios Device Id saved successfully');
+                                                                    }
+                                                                    else {
+                                                                        console.log(err);
+                                                                    }
+                                                                });
+                                                            }
+                                                            res.send(responseMessage);
                                                         }
-                                                    });
-
-
+                                                    }
+                                                });
                                             }
                                             else {
 
@@ -1223,9 +1218,7 @@ Auth.prototype.verifyResetCode = function(req,res,next){
             req.query.ezeone_id + ' 2. reset_code : '+ req.query.reset_code + ' IP Address : '+ ip + ' UserAgent : '+ userAgent );
         res.status(200).json(respMsg);
     }
-
 };
-
 
 Auth.prototype.verifySecretCode = function(req,res,next) {
 
@@ -1344,8 +1337,6 @@ Auth.prototype.verifySecretCode = function(req,res,next) {
         res.status(400).json(respMsg);
     }
 };
-
-
 
 Auth.prototype.sendOtp = function(req,res,next) {
 

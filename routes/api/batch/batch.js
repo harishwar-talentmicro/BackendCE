@@ -561,39 +561,39 @@ router.post('/trans', function(req,res,next){
         }
         else {
             try {
-
-                    var batchArrayList = req.body.batchArray;
-                        var combQuery = '';
+                var batchArrayList = req.body.batchArray;
+                var combQuery = '';
                 //console.log(batchArrayList.length,"batchArrayList.length");
-                        for (var i = 0; i < batchArrayList.length; i++ ){
-                            var batchQueryParams = req.db.escape(batchArrayList[i].typeId)
-                                + ',' + req.db.escape(batchArrayList[i].expenseDetails)+ ',' + req.db.escape(id)
-                                + ',' + req.db.escape(batchArrayList[i].total)+ ',' + req.db.escape(batchId);
-                            combQuery +=  ('CALL psave_batch_trans(' + batchQueryParams + ');');
+                for (var i = 0; i < batchArrayList.length; i++ ){
+                    var batchQueryParams = req.db.escape(batchArrayList[i].typeId)
+                        + ',' + req.db.escape(batchArrayList[i].expenseDetails)+ ',' + req.db.escape(id)
+                        + ',' + req.db.escape(batchArrayList[i].total)+ ',' + req.db.escape(batchId);
+                    combQuery +=  ('CALL psave_batch_trans(' + batchQueryParams + ');');
+                }
+                console.log(combQuery);
+                req.db.query(combQuery, function (err, batchResult) {
+                    if (!err) {
+                        if (batchResult) {
+                            console.log(batchResult);
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'batch created successfully';
+                            responseMessage.data = {
+                            };
+                            res.status(200).json(responseMessage);
                         }
-                        console.log(combQuery);
-                        req.db.query(combQuery, function (err, batchResult) {
-                            if (!err) {
-                                if (batchResult) {
-                                    console.log(batchResult);
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'batch created successfully';
-                                    responseMessage.data = {
-                                    };
-                                    res.status(200).json(responseMessage);
-                                }
-                                else {
-                                    console.log('batch not save');
-                                    res.status(200).json(responseMessage);
-                                }
-                            }
-                            else {
-                                console.log('batch not save');
-                                console.log(err);
-                                res.status(200).json(responseMessage);
-                            }
-                        });
+                        else {
+                            console.log('batch not save');
+                            res.status(200).json(responseMessage);
+                        }
+                    }
+                    else {
+                        console.log('batch not save');
+                        console.log(err);
+                        res.status(200).json(responseMessage);
+                    }
+                });
+
                 }
                 catch (ex) {
                     responseMessage.error = {
@@ -694,8 +694,6 @@ router.delete('/trans', function(req,res,next){
         }
     }
 });
-
-
 
 /**
  * Method : GET

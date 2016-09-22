@@ -2436,7 +2436,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     var regLastDate = (req.query.reg_lastdate) ? (req.query.reg_lastdate) : null;
     var type = req.query.type;     // 1(training),2=event,3=news,4=knowledge
     var note = req.query.note;
-    var venueId = req.query.venue_id;
+    var venueId = (req.query.venue_id) ? req.query.venue_id : 0;
     var code = req.st.alterEzeoneId(req.query.code);
     var capacity = (req.query.capacity) ? (req.query.capacity) : 0;
     var randomName='';

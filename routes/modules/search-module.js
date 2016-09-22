@@ -35,7 +35,7 @@ Search.prototype.searchKeyword = function(req,res,next){
     /**
      * @todo FnSearchByKeywords
      */
-
+        console.log('bodyParams', req.body);
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -56,9 +56,11 @@ Search.prototype.searchKeyword = function(req,res,next){
         var HomeDelivery = (req.body.HomeDelivery) ? req.body.HomeDelivery : 0;
         var CurrentDate = req.body.CurrentDate;
         var count = 0;
-
+        console.log('CurrentDate',CurrentDate);
         if(CurrentDate)
             CurrentDate = new Date(CurrentDate);
+        console.log('CurrentDate1111',CurrentDate);
+        if(type.toString() == 'NaN')
         if(type.toString() == 'NaN')
             type = 0;
 
@@ -304,7 +306,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         }
         else if (type == "2") {
 
-            if (find && !isNaN(Latitude)&& !isNaN(Longitude) && CurrentDate && pagesize != null && pagecount != null) {
+            if ( !isNaN(Latitude)&& !isNaN(Longitude) && CurrentDate && pagesize != null && pagecount != null) {
 
                 if (ParkingStatus == 0) {
                     ParkingStatus = "0";
@@ -399,7 +401,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                 else if (isNaN(Longitude)) {
                     console.log('FnSearchByKeywords: Longitude is empty');
                 }
-                else if (CurrentDate) {
+                else if (!CurrentDate) {
                     console.log('FnSearchByKeywords: CurrentDate is empty');
                 }
                 else if (pagesize == null) {
@@ -459,7 +461,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                 //if (!find) {
                 //    console.log('FnSearchByKeywords: keyword is empty');
                 //}
-                if (CurrentDate) {
+                if (!CurrentDate) {
                     console.log('FnSearchByKeywords: CurrentDate is empty');
                 }
                 else if (isNaN(Latitude)) {

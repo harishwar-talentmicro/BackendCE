@@ -799,7 +799,6 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
                                                                                operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
                                                                            console.log("Notification Send");
-
                                                                        }
                                                                    }
                                                                }
@@ -1338,6 +1337,7 @@ Association.prototype.associationGetEventInfo = function(req,res,next){
     };
     var validationFlag = true;
     var error = {};
+
     if(!req.query.token){
         error.token = 'Invalid token';
         validationFlag *= false;

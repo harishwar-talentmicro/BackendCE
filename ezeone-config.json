@@ -58,7 +58,7 @@
   },
   "VERSION_LIST" : {
     "IOS" : [[16],[17,18]],
-    "ANDROID" : [36],
+    "ANDROID" : [37],
     "WEB" : [1]
   },
   "NOTIFICATION" : {

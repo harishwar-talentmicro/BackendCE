@@ -217,8 +217,6 @@ router.get('/', function(req,res,next){
                                              * assign all values of group id in a variable
                                              * */
 
-
-
                                             contactResults[0][i].thumbnailImage = (contactResults[0][i].groupType == 1) ?
                                                 ((contactResults[0][i].thumbnailImage) ?
                                                 req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(contactResults[0][i].thumbnailImage) : '') :

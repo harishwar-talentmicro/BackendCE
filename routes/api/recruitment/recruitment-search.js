@@ -571,24 +571,19 @@ router.post('/job_seeker_new',function(req,res,next){
                     instituteId: educations[j].instituteId ? educations[j].instituteId.toString() : 0
 
                 };
-                if(eduSkills.education)
-                {
+                if(eduSkills.education) {
                     educationStr = ' edu.Educationid=' + req.db.escape(eduSkills.education) ;
                 }
-                if(eduSkills.spc && eduSkills.spc!="0")
-                {
+                if(eduSkills.spc && eduSkills.spc!="0") {
                     spcStr=' AND FIND_IN_SET(edu.Specializationids,' +  req.db.escape(eduSkills.spc) + ') ';
                 }
-                if(eduSkills.scoreTo)
-                {
+                if(eduSkills.scoreTo) {
                     scoreStr=' AND edu.Score>=' + req.db.escape(eduSkills.scoreFrom) + ' AND edu.Score<=' + req.db.escape(eduSkills.scoreTo) ;
                 }
-                if(eduSkills.yearOfPassingTo && eduSkills.yearOfPassingTo!="0")
-                {
+                if(eduSkills.yearOfPassingTo && eduSkills.yearOfPassingTo!="0") {
                     yopStr=' AND edu.yearofpassing>=' + req.db.escape(eduSkills.yearOfPassingFrom) + ' AND edu.yearofpassing<=' + req.db.escape(eduSkills.yearOfPassingTo) ;
                 }
-                if(eduSkills.instituteId)
-                {
+                if(eduSkills.instituteId) {
                     instituteStr=' and edu.Instituteid=' + req.db.escape(eduSkills.instituteId) ;
                 }
                 fullStr='(' + educationStr + spcStr + scoreStr + yopStr + instituteStr + ')';
@@ -699,8 +694,6 @@ router.post('/job_seeker_new',function(req,res,next){
         ratingQuery = ' and find_in_set(m.Rating,'+ req.db.escape(req.body.rating)+')';
     }
 
-
-
     if (parseInt(req.body.maritalStatus) != 0){
         maritalStatusQuery = ' and find_in_set(m.maritalStatus,'+ req.db.escape(req.body.maritalStatus)+')';
     }
@@ -719,20 +712,16 @@ router.post('/job_seeker_new',function(req,res,next){
 
     var apUserCvs='';
     var sourceQry='';
-    if (isAreaPartner == 1)
-    {
+    if (isAreaPartner == 1) {
         apUserCvs=' and m.apuserid!=0 and tcv.OID=0 and tcv.jobid=0 ';
     }
-    else if(isAreaPartner==0 && source=='1,2' && source=="2,1")
-    {
+    else if(isAreaPartner==0 && source=='1,2' && source=="2,1") {
         sourceQry=' and tcv.jobid=0 ';
     }
-    else if(isAreaPartner==0 && source=='1')
-    {
+    else if(isAreaPartner==0 && source=='1') {
         sourceQry=' and find_in_set(tcv.OID,@user_ids) and tcv.jobid=0 ';
     }
-    else if(isAreaPartner==0 && source=='2')
-    {
+    else if(isAreaPartner==0 && source=='2') {
         sourceQry=' and tcv.OID=0 and tcv.jobid=0 ';
     }
 
@@ -791,7 +780,7 @@ router.post('/job_seeker_new',function(req,res,next){
                 res.json(respMsg);
             }
         });
-    }
+    };
 
     console.log('locationQuery',locationQuery);
     if (locationList){
@@ -818,8 +807,8 @@ router.post('/job_seeker_new',function(req,res,next){
                     f.longitude ) - radians(g.longitude) )+ sin ( radians(g.latitude) )* sin( radians( f.latitude )))),2)  as distance ' ;
                     locationData = ' and find_in_set(g.tid,"' + locationId +'") ';
                 }
-
                 preparedQuery ();
+
 
             }
             else {
@@ -832,8 +821,6 @@ router.post('/job_seeker_new',function(req,res,next){
     else {
         preparedQuery ();
     }
-
-
 
 });
 

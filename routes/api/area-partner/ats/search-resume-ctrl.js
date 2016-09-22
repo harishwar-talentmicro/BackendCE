@@ -214,11 +214,12 @@ SearchResumeCtrl.searchResume = function(req,res,next){
     var ageTo=req.body.ageTo;
 
 
-    var gender = req.body.gender;
-
+    var source1GenderQuery = '';
     //gender = (gender == 2) ? "0,1,2" : ((gender) ? ""+gender+ "": "0,1,2");
-    gender = (req.body.gender) ? (req.body.gender).join(',') : '';
-    var source1GenderQuery = " AND FIND_IN_SET(m.Gender,"+req.db.escape(gender)+") ";
+    var gender = (req.body.gender) ? (req.body.gender).join(',') : '';
+    if(gender){
+        source1GenderQuery = " AND FIND_IN_SET(m.Gender,"+req.db.escape(gender)+") ";
+    }
 
     var expQuery = '';
     var salQuery  = '';
@@ -431,7 +432,7 @@ SearchResumeCtrl.searchResume = function(req,res,next){
     var distanceQuery = ' 0 as distance ';
 
 
-    if (parseInt(req.body.noticePeriodTo) != 0){
+    if (parseInt(req.body.noticePeriodTo)){
         noticePeriodQuery = ' and tcv.noticeperiod>='+req.db.escape(req.body.noticePeriodFrom) +' and tcv.noticeperiod<='+
             req.db.escape(req.body.noticePeriodTo);
     }
@@ -512,8 +513,7 @@ SearchResumeCtrl.searchResume = function(req,res,next){
                 var respMsg = {
                     status : true,
                     message : "Job seeker result loaded successfully",
-                    data : [],
-                    count : 0
+                    data : []
                 };
                 if(results[0]){
                     for(var i=0; i < results[0].length; i++){
@@ -521,6 +521,26 @@ SearchResumeCtrl.searchResume = function(req,res,next){
                         req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][i].resumeLink : '';
                         results[0][i].candidatePicture = (results[0][i].candidatePicture) ?
                         req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][i].candidatePicture : '';
+                        /**
+                         * resumeFreshnessPeriod is coming in days from db
+                         * here convering it in months and days
+                         */
+                        var resumeFreshnessMonth = (results[0][i].resumeFreshnessPeriod) ? parseInt(((results[0][i].resumeFreshnessPeriod)/30)) : 0;
+                        var resumeFreshnessDays = (results[0][i].resumeFreshnessPeriod) ? ((results[0][i].resumeFreshnessPeriod)%30) : 0;
+
+                        var daysStr = '';
+                        var monthStr = '';
+                        if (resumeFreshnessDays){
+                            daysStr = resumeFreshnessDays + ' days';
+                        }
+                        if (resumeFreshnessMonth == 1){
+                            monthStr = resumeFreshnessMonth + ' month ' ;
+                        }
+                        if (resumeFreshnessMonth > 1){
+                            monthStr = resumeFreshnessMonth + ' months ' ;
+                        }
+                        results[0][i].resumeFreshnessPeriod = monthStr + daysStr;
+
                     }
                     for (var y = 0; y < results[0].length; y++){
                         var tempArray = (results[0][y].lineOfCareerList) ?
@@ -532,18 +552,15 @@ SearchResumeCtrl.searchResume = function(req,res,next){
                         locList.push(locObj);
                         results[0][y].lineOfCareerList = locList
                     }
-
-
-                    var lineOfCareerList =
-                    respMsg.data = results[0];
-                }
-                if(results[1]){
-                    respMsg.count = (results[1][0]) ? ((results[1][0].count) ? results[1][0].count : 0) : 0;
+                    respMsg.data = {
+                        candidateSearchList : results[0],
+                        totalCount : (results[1]) ? ((results[1][0]) ? ((results[1][0].count) ? results[1][0].count : 0) : 0) : 0
+                    };
                 }
                 res.json(respMsg);
             }
         });
-    }
+    };
 
     console.log('locationQuery',locationQuery);
     if (locationList){
