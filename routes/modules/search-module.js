@@ -68,7 +68,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         var pagesize = (req.body.pagesize) ? parseInt(req.body.pagesize) : 0;
         var pagecount = (req.body.pagecount) ? parseInt(req.body.pagecount) : 0;
         var total = (req.body.total) ? parseInt(req.body.total) : 0;
-        var promotionFlag = (req.body.promotion_flag) ? ((parseInt(req.body.promotion_flag) == 1) ? req.body.promotion_flag : 2) : 2;
+        var promotionFlag = (parseInt(req.body.promotion_flag) == 1) ? (req.body.promotion_flag) : 2;
         var isVerified = (req.body.isVerified) ? parseInt(req.body.isVerified) : 0;
 
         if (type == "1") {
