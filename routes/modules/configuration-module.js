@@ -2900,8 +2900,9 @@ Configuration.prototype.saveHoliday = function(req,res,next){
                         st.db.query(query, function (err, holidayResult) {
                             if (!err){
                                 if(holidayResult) {
-                                    if (holidayResult.affectedRows > 0) {
+                                    if (holidayResult[0] && holidayResult[0][0] && holidayResult[0][0].holidayId) {
                                         rtnMessage.IsSuccessfull = true;
+                                        rtnMessage.holidayId = holidayResult[0][0].holidayId;
                                         res.send(rtnMessage);
                                         console.log('FnSaveHolidayCalendar: Holiday calander details save successfully');
                                     }

@@ -24,22 +24,26 @@ function alterEzeoneId(ezeoneId){
 
 
 router.get('*',function(req,res,next){
-    console.log('Hello');
-    var hostName = req.headers.host;
-    var parsedUrl = url.parse(req.originalUrl);
+    if(req.CONFIG.CONSTANT.DEBUG){
+        next();
+    }
+    else {
+        console.log('Hello');
+        var hostName = req.headers.host;
+        var parsedUrl = url.parse(req.originalUrl);
 
-    var requestedPath = parsedUrl.pathname;
+        var requestedPath = parsedUrl.pathname;
 
-    console.log(parsedUrl);
+        console.log(parsedUrl);
 
-    var alumniDomainList = ['www.vvalumni.com'];
+        var alumniDomainList = ['www.vvalumni.com'];
 
 
         console.log('Hostname : '+hostName);
 
         if(hostName && hostName.length){
             var hostNameParsed = hostName.split('.');
-            if(hostNameParsed.length){
+            if(hostNameParsed.length > 2){
 
                 var alumniName = hostNameParsed[0];
                 if(alumniName == 'www' || alumniName == '@www'){
@@ -78,13 +82,13 @@ router.get('*',function(req,res,next){
                                  * Loads alumni portal
                                  */
 
-                                    /**
-                                     * User has requested for a file or a path
-                                     * By default we assume he haven't requested for any file
-                                     */
-                                    console.log('calling next');
+                                /**
+                                 * User has requested for a file or a path
+                                 * By default we assume he haven't requested for any file
+                                 */
+                                console.log('calling next');
 
-                                    next();
+                                next();
 
 
 
@@ -101,7 +105,6 @@ router.get('*',function(req,res,next){
                                  * Loads ezeone portal
                                  */
 
-
                             }
                             else{
                                 res.redirect(req.CONFIG.CONSTANT.EZEONE_URL);
@@ -111,12 +114,14 @@ router.get('*',function(req,res,next){
                 }
             }
             else{
-                                           res.redirect(req.CONFIG.CONSTANT.EZEONE_URL);
+                res.redirect(req.CONFIG.CONSTANT.EZEONE_URL);
             }
         }
         else{
-                                       res.redirect(req.CONFIG.CONSTANT.EZEONE_URL);
+            res.redirect(req.CONFIG.CONSTANT.EZEONE_URL);
         }
+    }
+
 });
 
 module.exports = router;

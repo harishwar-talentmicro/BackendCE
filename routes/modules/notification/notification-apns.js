@@ -30,7 +30,7 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos){
         note['content-available'] = 1;
         note.badge = 1;
         //note.sound = "notification-beep.wav";
-        note.alert = { "body" : payload.g_title +' : ' +payload.message, "action-loc-key" : "Play" ,
+        note.alert = { "body" : payload.s_title +' : ' +payload.message, "action-loc-key" : "Play" ,
             "launch-image" :
                 //"mysplash.png","JsonResult":JSON.stringify(payload)};
                 "mysplash.png"};

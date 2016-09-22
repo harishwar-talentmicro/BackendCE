@@ -413,6 +413,16 @@ StdLib.prototype.getOnlyAttachmentName = function(attachmentLink){
     return (attachmentLink) ? attachmentLink.replace(regex,'') : '';
 };
 
+StdLib.prototype.getRandomCode = function () {
+        var vCode = "";
+        var numbers = "0123456789";
+
+        for( var i=0; i < 4; i++ )
+            vCode += numbers.charAt(Math.floor(Math.random() * numbers.length));
+
+        return vCode;
+    };
+
 /**
  * Hashes the password for saving into database
  * @param password

@@ -2221,8 +2221,6 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
                             res.status(400).json(respMsg);
                             return;
                         }
-
-
                         else{
                             if(result) {
                                 if (result.length > 0) {
@@ -3613,6 +3611,11 @@ BusinessManager.prototype.saveExternalsalesRequest = function(req,res,next){
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
                             if (!err) {
+                                /**
+                                 * function type is 0 for sales
+                                 * to send notifications and email to the persion who got sales enquiry
+                                 */
+                                sendNotificationAndMailToSubuser(req.body.token, req.body.toezeoneid, 0, results[0][0].rid,req.body.msg);
                                 responseMessage.status = true;
                                 responseMessage.error = null;
                                 responseMessage.message = 'External sales request added successfully';

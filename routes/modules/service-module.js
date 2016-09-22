@@ -1214,7 +1214,7 @@ Service.prototype.addMembersToService = function(req,res,next){
 
     var responseMessage = {
         status: false,
-        error: {},
+        error: null,
         message: '',
         data: null
     };
@@ -1231,10 +1231,18 @@ Service.prototype.addMembersToService = function(req,res,next){
          */
 
         var token = req.body.token;
-        var ezeid = req.st.alterEzeoneId(req.body.ezeid);
+        var ezeid = req.st.alterEzeoneId(req.body.ezeoneId);
 
         if(!(token)){
             error['token'] = 'token is Mandatory';
+            validateStatus *= false;
+        }
+        if (!req.body.communityType){
+            error['communityType'] = 'Community type is Mandatory';
+            validateStatus *= false;
+        }
+        if (!req.body.identifyName){
+            error['identifyName'] = 'Identify name is Mandatory';
             validateStatus *= false;
         }
     }
@@ -1249,9 +1257,18 @@ Service.prototype.addMembersToService = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
+                        req.body.notes = (req.body.notes) ? (req.body.notes) : '';
+                        req.body.batch = (req.body.batch) ? (req.body.batch) : 0;
+                        req.body.educationId = (req.body.educationId) ? (req.body.educationId) : 0;
+                        req.body.higherEducationId = (req.body.higherEducationId) ? (req.body.higherEducationId) : 0;
+                        req.body.specializationId = (req.body.specializationId) ? (req.body.specializationId) : 0;
+                        req.body.companyName = (req.body.companyName) ? (req.body.companyName) : '';
+                        req.body.jobTitle = (req.body.jobTitle) ? (req.body.jobTitle) : '';
+                        req.body.gender = (req.body.gender) ? (req.body.gender) : 2;
+                        req.body.dob = (req.body.dob) ? (req.body.dob) : null;
 
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(ezeid)
-                            + ',' + st.db.escape(req.body.identify_name);
+                            + ',' + st.db.escape(req.body.identifyName)+ ',' + st.db.escape(req.body.notes);
 
                         var query = 'CALL paddmembertoservice(' + queryParams + ')';
                         console.log(query);
@@ -1260,14 +1277,68 @@ Service.prototype.addMembersToService = function(req,res,next){
                                 if (memberResult) {
                                     console.log(memberResult);
                                     if (memberResult.affectedRows > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.message = 'Member added successfully';
-                                        responseMessage.data = {
-                                            ezeid: ezeid,
-                                            identify_name: req.body.identify_name
-                                        };
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnAddMembersToService: Member added successfully');
+                                    var finalQuery = '';
+                                        var educationParam = st.db.escape(token) + ',' + st.db.escape(ezeid) + ',' +
+                                        st.db.escape(req.body.batch) + ',' + st.db.escape(req.body.educationId)+ ',' + st.db.escape(req.body.higherEducationId)
+                                            + ',' + st.db.escape(req.body.specializationId)+ ',' + st.db.escape(req.body.identifyName);
+
+                                        var ezeIdParam = st.db.escape(token) + ',' + st.db.escape(req.body.companyName)
+                                            + ',' + st.db.escape(req.body.jobTitle)+ ',' + st.db.escape(req.body.gender)
+                                            + ',' + st.db.escape(req.body.dob)+ ',' + st.db.escape(req.body.communityType);
+
+                                        if (parseInt(req.body.communityType) == 2 || parseInt(req.body.communityType) == 5){
+                                            finalQuery = "CALL pSaveAlumniProfile_v2(" + educationParam + "); CALL pupdate_ezeone_details("+ ezeIdParam +");";
+                                            console.log('finalQuery',finalQuery);
+                                            st.db.query(finalQuery, function (err, result) {
+                                                if (!err && result){
+                                                    responseMessage.status = true;
+                                                    responseMessage.message = 'Member added successfully';
+                                                    responseMessage.data = {
+                                                        ezeoneId: ezeid,
+                                                        identifyName: req.body.identifyName
+                                                    };
+                                                    res.status(200).json(responseMessage)
+                                                }
+                                                else{
+                                                    responseMessage.status = false;
+                                                    responseMessage.message = 'Error while adding member';
+                                                    responseMessage.data = null
+                                                    res.status(200).json(responseMessage);
+                                                }
+
+                                            });
+                                        }
+                                        else if (parseInt(req.body.communityType) == 6){
+                                            finalQuery = "CALL pupdate_ezeone_details("+ ezeIdParam +");";
+                                            console.log('finalQuery',finalQuery);
+                                            st.db.query(finalQuery, function (err, result) {
+                                                if (!err && result){
+                                                    responseMessage.status = true;
+                                                    responseMessage.message = 'Member added successfully';
+                                                    responseMessage.data = {
+                                                        ezeoneId: ezeid,
+                                                        identifyName: req.body.identifyName
+                                                    };
+                                                    res.status(200).json(responseMessage)
+                                                }
+                                                else{
+                                                    responseMessage.status = false;
+                                                    responseMessage.message = 'Error while adding member';
+                                                    responseMessage.data = null;
+                                                    res.status(200).json(responseMessage);
+                                                }
+
+                                            });
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.message = 'Member added successfully';
+                                            responseMessage.data = {
+                                                ezeoneId: ezeid,
+                                                identifyName: req.body.identifyName
+                                            };
+                                            res.status(200).json(responseMessage);
+                                        }
                                     }
                                     else {
                                         if (memberResult[0]) {
@@ -1291,7 +1362,7 @@ Service.prototype.addMembersToService = function(req,res,next){
                                                 responseMessage.status = true;
                                                 responseMessage.message = 'Member added successfully';
                                                 responseMessage.data = {
-                                                    ezeid: ezeid,
+                                                    ezeoneId: ezeid,
                                                     identify_name: req.body.identify_name
                                                 };
                                                 res.status(200).json(responseMessage);
@@ -1402,7 +1473,7 @@ Service.prototype.getJoinedCommunity = function(req,res,next){
                                     if(communityResult[0]){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
-                                        responseMessage.message = 'communityResult loaded successfully';
+                                        responseMessage.message = 'community result loaded successfully';
                                         responseMessage.data = communityResult[0];
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetJoinedCommunity: communityResult loaded successfully');

@@ -264,7 +264,6 @@ router.get('/member_details', function(req,res,next){
  *
  * @discription : API to create batch receipts
  */
-
 router.post('/receipts', function(req,res,next){
     var responseMessage = {
         status: false,
@@ -318,6 +317,7 @@ router.post('/receipts', function(req,res,next){
         }
     }
 });
+
 
 /**
  * Method : GET

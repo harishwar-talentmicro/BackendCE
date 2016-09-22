@@ -452,12 +452,14 @@ User.prototype.getUserDetails = function(req,res,next){
              * If Android version is not supported
              */
             if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
+                console.log("===========coming to -1 block=============");
                 rtnMessage.versionStatus = 2;
                 rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
                 res.send([rtnMessage]);
                 return;
             }
             else{
+                console.log("===========coming to +1 block=============");
                 rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
                 (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
                 rtnMessage.versionMessage = (rtnMessage.versionStatus)

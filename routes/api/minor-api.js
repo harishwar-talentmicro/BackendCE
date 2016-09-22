@@ -15,7 +15,10 @@ var messaageBoxV1 =  require('./messagebox/messagebox-master.js');
 var locForecastV1 =  require('./line-of-career/loc-master.js');
 var apVersionV1 =  require('./ap-module/version.js');
 var areaPartner = require('./area-partner/area-partner-master.js');
+var configuration = require('./configuration/deal.js');
 var jobRaiser = require('./job-raiser/job-raiser-routes');
+var user = require('./user/user-routes');
+var community = require('./community/community-routes');
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
 
@@ -34,6 +37,9 @@ router.use('/versionCode',apVersionV1);
 
 router.use('/area_partner',areaPartner);
 router.use('/job_raiser',jobRaiser);
+router.use('/configuration',configuration);
+router.use('/user',user);
+router.use('/community',community);
 //router.use('/test_info',testInfoV1);
 //router.use('/association-ap',associationAPV1);
 

@@ -1,0 +1,729 @@
+/**
+ * @author Anjali Pandya
+ * @description Controller for signup, save address, save pin, validate ezeoneid etc for new wizard style UI
+ * @since August 26, 2016 10:46 AM IST
+ */
+
+var request = require('request');
+var validator = require('validator');
+var bcrypt = null;
+
+try{
+    bcrypt = require('bcrypt');
+}
+catch(ex){
+    console.log('Bcrypt not found, falling back to bcrypt-nodejs');
+    bcrypt = require('bcrypt-nodejs');
+}
+
+/**
+ * Compare the password and the hash for authenticating purposes
+ * @param password
+ * @param hash
+ * @returns {*}
+ */
+function comparePassword(password,hash){
+    if(!password){
+        return false;
+    }
+    if(!hash){
+        return false;
+    }
+    return bcrypt.compareSync(password,hash);
+}
+var UserCtrl = {};
+
+/**
+ * saving user data to sign up
+ * @param req
+ * @param res
+ * @param next
+ * @service-params {
+    "token": "{string}",
+    "firstName":"{string}:[30]",
+    "lastName":"{string}:[30]",
+    "email":"{string}:[150]",
+    "mobile":"{string}:[12]",
+    "isdMobile":"{string}:[10]"
+}
+ * @method POST
+ */
+UserCtrl.signup = function(req,res,next){
+
+    var response = {
+        status : false,
+        message : "Error while user registration",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.body.mobile){
+        error.mobile = 'Invalid mobile';
+        validationFlag *= false;
+    }
+    if (!validator.isLength((req.body.firstName), 3, 40)) {
+        error.firstName = 'First Name can be minimum 3 and maximum 40 characters';
+        validationFlag *= false;
+    }
+    if (!validator.isEmail(req.body.email)) {
+        error.email = 'Invalid Email';
+        validationFlag *= false;
+    }
+
+    if(!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+
+    else {
+        try{
+            req.body.lastName = (req.body.lastName) ? req.body.lastName : '';
+            req.body.isdMobile = (req.body.isdMobile) ? req.body.isdMobile : '';
+            req.body.password = (req.body.password) ? req.body.password : '';
+
+            var procParams = [
+                req.st.db.escape(req.body.firstName),
+                req.st.db.escape(req.body.lastName),
+                req.st.db.escape(req.body.email),
+                req.st.db.escape(req.body.mobile),
+                req.st.db.escape(req.body.isdMobile)
+            ];
+            /**
+             * Calling procedure to save user details
+             * @type {string}
+             */
+            var procQuery = 'CALL psignup( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,userResult){
+                /**
+                 * fetching ip address and user agent from header
+                 * @type {*|string}
+                 */
+                var ip = req.headers['x-forwarded-for'] ||
+                    req.connection.remoteAddress ||
+                    req.socket.remoteAddress;
+                var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+                if(!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].masterId){
+                    req.st.generateToken(ip, userAgent, userResult[0][0].ezeoneId, function (err, token) {
+                        if (err) {
+                            console.log('Error while generating token' + err);
+                            response.status = false;
+                            response.message = "Error while generating token";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                        else {
+                            response.status = true;
+                            response.message = "You are successfully register";
+                            response.error = null;
+                            response.data = {
+                                firstName : (req.body.firstName) ? req.body.firstName : '',
+                                lastName : (req.body.lastName) ? req.body.lastName : '',
+                                email : (req.body.email) ? req.body.email : '',
+                                mobile : (req.body.mobile) ? req.body.mobile : '',
+                                isdMobile : (req.body.isdMobile) ? req.body.isdMobile : '',
+                                token : token,
+                                masterId : (userResult[0][0].masterId) ? userResult[0][0].masterId : 0,
+                                ezeoneId : (userResult[0][0].ezeoneId) ? userResult[0][0].ezeoneId : 0
+                            };
+                            res.status(200).json(response);
+                        }
+                    });
+                }
+                else{
+                    response.status = false;
+                    response.message = "Error while user registration";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + '......... error .........');
+            console.log(ex);
+            console.log('Error: ' + ex);
+        }
+    }
+
+};
+
+/**
+ * saving user's address
+ * @param req
+ * @param res
+ * @param next
+ * @service-params {
+    "token": "{string}"
+    "address":"{string}:[250]",
+    "latitude":"{decimal}:[18,15]",
+    "longitude":"{decimal}:[18,15]"
+}
+ * @method POST
+ */
+UserCtrl.saveAddress = function(req,res,next){
+
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.body.address){
+        error.address = 'address can not be empty';
+        validationFlag *= false;
+    }
+    if(!req.body.latitude){
+        error.latitude = 'latitude can not be empty';
+        validationFlag *= false;
+    }
+    if(!req.body.longitude){
+        error.longitude = 'longitude can not be empty';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+
+    else {
+        try{
+            req.st.validateToken(req.query.token,function(err,tokenResult){
+                if((!err) && tokenResult){
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),req.st.db.escape(req.body.address),
+                        req.st.db.escape(req.body.latitude),req.st.db.escape(req.body.longitude)
+                    ];
+                    /**
+                     * Calling procedure to save deal
+                     * @type {string}
+                     */
+                    var procQuery = 'CALL psave_address( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery,function(err,addressResult){
+                        if(!err && addressResult && addressResult[0] && addressResult[0][0] && addressResult[0][0].id){
+                            response.status = true;
+                            response.message = "Address saved successfully";
+                            response.error = null;
+                            response.data = {
+                                address : (req.body.address) ? req.body.address : '',
+                                latitude : (req.body.latitude) ? req.body.latitude : '',
+                                longitude : (req.body.longitude) ? req.body.longitude : ''
+                            };
+                            res.status(200).json(response);
+
+                        }
+                        else{
+                            response.status = false;
+                            response.message = "Error while saving address";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                else{
+                    res.status(401).json(response);
+                }
+            });
+        }
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + '......... error .........');
+            console.log(ex);
+            console.log('Error: ' + ex);
+        }
+    }
+
+
+};
+
+/**
+ * saving user's pin to make profile pin protected
+ * @param req
+ * @param res
+ * @param next
+ * @service-params {
+    "token": "{string}",
+    "pin":"{int}:[3]"
+}
+ * @method POST
+ */
+UserCtrl.savePin = function(req,res,next){
+
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    var error = {};
+
+    if (!validator.isLength((req.body.password), 4, 100)) {
+        error.password = 'Password should be atleast 4 characters';
+        validationFlag *= false;
+    }
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+
+   else {
+        try {
+           req.st.validateToken(req.query.token,function(err,tokenResult){
+               if((!err) && tokenResult){
+
+                   var encryptPwd = '';
+                   if (req.body.password){
+                       encryptPwd = req.st.hashPassword(req.body.password);
+                   }
+                   var procParams = [
+                       req.st.db.escape(req.query.token),
+                       req.st.db.escape(req.body.pin),
+                       req.st.db.escape(encryptPwd)
+                   ];
+                   /**
+                    * Calling procedure to save deal
+                    * @type {string}
+                    */
+                   var procQuery = 'CALL psave_pin( ' + procParams.join(',') + ')';
+                   console.log(procQuery);
+                   req.db.query(procQuery,function(err,pinResult){
+                       if(!err && pinResult && pinResult[0] && pinResult[0][0]){
+                           response.status = true;
+                           response.message = "Password saved successfully";
+                           response.error = null;
+                           response.data = {
+                               pin : (req.body.pin) ? req.body.pin : 0,
+                               userDetails : pinResult[0][0]
+                           };
+                           res.status(200).json(response);
+                       }
+                       else{
+                           response.status = false;
+                           response.message = "Error while saving pin";
+                           response.error = null;
+                           response.data = null;
+                           res.status(500).json(response);
+                       }
+                   });
+               }
+               else{
+                   res.status(401).json(response);
+               }
+           });
+       }
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + '......... error .........');
+            console.log(ex);
+            console.log('Error: ' + ex);
+        }
+   }
+
+
+};
+
+/**
+ * generating OTP and sending SMS to given mobile number
+ * @param req
+ * @param res
+ * @param next
+ * @service-params {
+    "token": "{string}",
+    "pin":"{int}:[3]"
+}
+ * @method POST
+ */
+UserCtrl.mobileVerifyCodeGeneration = function(req,res,next){
+
+    var responseMsg = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.body.mobile){
+        error.mobile = 'Invalid mobile';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMsg.error = error;
+        responseMsg.message = 'Please check the errors';
+        res.status(400).json(responseMsg);
+        console.log(responseMsg);
+    }
+    /**
+     * to get otp calling getRandomCode() function from std lib
+     */
+    else {
+        var otp = req.st.getRandomCode();
+
+        req.body.isdMobile = (req.body.isdMobile) ? req.body.isdMobile : 0;
+        request({
+            url: 'http://sms.ssdindia.com/api/sendhttp.php',
+            qs: {
+                authkey: '11891AaSe1MQ6W57038d4b',
+                mobiles: req.body.isdMobile+req.body.mobile,
+                message: 'Your verification code is ' + otp + '.',
+                sender: 'EZEOne',
+                route: 4
+            },
+            method: 'GET'
+
+        }, function (error, response, body) {
+            if (error) {
+                console.log("Status code for error : " + response.statusCode);
+                console.log(error);
+            }
+            else {
+                console.log("Message sent successfully");
+                console.log("Messege body is :" + body);
+                console.log("Status Code :" + response.statusCode);
+                responseMsg.status = true;
+                responseMsg.message = "OTP sent successfully";
+                responseMsg.data = {
+                    mobile : req.body.mobile,
+                    isdMobile : req.body.isdMobile,
+                    otp : otp
+                };
+                responseMsg.error = null;
+                res.status(200).json(responseMsg);
+            }
+        });
+    }
+};
+
+/**
+ * validating ezeone id
+ * @param req
+ * @param res
+ * @param next
+ * @service-params {
+    "token": "{string}",
+    "ezeoneid":"{string}:[21]"
+}
+ * @method GET
+ */
+UserCtrl.verifyEzeoneId = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.params.ezeoneId){
+        error.ezeoneId = 'Invalid ezeoneid';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),req.st.db.escape(req.params.ezeoneId)
+                ];
+                /**
+                 * Calling procedure to save deal
+                 * @type {string}
+                 */
+                var procQuery = 'CALL pvalidate_ezeoneid( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,result){
+                    if(!err && result && result[0] && result[0][0]){
+                        if (result[0][0].ezeoneId){
+                            response.status = true;
+                            response.message = "This ezeoneid is available! ";
+                            response.error = null;
+                            response.data = {
+                                ezeoneId : result[0][0].ezeoneId
+                            };
+                            res.status(200).json(response);
+                        }
+                        else {
+                            response.status = true;
+                            response.message = "Ezeoneid already exist! You can not use this ezeoneid";
+                            response.error = null;
+                            response.data = null;
+                            res.status(200).json(response);
+                        }
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while validating ezeoneid";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+/**
+ * validating ezeone id
+ * @param req
+ * @param res
+ * @param next
+ * @service-params {
+    "token": "{string}",
+    "ezeoneid":"{string}:[21]"
+}
+ * @method GET
+ */
+UserCtrl.login = function(req,res,next){
+    var responseMessage = {
+        status : false,
+        message : "Invalid login details",
+        data : null,
+        error : null
+    };
+
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+
+
+    var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+    var deviceToken = req.body.device_token ? req.body.device_token : '';
+    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+    var ip = req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress;
+
+    var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
+
+    switch(req.platform){
+
+        case 'ios':
+            /**
+             * If IOS version is not supported
+             */
+            if(req.CONFIG.VERSION_LIST.IOS[0].indexOf(parseInt(req.query.versionCode)) == -1 && req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1 ){
+                responseMessage.versionStatus = 2;
+                responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+                res.send(responseMessage);
+                return;
+            }
+            else if(req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1){
+                responseMessage.versionStatus = 1;
+                responseMessage.versionMessage = "New update available. Please update your application to latest version";
+                //res.send(responseMessage);
+                //return;
+            }
+            else{
+                responseMessage.versionStatus = 0;
+                responseMessage.versionMessage = "Applications is up to date";
+                //res.send(responseMessage);
+            }
+            break;
+        case 'android':
+            /**
+             * If Android version is not supported
+             */
+            if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
+                responseMessage.versionStatus = 2;
+                responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+                res.send(responseMessage);
+                return;
+            }
+            else{
+                responseMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
+                (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+                responseMessage.versionMessage = (responseMessage.versionStatus)
+                    ? "New update available. Please update your application to latest version" : responseMessage.versionMessage;
+
+            }
+            break;
+        case 'web':
+            /**
+             * If Web version is not supported
+             */
+            if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
+                responseMessage.versionStatus = 2;
+                responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+                //res.send(responseMessage);
+                //return;
+            }
+            else{
+                responseMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
+                (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+                responseMessage.versionMessage = (responseMessage.versionStatus)
+                    ? "New update available. Please update your application to latest version" : responseMessage.versionMessage;
+            }
+            break;
+        default:
+            responseMessage.versionStatus = 2;
+            responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+            //res.send(responseMessage);
+            //return;
+            //break;
+    }
+
+    try{
+        var passwordMatchStatus = false;
+        var ezeoneId = '';
+        var queryParams = req.st.db.escape(req.body.userName) + ',' + req.st.db.escape(code);
+        var query = 'CALL plogin_v2(' + queryParams + ')';
+        console.log(query);
+        req.db.query(query, function (err, loginResult) {
+            if ((!err) && loginResult && loginResult[0]) {
+                console.log(loginResult);
+                var loginDetails = loginResult[0];
+                for (var i=0; i < loginResult[0].length; i++){
+                    if (comparePassword(req.body.password, loginResult[0][i].Password)){
+                        passwordMatchStatus = true;
+                        ezeoneId = loginResult[0][i].EZEID;
+                        break;
+                    }
+                    else {
+                        res.send(responseMessage);
+                        console.log('Invalid password');
+                    }
+                }
+                if (passwordMatchStatus){
+                    req.st.generateToken(ip, userAgent, ezeoneId, function (err, tokenResult) {
+
+                        if ((!err) && tokenResult) {
+                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, UserDetailsResult) {
+                                console.log(UserDetailsResult);
+                                if ((!err) && UserDetailsResult[0] && UserDetailsResult[0][0]) {
+                                    UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
+                                        (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +
+                                        UserDetailsResult[0][0].Picture) : '';
+
+                                    /**
+                                     * Every time the user loads the website the browser sends the cookie
+                                     * back to the server to notify the user previous activity
+                                     */
+                                    res.cookie('Token', tokenResult, {
+                                        maxAge: 900000,
+                                        httpOnly: true
+                                    });
+                                    responseMessage.message = 'You are logged in';
+                                    responseMessage.status = true;
+                                    responseMessage.Token = tokenResult;
+                                    responseMessage.IsAuthenticate = true;
+                                    responseMessage.TID = loginDetails[0].TID;
+                                    responseMessage.ezeone_id = loginDetails[0].EZEID;
+                                    responseMessage.FirstName = loginDetails[0].FirstName;
+                                    responseMessage.CompanyName = loginDetails[0].CompanyName;
+                                    responseMessage.Type = loginDetails[0].IDTypeID;
+                                    responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                    responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                    responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                    responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                    responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                    responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                    responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                    responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
+                                    responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
+                                    responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
+                                    responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
+                                    responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
+                                    responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
+                                    responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
+                                    responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                    responseMessage.LastName = loginDetails[0].LastName;
+                                    if (loginDetails[0].ParentMasterID == 0) {
+                                        responseMessage.MasterID = loginDetails[0].TID;
+                                    }
+                                    else {
+                                        responseMessage.MasterID = loginDetails[0].ParentMasterID;
+                                    }
+                                    responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
+                                    responseMessage.VisibleModules = loginDetails[0].VisibleModules;
+                                    responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
+                                    responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                    responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                    responseMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                    responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
+                                    responseMessage.group_id = loginDetails[0].group_id;
+                                    responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+                                    responseMessage.cvid = loginDetails[0].cvid;
+                                    responseMessage.profile_status = loginDetails[0].ps;
+                                    responseMessage.userDetails = UserDetailsResult[0];
+
+                                    console.log('FnLogin: Login success');
+                                    /**
+                                     * saving ios device id to database
+                                     */
+                                    if (isIphone == 1) {
+                                        var queryParams1 = req.st.db.escape(ezeoneId) + ',' + req.st.db.escape(deviceToken);
+                                        var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
+                                        req.db.query(query1, function (err, deviceResult) {
+                                            if (!err) {
+                                                console.log('FnLogin:Ios Device Id saved successfully');
+                                            }
+                                            else {
+                                                console.log(err);
+                                            }
+                                        });
+                                    }
+                                    res.send(responseMessage);
+                                }
+                            });
+                        }
+                        else {
+                            res.statusCode = 500;
+                            res.send(responseMessage);
+                            console.log('Failed to generate a token ' + err);
+                        }
+                    });
+                }
+            }
+            else {
+                res.statusCode = 500;
+                res.send(responseMessage);
+                console.log('Error: ' + err);
+            }
+        });
+    }
+    catch (ex) {
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + '......... error .........');
+        console.log(ex);
+        console.log('Error: ' + ex);
+    }
+};
+
+
+module.exports = UserCtrl;

@@ -1793,8 +1793,8 @@ Job.prototype.getJobDetails = function(req,res,next){
 
     var token = (req.query.token) ? req.query.token : null;
     var jobId = req.query.job_id;
-    var latitude = (req.query.lat) ? req.query.lat : '';
-    var longitude = (req.query.lng) ? req.query.lng : '';
+    var latitude = (req.query.lat) ? req.query.lat : 0;
+    var longitude = (req.query.lng) ? req.query.lng : 0;
 
     var responseMessage = {
         status: false,
@@ -3297,7 +3297,7 @@ Job.prototype.viewApplicantList = function(req,res,next){
  * @param next
  * @description api code for view job details
  */
-    Job.prototype.viewJobDetails = function(req,res,next){
+Job.prototype.viewJobDetails = function(req,res,next){
 
     var token = req.query.token;
     var jobId = req.query.job_id;

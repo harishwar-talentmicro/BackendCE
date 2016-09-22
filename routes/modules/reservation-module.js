@@ -1044,10 +1044,10 @@ Reservation.prototype.saveFeedback = function(req,res,next){
 
             catch (ex) {
                 responseMessage.error = {};
-                responseMessage.message = 'An error occured !'
+                responseMessage.message = 'An error occured !';
                 console.log('FnSaveFeedback:error ' + ex);
                 var errorDate = new Date();
-                console.log(errorDate.toTimeString() + ' ....................');
+                console.log(errorDate.toTimeString() + '....................');
                 res.status(400).json(responseMessage);
             }
         }
