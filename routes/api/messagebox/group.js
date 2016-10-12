@@ -426,7 +426,7 @@ router.post('/members', function(req,res,next){
                             if (addMemberResult && addMemberResult[0] && addMemberResult[0].length>0 && addMemberResult[0][0].userGroupId){
                                 var contactParams = [
                                     req.db.escape(addMemberResult[0][0].groupName) ,
-                                    req.db.escape(null) ,
+                                    req.db.escape(0) ,
                                     req.db.escape(req.body.groupId)
                                 ];
                                 var contactQuery = 'CALL get_v1_contact(' + contactParams.join(',') + ')';
