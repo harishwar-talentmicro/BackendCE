@@ -57,8 +57,8 @@
     "VHOST" : "%2f"
   },
   "VERSION_LIST" : {
-    "IOS" : [[16],[17,18]],
-    "ANDROID" : [37],
+    "IOS" : [[17],[18,19]],
+    "ANDROID" : [37,38],
     "WEB" : [1]
   },
   "NOTIFICATION" : {

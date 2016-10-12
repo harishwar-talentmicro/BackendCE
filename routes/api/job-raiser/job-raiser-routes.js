@@ -9,6 +9,8 @@ var router = express.Router();
 var jobRaiserCtrl = require('./job-raiser-ctrl');
 
 router.get('/call_notification',jobRaiserCtrl.getCallNotification);
+router.post('/setting',jobRaiserCtrl.saveSettings);
+router.get('/setting',jobRaiserCtrl.getSettings);
 
 
 module.exports = router;
