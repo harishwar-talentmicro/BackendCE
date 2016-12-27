@@ -91,6 +91,7 @@ DealCtrl.getDeal = function(req,res,next){
             var procQuery = 'CALL pget_deal_details( ' + procParams.join(',') + ')';
             console.log(procQuery);
             req.db.query(procQuery,function(err,dealResult){
+                console.log(dealResult);
                 if(!err && dealResult && dealResult[0] && dealResult[0][0]){
                     response.status = true;
                     response.message = "Deal details loaded successfully";

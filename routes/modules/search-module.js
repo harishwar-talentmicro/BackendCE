@@ -51,7 +51,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         var Latitude = parseFloat(req.body.Latitude);
         var Longitude = parseFloat(req.body.Longitude);
         var ParkingStatus = (req.body.ParkingStatus) ? req.body.ParkingStatus : '';
-        var OpenCloseStatus = (req.body.OpenCloseStatus) ? req.body.OpenCloseStatus : '';
+        var OpenCloseStatus = (req.body.OpenStatus) ? req.body.OpenStatus : '';
         var Rating = (req.body.Rating) ? req.body.Rating : '';
         var HomeDelivery = (req.body.HomeDelivery) ? req.body.HomeDelivery : 0;
         var CurrentDate = req.body.CurrentDate;
@@ -69,7 +69,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         var pagecount = (req.body.pagecount) ? parseInt(req.body.pagecount) : 0;
         var total = (req.body.total) ? parseInt(req.body.total) : 0;
         var promotionFlag = (parseInt(req.body.promotion_flag) == 1) ? (req.body.promotion_flag) : 2;
-        var isVerified = (req.body.isVerified) ? parseInt(req.body.isVerified) : 0;
+
 
         if (type == "1") {
 
@@ -155,8 +155,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                                 + ',' + st.db.escape(Longitude) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ',' + st.db.escape(Pin) + ',' + st.db.escape(SearchType) + ',' + st.db.escape(DocType)
                                 + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape(token)
                                 + ',' + st.db.escape(HomeDelivery) + ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                                st.db.escape(pagesize) + ',' + st.db.escape(pagecount) + ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag)
-                                + ',' + st.db.escape(isVerified);
+                                st.db.escape(pagesize) + ',' + st.db.escape(pagecount) + ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag);
 
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             st.db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
@@ -316,8 +315,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(1)
                     + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
                     + ',' + st.db.escape(token) + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ','+ st.db.escape(promotionFlag)
-                    + ',' + st.db.escape(isVerified);
+                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ','+ st.db.escape(promotionFlag);
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
@@ -333,17 +331,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                                     if (SearchResult[1]) {
 
                                         for (var i = 0; i < SearchResult[1].length; i++) {
-                                            console.log('SearchResult[1][i]',SearchResult[1][i]);
-                                            console.log('Open Status of SearchResult : ', st.getOpenStatus(SearchResult[1][i].OpenStatus,SearchResult[1][i].wh));
-
-                                            SearchResult[1][i]['OpenStatus'] = st.getOpenStatus(SearchResult[1][i].OpenStatus,SearchResult[1][i].wh);
-
-                                            //if(SearchResult[1][i].IDTypeID == 1){
-                                            //    //individualResList.push(i);
-                                            //    SearchResult[1].splice(i,1);
-                                            //}
-
-
+                                           // SearchResult[1][i]['OpenStatus'] = st.getOpenStatus(SearchResult[1][i].OpenStatus,SearchResult[1][i].wh);
                                             if (SearchResult[1][i].tilebanner == '') {
 
                                                 if (SearchResult[2].length != count) {
@@ -360,13 +348,25 @@ Search.prototype.searchKeyword = function(req,res,next){
 
                                             }
                                         }
+                                        //if(OpenCloseStatus == 1 )
+                                        //{
+                                        //    SearchResult[1] = SearchResult[1].filter(function( obj ) {
+                                        //        return obj.OpenStatus == 1;
+                                        //    });
+                                        //}
+
+
                                     }
 
-                                    res.json({
-                                        totalcount: SearchResult[0][0].totalcount,
-                                        Result: SearchResult[1],
-                                        isLoggedOut: 0
-                                    });
+
+                                        res.json({
+                                            totalcount: SearchResult[0][0].totalcount,
+                                            Result: SearchResult[1],
+                                            isLoggedOut: 0
+                                        });
+
+
+
                                     console.log('FnSearchByKeywords:  tmaster:Search Found');
                                 }
                                 else {
@@ -424,8 +424,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(3)
                     + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
                     + ',' + st.db.escape(token)  + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag)
-                    + ',' + st.db.escape(isVerified);
+                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag);
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {

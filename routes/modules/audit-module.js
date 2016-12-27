@@ -1071,7 +1071,6 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
                                         data = data.replace("[EZEIDNAME]", OutputFileName);
                                         data = data.replace("[EZEID]", EZEID);
                                         console.log('FnSendBulkMailer:Replace name send successfully');
-
                                     }
                                     else
                                     {

@@ -7,8 +7,9 @@
 var mysql = require('mysql'),
  //db_server = "10.0.100.223",//Name of the Server.
  //db_server = "182.73.205.244",//Name of the Server.
- db_server = "104.199.128.226",//Name of the Server.
-db_port = 3306, //Integers please.
+ // db_server = "104.199.128.226",//Name of the Server.
+ db_server = "182.74.145.170",//Name of the Server.
+db_port = 4406, //Integers please db_port = 3306 .
     //db_collection = "ezeid"; //Name of DB Collection
     db_collection = "test_ezeid"; //Name of DB Collection
 
@@ -24,7 +25,9 @@ exports.getDBContext = function () {
         database: db_collection,
         user: 'root',
         //password: 'ezeid',
-        password: 'StesTEzeOneID*2016#S',
+        //commented below to access database from local vedha system
+        // password: 'StesTEzeOneID*2016#S',
+        password: 'ezeone',
         multipleStatements: true,
         waitForConnection : true,
         queueLimit : 0,

@@ -285,14 +285,15 @@ StdLib.prototype.getOpenStatus = function(openStatusParam,workingHoursStrParam){
         return openStatus;
     }
     else{
-
         /**
          * Splitting working hours set
          */
         var workingHoursRes = (workingHoursStrParam) ? workingHoursStrParam.split('^') :[];
 
-        var currentDateObj = new Date();
-
+        var currentDateObj = '';
+        var ud = (new Date()).toUTCString();
+        currentDateObj = new Date(ud);
+        console.log(currentDateObj) ;
         /**
          * Current Time in minutes
          */

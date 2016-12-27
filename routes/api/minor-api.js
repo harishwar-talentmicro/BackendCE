@@ -19,6 +19,9 @@ var configuration = require('./configuration/deal.js');
 var jobRaiser = require('./job-raiser/job-raiser-routes');
 var user = require('./user/user-routes');
 var community = require('./community/community-routes');
+
+var job = require('./job/job-routes');
+
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
 
@@ -40,6 +43,8 @@ router.use('/job_raiser',jobRaiser);
 router.use('/configuration',configuration);
 router.use('/user',user);
 router.use('/community',community);
+router.use('/job',job);
+
 //router.use('/test_info',testInfoV1);
 //router.use('/association-ap',associationAPV1);
 

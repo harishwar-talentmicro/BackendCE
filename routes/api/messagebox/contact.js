@@ -9,6 +9,8 @@
 var express = require('express');
 var router = express.Router();
 var moment = require('moment');
+var Sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+
 var notification = null;
 var NotificationTemplater = require('../../lib/NotificationTemplater.js');
 var notificationTemplater = new NotificationTemplater();
@@ -670,6 +672,22 @@ router.put('/status', function(req,res,next){
     }
 });
 
+router.post('/hello',function(req,res,next){
+    Sendgrid.send({
+        from: 'ap.anjalipandya@gmail.com', // From address
+        to: 'tinipandya19@gmail.com', // To address
+        subject: 'Hello World!', // Subject
+        text: 'Sendgrid on Google App Engine with Node.js' // Content
+    }, function (err) {
+        if (err) {
+            return next(err);
+        }
+        // Render the index route on success
+        return res.send({
+            sent: true
+        });
+    });
+});
 
 
 

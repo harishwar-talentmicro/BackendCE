@@ -8,7 +8,7 @@
 
 var express = require('express');
 var router = express.Router();
-
+var Sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 /**
  * Method : GET
  * @param req
@@ -491,6 +491,24 @@ router.get('/opinionResult/:opinionPollId', function(req,res,next){
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
     }
+});
+
+
+router.post('/hello',function(req,res,next){
+    Sendgrid.send({
+        from: 'ap.anjalipandya@gmail.com', // From address
+        to: 'tinipandya19@gmail.com', // To address
+        subject: 'Hello World!', // Subject
+        text: 'Sendgrid on Google App Engine with Node.js' // Content
+    }, function (err) {
+        if (err) {
+            return next(err);
+        }
+        // Render the index route on success
+        return res.send({
+            sent: true
+        });
+    });
 });
 
 module.exports = router;

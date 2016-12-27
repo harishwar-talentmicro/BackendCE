@@ -237,4 +237,5 @@ JobRaiserCtrl.getSettings = function(req, res, next){
         }
     }
 };
+
 module.exports = JobRaiserCtrl;

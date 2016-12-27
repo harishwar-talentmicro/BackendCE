@@ -170,10 +170,7 @@ router.post('/cv_generate',function(req,res,next){
                             }
                         });
 
-
                     }
-
-
                 }
                 else{
                     console.log("imagePath4",imagePath);
@@ -331,7 +328,7 @@ router.post('/cv_generate',function(req,res,next){
                     if (!err) {
                         var procParams = [
                             req.db.escape(req.body.token) ,
-                            req.db.escape(attachmentFileName),
+                            req.db.escape(attachmentFileName)
                         ];
                         var procQuery = 'CALL psave_resumeurl(' + procParams.join(',') + ')';
                         console.log("procQuery",procQuery);
