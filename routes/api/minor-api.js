@@ -21,6 +21,7 @@ var user = require('./user/user-routes');
 var community = require('./community/community-routes');
 
 var job = require('./job/job-routes');
+var jobInfo = require('./jobInfo/jobInfo-routes');
 
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
@@ -44,6 +45,7 @@ router.use('/configuration',configuration);
 router.use('/user',user);
 router.use('/community',community);
 router.use('/job',job);
+router.use('/jobInfo',jobInfo);
 
 //router.use('/test_info',testInfoV1);
 //router.use('/association-ap',associationAPV1);

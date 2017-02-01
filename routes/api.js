@@ -319,6 +319,10 @@ router.post('/applicant_status',jobModule.applicantStatus);
 router.put('/job/status',jobModule.activateJobPO);
 router.post('/notify_job_seekers',jobModule.notifyRelevantJobSeekers);
 
+router.get('/applicants',jobModule.getApplicants);
+router.post('/applicants',jobModule.assignApplicantsToJobs);
+
+
 /**
  * Link multiple candidates to multiple jobs at once
  *
@@ -458,6 +462,7 @@ router.get('/v1/tag',tagModule.getTags);
 router.delete('/v1/tag',tagModule.deleteTag);
 router.post('/save_pictures',tagModule.savePictures);
 router.put('/v1/tag',tagModule.updatePin);
+router.get('/v1/tagList',tagModule.getTagsList);
 
 //Sos Module
 var Sos = require('./modules/sos-module.js');

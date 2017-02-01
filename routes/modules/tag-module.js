@@ -1748,6 +1748,111 @@ Tag.prototype.updatePin = function(req,res,next){
 //
 //saveAlumniPictureToCloud();
 
+/**
+ * @todo FnGetTagsList
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get tags
+ */
+Tag.prototype.getTagsList = function(req,res,next){
+
+    var token = req.query.token;
+    var output = [];
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true;
+    var error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var queryParams = st.db.escape(token);
+                        var query = 'CALL pgettagslist(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, getresult) {
+                            if (!err) {
+                                if(getresult) {
+                                    if (getresult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Tags Loaded successfully';
+                                        responseMessage.data = getresult[0];
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        responseMessage.message = 'Tags not Loaded';
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Tags not Loaded';
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetTags: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetTags:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetTags ' + ex);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
 module.exports = Tag;
 
 

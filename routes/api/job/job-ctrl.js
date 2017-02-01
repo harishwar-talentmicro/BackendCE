@@ -49,7 +49,9 @@ jobCtrl.saveJob = function(req, res, next){
                         req.st.db.escape(req.body.status ? req.body.status : 1) ,
                         req.st.db.escape(req.body.address),
                         req.st.db.escape(req.body.latitude),
-                        req.st.db.escape(req.body.longitude)
+                        req.st.db.escape(req.body.longitude),
+                        req.st.db.escape(req.body.expFrom ? req.body.expFrom : null),
+                        req.st.db.escape(req.body.expTo ? req.body.expTo : null)
                     ];
 
                     var procQuery = 'CALL p_m_savejob( ' + procParams.join(',') + ')';
@@ -67,7 +69,9 @@ jobCtrl.saveJob = function(req, res, next){
                                 status : req.body.status ? req.body.status : 1,
                                 address : req.body.address,
                                 latitude : req.body.latitude,
-                                longitude : req.body.longitude
+                                longitude : req.body.longitude,
+                                expFrom : req.body.expFrom ? req.body.expFrom : '',
+                                expTo : req.body.expTo ? req.body.expTo : ''
                             };
                             res.status(200).json(response);
                         }
@@ -144,7 +148,9 @@ jobCtrl.updateJob = function(req, res, next){
                         req.st.db.escape(req.body.status ? req.body.status : 1) ,
                         req.st.db.escape(req.body.address),
                         req.st.db.escape(req.body.latitude),
-                        req.st.db.escape(req.body.longitude)
+                        req.st.db.escape(req.body.longitude),
+                        req.st.db.escape(req.body.expFrom ? req.body.expFrom : null),
+                        req.st.db.escape(req.body.expTo ? req.body.expTo : null)
                     ];
 
                     var procQuery = 'CALL p_m_savejob( ' + procParams.join(',') + ')';
@@ -162,7 +168,9 @@ jobCtrl.updateJob = function(req, res, next){
                                 status : req.body.status ? req.body.status : 1,
                                 address : req.body.address,
                                 latitude : req.body.latitude,
-                                longitude : req.body.longitude
+                                longitude : req.body.longitude,
+                                expFrom : req.body.expFrom ? req.body.expFrom : '',
+                                expTo : req.body.expFrom ? req.body.expTo : ''
                             };
                             res.status(200).json(response);
                         }
@@ -248,7 +256,10 @@ jobCtrl.getJobList = function(req, res, next){
                                     result1.address =  result[0][i].address,
                                     result1.latitude =  result[0][i].latitude,
                                     result1.longitude =  result[0][i].longitude,
-                                    result1.applicantCount = result[0][i].applicantCount
+                                    result1.applicantCount = result[0][i].applicantCount,
+                                result1.createdDate =  result[0][i].createdDate,
+                                    result1.expFrom =  result[0][i].expFrom,
+                                    result1.expTo =  result[0][i].expTo
                                 output.push(result1);
                             }
 

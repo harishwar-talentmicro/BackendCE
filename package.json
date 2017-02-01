@@ -36,7 +36,7 @@
     "node-geocoder": "^3.13.1",
     "node-uuid": "~1.4.3",
     "nodemailer": "~1.4.0",
-    "nodemailer-smtp-transport": "^2.5.0",
+    "nodemailer-smtp-transport": "^2.7.2",
     "pdfkit": "~0.7.1",
     "querystring": "~0.2.0",
     "random-string": "0.1.2",

@@ -574,7 +574,7 @@ Search.prototype.searchInformation = function(req,res,next){
 
                                     console.log(' UserInfoResult[0][0]',UserInfoResult[0][0]);
                                     if(UserInfoResult[0][0]){
-                                        UserInfoResult[0][0].OpenStatus = st.getOpenStatus(UserInfoResult[0][0].OpenStatus,UserInfoResult[0][0].wh);
+                                        // UserInfoResult[0][0].OpenStatus = st.getOpenStatus(UserInfoResult[0][0].OpenStatus,UserInfoResult[0][0].wh);
                                         /**
                                          * Removing wh property
                                          */
