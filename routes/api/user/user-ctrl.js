@@ -67,10 +67,10 @@ UserCtrl.signup = function(req,res,next){
         error.firstName = 'First Name can be minimum 3 and maximum 40 characters';
         validationFlag *= false;
     }
-    if (!validator.isEmail(req.body.email)) {
-        error.email = 'Invalid Email';
-        validationFlag *= false;
-    }
+    // if (!validator.isEmail(req.body.email)) {
+    //     error.email = 'Invalid Email';
+    //     validationFlag *= false;
+    // }
 
     if(!validationFlag){
         response.error = error;

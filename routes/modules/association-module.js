@@ -15,6 +15,7 @@ var path = require('path');
 var util = require( "util" );
 var Notification = require('./notification/notification-master.js');
 var notification = null;
+var request = require('request');
 
 var st = null;
 function Association(db,stdLib){
@@ -120,12 +121,15 @@ Association.prototype.associGetEventDtl = function(req,res,next){
             req.query.pg_no = (req.query.pg_no) ? req.query.pg_no : 1;
             req.query.limit = (req.query.limit) ? req.query.limit : 10;
             req.query.status = (req.query.status) ? req.query.status : null;
+            req.query.searchKeyword = (req.query.searchKeyword) ? req.query.searchKeyword : '';
+            req.query.type =(req.query.type) ? req.query.type : '2,5,6'
+
             st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
                         var procParams = st.db.escape(req.query.token) + ',' + st.db.escape(req.query.service_mid)
                             + ',' + st.db.escape(req.query.pg_no)+ ',' + st.db.escape(req.query.limit)
-                            + ',' + st.db.escape(req.query.status);
+                            + ',' + st.db.escape(req.query.status) + ',' + st.db.escape(req.query.searchKeyword)+ ',' + st.db.escape(req.query.type);
                         var procQuery = 'CALL pGetAlumni_eventdetails(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -133,6 +137,9 @@ Association.prototype.associGetEventDtl = function(req,res,next){
                                 console.log(results);
                                 if (results) {
                                     if (results[0]){
+                                        console.log("---------------------------------------");
+                                        console.log(results);
+                                        console.log("---------------------------------------");
                                         if (results[0].length > 0) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
@@ -140,7 +147,8 @@ Association.prototype.associGetEventDtl = function(req,res,next){
                                             responseMessage.data = {
                                                 userDetails : results[0],
                                                 eventDetails : results[1],
-                                                totalCount : results[2][0].tc
+                                                totalCount : results[2][0].tc,
+                                                memberList : (results[3][0]) ? results[3] : []
                                             }
                                             res.status(200).json(responseMessage);
 
@@ -1363,6 +1371,8 @@ Association.prototype.associationGetEventInfo = function(req,res,next){
             st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
+                        // req.query.type =(req.query.type) ? req.query.type : '2,5,6'
+
                         var procParams = st.db.escape(req.query.token) + ',' + st.db.escape(req.query.service_mid)
                             + ',' + st.db.escape(req.query.ten_id) + ',' + st.db.escape(req.query.flag);
                         var procQuery = 'CALL get_event_details(' + procParams + ')';
@@ -1659,10 +1669,12 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
             error['title'] = 'Invalid title';
             validationFlag *= false;
         }
-        if (!req.body.startDate) {
-            error['s_date'] = 'Start date can not be empty';
-            validationFlag *= false;
-        }
+
+
+        // if (!req.body.startDate) {
+        //     error['s_date'] = 'Start date can not be empty';
+        //     validationFlag *= false;
+        // }
         if (!req.body.code) {
             error['code'] = 'Invalid code';
             validationFlag *= false;
@@ -1675,7 +1687,7 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
         }
         else {
             try {
-                var tenType = ['poster','event','poster','poster','opinion-poll','poster'];
+                var tenType = ['poster','event','poster','poster','opinion-poll','poster','message','job'];
                 req.body.ten_id = (req.body.ten_id) ? req.body.ten_id : 0;      // while saving time 0 else id of user
                 req.body.e_date = (req.body.e_date) ? (req.body.e_date) : null;
                 req.body.reg_lastdate = (req.body.reg_lastdate) ? (req.body.reg_lastdate) : null;
@@ -1685,6 +1697,8 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                 req.body.note = (req.body.note) ? req.body.note : '';
                 req.body.description = (req.body.description) ? req.body.description : '';
                 req.body.capacity = (req.body.capacity) ? (req.body.capacity) : 0;
+                req.body.startDate = (req.body.startDate) ? (req.body.startDate) : null;
+
                 console.log("req.body.image_details",req.body.image_details);
                 var imgObject = (req.body.image_details) ? req.body.image_details : '';
                 st.validateToken(req.body.token, function (err, tokenResult) {
@@ -2922,5 +2936,214 @@ Association.prototype.associationGetOPoptions = function(req,res,next){
     }
 
 };
+
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description get all options of opinion poll
+ * @accepts json
+ *
+ * @param token <string> token of login user
+ * @param ten_id <int> ten_id id of opinion poll
+ *
+ */
+Association.prototype.associationInvite = function(req, res, next){
+
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    var error = {};
+    var contactList = req.body.contactList;
+    if(typeof(contactList) == "string") {
+        contactList = JSON.parse(contactList);
+    }
+    if(!contactList){
+        contactList = [];
+    }
+
+    var mobileCount = 0;
+    var mobileData = contactList[mobileCount];
+    var message;
+    var attachmentObject = '';
+    var senderGroupId;
+    var companyName='';
+    var mobileList = '';
+    var messageId = 0 ;
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+            req.st.validateToken(req.query.token,function(err,tokenResult){
+
+                if((!err) && tokenResult){
+
+                    var sendInvitation = function(){
+                        if(mobileList!='') {
+                            mobileList = mobileList.substr(0, mobileList.length - 1);
+                            request({
+                                url: 'http://sms.ssdindia.com/api/sendhttp.php',
+                                qs: {
+                                    authkey: '12909AK9RbCdvLf57d63bfc',
+                                    mobiles: mobileList,
+                                    message: "You are invited to join " + companyName + " by " + tokenResult[0].fullName + ". Click on the following link based on your mobile phone type to download App. Sign-up as new user to join the group." +
+                                    "\n\n" +
+                                    "For Android:  https://www.ezeone.com/EZEONE.android " +
+                                    "\n\n" +
+                                    "For iOS: https://www.ezeone.com/EZEONE.ios " +
+                                    "\n\n" +
+                                    "Hope you will enjoy using EZEOne." +
+                                    "\n\n" +
+                                    "EZEOne Team",
+                                    sender: 'EZEONE',
+                                    route: 4
+                                },
+                                method: 'GET'
+
+                            }, function (error, response, body) {
+                                if (error) {
+                                    console.log(error);
+                                    console.log('Error :', err);
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    responseMessage.message = 'An error occurred !';
+                                    res.status(500).json(responseMessage);
+                                }
+                                else {
+                                    console.log("Message sent successfully");
+                                    console.log("Messege body is :" + body);
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Successfully invited ..';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+
+                            });
+                        }
+                        else{
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Successfully invited ..';
+                            responseMessage.data = null;
+                            res.status(200).json(responseMessage);
+                        }
+                    };
+
+                    var inviteMobile = function(mobileData){
+
+                        var queryParams = req.st.db.escape(req.query.token) + ',' + req.st.db.escape(mobileData.mobile) + ',' + req.st.db.escape(mobileData.isdMobile)+ ',' + req.st.db.escape(mobileData.firstName)+ ',' + req.st.db.escape(mobileData.lastName)+ ',' + req.st.db.escape(mobileData.ezeoneId)+ ',' + req.st.db.escape(req.body.serviceMasterId) ;
+                        var addressBookQry = 'CALL addressBook_community(' + queryParams + ')';
+                        console.log('addressBookQry_community',addressBookQry);
+                        req.db.query(addressBookQry, function (err, results) {
+                            if (!err) {
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0][0]) {
+
+                                            mobileCount += 1;
+                                            if (results[0][0].mobile != '') {
+                                                mobileList += results[0][0].mobile + ',';
+                                                companyName= results[0][0].companyName ;
+                                            }
+                                            if (mobileCount < contactList.length) {
+                                                inviteMobile(contactList[mobileCount]);
+                                            }
+                                            else {
+                                                sendInvitation();
+                                            }
+                                        }
+                                        else {
+                                            console.log('Invite:results no found');
+                                            mobileCount += 1;
+                                            if (mobileCount < contactList.length) {
+                                                inviteMobile(contactList[mobileCount]);
+                                            }
+                                            else {
+                                                sendInvitation();
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        console.log('FnSaveJobLocation:results no found');
+                                        mobileCount += 1;
+                                        if (mobileCount < contactList.length) {
+                                            inviteMobile(contactList[mobileCount]);
+                                        }
+                                        else {
+                                            sendInvitation();
+                                        }
+                                    }
+                                }
+                                else {
+                                    console.log('FnSaveJobLocation:results no found');
+                                    mobileCount += 1;
+                                    if (mobileCount < contactList.length) {
+                                        inviteMobile(contactList[mobileCount]);
+                                    }
+                                    else {
+                                        sendInvitation();
+                                    }
+                                }
+                            }
+                            else{
+                                console.log('Error :', err);
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    };
+                    //calling function at first time
+
+
+                    if (contactList) {
+                        if (contactList.length > 0) {
+                            inviteMobile(mobileData);
+                        }
+                    }
+                    else{
+                        res.status(401).json(response);
+                    }
+
+                }
+                else{
+                    res.status(401).json(response);
+                }
+            });
+        }
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + '......... error .........');
+            console.log(ex);
+            console.log('Error: ' + ex);
+        }
+    }
+};
+
 
 module.exports = Association;

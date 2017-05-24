@@ -273,10 +273,6 @@ router.put('/status', function(req,res,next){
         error.member_id = 'Invalid member id';
         validationFlag *= false;
     }
-    if (isNaN(parseInt(req.body.type)) || (req.body.type) < 0 ) {
-        error.type = 'Invalid type';
-        validationFlag *= false;
-    }
     if (isNaN(parseInt(req.body.service_mid)) || (req.body.service_mid) < 0 ) {
         error.service_mid = 'Invalid service id';
         validationFlag *= false;
@@ -300,6 +296,8 @@ router.put('/status', function(req,res,next){
                         req.body.sa = (req.body.sa) ? req.body.sa : 2;
                         req.body.ha = (req.body.ha) ? req.body.ha : 2;
                         req.body.ba = (req.body.ba) ? req.body.ba : 2;
+                        req.body.type = (req.body.type) ? req.body.type : 0;
+
                         var procParams = req.db.escape(req.body.service_mid)+ ',' + req.db.escape(req.body.member_id)+ ',' + req.db.escape(req.body.token)
                             + ',' + req.db.escape(req.body.status)+ ',' + req.db.escape(req.body.pa)+ ',' + req.db.escape(req.body.sa)
                             + ',' + req.db.escape(req.body.ha)+ ',' + req.db.escape(req.body.ba)+ ',' + req.db.escape(req.body.type);

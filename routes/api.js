@@ -675,6 +675,7 @@ router.delete('/association_ten_img/:id',AssociationtModule.associationDeleteTen
 router.delete('/association_service_img/:id',AssociationtModule.associationDeleteServiceImg);
 router.put('/association_ten_status',AssociationtModule.associationUpdateTenStatus);
 router.get('/association_op_option',AssociationtModule.associationGetOPoptions);
+router.post('/association_invite',AssociationtModule.associationInvite);
 
 //test-module
 //var Test = require('./modules/test-module.js');

@@ -10,6 +10,17 @@ function error(err, req, res, next) {
 };
 
 var gcloud = require('gcloud');
+
+var bcrypt = null;
+
+try{
+    bcrypt = require('bcrypt');
+}
+catch(ex){
+    console.log('Bcrypt not found, falling back to bcrypt-nodejs');
+    bcrypt = require('bcrypt-nodejs');
+}
+
 var gcs = gcloud.storage({
     projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
     keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
@@ -499,6 +510,66 @@ function FnSendMailEzeid(MailContent, CallBack) {
     }
 };
 
+
+StdLib.prototype.validateHEToken = function(token , EZEOneId , password, CallBack){
+    var _this = this;
+    try {
+        //below query to check token exists for the users or not.
+        if (token) {
+
+            /**
+             * @info : Token is now queried from session table i.e. tloginout
+             */
+            var queryParams = _this.db.escape(token) + ',' + _this.db.escape(EZEOneId);
+
+            var validateTokenQuery = 'CALL pvalidateHEToken(' + queryParams + ')';
+            console.log(validateTokenQuery);
+
+            _this.db.query(validateTokenQuery, function (err, sessionResult) {
+                if (!err) {
+                    if(sessionResult && sessionResult.length && sessionResult[0] && sessionResult[0][0] && sessionResult[0][0].password){
+                        if (comparePassword(password, sessionResult[0][0].password)) {
+                            CallBack(null, sessionResult[0]);
+                        }
+                        else{
+                            CallBack(null, null);
+                        }
+
+                    }
+                    else{
+                        CallBack(null, null);
+                        console.log('FnValidateToken:No Token found');
+                    }
+                }
+                else {
+                    CallBack(err, null);
+                    console.log('FnValidateToken:' + err);
+
+                }
+            });
+        }
+        else {
+            CallBack(null, null);
+            console.log('FnValidateToken: Token is empty');
+        }
+
+    }
+    catch (ex) {
+        console.log('OTP FnValidateToken error:' + ex);
+
+        return 'error'
+    }
+};
+
+function comparePassword(password,hash){
+    if(!password){
+        return false;
+    }
+    if(!hash){
+        return false;
+    }
+    return bcrypt.compareSync(password,hash);
+}
 
 
 module.exports = StdLib;

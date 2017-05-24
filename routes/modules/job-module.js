@@ -654,6 +654,8 @@ Job.prototype.create = function(req,res,next){
                                 }
                             });
                         };
+
+
                         var insertLocations = function(locationDetails){
                             var list = {
                                 location_title: locationDetails.location_title,

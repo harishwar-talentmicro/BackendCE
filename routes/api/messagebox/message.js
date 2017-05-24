@@ -802,7 +802,11 @@ router.get('/', function(req,res,next){
                                                 break;
                                             case 3:
                                                 message = results[0][messageCounter].message;
+                                                console.log("-----------------------------------------------------------");
+                                                console.log(message);
+                                                console.log("-----------------------------------------------------------");
                                                 messageObj = JSON.parse(message);
+
                                                 messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
                                                 req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
                                                 messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
@@ -820,8 +824,31 @@ router.get('/', function(req,res,next){
                                     responseMessage.error = null;
                                     responseMessage.message = 'Messages of group loaded successfully';
                                     responseMessage.totalCount = (results[1] && results[1][0] && results[1][0].count) ? results[1][0].count : 0;
+                                    var output =[];
+                                    for (var i = 0; i < results[0].length; i++ ) {
+                                        output.push({
+                                            messageId: results[0][i].messageId,
+                                            message: results[0][i].message,
+                                            messageLink: results[0][i].messageLink,
+                                            createdDate: results[0][i].createdDate,
+                                            messageType: results[0][i].messageType,
+                                            messageStatus: results[0][i].messageStatus,
+                                            priority: results[0][i].priority,
+                                            senderName: results[0][i].senderName,
+                                            senderId: results[0][i].senderId,
+                                            receiverId: results[0][i].receiverId,
+                                            transId : results[0][i].transId ? results[0][i].transId : 0,
+                                            formId : results[0][i].formId ? results[0][i].formId : 0,
+                                            currentStatus : results[0][i].currentStatus ? results[0][i].currentStatus : 0,
+                                            currentTransId : results[0][i].currentTransId ? results[0][i].currentTransId : 0,
+                                            parentId : results[0][i].parentId ? results[0][i].parentId : 0,
+                                            accessUserType : results[0][i].accessUserType ? results[0][i].accessUserType : 0,
+                                            heUserId : results[0][i].heUserId ? results[0][i].heUserId : 0,
+                                            formData : results[0][i].formDataJSON ? JSON.parse(results[0][i].formDataJSON) : null
+                                        });
+                                    }
                                     responseMessage.data = {
-                                        messageList : results[0],
+                                        messageList : output,
                                         deleteMessageIdList : (results[2]) ? results[2] : []
                                     };
 
@@ -890,8 +917,6 @@ router.get('/', function(req,res,next){
         }
     }
 });
-
-
 
 
 /**

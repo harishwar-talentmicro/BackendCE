@@ -16,7 +16,9 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos){
     var myPhone =  iphoneId;
 
     try{
+        console.log("myPhone",myPhone);
         var myDevice = new apn.Device(myPhone);
+        console.log("myDevice",myDevice);
 
 
         var note = new apn.Notification();

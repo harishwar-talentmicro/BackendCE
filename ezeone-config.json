@@ -16,13 +16,8 @@
     "EZEONE_CRASH_REPORT_DIR" : "ezeone_crash_report",
     "GROUP_ICON_URL" : "http://icons.iconarchive.com/icons/blackvariant/button-ui-system-folders-alt/512/Group-icon.png",
     "EZEONE_MAILING_LIST" : [
-      "jain31192@gmail.com",
-      "indrajeetnagda@gmail.com",
-      "himank1991@gmail.com",
       "sujit.mishra3147@gmail.com",
-      "himank@hirecraft.in",
-      "sujitkumar@hirecraft.in",
-      "pal.aabhishek95@gmail.com"
+      "sujitkumar@hirecraft.in"
     ],
     "EZEONE_MESSAGE_ACCEPT_STATUS":1,
     "EZEONE_MESSAGE_REJECT_STATUS":2,
