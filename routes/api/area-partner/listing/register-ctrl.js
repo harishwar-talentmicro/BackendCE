@@ -184,6 +184,7 @@ RegisterCtrl.register = function(req,res,next){
                      * Register
                      */
                     encryptPwd = (password) ? req.st.hashPassword(password) : req.st.hashPassword('123456');
+                    var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
 
                     var queryParams = req.st.db.escape(idtypeId) + ',' + req.st.db.escape(ezeid) + ',' + req.st.db.escape(encryptPwd)
                         + ',' + req.st.db.escape(firstName) + ',' + req.st.db.escape(lastName) + ',' + req.st.db.escape(companyName)
@@ -233,7 +234,7 @@ RegisterCtrl.register = function(req,res,next){
                                 req.connection.socket.remoteAddress;
                             var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
-                            req.st.generateToken(ip, userAgent, ezeid, function (err, token) {
+                            req.st.generateToken(ip, userAgent, ezeid,isWhatMate, function (err, token) {
                                 if (err) {
                                     console.log('FnRegistration: Token Generation Error');
                                     console.log(err);

@@ -19,16 +19,30 @@ userCtrl.saveUser = function(req,res,next){
         validationFlag *= false;
     }
     if(!req.body.userMasterId){
-        error.token = 'Invalid user masterId';
+        error.userMasterId = 'Invalid user masterId';
         validationFlag *= false;
     }
 
-    var userRights =req.body.userRights;
-    if(typeof(userRights) == "string") {
-        userRights = JSON.parse(userRights);
+    if(!req.body.formTemplateId){
+        error.formTemplateId = 'Invalid formTemplateId';
+        validationFlag *= false;
     }
-    if(!userRights){
-        userRights = [];
+
+
+    var approverGroups =req.body.approverGroups;
+    if(typeof(approverGroups) == "string") {
+        approverGroups = JSON.parse(approverGroups);
+    }
+    if(!approverGroups){
+        approverGroups = [];
+    }
+
+    var receiverGroups =req.body.receiverGroups;
+    if(typeof(receiverGroups) == "string") {
+        receiverGroups = JSON.parse(receiverGroups);
+    }
+    if(!receiverGroups){
+        receiverGroups = [];
     }
 
     if (!validationFlag){
@@ -39,37 +53,29 @@ userCtrl.saveUser = function(req,res,next){
     }
     req.st.validateToken(req.query.token,function(err,tokenResult){
         if((!err) && tokenResult){
-            req.body.userType = (req.body.userType) ? req.body.userType : 0;
             req.body.employeeCode = (req.body.employeeCode) ? req.body.employeeCode : '';
             req.body.jobTitle = (req.body.jobTitle) ? req.body.jobTitle : '';
             req.body.departmentTitle = (req.body.departmentTitle) ? req.body.departmentTitle : '';
             req.body.locationTitle = (req.body.locationTitle) ? req.body.locationTitle : '';
             req.body.grade = (req.body.grade) ? req.body.grade : '';
-            req.body.bankAcNo = (req.body.bankAcNo) ? req.body.bankAcNo : '';
-            req.body.IFSCCode = (req.body.IFSCCode) ? req.body.IFSCCode : '';
-            req.body.bankName = (req.body.bankName) ? req.body.bankName : '';
             req.body.status = (req.body.status) ? req.body.status : 1;
             req.body.trackTemplateId = (req.body.trackTemplateId) ? req.body.trackTemplateId : 0;
-            req.body.administrator = (req.body.administrator) ? req.body.administrator : 0;
             req.body.workLocationId = (req.body.workLocationId) ? req.body.workLocationId : 0;
 
             var procParams = [
                 req.st.db.escape(req.query.token),
                 req.st.db.escape(req.body.userMasterId),
-                req.st.db.escape(req.body.userType),
                 req.st.db.escape(req.body.employeeCode),
                 req.st.db.escape(req.body.jobTitle),
                 req.st.db.escape(req.body.departmentTitle),
                 req.st.db.escape(req.body.locationTitle),
                 req.st.db.escape(req.body.grade),
-                req.st.db.escape(req.body.bankAcNo),
-                req.st.db.escape(req.body.IFSCCode),
-                req.st.db.escape(req.body.bankName),
                 req.st.db.escape(req.body.status),
                 req.st.db.escape(req.body.trackTemplateId),
-                req.st.db.escape(req.body.administrator),
                 req.st.db.escape(req.body.workLocationId),
-                req.st.db.escape(JSON.stringify(userRights))
+                req.st.db.escape(req.body.formTemplateId),
+                req.st.db.escape(JSON.stringify(approverGroups)),
+                req.st.db.escape(JSON.stringify(receiverGroups))
             ];
             /**
              * Calling procedure to save form template
@@ -131,7 +137,7 @@ userCtrl.getMasterData = function(req,res,next){
                         bankNameList : masterDataResult[3],
                         workLocationList : masterDataResult[4],
                         trackTemplateList : masterDataResult[5],
-                        formTypeList : masterDataResult[6]
+                        formTemplateList : masterDataResult[6]
                     }
                     res.status(200).json(response);
 
@@ -174,27 +180,26 @@ userCtrl.getUserDetails = function(req,res,next){
             console.log(procQuery);
             req.db.query(procQuery,function(err,userData){
                 if(!err && userData){
-                    var outputArray=[];
-                    var userRights = JSON.parse("[" + userData[0][0].userRights + "]");
-                    console.log(userRights);
-
-                    for (var i = 0; i < userRights.length ; i++ ) {
-                        var result = {};
-                            result.HEFormId = userRights[i].HEFormId,
-                            result.isMapped = userRights[i].isMapped,
-                            result.HEFormTitle = userRights[i].HEFormTitle,
-                            result.approvers = JSON.parse("[" + userRights[i].approvers + "]"),
-                            result.receivers = JSON.parse("[" + userRights[i].receivers + "]"),
-                            result.accessType = JSON.parse("[" + userRights[i].accessType + "]")
-                                outputArray.push(result);
-                    }
+                    // var outputArray=[];
+                    // var userRights = JSON.parse("[" + userData[0][0].userRights + "]");
+                    // console.log(userRights);
+                    //
+                    // for (var i = 0; i < userRights.length ; i++ ) {
+                    //     var result = {};
+                    //         result.HEFormId = userRights[i].HEFormId,
+                    //         result.isMapped = userRights[i].isMapped,
+                    //         result.HEFormTitle = userRights[i].HEFormTitle,
+                    //         result.approvers = JSON.parse("[" + userRights[i].approvers + "]"),
+                    //         result.receivers = JSON.parse("[" + userRights[i].receivers + "]"),
+                    //         result.accessType = JSON.parse("[" + userRights[i].accessType + "]")
+                    //             outputArray.push(result);
+                    // }
 
                     response.status = true;
                     response.message = "User details loaded successfully";
                     response.error = null;
                     response.data = {
                         name :  userData[0][0].name,
-                    userType :  userData[0][0].type,
                     employeeCode : userData[0][0].employeeCode,
                     HEJobTitleId : userData[0][0].HEJobTitleId,
                     jobTitle : userData[0][0].jobTitle,
@@ -203,18 +208,18 @@ userCtrl.getUserDetails = function(req,res,next){
                     HELocationId : userData[0][0].HELocationId,
                     locationTitle : userData[0][0].locationTitle,
                     grade : userData[0][0].grade,
-                    bankAcNo : userData[0][0].bankAcNo,
-                    IFSCCode : userData[0][0].IFSCCode,
-                    bankNameId : userData[0][0].bankNameId,
-                    bankName : userData[0][0].bankName,
                     status : userData[0][0].status,
                     trackTemplateId : userData[0][0].trackTemplateId,
                     trackTemplateTitle : userData[0][0].trackTemplateTitle,
-                    administrator : userData[0][0].administrator,
                     workLocationId : userData[0][0].workLocationId,
                     workLocationTitle : userData[0][0].workLocationTitle ,
-                    userRights : outputArray
+                        formTemplateId : userData[0][0].formTemplateId ,
+                        formTemplateTitle : userData[0][0].formTemplateTitle ,
+                        approverGroups : (userData[0][0].approverGroups) ? JSON.parse(userData[0][0].approverGroups) : [],
+                        receiverGroups : (userData[0][0].receiverGroups) ? JSON.parse(userData[0][0].receiverGroups) : []
                     };
+
+
 
                     res.status(200).json(response);
 
@@ -247,12 +252,14 @@ userCtrl.getUserList = function(req,res,next){
 
             req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
             req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+            req.query.searchKeywords = (req.query.searchKeywords) ? (req.query.searchKeywords) : '';
             var startPage = 0;
 
             startPage = ((((parseInt(req.query.pageNo)) * req.query.limit) + 1) - req.query.limit) - 1;
 
             var procParams = [
                 req.st.db.escape(req.query.token),
+                req.st.db.escape(req.query.searchKeywords),
                 req.st.db.escape(startPage),
                 req.st.db.escape(req.query.limit)
             ];

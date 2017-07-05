@@ -494,7 +494,7 @@ router.post('/members', function(req,res,next){
                                                     memberCount : contactGroupResult[0][0].memberCount,
                                                     autoJoin : contactGroupResult[0][0].autoJoin
                                                 },
-                                                null);
+                                                null,tokenResult[0].isWhatMate);
                                             console.log('postNotification : notification for add members to group is sent successfully');
                                         }
                                         else{
@@ -711,7 +711,7 @@ router.post('/join', function(req,res,next){
                                                 isRequester : joinGroupResult[1][0].isRequester,
                                                 receiverGroupId :joinGroupResult[0][0].groupId
                                             },
-                                            null);
+                                            null,tokenResult[0].isWhatMate);
                                         console.log('postNotification : notification for join_group is sent successfully');
                                     }
                                     else{
@@ -755,7 +755,7 @@ router.post('/join', function(req,res,next){
                                                 isRequester : joinGroupResult[1][0].isRequester,
                                                 receiverGroupId :joinGroupResult[0][0].groupId
                                             },
-                                            null);
+                                            null,tokenResult[0].isWhatMate);
                                         console.log('postNotification : notification for join_group is sent successfully');
                                     }
                                     else{
@@ -1204,7 +1204,7 @@ router.post('/change_admin', function(req,res,next){
                                             moment().format("YYYY-MM-DD HH:mm:ss"),
                                             '',
                                             0,
-                                            0);
+                                            0,null,null,null,null,tokenResult[0].isWhatMate);
                                         console.log('postNotification : notification for change_admin is sent successfully');
                                     }
                                     else{
@@ -1369,7 +1369,7 @@ router.delete('/:groupId', function(req,res,next){
                                                 moment().format("YYYY-MM-DD HH:mm:ss"),
                                                 '',
                                                 0,
-                                                0);
+                                                0,null,null,null,null,tokenResult[0].isWhatMate);
                                             console.log('postNotification : notification for delete_group is sent successfully');
                                         }
                                         else{
@@ -1528,7 +1528,7 @@ router.put('/leave', function(req,res,next){
                                         moment().format("YYYY-MM-DD HH:mm:ss"),
                                         '',
                                         0,
-                                        0);
+                                        0,null,null,null,null,tokenResult[0].isWhatMate);
                                     console.log('postNotification : notification for leave_group is sent successfully');
                                 }
                                 else{

@@ -7,6 +7,9 @@
 var request = require('request');
 var validator = require('validator');
 var bcrypt = null;
+var fs = require('fs');
+var path = require('path');
+var EZEIDEmail = 'noreply@talentmicro.com';
 
 try{
     bcrypt = require('bcrypt');
@@ -15,6 +18,8 @@ catch(ex){
     console.log('Bcrypt not found, falling back to bcrypt-nodejs');
     bcrypt = require('bcrypt-nodejs');
 }
+
+var st = null;
 
 /**
  * Compare the password and the hash for authenticating purposes
@@ -84,6 +89,7 @@ UserCtrl.signup = function(req,res,next){
             req.body.lastName = (req.body.lastName) ? req.body.lastName : '';
             req.body.isdMobile = (req.body.isdMobile) ? req.body.isdMobile : '';
             req.body.password = (req.body.password) ? req.body.password : '';
+            req.body.isWhatMate = (req.body.isWhatMate) ? req.body.isWhatMate : 0;
 
             var procParams = [
                 req.st.db.escape(req.body.firstName),
@@ -108,7 +114,7 @@ UserCtrl.signup = function(req,res,next){
                     req.socket.remoteAddress;
                 var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
                 if(!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].masterId){
-                    req.st.generateToken(ip, userAgent, userResult[0][0].ezeoneId, function (err, token) {
+                    req.st.generateToken(ip, userAgent, userResult[0][0].ezeoneId,req.body.isWhatMate, function (err, token) {
                         if (err) {
                             console.log('Error while generating token' + err);
                             response.status = false;
@@ -202,10 +208,14 @@ UserCtrl.saveAddress = function(req,res,next){
         try{
             req.st.validateToken(req.query.token,function(err,tokenResult){
                 if((!err) && tokenResult){
+                    var emailId = req.body.emailId ? req.body.emailId : "";
 
                     var procParams = [
-                        req.st.db.escape(req.query.token),req.st.db.escape(req.body.address),
-                        req.st.db.escape(req.body.latitude),req.st.db.escape(req.body.longitude)
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.body.address),
+                        req.st.db.escape(req.body.latitude),
+                        req.st.db.escape(req.body.longitude),
+                        req.st.db.escape(emailId)
                     ];
                     /**
                      * Calling procedure to save deal
@@ -215,20 +225,96 @@ UserCtrl.saveAddress = function(req,res,next){
                     console.log(procQuery);
                     req.db.query(procQuery,function(err,addressResult){
                         if(!err && addressResult && addressResult[0] && addressResult[0][0] && addressResult[0][0].id){
+                            if (emailId != ""){
+                                var file = path.join(__dirname, '../../../mail/templates/registrationNew.html');
+
+                                fs.readFile(file, "utf8", function (err, data) {
+
+                                    if (!err) {
+                                        data = data.replace("[DisplayName]", tokenResult[0].DisplayName);
+                                        data = data.replace("[EZEOneID]", tokenResult[0].ezeoneId);
+
+                                        var mailOptions = {
+                                            from: EZEIDEmail,
+                                            to: emailId,
+                                            subject: 'Sign Up Process Successful',
+                                            html: data // html body
+                                        };
+
+                                        // send mail with defined transport object
+                                        //message Type 7 - Forgot password mails service
+                                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                        var email = new sendgrid.Email();
+                                        email.from = mailOptions.from;
+                                        email.to = mailOptions.to;
+                                        email.subject = mailOptions.subject;
+                                        email.html = mailOptions.html;
+
+                                        sendgrid.send(email, function (err, result) {
+                                            //console.log(result);
+                                            if (!err) {
+                                                if (result.message == 'success') {
+                                                    var post = {
+                                                        MessageType: 7,
+                                                        Priority: 1,
+                                                        ToMailID: mailOptions.to,
+                                                        Subject: mailOptions.subject,
+                                                        Body: mailOptions.html,
+                                                        SentbyMasterID: tokenResult[0].masterid,
+                                                        SentStatus: 1
+                                                    };
+                                                    //console.log(post);
+                                                    var query = req.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                        // Neat!
+                                                        if (!err) {
+                                                            console.log('FnForgetPassword: Mail saved Successfully');
+
+                                                        }
+                                                        else {
+                                                            console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+
+                                                        }
+                                                    });
+                                                }
+                                                else {
+                                                    console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+
+                                                }
+                                            }
+                                            else {
+                                                console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+
+                                            }
+                                        });
+                                    }
+                                    else{
+                                        console.log('FnForgetPassword: readfile '+err);
+                                    }
+                                });
+                            }
+                            else {
+                                /*
+                                @TODO
+                                If email id is not there then send SMS for successfull registration
+                                 */
+
+                            }
+
                             response.status = true;
-                            response.message = "Address saved successfully";
+                            response.message = "Sign Up Complete";
                             response.error = null;
                             response.data = {
                                 address : (req.body.address) ? req.body.address : '',
                                 latitude : (req.body.latitude) ? req.body.latitude : '',
-                                longitude : (req.body.longitude) ? req.body.longitude : ''
+                                longitude : (req.body.longitude) ? req.body.longitude : '',
+                                emailId : (req.body.emailId) ? req.body.emailId : ''
                             };
                             res.status(200).json(response);
 
                         }
                         else{
                             response.status = false;
-                            response.message = "Error while saving address";
+                            response.message = "Error while sign up";
                             response.error = null;
                             response.data = null;
                             res.status(500).json(response);
@@ -471,7 +557,7 @@ UserCtrl.verifyEzeoneId = function(req,res,next){
                             res.status(200).json(response);
                         }
                         else {
-                            response.status = true;
+                            response.status = false;
                             response.message = "Ezeoneid already exist! You can not use this ezeoneid";
                             response.error = null;
                             response.data = null;
@@ -520,6 +606,8 @@ UserCtrl.login = function(req,res,next){
 
 
     var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+    var isWhatMate = req.body.isWhatMate ? parseInt(req.body.isWhatMate) : 0;
+
     var deviceToken = req.body.device_token ? req.body.device_token : '';
     var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
     var ip = req.headers['x-forwarded-for'] ||
@@ -618,7 +706,7 @@ UserCtrl.login = function(req,res,next){
                     }
                 }
                 if (passwordMatchStatus){
-                    req.st.generateToken(ip, userAgent, ezeoneId, function (err, tokenResult) {
+                    req.st.generateToken(ip, userAgent, ezeoneId,isWhatMate, function (err, tokenResult) {
 
                         if ((!err) && tokenResult) {
                             var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ')';
@@ -722,6 +810,176 @@ UserCtrl.login = function(req,res,next){
         console.log(errorDate.toTimeString() + '......... error .........');
         console.log(ex);
         console.log('Error: ' + ex);
+    }
+};
+
+
+/**
+ * get profile data
+ * @param req
+ * @param res
+ * @param next
+ * @service-params {
+    "token": "{string}"
+}
+ * @method GET
+ */
+UserCtrl.getProfileData = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token)
+                ];
+                /**
+                 * Calling procedure to save deal
+                 * @type {string}
+                 */
+                var procQuery = 'CALL get_profile_data( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,result){
+                    if(!err && result ){
+                        response.status = true;
+                        response.message = "User details loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            userData : {
+                                displayName : result[0][0].displayName,
+                                isdMobile : result[0][0].isdMobile,
+                                mobileNo : result[0][0].mobileNo,
+                                EZEOneId : result[0][0].EZEOneId,
+                                address : result[0][0].address,
+                                latitude : result[0][0].latitude,
+                                longitude : result[0][0].longitude,
+                                emailId : result[0][0].emailId,
+                                pictureURL : (result[0][0].pictureURL) ?
+                                    (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + result[0][0].pictureURL) : ''
+                            },
+                            vaultData : result[1],
+                            tags : result[2]
+                        };
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting user data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+UserCtrl.saveProfileData = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    var vaultData =req.body.vaultData;
+    if(typeof(vaultData) == "string") {
+        vaultData = JSON.parse(vaultData);
+    }
+    if(!vaultData){
+        vaultData = [];
+    }
+
+    if(!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.pictureURL ? req.body.pictureURL : ''),
+                    req.st.db.escape(req.body.displayName),
+                    req.st.db.escape(req.body.isdMobile),
+                    req.st.db.escape(req.body.mobileNo),
+                    req.st.db.escape(req.body.EZEOneId),
+                    req.st.db.escape(req.body.address),
+                    req.st.db.escape(req.body.latitude),
+                    req.st.db.escape(req.body.longitude),
+                    req.st.db.escape(req.body.emailId),
+                    req.st.db.escape(JSON.stringify(vaultData))
+                ];
+
+                var procQuery = 'CALL update_profile_data( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,result){
+                    if(!err && result ){
+                        response.status = true;
+                        response.message = "Saved";
+                        response.error = null;
+                        response.data = {
+                            userData : {
+                                displayName : result[0][0].displayName,
+                                isdMobile : result[0][0].isdMobile,
+                                mobileNo : result[0][0].mobileNo,
+                                EZEOneId : result[0][0].EZEOneId,
+                                address : result[0][0].address,
+                                latitude : result[0][0].latitude,
+                                longitude : result[0][0].longitude,
+                                emailId : result[0][0].emailId,
+                                pictureURL : (result[0][0].pictureURL) ?
+                                    (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + result[0][0].pictureURL) : ''
+                            },
+                            vaultData : result[1],
+                            tags : result[2]
+                        };
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting user data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
     }
 };
 

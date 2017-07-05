@@ -107,7 +107,7 @@ leaveBalanceCtrl.getLeaveBalanceForm = function(req,res,next){
                                         }
                                     }
                                 },
-                                null);
+                                null,tokenResult[0].isWhatMate);
                             console.log('postNotification : notification for compose_message is sent successfully');
                         }
                         else {
@@ -135,6 +135,7 @@ leaveBalanceCtrl.getLeaveBalanceForm = function(req,res,next){
                             receiverId: results[0][0].receiverId,
                             transId : results[0][0].transId,
                             formId : results[0][0].formId,
+                            groupId: req.body.groupId,
                             currentStatus : results[0][0].currentStatus,
                             localMessageId : req.body.localMessageId,
                             formData : {

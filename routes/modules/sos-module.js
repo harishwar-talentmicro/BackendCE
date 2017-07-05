@@ -138,7 +138,7 @@ Sos.prototype.saveSos = function(req,res,next) {
                                                     console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
                                                         operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
                                                     notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos,0);
                                                 }
                                             }
                                         });

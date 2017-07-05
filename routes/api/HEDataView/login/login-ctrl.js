@@ -72,7 +72,6 @@ LoginCtrl.login = function(req,res,next){
     });
 };
 
-
 LoginCtrl.getHelloEZEUsers = function(req,res,next){
     var response = {
         status : false,

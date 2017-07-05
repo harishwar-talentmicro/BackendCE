@@ -805,7 +805,7 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                                            console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
                                                                                operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
                                                                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                               operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                               operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos,tokenResult[0].isWhatMate);
                                                                            console.log("Notification Send");
                                                                        }
                                                                    }
@@ -1100,7 +1100,7 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                                 console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
                                                                                     operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
                                                                                 notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                                    operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                    operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos,tokenResult[0].isWhatMate);
                                                                                 console.log("Notification Send");
                                                                             }
                                                                         }
@@ -1842,7 +1842,7 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                                                 console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
                                                                                     operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
                                                                                 notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                                    operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                    operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos,tokenResult[0].isWhatMate);
                                                                                 console.log("Notification Send");
                                                                             }
                                                                         }
@@ -2215,7 +2215,7 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                                 console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
                                                                                     operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
                                                                                 notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                                    operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                    operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos,tokenResult[0].isWhatMate);
                                                                                 console.log("Notification Send");
                                                                             }
                                                                         }
@@ -2740,7 +2740,7 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                                                     console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
                                                                         operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
                                                                     notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos,tokenResult[0].isWhatMate);
                                                                     console.log("Notification Send");
 
                                                                 }

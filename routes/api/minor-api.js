@@ -17,8 +17,10 @@ var apVersionV1 =  require('./ap-module/version.js');
 var areaPartner = require('./area-partner/area-partner-master.js');
 var configuration = require('./configuration/deal.js');
 var jobRaiser = require('./job-raiser/job-raiser-routes');
+
 var user = require('./user/user-routes');
 var community = require('./community/community-routes');
+var whatmatemanager = require('./whatmatemanager/whatmatemanager-routes');
 
 var job = require('./job/job-routes');
 var jobInfo = require('./jobInfo/jobInfo-routes');
@@ -50,7 +52,10 @@ var HELeave = require('./HEBackEnd/leave.js');
 var HEITHelpDesk = require('./HEApp/ITHelpdeskRequest.js');
 var HEVisitor = require('./HEApp/visitor.js');
 var HELogInOut = require('./HEApp/TITO.js');
-
+var HEsendMessage = require('./HEApp/sendMessage.js');
+var HEsendSOSMessage = require('./HEApp/sendSOSMessage.js');
+var HEgreeting = require('./HEApp/greeting.js');
+var signup = require('./signup/signup-routes');
 
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
@@ -74,8 +79,12 @@ router.use('/configuration',configuration);
 router.use('/user',user);
 router.use('/community',community);
 router.use('/job',job);
+router.use('/whatMate',whatmatemanager);
+
 router.use('/invite',invite);
 router.use('/jobInfo',jobInfo);
+
+router.use('/signup',signup);
 
 // for Hello EZE Project
 router.use('/helloEZE/appSettings',helloEZE);
@@ -105,6 +114,9 @@ router.use('/helloEZE',HELeave);
 router.use('/helloEZE/app',HEITHelpDesk);
 router.use('/helloEZE/app',HEVisitor);
 router.use('/helloEZE/app',HELogInOut);
+router.use('/helloEZE/app',HEsendMessage);
+router.use('/helloEZE/app',HEsendSOSMessage);
+router.use('/helloEZE/app',HEgreeting);
 
 //router.use('/test_info',testInfoV1);
 //router.use('/association-ap',associationAPV1);

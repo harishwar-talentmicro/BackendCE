@@ -172,7 +172,7 @@ router.post('/', function(req,res,next){
                                              moment().format("YYYY-MM-DD HH:mm:ss"),
                                              '',
                                              0,
-                                             0);
+                                             0,null,null,null,null,tokenResult[0].isWhatMate);
                                          console.log('postNotification : notification for join_group is sent successfully');
                                      }
                                      else{
@@ -398,7 +398,7 @@ router.post('/', function(req,res,next){
                                                                     }
 
                                                                 },
-                                                                null);
+                                                                null,tokenResult[0].isWhatMate);
                                                             console.log('postNotification : notification for compose_message is sent successfully');
                                                         }
                                                         else{
@@ -466,7 +466,7 @@ router.post('/', function(req,res,next){
                                                                         groupType : results[0][0].groupType
                                                                     }
                                                                 },
-                                                                null);
+                                                                null,tokenResult[0].isWhatMate);
                                                             console.log('postNotification : notification for compose_message is sent successfully');
                                                         }
                                                         else{
@@ -1019,7 +1019,7 @@ router.post('/delete', function(req,res,next){
                                                 {
                                                     deleteMessageIdList: outputArray
                                                 },
-                                                null);
+                                                null,tokenResult[0].isWhatMate);
                                             console.log('postNotification : notification for delete messages sent successfully');
 
 

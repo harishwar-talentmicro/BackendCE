@@ -15,8 +15,6 @@ var mysql = require('mysql'),
 //db_collection = "livedb"; //Name of DB Collection
 db_collection = "test_ezeid"; //Name of DB Collection
 
-
-
 var getDBContext = function () {
 
     //console.log("TEST TEST TEST ");

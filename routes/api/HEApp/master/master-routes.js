@@ -17,4 +17,6 @@ router.get('/HRDocTypes',masterCtrl.getHRDocItems);
 router.get('/expenseList',masterCtrl.expenseList);
 router.get('/formList',masterCtrl.getFormTypeList);
 
+router.get('/workGroups',masterCtrl.getWorkGroup);
+
 module.exports = router;

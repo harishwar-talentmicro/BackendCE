@@ -156,7 +156,7 @@ meetingCtrl.saveMetting = function(req,res,next){
                                     },
                                     contactList : null
                                 },
-                                null);
+                                null,tokenResult[0].isWhatMate);
                             console.log('postNotification : notification for compose_message is sent successfully');
                         }
                         else {
@@ -183,6 +183,7 @@ meetingCtrl.saveMetting = function(req,res,next){
                             receiverId: results[0][0].receiverId,
                             transId : results[0][0].transId,
                             formId : results[0][0].formId,
+                            groupId: req.body.groupId,
                             currentStatus : results[0][0].currentStatus,
                             currentTransId : results[0][0].currentTransId,
                             localMessageId : req.body.localMessageId,

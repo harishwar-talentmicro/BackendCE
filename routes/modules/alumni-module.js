@@ -352,6 +352,8 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                         encryptPwd = hashPassword(password);
                     }
 
+                    var isWhatMate = (req.body.isWhatMate) ? req.body.isWhatMate : 0;
+
                     var queryParams = st.db.escape(idtypeId) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(encryptPwd)
                         + ',' + st.db.escape(firstName) + ',' + st.db.escape(lastName) + ',' + st.db.escape(companyName)
                         + ',' + st.db.escape(jobTitle) + ',' + st.db.escape(functionId) + ',' + st.db.escape(roleId)
@@ -428,7 +430,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                                                     req.connection.socket.remoteAddress;
                                                 var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
-                                                st.generateToken(ip, userAgent, ezeid, function (err, token) {
+                                                st.generateToken(ip, userAgent, ezeid,isWhatMate, function (err, token) {
                                                     if (err) {
                                                         console.log('FnRegistration: Token Generation Error');
                                                         console.log(err);
@@ -4905,7 +4907,7 @@ Alumni.prototype.create = function(req,res,next){
                                                                                                     messageId = 0;
                                                                                                     masterid = '';
                                                                                                     //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid,null,null,null,null,null,null,null,null,null,null,null,tokenResult[0].isWhatMate);
                                                                                                 }
                                                                                                 else {
                                                                                                     console.log('FnjobNotification:user details not loaded');

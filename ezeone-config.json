@@ -37,6 +37,7 @@
   "APNS" : {
     "GATEWAY" : "gateway.sandbox.push.apple.com",
     "PASSPHRASE" : "hire@123",
+    "WHATMATEPASSPHRASE" : "what123",
     "PORT" : 2195
   },
   "MQTT" : {

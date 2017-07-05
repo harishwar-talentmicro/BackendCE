@@ -354,6 +354,10 @@ leaveCtrl.getLeaveBalance = function(req,res,next){
 
             req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
             req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+            req.query.employeeCode = (req.query.employeeCode) ? (req.query.employeeCode) : '';
+            req.query.name = (req.query.name) ? (req.query.name) : '';
+            req.query.dateFrom = (req.query.dateFrom) ? (req.query.dateFrom) : null;
+            req.query.dateTo = (req.query.dateTo) ? (req.query.dateTo) : null;
             var startPage = 0;
 
             startPage = ((((parseInt(req.query.pageNo)) * req.query.limit) + 1) - req.query.limit) - 1;
@@ -363,7 +367,9 @@ leaveCtrl.getLeaveBalance = function(req,res,next){
                 req.st.db.escape(req.query.employeeCode),
                 req.st.db.escape(req.query.name),
                 req.st.db.escape(startPage),
-                req.st.db.escape(req.query.limit)
+                req.st.db.escape(req.query.limit),
+                req.st.db.escape(req.query.dateFrom),
+                req.st.db.escape(req.query.dateTo)
             ];
             /**
              * Calling procedure to get form template

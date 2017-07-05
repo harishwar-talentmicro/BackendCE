@@ -160,7 +160,7 @@ taskCtrl.saveTask = function(req,res,next){
                                     },
                                     contactList : null
                                 },
-                                null);
+                                null,tokenResult[0].isWhatMate);
                             console.log('postNotification : notification for compose_message is sent successfully');
                         }
                         else {
@@ -184,6 +184,7 @@ taskCtrl.saveTask = function(req,res,next){
                             priority: results[0][0].priority,
                             senderName: results[0][0].senderName,
                             senderId: results[0][0].senderId,
+                            groupId: req.body.groupId,
                             receiverId: results[0][0].receiverId,
                             transId : results[0][0].transId,
                             formId : results[0][0].formId,

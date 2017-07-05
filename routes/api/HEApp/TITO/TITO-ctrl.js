@@ -49,7 +49,9 @@ TITOCtrl.saveAttendence = function(req,res,next){
                     response.status = true;
                     response.message = "Attendence list saved successfully";
                     response.error = null;
-                    response.maxAttendenceId = (req.body.maxAttendenceId) ? req.body.maxAttendenceId : 0 ;
+                    response.data = {
+                        maxAttendanceId : (req.body.maxAttendanceId) ? req.body.maxAttendanceId : 0
+                    };
                     res.status(200).json(response);
                 }
                 else{
@@ -112,7 +114,9 @@ TITOCtrl.saveLocationTracking = function(req,res,next){
                     response.status = true;
                     response.message = "Location tracking saved successfully";
                     response.error = null;
-                    response.maxTrackId = (req.body.maxTrackId) ? req.body.maxTrackId : 0 ;
+                    response.data = {
+                        maxTrackId : (req.body.maxTrackId) ? req.body.maxTrackId : 0
+                    };
                     res.status(200).json(response);
                 }
                 else{

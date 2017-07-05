@@ -142,7 +142,8 @@ itemRequestCtrl.saveStationaryRequest = function(req,res,next){
 
                                     }
                                 },
-                                null);
+                                null,
+                                tokenResult[0].isWhatMate);
                             console.log('postNotification : notification for compose_message is sent successfully');
                         }
                         else {
@@ -169,7 +170,7 @@ itemRequestCtrl.saveStationaryRequest = function(req,res,next){
                             receiverId: results[0][0].receiverId,
                             transId : results[0][0].transId,
                             formId : results[0][0].formId,
-                            groupId: results[0][0].senderId,
+                            groupId: req.body.groupId,
                             currentStatus : results[0][0].currentStatus,
                             currentTransId : results[0][0].currentTransId,
                             localMessageId : req.body.localMessageId,
@@ -324,7 +325,8 @@ itemRequestCtrl.savePantryRequest = function(req,res,next){
 
                                     }
                                 },
-                                null);
+                                null,
+                                tokenResult[0].isWhatMate);
                             console.log('postNotification : notification for compose_message is sent successfully');
                         }
                         else {
@@ -351,7 +353,7 @@ itemRequestCtrl.savePantryRequest = function(req,res,next){
                             receiverId: results[0][0].receiverId,
                             transId : results[0][0].transId,
                             formId : results[0][0].formId,
-                            groupId: results[0][0].senderId,
+                            groupId: req.body.groupId,
                             currentStatus : results[0][0].currentStatus,
                             currentTransId : results[0][0].currentTransId,
                             localMessageId : req.body.localMessageId,
@@ -409,10 +411,12 @@ itemRequestCtrl.saveAssetRequest = function(req,res,next){
 
     req.st.validateToken(req.query.token,function(err,tokenResult){
         if((!err) && tokenResult){
-
+            console.log(req.body.assetPriority,"req.body.assetPriority");
             req.body.parentId = req.body.parentId ? req.body.parentId : 0;
             req.body.status = req.body.status ? req.body.status : 1;
-            req.body.assetPriority = req.body.assetPriority ? req.body.assetPriority : 1;
+            req.body.assetPriority = (req.body.assetPriority == undefined) ? 1 : req.body.assetPriority;
+            console.log(req.body.assetPriority,"req.body.assetPriority");
+
             req.body.assetRequiredDate = req.body.assetRequiredDate ? req.body.assetRequiredDate : null;
             req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : '';
             req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
@@ -504,7 +508,7 @@ itemRequestCtrl.saveAssetRequest = function(req,res,next){
 
                                     }
                                 },
-                                null);
+                                null,tokenResult[0].isWhatMate);
                             console.log('postNotification : notification for compose_message is sent successfully');
                         }
                         else {
@@ -531,7 +535,7 @@ itemRequestCtrl.saveAssetRequest = function(req,res,next){
                             receiverId: results[0][0].receiverId,
                             transId : results[0][0].transId,
                             formId : results[0][0].formId,
-                            groupId: results[0][0].senderId,
+                            groupId: req.body.groupId,
                             currentStatus : results[0][0].currentStatus,
                             currentTransId : results[0][0].currentTransId,
                             localMessageId : req.body.localMessageId,
@@ -687,7 +691,7 @@ itemRequestCtrl.saveDocRequestToHR = function(req,res,next){
 
                                     }
                                 },
-                                null);
+                                null,tokenResult[0].isWhatMate);
                             console.log('postNotification : notification for compose_message is sent successfully');
                         }
                         else {
@@ -714,7 +718,7 @@ itemRequestCtrl.saveDocRequestToHR = function(req,res,next){
                             receiverId: results[0][0].receiverId,
                             transId : results[0][0].transId,
                             formId : results[0][0].formId,
-                            groupId: results[0][0].senderId,
+                            groupId: req.body.groupId,
                             currentStatus : results[0][0].currentStatus,
                             currentTransId : results[0][0].currentTransId,
                             localMessageId : req.body.localMessageId,

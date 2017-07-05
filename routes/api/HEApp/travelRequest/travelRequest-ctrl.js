@@ -66,6 +66,7 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
 
             req.body.travelDeskMessage = req.body.travelDeskMessage ? req.body.travelDeskMessage : '';
             req.body.isAdvanceAmountIssued = req.body.isAdvanceAmountIssued ? req.body.isAdvanceAmountIssued : 0;
+            req.body.isAdvanceAmountRequired = req.body.isAdvanceAmountRequired ? req.body.isAdvanceAmountRequired : 0;
             req.body.markAttendence = req.body.markAttendence ? req.body.markAttendence : 0;
             req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
             req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
@@ -98,7 +99,8 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
                 req.st.db.escape(req.body.isAdvanceAmountIssued),
                 req.st.db.escape(JSON.stringify(attachmentList)),
                 req.st.db.escape(req.body.approverCount),
-                req.st.db.escape(req.body.receiverCount)
+                req.st.db.escape(req.body.receiverCount),
+                req.st.db.escape(req.body.isAdvanceAmountRequired)
             ];
             /**
              * Calling procedure to save form template
@@ -161,7 +163,7 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
 
                                     }
                                 },
-                                null);
+                                null,tokenResult[0].isWhatMate);
                             console.log('postNotification : notification for compose_message is sent successfully');
                         }
                         else {
@@ -188,7 +190,7 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
                             receiverId: results[0][0].receiverId,
                             transId : results[0][0].transId,
                             formId : results[0][0].formId,
-                            groupId: results[0][0].senderId,
+                            groupId: req.body.groupId,
                             currentStatus : results[0][0].currentStatus,
                             currentTransId : results[0][0].currentTransId,
                             localMessageId : req.body.localMessageId,

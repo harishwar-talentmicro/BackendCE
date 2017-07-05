@@ -1,0 +1,359 @@
+/**
+ * Created by vedha on 29-06-2017.
+ */
+
+var moment = require('moment');
+var request = require('request');
+var fs = require('fs');
+var path = require('path');
+var signupCtrl = {};
+var bcrypt = null;
+
+try{
+    bcrypt = require('bcrypt');
+}
+catch(ex){
+    console.log('Bcrypt not found, falling back to bcrypt-nodejs');
+    bcrypt = require('bcrypt-nodejs');
+}
+
+signupCtrl.sendOtp = function(req,res,next) {
+
+    var mobileNo= req.body.mobileNo;
+    var isdMobile = req.body.isdMobile ;
+
+    var status = true, error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+
+    if (!mobileNo) {
+        error['mobile'] = 'mobile no is mandatory';
+        status *= false;
+    }
+    if (!isdMobile) {
+        error['isdMobile'] = 'isd mobile is mandatory';
+        status *= false;
+    }
+    if (status) {
+        try {
+            var isWhatMate= req.body.isWhatMate ? req.body.isWhatMate : 0;
+            var message="";
+
+                //generate otp 6 digit random number
+                var code = "";
+                var possible = "1234567890";
+
+                for (var i = 0; i <= 5; i++) {
+
+                    code += possible.charAt(Math.floor(Math.random() * possible.length));
+                }
+
+
+            if(isWhatMate ==0 )
+            {
+                message='Your EZEOne verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed.';
+            }
+            else{
+                message='Your WhatMate verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed.';
+            }
+
+            var query = req.st.db.escape(mobileNo) + ',' + req.st.db.escape(code);
+            req.st.db.query('CALL generate_otp(' + query + ')', function (err, insertResult) {
+                if (!err) {
+                    if(isdMobile == "+977"){
+                        request({
+                            url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                            qs: {
+                                token : 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                to : mobileNo,
+                                message: message,
+                                sender: 'Techingen'
+                            },
+                            method: 'GET'
+
+                        }, function (error, response, body) {
+                            if(error)
+                            {
+                                console.log(error,"SMS");
+                            }
+                            else{
+                                console.log("SUCCESS","SMS response");
+                            }
+
+                        });
+                    }
+                    else if(isdMobile == "+91")
+                    {
+                        request({
+                            url: 'https://aikonsms.co.in/control/smsapi.php',
+                            qs: {
+                                user_name : 'janardana@hirecraft.com',
+                                password : 'Ezeid2015',
+                                sender_id : 'EZEONE',
+                                service : 'TRANS',
+                                mobile_no: mobileNo,
+                                message: message,
+                                method : 'send_sms'
+                            },
+                            method: 'GET'
+
+                        }, function (error, response, body) {
+                            if(error)
+                            {
+                                console.log(error,"SMS");
+                            }
+                            else{
+                                console.log("SUCCESS","SMS response");
+                            }
+                        });
+                    }
+                    else if(isdMobile != "")
+                    {
+                        request({
+                            url: 'https://aikonsms.co.in/control/smsapi.php',
+                            qs: {
+                                user_name : 'janardana@hirecraft.com',
+                                password : 'Ezeid2015',
+                                sender_id : 'EZEONE',
+                                service : 'INTSMS',
+                                mobile_no: mobileNo,
+                                message: message,
+                                method : 'send_sms'
+                            },
+                            method: 'GET'
+
+                        }, function (error, response, body) {
+                            if(error)
+                            {
+                                console.log(error,"SMS");
+                            }
+                            else{
+                                console.log("SUCCESS","SMS response");
+                            }
+                        });
+                    }
+                    respMsg.status = true;
+                    respMsg.message = 'OTP Sent Successfully';
+                    res.status(200).json(respMsg);
+                }
+                else{
+                    respMsg.status = false;
+                    respMsg.message = 'Something went wrong';
+                    res.status(500).json(respMsg);
+                }
+            });
+
+
+        }
+        catch (ex) {
+            console.log('Error : FnSendOtp ' + ex);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = {server: 'Internal Server Error'};
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
+    }
+};
+
+signupCtrl.verifyOTP = function(req,res,next){
+    var mobileNo= req.body.mobileNo;
+    var isdMobile = req.body.isdMobile ;
+
+    var status = true, error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+
+    if (!mobileNo) {
+        error['mobile'] = 'mobile no is mandatory';
+        status *= false;
+    }
+    if (!isdMobile) {
+        error['isdMobile'] = 'isd mobile is mandatory';
+        status *= false;
+    }
+    if (!req.body.otp) {
+        error['otp'] = 'otp is mandatory';
+        status *= false;
+    }
+
+    if (status) {
+        try {
+            var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+            req.query.token = req.query.token ? req.query.token : "";
+
+            var procParams = [
+                req.st.db.escape(mobileNo),
+                req.st.db.escape(req.body.otp),
+                req.st.db.escape(req.body.pictureURL ? req.body.pictureURL : ''),
+                req.st.db.escape(req.body.displayName),
+                req.st.db.escape(isdMobile),
+                req.st.db.escape(req.body.idTypeId),
+                req.st.db.escape(req.query.token)
+            ];
+
+            var procQuery = 'CALL verify_otp( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,result) {
+                if (!err && result && result[0] && result[0][0].message){
+                    respMsg.status = false;
+                    respMsg.message = "Invalid OTP";
+                    res.status(200).json(respMsg);
+                }
+                else if (!err && result && result[0] && result[0][0].EZEID){
+                    var EZEOneId= result[0][0].EZEID;
+                    var ip = req.headers['x-forwarded-for'] ||
+                        req.connection.remoteAddress ||
+                        req.socket.remoteAddress;
+                    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+
+                    req.st.generateToken(ip, userAgent, EZEOneId,isWhatMate, function (err, token) {
+                        console.log("token",token);
+                        if (err) {
+                            respMsg.status = false;
+                            respMsg.message = "Error while generating token";
+                            respMsg.data = null;
+                            res.status(500).json(respMsg);
+                        }
+                        else {
+                            respMsg.status = true;
+                            respMsg.message = "OTP is matched";
+                            respMsg.data = {
+                                // EZEOneId : result[0][0].EZEOneId,
+                                // masterId : result[0][0].masterId,
+                                token : token,
+                                IsAuthenticate : true,
+                                TID : result[0][0].TID,
+                                MasterID : result[0][0].MasterID,
+                                ezeone_id : result[0][0].EZEID,
+                                FirstName : result[0][0].FirstName,
+                                LastName : result[0][0].LastName,
+                                CompanyName : result[0][0].CompanyName,
+                                Type : result[0][0].IDTypeID,
+                                Verified : result[0][0].EZEIDVerifiedID,
+                                isHelloEZE : result[0][0].isHelloEZE,
+                                displayName : result[0][0].displayName,
+                                group_id : result[0][0].group_id,
+                                mobilenumber : result[0][0].mobilenumber
+                            };
+                            res.status(200).json(respMsg);
+
+                        }
+                    });
+                }
+                else if (!err){
+                    respMsg.status = true ;
+                    respMsg.message = "OTP is matched";
+                    res.status(200).json(respMsg);
+                }
+                else {
+                    respMsg.status = false;
+                    respMsg.message = "Internal Server Error";
+                    res.status(500).json(respMsg);
+                }
+            });
+        }
+        catch (ex) {
+            respMsg.error = 'Internal Server Error' ;
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(500).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
+    }
+
+    };
+
+signupCtrl.savePassword = function(req,res,next){
+
+    var status = true, error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+
+    if (!req.body.password) {
+        error['password'] = 'password is mandatory';
+        status *= false;
+    }
+    if (!req.body.masterId) {
+        error['masterId'] = 'MasterId is mandatory';
+        status *= false;
+    }
+    if (!req.body.EZEOneId) {
+        error['EZEOneId'] = 'EZEOneId is mandatory';
+        status *= false;
+    }
+
+    if (status) {
+        try {
+            var encryptPwd = req.st.hashPassword(req.body.password);
+
+            var procParams = [
+                req.st.db.escape(encryptPwd),
+                req.st.db.escape(req.body.masterId),
+                req.st.db.escape(req.body.EZEOneId)
+            ];
+
+            var procQuery = 'CALL save_password( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,result) {
+                if (!err ){
+                    var file = path.join(__dirname, '../../../mail/templates/signup.html');
+                    fs.readFile(file, "utf8", function (err, data) {
+                        if (!err) {
+                            respMsg.status = true;
+                            respMsg.message = "Saved..";
+                            respMsg.data = data ;
+                            res.status(200).json(respMsg);
+                        }
+                        else{
+                            respMsg.status = false;
+                            respMsg.message = "Internal Server Error";
+                            respMsg.data =null;
+                            res.status(200).json(respMsg);
+                        }
+                    });
+
+                }
+                else {
+                    respMsg.status = false;
+                    respMsg.message = "Internal Server Error";
+                    res.status(500).json(respMsg);
+                }
+            });
+        }
+        catch (ex) {
+            respMsg.error = 'Internal Server Error' ;
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(500).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
+    }
+
+};
+
+module.exports = signupCtrl;

@@ -12,4 +12,16 @@ router.get('/formType',formTypeCtrl.getFormTypeList);
 router.post('/workGroup',formTypeCtrl.saveWorkGroup);
 router.get('/workGroup',formTypeCtrl.getWorkGroup);
 
+
+router.post('/formGroup',formTypeCtrl.saveFormGroup);
+router.get('/formGroup',formTypeCtrl.getFormGroupList);
+router.get('/formGroup/details',formTypeCtrl.getFormGroupDetails);
+
+router.get('/form',formTypeCtrl.getFormsNeedToSelect);
+
+router.get('/formTemplate/workGroup',formTypeCtrl.getFormWorkList);
+
+router.delete('/workGroup',formTypeCtrl.deleteWorkGroup);
+router.delete('/formTemplateGroup',formTypeCtrl.deleteFormGroup);
+
 module.exports = router;

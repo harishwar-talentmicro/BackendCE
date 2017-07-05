@@ -230,13 +230,11 @@ router.get('/', function(req,res,next){
 
                                             // contactResults[0][i].attendence = isAttendence;
 
-
                                             for (var j = 0; j < countResults[0].length; j++) {
                                                 /**
                                                  * compare both group id getting from both proc if equal then push unreadcount to first results
                                                  * only in web condition
                                                  * */
-
 
                                                 if (groupId == countResults[0][j].groupID) {
                                                     //console.log(countResults[0][j].groupID,"countResults[0][j].groupID");
@@ -254,11 +252,8 @@ router.get('/', function(req,res,next){
                                         res.status(200).json(responseMessage);
                                     }
                                     else{
-                                        var isAttendence = 0;
+
                                         for(var i = 0; i < contactResults[0].length; i++){
-
-
-
                                             contactResults[0][i].thumbnailImage = (contactResults[0][i].groupType == 1) ?
                                                 ((contactResults[0][i].thumbnailImage) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(contactResults[0][i].thumbnailImage) : '') :
                                                 req.CONFIG.CONSTANT.GROUP_ICON_URL;
@@ -491,7 +486,7 @@ router.put('/status', function(req,res,next){
                                                 null,
                                                 '',
                                                 updateResult[3][0],
-                                                null);
+                                                null,tokenResult[0].isWhatMate);
                                             console.log('postNotification : notification is sent successfully');
                                         }
                                         else{
@@ -552,7 +547,7 @@ router.put('/status', function(req,res,next){
                                                     null,
                                                     '',
                                                     updateResult[3][0],
-                                                    null);
+                                                    null,tokenResult[0].isWhatMate);
                                                 console.log('postNotification : notification is sent successfully');
                                             }
                                             else{
@@ -583,7 +578,7 @@ router.put('/status', function(req,res,next){
                                                     null,
                                                     '',
                                                     updateResult[3][0],
-                                                    null);
+                                                    null,tokenResult[0].isWhatMate);
                                                 console.log('postNotification : notification is sent successfully');
                                             }
                                             else{
@@ -623,7 +618,7 @@ router.put('/status', function(req,res,next){
                                         null,
                                         '',
                                         updateResult[3][0],
-                                        null);
+                                        null,tokenResult[0].isWhatMate);
                                     console.log('postNotification : notification is sent successfully');
                                 }
                                 else{
@@ -1130,7 +1125,7 @@ router.post('/addressBook',function(req, res, next){
                                                                                         }
 
                                                                                     },
-                                                                                    null);
+                                                                                    null,tokenResult[0].isWhatMate);
                                                                                 console.log('postNotification : notification for compose_message is sent successfully');
                                                                             }
                                                                             else {
@@ -1198,7 +1193,7 @@ router.post('/addressBook',function(req, res, next){
                                                                                             groupType: results[0][0].groupType
                                                                                         }
                                                                                     },
-                                                                                    null);
+                                                                                    null,tokenResult[0].isWhatMate);
                                                                                 console.log('postNotification : notification for compose_message is sent successfully');
                                                                             }
                                                                             else {

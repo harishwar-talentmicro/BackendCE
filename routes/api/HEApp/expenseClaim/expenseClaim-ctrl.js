@@ -155,7 +155,8 @@ expenseClaimCtrl.saveExpenseClaim = function(req,res,next){
 
                                     }
                                 },
-                                null);
+                                null,
+                                tokenResult[0].isWhatMate);
                             console.log('postNotification : notification for compose_message is sent successfully');
                         }
                         else {
@@ -182,7 +183,7 @@ expenseClaimCtrl.saveExpenseClaim = function(req,res,next){
                             receiverId: results[0][0].receiverId,
                             transId : results[0][0].transId,
                             formId : results[0][0].formId,
-                            groupId: results[0][0].senderId,
+                            groupId: req.body.groupId,
                             currentStatus : results[0][0].currentStatus,
                             currentTransId : results[0][0].currentTransId,
                             localMessageId : req.body.localMessageId,

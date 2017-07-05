@@ -62,7 +62,7 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
             req.body.totalAmount = req.body.totalAmount ? req.body.totalAmount : 0;
             req.body.totalPayableCurrencyId = req.body.totalPayableCurrencyId ? req.body.totalPayableCurrencyId : 0;
             req.body.totalPayableAmount = req.body.totalPayableAmount ? req.body.totalPayableAmount : 0;
-            req.body.settlementPaid = req.body.settlementPaid ? req.body.settlementPaid : 1;
+            req.body.settlementPaid = (req.body.settlementPaid == undefined) ? 1 : req.body.settlementPaid;
             req.body.advanceCurrencyId = req.body.advanceCurrencyId ? req.body.advanceCurrencyId : 0;
             req.body.advanceAmount = req.body.advanceAmount ? req.body.advanceAmount : 0;
             req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
@@ -157,7 +157,7 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
 
                                     }
                                 },
-                                null);
+                                null,tokenResult[0].isWhatMate);
                             console.log('postNotification : notification for compose_message is sent successfully');
                         }
                         else {
@@ -184,7 +184,7 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                             receiverId: results[0][0].receiverId,
                             transId : results[0][0].transId,
                             formId : results[0][0].formId,
-                            groupId: results[0][0].senderId,
+                            groupId: req.body.groupId,
                             currentStatus : results[0][0].currentStatus,
                             currentTransId : results[0][0].currentTransId,
                             localMessageId : req.body.localMessageId,

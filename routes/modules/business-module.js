@@ -114,7 +114,7 @@ var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folde
                                                          * which is assigned to this lead
                                                          */
                                                         notification.publish(receiverId, senderTitle, groupTitle, groupId,
-                                                            messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                            messageText, messageType, operationType, iphoneId, messageId, masterid,null,null,null,null,null,null,null,null,null,null,null,0);
                                                         console.log("Notification Send");
 
                                                         if (notDetailsRes[0][count].SalesMailID){

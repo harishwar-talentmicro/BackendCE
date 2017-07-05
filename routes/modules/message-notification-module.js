@@ -115,7 +115,7 @@ msgNotification.prototype.sendComposeMessage= function(msgContent, callBack) {
                                                                             var longitude = 0.00;
                                                                             var jobId = 0;
                                                                             console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
-                                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
+                                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url,null,null,null,0);
                                                                         }
                                                                     }
                                                                     c = c + 1;
@@ -421,7 +421,7 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
                                                                         var longitude = 0.00;
                                                                         var jobId = 0;
                                                                         //console.log(receiverId, senderTitle, groupTitle, gid, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
-                                                                        notification.publish(receiverId, senderTitle, groupTitle, gid, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
+                                                                        notification.publish(receiverId, senderTitle, groupTitle, gid, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url,null,null,null,tokenResult[0].isWhatMate);
 
 
                                                                         //send notification to group members

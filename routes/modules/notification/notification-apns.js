@@ -9,7 +9,8 @@ function AppleNotification(){
  * @param iphoneId
  * @param payload (JSON Object)
  */
-AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos){
+
+AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos,isWhatMate){
     var http = require('http');
     var apn = require('apn');
 
@@ -40,25 +41,42 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos){
 
         note.device = myDevice;
 
-
-
         var callback = function(errorNum, notification){
             console.log('Error is: %s', errorNum);
             console.log("Note ", notification);
         };
-        var options = {
+        var options = {};
 
-            //gateway: 'gateway.sandbox.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
-            //gateway: 'gateway.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
-            gateway : (CONFIG.APNS.GATEWAY) ? CONFIG.APNS.GATEWAY : 'gateway.sandbox.push.apple.com',
-            errorCallback: callback,
-            cert: (CONFIG.CONSTANT.DEBUG) ?  'cert.pem' : 'apple_cert.pem',
-            key:  (CONFIG.CONSTANT.DEBUG) ?  'key.pem' : 'apple_key.pem',
-            passphrase: (CONFIG.APNS.PASSPHRASE) ? CONFIG.APNS.PASSPHRASE : 'hire@123',
-            port: (CONFIG.APNS.PORT) ? CONFIG.APNS.PORT : 2195,
-            enhanced: true,
-            cacheLength: 100
-        };
+        if(isWhatMate == 1){
+            options = {
+                //gateway: 'gateway.sandbox.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
+                //gateway: 'gateway.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
+                gateway : (CONFIG.APNS.GATEWAY) ? CONFIG.APNS.GATEWAY : 'gateway.sandbox.push.apple.com',
+                errorCallback: callback,
+                cert: (CONFIG.CONSTANT.DEBUG) ?  'WhatMateCert.pem' : 'apple_cert.pem',
+                key:  (CONFIG.CONSTANT.DEBUG) ?  'WhatMateKey.pem' : 'apple_key.pem',
+                passphrase: (CONFIG.APNS.WHATMATEPASSPHRASE) ? CONFIG.APNS.WHATMATEPASSPHRASE : 'what123',
+                port: (CONFIG.APNS.PORT) ? CONFIG.APNS.PORT : 2195,
+                enhanced: true,
+                cacheLength: 100
+            };
+        }
+        else{
+            options = {
+
+                //gateway: 'gateway.sandbox.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
+                //gateway: 'gateway.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
+                gateway : (CONFIG.APNS.GATEWAY) ? CONFIG.APNS.GATEWAY : 'gateway.sandbox.push.apple.com',
+                errorCallback: callback,
+                cert: (CONFIG.CONSTANT.DEBUG) ?  'cert.pem' : 'apple_cert.pem',
+                key:  (CONFIG.CONSTANT.DEBUG) ?  'key.pem' : 'apple_key.pem',
+                passphrase: (CONFIG.APNS.PASSPHRASE) ? CONFIG.APNS.PASSPHRASE : 'hire@123',
+                port: (CONFIG.APNS.PORT) ? CONFIG.APNS.PORT : 2195,
+                enhanced: true,
+                cacheLength: 100
+            };
+        }
+
         console.log('options',options);
             var apnsConnection = new apn.Connection(options);
             apnsConnection.pushNotification(note, myDevice);

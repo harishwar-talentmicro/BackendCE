@@ -479,7 +479,6 @@ masterCtrl.expenseList = function(req,res,next){
     });
 };
 
-
 masterCtrl.getFormTypeList = function(req,res,next){
     var response = {
         status : false,
@@ -547,5 +546,57 @@ masterCtrl.getFormTypeList = function(req,res,next){
     });
 };
 
+masterCtrl.getWorkGroup = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    req.st.validateToken(req.query.token,function(err,tokenResult){
+        if((!err) && tokenResult){
+
+            var procParams = [
+                req.st.db.escape(req.query.groupId)
+            ];
+            /**
+             * Calling procedure to get form template
+             * @type {string}
+             */
+            var procQuery = 'CALL HE_get_app_workGroups( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,workGroupResult){
+                if(!err && workGroupResult && workGroupResult[0] && workGroupResult[0][0]){
+                    response.status = true;
+                    response.message = "Work group loaded successfully";
+                    response.error = null;
+                    response.data = {
+                        workGroupList : workGroupResult[0]
+                    }
+                    res.status(200).json(response);
+
+                }
+                else if(!err){
+                    response.status = true;
+                    response.message = "Work group loaded successfully";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                }
+                else{
+                    response.status = false;
+                    response.message = "Error while getting work group";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else{
+            res.status(401).json(response);
+        }
+    });
+};
 
 module.exports = masterCtrl;
