@@ -209,13 +209,17 @@ UserCtrl.saveAddress = function(req,res,next){
             req.st.validateToken(req.query.token,function(err,tokenResult){
                 if((!err) && tokenResult){
                     var emailId = req.body.emailId ? req.body.emailId : "";
+                    var aboutCompany = req.body.aboutCompany ? req.body.aboutCompany : "";
+                    var keywords = req.body.keywords ? req.body.keywords : "";
 
                     var procParams = [
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.body.address),
                         req.st.db.escape(req.body.latitude),
                         req.st.db.escape(req.body.longitude),
-                        req.st.db.escape(emailId)
+                        req.st.db.escape(emailId),
+                        req.st.db.escape(req.body.aboutCompany),
+                        req.st.db.escape(req.body.keywords)
                     ];
                     /**
                      * Calling procedure to save deal
@@ -947,7 +951,7 @@ UserCtrl.saveProfileData = function(req,res,next){
                 req.db.query(procQuery,function(err,result){
                     if(!err && result ){
                         response.status = true;
-                        response.message = "Saved";
+                        response.message = "Profile updated successfully";
                         response.error = null;
                         response.data = {
                             userData : {

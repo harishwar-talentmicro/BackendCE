@@ -699,7 +699,6 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
     };
 
     try{
-
         if(req.files) {
             if(req.files.attachment) {
                 var uniqueId = uuid.v4();
@@ -716,6 +715,8 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
                             a_url : aUrl,
                             a_fn :aFilename
                         };
+                        console.log("responseMessage",responseMessage);
+
                         res.status(200).json(responseMessage);
                         console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
                     }

@@ -40,64 +40,122 @@ composeCtrl.sendMessage = function(req,res,next){
         res.status(400).json(response);
         console.log(response);
     }
-    req.st.validateToken(req.body.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    else {
+        req.st.validateToken(req.body.token,function(err,tokenResult){
+            if((!err) && tokenResult){
 
-            var procParams = [
-                req.st.db.escape(req.body.token),
-                req.st.db.escape(req.body.message),
-                req.st.db.escape(req.body.receiverGroupId)
-            ];
-            /**
-             * Calling procedure to save form template
-             * @type {string}
-             */
-            var procQuery = 'CALL HE_send_message( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,results){
-                console.log(results);
-                if(!err){
+                var procParams = [
+                    req.st.db.escape(req.body.token),
+                    req.st.db.escape(req.body.message),
+                    req.st.db.escape(req.body.receiverGroupId)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL HE_send_message( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+                    console.log(results);
+                    if(!err){
+                        response.status = true;
+                        response.message = "Message send successfully";
+                        response.error = null;
+                        response.data = {
+                            formId : results[0][0].formId,
+                            message : results[0][0].message
+                        };
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while searching form";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                    response.status = true;
-                    response.message = "Message send successfully";
-                    response.error = null;
-                    response.data = {
-                        messageList : results[0]
-                    };
-                    res.status(200).json(response);
-
-                    // if(results[0][0]._error == "-1")
-                    // {
-                    //     response.status = false;
-                    //     response.message = "Sorry no form is matched";
-                    //     response.error = null;
-                    //     response.data = "-1" ;
-                    //     res.status(200).json(response);
-                    // }
-                    // else if (results[0][0]._error == "0")
-                    // {
-                    //     response.status = true;
-                    //     response.message = "form is matched";
-                    //     response.error = null;
-                    //     response.data = results[0];
-                    //     res.status(200).json(response);
-                    // }
-
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while searching form";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
+composeCtrl.learnMessage = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.body.message) {
+        error.token = 'Invalid message';
+        validationFlag *= false;
+    }
+    if (!req.body.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+    if (!req.body.formId) {
+        error.formId = 'Invalid formId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.formId),
+                    req.st.db.escape(req.body.message),
+                    req.st.db.escape(req.body.groupId)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_learn_robotic_message( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+                    console.log(results);
+                    if(!err){
+                        response.status = true;
+                        response.message = "Message saved successfully";
+                        response.error = null;
+                        response.data = null ;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving message";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
 
 module.exports = composeCtrl;

@@ -11,7 +11,6 @@
 var fs = require('fs');
 var uuid = require('node-uuid');
 
-
 var CONFIG = require('../../../ezeone-config.json');
 
 /*********************************************** AMQP upgraded code **************************************/
@@ -22,6 +21,7 @@ function createConnection(){
     var open = require('amqplib').connect('amqp://'+CONFIG.MQTT.USERNAME+':'+CONFIG.MQTT.PASSWORD+'@'+CONFIG.MQTT.HOST+
         ':'+CONFIG.MQTT.AMQP_PORT+'/'+CONFIG.MQTT.VHOST+'?heartbeat=500');
     var openConn = open;
+console.log("openConn",openConn);
 
     openConn.then(function(conn) {
 
@@ -76,7 +76,6 @@ function publishMessage(channel){
         publishMessage(channel);
     },500);
 }
-
 
 function NotificationMqtt(){
 };

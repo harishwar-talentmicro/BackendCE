@@ -14,6 +14,7 @@ router.post('/manager/APIKey',managerCtrl.resetAPIKey);
 router.get('/EZEOneId',managerCtrl.validateEzeoneId);
 
 router.get('/companies',managerCtrl.getWhatMateCompaniesList);
+router.get('/dashboardInfo',managerCtrl.getFormTransactionData);
 
 
 module.exports = router;

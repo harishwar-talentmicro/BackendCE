@@ -511,16 +511,16 @@ function FnSendMailEzeid(MailContent, CallBack) {
 };
 
 
-StdLib.prototype.validateHEToken = function(token , EZEOneId , password, CallBack){
+StdLib.prototype.validateHEToken = function(APIKey , EZEOneId , password,token, CallBack){
     var _this = this;
     try {
         //below query to check token exists for the users or not.
-        if (token) {
+        if (EZEOneId != "") {
 
             /**
              * @info : Token is now queried from session table i.e. tloginout
              */
-            var queryParams = _this.db.escape(token) + ',' + _this.db.escape(EZEOneId);
+            var queryParams = _this.db.escape(APIKey) + ',' + _this.db.escape(EZEOneId);
 
             var validateTokenQuery = 'CALL pvalidateHEToken(' + queryParams + ')';
             console.log(validateTokenQuery);
@@ -535,6 +535,29 @@ StdLib.prototype.validateHEToken = function(token , EZEOneId , password, CallBac
                             CallBack(null, null);
                         }
 
+                    }
+                    else{
+                        CallBack(null, null);
+                        console.log('FnValidateToken:No Token found');
+                    }
+                }
+                else {
+                    CallBack(err, null);
+                    console.log('FnValidateToken:' + err);
+
+                }
+            });
+        }
+        else if (token != ""){
+            var validateTokenQuery = 'CALL pvalidate_token(' + _this.db.escape(token)+')';
+            _this.db.query(validateTokenQuery, function (err, sessionResult) {
+                if (!err) {
+
+                    if(sessionResult && sessionResult.length){
+
+                        console.log('FnValidateToken: Token found');
+                        console.log('sessionResult',sessionResult);
+                        CallBack(null, sessionResult[0]);
                     }
                     else{
                         CallBack(null, null);

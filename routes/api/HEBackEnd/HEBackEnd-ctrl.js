@@ -4,7 +4,6 @@
 var moment = require('moment');
 var HEBackkendCtrl = {};
 
-
 HEBackkendCtrl.saveAppSettings = function(req, res, next){
 
     var response = {
@@ -23,6 +22,13 @@ HEBackkendCtrl.saveAppSettings = function(req, res, next){
         validationFlag *= false;
     }
 
+    if (!req.query.APIKey)
+    {
+        console.log("Entered....");
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
@@ -35,11 +41,22 @@ HEBackkendCtrl.saveAppSettings = function(req, res, next){
 
                 if((!err) && tokenResult){
 
+                    req.body.salesAllocationType = req.body.salesAllocationType  ? req.body.salesAllocationType  : 1;
+                    req.body.supportAllocationType = req.body.supportAllocationType  ? req.body.supportAllocationType  : 1;
+                    req.body.salesDisplayFormat  = req.body.salesDisplayFormat  ? req.body.salesDisplayFormat  : 1;
+                    req.body.salesDefaultUser  = req.body.salesDefaultUser  ? req.body.salesDefaultUser  : 0;
+                    req.body.supportDefaultUser  = req.body.supportDefaultUser  ? req.body.supportDefaultUser  : 0;
 
                     var procParams = [
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.body.paymentGateWay ? req.body.paymentGateWay : ''),
-                        req.st.db.escape(req.body.attendence ? req.body.attendence : 1)
+                        req.st.db.escape(req.body.attendence ? req.body.attendence : 1),
+                        req.st.db.escape(req.body.salesAllocationType),
+                        req.st.db.escape(req.body.supportAllocationType),
+                        req.st.db.escape(req.body.salesDisplayFormat),
+                        req.st.db.escape(req.body.salesDefaultUser),
+                        req.st.db.escape(req.body.supportDefaultUser),
+                        req.st.db.escape(req.query.APIKey)
                     ];
 
                     var procQuery = 'CALL HE_Save_Appsettings( ' + procParams.join(',') + ')';
@@ -52,7 +69,12 @@ HEBackkendCtrl.saveAppSettings = function(req, res, next){
                             response.data = {
                                 HEMasterId : result[0][0].HEMasterId,
                                 paymentGateWay : req.body.paymentGateWay ? req.body.paymentGateWay : '',
-                                attendence : req.body.attendence ? req.body.attendence : 1
+                                attendence : req.body.attendence ? req.body.attendence : 1,
+                                salesAllocationType : req.body.salesAllocationType,
+                                supportAllocationType : req.body.supportAllocationType,
+                                salesDisplayFormat : req.body.salesDisplayFormat,
+                                salesDefaultUser : req.body.salesDefaultUser,
+                                supportDefaultUser : req.body.supportDefaultUser
                             };
                             res.status(200).json(response);
                         }
@@ -97,7 +119,13 @@ HEBackkendCtrl.updateAppSettings = function(req, res, next){
         validationFlag *= false;
     }
 
-    console.log("aaa");
+    if (!req.query.APIKey)
+    {
+        console.log("Entered....");
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
@@ -111,14 +139,24 @@ HEBackkendCtrl.updateAppSettings = function(req, res, next){
 
                 if((!err) && tokenResult){
 
+                    req.body.salesAllocationType = req.body.salesAllocationType  ? req.body.salesAllocationType  : 1;
+                    req.body.supportAllocationType = req.body.supportAllocationType  ? req.body.supportAllocationType  : 1;
+                    req.body.salesDisplayFormat  = req.body.salesDisplayFormat  ? req.body.salesDisplayFormat  : 1;
+                    req.body.salesDefaultUser  = req.body.salesDefaultUser  ? req.body.salesDefaultUser  : 0;
+                    req.body.supportDefaultUser  = req.body.supportDefaultUser  ? req.body.supportDefaultUser  : 0;
+
 
                     var procParams = [
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.body.paymentGateWay ? req.body.paymentGateWay : ''),
-                        req.st.db.escape(req.body.attendence ? req.body.attendence : 1)
+                        req.st.db.escape(req.body.attendence ? req.body.attendence : 1),
+                        req.st.db.escape(req.body.salesAllocationType),
+                        req.st.db.escape(req.body.supportAllocationType),
+                        req.st.db.escape(req.body.salesDisplayFormat),
+                        req.st.db.escape(req.body.salesDefaultUser),
+                        req.st.db.escape(req.body.supportDefaultUser),
+                        req.st.db.escape(req.query.APIKey)
                     ];
-
-                    console.log("procParams");
 
                     var procQuery = 'CALL HE_Save_Appsettings( ' + procParams.join(',') + ')';
                     console.log(procQuery);
@@ -132,7 +170,12 @@ HEBackkendCtrl.updateAppSettings = function(req, res, next){
                             response.data = {
                                 HEMasterId : result[0][0].HEMasterId,
                                 paymentGateWay : req.body.paymentGateWay ? req.body.paymentGateWay : '',
-                                attendence : req.body.attendence ? req.body.attendence : 1
+                                attendence : req.body.attendence ? req.body.attendence : 1,
+                                salesAllocationType : req.body.salesAllocationType,
+                                supportAllocationType : req.body.supportAllocationType,
+                                salesDisplayFormat : req.body.salesDisplayFormat,
+                                salesDefaultUser : req.body.salesDefaultUser,
+                                supportDefaultUser : req.body.supportDefaultUser
                             };
                             res.status(200).json(response);
                         }
@@ -176,6 +219,13 @@ HEBackkendCtrl.getAppSettings = function(req, res, next){
         validationFlag *= false;
     }
 
+    if (!req.query.APIKey)
+    {
+        console.log("Entered....");
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
@@ -187,7 +237,8 @@ HEBackkendCtrl.getAppSettings = function(req, res, next){
             req.st.validateToken(req.query.token,function(err,tokenResult){
                 if((!err) && tokenResult){
                     var procParams = [
-                        req.st.db.escape(req.query.token)
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.APIKey)
                     ];
 
                     var procQuery = 'CALL  HE_Get_Appsettings( ' + procParams.join(',') + ')';

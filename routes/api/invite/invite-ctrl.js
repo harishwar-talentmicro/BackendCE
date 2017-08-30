@@ -57,7 +57,7 @@ inviteCtrl.invite = function(req, res, next){
                                 qs: {
                                     user_name : 'janardana@hirecraft.com',
                                     password : 'Ezeid2015',
-                                    sender_id : 'EZEONE',
+                                    sender_id : 'WtMate',
                                     service : 'INTSMS',
                                     mobile_no: mobileList,
                                     message: " " + tokenResult[0].fullName + " requested you to join EZEOne network. Click on the following link based on your mobile phone type to download App.  Sign-up as new user and enjoy using EZEOne. " +
@@ -69,7 +69,7 @@ inviteCtrl.invite = function(req, res, next){
                                     "Hope you will enjoy using EZEOne." +
                                     "\n\n" +
                                     "EZEOne Team",
-                                    method : 'send_sms'
+                                    method : 'send_intsms'
                                 },
                                 method: 'GET'
 
@@ -186,7 +186,7 @@ inviteCtrl.invite = function(req, res, next){
                                         }
                                         else if(results[0][0].isdMobile != "")
                                         {
-                                            mobileList += results[0][0].mobile + ',';
+                                            mobileList += "00" + results[0][0].isdMobile.replace("+","") + results[0][0].mobile + ',';
                                         }
 
                                         if(mobileCount < mobile.length){

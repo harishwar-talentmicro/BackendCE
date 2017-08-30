@@ -73,12 +73,14 @@ router.get('/query', function(req,res,next){
                         if (!isNaN(parseInt(ezeArr[1])) && ezeArr[1].length > 2 && parseInt(ezeArr[1]) > 0 && parseInt(ezeArr[1]) < 1000) {
                             pin = parseInt(ezeArr[1]).toString();
                         }
-
                     }
+                    req.query.isWhatMate = req.query.isWhatMate ? req.query.isWhatMate : 0;
+
                     var procParams = [
                         req.db.escape(title) ,
                         req.db.escape(pin) ,
-                        req.db.escape(req.query.token)
+                        req.db.escape(req.query.token),
+                        req.db.escape(req.query.isWhatMate)
                     ];
                     var procQuery = 'CALL get_v1_messagebox_contact(' + procParams.join(',') + ')';
                     console.log(procQuery);
@@ -242,7 +244,7 @@ router.get('/', function(req,res,next){
                                                 }
                                             }
                                         }
-                                        contactList.push(results[0]);
+                                        // contactList.push(results[0]);
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Contact list loaded successfully';
@@ -810,7 +812,7 @@ router.post('/addressBook',function(req, res, next){
                                 qs: {
                                     user_name : 'janardana@hirecraft.com',
                                     password : 'Ezeid2015',
-                                    sender_id : 'EZEONE',
+                                    sender_id : 'WtMate',
                                     service : 'INTSMS',
                                     mobile_no: mobileList,
                                     message: " " + tokenResult[0].fullName + " requested you to join EZEOne network. Click on the following link based on your mobile phone type to download App.  Sign-up as new user and enjoy using EZEOne. " +
@@ -822,7 +824,7 @@ router.post('/addressBook',function(req, res, next){
                                     "Hope you will enjoy using EZEOne." +
                                     "\n\n" +
                                     "EZEOne Team",
-                                    method : 'send_sms'
+                                    method : 'send_intsms'
                                 },
                                 method: 'GET'
 
@@ -1254,13 +1256,9 @@ router.post('/addressBook',function(req, res, next){
                                             }
                                             else if(results[0][0].isdMobile != "")
                                             {
-                                                mobileList += results[0][0].mobile + ',';
+                                                mobileList += "00" + results[0][0].isdMobile.replace("+","") + results[0][0].mobile + ',';
                                             }
 
-                                            // if (results[0][0].mobile != '') {
-                                            //     mobileList += results[0][0].mobile + ',';
-                                            // }
-                                            console.log(mobileList,"mobileList----------------------------------------mobileList");
                                             if (mobileCount < contactList.length) {
                                                 inviteMobile(contactList[mobileCount]);
                                             }
@@ -1311,7 +1309,7 @@ router.post('/addressBook',function(req, res, next){
                             }
                         });
                     };
-                    //calling function at first time
+
                     if (contactList) {
                         if (contactList.length > 0) {
                             inviteMobile(mobileData);
@@ -1336,22 +1334,4 @@ router.post('/addressBook',function(req, res, next){
     }
 });
 
-function getAttendence(req,callback) {
-    var isAttendence =0 ;
-    console.log(req.body.attendenceQuery,"req.body.attendenceQuery");
-    req.db.query(req.body.attendenceQuery, function (err, attendenceResults) {
-        console.log(attendenceResults,"attendenceResults");
-        if (attendenceResults && attendenceResults[0] && attendenceResults[0].length > 0) {
-            console.log(attendenceResults[0][0].type,"isAttendence");
-            isAttendence =  attendenceResults[0][0].type;
-            callback(isAttendence);
-        }
-        else{
-            callback(isAttendence);
-        }
-    });
-
-
-
-}
 module.exports = router;

@@ -121,8 +121,6 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             tx_id : txId,
             data : data
         };
-        //console.log(messagePayload);
-        console.log('Actual receiver Id : '+receiverId);
 
 
         if(receiverId){
@@ -136,7 +134,25 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
          */
         if(iphoneId){
             try{
-                _apnsNotification.sendAppleNS(iphoneId,messagePayload,issos,isWhatMate);
+                var procQuery = 'SELECT ifnull(isWhatMate,0) as "isWhatMate" FROM tloginout WHERE masterid= (SELECT tmgroups.AdminID FROM tmgroups WHERE tmgroups.tid=' + receiverId + ') order by tloginout.tid desc limit 0,1';
+                console.log(procQuery);
+                st.db.query(procQuery,function(err,result) {
+
+
+                    if(!err && result &&  result[0] ){
+                        isWhatMate = result[0].isWhatMate;
+                        _apnsNotification.sendAppleNS(iphoneId,messagePayload,issos,isWhatMate);
+                    }
+                    else if(err){
+                        console.log("errerrerrerrerrerr",err);
+                    }
+                    else{
+                        isWhatMate =0 ;
+                        _apnsNotification.sendAppleNS(iphoneId,messagePayload,issos,isWhatMate);
+                    }
+
+                });
+
             }
             catch(ex){
                 console.log('APNS Notification error',ex);

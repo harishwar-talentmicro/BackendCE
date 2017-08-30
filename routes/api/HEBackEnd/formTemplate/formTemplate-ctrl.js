@@ -4,6 +4,7 @@
 
 
 var formTemplateCtrl = {};
+var error = {};
 
 /**
  *
@@ -32,6 +33,11 @@ formTemplateCtrl.saveFormTemplate = function(req,res,next){
         error.token = 'Invalid formTitle';
         validationFlag *= false;
     }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
 
     if (!validationFlag){
         response.error = error;
@@ -39,68 +45,72 @@ formTemplateCtrl.saveFormTemplate = function(req,res,next){
         res.status(400).json(response);
         console.log(response);
     }
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
-            req.body.formTemplateId = (req.body.formTemplateId) ? req.body.formTemplateId : 0;
-            req.body.status = (req.body.status) ? req.body.status : 0;
-            req.body.employee = (req.body.employee) ? req.body.employee : 0;
-            req.body.alumni = (req.body.alumni) ? req.body.alumni : 0;
-            req.body.public = (req.body.public) ? req.body.public : 0;
-            req.body.customer = (req.body.customer) ? req.body.customer : 0;
-            req.body.vendor = (req.body.vendor) ? req.body.vendor : 0;
-            req.body.timeOut = (req.body.timeOut) ? req.body.timeOut : 0;
-            req.body.approversCount = (req.body.approversCount) ? req.body.approversCount : 0;
-            req.body.approvalType = (req.body.approvalType) ? req.body.approvalType : 0;
-            req.body.layoutJSON = (req.body.layoutJSON) ? req.body.layoutJSON : null ;
-            req.body.receiverAllocation = (req.body.receiverAllocation) ? req.body.receiverAllocation : 0 ;
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.body.formTemplateId = (req.body.formTemplateId) ? req.body.formTemplateId : 0;
+                req.body.status = (req.body.status) ? req.body.status : 0;
+                req.body.employee = (req.body.employee) ? req.body.employee : 0;
+                req.body.alumni = (req.body.alumni) ? req.body.alumni : 0;
+                req.body.public = (req.body.public) ? req.body.public : 0;
+                req.body.customer = (req.body.customer) ? req.body.customer : 0;
+                req.body.vendor = (req.body.vendor) ? req.body.vendor : 0;
+                req.body.timeOut = (req.body.timeOut) ? req.body.timeOut : 0;
+                req.body.approversCount = (req.body.approversCount) ? req.body.approversCount : 0;
+                req.body.approvalType = (req.body.approvalType) ? req.body.approvalType : 0;
+                req.body.layoutJSON = (req.body.layoutJSON) ? req.body.layoutJSON : null ;
+                req.body.receiverAllocation = (req.body.receiverAllocation) ? req.body.receiverAllocation : 0 ;
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.body.formTemplateId),
-                req.st.db.escape(req.body.formType),
-                req.st.db.escape(req.body.formTitle),
-                req.st.db.escape(req.body.timeOut),
-                req.st.db.escape(req.body.employee),
-                req.st.db.escape(req.body.alumni),
-                req.st.db.escape(req.body.public),
-                req.st.db.escape(req.body.customer),
-                req.st.db.escape(req.body.vendor),
-                req.st.db.escape(req.body.status),
-                req.st.db.escape(req.body.layoutJSON),
-                req.st.db.escape(req.body.approversCount),
-                req.st.db.escape(req.body.approvalType),
-                req.st.db.escape(req.body.receiverAllocation)
-            ];
-            /**
-             * Calling procedure to save form template
-             * @type {string}
-             */
-            var procQuery = 'CALL save_HEformTemplates( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,formTemplateResult){
-                console.log(err);
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.formTemplateId),
+                    req.st.db.escape(req.body.formType),
+                    req.st.db.escape(req.body.formTitle),
+                    req.st.db.escape(req.body.timeOut),
+                    req.st.db.escape(req.body.employee),
+                    req.st.db.escape(req.body.alumni),
+                    req.st.db.escape(req.body.public),
+                    req.st.db.escape(req.body.customer),
+                    req.st.db.escape(req.body.vendor),
+                    req.st.db.escape(req.body.status),
+                    req.st.db.escape(req.body.layoutJSON),
+                    req.st.db.escape(req.body.approversCount),
+                    req.st.db.escape(req.body.approvalType),
+                    req.st.db.escape(req.body.receiverAllocation),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL save_HEformTemplates( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,formTemplateResult){
+                    console.log(err);
 
-                if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0] && formTemplateResult[0][0].formTemplateId){
-                    response.status = true;
-                    response.message = "Form Template saved successfully";
-                    response.error = null;
-                    response.formTemplateId = formTemplateResult[0][0].formTemplateId
-                    res.status(200).json(response);
+                    if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0] && formTemplateResult[0][0].formTemplateId){
+                        response.status = true;
+                        response.message = "Form Template saved successfully";
+                        response.error = null;
+                        response.formTemplateId = formTemplateResult[0][0].formTemplateId
+                        res.status(200).json(response);
 
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while saving form template";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving form template";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
 };
 
 formTemplateCtrl.updateFormTemplate = function(req,res,next){
@@ -130,75 +140,83 @@ formTemplateCtrl.updateFormTemplate = function(req,res,next){
         validationFlag *= false;
     }
 
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.body.formTemplateId = (req.body.formTemplateId) ? req.body.formTemplateId : 0;
+                req.body.status = (req.body.status) ? req.body.status : 0;
+                req.body.employee = (req.body.employee) ? req.body.employee : 0;
+                req.body.alumni = (req.body.alumni) ? req.body.alumni : 0;
+                req.body.public = (req.body.public) ? req.body.public : 0;
+                req.body.customer = (req.body.customer) ? req.body.customer : 0;
+                req.body.vendor = (req.body.vendor) ? req.body.vendor : 0;
+                req.body.timeOut = (req.body.timeOut) ? req.body.timeOut : 0;
+                req.body.approversCount = (req.body.approversCount) ? req.body.approversCount : 0;
+                req.body.approvalType = (req.body.approvalType) ? req.body.approvalType : 0;
+                req.body.layoutJSON = (req.body.layoutJSON) ? req.body.layoutJSON : null;
+                req.body.receiverAllocation = (req.body.receiverAllocation) ? req.body.receiverAllocation : 0 ;
 
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
-            req.body.formTemplateId = (req.body.formTemplateId) ? req.body.formTemplateId : 0;
-            req.body.status = (req.body.status) ? req.body.status : 0;
-            req.body.employee = (req.body.employee) ? req.body.employee : 0;
-            req.body.alumni = (req.body.alumni) ? req.body.alumni : 0;
-            req.body.public = (req.body.public) ? req.body.public : 0;
-            req.body.customer = (req.body.customer) ? req.body.customer : 0;
-            req.body.vendor = (req.body.vendor) ? req.body.vendor : 0;
-            req.body.timeOut = (req.body.timeOut) ? req.body.timeOut : 0;
-            req.body.approversCount = (req.body.approversCount) ? req.body.approversCount : 0;
-            req.body.approvalType = (req.body.approvalType) ? req.body.approvalType : 0;
-            req.body.layoutJSON = (req.body.layoutJSON) ? req.body.layoutJSON : null;
-            req.body.receiverAllocation = (req.body.receiverAllocation) ? req.body.receiverAllocation : 0 ;
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.formTemplateId),
+                    req.st.db.escape(req.body.formType),
+                    req.st.db.escape(req.body.formTitle),
+                    req.st.db.escape(req.body.timeOut),
+                    req.st.db.escape(req.body.employee),
+                    req.st.db.escape(req.body.alumni),
+                    req.st.db.escape(req.body.public),
+                    req.st.db.escape(req.body.customer),
+                    req.st.db.escape(req.body.vendor),
+                    req.st.db.escape(req.body.status),
+                    req.st.db.escape(req.body.layoutJSON),
+                    req.st.db.escape(req.body.approversCount),
+                    req.st.db.escape(req.body.approvalType),
+                    req.st.db.escape(req.body.receiverAllocation),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL save_HEformTemplates( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,formTemplateResult){
+                    if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0] && formTemplateResult[0][0].formTemplateId){
+                        response.status = true;
+                        response.message = "Form Template saved successfully";
+                        response.error = null;
+                        response.formTemplateId = formTemplateResult[0][0].formTemplateId
+                        res.status(200).json(response);
 
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving form template";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.body.formTemplateId),
-                req.st.db.escape(req.body.formType),
-                req.st.db.escape(req.body.formTitle),
-                req.st.db.escape(req.body.timeOut),
-                req.st.db.escape(req.body.employee),
-                req.st.db.escape(req.body.alumni),
-                req.st.db.escape(req.body.public),
-                req.st.db.escape(req.body.customer),
-                req.st.db.escape(req.body.vendor),
-                req.st.db.escape(req.body.status),
-                req.st.db.escape(req.body.layoutJSON),
-                req.st.db.escape(req.body.approversCount),
-                req.st.db.escape(req.body.approvalType),
-                req.st.db.escape(req.body.receiverAllocation)
-            ];
-            /**
-             * Calling procedure to save form template
-             * @type {string}
-             */
-            var procQuery = 'CALL save_HEformTemplates( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,formTemplateResult){
-                if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0] && formTemplateResult[0][0].formTemplateId){
-                    response.status = true;
-                    response.message = "Form Template saved successfully";
-                    response.error = null;
-                    response.formTemplateId = formTemplateResult[0][0].formTemplateId
-                    res.status(200).json(response);
-
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while saving form template";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
 formTemplateCtrl.getFormTemplate = function(req,res,next){
@@ -213,55 +231,64 @@ formTemplateCtrl.getFormTemplate = function(req,res,next){
         error.token = 'Invalid formTemplateId';
         validationFlag *= false;
     }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.formTemplateId),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL get_HEFormTemplateDetails( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,formTemplateResult){
+                    if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0]){
+                        response.status = true;
+                        response.message = "Form template loaded successfully";
+                        response.error = null;
+                        response.data = formTemplateResult[0][0];
+                        res.status(200).json(response);
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.query.formTemplateId)
-            ];
-            /**
-             * Calling procedure to get form template
-             * @type {string}
-             */
-            var procQuery = 'CALL get_HEFormTemplateDetails( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,formTemplateResult){
-                if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0]){
-                    response.status = true;
-                    response.message = "Form template loaded successfully";
-                    response.error = null;
-                    response.data = formTemplateResult[0][0];
-                    res.status(200).json(response);
+                    }
+                    else if(err){
+                        response.status = false;
+                        response.message = "Error while getting form template";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                    else{
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                }
-                else if(err){
-                    response.status = false;
-                    response.message = "Error while getting form template";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-                else{
-                    response.status = true;
-                    response.message = "No data found";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
 formTemplateCtrl.getFormTemplateList = function(req,res,next){
@@ -271,50 +298,67 @@ formTemplateCtrl.getFormTemplateList = function(req,res,next){
         data : null,
         error : null
     };
+    var validationFlag = true;
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
 
-            var procParams = [
-                req.st.db.escape(req.query.token)
-            ];
-            /**
-             * Calling procedure to get form template
-             * @type {string}
-             */
-            var procQuery = 'CALL get_HEFormTemplateList( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,formTemplateResult){
-                if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0]){
-                    response.status = true;
-                    response.message = "Form template loaded successfully";
-                    response.error = null;
-                    response.data = {
-                        formTemplateList : formTemplateResult[0]
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL get_HEFormTemplateList( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,formTemplateResult){
+                    if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0]){
+                        response.status = true;
+                        response.message = "Form template loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            formTemplateList : formTemplateResult[0]
+                        };
+                        res.status(200).json(response);
+
                     }
-                    res.status(200).json(response);
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Form template loaded successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting form template";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                }
-                else if(!err){
-                    response.status = true;
-                    response.message = "Form template loaded successfully";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while getting form template";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
 formTemplateCtrl.deleteFormTemplate = function(req,res,next){
@@ -329,48 +373,57 @@ formTemplateCtrl.deleteFormTemplate = function(req,res,next){
         error.token = 'Invalid formTemplateId';
         validationFlag *= false;
     }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.formTemplateId),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL delete_HE_FormTemplateDetails( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,formTemplateResult){
+                    if(!err){
+                        response.status = true;
+                        response.message = "Form template deleted successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.query.formTemplateId)
-            ];
-            /**
-             * Calling procedure to get form template
-             * @type {string}
-             */
-            var procQuery = 'CALL delete_HE_FormTemplateDetails( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,formTemplateResult){
-                if(!err){
-                    response.status = true;
-                    response.message = "Form template deleted successfully";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting form template";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while getting form template";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
 module.exports = formTemplateCtrl;

@@ -656,6 +656,7 @@ var EzeoneAttrbt = require('./modules/ezeone-attribute-module.js');
 var EzeoneAttrbtModule = new EzeoneAttrbt(db,stdLib);
 router.get('/signup_data',EzeoneAttrbtModule.signUpData);
 router.get('/version_code',EzeoneAttrbtModule.versionCode);
+router.get('/WhatMate/version_code',EzeoneAttrbtModule.WhatMateVersionCode);
 
 //association-ap-module
 var Association = require('./modules/association-module.js');

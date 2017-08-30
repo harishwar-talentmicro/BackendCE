@@ -3,6 +3,7 @@
  */
 
 var currencyCtrl = {};
+var error = {};
 
 currencyCtrl.saveCurrency = function(req,res,next){
     var response = {
@@ -18,7 +19,14 @@ currencyCtrl.saveCurrency = function(req,res,next){
     }
     if (!req.body.currencySymbol)
     {
-        error.token = 'Invalid currency symbol';
+        error.currencySymbol = 'Invalid currency symbol';
+        validationFlag *= false;
+    }
+
+    if (!req.query.APIKey)
+    {
+        console.log("Entered....");
+        error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
@@ -28,61 +36,65 @@ currencyCtrl.saveCurrency = function(req,res,next){
         res.status(400).json(response);
         console.log(response);
     }
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
-            req.body.conversionRate = (req.body.conversionRate) ? req.body.conversionRate : 0;
-            req.body.currencyId = (req.body.currencyId) ? req.body.currencyId : 0;
-            req.body.baseCurrency = (req.body.baseCurrency) ? req.body.baseCurrency : 0;
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.body.conversionRate = (req.body.conversionRate) ? req.body.conversionRate : 0;
+                req.body.currencyId = (req.body.currencyId) ? req.body.currencyId : 0;
+                req.body.baseCurrency = (req.body.baseCurrency) ? req.body.baseCurrency : 0;
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.body.currencyId),
-                req.st.db.escape(req.body.currencySymbol),
-                req.st.db.escape(req.body.conversionRate),
-                req.st.db.escape(req.body.baseCurrency)
-            ];
-            /**
-             * Calling procedure to save form template
-             * @type {string}
-             */
-            var procQuery = 'CALL save_HE_currency( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,currencyResult){
-                console.log(err);
-                if(!err && currencyResult && currencyResult[0] && currencyResult[0][0]._error){
-                    switch (currencyResult[0][0]._error) {
-                        case 'ALL_READY_DEFAULT_CURRENCY' :
-                            response.status = false;
-                            response.message = "Only one default currency can be created";
-                            response.error = null;
-                            res.status(200).json(response);
-                            break ;
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.currencyId),
+                    req.st.db.escape(req.body.currencySymbol),
+                    req.st.db.escape(req.body.conversionRate),
+                    req.st.db.escape(req.body.baseCurrency),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL save_HE_currency( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,currencyResult){
+                    console.log(err);
+                    if(!err && currencyResult && currencyResult[0] && currencyResult[0][0]._error){
+                        switch (currencyResult[0][0]._error) {
+                            case 'ALL_READY_DEFAULT_CURRENCY' :
+                                response.status = false;
+                                response.message = "Only one default currency can be created";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
 
-                        default:
-                            break;
+                            default:
+                                break;
+                        }
+
                     }
 
-                }
+                    if(!err){
+                        response.status = true;
+                        response.message = "Currency saved successfully";
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving currency";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                if(!err){
-                    response.status = true;
-                    response.message = "Currency saved successfully";
-                    response.error = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while saving currency";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
 currencyCtrl.updateCurrency = function(req,res,next){
@@ -107,6 +119,11 @@ currencyCtrl.updateCurrency = function(req,res,next){
         error.token = 'Invalid currency Id';
         validationFlag *= false;
     }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
 
     if (!validationFlag){
         response.error = error;
@@ -114,60 +131,64 @@ currencyCtrl.updateCurrency = function(req,res,next){
         res.status(400).json(response);
         console.log(response);
     }
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
-            req.body.conversionRate = (req.body.conversionRate) ? req.body.conversionRate : 0;
-            req.body.baseCurrency = (req.body.baseCurrency) ? req.body.baseCurrency : 0;
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.body.conversionRate = (req.body.conversionRate) ? req.body.conversionRate : 0;
+                req.body.baseCurrency = (req.body.baseCurrency) ? req.body.baseCurrency : 0;
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.body.currencyId),
-                req.st.db.escape(req.body.currencySymbol),
-                req.st.db.escape(req.body.conversionRate),
-                req.st.db.escape(req.body.baseCurrency)
-            ];
-            /**
-             * Calling procedure to save form template
-             * @type {string}
-             */
-            var procQuery = 'CALL save_HE_currency( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,worklocationResult){
-                console.log(err);
-                if(!err && worklocationResult && worklocationResult[0] && worklocationResult[0][0]._error){
-                    switch (worklocationResult[0][0]._error) {
-                        case 'ALL_READY_DEFAULT_CURRENCY' :
-                            response.status = false;
-                            response.message = "Only one default currency can be created";
-                            response.error = null;
-                            res.status(200).json(response);
-                            break ;
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.currencyId),
+                    req.st.db.escape(req.body.currencySymbol),
+                    req.st.db.escape(req.body.conversionRate),
+                    req.st.db.escape(req.body.baseCurrency),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL save_HE_currency( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,worklocationResult){
+                    console.log(err);
+                    if(!err && worklocationResult && worklocationResult[0] && worklocationResult[0][0]._error){
+                        switch (worklocationResult[0][0]._error) {
+                            case 'ALL_READY_DEFAULT_CURRENCY' :
+                                response.status = false;
+                                response.message = "Only one default currency can be created";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
 
-                        default:
-                            break;
+                            default:
+                                break;
+                        }
+
                     }
 
-                }
+                    if(!err){
+                        response.status = true;
+                        response.message = "Currency saved successfully";
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving currency";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                if(!err){
-                    response.status = true;
-                    response.message = "Currency saved successfully";
-                    response.error = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while saving currency";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
 currencyCtrl.getCurrencyList = function(req,res,next){
@@ -178,49 +199,72 @@ currencyCtrl.getCurrencyList = function(req,res,next){
         error : null
     };
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
 
-            var procParams = [
-                req.st.db.escape(req.query.token)
-            ];
-            /**
-             * Calling procedure to get form template
-             * @type {string}
-             */
-            var procQuery = 'CALL get_HECurrencyList( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,currencyResult){
-                if(!err && currencyResult && currencyResult[0] && currencyResult[0][0]){
-                    response.status = true;
-                    response.message = "Currency loaded successfully";
-                    response.error = null;
-                    response.data = {
-                        currencyList : currencyResult[0]
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL get_HECurrencyList( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,currencyResult){
+                    if(!err && currencyResult && currencyResult[0] && currencyResult[0][0]){
+                        response.status = true;
+                        response.message = "Currency loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            currencyList : currencyResult[0]
+                        };
+                        res.status(200).json(response);
+
                     }
-                    res.status(200).json(response);
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Currency loaded successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting currency";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                }
-                else if(!err){
-                    response.status = true;
-                    response.message = "Currency loaded successfully";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while getting currency";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
+
 };
 
 currencyCtrl.deleteCurrency = function(req,res,next){
@@ -231,62 +275,71 @@ currencyCtrl.deleteCurrency = function(req,res,next){
         error : null
     };
     var validationFlag = true;
+
     if (!req.query.currencyId) {
         error.token = 'Invalid currencyId';
         validationFlag *= false;
     }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.currencyId),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL delete_HE_currency( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,formTemplateResult){
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.query.currencyId)
-            ];
-            /**
-             * Calling procedure to get form template
-             * @type {string}
-             */
-            var procQuery = 'CALL delete_HE_currency( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,formTemplateResult){
-
-                if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0]._error){
-                    switch (formTemplateResult[0][0]._error) {
-                        case 'IN_USE' :
-                            response.status = false;
-                            response.message = "Currenncy is in use";
-                            response.error = null;
-                            res.status(200).json(response);
-                            break ;
+                    if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0]._error){
+                        switch (formTemplateResult[0][0]._error) {
+                            case 'IN_USE' :
+                                response.status = false;
+                                response.message = "Currenncy is in use";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
+                        }
                     }
-                }
-                else if (!err ){
-                    response.status = true;
-                    response.message = "Currency deleted successfully";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while deleting currency";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
+                    else if (!err ){
+                        response.status = true;
+                        response.message = "Currency deleted successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while deleting currency";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 };
 
 module.exports = currencyCtrl;

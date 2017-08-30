@@ -9,5 +9,6 @@ var router = express.Router();
 var composeCtrl = require('./compose-ctrl');
 
 router.post('/send',composeCtrl.sendMessage);
+router.post('/learnMessage',composeCtrl.learnMessage);
 
 module.exports = router;

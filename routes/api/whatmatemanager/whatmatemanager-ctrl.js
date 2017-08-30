@@ -49,6 +49,13 @@ managerCtrl.getUsers = function(req,res,next){
                         response.data = result[0];
                         res.status(200).json(response);
                     }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Users loaded successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
                     else{
                         response.status = false;
                         response.message = "Error while getting users";
@@ -403,6 +410,105 @@ managerCtrl.getWhatMateCompaniesList = function(req,res,next){
                     else{
                         response.status = false;
                         response.message = "Error while getting companies list";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+managerCtrl.getFormTransactionData = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if(!req.query.HEMasterId){
+        error.HEMasterId = 'Invalid HEMasterId';
+        validationFlag *= false;
+    }
+
+    if(!req.query.APIKey){
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
+    if(!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.fromDate = req.query.fromDate ? req.query.fromDate : null;
+                req.query.toDate = req.query.toDate ? req.query.toDate : null;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.fromDate),
+                    req.st.db.escape(req.query.toDate),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to save deal
+                 * @type {string}
+                 */
+                var procQuery = 'CALL get_whatmate_dashboard( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,result){
+                    if(!err && result && result[0] && result[0][0].message){
+                        response.status = false;
+                        response.message = "Access denied";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else if(!err && result && result[0]){
+                        var output = [];
+                        var dashboard = JSON.parse(result[0][0].data) ;
+                        for(var i = 0; i < dashboard.length; i++) {
+                            var res1 = {};
+                            res1.formName = dashboard[i].formName;
+                            res1.formId = dashboard[i].formId;
+                            res1.statusList = JSON.parse(dashboard[i].statusList);
+                            output.push(res1);
+                        }
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            userManager : result[1][0].userManager,
+                            masterConfiguration : result[1][0].masterConfiguration,
+                            formList : output
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if(!err ){
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting data";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

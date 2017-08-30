@@ -396,7 +396,6 @@ router.post('/', function(req,res,next){
                                                                         autoJoin : results[3][0].autoJoin,
                                                                         groupType : results[0][0].groupType
                                                                     }
-
                                                                 },
                                                                 null,tokenResult[0].isWhatMate);
                                                             console.log('postNotification : notification for compose_message is sent successfully');
@@ -849,7 +848,9 @@ router.get('/', function(req,res,next){
                                     }
                                     responseMessage.data = {
                                         messageList : output,
-                                        deleteMessageIdList : (results[2]) ? results[2] : []
+                                        deleteMessageIdList : (results[2]) ? results[2] : [],
+                                        feedback : (results[3]) ? results[3] : []
+                                        // supportFeedback : (results[4]) ? results[4] : []
                                     };
 
                                     console.log('deleteMessageIdList',results[2]);

@@ -422,74 +422,74 @@ User.prototype.getUserDetails = function(req,res,next){
         versionMessage : "Your application is up to date"
     };
 
-    switch(req.platform){
-        case 'ios':
-            /**
-             * If IOS version is not supported
-             */
-            if(req.CONFIG.VERSION_LIST.IOS[0].indexOf(parseInt(req.query.versionCode)) == -1 && req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1 ){
-                rtnMessage.versionStatus = 2;
-                rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-                res.send([rtnMessage]);
-                return;
-            }
-            else if(req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1){
-
-                rtnMessage.versionStatus = 1;
-                rtnMessage.versionMessage = "New update available. Please update your application to latest version";
-                //res.send([rtnMessage]);
-                //return;
-            }
-            else{
-                rtnMessage.versionStatus = 0;
-                rtnMessage.versionMessage = "Applications is up to date";
-                //res.send([rtnMessage]);
-                //return;
-            }
-            break;
-        case 'android':
-            /**
-             * If Android version is not supported
-             */
-            if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
-                console.log("===========coming to -1 block=============");
-                rtnMessage.versionStatus = 2;
-                rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-                res.send([rtnMessage]);
-                return;
-            }
-            else{
-                console.log("===========coming to +1 block=============");
-                rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
-                (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
-                rtnMessage.versionMessage = (rtnMessage.versionStatus)
-                    ? "New update available. Please update your application to latest version" : rtnMessage.versionMessage;
-            }
-            break;
-        case 'web':
-            /**
-             * If Web version is not supported
-             */
-            if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
-                rtnMessage.versionStatus = 2;
-                rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-                res.send([rtnMessage]);
-                return;
-            }
-            else{
-                rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
-                (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
-                rtnMessage.versionMessage = (rtnMessage.versionStatus)
-                    ? "New update available. Please update your application to latest version" : rtnMessage.versionMessage;
-            }
-            break;
-        default:
-            rtnMessage.versionStatus = 2;
-            rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-            res.send([rtnMessage]);
-            return;
-            break;
-    }
+    // switch(req.platform){
+    //     case 'ios':
+    //         /**
+    //          * If IOS version is not supported
+    //          */
+    //         if(req.CONFIG.VERSION_LIST.IOS[0].indexOf(parseInt(req.query.versionCode)) == -1 && req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1 ){
+    //             rtnMessage.versionStatus = 2;
+    //             rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //             res.send([rtnMessage]);
+    //             return;
+    //         }
+    //         else if(req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1){
+    //
+    //             rtnMessage.versionStatus = 1;
+    //             rtnMessage.versionMessage = "New update available. Please update your application to latest version";
+    //             //res.send([rtnMessage]);
+    //             //return;
+    //         }
+    //         else{
+    //             rtnMessage.versionStatus = 0;
+    //             rtnMessage.versionMessage = "Applications is up to date";
+    //             //res.send([rtnMessage]);
+    //             //return;
+    //         }
+    //         break;
+    //     case 'android':
+    //         /**
+    //          * If Android version is not supported
+    //          */
+    //         if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
+    //             console.log("===========coming to -1 block=============");
+    //             rtnMessage.versionStatus = 2;
+    //             rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //             res.send([rtnMessage]);
+    //             return;
+    //         }
+    //         else{
+    //             console.log("===========coming to +1 block=============");
+    //             rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
+    //             (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+    //             rtnMessage.versionMessage = (rtnMessage.versionStatus)
+    //                 ? "New update available. Please update your application to latest version" : rtnMessage.versionMessage;
+    //         }
+    //         break;
+    //     case 'web':
+    //         /**
+    //          * If Web version is not supported
+    //          */
+    //         if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
+    //             rtnMessage.versionStatus = 2;
+    //             rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //             res.send([rtnMessage]);
+    //             return;
+    //         }
+    //         else{
+    //             rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
+    //             (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+    //             rtnMessage.versionMessage = (rtnMessage.versionStatus)
+    //                 ? "New update available. Please update your application to latest version" : rtnMessage.versionMessage;
+    //         }
+    //         break;
+    //     default:
+    //         rtnMessage.versionStatus = 2;
+    //         rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //         res.send([rtnMessage]);
+    //         return;
+    //         break;
+    // }
 
     try {
 
@@ -790,6 +790,7 @@ User.prototype.forgetPassword = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var EZEID = req.st.alterEzeoneId(req.body.EZEID);
+        var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
 
         var resetCode = st.generateRandomHash(Date.now().toString());
 
@@ -804,75 +805,6 @@ User.prototype.forgetPassword = function(req,res,next){
             mailSend : false
         };
         RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-
-
-        switch(req.platform){
-
-            case 'ios':
-                /**
-                 * If IOS version is not supported
-                 */
-                if(req.CONFIG.VERSION_LIST.IOS[0].indexOf(parseInt(req.query.versionCode)) == -1 && req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1 ){
-                    RtnMessage.versionStatus = 2;
-                    RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-                    res.send(RtnMessage);
-                    return;
-                }
-                else if(req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1){
-
-                    RtnMessage.versionStatus = 1;
-                    RtnMessage.versionMessage = "New update available. Please update your application to latest version";
-                    //res.send(RtnMessage);
-                    //return;
-                }
-                else{
-                    RtnMessage.versionStatus = 0;
-                    RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-                    //res.send(RtnMessage);
-                    //return;
-                }
-                break;
-            case 'android':
-                /**
-                 * If Android version is not supported
-                 */
-                if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
-                    RtnMessage.versionStatus = 2;
-                    RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-                    res.send(RtnMessage);
-                    return;
-                }
-                else{
-                    RtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
-                    (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
-                    RtnMessage.versionMessage = (RtnMessage.versionStatus)
-                        ? "New update available. Please update your application to latest version" : RtnMessage.versionMessage;
-                }
-                break;
-            case 'web':
-                /**
-                 * If Web version is not supported
-                 */
-                if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
-                    RtnMessage.versionStatus = 2;
-                    RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-                    res.send(RtnMessage);
-                    return;
-                }
-                else{
-                    RtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
-                    (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
-                    RtnMessage.versionMessage = (RtnMessage.versionStatus)
-                        ? "New update available. Please update your application to latest version" : RtnMessage.versionMessage;
-                }
-                break;
-            default:
-                RtnMessage.versionStatus = 2;
-                RtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-                res.send(RtnMessage);
-                return;
-                break;
-        }
 
         if (EZEID != null) {
             var resetQueryParams = st.db.escape(EZEID) + ',' + st.db.escape(resetCode) +

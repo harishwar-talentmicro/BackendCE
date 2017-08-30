@@ -1,1 +1,1 @@
-<%=senderName%> has sent message.
+<%=senderName%> has sent a message.

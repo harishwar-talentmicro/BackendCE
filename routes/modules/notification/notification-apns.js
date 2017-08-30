@@ -33,10 +33,20 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos,isWhat
         note['content-available'] = 1;
         note.badge = 1;
         //note.sound = "notification-beep.wav";
-        note.alert = { "body" : payload.s_title +' : ' +payload.message, "action-loc-key" : "Play" ,
-            "launch-image" :
-                //"mysplash.png","JsonResult":JSON.stringify(payload)};
-                "mysplash.png"};
+        console.log("payload.s_title",payload.s_title);
+if(payload.s_title == ""){
+    note.alert = { "body" : payload.message, "action-loc-key" : "Play" ,
+        "launch-image" :
+        //"mysplash.png","JsonResult":JSON.stringify(payload)};
+            "mysplash.png"};
+}
+else {
+    note.alert = { "body" : payload.s_title +' : ' +payload.message, "action-loc-key" : "Play" ,
+        "launch-image" :
+        //"mysplash.png","JsonResult":JSON.stringify(payload)};
+            "mysplash.png"};
+}
+
         note.payload = payload;
 
         note.device = myDevice;
@@ -53,8 +63,8 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos,isWhat
                 //gateway: 'gateway.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
                 gateway : (CONFIG.APNS.GATEWAY) ? CONFIG.APNS.GATEWAY : 'gateway.sandbox.push.apple.com',
                 errorCallback: callback,
-                cert: (CONFIG.CONSTANT.DEBUG) ?  'WhatMateCert.pem' : 'apple_cert.pem',
-                key:  (CONFIG.CONSTANT.DEBUG) ?  'WhatMateKey.pem' : 'apple_key.pem',
+                cert: (CONFIG.CONSTANT.DEBUG) ?  'WhatMateCert.pem' : 'WhatMateCert.pem',
+                key:  (CONFIG.CONSTANT.DEBUG) ?  'WhatMateKey.pem' : 'WhatMateKey.pem',
                 passphrase: (CONFIG.APNS.WHATMATEPASSPHRASE) ? CONFIG.APNS.WHATMATEPASSPHRASE : 'what123',
                 port: (CONFIG.APNS.PORT) ? CONFIG.APNS.PORT : 2195,
                 enhanced: true,

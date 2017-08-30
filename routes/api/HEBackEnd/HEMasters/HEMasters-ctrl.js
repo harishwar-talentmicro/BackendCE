@@ -3,6 +3,8 @@
  */
 
 var HEMasterCtrl = {};
+var error = {};
+
 HEMasterCtrl.getFormTypeList = function(req,res,next){
     var response = {
         status : false,
@@ -10,50 +12,61 @@ HEMasterCtrl.getFormTypeList = function(req,res,next){
         data : null,
         error : null
     };
+    var validationFlag = true;
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
-            req.query.lngId =(req.query.lngId) ? req.query.lngId : 1 ;
-            var procParams = [
-                req.st.db.escape(req.query.lngId)
-            ];
-            /**
-             * Calling procedure to get form template
-             * @type {string}
-             */
-            var procQuery = 'CALL get_HEForm_list( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,formTypeResult){
-                if(!err && formTypeResult && formTypeResult[0] && formTypeResult[0][0]){
-                    response.status = true;
-                    response.message = "Form type loaded successfully";
-                    response.error = null;
-                    response.data = {
-                        formTypeList : formTypeResult[0]
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.lngId =(req.query.lngId) ? req.query.lngId : 1 ;
+                var procParams = [
+                    req.st.db.escape(req.query.lngId)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+
+                var procQuery = 'CALL get_HEForm_list( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,formTypeResult){
+                    if(!err && formTypeResult && formTypeResult[0] && formTypeResult[0][0]){
+                        response.status = true;
+                        response.message = "Form type loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            formTypeList : formTypeResult[0]
+                        };
+                        res.status(200).json(response);
                     }
-                    res.status(200).json(response);
+                    else if(err){
+                        response.status = false;
+                        response.message = "Error while getting form type list";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                    else{
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                }
-                else if(err){
-                    response.status = false;
-                    response.message = "Error while getting form type list";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-                else{
-                    response.status = true;
-                    response.message = "No data found";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
 HEMasterCtrl.saveWorkGroup = function(req,res,next){
@@ -74,6 +87,11 @@ HEMasterCtrl.saveWorkGroup = function(req,res,next){
         error.groupName = 'Invalid groupName';
         validationFlag *= false;
     }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
 
     if (!validationFlag){
 
@@ -82,61 +100,65 @@ HEMasterCtrl.saveWorkGroup = function(req,res,next){
         res.status(400).json(response);
         console.log(response);
     }
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
 
-            req.body.groupCode = (req.body.groupCode) ? req.body.groupCode : '';
+                req.body.groupCode = (req.body.groupCode) ? req.body.groupCode : '';
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.body.groupName),
-                req.st.db.escape(req.body.groupCode),
-                req.st.db.escape(req.body.groupType)
-            ];
-            /**
-             * Calling procedure to save work group
-             * @type {string}
-             */
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.groupName),
+                    req.st.db.escape(req.body.groupCode),
+                    req.st.db.escape(req.body.groupType),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to save work group
+                 * @type {string}
+                 */
 
-            var procQuery = 'CALL HE_Save_workGroups( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,workGroupResult){
-                console.log(err);
-                if(!err && workGroupResult && workGroupResult[0] && workGroupResult[0][0]._error){
-                    switch (workGroupResult[0][0]._error) {
-                        case 'ALREADY_EXISTS' :
-                            response.status = false;
-                            response.message = "Work group already exists";
-                            response.error = null;
-                            res.status(200).json(response);
-                            break ;
+                var procQuery = 'CALL HE_Save_workGroups( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,workGroupResult){
+                    console.log(err);
+                    if(!err && workGroupResult && workGroupResult[0] && workGroupResult[0][0]._error){
+                        switch (workGroupResult[0][0]._error) {
+                            case 'ALREADY_EXISTS' :
+                                response.status = false;
+                                response.message = "Work group already exists";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
 
-                        default:
-                            break;
+                            default:
+                                break;
+                        }
+
                     }
+                    if(!err){
+                        response.status = true;
+                        response.message = "Work group saved successfully";
+                        response.error = null;
+                        response.workGroupId = workGroupResult[0][0].workGroupId;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        console.log(err,"err");
+                        response.status = false;
+                        response.message = "Error while Work group";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                }
-                if(!err){
-                    response.status = true;
-                    response.message = "Work group saved successfully";
-                    response.error = null;
-                    response.workGroupId = workGroupResult[0][0].workGroupId;
-                    res.status(200).json(response);
-                }
-                else{
-                    console.log(err,"err");
-                    response.status = false;
-                    response.message = "Error while Work group";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
 HEMasterCtrl.getWorkGroup = function(req,res,next){
@@ -146,50 +168,67 @@ HEMasterCtrl.getWorkGroup = function(req,res,next){
         data : null,
         error : null
     };
+    var validationFlag = true;
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
 
-            var procParams = [
-                req.st.db.escape(req.query.token)
-            ];
-            /**
-             * Calling procedure to get form template
-             * @type {string}
-             */
-            var procQuery = 'CALL HE_get_workGroups( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,workGroupResult){
-                if(!err && workGroupResult && workGroupResult[0] && workGroupResult[0][0]){
-                    response.status = true;
-                    response.message = "Work group loaded successfully";
-                    response.error = null;
-                    response.data = {
-                        workGroupList : workGroupResult[0]
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL HE_get_workGroups( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,workGroupResult){
+                    if(!err && workGroupResult && workGroupResult[0] && workGroupResult[0][0]){
+                        response.status = true;
+                        response.message = "Work group loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            workGroupList : workGroupResult[0]
+                        };
+                        res.status(200).json(response);
+
                     }
-                    res.status(200).json(response);
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Work group loaded successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting work group";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                }
-                else if(!err){
-                    response.status = true;
-                    response.message = "Work group loaded successfully";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while getting work group";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
 HEMasterCtrl.saveFormGroup = function(req,res,next){
@@ -216,6 +255,11 @@ HEMasterCtrl.saveFormGroup = function(req,res,next){
         error.templateCode = 'Invalid templateCode';
         validationFlag *= false;
     }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
 
     var formList =req.body.formList;
     if(typeof(formList) == "string") {
@@ -233,62 +277,66 @@ HEMasterCtrl.saveFormGroup = function(req,res,next){
         res.status(400).json(response);
         console.log(response);
     }
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
 
-            req.body.templateId = (req.body.templateId) ? req.body.templateId : 0;
-            req.body.userType = (req.body.userType) ? req.body.userType : 0;
+                req.body.templateId = (req.body.templateId) ? req.body.templateId : 0;
+                req.body.userType = (req.body.userType) ? req.body.userType : 0;
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.body.templateId),
-                req.st.db.escape(req.body.templateName),
-                req.st.db.escape(req.body.templateCode),
-                req.st.db.escape(req.body.userType),
-                req.st.db.escape(JSON.stringify(formList))
-            ];
-            /**
-             * Calling procedure to save work group
-             * @type {string}
-             */
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.templateId),
+                    req.st.db.escape(req.body.templateName),
+                    req.st.db.escape(req.body.templateCode),
+                    req.st.db.escape(req.body.userType),
+                    req.st.db.escape(JSON.stringify(formList)),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to save work group
+                 * @type {string}
+                 */
 
-            var procQuery = 'CALL HE_save_formGroup( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,formGroupResult){
-                if(!err && formGroupResult && formGroupResult[0] && formGroupResult[0][0]._error){
-                    switch (formGroupResult[0][0]._error) {
-                        case 'ALREADY_EXISTS' :
-                            response.status = false;
-                            response.message = "Duplicate template name or code ";
-                            response.error = null;
-                            res.status(200).json(response);
-                            break ;
+                var procQuery = 'CALL HE_save_formGroup( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,formGroupResult){
+                    if(!err && formGroupResult && formGroupResult[0] && formGroupResult[0][0]._error){
+                        switch (formGroupResult[0][0]._error) {
+                            case 'ALREADY_EXISTS' :
+                                response.status = false;
+                                response.message = "Duplicate template name or code ";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
 
-                        default:
-                            break;
+                            default:
+                                break;
+                        }
+
                     }
+                    if(!err){
+                        response.status = true;
+                        response.message = "Form template saved successfully";
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        console.log(err,"err");
+                        response.status = false;
+                        response.message = "Error while form template";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                }
-                if(!err){
-                    response.status = true;
-                    response.message = "Form template saved successfully";
-                    response.error = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    console.log(err,"err");
-                    response.status = false;
-                    response.message = "Error while form template";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
 HEMasterCtrl.getFormGroupList = function(req,res,next){
@@ -298,50 +346,67 @@ HEMasterCtrl.getFormGroupList = function(req,res,next){
         data : null,
         error : null
     };
+    var validationFlag = true;
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
 
-            var procParams = [
-                req.st.db.escape(req.query.token)
-            ];
-            /**
-             * Calling procedure to get form template
-             * @type {string}
-             */
-            var procQuery = 'CALL HE_Get_formGroup_List( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,formGroupResult){
-                if(!err && formGroupResult && formGroupResult[0] && formGroupResult[0][0]){
-                    response.status = true;
-                    response.message = "Form template loaded successfully";
-                    response.error = null;
-                    response.data = {
-                        formTemplateList : formGroupResult[0]
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL HE_Get_formGroup_List( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,formGroupResult){
+                    if(!err && formGroupResult && formGroupResult[0] && formGroupResult[0][0]){
+                        response.status = true;
+                        response.message = "Form template loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            formTemplateList : formGroupResult[0]
+                        };
+                        res.status(200).json(response);
+
                     }
-                    res.status(200).json(response);
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Form template loaded successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting form template";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                }
-                else if(!err){
-                    response.status = true;
-                    response.message = "Form template loaded successfully";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while getting form template";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
 HEMasterCtrl.getFormGroupDetails = function(req,res,next){
@@ -357,59 +422,66 @@ HEMasterCtrl.getFormGroupDetails = function(req,res,next){
         error.formGroupId = 'Invalid formGroupId';
         validationFlag *= false;
     }
-
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.formGroupId),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL HE_Get_formGroup_details( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,formGroupResult){
+                    if(!err && formGroupResult && formGroupResult[0] && formGroupResult[0][0]){
+                        response.status = true;
+                        response.message = "Form template details loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            formTemplateDetails : formGroupResult[0],
+                            formList : formGroupResult[1]
+                        }
+                        res.status(200).json(response);
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.query.formGroupId)
-            ];
-            /**
-             * Calling procedure to get form template
-             * @type {string}
-             */
-            var procQuery = 'CALL HE_Get_formGroup_details( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,formGroupResult){
-                if(!err && formGroupResult && formGroupResult[0] && formGroupResult[0][0]){
-                    response.status = true;
-                    response.message = "Form template details loaded successfully";
-                    response.error = null;
-                    response.data = {
-                        formTemplateDetails : formGroupResult[0],
-                        formList : formGroupResult[1]
                     }
-                    res.status(200).json(response);
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Form template details loaded successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting form template details";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                }
-                else if(!err){
-                    response.status = true;
-                    response.message = "Form template details loaded successfully";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while getting form template details";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
 /* List of form need to select */
@@ -421,7 +493,11 @@ HEMasterCtrl.getFormsNeedToSelect = function(req,res,next){
         error : null
     };
     var validationFlag = true;
-
+    // if (!req.query.APIKey)
+    // {
+    //     error.APIKey = 'Invalid APIKey';
+    //     validationFlag *= false;
+    // }
 
     if (!validationFlag){
         response.error = error;
@@ -434,10 +510,12 @@ HEMasterCtrl.getFormsNeedToSelect = function(req,res,next){
         if((!err) && tokenResult){
 
             req.query.formGroupId = (req.query.formGroupId) ? req.query.formGroupId : 0;
+            req.query.APIKey = req.query.APIKey ? req.query.APIKey : 0;
 
             var procParams = [
                 req.st.db.escape(req.query.token),
-                req.st.db.escape(req.query.formGroupId)
+                req.st.db.escape(req.query.formGroupId),
+                req.st.db.escape(req.query.APIKey)
             ];
             /**
              * Calling procedure to get form template
@@ -452,7 +530,7 @@ HEMasterCtrl.getFormsNeedToSelect = function(req,res,next){
                     response.error = null;
                     response.data = {
                         formList : formResult[0]
-                    }
+                    };
                     res.status(200).json(response);
 
                 }
@@ -490,6 +568,11 @@ HEMasterCtrl.getFormWorkList = function(req,res,next){
     };
     var validationFlag = true;
 
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
 
     if (!validationFlag){
         response.error = error;
@@ -503,7 +586,8 @@ HEMasterCtrl.getFormWorkList = function(req,res,next){
 
 
             var procParams = [
-                req.st.db.escape(req.query.token)
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.query.APIKey)
             ];
             /**
              * Calling procedure to get form template
@@ -557,59 +641,68 @@ HEMasterCtrl.deleteWorkGroup = function(req,res,next){
         error.workGroupId = 'Invalid workGroupId';
         validationFlag *= false;
     }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
 
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
     }
-    console.log(req.query.token,"req.query.token");
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.workGroupId),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_delete_workgroup( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,workGroupResult){
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.query.workGroupId)
-            ];
-            /**
-             * Calling procedure to get form template
-             * @type {string}
-             */
-            var procQuery = 'CALL he_delete_workgroup( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,workGroupResult){
-
-                if(!err && workGroupResult && workGroupResult[0] && workGroupResult[0][0]._error){
-                    switch (workGroupResult[0][0]._error) {
-                        case 'IN_USE' :
-                            response.status = false;
-                            response.message = "work group is in use";
-                            response.error = null;
-                            res.status(200).json(response);
-                            break ;
+                    if(!err && workGroupResult && workGroupResult[0] && workGroupResult[0][0]._error){
+                        switch (workGroupResult[0][0]._error) {
+                            case 'IN_USE' :
+                                response.status = false;
+                                response.message = "work group is in use";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
+                        }
                     }
-                }
-                else if (!err ){
-                    response.status = true;
-                    response.message = "work group deleted successfully";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while deleting work group";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
+                    else if (!err ){
+                        response.status = true;
+                        response.message = "work group deleted successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while deleting work group";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+
+
 };
 
 HEMasterCtrl.deleteFormGroup = function(req,res,next){
@@ -625,58 +718,146 @@ HEMasterCtrl.deleteFormGroup = function(req,res,next){
         error.templateId = 'Invalid templateId';
         validationFlag *= false;
     }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
 
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
     }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.templateId),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_delete_formTemplategroup( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,workGroupResult){
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.query.templateId)
-            ];
-            /**
-             * Calling procedure to get form template
-             * @type {string}
-             */
-            var procQuery = 'CALL he_delete_formTemplategroup( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,workGroupResult){
-
-                if(!err && workGroupResult && workGroupResult[0] && workGroupResult[0][0]._error){
-                    switch (workGroupResult[0][0]._error) {
-                        case 'IN_USE' :
-                            response.status = false;
-                            response.message = "Form template is in use";
-                            response.error = null;
-                            res.status(200).json(response);
-                            break ;
+                    if(!err && workGroupResult && workGroupResult[0] && workGroupResult[0][0]._error){
+                        switch (workGroupResult[0][0]._error) {
+                            case 'IN_USE' :
+                                response.status = false;
+                                response.message = "Form template is in use";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
+                        }
                     }
-                }
-                else if (!err ){
-                    response.status = true;
-                    response.message = "Form template deleted successfully";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while deleting form template";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
+                    else if (!err ){
+                        response.status = true;
+                        response.message = "Form template deleted successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while deleting form template";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+HEMasterCtrl.findHEUser = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token)
+    {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.userType = req.query.userType ? req.query.userType : 0 ;
+                req.query.keyword = req.query.keyword ? req.query.keyword : "" ;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.query.keyword),
+                    req.st.db.escape(req.query.userType)
+                ];
+
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL HE_find_user( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,userResult){
+                    if(!err && userResult && userResult[0] && userResult[0][0]){
+                        response.status = true;
+                        response.message = "Users loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            user : userResult[0]
+                        };
+                        res.status(200).json(response);
+
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Users loaded successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting Users";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 };
 
 module.exports = HEMasterCtrl;

@@ -24,4 +24,6 @@ router.get('/formTemplate/workGroup',formTypeCtrl.getFormWorkList);
 router.delete('/workGroup',formTypeCtrl.deleteWorkGroup);
 router.delete('/formTemplateGroup',formTypeCtrl.deleteFormGroup);
 
+router.get('/search/user',formTypeCtrl.findHEUser);
+
 module.exports = router;

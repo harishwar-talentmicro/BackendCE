@@ -113,16 +113,17 @@ signupCtrl.sendOtp = function(req,res,next) {
                     }
                     else if(isdMobile != "")
                     {
+                        console.log("mobile_no", "00" + isdMobile.replace("+","") + mobileNo );
                         request({
                             url: 'https://aikonsms.co.in/control/smsapi.php',
                             qs: {
                                 user_name : 'janardana@hirecraft.com',
                                 password : 'Ezeid2015',
-                                sender_id : 'EZEONE',
+                                sender_id : 'WtMate',
                                 service : 'INTSMS',
-                                mobile_no: mobileNo,
+                                mobile_no: "00" + isdMobile.replace("+","") + mobileNo,
                                 message: message,
-                                method : 'send_sms'
+                                method : 'send_intsms'
                             },
                             method: 'GET'
 
@@ -137,7 +138,17 @@ signupCtrl.sendOtp = function(req,res,next) {
                         });
                     }
                     respMsg.status = true;
+                    respMsg.otp = code;
                     respMsg.message = 'OTP Sent Successfully';
+                    respMsg.data = {
+                        mobileNo : mobileNo,
+                        message : message,
+                        user_name : 'janardana@hirecraft.com',
+                        password : 'Ezeid2015',
+                        sender_id : 'EZEONE',
+                        service : 'TRANS',
+                        method : 'send_sms'
+                    };
                     res.status(200).json(respMsg);
                 }
                 else{
@@ -195,6 +206,13 @@ signupCtrl.verifyOTP = function(req,res,next){
         try {
             var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
             req.query.token = req.query.token ? req.query.token : "";
+            var pictureURL = req.body.pictureURL ? req.body.pictureURL : "";
+
+            if (pictureURL != "")
+            {
+                pictureURL = (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + pictureURL);
+            }
+
 
             var procParams = [
                 req.st.db.escape(mobileNo),
@@ -248,7 +266,8 @@ signupCtrl.verifyOTP = function(req,res,next){
                                 isHelloEZE : result[0][0].isHelloEZE,
                                 displayName : result[0][0].displayName,
                                 group_id : result[0][0].group_id,
-                                mobilenumber : result[0][0].mobilenumber
+                                mobilenumber : result[0][0].mobilenumber,
+                                pictureUrl : pictureURL
                             };
                             res.status(200).json(respMsg);
 

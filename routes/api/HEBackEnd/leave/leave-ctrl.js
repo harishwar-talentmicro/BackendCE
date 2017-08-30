@@ -2,8 +2,8 @@
  * Created by Jana1 on 25-04-2017.
  */
 
-
 var leaveCtrl = {};
+var error = {};
 
 leaveCtrl.saveLeaveTypes = function(req,res,next){
     var response = {
@@ -28,6 +28,11 @@ leaveCtrl.saveLeaveTypes = function(req,res,next){
         error.leaveTitle = 'Invalid leaveTitle';
         validationFlag *= false;
     }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
 
 
     if (!validationFlag){
@@ -36,44 +41,48 @@ leaveCtrl.saveLeaveTypes = function(req,res,next){
         res.status(400).json(response);
         console.log(response);
     }
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
-            req.body.leaveDescription = (req.body.leaveDescription) ? req.body.leaveDescription : '';
-            req.body.leaveTypeId = (req.body.leaveTypeId) ? req.body.leaveTypeId : 0;
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.body.leaveDescription = (req.body.leaveDescription) ? req.body.leaveDescription : '';
+                req.body.leaveTypeId = (req.body.leaveTypeId) ? req.body.leaveTypeId : 0;
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.body.leaveTypeId),
-                req.st.db.escape(req.body.shortCode),
-                req.st.db.escape(req.body.leaveTitle),
-                req.st.db.escape(req.body.leaveDescription)
-            ];
-            /**
-             * Calling procedure to save form template
-             * @type {string}
-             */
-            var procQuery = 'CALL HE_save_leaveTypes( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,leaveTypeResult){
-                if(!err){
-                    response.status = true;
-                    response.message = "Leave type saved successfully";
-                    response.error = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while saving leave type";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.leaveTypeId),
+                    req.st.db.escape(req.body.shortCode),
+                    req.st.db.escape(req.body.leaveTitle),
+                    req.st.db.escape(req.body.leaveDescription),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL HE_save_leaveTypes( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,leaveTypeResult){
+                    if(!err){
+                        response.status = true;
+                        response.message = "Leave type saved successfully";
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving leave type";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
 };
 
 leaveCtrl.updateLeaveTypes = function(req,res,next){
@@ -105,7 +114,11 @@ leaveCtrl.updateLeaveTypes = function(req,res,next){
         error.leaveTitle = 'Invalid leaveTitle';
         validationFlag *= false;
     }
-
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
 
     if (!validationFlag){
         response.error = error;
@@ -113,43 +126,47 @@ leaveCtrl.updateLeaveTypes = function(req,res,next){
         res.status(400).json(response);
         console.log(response);
     }
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
-            req.body.leaveDescription = (req.body.leaveDescription) ? req.body.leaveDescription : '';
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.body.leaveDescription = (req.body.leaveDescription) ? req.body.leaveDescription : '';
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.body.leaveTypeId),
-                req.st.db.escape(req.body.shortCode),
-                req.st.db.escape(req.body.leaveTitle),
-                req.st.db.escape(req.body.leaveDescription)
-            ];
-            /**
-             * Calling procedure to save form template
-             * @type {string}
-             */
-            var procQuery = 'CALL HE_save_leaveTypes( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,leaveTypeResult){
-                if(!err){
-                    response.status = true;
-                    response.message = "Leave type saved successfully";
-                    response.error = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while saving leave type";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.leaveTypeId),
+                    req.st.db.escape(req.body.shortCode),
+                    req.st.db.escape(req.body.leaveTitle),
+                    req.st.db.escape(req.body.leaveDescription),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL HE_save_leaveTypes( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,leaveTypeResult){
+                    if(!err){
+                        response.status = true;
+                        response.message = "Leave type saved successfully";
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving leave type";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
 };
 
 leaveCtrl.getLeaveTypes = function(req,res,next){
@@ -159,50 +176,65 @@ leaveCtrl.getLeaveTypes = function(req,res,next){
         data : null,
         error : null
     };
+    var validationFlag = true;
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL HE_get_leaveType( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,leaveTypeResult){
+                    if(!err && leaveTypeResult && leaveTypeResult[0] && leaveTypeResult[0][0]){
+                        response.status = true;
+                        response.message = "Leave type loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            leaveTypeList : leaveTypeResult[0]
+                        }
+                        res.status(200).json(response);
 
-            var procParams = [
-                req.st.db.escape(req.query.token)
-            ];
-            /**
-             * Calling procedure to get form template
-             * @type {string}
-             */
-            var procQuery = 'CALL HE_get_leaveType( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,leaveTypeResult){
-                if(!err && leaveTypeResult && leaveTypeResult[0] && leaveTypeResult[0][0]){
-                    response.status = true;
-                    response.message = "Leave type loaded successfully";
-                    response.error = null;
-                    response.data = {
-                        leaveTypeList : leaveTypeResult[0]
                     }
-                    res.status(200).json(response);
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Leave type loaded successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting Leave type";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 
-                }
-                else if(!err){
-                    response.status = true;
-                    response.message = "Leave type loaded successfully";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while getting Leave type";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
 };
 
 leaveCtrl.deleteLeaveTypes = function(req,res,next){
@@ -217,58 +249,67 @@ leaveCtrl.deleteLeaveTypes = function(req,res,next){
         error.leaveTypeId = 'Invalid leaveTypeId';
         validationFlag *= false;
     }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.leaveTypeId),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL HE_delete_leaveType( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,leaveTypeResult){
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.query.leaveTypeId)
-            ];
-            /**
-             * Calling procedure to get form template
-             * @type {string}
-             */
-            var procQuery = 'CALL HE_delete_leaveType( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,leaveTypeResult){
-
-                if(!err && leaveTypeResult && leaveTypeResult[0] && leaveTypeResult[0][0]._error){
-                    switch (leaveTypeResult[0][0]._error) {
-                        case 'IN_USE' :
-                            response.status = false;
-                            response.message = "Leave type is in use";
-                            response.error = null;
-                            res.status(200).json(response);
-                            break ;
+                    if(!err && leaveTypeResult && leaveTypeResult[0] && leaveTypeResult[0][0]._error){
+                        switch (leaveTypeResult[0][0]._error) {
+                            case 'IN_USE' :
+                                response.status = false;
+                                response.message = "Leave type is in use";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
+                        }
                     }
-                }
-                else if (!err ){
-                    response.status = true;
-                    response.message = "Leave type deleted successfully";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while deleting leave type";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
+                    else if (!err ){
+                        response.status = true;
+                        response.message = "Leave type deleted successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while deleting leave type";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
 };
 
 leaveCtrl.saveLeaveBalance = function(req,res,next){
@@ -288,6 +329,11 @@ leaveCtrl.saveLeaveBalance = function(req,res,next){
         error.HEUsersId = 'Invalid HEUsersId';
         validationFlag *= false;
     }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
 
     var leaveTypes =req.body.leaveTypes;
     if(typeof(leaveTypes) == "string") {
@@ -305,40 +351,44 @@ leaveCtrl.saveLeaveBalance = function(req,res,next){
         res.status(400).json(response);
         console.log(response);
     }
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
 
-            var procParams = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(req.body.HEUsersId),
-                req.st.db.escape(JSON.stringify(leaveTypes))
-            ];
-            /**
-             * Calling procedure to save form template
-             * @type {string}
-             */
-            var procQuery = 'CALL HE_save_leaveBalance( ' + procParams.join(',') + ')';
-            console.log(procQuery);
-            req.db.query(procQuery,function(err,leaveBalanceResult){
-                if(!err){
-                    response.status = true;
-                    response.message = "Leave balance saved successfully";
-                    response.error = null;
-                    res.status(200).json(response);
-                }
-                else{
-                    response.status = false;
-                    response.message = "Error while saving leave balance";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
-        }
-        else{
-            res.status(401).json(response);
-        }
-    });
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.HEUsersId),
+                    req.st.db.escape(JSON.stringify(leaveTypes)),
+                    req.st.db.escape(req.query.APIKey)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL HE_save_leaveBalance( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,leaveBalanceResult){
+                    if(!err){
+                        response.status = true;
+                        response.message = "Leave balance saved successfully";
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving leave balance";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
 };
 
 leaveCtrl.getLeaveBalance = function(req,res,next){
@@ -348,19 +398,31 @@ leaveCtrl.getLeaveBalance = function(req,res,next){
         data : null,
         error : null
     };
+    var validationFlag = true;
 
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
     req.st.validateToken(req.query.token,function(err,tokenResult){
         if((!err) && tokenResult){
 
             req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
-            req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+            req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
             req.query.employeeCode = (req.query.employeeCode) ? (req.query.employeeCode) : '';
             req.query.name = (req.query.name) ? (req.query.name) : '';
             req.query.dateFrom = (req.query.dateFrom) ? (req.query.dateFrom) : null;
             req.query.dateTo = (req.query.dateTo) ? (req.query.dateTo) : null;
             var startPage = 0;
 
-            startPage = ((((parseInt(req.query.pageNo)) * req.query.limit) + 1) - req.query.limit) - 1;
+            startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
 
             var procParams = [
                 req.st.db.escape(req.query.token),
@@ -369,7 +431,8 @@ leaveCtrl.getLeaveBalance = function(req,res,next){
                 req.st.db.escape(startPage),
                 req.st.db.escape(req.query.limit),
                 req.st.db.escape(req.query.dateFrom),
-                req.st.db.escape(req.query.dateTo)
+                req.st.db.escape(req.query.dateTo),
+                req.st.db.escape(req.query.APIKey)
             ];
             /**
              * Calling procedure to get form template
@@ -396,7 +459,7 @@ leaveCtrl.getLeaveBalance = function(req,res,next){
                     response.data = {
                         count : leaveTypeResult[1][0].count,
                         userList : outputArray
-                    }
+                    };
                     res.status(200).json(response);
 
                 }
