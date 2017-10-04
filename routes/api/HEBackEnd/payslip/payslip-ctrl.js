@@ -2,7 +2,6 @@
  * Created by Jana1 on 08-08-2017.
  */
 
-
 var payslipCtrl = {};
 var error = {};
 
@@ -176,5 +175,6 @@ payslipCtrl.getPaySlips = function(req,res,next){
     }
 
 };
+
 
 module.exports = payslipCtrl;

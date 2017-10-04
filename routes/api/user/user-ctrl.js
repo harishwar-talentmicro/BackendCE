@@ -185,18 +185,18 @@ UserCtrl.saveAddress = function(req,res,next){
     var validationFlag = true;
     var error = {};
 
-    if(!req.body.address){
-        error.address = 'address can not be empty';
-        validationFlag *= false;
-    }
-    if(!req.body.latitude){
-        error.latitude = 'latitude can not be empty';
-        validationFlag *= false;
-    }
-    if(!req.body.longitude){
-        error.longitude = 'longitude can not be empty';
-        validationFlag *= false;
-    }
+    // if(!req.body.address){
+    //     error.address = 'address can not be empty';
+    //     validationFlag *= false;
+    // }
+    // if(!req.body.latitude){
+    //     error.latitude = 'latitude can not be empty';
+    //     validationFlag *= false;
+    // }
+    // if(!req.body.longitude){
+    //     error.longitude = 'longitude can not be empty';
+    //     validationFlag *= false;
+    // }
     if(!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
@@ -209,6 +209,9 @@ UserCtrl.saveAddress = function(req,res,next){
             req.st.validateToken(req.query.token,function(err,tokenResult){
                 if((!err) && tokenResult){
                     var emailId = req.body.emailId ? req.body.emailId : "";
+                    var address = req.body.address ? req.body.address : "";
+                    var latitude = req.body.latitude ? req.body.latitude : 0;
+                    var longitude = req.body.longitude ? req.body.longitude : 0;
                     var aboutCompany = req.body.aboutCompany ? req.body.aboutCompany : "";
                     var keywords = req.body.keywords ? req.body.keywords : "";
 
@@ -620,6 +623,8 @@ UserCtrl.login = function(req,res,next){
         req.connection.socket.remoteAddress;
 
     var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
+    var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
+    var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
 
     switch(req.platform){
 
@@ -710,7 +715,7 @@ UserCtrl.login = function(req,res,next){
                     }
                 }
                 if (passwordMatchStatus){
-                    req.st.generateToken(ip, userAgent, ezeoneId,isWhatMate, function (err, tokenResult) {
+                    req.st.generateToken(ip, userAgent, ezeoneId,isWhatMate,APNS_Id,GCM_Id, function (err, tokenResult) {
 
                         if ((!err) && tokenResult) {
                             var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ')';
@@ -986,6 +991,5 @@ UserCtrl.saveProfileData = function(req,res,next){
         });
     }
 };
-
 
 module.exports = UserCtrl;

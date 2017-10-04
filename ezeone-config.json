@@ -52,6 +52,12 @@
     "PASSWORD" : "indrajeet",
     "VHOST" : "%2f"
   },
+  "AWS_SNS" :{
+    "SNS_KEY_ID" : "AKIAIH6FF3TBQDH4ZZ6Q",
+    "SNS_SECRET_KEY_ID" : "POZikDV3N7S+7Dxl4qRZX+GeEJwW+bvsvpV9qkqh",
+    "SNS_IOS_ARN" : "arn:aws:sns:us-east-1:546144508006:app/APNS/IOSPRO",
+    "SNS_ANDROID_ARN" : "arn:aws:sns:us-east-1:546144508006:app/GCM/ANDROIDDEV"
+  },
   "VERSION_LIST" : {
     "IOS" : [[],[23,24]],
     "ANDROID" : [46],

@@ -70,7 +70,12 @@ salesCtrl.getMasterData = function(req,res,next){
                             stageStatusList : output,
                             categoryList : masterData[1] ? masterData[1] : [],
                             currencyList : masterData[2] ? masterData[2] : [],
-                            memberList : masterData[3] ? masterData[3] : []
+                            memberList : masterData[3] ? masterData[3] : [],
+                            salesType : masterData[4] ? masterData[4][0].salesDisplayFormat : 0,
+                            currency : {
+                                currencySymbol : masterData[5] ? masterData[5][0].currencySymbol : '',
+                                currencyId : masterData[5] ? masterData[5][0].currencyId : 0
+                            }
                         } ;
                         response.error = null;
                         res.status(200).json(response);
@@ -130,6 +135,15 @@ salesCtrl.saveSalesRequest = function(req,res,next){
     if(!attachmentList){
         attachmentList = [] ;
     }
+
+    var items =req.body.items;
+    if(typeof(items) == "string") {
+        items = JSON.parse(items);
+    }
+    if(!items){
+        items = [] ;
+    }
+
     var senderGroupId;
 
     if (!validationFlag){
@@ -169,6 +183,9 @@ salesCtrl.saveSalesRequest = function(req,res,next){
                 req.body.clientEmail = req.body.clientEmail ? req.body.clientEmail : "";
                 req.body.clientCompany = req.body.clientCompany ? req.body.clientCompany : "";
                 req.body.clientJobTitle = req.body.clientJobTitle ? req.body.clientJobTitle : "";
+                req.body.discount  = req.body.discount  ? req.body.discount  : 0;
+                req.body.itemCurrencyId  = req.body.itemCurrencyId  ? req.body.itemCurrencyId  : 0;
+                req.body.itemCurrencySymbol  = req.body.itemCurrencySymbol  ? req.body.itemCurrencySymbol  : 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -200,7 +217,11 @@ salesCtrl.saveSalesRequest = function(req,res,next){
                     req.st.db.escape(req.body.clientMobile),
                     req.st.db.escape(req.body.clientEmail),
                     req.st.db.escape(req.body.clientCompany),
-                    req.st.db.escape(req.body.clientJobTitle)
+                    req.st.db.escape(req.body.clientJobTitle),
+                    req.st.db.escape(req.body.discount),
+                    req.st.db.escape(JSON.stringify(items)),
+                    req.st.db.escape(req.body.itemCurrencyId),
+                    req.st.db.escape(req.body.itemCurrencySymbol)
                 ];
 
 
@@ -232,6 +253,7 @@ salesCtrl.saveSalesRequest = function(req,res,next){
                                     notificationTemplaterRes.parsedTpl,
                                     31,
                                     0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
                                     0,
                                     0,
                                     0,
@@ -289,6 +311,7 @@ salesCtrl.saveSalesRequest = function(req,res,next){
                                     notificationTemplaterRes.parsedTpl,
                                     41,
                                     0, (results[2][0].iphoneId) ? (results[2][0].iphoneId) : '',
+                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
                                     0,
                                     0,
                                     0,
@@ -446,6 +469,7 @@ salesCtrl.assignToUser = function(req,res,next){
                                     notificationTemplaterRes.parsedTpl,
                                     31,
                                     0, (results[0][i].iphoneId) ? (results[0][i].iphoneId) : '',
+                                    (results[0][i].GCM_Id) ? (results[0][i].GCM_Id) : '',
                                     0,
                                     0,
                                     0,
@@ -683,5 +707,100 @@ salesCtrl.saveSalesFeedback = function(req,res,next){
     }
 
 };
+
+salesCtrl.getSalesItems = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.groupId)
+    {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.keywords = req.query.keywords ? req.query.keywords : "";
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(req.query.keywords)
+                ];
+                /**
+                 * Calling procedure to save form sales items
+                 */
+                var procQuery = 'CALL he_get_app_salesItems( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,salesItems){
+                    if(!err && salesItems[0] && salesItems[0][0]){
+                        var output = [];
+                        for(var i = 0; i < salesItems[0].length; i++) {
+                            var res1 = {};
+                            res1.description = salesItems[0][i].description;
+                            res1.itemId = salesItems[0][i].itemId;
+                            res1.itemCode = salesItems[0][i].itemCode;
+                            res1.itemImage = (salesItems[0][i].itemImage) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + salesItems[0][i].itemImage) : "";
+                            res1.itemName = salesItems[0][i].itemName;
+                            res1.itemRate = salesItems[0][i].itemRate;
+                            res1.maxQuantity = salesItems[0][i].maxQuantity;
+                            res1.minQuantity = salesItems[0][i].minQuantity;
+                            res1.notes = salesItems[0][i].notes;
+                            res1.UOM = salesItems[0][i].UOM;
+                            res1.UOMTitle = salesItems[0][i].UOMTitle;
+                            output.push(res1);
+                        }
+
+                        response.status = true;
+                        response.message = "Items loaded successfully";
+                        response.data = {
+                            salesItems : output
+                        } ;
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+                    else if (!err){
+                        response.status = true;
+                        response.message = "No items found";
+                        response.data = {
+                            salesItems : []
+                        };
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting items";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 
 module.exports = salesCtrl;

@@ -269,7 +269,8 @@ Auth.prototype.register = function(req,res,next){
     var ismnc = (req.body.ismnc) ? req.body.ismnc : 0;
     var rating = (req.body.rating) ? req.body.rating : 1;
     var isWhatMate = (req.body.isWhatMate) ? req.body.isWhatMate : 0;
-
+    var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
+    var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
 
 
     var validateStatus = true;
@@ -417,7 +418,7 @@ Auth.prototype.register = function(req,res,next){
                                                         req.socket.remoteAddress;
                                                     var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
-                                                    st.generateToken(ip, userAgent, ezeid,isWhatMate, function (err, token) {
+                                                    st.generateToken(ip, userAgent, ezeid,isWhatMate,APNS_Id,GCM_Id, function (err, token) {
                                                         if (err) {
                                                             console.log('FnRegistration: Token Generation Error' + err);
                                                         }
@@ -667,6 +668,8 @@ Auth.prototype.login = function(req,res,next){
     var token = req.body.token ? req.body.token : '';
     var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
     var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+    var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
+    var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
 
     var responseMessage = {
         Token: '',
@@ -864,7 +867,7 @@ Auth.prototype.login = function(req,res,next){
                                 if (!token) {
                                     console.log('compare password..');
                                     if (comparePassword(password, loginDetails[0].Password)) {
-                                        st.generateToken(ip, userAgent, ezeoneId,isWhatMate, function (err, tokenResult) {
+                                        st.generateToken(ip, userAgent, ezeoneId,isWhatMate,APNS_Id,GCM_Id, function (err, tokenResult) {
                                             if ((!err) && tokenResult && loginDetails[0]) {
                                                 st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ')', function (err, UserDetailsResult) {
                                                     if (!err) {
@@ -1022,7 +1025,7 @@ Auth.prototype.login = function(req,res,next){
                                     if (isIphone == 1) {
                                         var queryParams2 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
                                         var query2 = 'CALL pSaveIPhoneDeviceID(' + queryParams2 + ')';
-                                        //console.log(query);
+                                        console.log(query);
                                         st.db.query(query, function (err, deviceResult) {
                                             if (!err) {
                                                 console.log('FnLogin:Ios Device Id saved successfully');

@@ -50,6 +50,7 @@ salesCtrl.saveItems = function(req,res,next){
                 req.body.itemId = (req.body.itemId) ? req.body.itemId : 0;
                 req.body.itemRate = (req.body.itemRate) ? req.body.itemRate : 0;
                 req.body.itemImage = (req.body.itemImage) ? req.body.itemImage : 0;
+                req.body.notes = (req.body.notes) ? req.body.notes : "";
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -63,7 +64,8 @@ salesCtrl.saveItems = function(req,res,next){
                     req.st.db.escape(req.body.minQuantity),
                     req.st.db.escape(req.body.maxQuantity),
                     req.st.db.escape(req.body.itemRate),
-                    req.st.db.escape(req.body.itemImage)
+                    req.st.db.escape(req.body.itemImage),
+                    req.st.db.escape(req.body.notes)
                 ];
                 /**
                  * Calling procedure to save form sales items
@@ -83,7 +85,8 @@ salesCtrl.saveItems = function(req,res,next){
                             description  : req.body.description,
                             status  : req.body.status,
                             minQuantity  : req.body.minQuantity,
-                            maxQuantity  : req.body.maxQuantity
+                            maxQuantity  : req.body.maxQuantity,
+                            notes  : req.body.notes
                         };
                         response.error = null;
                         res.status(200).json(response);
@@ -1073,6 +1076,7 @@ salesCtrl.getSalesItemDetails = function(req,res,next){
                             createdBy : salesItems[0][0].createdBy,
                             updatedBy : salesItems[0][0].updatedBy,
                             itemRate : salesItems[0][0].itemRate,
+                            notes : salesItems[0][0].notes,
                             itemImage : (salesItems[0][0].itemImage) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + salesItems[0][0].itemImage) : ""
                         };
                         res.status(200).json(response);
@@ -1100,6 +1104,5 @@ salesCtrl.getSalesItemDetails = function(req,res,next){
         });
     }
 };
-
 
 module.exports = salesCtrl;

@@ -67,6 +67,10 @@ transportCtrl.saveTransportRequest = function(req,res,next){
                 req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
                 req.body.status = req.body.status ? req.body.status : 1;
 
+                if(req.body.expenseAmount == ""){
+                    req.body.expenseAmount = 0;
+                }
+
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.parentId),
@@ -111,6 +115,7 @@ transportCtrl.saveTransportRequest = function(req,res,next){
                                     notificationTemplaterRes.parsedTpl,
                                     31,
                                     0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
                                     0,
                                     0,
                                     0,

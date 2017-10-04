@@ -1,8 +1,12 @@
 var moment = require('moment');
 var AppleNotification = require('./notification-apns.js');
 var NotificationMqtt = require('./notification-mqtt.js');
+var Notification_aws = require('./aws-sns-push.js');
+
 var _notificationMqtt = new NotificationMqtt();
 var _apnsNotification = new AppleNotification();
+
+var _Notification_aws = new  Notification_aws();
 
 var st = null;
 
@@ -30,7 +34,7 @@ function Notification(db,stdLib){
  * @param latitude (latitude of location)
  * @param longitude (longitude of location)
 _ */
-Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId,
+Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId,GCM_Id,
                                           messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos,isWhatMate){
 
     console.log('It is coming to publish block of Notification');
@@ -122,42 +126,48 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             data : data
         };
 
+        //  _Notification_aws.publish_Android("frFpJt3qxzc:APA91bFS8J2Vwz6VvVWXuC91gOWsrzOx-JxEQgzJffBFK1dOp9lWxJtAUOj7RfmRjOHBxJRgoAbGVRUVXjx1h28iIaPTPRQH1QBJlxAIzEOFLNHRFdFo8rYZWdTpFX--RNA6I4d-0CIz",messagePayload);
 
-        if(receiverId){
-            _notificationMqtt.publish(receiverId,messagePayload);
+        if(iphoneId){
+            // _notificationMqtt.publish(receiverId,messagePayload);
+            _Notification_aws.publish_IOS(iphoneId,messagePayload,issos);
         }
+        console.log("GCM_Id",GCM_Id);
 
-
+        if (GCM_Id){
+            console.log("Entered...");
+            _Notification_aws.publish_Android(GCM_Id,messagePayload);
+        }
 
         /**
          * If IPhone ID is there for this user then send notification to his iphone id also
          */
-        if(iphoneId){
-            try{
-                var procQuery = 'SELECT ifnull(isWhatMate,0) as "isWhatMate" FROM tloginout WHERE masterid= (SELECT tmgroups.AdminID FROM tmgroups WHERE tmgroups.tid=' + receiverId + ') order by tloginout.tid desc limit 0,1';
-                console.log(procQuery);
-                st.db.query(procQuery,function(err,result) {
+        // if(iphoneId){
+        //     try{
+        //         var procQuery = 'SELECT ifnull(isWhatMate,0) as "isWhatMate" FROM tloginout WHERE masterid= (SELECT tmgroups.AdminID FROM tmgroups WHERE tmgroups.tid=' + receiverId + ') order by tloginout.tid desc limit 0,1';
+        //         console.log(procQuery);
+        //         st.db.query(procQuery,function(err,result) {
+        //
+        //             if(!err && result &&  result[0] ){
+        //                 isWhatMate = result[0].isWhatMate;
+        //                 _apnsNotification.sendAppleNS(iphoneId,messagePayload,issos,isWhatMate);
+        //             }
+        //             else if(err){
+        //                 console.log("errerrerrerrerrerr",err);
+        //             }
+        //             else{
+        //                 isWhatMate =0 ;
+        //                 _apnsNotification.sendAppleNS(iphoneId,messagePayload,issos,isWhatMate);
+        //             }
+        //
+        //         });
+        //
+        //     }
+        //     catch(ex){
+        //         console.log('APNS Notification error',ex);
+        //     }
+        // }
 
-
-                    if(!err && result &&  result[0] ){
-                        isWhatMate = result[0].isWhatMate;
-                        _apnsNotification.sendAppleNS(iphoneId,messagePayload,issos,isWhatMate);
-                    }
-                    else if(err){
-                        console.log("errerrerrerrerrerr",err);
-                    }
-                    else{
-                        isWhatMate =0 ;
-                        _apnsNotification.sendAppleNS(iphoneId,messagePayload,issos,isWhatMate);
-                    }
-
-                });
-
-            }
-            catch(ex){
-                console.log('APNS Notification error',ex);
-            }
-        }
     }
 
 

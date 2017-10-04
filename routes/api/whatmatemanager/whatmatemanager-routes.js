@@ -15,6 +15,6 @@ router.get('/EZEOneId',managerCtrl.validateEzeoneId);
 
 router.get('/companies',managerCtrl.getWhatMateCompaniesList);
 router.get('/dashboardInfo',managerCtrl.getFormTransactionData);
-
+router.get('/forms',managerCtrl.getFormsNeedToSelect);
 
 module.exports = router;

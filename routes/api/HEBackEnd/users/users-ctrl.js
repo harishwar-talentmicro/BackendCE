@@ -632,7 +632,6 @@ userCtrl.validateEzeoneId = function(req,res,next){
                 var procQuery = 'CALL get_ezeonId_details( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,searchList){
-                    console.log(searchList[0][0]._error);
                     if(!err && searchList && searchList[0] && searchList[0][0]._error){
                         switch (searchList[0][0]._error) {
                             case 'ALREADY_USER' :
@@ -659,7 +658,7 @@ userCtrl.validateEzeoneId = function(req,res,next){
                         response.error = null;
                         response.data = {
                             searchList : searchList[0]
-                        }
+                        };
                         res.status(200).json(response);
                     }
                     else{

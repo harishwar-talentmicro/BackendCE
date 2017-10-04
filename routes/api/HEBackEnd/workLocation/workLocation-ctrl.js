@@ -40,6 +40,11 @@ workLocationCtrl.saveWorkLocation = function(req,res,next){
                 req.body.slotDuration = (req.body.slotDuration) ? req.body.slotDuration : 0;
                 req.body.isSlotDuration = (req.body.isSlotDuration) ? req.body.isSlotDuration : 0;
                 req.body.canUserViewBooking = (req.body.canUserViewBooking) ? req.body.canUserViewBooking : 0;
+                req.body.isdPhone = (req.body.isdPhone) ? req.body.isdPhone : '';
+                req.body.phone = (req.body.phone) ? req.body.phone : '';
+                req.body.parking = (req.body.parking) ? req.body.parking : 0;
+                req.body.parkingText = (req.body.parkingText) ? req.body.parkingText : '';
+                req.body.workingHours = (req.body.workingHours) ? req.body.workingHours : '';
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -53,7 +58,12 @@ workLocationCtrl.saveWorkLocation = function(req,res,next){
                     req.st.db.escape(req.body.defaultStartTime),
                     req.st.db.escape(req.body.slotDuration),
                     req.st.db.escape(req.body.isSlotDuration),
-                    req.st.db.escape(req.body.canUserViewBooking)
+                    req.st.db.escape(req.body.canUserViewBooking),
+                    req.st.db.escape(req.body.isdPhone),
+                    req.st.db.escape(req.body.phone),
+                    req.st.db.escape(req.body.parking),
+                    req.st.db.escape(req.body.parkingText),
+                    req.st.db.escape(req.body.workingHours)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -127,6 +137,11 @@ workLocationCtrl.updateWorkLocation = function(req,res,next){
                 req.body.slotDuration = (req.body.slotDuration) ? req.body.slotDuration : 0;
                 req.body.isSlotDuration = (req.body.isSlotDuration) ? req.body.isSlotDuration : 0;
                 req.body.canUserViewBooking = (req.body.canUserViewBooking) ? req.body.canUserViewBooking : 0;
+                req.body.isdPhone = (req.body.isdPhone) ? req.body.isdPhone : '';
+                req.body.phone = (req.body.phone) ? req.body.phone : '';
+                req.body.parking = (req.body.parking) ? req.body.parking : 0;
+                req.body.parkingText = (req.body.parkingText) ? req.body.parkingText : '';
+                req.body.workingHours = (req.body.workingHours) ? req.body.workingHours : '';
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -140,7 +155,12 @@ workLocationCtrl.updateWorkLocation = function(req,res,next){
                     req.st.db.escape(req.body.defaultStartTime),
                     req.st.db.escape(req.body.slotDuration),
                     req.st.db.escape(req.body.isSlotDuration),
-                    req.st.db.escape(req.body.canUserViewBooking)
+                    req.st.db.escape(req.body.canUserViewBooking),
+                    req.st.db.escape(req.body.isdPhone),
+                    req.st.db.escape(req.body.phone),
+                    req.st.db.escape(req.body.parking),
+                    req.st.db.escape(req.body.parkingText),
+                    req.st.db.escape(req.body.workingHours)
                 ];
                 /**
                  * Calling procedure to save form template

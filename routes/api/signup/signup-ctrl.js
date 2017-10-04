@@ -113,19 +113,38 @@ signupCtrl.sendOtp = function(req,res,next) {
                     }
                     else if(isdMobile != "")
                     {
-                        console.log("mobile_no", "00" + isdMobile.replace("+","") + mobileNo );
+                        // request({
+                        //     url: 'https://aikonsms.co.in/control/smsapi.php',
+                        //     qs: {
+                        //         user_name : 'janardana@hirecraft.com',
+                        //         password : 'Ezeid2015',
+                        //         sender_id : 'WtMate',
+                        //         service : 'INTSMS',
+                        //         mobile_no: "00" + isdMobile.replace("+","") + mobileNo,
+                        //         message: message,
+                        //         method : 'send_intsms'
+                        //     },
+                        //     method: 'GET'
+                        //
+                        // }, function (error, response, body) {
+                        //     if(error)
+                        //     {
+                        //         console.log(error,"SMS");
+                        //     }
+                        //     else{
+                        //         console.log("SUCCESS","SMS response");
+                        //     }
+                        // });
                         request({
-                            url: 'https://aikonsms.co.in/control/smsapi.php',
+                            url: 'https://rest.nexmo.com/sms/json',
                             qs: {
-                                user_name : 'janardana@hirecraft.com',
-                                password : 'Ezeid2015',
-                                sender_id : 'WtMate',
-                                service : 'INTSMS',
-                                mobile_no: "00" + isdMobile.replace("+","") + mobileNo,
-                                message: message,
-                                method : 'send_intsms'
+                                api_key : '4405b7b5 ',
+                                api_secret : '77dfad076c27e4c8',
+                                to: isdMobile.replace("+","") + mobileNo,
+                                from : 'WtMate',
+                                text: message
                             },
-                            method: 'GET'
+                            method: 'POST'
 
                         }, function (error, response, body) {
                             if(error)
@@ -136,9 +155,9 @@ signupCtrl.sendOtp = function(req,res,next) {
                                 console.log("SUCCESS","SMS response");
                             }
                         });
+
                     }
                     respMsg.status = true;
-                    respMsg.otp = code;
                     respMsg.message = 'OTP Sent Successfully';
                     respMsg.data = {
                         mobileNo : mobileNo,
@@ -207,6 +226,8 @@ signupCtrl.verifyOTP = function(req,res,next){
             var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
             req.query.token = req.query.token ? req.query.token : "";
             var pictureURL = req.body.pictureURL ? req.body.pictureURL : "";
+            var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
+            var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
 
             if (pictureURL != "")
             {
@@ -239,7 +260,7 @@ signupCtrl.verifyOTP = function(req,res,next){
                         req.socket.remoteAddress;
                     var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
-                    req.st.generateToken(ip, userAgent, EZEOneId,isWhatMate, function (err, token) {
+                    req.st.generateToken(ip, userAgent, EZEOneId,isWhatMate,APNS_Id,GCM_Id, function (err, token) {
                         console.log("token",token);
                         if (err) {
                             respMsg.status = false;
@@ -326,6 +347,7 @@ signupCtrl.savePassword = function(req,res,next){
     if (status) {
         try {
             var encryptPwd = req.st.hashPassword(req.body.password);
+            req.body.isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
 
             var procParams = [
                 req.st.db.escape(encryptPwd),
@@ -337,7 +359,15 @@ signupCtrl.savePassword = function(req,res,next){
             console.log(procQuery);
             req.db.query(procQuery,function(err,result) {
                 if (!err ){
-                    var file = path.join(__dirname, '../../../mail/templates/signup.html');
+                    var file = "";
+                    if(req.body.isWhatMate == 0)
+                    {
+                        file = path.join(__dirname, '../../../mail/templates/signup.html');
+                    }
+                    else {
+                        file = path.join(__dirname, '../../../mail/templates/signupWhatMate.html');
+                    }
+
                     fs.readFile(file, "utf8", function (err, data) {
                         if (!err) {
                             respMsg.status = true;

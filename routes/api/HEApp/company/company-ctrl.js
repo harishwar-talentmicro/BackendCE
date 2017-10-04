@@ -1,0 +1,204 @@
+/**
+ * Created by Jana1 on 31-08-2017.
+ */
+
+var companyCtrl = {};
+var error = {};
+
+companyCtrl.searchComapny = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Error while searching company",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.keywords = req.query.keywords ? req.query.keywords : "";
+                req.query.userType = req.query.userType ? req.query.userType : 0;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.userType),
+                    req.st.db.escape(req.query.keywords)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_checkMember( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,companyResult){
+                    if(!err && companyResult && companyResult[0] && companyResult[0][0]){
+                        var output = [];
+                        for(var i = 0; i < companyResult[0].length; i++) {
+                            var res1 = {};
+                            res1.HEUserId = companyResult[0][i].HEUserId;
+                            res1.HEMasterId = companyResult[0][i].HEMasterId;
+                            res1.departmentId = companyResult[0][i].departmentId;
+                            res1.departmentTitle = companyResult[0][i].departmentTitle;
+                            res1.departments = companyResult[0][i].departments ? JSON.parse(companyResult[0][i].departments) : [];
+                            res1.gradeId = companyResult[0][i].gradeId;
+                            res1.gradeTitle = companyResult[0][i].gradeTitle;
+                            res1.grades = companyResult[0][i].grades ? JSON.parse(companyResult[0][i].grades) : [];
+                            res1.locationId = companyResult[0][i].locationId;
+                            res1.locationTitle = companyResult[0][i].locationTitle;
+                            res1.locations = companyResult[0][i].locations ? JSON.parse(companyResult[0][i].locations) : [];
+                            res1.type = companyResult[0][i].type;
+                            res1.code = companyResult[0][i].code;
+                            res1.notes = companyResult[0][i].notes;
+                            res1.displayName = companyResult[0][i].displayName;
+                            output.push(res1);
+                        }
+
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            company : output
+                        };
+                        res.status(200).json(response);
+
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+
+};
+
+companyCtrl.joinComapny = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Error while searching company",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.HEUserId),
+                    req.st.db.escape(req.body.HEMasterId),
+                    req.st.db.escape(req.body.userType),
+                    req.st.db.escape(req.body.code),
+                    req.st.db.escape(req.body.departmentId),
+                    req.st.db.escape(req.body.gradeId),
+                    req.st.db.escape(req.body.locationId),
+                    req.st.db.escape(req.body.notes)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_join_company( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,companyResult){
+                    if(!err && companyResult && companyResult[0] && companyResult[0][0]){
+                        switch (companyResult[0][0].message) {
+                            case '1' :
+                                response.status = false;
+                                response.message = "Invalid combination of inputs.Try again...";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
+                            case '2' :
+                                response.status = true;
+                                response.message = "Joining successful";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
+                            case '3' :
+                                response.status = true;
+                                response.message = "Request submitted for activation";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
+                            case '4' :
+                                response.status = false;
+                                response.message = "Joining access denied";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
+                            case '5' :
+                                response.status = false;
+                                response.message = "You are already associate with this company";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
+                        }
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+
+};
+
+module.exports = companyCtrl;

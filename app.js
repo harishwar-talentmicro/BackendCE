@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var cors = require('cors');
 var uuid = require('node-uuid');
-
+var aws_sns_push = require('./routes/modules/notification/aws-sns-push.js');
 
 var compress = require('compression');
 var fs = require('fs');
@@ -59,15 +59,6 @@ app.all('*',function(req,res,next){
     // Pass to next layer of middleware
     next();
 });
-
-
-
-
-
-
-
-
-
 
 // Added for testing purpose
 

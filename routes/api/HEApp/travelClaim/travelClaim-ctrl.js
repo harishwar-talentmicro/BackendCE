@@ -123,6 +123,7 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                                     notificationTemplaterRes.parsedTpl,
                                     31,
                                     0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
                                     0,
                                     0,
                                     0,
@@ -237,7 +238,7 @@ travelClaimCtrl.getTravelRequest = function(req,res,next){
             var procQuery = 'CALL HE_get_travelRequest( ' + procParams.join(',') + ')';
             console.log(procQuery);
             req.db.query(procQuery,function(err,travelRequestResult){
-                if(!err && travelRequestResult && travelRequestResult[0] && travelRequestResult[0][0]){
+                if(!err && travelRequestResult && travelRequestResult[0]){
                     response.status = true;
                     response.message = "Travel request loaded successfully";
                     response.error = null;

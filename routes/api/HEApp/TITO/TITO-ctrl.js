@@ -139,4 +139,154 @@ TITOCtrl.saveLocationTracking = function(req,res,next){
 
 };
 
+TITOCtrl.getAttendanceRegister = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid credentials",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+
+    if (!req.query.token)
+    {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+
+            if((!err) && tokenResult){
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.date),
+                    req.st.db.escape(req.query.groupId)
+                ];
+
+                var procQuery = 'CALL he_get_attendance( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,attendanceList){
+                    if(!err && attendanceList && attendanceList[0]){
+
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            attendanceList : attendanceList[0][0] ? JSON.parse("[" + attendanceList[0][0].attendanceData + "]") : []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null ;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting data list";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+TITOCtrl.getAttendanceRegisterDetails = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid credentials",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token)
+    {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.date)
+    {
+        error.date = 'Invalid date';
+        validationFlag *= false;
+    }
+    if (!req.query.groupId)
+    {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+
+            if((!err) && tokenResult){
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.date),
+                    req.st.db.escape(req.query.groupId)
+                ];
+
+                var procQuery = 'CALL he_get_attendanceRegister_Details( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,attendanceRegister){
+                    console.log(err);
+                    if(!err && attendanceRegister){
+                        response.status = true;
+                        response.message = "attendance register loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            TITO : attendanceRegister[0] ? attendanceRegister[0] : [],
+                            attendanceRequest : attendanceRegister[1] ? attendanceRegister[1] : [],
+                            leaveRequest : attendanceRegister[2] ? attendanceRegister[2] : []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null ;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting data list";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
 module.exports = TITOCtrl;

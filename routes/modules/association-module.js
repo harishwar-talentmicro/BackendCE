@@ -16,6 +16,8 @@ var util = require( "util" );
 var Notification = require('./notification/notification-master.js');
 var notification = null;
 var request = require('request');
+var stream = require( "stream" );
+var chalk = require( "chalk" );
 
 var st = null;
 function Association(db,stdLib){
@@ -43,8 +45,11 @@ bucket.acl.default.add({
 
 // method for upload image to cloud
 var uploadDocumentToCloud = function(uniqueName,readStream,callback){
+    console.log("entered to cloud");
     var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
     readStream.pipe(remoteWriteStream);
+
+    console.log("Uploaded");
 
     remoteWriteStream.on('finish', function(){
         console.log('done');
@@ -62,6 +67,7 @@ var uploadDocumentToCloud = function(uniqueName,readStream,callback){
     });
 
     remoteWriteStream.on('error', function(err){
+        console.log("err",err);
         if(callback){
             if(typeof(callback)== 'function'){
                 console.log(err);
@@ -1542,6 +1548,9 @@ Association.prototype.imageUploadWithThumbnail = function(req,res,next){
                                 fs.unlink('../bin/'+req.files.pr.path);
                                 console.log("Image Path is deleted from server");
                             };
+                            console.log("path", req.files.pr.path);
+                            console.log("extension", req.files.pr.extension);
+
                             var readStream = fs.createReadStream(req.files.pr.path);
                             var resizedReadStream = gm(req.files['pr'].path).resize(100,100).autoOrient().quality(0).stream(req.files.pr.extension);
                             var uniqueFileName = uuid.v4() + ((req.files.pr.extension) ? ('.' + req.files.pr.extension) : 'jpg');
@@ -1549,7 +1558,9 @@ Association.prototype.imageUploadWithThumbnail = function(req,res,next){
                             console.log(uniqueFileName);
                             uploadDocumentToCloud(uniqueFileName, readStream, function (err) {
                                 if (!err) {
+                                    console.log("before delete");
                                     deleteTempFile();
+                                    console.log("Afeter delete");
                                     uploadDocumentToCloud(tnUniqueFileName, resizedReadStream, function (err) {
                                         if (!err) {
                                             responseMessage.status = true;
@@ -1563,6 +1574,7 @@ Association.prototype.imageUploadWithThumbnail = function(req,res,next){
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
+                                            console.log("err1",err);
                                             responseMessage.status = false;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Error in uploading thumbnail';
@@ -1572,7 +1584,8 @@ Association.prototype.imageUploadWithThumbnail = function(req,res,next){
                                         }
                                     });
                                 }
-                                else {
+                                else  {
+                                    console.log("err",err);
                                     responseMessage.status = false;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Error in uploading image';
@@ -1583,6 +1596,7 @@ Association.prototype.imageUploadWithThumbnail = function(req,res,next){
                             });
                         }
                         else{
+                            console.log("Invalid input data");
                             responseMessage.status = false;
                             responseMessage.error = null;
                             responseMessage.message = 'Invalid input data';
@@ -1601,6 +1615,7 @@ Association.prototype.imageUploadWithThumbnail = function(req,res,next){
                     }
                 }
                 else {
+                    console.log("An error occurred ");
                     responseMessage.error = {
                         server: 'Internal Server Error'
                     };
@@ -1613,6 +1628,7 @@ Association.prototype.imageUploadWithThumbnail = function(req,res,next){
             });
         }
         catch(ex) {
+            console.log("ex",ex);
             responseMessage.error = {
                 server: 'Internal Server Error'
             };

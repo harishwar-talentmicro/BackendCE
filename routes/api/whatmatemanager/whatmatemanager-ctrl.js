@@ -472,14 +472,14 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                 var procQuery = 'CALL get_whatmate_dashboard( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,result){
-                    if(!err && result && result[0] && result[0][0].message){
+                    if(!err && result && result[0] && result[0][0] && result[0][0].message){
                         response.status = false;
                         response.message = "Access denied";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
-                    else if(!err && result && result[0]){
+                    else if(!err && result && result[0] && result[0][0]){
                         var output = [];
                         var dashboard = JSON.parse(result[0][0].data) ;
                         for(var i = 0; i < dashboard.length; i++) {
@@ -495,7 +495,20 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                         response.data = {
                             userManager : result[1][0].userManager,
                             masterConfiguration : result[1][0].masterConfiguration,
+                            attendanceRequest : result[1][0].attendanceRequest,
                             formList : output
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if(!err && result && result[1] && result[1][0]){
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            userManager : result[1][0].userManager,
+                            masterConfiguration : result[1][0].masterConfiguration,
+                            attendanceRequest : result[1][0].attendanceRequest,
+                            formList : []
                         };
                         res.status(200).json(response);
                     }
@@ -521,5 +534,75 @@ managerCtrl.getFormTransactionData = function(req,res,next){
         });
     }
 };
+
+managerCtrl.getFormsNeedToSelect = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    // if (!req.query.APIKey)
+    // {
+    //     error.APIKey = 'Invalid APIKey';
+    //     validationFlag *= false;
+    // }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+
+    req.st.validateToken(req.query.token,function(err,tokenResult){
+        if((!err) && tokenResult){
+
+            req.query.managerId = (req.query.managerId) ? req.query.managerId : 0;
+
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.query.managerId)
+            ];
+            /**
+             * Calling procedure to get form template
+             * @type {string}
+             */
+            var procQuery = 'CALL WhatMate_get_reportForms( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,formResult){
+                if(!err && formResult && formResult[0]){
+                    response.status = true;
+                    response.message = "Form list loaded successfully";
+                    response.error = null;
+                    response.data = {
+                        formList : formResult[0] ? formResult[0] : []
+                    };
+                    res.status(200).json(response);
+
+                }
+                else if(!err){
+                    response.status = true;
+                    response.message = "Form list loaded successfully";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                }
+                else{
+                    response.status = false;
+                    response.message = "Error while getting form list ";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else{
+            res.status(401).json(response);
+        }
+    });
+};
+
 
 module.exports = managerCtrl;

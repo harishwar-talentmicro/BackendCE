@@ -130,6 +130,8 @@ RegisterCtrl.register = function(req,res,next){
     var rating = (req.body.rating) ? req.body.rating : 1;
     var holidayList = (req.body.holidayList) ? req.body.holidayList : [];
     var workingHourList = (req.body.workingHourList) ? req.body.workingHourList : [];
+    var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
+    var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
 
 
     var validateStatus = true;
@@ -234,7 +236,7 @@ RegisterCtrl.register = function(req,res,next){
                                 req.connection.socket.remoteAddress;
                             var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
-                            req.st.generateToken(ip, userAgent, ezeid,isWhatMate, function (err, token) {
+                            req.st.generateToken(ip, userAgent, ezeid,isWhatMate,APNS_Id,GCM_Id, function (err, token) {
                                 if (err) {
                                     console.log('FnRegistration: Token Generation Error');
                                     console.log(err);

@@ -90,7 +90,7 @@ router.get('/query', function(req,res,next){
                             if (results && results[0] && results[0].length > 0) {
                                 responseMessage.status = true;
                                 responseMessage.error = null;
-                                responseMessage.message = 'Message contacts loaded successfully';
+                                responseMessage.message = 'Contacts loaded successfully';
                                 responseMessage.data = {
                                     contactSuggestionList :results[0]
                                 };
@@ -99,7 +99,7 @@ router.get('/query', function(req,res,next){
                             else {
                                 responseMessage.status = true;
                                 responseMessage.error = null;
-                                responseMessage.message = 'Message contacts not available';
+                                responseMessage.message = 'Contacts not available';
                                 responseMessage.data = {
                                     contactSuggestionList :[]
                                 };
@@ -624,8 +624,8 @@ router.put('/status', function(req,res,next){
                                     console.log('postNotification : notification is sent successfully');
                                 }
                                 else{
-                                    console.log('Error in parsing notification accept_request template - ',
-                                        notificationTemplaterRes.error);
+                                    // console.log('Error in parsing notification accept_request template - ',
+                                    //     notificationTemplaterRes.error);
                                     console.log('postNotification : notification  is sent successfully');
                                 }
                             }
@@ -1078,7 +1078,9 @@ router.post('/addressBook',function(req, res, next){
                                                                                     results[0][0].senderId,
                                                                                     notificationTemplaterRes.parsedTpl,
                                                                                     31,
-                                                                                    0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                                                                    0,
+                                                                                    (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                                                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
                                                                                     0,
                                                                                     0,
                                                                                     0,
@@ -1147,7 +1149,9 @@ router.post('/addressBook',function(req, res, next){
                                                                                     results[0][0].senderId,
                                                                                     notificationTemplaterRes.parsedTpl,
                                                                                     31,
-                                                                                    0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                                                                    0,
+                                                                                    (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                                                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
                                                                                     0,
                                                                                     0,
                                                                                     0,
@@ -1330,6 +1334,116 @@ router.post('/addressBook',function(req, res, next){
             console.log(errorDate.toTimeString() + '......... error .........');
             console.log(ex);
             console.log('Error: ' + ex);
+        }
+    }
+});
+
+
+/**
+ * Method : GET deviceIds
+ * @param req
+ * @param res
+ * @param next
+ *@param token <string> token of user
+ *@param dateTime <datetime> dateTime from this time modified contact we will give
+ *@param isWeb <int> isWeb is just a flaf for web 1 and for mobile 0
+ * @discription : API to get messagebox contact list
+ */
+router.get('/deviceIds', function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.query.groupId)
+    {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            /**
+             * validating token for login user
+             * */
+
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    var procParams = [
+                        req.db.escape(req.query.groupId)
+                    ];
+                    var procQuery = 'CALL he_get_deviceIds(' + procParams.join(' ,') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, deviceIdResults) {
+                        if (!err) {
+                            /**
+                             *if results are there then check for condition that its web or not
+                             * */
+                            if (deviceIdResults && deviceIdResults[0] && deviceIdResults[0].length > 0){
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Device id list loaded successfully ';
+                                responseMessage.data = {
+                                    APNSId :deviceIdResults[0][0].APNS_Id ? JSON.parse(deviceIdResults[0][0].APNS_Id) : [],
+                                    GCMId : (deviceIdResults[1][0].GCM_Id) ? JSON.parse(deviceIdResults[1][0].GCM_Id) : []
+                                };
+                                res.status(200).json(responseMessage);
+
+                            }
+                            else{
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Device id not available';
+                                responseMessage.data = {
+                                    APNSId : [],
+                                    GCMId : []
+                                };
+                                res.status(200).json(responseMessage);
+                            }
+                        }
+                        else {
+                            responseMessage.error = {
+                                server: 'Internal Server Error'
+                            };
+                            responseMessage.message = 'An error occurred !';
+                            res.status(500).json(responseMessage);
+                            console.log('Error :', err);
+                            var errorDate = new Date();
+                            console.log(errorDate.toTimeString() + ' ......... error ...........');
+                        }
+                    });
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Invalid Token'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
+                    console.log('Error :', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error pGetGroupAndIndividuals_new : ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
     }
 });

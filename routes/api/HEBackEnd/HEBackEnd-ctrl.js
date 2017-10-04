@@ -46,6 +46,7 @@ HEBackkendCtrl.saveAppSettings = function(req, res, next){
                     req.body.salesDisplayFormat  = req.body.salesDisplayFormat  ? req.body.salesDisplayFormat  : 1;
                     req.body.salesDefaultUser  = req.body.salesDefaultUser  ? req.body.salesDefaultUser  : 0;
                     req.body.supportDefaultUser  = req.body.supportDefaultUser  ? req.body.supportDefaultUser  : 0;
+                    req.body.canUserJoin  = req.body.canUserJoin  ? req.body.canUserJoin  : 0;
 
                     var procParams = [
                         req.st.db.escape(req.query.token),
@@ -56,7 +57,8 @@ HEBackkendCtrl.saveAppSettings = function(req, res, next){
                         req.st.db.escape(req.body.salesDisplayFormat),
                         req.st.db.escape(req.body.salesDefaultUser),
                         req.st.db.escape(req.body.supportDefaultUser),
-                        req.st.db.escape(req.query.APIKey)
+                        req.st.db.escape(req.query.APIKey),
+                        req.st.db.escape(req.body.canUserJoin)
                     ];
 
                     var procQuery = 'CALL HE_Save_Appsettings( ' + procParams.join(',') + ')';
@@ -74,7 +76,8 @@ HEBackkendCtrl.saveAppSettings = function(req, res, next){
                                 supportAllocationType : req.body.supportAllocationType,
                                 salesDisplayFormat : req.body.salesDisplayFormat,
                                 salesDefaultUser : req.body.salesDefaultUser,
-                                supportDefaultUser : req.body.supportDefaultUser
+                                supportDefaultUser : req.body.supportDefaultUser,
+                                canUserJoin : req.body.canUserJoin
                             };
                             res.status(200).json(response);
                         }
@@ -144,6 +147,7 @@ HEBackkendCtrl.updateAppSettings = function(req, res, next){
                     req.body.salesDisplayFormat  = req.body.salesDisplayFormat  ? req.body.salesDisplayFormat  : 1;
                     req.body.salesDefaultUser  = req.body.salesDefaultUser  ? req.body.salesDefaultUser  : 0;
                     req.body.supportDefaultUser  = req.body.supportDefaultUser  ? req.body.supportDefaultUser  : 0;
+                    req.body.canUserJoin  = req.body.canUserJoin  ? req.body.canUserJoin  : 0;
 
 
                     var procParams = [
@@ -155,7 +159,8 @@ HEBackkendCtrl.updateAppSettings = function(req, res, next){
                         req.st.db.escape(req.body.salesDisplayFormat),
                         req.st.db.escape(req.body.salesDefaultUser),
                         req.st.db.escape(req.body.supportDefaultUser),
-                        req.st.db.escape(req.query.APIKey)
+                        req.st.db.escape(req.query.APIKey),
+                        req.st.db.escape(req.body.canUserJoin)
                     ];
 
                     var procQuery = 'CALL HE_Save_Appsettings( ' + procParams.join(',') + ')';
@@ -175,7 +180,8 @@ HEBackkendCtrl.updateAppSettings = function(req, res, next){
                                 supportAllocationType : req.body.supportAllocationType,
                                 salesDisplayFormat : req.body.salesDisplayFormat,
                                 salesDefaultUser : req.body.salesDefaultUser,
-                                supportDefaultUser : req.body.supportDefaultUser
+                                supportDefaultUser : req.body.supportDefaultUser,
+                                canUserJoin : req.body.canUserJoin
                             };
                             res.status(200).json(response);
                         }

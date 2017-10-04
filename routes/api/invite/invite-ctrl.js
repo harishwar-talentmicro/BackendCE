@@ -4,6 +4,7 @@
 var moment = require('moment');
 var inviteCtrl = {};
 var request = require('request');
+
 inviteCtrl.invite = function(req, res, next){
 
     var response = {
@@ -50,28 +51,47 @@ inviteCtrl.invite = function(req, res, next){
                         if(mobileList != "")
                         {
                             mobileList = mobileList.substr(0,mobileList.length - 1);
-                            console.log(mobileList,"mobileList");
                             //  sms integration for international (except nepal)
+                            // request({
+                            //     url: 'https://aikonsms.co.in/control/smsapi.php',
+                            //     qs: {
+                            //         user_name : 'janardana@hirecraft.com',
+                            //         password : 'Ezeid2015',
+                            //         sender_id : 'WtMate',
+                            //         service : 'INTSMS',
+                            //         mobile_no: mobileList,
+                            //         message: " " + tokenResult[0].fullName + " requested you to join EZEOne network. Click on the following link based on your mobile phone type to download App.  Sign-up as new user and enjoy using EZEOne. " +
+                            //         "\n\n" +
+                            //         "For Android:  https://www.ezeone.com/EZEONE.android " +
+                            //         "\n\n" +
+                            //         "For iOS: https://www.ezeone.com/EZEONE.ios " +
+                            //         "\n\n" +
+                            //         "Hope you will enjoy using EZEOne." +
+                            //         "\n\n" +
+                            //         "EZEOne Team",
+                            //         method : 'send_intsms'
+                            //     },
+                            //     method: 'GET'
+                            //
+                            // }
                             request({
-                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                url: 'https://rest.nexmo.com/sms/json',
                                 qs: {
-                                    user_name : 'janardana@hirecraft.com',
-                                    password : 'Ezeid2015',
-                                    sender_id : 'WtMate',
-                                    service : 'INTSMS',
-                                    mobile_no: mobileList,
-                                    message: " " + tokenResult[0].fullName + " requested you to join EZEOne network. Click on the following link based on your mobile phone type to download App.  Sign-up as new user and enjoy using EZEOne. " +
-                                    "\n\n" +
-                                    "For Android:  https://www.ezeone.com/EZEONE.android " +
-                                    "\n\n" +
-                                    "For iOS: https://www.ezeone.com/EZEONE.ios " +
-                                    "\n\n" +
-                                    "Hope you will enjoy using EZEOne." +
-                                    "\n\n" +
-                                    "EZEOne Team",
-                                    method : 'send_intsms'
+                                    api_key : '4405b7b5 ',
+                                    api_secret : '77dfad076c27e4c8',
+                                    to: mobileList,
+                                    from : 'WtMate',
+                                    text: " " + tokenResult[0].fullName + " requested you to join EZEOne network. Click on the following link based on your mobile phone type to download App.  Sign-up as new user and enjoy using EZEOne. " +
+                                            "\n\n" +
+                                            "For Android:  https://www.ezeone.com/EZEONE.android " +
+                                            "\n\n" +
+                                            "For iOS: https://www.ezeone.com/EZEONE.ios " +
+                                            "\n\n" +
+                                            "Hope you will enjoy using EZEOne." +
+                                            "\n\n" +
+                                            "EZEOne Team"
                                 },
-                                method: 'GET'
+                                method: 'POST'
 
                             }, function (error, response, body) {
                                 if (error) {
@@ -186,7 +206,8 @@ inviteCtrl.invite = function(req, res, next){
                                         }
                                         else if(results[0][0].isdMobile != "")
                                         {
-                                            mobileList += "00" + results[0][0].isdMobile.replace("+","") + results[0][0].mobile + ',';
+                                            // mobileList += "00" + results[0][0].isdMobile.replace("+","") + results[0][0].mobile + ',';
+                                            mobileList += results[0][0].isdMobile.replace("+","") + results[0][0].mobile + ',';
                                         }
 
                                         if(mobileCount < mobile.length){

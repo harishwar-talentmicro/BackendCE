@@ -1570,5 +1570,81 @@ Search.prototype.navigateSearch = function(req,res,next){
     }
 };
 
+Search.prototype.searchInformationNew = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if(!req.query.groupId){
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.groupId)
+                ];
+
+                var procQuery = 'CALL pSearchInformation( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,result){
+                    if(!err && result ){
+                        response.status = true;
+                        response.message = "Information loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            profileDetails : {
+                                idType : result[0][0].idType,
+                                displayName : result[0][0].displayName,
+                                aboutCompany : result[0][0].aboutCompany,
+                                mobile : result[0][0].mobile,
+                                emailId : result[0][0].emailId,
+                                latitude : result[0][0].latitude,
+                                longitude : result[0][0].longitude,
+                                address : result[0][0].address,
+                                pictureUrl : (result[0][0].pictureUrl && result[0][0].pictureUrl!="") ?
+                                    (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + result[0][0].pictureUrl) : ''
+                            },
+                            branchList : result[1],
+                            reviews : {
+                                count : (result[2] && result[2][0] && result[2][0].count) ? result[2][0].count : 0,
+                                avgRating : (result[2] && result[2][0] && result[2][0].avgRating) ? result[2][0].avgRating : 0,
+                                reviewList : result[3] ? result[3] : []
+                            }
+                        };
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting information";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
 
 module.exports = Search;

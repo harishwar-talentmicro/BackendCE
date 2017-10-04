@@ -253,6 +253,7 @@ router.get('/ewtGetBannerPicture', searchModule.getBanner);
 router.post('/ewtSearchForTracker', searchModule.searchTracker);
 router.get('/ewtGetWorkingHrsHolidayList',searchModule.getWorkingHrsHolidayList);
 router.get('/navigation',searchModule.navigateSearch);
+router.get('/searchInformation', searchModule.searchInformationNew);
 
 //Mail Module methods
 var Mail = require('./modules/mail-module.js');

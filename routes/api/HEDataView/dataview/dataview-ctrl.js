@@ -1268,7 +1268,8 @@ LoginCtrl.getAttendanceRegisterDetails = function(req,res,next){
                         response.error = null;
                         response.data = {
                             TITO : attendanceRegister[0] ? attendanceRegister[0] : [],
-                            attendanceRequest : attendanceRegister[1] ? attendanceRegister[1] : []
+                            attendanceRequest : attendanceRegister[1] ? attendanceRegister[1] : [],
+                            leaveRequest : attendanceRegister[2] ? attendanceRegister[2] : []
                         };
                         res.status(200).json(response);
                     }
@@ -1641,6 +1642,14 @@ LoginCtrl.getManpowerList = function(req,res,next){
                             res1.senderNotes = manpowerList[0][i].senderNotes;
                             res1.assessmentDetails = manpowerList[0][i].assessmentDetails ? JSON.parse(manpowerList[0][i].assessmentDetails) : [];
                             res1.attachments = manpowerList[0][i].attachments ? JSON.parse(manpowerList[0][i].attachments) : [];
+                            res1.CVCount = manpowerList[0][i].CVCount;
+                            res1.shortlsited = manpowerList[0][i].shortlsited;
+                            res1.interview = manpowerList[0][i].interview;
+                            res1.offer = manpowerList[0][i].offer;
+                            res1.joined = manpowerList[0][i].joined;
+                            res1.quit = manpowerList[0][i].quit;
+                            res1.requestedDate = manpowerList[0][i].requestedDate;
+                            res1.closedDate = manpowerList[0][i].closedDate;
                             output.push(res1);
                         }
 
@@ -1835,6 +1844,7 @@ LoginCtrl.getInterviewScheduler = function(req,res,next){
                             res1.stageId = interviewScheduledList[0][i].stageId;
                             res1.stageTitle = interviewScheduledList[0][i].stageTitle;
                             res1.panels = interviewScheduledList[0][i].panels;
+                            res1.jobCode = interviewScheduledList[0][i].jobCode;
                             output.push(res1);
                         }
 

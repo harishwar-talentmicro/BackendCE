@@ -108,6 +108,7 @@ sendSOSMessageCtrl.sendSOSMessage = function(req,res,next){
                                     31,
                                     0,
                                     (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
                                     0,
                                     0,
                                     0,
@@ -145,7 +146,7 @@ sendSOSMessageCtrl.sendSOSMessage = function(req,res,next){
                                         },
                                         contactList : null
                                     },
-                                    null,tokenResult[0].isWhatMate);
+                                    1,tokenResult[0].isWhatMate);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {

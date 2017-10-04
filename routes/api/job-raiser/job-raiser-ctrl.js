@@ -50,6 +50,7 @@ JobRaiserCtrl.getCallNotification = function(req,res,next) {
                     var messageType = 101;
 
                     var iphoneId = (result[0][0].iphoneDeviceId) ? (result[0][0].iphoneDeviceId) : '';
+                    var GCM_Id = (result[0][0].GCM_Id) ? (result[0][0].GCM_Id) : '';
                     var data = {
                         callingNumber: req.query.phoneNumber,
                         notificationDateTime : moment().format('YYYY-MM-DD HH:mm:ss')
@@ -58,7 +59,7 @@ JobRaiserCtrl.getCallNotification = function(req,res,next) {
                      * sending notification to ezeoneId with contact number
                      * after receiving notification call will go to given contact number
                      */
-                    notification.publish(receiverId,'','','',message,messageType,0,iphoneId,
+                    notification.publish(receiverId,'','','',message,messageType,0,iphoneId,GCM_Id,
                         0,0,0,0,1,null,'',0,0,null,'',data,null);
 
 

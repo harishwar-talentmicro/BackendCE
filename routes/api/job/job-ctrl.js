@@ -532,6 +532,7 @@ jobCtrl.applyJob = function(req,res,next){
                                                                     var messageType = 22;
                                                                     var operationType = 0;
                                                                     var iphoneId = notDetailsRes[0][count].iphoneId;
+                                                                    var GCM_Id = notDetailsRes[0][count].GCM_Id;
                                                                     var messageId = 0;
                                                                     var masterid = notDetailsRes[0][count].masterid;
                                                                     var latitude = '';
@@ -544,7 +545,7 @@ jobCtrl.applyJob = function(req,res,next){
                                                                     console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType,
                                                                         operationType, iphoneId, messageId, masterid);
                                                                     notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
-                                                                        messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
+                                                                        messageType, operationType, iphoneId,GCM_Id, messageId, masterid, latitude, longitude, prioritys,
                                                                         dateTime, a_name, msgUserid, jid);
                                                                     console.log('Job Post Notification Send Successfully');
                                                                     /**
@@ -574,6 +575,7 @@ jobCtrl.applyJob = function(req,res,next){
                                                                     var messageType = 24;
                                                                     var operationType = 0;
                                                                     var iphoneId = notDetailsRes[0][count].iphoneId;
+                                                                    var GCM_Id = notDetailsRes[0][count].GCM_Id;
                                                                     var messageId = 0;
                                                                     var masterid = notDetailsRes[0][count].masterid;
                                                                     console.log(receiverId, senderTitle, groupTitle, groupId, messageText,
@@ -584,7 +586,7 @@ jobCtrl.applyJob = function(req,res,next){
                                                                      * which is assigned to this lead
                                                                      */
                                                                     notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
-                                                                        messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
+                                                                        messageType, operationType, iphoneId,GCM_Id, messageId, masterid, latitude, longitude, prioritys,
                                                                         dateTime, a_name, msgUserid, jid);
                                                                     console.log("Notification Send");
 

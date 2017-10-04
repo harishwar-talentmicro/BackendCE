@@ -270,6 +270,30 @@ HEMasterCtrl.saveFormGroup = function(req,res,next){
         validationFlag *= false;
     }
 
+    var departments =req.body.departments;
+    if(typeof(departments) == "string") {
+        departments = JSON.parse(departments);
+    }
+    if(!departments){
+        departments = [] ;
+    }
+
+    var grades =req.body.grades;
+    if(typeof(grades) == "string") {
+        grades = JSON.parse(grades);
+    }
+    if(!grades){
+        grades = [] ;
+    }
+
+    var locations =req.body.locations;
+    if(typeof(locations) == "string") {
+        locations = JSON.parse(locations);
+    }
+    if(!locations){
+        locations = [] ;
+    }
+
     if (!validationFlag){
 
         response.error = error;
@@ -291,7 +315,10 @@ HEMasterCtrl.saveFormGroup = function(req,res,next){
                     req.st.db.escape(req.body.templateCode),
                     req.st.db.escape(req.body.userType),
                     req.st.db.escape(JSON.stringify(formList)),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(JSON.stringify(departments)),
+                    req.st.db.escape(JSON.stringify(grades)),
+                    req.st.db.escape(JSON.stringify(locations))
                 ];
                 /**
                  * Calling procedure to save work group
@@ -455,8 +482,11 @@ HEMasterCtrl.getFormGroupDetails = function(req,res,next){
                         response.error = null;
                         response.data = {
                             formTemplateDetails : formGroupResult[0],
-                            formList : formGroupResult[1]
-                        }
+                            formList : formGroupResult[1],
+                            departments : formGroupResult[2],
+                            grades : formGroupResult[3],
+                            locations : formGroupResult[4]
+                        };
                         res.status(200).json(response);
 
                     }
@@ -524,12 +554,15 @@ HEMasterCtrl.getFormsNeedToSelect = function(req,res,next){
             var procQuery = 'CALL HE_formsNeedToSelect( ' + procParams.join(',') + ')';
             console.log(procQuery);
             req.db.query(procQuery,function(err,formResult){
-                if(!err && formResult && formResult[0] && formResult[0][0]){
+                if(!err && formResult && formResult[0]){
                     response.status = true;
                     response.message = "Form list loaded successfully";
                     response.error = null;
                     response.data = {
-                        formList : formResult[0]
+                        formList : formResult[0] ? formResult[0] : [],
+                        departments : formResult[1] ? formResult[1] : [],
+                        grades : formResult[2] ? formResult[2] : [],
+                        locations : formResult[3] ? formResult[3] : []
                     };
                     res.status(200).json(response);
 

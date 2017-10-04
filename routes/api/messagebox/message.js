@@ -19,7 +19,6 @@ var Notification = require('../../modules/notification/notification-master.js');
 var notification = new Notification();
 var fs = require('fs');
 
-
 /**
  * Method : POST
  * @param req
@@ -163,7 +162,9 @@ router.post('/', function(req,res,next){
                                              autoJoinResults[0][0].senderId,
                                              notificationTemplaterRes.parsedTpl,
                                              38,
-                                             0, autoJoinResults[0][0].iphoneId,
+                                             0,
+                                             autoJoinResults[0][0].iphoneId,
+                                             autoJoinResults[0][0].GCM_Id,
                                              0,
                                              0,
                                              0,
@@ -302,16 +303,13 @@ router.post('/', function(req,res,next){
                                             res.status(200).json(responseMessage);
                                             /**notification send to user to whome message is sending*/
                                             if(results[1] && results[1].length > 0){
-                                                console.log(results[0][0].groupId,"groupId");
-                                                console.log(results[0][0].senderId,"sender");
-                                                console.log(results[0][0].groupType,"groupType");
+
                                                 if(results[0][0].groupType == 0){
                                                     senderGroupId = results[0][0].groupId;
                                                     var notificationTemplaterRes = notificationTemplater.parse('compose_message_group',{
                                                         senderName : results[0][0].senderName,
                                                         groupName : results[1][0].groupName
                                                     });
-                                                    console.log(notificationTemplaterRes,"notificationTemplaterRes");
                                                 }
                                                 else{
                                                     senderGroupId = results[0][0].senderId;
@@ -319,7 +317,6 @@ router.post('/', function(req,res,next){
                                                         senderName : results[0][0].senderName
                                                     });
                                                 }
-                                                console.log(results[0][0].messageType,"messageType");
 
                                                 /**
                                                  * Condtion should be like this in restricted reply case
@@ -340,7 +337,7 @@ router.post('/', function(req,res,next){
                                                      * */
                                                     if(autoJoinResults[0][0].groupuserid == 0){
                                                         console.log(autoJoinResults[0][0].groupuserid,"groupuserid");
-                                                        console.log((results[1][i].iphoneId),"iphoneId");
+                                                        console.log((results[1][i].GCM_Id),"GCM_Id");
                                                         if(notificationTemplaterRes.parsedTpl){
                                                             notification.publish(
                                                                 results[1][i].receiverGroupId,
@@ -349,7 +346,9 @@ router.post('/', function(req,res,next){
                                                                 results[0][0].senderId,
                                                                 notificationTemplaterRes.parsedTpl,
                                                                 31,
-                                                                0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                                                0,
+                                                                (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                                                (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
                                                                 0,
                                                                 0,
                                                                 0,
@@ -418,6 +417,7 @@ router.post('/', function(req,res,next){
                                                                 notificationTemplaterRes.parsedTpl,
                                                                 31,
                                                                 0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                                                (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
                                                                 0,
                                                                 0,
                                                                 0,
@@ -693,7 +693,6 @@ router.post('/attachment',function(req,res,next){
     });
 });
 
-
 /**
  * Method : GET
  * @param req
@@ -846,14 +845,18 @@ router.get('/', function(req,res,next){
                                             formData : results[0][i].formDataJSON ? JSON.parse(results[0][i].formDataJSON) : null
                                         });
                                     }
+
+                                    // console.log("results[5][0].GCM_Id",results[5][0].GCM_Id);
                                     responseMessage.data = {
                                         messageList : output,
                                         deleteMessageIdList : (results[2]) ? results[2] : [],
-                                        feedback : (results[3]) ? results[3] : []
+                                        feedback : (results[3]) ? results[3] : [],
+                                        APNSId : (results[4] && results[4][0]) ? JSON.parse(results[4][0].APNS_Id) : [],
+                                        GCMId : (results[5] && results[5][0]) ? JSON.parse(results[5][0].GCM_Id) : []
                                         // supportFeedback : (results[4]) ? results[4] : []
                                     };
 
-                                    console.log('deleteMessageIdList',results[2]);
+                                    // console.log('deleteMessageIdList',results[2]);
                                     res.status(200).json(responseMessage);
                                 }
                                 else {
@@ -861,10 +864,12 @@ router.get('/', function(req,res,next){
                                     responseMessage.error = null;
                                     responseMessage.totalCount = 0;
                                     responseMessage.message = 'Messages of group not available';
-
+                                    // console.log("results[5][0].GCM_Id",results[5][0].GCM_Id);
                                     responseMessage.data = {
                                         messageList : [],
-                                        deleteMessageIdList : []
+                                        deleteMessageIdList : [],
+                                        APNSId : (results[4] && results[4][0]) ? JSON.parse(results[4][0].APNS_Id) : [],
+                                        GCMId : (results[5] && results[5][0]) ? JSON.parse(results[5][0].GCM_Id) : []
                                     };
                                     res.status(200).json(responseMessage);
                                 }
@@ -918,7 +923,6 @@ router.get('/', function(req,res,next){
         }
     }
 });
-
 
 /**
  * Method : GET
