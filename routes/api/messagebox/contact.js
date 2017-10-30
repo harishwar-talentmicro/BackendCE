@@ -198,7 +198,7 @@ router.get('/', function(req,res,next){
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if ((!err) && tokenResult) {
                     var procParams = [
-                        req.db.escape(req.query.token) ,
+                        req.db.escape(req.query.token),
                         req.db.escape(req.query.dateTime)
                     ];
                     var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(' ,') + ')';

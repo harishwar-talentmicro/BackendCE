@@ -92,5 +92,4 @@ routeMapCtrl.getRouteMap = function(req,res,next){
 
 };
 
-
 module.exports = routeMapCtrl;

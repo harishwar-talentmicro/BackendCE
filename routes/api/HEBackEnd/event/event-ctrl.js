@@ -398,12 +398,14 @@ eventCtrl.getEventUser = function(req,res,next){
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
                 req.query.type = req.query.type ? req.query.type : 1;
+                req.query.sessionId = req.query.sessionId ? req.query.sessionId : 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.eventId),
-                    req.st.db.escape(req.query.type)
+                    req.st.db.escape(req.query.type),
+                    req.st.db.escape(req.query.sessionId)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -523,7 +525,6 @@ eventCtrl.deleteEventUser = function(req,res,next){
     }
 
 };
-
 
 eventCtrl.saveEventSponsorCategories = function(req,res,next){
     var response = {
@@ -895,6 +896,7 @@ eventCtrl.saveBasicEventInfo = function(req,res,next){
             if((!err) && tokenResult){
                 req.body.eventId = (req.body.eventId) ? req.body.eventId : 0;
                 req.body.aboutEvent = (req.body.aboutEvent) ? req.body.aboutEvent : '';
+                req.body.selfCheckInCode = (req.body.selfCheckInCode) ? req.body.selfCheckInCode : '';
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -903,7 +905,8 @@ eventCtrl.saveBasicEventInfo = function(req,res,next){
                     req.st.db.escape(req.body.eventTitle),
                     req.st.db.escape(req.body.aboutEvent),
                     req.st.db.escape(req.body.startDateTime),
-                    req.st.db.escape(req.body.endDateTime)
+                    req.st.db.escape(req.body.endDateTime),
+                    req.st.db.escape(req.body.selfCheckInCode)
                 ];
 
                 /**
@@ -979,6 +982,11 @@ eventCtrl.saveAdvanceEventInfo = function(req,res,next){
                 req.body.eventBanner = (req.body.eventBanner) ? req.body.eventBanner : '';
                 req.body.sponsorshipEmailId = (req.body.sponsorshipEmailId) ? req.body.sponsorshipEmailId : '';
                 req.body.enquiryEmailId = (req.body.enquiryEmailId) ? req.body.enquiryEmailId : '';
+                req.body.canPublishToLinkedIn = (req.body.canPublishToLinkedIn) ? req.body.canPublishToLinkedIn : 0;
+                req.body.LinkedInTitle = (req.body.LinkedInTitle) ? req.body.LinkedInTitle : "";
+                req.body.LinkedInDescription = (req.body.LinkedInDescription) ? req.body.LinkedInDescription : "";
+                req.body.LinkedInBanner = (req.body.LinkedInBanner) ? req.body.LinkedInBanner : "";
+                req.body.eventType = (req.body.eventType) ? req.body.eventType : 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -990,7 +998,12 @@ eventCtrl.saveAdvanceEventInfo = function(req,res,next){
                     req.st.db.escape(req.body.proximity),
                     req.st.db.escape(req.body.eventBanner),
                     req.st.db.escape(req.body.sponsorshipEmailId),
-                    req.st.db.escape(req.body.enquiryEmailId)
+                    req.st.db.escape(req.body.enquiryEmailId),
+                    req.st.db.escape(req.body.canPublishToLinkedIn),
+                    req.st.db.escape(req.body.LinkedInTitle),
+                    req.st.db.escape(req.body.LinkedInDescription),
+                    req.st.db.escape(req.body.LinkedInBanner),
+                    req.st.db.escape(req.body.eventType)
                 ];
                 /**
                  * Calling procedure to save advance event info
@@ -1182,6 +1195,503 @@ eventCtrl.deleteEventAgenda = function(req,res,next){
                     else{
                         response.status = false;
                         response.message = "Error while deleting event agenda";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+eventCtrl.getEvents = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
+                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.query.pageNo),
+                    req.st.db.escape(req.query.limit)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_get_events( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,eventResult){
+                    if(!err && eventResult && eventResult[0] && eventResult[0][0]){
+                        response.status = true;
+                        response.message = "Event list loaded successfully";
+                        response.error = null;
+                        response.data ={
+                            events : eventResult[0]
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if (!err){
+                        response.status = true;
+                        response.message = "No events found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting event list";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+eventCtrl.getEventDetails = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+    if (!req.query.eventId)
+    {
+        error.eventId = 'Invalid eventId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.query.eventId)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_get_event_details( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,eventResult){
+                    if(!err && eventResult && eventResult[0] && eventResult[0][0]){
+                        response.status = true;
+                        response.message = "Event data loaded successfully";
+                        response.error = null;
+                        response.data ={
+                            eventId : eventResult[0][0].eventId,
+                            aboutEvent : eventResult[0][0].aboutEvent,
+                            address : eventResult[0][0].address,
+                            endDateTime : eventResult[0][0].endDateTime,
+                            enquiryEmailId : eventResult[0][0].enquiryEmailId,
+                            eventBanner : eventResult[0][0].eventBanner,
+                            eventTitle : eventResult[0][0].eventTitle,
+                            latitude : eventResult[0][0].latitude,
+                            longitude : eventResult[0][0].longitude,
+                            proximity : eventResult[0][0].proximity,
+                            sponsorshipEmailId : eventResult[0][0].sponsorshipEmailId,
+                            startDateTime : eventResult[0][0].startDateTime,
+                            sponsors : eventResult[0][0].sponsors,
+                            eventAdmin : eventResult[0][0].eventAdmin,
+                            canPublishToLinkedIn : eventResult[0][0].canPublishToLinkedIn,
+                            LinkedInTitle : eventResult[0][0].LinkedInTitle,
+                            LinkedInDescription : eventResult[0][0].LinkedInDescription,
+                            LinkedInBanner : eventResult[0][0].LinkedInBanner,
+                            selfCheckInCode : eventResult[0][0].selfCheckInCode,
+                            eventType : eventResult[0][0].eventType
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if (!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting event data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+eventCtrl.getEventAgendaList = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+    if (!req.query.eventId)
+    {
+        error.eventId = 'Invalid eventId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.query.eventId)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_get_event_sessions( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,eventResult){
+                    if(!err && eventResult && eventResult[0] && eventResult[0][0]){
+                        response.status = true;
+                        response.message = "Agenda data loaded successfully";
+                        response.error = null;
+                        response.data ={
+                            agendaList : eventResult[0]
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if (!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting agenda data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+eventCtrl.deleteSponsor = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
+    if (!req.query.eventId)
+    {
+        error.eventId = 'Invalid eventId';
+        validationFlag *= false;
+    }
+    if (!req.query.sponsorId)
+    {
+        error.sponsorId = 'Invalid sponsorId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.query.eventId),
+                    req.st.db.escape(req.query.sponsorId)
+                ];
+                /**
+                 * Calling procedure to save advance event info
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_delete_sponsor( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,sponsorResult){
+                    if(!err){
+                        response.status = true;
+                        response.message = "Sponsor deleted successfully";
+                        response.error = null;
+                        response.data =null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while deleting sponsor";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+eventCtrl.deleteSponsorCategory = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
+    if (!req.query.eventId)
+    {
+        error.eventId = 'Invalid eventId';
+        validationFlag *= false;
+    }
+    if (!req.query.categoryId)
+    {
+        error.categoryId = 'Invalid categoryId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.query.eventId),
+                    req.st.db.escape(req.query.categoryId)
+                ];
+                /**
+                 * Calling procedure to save advance event info
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_delete_sponsorCategory( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,sponsorResult){
+                    if(!err && sponsorResult && sponsorResult[0] && sponsorResult[0][0] && sponsorResult[0][0].error ){
+                        response.status = false;
+                        response.message = "Category is in use";
+                        response.error = null;
+                        response.data =null;
+                        res.status(200).json(response);
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Category deleted";
+                        response.error = null;
+                        response.data =null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while deleting category";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+eventCtrl.deleteVenue = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
+    if (!req.query.eventId)
+    {
+        error.eventId = 'Invalid eventId';
+        validationFlag *= false;
+    }
+    if (!req.query.venueId)
+    {
+        error.venueId = 'Invalid venueId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.query.eventId),
+                    req.st.db.escape(req.query.venueId)
+                ];
+                /**
+                 * Calling procedure to save advance event info
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_delete_event_venue( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,venueResult){
+                    if(!err && venueResult && venueResult[0] && venueResult[0][0] && venueResult[0][0].error ){
+                        response.status = false;
+                        response.message = "Stage is in use";
+                        response.error = null;
+                        response.data =null;
+                        res.status(200).json(response);
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Stage deleted";
+                        response.error = null;
+                        response.data =null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while deleting stage";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

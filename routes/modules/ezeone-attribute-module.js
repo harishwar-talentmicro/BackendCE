@@ -282,4 +282,46 @@ EzeoneAttrbt.prototype.WhatMateVersionCode = function(req,res,next){
 
 };
 
+EzeoneAttrbt.prototype.getSysConfig = function(req,res,next){
+
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    try{
+        var procQuery = 'CALL get_sysConfig()';
+        console.log(procQuery);
+        req.db.query(procQuery,function(err,result){
+            if(!err && result ){
+                response.status = true;
+                response.message = "System config loaded successfully";
+                response.error = null;
+                response.data = {
+                    isOTPRequired : result[0][0].isOTPRequired
+                };
+                res.status(200).json(response);
+            }
+            else{
+                response.status = false;
+                response.message = "Error while getting sys config";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+    }
+    catch (ex){
+        response.status = false;
+        response.message = "Error while getting sys config";
+        response.error = null;
+        response.data = null;
+        res.status(500).json(response);
+    }
+
+
+};
+
 module.exports = EzeoneAttrbt;

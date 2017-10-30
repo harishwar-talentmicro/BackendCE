@@ -213,5 +213,114 @@ expenseClaimCtrl.saveExpenseClaim = function(req,res,next){
 
 };
 
+expenseClaimCtrl.getVaultData = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                req.query.keywords = req.query.keywords ? req.query.keywords : "";
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(req.query.keywords)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_get_expense_vaultdata( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+                    console.log(results);
+                    if(!err && results && results[0] ){
+                        var output = [];
+                        for(var i = 0; i < results[0].length; i++) {
+                            var res1 = {};
+
+                            var items = (results[0][i].items) ? JSON.parse(results[0][i].items) : [];
+                            if(items.length >0){
+                                res1.title = results[0][i].title;
+                                res1.isFolder = results[0][i].isFolder;
+                                var item = [];
+                                for(var j = 0; j < items.length; j++) {
+                                    var res2 = {};
+                                    var itemDetails = (items[j].details) ? (items[j].details) : null;
+                                    res2.expTypeId = items[j].expTypeId;
+                                    res2.conversionRate = items[j].conversionRate;
+                                    res2.attachmentList = (items[j].attachmentList) ? (items[j].attachmentList) : [];
+                                    res2.amount =(itemDetails) ? itemDetails.amount : 0;
+                                    res2.expDate = (itemDetails) ? itemDetails.billDate : null;
+                                    res2.currencyId = (itemDetails) ? itemDetails.currencyId : 0;
+                                    res2.particulars =(itemDetails) ?  itemDetails.particulars : "";
+                                    res2.currencyTitle =(itemDetails) ?  itemDetails.currencyTitle : "";
+                                    item.push(res2);
+                                }
+                                res1.item = item;
+                                output.push(res1);
+                            }
+
+                        }
+                        for(var z = 0; z < results[1].length; z++) {
+                            var res3 = {};
+                            var vaultItems = (results[1][z].details) ? JSON.parse(results[1][z].details) : null;
+                            console.log("vaultItems",vaultItems);
+                            res3.expTypeId = results[1][z].expTypeId;
+                            res3.attachmentList = (results[1][z].attachmentList) ? JSON.parse(results[1][z].attachmentList) : [];
+                            res3.amount =(vaultItems) ? vaultItems.amount : 0;
+                            res3.expDate = (vaultItems) ? vaultItems.billDate : null;
+                            res3.currencyId = (vaultItems) ? vaultItems.currencyId : 0;
+                            res3.particulars =(vaultItems) ?  vaultItems.particulars : "";
+                            res3.currencyTitle =(vaultItems) ?  vaultItems.currencyTitle : "";
+                            res3.conversionRate = results[1][z].conversionRate;
+                            res3.isFolder = results[1][z].isFolder;
+                            res3.title = results[1][z].title;
+                            output.push(res3);
+                        }
+                        response.status = true;
+                        response.message = "Vault data loaded ";
+                        response.error = null;
+                        response.data = {
+                            vaultData : output
+                        } ;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting vault data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
 
 module.exports = expenseClaimCtrl;

@@ -8,5 +8,6 @@ var router = express.Router();
 var expenseClaimCtrl = require('./expenseClaim-ctrl');
 
 router.post('/',expenseClaimCtrl.saveExpenseClaim);
+router.get('/vault',expenseClaimCtrl.getVaultData);
 
 module.exports = router;

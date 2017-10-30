@@ -1545,11 +1545,19 @@ Association.prototype.imageUploadWithThumbnail = function(req,res,next){
                         console.log(req.files);
                         if (req.files) {
                             var deleteTempFile = function(){
-                                fs.unlink('../bin/'+req.files.pr.path);
-                                console.log("Image Path is deleted from server");
+                                try{
+                                    if (fs.exists('../bin/'+req.files.pr.path)){
+                                        fs.unlink('../bin/'+req.files.pr.path);
+                                        console.log("Image Path is deleted from server");
+                                    }
+                                    else {
+                                        console.log("image not found");
+                                    }
+                                }
+                                catch(ex){
+                                    console.log(ex);
+                                }
                             };
-                            console.log("path", req.files.pr.path);
-                            console.log("extension", req.files.pr.extension);
 
                             var readStream = fs.createReadStream(req.files.pr.path);
                             var resizedReadStream = gm(req.files['pr'].path).resize(100,100).autoOrient().quality(0).stream(req.files.pr.extension);

@@ -17,19 +17,17 @@ currencyCtrl.saveCurrency = function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.body.currencySymbol)
-    {
-        error.currencySymbol = 'Invalid currency symbol';
-        validationFlag *= false;
-    }
 
     if (!req.query.APIKey)
     {
-        console.log("Entered....");
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
-
+    if (!req.body.currencyId)
+    {
+        error.currencyId = 'Invalid currencyId';
+        validationFlag *= false;
+    }
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
@@ -46,7 +44,6 @@ currencyCtrl.saveCurrency = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.currencyId),
-                    req.st.db.escape(req.body.currencySymbol),
                     req.st.db.escape(req.body.conversionRate),
                     req.st.db.escape(req.body.baseCurrency),
                     req.st.db.escape(req.query.APIKey)
@@ -73,8 +70,7 @@ currencyCtrl.saveCurrency = function(req,res,next){
                         }
 
                     }
-
-                    if(!err){
+                    else if(!err){
                         response.status = true;
                         response.message = "Currency saved successfully";
                         response.error = null;
@@ -140,7 +136,6 @@ currencyCtrl.updateCurrency = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.currencyId),
-                    req.st.db.escape(req.body.currencySymbol),
                     req.st.db.escape(req.body.conversionRate),
                     req.st.db.escape(req.body.baseCurrency),
                     req.st.db.escape(req.query.APIKey)
@@ -232,12 +227,13 @@ currencyCtrl.getCurrencyList = function(req,res,next){
                 var procQuery = 'CALL get_HECurrencyList( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,currencyResult){
-                    if(!err && currencyResult && currencyResult[0] && currencyResult[0][0]){
+                    if(!err && currencyResult  ){
                         response.status = true;
                         response.message = "Currency loaded successfully";
                         response.error = null;
                         response.data = {
-                            currencyList : currencyResult[0]
+                            currencyList : currencyResult[0] ? currencyResult[0] : [],
+                            masterCurrencyList : currencyResult[1] ? currencyResult[1] : []
                         };
                         res.status(200).json(response);
 

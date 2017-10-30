@@ -11,4 +11,6 @@ router.post('/otp',signupCtrl.sendOtp);
 router.post('/verifyotp',signupCtrl.verifyOTP);
 router.post('/password',signupCtrl.savePassword);
 
+router.get('/emailId',signupCtrl.verifyEmailId);
+
 module.exports = router;

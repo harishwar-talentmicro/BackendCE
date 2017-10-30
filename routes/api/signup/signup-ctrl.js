@@ -199,6 +199,7 @@ signupCtrl.sendOtp = function(req,res,next) {
 signupCtrl.verifyOTP = function(req,res,next){
     var mobileNo= req.body.mobileNo;
     var isdMobile = req.body.isdMobile ;
+    var emailId = req.body.emailId ;
 
     var status = true, error = {};
     var respMsg = {
@@ -216,8 +217,8 @@ signupCtrl.verifyOTP = function(req,res,next){
         error['isdMobile'] = 'isd mobile is mandatory';
         status *= false;
     }
-    if (!req.body.otp) {
-        error['otp'] = 'otp is mandatory';
+    if (!emailId) {
+        error['emailId'] = 'Email id is mandatory';
         status *= false;
     }
 
@@ -228,6 +229,11 @@ signupCtrl.verifyOTP = function(req,res,next){
             var pictureURL = req.body.pictureURL ? req.body.pictureURL : "";
             var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
             var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
+            var isOTPRequired = (req.body.isOTPRequired) ? (req.body.isOTPRequired) : 0;
+            var otp = (req.body.otp) ? (req.body.otp) : 0;
+            if (req.body.otp == ""){
+                req.body.otp = 0;
+            }
 
             if (pictureURL != "")
             {
@@ -242,16 +248,31 @@ signupCtrl.verifyOTP = function(req,res,next){
                 req.st.db.escape(req.body.displayName),
                 req.st.db.escape(isdMobile),
                 req.st.db.escape(req.body.idTypeId),
-                req.st.db.escape(req.query.token)
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.body.isOTPRequired),
+                req.st.db.escape(emailId)
             ];
 
             var procQuery = 'CALL verify_otp( ' + procParams.join(',') + ')';
             console.log(procQuery);
             req.db.query(procQuery,function(err,result) {
                 if (!err && result && result[0] && result[0][0].message){
-                    respMsg.status = false;
-                    respMsg.message = "Invalid OTP";
-                    res.status(200).json(respMsg);
+                    switch (result[0][0].message) {
+                        case 'INVALID' :
+                            respMsg.status = false;
+                            respMsg.message = "Invalid OTP";
+                            res.status(200).json(respMsg);
+                            break;
+                        case 'NOT_AVAILABLE' :
+                            respMsg.status = false;
+                            respMsg.message = "EmailId already exists";
+                            res.status(200).json(respMsg);
+                            break ;
+
+                        default:
+                            break;
+                    }
+
                 }
                 else if (!err && result && result[0] && result[0][0].EZEID){
                     var EZEOneId= result[0][0].EZEID;
@@ -403,6 +424,74 @@ signupCtrl.savePassword = function(req,res,next){
         res.status(400).json(respMsg);
     }
 
+};
+
+signupCtrl.verifyEmailId = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.emailId){
+        error.emailId = 'Invalid emailId';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+                var procParams = [
+                    req.st.db.escape(req.query.emailId)
+                ];
+                /**
+                 * Calling procedure to save deal
+                 * @type {string}
+                 */
+                var procQuery = 'CALL validate_emailId( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,result){
+                    console.log(result);
+                    if(!err && result && result[0] && result[0][0] && result[0][0].message ){
+                        switch (result[0][0].message) {
+                            case 'AVAILABLE' :
+                                response.status = true;
+                                response.message = "Valid email id." ;
+                                response.error = null;
+                                res.status(200).json(response);
+                                break;
+                            case 'NOT_AVAILABLE' :
+                                response.status = false;
+                                response.message = "Email id already exists.";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
+
+                            default:
+                                break;
+                        }
+                    }
+                    else if(!err){
+                        response.status = false;
+                        response.message = "Email id already exists.";
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while validating emailId";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+    }
 };
 
 module.exports = signupCtrl;

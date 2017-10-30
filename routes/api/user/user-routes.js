@@ -14,5 +14,8 @@ router.get('/validate_ezeone_id/:ezeoneId',userCtrl.verifyEzeoneId);
 router.get('',userCtrl.getProfileData);
 
 router.post('',userCtrl.saveProfileData);
+router.post('/passwordReset',userCtrl.sendPasswordResetOTP);
+router.get('/password/verifyOTP',userCtrl.verifyPasswordResetOTP);
+router.post('/password/change',userCtrl.changePassword);
 
 module.exports = router;

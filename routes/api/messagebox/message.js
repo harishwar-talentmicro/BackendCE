@@ -1105,6 +1105,86 @@ router.post('/delete', function(req,res,next){
     }
 });
 
+router.post('/delete/all', function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.groupId)
+                ];
+
+                var procQuery = 'CALL p_v1_delete_allmessages( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, messageData) {
+                    if (!err && messageData && messageData[0] && messageData[0][0] && messageData[0][0].error ) {
+                        switch (messageData[0][0].error) {
+                            case 'ACCESS_DENIED' :
+                                response.status = false;
+                                response.message = "Access denied";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
+                            case 'MESSAGE_SENT' :
+                                response.status = false;
+                                response.message = "Message can't be deleted.";
+                                response.error = null;
+                                res.status(200).json(response);
+                                break ;
+
+                            default:
+                                break;
+                        }
+
+                    }
+                    else if (!err ) {
+                        response.status = true;
+                        response.message = "Messages deleted successfully";
+                        response.error = null;
+                        response.data = null ;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while deleting messages ";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+});
+
 module.exports = router;
 
 

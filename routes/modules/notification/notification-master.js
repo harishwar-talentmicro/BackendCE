@@ -132,7 +132,6 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             // _notificationMqtt.publish(receiverId,messagePayload);
             _Notification_aws.publish_IOS(iphoneId,messagePayload,issos);
         }
-        console.log("GCM_Id",GCM_Id);
 
         if (GCM_Id){
             console.log("Entered...");
@@ -335,7 +334,5 @@ Notification.prototype.authResource = function(req,res,next){
     }
 
 };
-
-
 
 module.exports = Notification;

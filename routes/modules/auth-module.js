@@ -653,8 +653,9 @@ Auth.prototype.login = function(req,res,next){
     res.header('Access-Control-Allow-Origin', "*");
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
-
+console.log("req.body.UserName",req.body.UserName);
     var ezeoneId = req.st.alterEzeoneId(req.body.UserName);
+    console.log("ezeoneid",ezeoneId);
 
     var password = req.body.Password;
     var isIphone = req.body.device ? parseInt(req.body.device) : 0;
@@ -867,7 +868,7 @@ Auth.prototype.login = function(req,res,next){
                                 if (!token) {
                                     console.log('compare password..');
                                     if (comparePassword(password, loginDetails[0].Password)) {
-                                        st.generateToken(ip, userAgent, ezeoneId,isWhatMate,APNS_Id,GCM_Id, function (err, tokenResult) {
+                                        st.generateToken(ip, userAgent, loginDetails[0].EZEID,isWhatMate,APNS_Id,GCM_Id, function (err, tokenResult) {
                                             if ((!err) && tokenResult && loginDetails[0]) {
                                                 st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ')', function (err, UserDetailsResult) {
                                                     if (!err) {
@@ -935,6 +936,7 @@ Auth.prototype.login = function(req,res,next){
                                                                     responseMessage.isHelloEZE = loginDetails[0].isHelloEZE;
                                                                     responseMessage.displayName = loginDetails[0].displayName;
                                                                     responseMessage.whatMateCount = loginDetails[0].whatMateCount;
+                                                                    responseMessage.isEmployee = loginDetails[0].isEmployee;
                                                                     responseMessage.userDetails = UserDetailsResult[0];
                                                                     if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
                                                                         responseMessage.contactDetails = contactResult[0];
