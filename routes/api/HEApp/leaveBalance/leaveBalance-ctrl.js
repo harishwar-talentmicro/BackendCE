@@ -13,6 +13,11 @@ var fs = require('fs');
 
 var leaveBalanceCtrl = {};
 
+
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
 leaveBalanceCtrl.getLeaveBalanceForm = function(req,res,next){
     var response = {
         status : false,
@@ -217,7 +222,11 @@ leaveBalanceCtrl.getLeaveBalance = function(req,res,next){
                             leaveTypes : JSON.parse(leaveTypes["leaveTypes"]),
                             totalLeaves : leaveTypes["totalLeaves"]
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;

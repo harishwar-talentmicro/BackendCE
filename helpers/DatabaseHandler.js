@@ -9,11 +9,10 @@ var mysql = require('mysql'),
  //db_server = "182.73.205.244",//Name of the Server.
  // db_server = "104.199.128.226",//Name of the Server.
   // db_server = "182.74.145.170",//Name of the Server port= 4406 , p=ezeone.
-   db_server = "23.236.49.140",
+   db_server = "104.196.9.194",
 db_port = 3306, //Integers please db_port = 3306 .
     //db_collection = "ezeid"; //Name of DB Collection
-    db_collection = "test_ezeid"; //Name of DB Collection
-
+    db_collection = "livedb"; //Name of DB Collection
 
 
 exports.getDBContext = function () {
@@ -24,11 +23,11 @@ exports.getDBContext = function () {
         host: db_server,
         port: db_port,
         database: db_collection,
-        user: 'root',
+        user: 'whatmate',
         //password: 'ezeid',
         //commented below to access database from local vedha system
         // password: 'StesTEzeOneID*2016#S',
-        password: 'cvmine@123',
+        password: 'mateonet@lentEZe2017',
         multipleStatements: true,
         waitForConnection : true,
         queueLimit : 0,

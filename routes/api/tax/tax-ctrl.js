@@ -75,7 +75,7 @@ taxCtrl.getTaxDeclarations = function(req,res,next){
                             response.message = "Tax declaration loaded successfully";
                             response.error = null;
                             response.data = {
-                                savingMasterId : taxDeclaration[0][0].taxDeclaration,
+                                savingMasterId : taxDeclaration[0][0].savingMasterId,
                                 startDate : taxDeclaration[0][0].startDate,
                                 endDate : taxDeclaration[0][0].endDate,
                                 helpUrlLink : taxDeclaration[0][0].helpUrlLink,
@@ -151,6 +151,8 @@ taxCtrl.saveTaxItems = function(req,res,next){
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if ((!err) && tokenResult) {
+                    req.body.savingMasterId = req.body.savingMasterId ? req.body.savingMasterId : 0;
+
                     var procParams = [
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.body.groupId),
@@ -160,7 +162,8 @@ taxCtrl.saveTaxItems = function(req,res,next){
                         req.st.db.escape(req.body.billDate),
                         req.st.db.escape(req.body.amount),
                         req.st.db.escape(req.body.notes),
-                        req.st.db.escape(JSON.stringify(attachments))
+                        req.st.db.escape(JSON.stringify(attachments)),
+                        req.st.db.escape(req.body.savingMasterId)
                     ];
                     /**
                      * Calling procedure to get form template
@@ -292,7 +295,6 @@ taxCtrl.getTaxItems = function(req,res,next){
 
 };
 
-
 taxCtrl.deleteTaxItems = function(req,res,next){
     var response = {
         status : false,
@@ -349,6 +351,83 @@ taxCtrl.deleteTaxItems = function(req,res,next){
                         else{
                             response.status = false;
                             response.message = "Error while deleting tax item";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+            }
+        );
+    }
+
+};
+
+taxCtrl.saveTaxGroupPlannedAmount = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.body.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!req.body.savingMasterId) {
+        error.savingMasterId = 'Invalid savingMasterId';
+        validationFlag *= false;
+    }
+
+    var taxGroupList =req.body.taxGroupList;
+    if(typeof(taxGroupList) == "string") {
+        taxGroupList = JSON.parse(taxGroupList);
+    }
+    if(!taxGroupList){
+        error.taxGroupList = 'Invalid taxGroupList' ;
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.body.savingMasterId),
+                        req.st.db.escape(req.body.groupId),
+                        req.st.db.escape(JSON.stringify(taxGroupList))
+                    ];
+                    /**
+                     * Calling procedure to get form template
+                     * @type {string}
+                     */
+                    var procQuery = 'CALL he_save_tax_plannedAmount( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery,function(err,taxItem){
+                        if(!err){
+                            response.status = true;
+                            response.message = "Planned amount saved successfully";
+                            response.error = null;
+                            response.data = null;
+                            res.status(200).json(response);
+                        }
+                        else{
+                            response.status = false;
+                            response.message = "Error while saving planned amount";
                             response.error = null;
                             response.data = null;
                             res.status(500).json(response);

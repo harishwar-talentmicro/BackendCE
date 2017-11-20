@@ -12,6 +12,9 @@ var fs = require('fs');
 
 var supportCtrl = {};
 var error = {};
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 
 supportCtrl.saveSupportRequest = function(req,res,next){
     var response = {
@@ -162,39 +165,11 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                                             accessUserType : results[1][i].accessUserType,
                                             heUserId : results[1][i].heUserId,
                                             formData : JSON.parse(results[1][i].formDataJSON)
-                                            // formData : {
-                                            //     stage : formDataJSON.stage,
-                                            //     amount : formDataJSON.amount,
-                                            //     reason : formDataJSON.reason,
-                                            //     status : formDataJSON.status,
-                                            //     transId : formDataJSON.transId,
-                                            //     clientId : formDataJSON.clientId,
-                                            //     parentId : formDataJSON.parentId,
-                                            //     changeLog : formDataJSON.changeLog,
-                                            //     formTitle : formDataJSON.formTitle,
-                                            //     categoryId : formDataJSON.categoryId,
-                                            //     clientName : formDataJSON.clientName,
-                                            //     currencyId : formDataJSON.currencyId,
-                                            //     stageTitle : formDataJSON.stageTitle,
-                                            //     probability : formDataJSON.probability,
-                                            //     requirement : formDataJSON.requirement,
-                                            //     senderNotes : formDataJSON.senderNotes,
-                                            //     statusTitle : formDataJSON.statusTitle,
-                                            //     infoToSender : formDataJSON.infoToSender,
-                                            //     approverCount : formDataJSON.approverCount,
-                                            //     assignHistory : (formDataJSON.assignHistory) ? JSON.parse(formDataJSON.assignHistory) : null ,
-                                            //     categoryTitle : formDataJSON.categoryTitle,
-                                            //     currencyTitle : formDataJSON.currencyTitle,
-                                            //     receiverCount : formDataJSON.receiverCount,
-                                            //     receiverNotes : formDataJSON.receiverNotes,
-                                            //     statusHistory : (formDataJSON.statusHistory) ? JSON.parse(formDataJSON.statusHistory) : null ,
-                                            //     accessUserType : formDataJSON.accessUserType,
-                                            //     attachmentList : (formDataJSON.attachmentList) ? JSON.parse(formDataJSON.attachmentList) : null
-                                            // }
                                         }
                                     },
                                     null,
-                                    tokenResult[0].isWhatMate);
+                                    tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -261,7 +236,11 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                                 // }
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -398,7 +377,9 @@ supportCtrl.assignToUser = function(req,res,next){
                                         }
                                     },
                                     null,
-                                    tokenResult[0].isWhatMate);
+                                    tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
+
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {

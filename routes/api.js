@@ -90,6 +90,7 @@ var Auth = require('./modules/auth-module.js');
 var authModule = new Auth(db,stdLib);
 router.post('/ewSavePrimaryEZEData', authModule.register);
 router.post('/ewLogin', authModule.login);
+router.post('/login', authModule.loginNew);
 router.get('/ewLogout', authModule.logout);
 router.get('/pass_reset_code',authModule.verifyResetCode);
 router.post('/verify_secret_code',authModule.verifySecretCode);

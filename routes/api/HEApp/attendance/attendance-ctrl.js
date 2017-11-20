@@ -10,6 +10,10 @@ var Notification = require('../../../modules/notification/notification-master.js
 var notification = new Notification();
 var fs = require('fs');
 
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
 var attendanceCtrl = {};
 var error = {};
 
@@ -42,7 +46,6 @@ attendanceCtrl.saveAttendance = function(req,res,next){
     }
 
     var senderGroupId;
-    console.log(validationFlag, "validationFlag");
 
     if (!validationFlag){
         response.error = error;
@@ -153,7 +156,8 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                                         }
                                     },
                                     null,
-                                    tokenResult[0].isWhatMate);
+                                    tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -190,7 +194,11 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -208,6 +216,5 @@ attendanceCtrl.saveAttendance = function(req,res,next){
     }
 
 };
-
 
 module.exports = attendanceCtrl;

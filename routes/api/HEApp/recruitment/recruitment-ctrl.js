@@ -13,6 +13,11 @@ var fs = require('fs');
 var recruitmentCtrl = {};
 var error = {};
 
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
+
 recruitmentCtrl.manpowerRequest = function(req,res,next){
     var response = {
         status : false,
@@ -149,7 +154,8 @@ recruitmentCtrl.manpowerRequest = function(req,res,next){
                                         }
                                     },
                                     null,
-                                    tokenResult[0].isWhatMate);
+                                    tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -186,7 +192,11 @@ recruitmentCtrl.manpowerRequest = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -252,7 +262,11 @@ recruitmentCtrl.getManpowerList = function(req,res,next){
                         response.data =  {
                             manpowerList : manpowerList[0]
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if(!err){
                         response.status = true;
@@ -410,7 +424,8 @@ recruitmentCtrl.referCV = function(req,res,next){
                                         }
                                     },
                                     null,
-                                    tokenResult[0].isWhatMate);
+                                    tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -447,7 +462,11 @@ recruitmentCtrl.referCV = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -588,7 +607,8 @@ recruitmentCtrl.contactUs = function(req,res,next){
                                         }
                                     },
                                     null,
-                                    tokenResult[0].isWhatMate);
+                                    tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -625,7 +645,11 @@ recruitmentCtrl.contactUs = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -704,7 +728,11 @@ recruitmentCtrl.getSalaryLedger = function(req,res,next){
                         response.data =  {
                             salaryLedger : output
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if(!err){
                         response.status = true;
@@ -777,7 +805,11 @@ recruitmentCtrl.getInterviewSchedularMasterData = function(req,res,next){
                             manpowerList : masterData[0],
                             stageList : masterData[1]
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if(!err){
                         response.status = true;
@@ -849,7 +881,11 @@ recruitmentCtrl.getAssessmentList = function(req,res,next){
                         response.data =  {
                             assessmentList : assessmentList[0]
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if(!err){
                         response.status = true;
@@ -1026,7 +1062,8 @@ recruitmentCtrl.interviewScheduler = function(req,res,next){
                                         }
                                     },
                                     null,
-                                    tokenResult[0].isWhatMate);
+                                    tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -1063,7 +1100,11 @@ recruitmentCtrl.interviewScheduler = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -1146,7 +1187,11 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
                             information : output,
                             count : informationResult[1][0].count
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if(!err){
                         response.status = true;

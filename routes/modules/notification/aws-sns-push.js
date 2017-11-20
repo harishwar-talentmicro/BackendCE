@@ -49,7 +49,7 @@ var ANDROID_SNS = new SNS({
 //     console.log('\nSuccessfully added device with deviceId: ' + deviceId + '.\nEndpointArn for user is: ' + endpointArn);
 //     // Maybe do some other stuff...
 // });
-
+//
 // Publically exposed function
 // Recieves request and response objects
 // This is used by index.js
@@ -155,6 +155,104 @@ Notification_aws.prototype.publish_IOS = function(deviceId,messagePayload,issos)
     //});
 
 };
+
+// Notification_aws.prototype.publish_IOS = function(deviceId,messagePayload,issos) {
+//     // Add the user to SNS
+//     var sound = "default";
+//     var alert ="" ;
+//     var alarmType = (messagePayload.alarmType != 'undefined' || messagePayload.alarmType != 'Nan' || messagePayload.alarmType != null ) ? messagePayload.alarmType : 1 ;
+//     if(alarmType == 0){
+//         sound = null;
+//     }
+//     else if(alarmType == 1){
+//         sound = "default";
+//     }
+//     else if(alarmType == 2){
+//         sound = "bell.wav";
+//     }
+//     else if(alarmType == 3){
+//         sound = "emergency_alert.mp3";
+//     }
+//     else if(alarmType == 4){
+//         sound = "short.wav";
+//     }
+//
+//     if(messagePayload.type == 72 || messagePayload.type == 74 ){
+//         alert = {
+//             title : messagePayload.eventTitle,
+//             body : messagePayload.message
+//         }
+//     }
+//     else if(messagePayload.type == 73){
+//         alert = {
+//             title : messagePayload.title,
+//             body : messagePayload.message
+//         }
+//     }
+//     else {
+//         alert = messagePayload.message ;
+//     }
+//     console.log("sound",sound);
+//
+//
+//     if (issos){
+//         var params = {
+//             default : "This is the default",
+//             // APNS_SANDBOX : {
+//             APNS_SANDBOX : {
+//                 aps : {
+//                     alert : alert,
+//                     sound: 'emergency_alert.mp3'
+//                 },
+//                 payload : messagePayload
+//             }
+//         };
+//     }
+//     else {
+//         var params = {
+//             default : "This is the default",
+//             APNS_SANDBOX : {
+//                 aps : {
+//                     alert : alert,
+//                     sound : sound
+//                 },
+//                 payload : messagePayload
+//             }
+//         };
+//     }
+//
+//     params.APNS_SANDBOX = JSON.stringify(params.APNS_SANDBOX);
+//
+//     deviceId = JSON.parse(deviceId);
+//
+//     for (var i = 0; i < deviceId.length; i++ ) {
+//         if(deviceId[i].deviceId)
+//         {
+//             IOS_SNS.addUser(deviceId[i].deviceId, null, function(err, endpointArn) {
+//                 if (err) {
+//                     console.log(err);
+//                 }
+//                 else {
+//                     // Send notifications
+//                     IOS_SNS.sendMessage(endpointArn, params, function(err, data) {
+//                         if (err) {
+//                             console.log(err.stack);
+//                         }
+//                         else {
+//                             console.log('push sent');
+//                             console.log(data);
+//                         }
+//
+//                     });
+//                 }
+//             });
+//         }
+//
+//     }
+//
+//     //});
+//
+// };
 
 Notification_aws.prototype.publish_Android = function(deviceId,messagePayload) {
     // Add the user to SNS

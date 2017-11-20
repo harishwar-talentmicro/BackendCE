@@ -17,6 +17,10 @@ var notificationTemplater = new NotificationTemplater();
 var Notification = require('../../modules/notification/notification-master.js');
 var notification = new Notification();
 var request = require('request');
+var zlib = require('zlib');
+
+var AES_256_encryption = require('../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 
 /**
  * Method : GET
@@ -94,7 +98,11 @@ router.get('/query', function(req,res,next){
                                 responseMessage.data = {
                                     contactSuggestionList :results[0]
                                 };
-                                res.status(200).json(responseMessage);
+                                var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    responseMessage.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(responseMessage);
+                                });
                             }
                             else {
                                 responseMessage.status = true;
@@ -103,7 +111,11 @@ router.get('/query', function(req,res,next){
                                 responseMessage.data = {
                                     contactSuggestionList :[]
                                 };
-                                res.status(200).json(responseMessage);
+                                var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    responseMessage.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(responseMessage);
+                                });
                             }
                         }
                         else {
@@ -251,7 +263,12 @@ router.get('/', function(req,res,next){
                                         responseMessage.data = {
                                             contactList:contactResults[0]
                                         };
-                                        res.status(200).json(responseMessage);
+                                        var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            responseMessage.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(responseMessage);
+                                        });
+
                                     }
                                     else{
 
@@ -268,7 +285,12 @@ router.get('/', function(req,res,next){
                                         responseMessage.data = {
                                             contactList:contactResults[0]
                                         };
-                                        res.status(200).json(responseMessage);
+                                        var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            responseMessage.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(responseMessage);
+                                        });
+
                                     }
                                 });
 
@@ -281,7 +303,11 @@ router.get('/', function(req,res,next){
                                 responseMessage.data = {
                                     contactList:[]
                                 };
-                                res.status(200).json(responseMessage);
+                                var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    responseMessage.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(responseMessage);
+                                });
                             }
                         }
                         else {
@@ -1338,7 +1364,6 @@ router.post('/addressBook',function(req, res, next){
     }
 });
 
-
 /**
  * Method : GET deviceIds
  * @param req
@@ -1442,6 +1467,140 @@ router.get('/deviceIds', function(req,res,next){
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
             console.log('Error pGetGroupAndIndividuals_new : ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+});
+
+
+/**
+ * Method : post
+ * @param req
+ * @param res
+ * @param next
+ * @param token* <string> token of login user
+ * @param groupUserId* <int> group id(Group Id of an individual user or a group where the operation has to be done)
+ * @param deleteArchieve* <int> is group id
+ *
+ * @discription : API to change status of contacts
+ */
+router.post('/archieveDelete', function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    /**
+     * validation goes here for each param
+     */
+
+    var validationFlag = true;
+    var error = {};
+    req.body.groupUserId  = parseInt(req.body.groupUserId);   // groupid of receiver
+    req.body.groupState  = parseInt(req.body.groupState);      // archieveDelete 0 : Active, 1: Deleted, 2 : Archieve
+
+    /**
+     * validating for token as token,groupId,userGroupId and status
+     * */
+    if (isNaN(parseInt(req.body.groupUserId))) {
+        error.groupUserId = 'Invalid groupUserId';
+        validationFlag *= false;
+    }
+
+    // if(isNaN(parseInt(req.body.groupState)) || (!parseInt(req.body.groupState))){
+    //     error.groupState = 'Invalid groupState';
+    //     validationFlag *= false;
+    // }
+
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            /**
+             * validation for token of login user
+             * */
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err && tokenResult) {
+
+                    var queryParams = [
+                        req.db.escape(req.query.token) ,
+                        req.db.escape(req.body.groupUserId) ,
+                        req.db.escape(req.body.groupState)
+                    ];
+
+                    var query = 'CALL p_v1_deleteOrArchieve(' + queryParams.join(',') + ');' ;
+                    console.log(query);
+                    req.db.query(query, function (err, updateResult) {
+                        if (!err) {
+                            if (updateResult
+                                && updateResult[0]) {
+                                if(updateResult[0][0].groupUserId){
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'User status updated successfully';
+                                    responseMessage.data = {
+                                        groupUserId : updateResult[0][0].groupUserId,
+                                        groupState : updateResult[0][0].groupState
+                                    };
+                                    res.status(200).json(responseMessage);
+                                }
+                                else{
+                                    responseMessage.status = false;
+                                    responseMessage.error = { server : 'Internal server error'};
+                                    responseMessage.message = 'Something went wrong!';
+                                    responseMessage.data = null;
+                                    res.status(400).json(responseMessage);
+                                }
+
+                            }
+                            /**
+                             * if proc executed unsuccessfully then give response false
+                             * */
+                            else {
+                                var qMsg = {server: 'Internal Server Error'};
+                                responseMessage.status = false;
+                                responseMessage.data = {};
+                                res.status(400).json(responseMessage);
+                            }
+                        }
+                        /**
+                         * while executing proc if error comes then give error
+                         * */
+                        else {
+                            responseMessage.message = 'An error occured ! Please try again';
+                            responseMessage.error = {
+                                server: 'Internal Server Error'
+                            };
+                            res.status(500).json(responseMessage);
+                            console.log('p_v1_UpdateUserStatus: error in updating user status :' + err);
+                        }
+                    });
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Invalid Token'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(401).json(responseMessage);
+                    console.log('Error :', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : p_v1_UpdateUserStatus ' + ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

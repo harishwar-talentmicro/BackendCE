@@ -7,6 +7,11 @@ var moment = require('moment');
 var error = {};
 var validationFlag = true;
 
+
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
 formTypeCtrl.getFormTypeList = function(req,res,next){
     var response = {
         status : false,
@@ -57,8 +62,12 @@ formTypeCtrl.getFormTypeList = function(req,res,next){
                         response.error = null;
                         response.data = {
                             formTypeList : formTypeResult[0]
-                        }
-                        res.status(200).json(response);
+                        };
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
 
                     }
                     else if(!err){
@@ -85,6 +94,5 @@ formTypeCtrl.getFormTypeList = function(req,res,next){
 
 
 };
-
 
 module.exports = formTypeCtrl;

@@ -15,6 +15,12 @@ var fs = require('fs');
 var visitorCtrl = {};
 var error = {};
 
+
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
+
 visitorCtrl.saveGatePassRequest = function(req,res,next){
     var response = {
         status : false,
@@ -150,7 +156,8 @@ visitorCtrl.saveGatePassRequest = function(req,res,next){
 
                                         }
                                     },
-                                    null,tokenResult[0].isWhatMate);
+                                    null,tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -187,7 +194,11 @@ visitorCtrl.saveGatePassRequest = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -235,7 +246,11 @@ visitorCtrl.getVisitorList = function(req,res,next){
                     response.data = {
                         visitorList : visitorsResult[0]
                     };
-                    res.status(200).json(response);
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
 
                 }
                 else if(!err){
@@ -412,7 +427,8 @@ visitorCtrl.saveGateAssetPassRequest = function(req,res,next){
 
                                         }
                                     },
-                                    null,tokenResult[0].isWhatMate);
+                                    null,tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -449,7 +465,11 @@ visitorCtrl.saveGateAssetPassRequest = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -535,7 +555,11 @@ visitorCtrl.searchVisitors = function(req,res,next){
                     response.data = {
                         visitorList : output
                     };
-                    res.status(200).json(response);
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
 
                 }
                 else if(!err){
@@ -694,7 +718,8 @@ visitorCtrl.saveGuestHospitalityRequest = function(req,res,next){
 
                                         }
                                     },
-                                    null,tokenResult[0].isWhatMate);
+                                    null,tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -731,7 +756,11 @@ visitorCtrl.saveGuestHospitalityRequest = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -902,7 +931,8 @@ visitorCtrl.saveInternetRequest = function(req,res,next){
 
                                         }
                                     },
-                                    null,tokenResult[0].isWhatMate);
+                                    null,tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -939,11 +969,100 @@ visitorCtrl.saveInternetRequest = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
                         response.message = "Error while saving visitor asset pass request";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+visitorCtrl.getChangeLog = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+    if (!req.query.parentId) {
+        error.parentId = 'Invalid parentId';
+        validationFlag *= false;
+    }
+    if (!req.query.formId) {
+        error.formId = 'Invalid formId';
+        validationFlag *= false;
+    }
+
+    var senderGroupId;
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        console.log(response);
+        res.status(400).json(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.parentId),
+                    req.st.db.escape(req.query.formId)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_get_changeLog( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,changeLogResult){
+                    if(!err && changeLogResult && changeLogResult[0] && changeLogResult[0][0]){
+                        response.status = true;
+                        response.message = "Change log loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            changeLog : changeLogResult[0]
+                        };
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = {
+                            changeLog : []
+                        };
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting change log";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

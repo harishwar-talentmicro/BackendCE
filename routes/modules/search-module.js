@@ -8,11 +8,11 @@
  *
  */
 "use strict";
-
+var zlib = require('zlib');
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
-
-
+var AES_256_encryption = require('../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 
 var st = null;
 
@@ -22,8 +22,6 @@ function Search(db,stdLib){
         st = stdLib;
     }
 };
-
-
 
 /**
  * Method : POST
@@ -1571,6 +1569,7 @@ Search.prototype.navigateSearch = function(req,res,next){
 };
 
 Search.prototype.searchInformationNew = function(req,res,next){
+
     var response = {
         status : false,
         message : "Invalid token",
@@ -1619,6 +1618,9 @@ Search.prototype.searchInformationNew = function(req,res,next){
                                 latitude : result[0][0].latitude,
                                 longitude : result[0][0].longitude,
                                 address : result[0][0].address,
+                                tileStyle : result[0][0].tileStyle,
+                                ezeoneId : result[0][0].ezeoneId,
+                                groupType : result[0][0].groupType,
                                 pictureUrl : (result[0][0].pictureUrl && result[0][0].pictureUrl!="") ?
                                     (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + result[0][0].pictureUrl) : ''
                             },
@@ -1629,14 +1631,25 @@ Search.prototype.searchInformationNew = function(req,res,next){
                                 reviewList : result[3] ? result[3] : []
                             }
                         };
-                        res.status(200).json(response);
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
                     }
                     else{
                         response.status = false;
                         response.message = "Error while getting information";
                         response.error = null;
                         response.data = null;
-                        res.status(500).json(response);
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                 });
             }

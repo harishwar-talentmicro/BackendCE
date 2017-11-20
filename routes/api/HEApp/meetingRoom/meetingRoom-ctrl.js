@@ -5,6 +5,10 @@
 var meetingRoomCtrl = {};
 var error = {};
 
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
 meetingRoomCtrl.getMeetingRooms = function(req,res,next){
     var response = {
         status : false,
@@ -85,7 +89,11 @@ meetingRoomCtrl.getMeetingRooms = function(req,res,next){
                         response.data = {
                             meetingRoomList : output
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if(!err){
                         response.status = true;
@@ -155,7 +163,11 @@ meetingRoomCtrl.getMasterData = function(req,res,next){
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data =  meetingRoomResult[0][0] ;
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if(!err){
                         response.status = true;
@@ -277,7 +289,11 @@ meetingRoomCtrl.bookMeetingRoom = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;

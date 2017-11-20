@@ -15,4 +15,18 @@ router.get('/item',taxSavingsCtrl.getTaxItem);
 router.post('/templateGroupMap',taxSavingsCtrl.saveTaxTemplateGroupMap);
 router.post('/groupItemMap',taxSavingsCtrl.saveTaxGroupItemMap);
 
+router.get('/map/details',taxSavingsCtrl.getTaxMap);
+
+router.post('/template',taxSavingsCtrl.saveTemplate);
+router.get('/template',taxSavingsCtrl.getTemplate);
+
+router.post('/savingMaster',taxSavingsCtrl.saveSavingsMaster);
+router.get('/savingMaster',taxSavingsCtrl.getSavingsMaster);
+
+router.delete('/group',taxSavingsCtrl.deleteTaxGroup);
+router.delete('/item',taxSavingsCtrl.deleteTaxItem);
+router.delete('/templateGroupMap',taxSavingsCtrl.deleteTaxTemplateGroupMap);
+router.delete('/groupItemMap',taxSavingsCtrl.deleteTaxGroupItemMap);
+router.delete('/savingMaster',taxSavingsCtrl.deleteSavingMaster);
+
 module.exports = router;

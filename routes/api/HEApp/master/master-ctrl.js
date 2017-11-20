@@ -4,6 +4,10 @@
 
 var masterCtrl = {};
 
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
 masterCtrl.searchUsers = function(req,res,next){
     var response = {
         status : false,
@@ -35,8 +39,12 @@ masterCtrl.searchUsers = function(req,res,next){
                     response.error = null;
                     response.data = {
                         userList : userResult[0]
-                    }
-                    res.status(200).json(response);
+                    };
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
 
                 }
                 else if(!err){
@@ -112,7 +120,11 @@ masterCtrl.expenseMasterData = function(req,res,next){
                         }
                     }
 
-                    res.status(200).json(response);
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
 
                 }
                 else if(!err){
@@ -166,7 +178,11 @@ masterCtrl.getStationary = function(req,res,next){
                     response.data = {
                         stationaryList : stationaryResult[0]
                     }
-                    res.status(200).json(response);
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
 
                 }
                 else if(!err){
@@ -238,7 +254,11 @@ masterCtrl.currencyData = function(req,res,next){
                         };
                     }
 
-                    res.status(200).json(response);
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
 
                 }
                 else if(!err){
@@ -292,7 +312,11 @@ masterCtrl.getPantryItems = function(req,res,next){
                     response.data = {
                         pantryList : stationaryResult[0]
                     }
-                    res.status(200).json(response);
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
 
                 }
                 else if(!err){
@@ -345,8 +369,12 @@ masterCtrl.getAssetsItems = function(req,res,next){
                     response.error = null;
                     response.data = {
                         assetList : assetResult[0]
-                    }
-                    res.status(200).json(response);
+                    };
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
 
                 }
                 else if(!err){
@@ -400,7 +428,11 @@ masterCtrl.getHRDocItems = function(req,res,next){
                     response.data = {
                         HRDocList : HRDocsResult[0]
                     }
-                    res.status(200).json(response);
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
 
                 }
                 else if(!err){
@@ -453,8 +485,12 @@ masterCtrl.expenseList = function(req,res,next){
                     response.error = null;
                     response.data = {
                         expenseList : expenseList[0]
-                    }
-                    res.status(200).json(response);
+                    };
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
 
                 }
                 else if(!err){
@@ -521,7 +557,11 @@ masterCtrl.getFormTypeList = function(req,res,next){
                         response.data = {
                             formTypeList : formTypeResult[0]
                         }
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
 
                     }
                     else if(!err){
@@ -576,8 +616,12 @@ masterCtrl.getWorkGroup = function(req,res,next){
                     response.error = null;
                     response.data = {
                         workGroupList : workGroupResult[0]
-                    }
-                    res.status(200).json(response);
+                    };
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
 
                 }
                 else if(!err){

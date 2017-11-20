@@ -27,7 +27,7 @@ app.use(multer({
         fileSize : (1024*1024*5)
     }
 }));
-app.use(compress());
+
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
@@ -70,6 +70,7 @@ var api = require('./routes/api.js');
 var index = require('./routes/index.js');
 var redirectMiddleware = require('./routes/middleware/redirect-middleware');
 app.use(redirectMiddleware);
+app.use(compress());
 
 app.use('/api',api);
 

@@ -55,7 +55,7 @@ function StdLib(db){
  * @param ezeoneId
  * @param callBack function (err,token)
  */
-StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,isWhatMate,APNS_Id,GCM_Id,callBack){
+StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,isWhatMate,APNS_Id,GCM_Id,secretKey,callBack){
     var _this = this;
     /////////////////////////////////////////////////////////////////////
 
@@ -84,7 +84,7 @@ StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,isWhatMate,APNS_
 
 
     var tokenGenQueryParams = _this.db.escape(ip) + ',' + _this.db.escape(userAgent)
-        + ',' + _this.db.escape(ezeoneId) + ',' + _this.db.escape(deviceType) + ',' + _this.db.escape(isWhatMate) + ',' + _this.db.escape(APNS_Id) + ',' + _this.db.escape(GCM_Id);
+        + ',' + _this.db.escape(ezeoneId) + ',' + _this.db.escape(deviceType) + ',' + _this.db.escape(isWhatMate) + ',' + _this.db.escape(APNS_Id) + ',' + _this.db.escape(GCM_Id) + ',' + _this.db.escape(secretKey) ;
     var tokenGenQuery = 'CALL pGenerateTokenNew('+tokenGenQueryParams + ')';
 
     console.log(tokenGenQuery);

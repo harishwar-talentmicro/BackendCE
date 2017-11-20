@@ -4,6 +4,10 @@
 
 var TITOCtrl = {};
 
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
 TITOCtrl.saveAttendence = function(req,res,next){
     var response = {
         status : false,
@@ -182,7 +186,11 @@ TITOCtrl.getAttendanceRegister = function(req,res,next){
                         response.data = {
                             attendanceList : attendanceList[0][0] ? JSON.parse("[" + attendanceList[0][0].attendanceData + "]") : []
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if(!err){
                         response.status = true;
@@ -262,7 +270,11 @@ TITOCtrl.getAttendanceRegisterDetails = function(req,res,next){
                             attendanceRequest : attendanceRegister[1] ? attendanceRegister[1] : [],
                             leaveRequest : attendanceRegister[2] ? attendanceRegister[2] : []
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if(!err){
                         response.status = true;
@@ -287,6 +299,5 @@ TITOCtrl.getAttendanceRegisterDetails = function(req,res,next){
     }
 
 };
-
 
 module.exports = TITOCtrl;

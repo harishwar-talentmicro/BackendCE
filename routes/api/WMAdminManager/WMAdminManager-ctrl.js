@@ -36,6 +36,7 @@ wmAdminManagerCtrl.saveWhatMate = function(req, res, next){
             req.body.WMId = req.body.WMId ? req.body.WMId : 0;
             req.body.type = req.body.type ? req.body.type : 1;
             req.body.eventId = req.body.eventId ? req.body.eventId : 0;
+            req.body.tileStyle = req.body.tileStyle ? req.body.tileStyle : 0;
 
             var procParams = [
                 req.st.db.escape(req.body.WMId),
@@ -52,7 +53,8 @@ wmAdminManagerCtrl.saveWhatMate = function(req, res, next){
                 req.st.db.escape(req.body.about),
                 req.st.db.escape(req.body.keywords),
                 req.st.db.escape(req.body.topBannerId),
-                req.st.db.escape(req.body.address)
+                req.st.db.escape(req.body.address),
+                req.st.db.escape(req.body.tileStyle)
             ];
 
             var procQuery = 'CALL wm_save_whatmateList( ' + procParams.join(',') + ')';
@@ -200,7 +202,8 @@ wmAdminManagerCtrl.getWhatMateDetails = function(req, res, next){
                         about : whatMateResult[0][0].aboutCompany,
                         keywords : whatMateResult[0][0].keywords,
                         topBannerId : whatMateResult[0][0].topBannerId,
-                        address : whatMateResult[0][0].address
+                        address : whatMateResult[0][0].address,
+                        tileStyle : whatMateResult[0][0].tileStyle
                     };
                     res.status(200).json(response);
                 }

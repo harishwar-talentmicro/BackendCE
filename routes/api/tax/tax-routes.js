@@ -13,4 +13,6 @@ router.get('/tax/item',taxCtrl.getTaxItems);
 
 router.delete('/tax/item',taxCtrl.deleteTaxItems);
 
+router.post('/tax/plannedAmount',taxCtrl.saveTaxGroupPlannedAmount);
+
 module.exports = router;

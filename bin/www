@@ -7,8 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('ezeid_node:server');
 var http = require('http');
-var logger = require('../logger.js')
-var log = logger.logger;
+// var logger = require('../logger.js')
+// var log = logger.logger;
 
 var https = require('https');
 var fs = require('fs');

@@ -17,5 +17,6 @@ router.get('/visitor/search',visitorCtrl.searchVisitors);
 router.post('/guestHospitality',visitorCtrl.saveGuestHospitalityRequest);
 
 router.post('/visitorInternet',visitorCtrl.saveInternetRequest);
+router.get('/changeLog',visitorCtrl.getChangeLog);
 
 module.exports = router;

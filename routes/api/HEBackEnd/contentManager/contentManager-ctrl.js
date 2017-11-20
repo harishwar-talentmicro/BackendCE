@@ -2,7 +2,6 @@
  * Created by Jana1 on 07-08-2017.
  */
 
-
 var contentManagerCtrl = {};
 var error = {};
 
@@ -71,6 +70,8 @@ contentManagerCtrl.saveContent = function(req,res,next){
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
 
+                req.body.helpCode = req.body.helpCode ? req.body.helpCode : "";
+
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.APIKey),
@@ -85,7 +86,8 @@ contentManagerCtrl.saveContent = function(req,res,next){
                     req.st.db.escape(JSON.stringify(usertype)),
                     req.st.db.escape(JSON.stringify(grade)),
                     req.st.db.escape(JSON.stringify(department)),
-                    req.st.db.escape(JSON.stringify(location))
+                    req.st.db.escape(JSON.stringify(location)),
+                    req.st.db.escape(req.body.helpCode)
                 ];
 
                 var procQuery = 'CALL he_save_documents( ' + procParams.join(',') + ')';
@@ -108,7 +110,8 @@ contentManagerCtrl.saveContent = function(req,res,next){
                             usertype : req.body.usertype,
                             grade : req.body.grade,
                             department : req.body.department,
-                            location : req.body.location
+                            location : req.body.location,
+                            helpCode : req.body.helpCode
                         };
                         res.status(200).json(response);
                     }
@@ -271,6 +274,7 @@ contentManagerCtrl.getDocumentDetails = function(req,res,next){
                             res1.department = (documentResult[0][i].department) ? JSON.parse(documentResult[0][i].department) : null;
                             res1.grade = (documentResult[0][i].grade) ? JSON.parse(documentResult[0][i].grade) : null;
                             res1.location = (documentResult[0][i].location) ? JSON.parse(documentResult[0][i].location) : null;
+                            res1.helpCode = documentResult[0][i].helpCode;
                             output.push(res1);
                         }
                         response.data = output;

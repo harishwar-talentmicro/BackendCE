@@ -13,6 +13,10 @@ var fs = require('fs');
 var salesCtrl = {};
 var error = {};
 
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
 salesCtrl.getMasterData = function(req,res,next){
     var response = {
         status : false,
@@ -73,12 +77,16 @@ salesCtrl.getMasterData = function(req,res,next){
                             memberList : masterData[3] ? masterData[3] : [],
                             salesType : masterData[4] ? masterData[4][0].salesDisplayFormat : 0,
                             currency : {
-                                currencySymbol : masterData[5] ? masterData[5][0].currencySymbol : '',
-                                currencyId : masterData[5] ? masterData[5][0].currencyId : 0
+                                currencySymbol : (masterData[5] && masterData[5][0] && masterData[5][0].currencySymbol) ? masterData[5][0].currencySymbol : '',
+                                currencyId : (masterData[5] && masterData[5][0] && masterData[5][0].currencyId) ? masterData[5][0].currencyId : 0
                             }
                         } ;
                         response.error = null;
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if (!err){
                         response.status = true;
@@ -90,7 +98,11 @@ salesCtrl.getMasterData = function(req,res,next){
                             memberList : []
                         };
                         response.error = null;
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -291,7 +303,8 @@ salesCtrl.saveSalesRequest = function(req,res,next){
                                         }
                                     },
                                     null,
-                                    tokenResult[0].isWhatMate);
+                                    tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -334,7 +347,8 @@ salesCtrl.saveSalesRequest = function(req,res,next){
                                         status: results[2][0].status
                                     },
                                     null,
-                                    tokenResult[0].isWhatMate);
+                                    tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -371,7 +385,12 @@ salesCtrl.saveSalesRequest = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
                     }
                     else{
                         response.status = false;
@@ -508,7 +527,8 @@ salesCtrl.assignToUser = function(req,res,next){
                                         }
                                     },
                                     null,
-                                    tokenResult[0].isWhatMate);
+                                    tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -600,7 +620,11 @@ salesCtrl.findHECustomer = function(req,res,next){
                         response.data = {
                             client : userResult[0]
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
 
                     }
                     else if(!err){
@@ -689,7 +713,11 @@ salesCtrl.saveSalesFeedback = function(req,res,next){
                         response.message = "Feedback saved successfully";
                         response.error = null;
                         response.data = results[0] ;
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -774,7 +802,12 @@ salesCtrl.getSalesItems = function(req,res,next){
                             salesItems : output
                         } ;
                         response.error = null;
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
                     }
                     else if (!err){
                         response.status = true;
@@ -783,7 +816,12 @@ salesCtrl.getSalesItems = function(req,res,next){
                             salesItems : []
                         };
                         response.error = null;
-                        res.status(200).json(response);
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -801,6 +839,5 @@ salesCtrl.getSalesItems = function(req,res,next){
     }
 
 };
-
 
 module.exports = salesCtrl;

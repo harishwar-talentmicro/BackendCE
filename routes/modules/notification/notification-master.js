@@ -10,6 +10,11 @@ var _Notification_aws = new  Notification_aws();
 
 var st = null;
 
+
+var zlib = require('zlib');
+var AES_256_encryption = require('../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
 function Notification(db,stdLib){
 
     if(stdLib){
@@ -35,7 +40,7 @@ function Notification(db,stdLib){
  * @param longitude (longitude of location)
 _ */
 Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId,GCM_Id,
-                                          messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos,isWhatMate){
+                                          messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos,isWhatMate,secretKey){
 
     console.log('It is coming to publish block of Notification');
     var validationStatus = true;
@@ -102,70 +107,74 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
 
 
     if(validationStatus){
-
         var msgBytes = 1024;
-        var messagePayload = {
-            gid : groupId,
-            message : _notificationMqtt.limitMessage(message,msgBytes),
-            s_title : senderTitle,
-            g_title : groupTitle,
-            type : messageType,
-            ts : moment().format("YYYY-MM-DD HH:mm:ss"),
-            op: operationType,
-            mid : messageId,
-            masterid : masterId,
-            lat : latitude,
-            long : longitude,
-            priority : priority,
-            date_time : dateTime,
-            a_filename : a_name,
-            msgUserid : msgUserid,
-            job_id : jobId,
-            a_url : aUrl,
-            tx_id : txId,
-            data : data
-        };
+        var messagePayload = {} ;
+        if (messageType == 31){
+            var buf = new Buffer(JSON.stringify(data), 'utf-8');
+            zlib.gzip(buf, function (_, result) {
+                messagePayload = {
+                    gid : groupId,
+                    message : _notificationMqtt.limitMessage(message,msgBytes),
+                    s_title : senderTitle,
+                    g_title : groupTitle,
+                    type : messageType,
+                    ts : moment().format("YYYY-MM-DD HH:mm:ss"),
+                    op: operationType,
+                    mid : messageId,
+                    masterid : masterId,
+                    lat : latitude,
+                    long : longitude,
+                    priority : priority,
+                    date_time : dateTime,
+                    a_filename : a_name,
+                    msgUserid : msgUserid,
+                    job_id : jobId,
+                    a_url : aUrl,
+                    tx_id : txId,
+                    data : encryption.encrypt(result,secretKey).toString('base64')
+                };
 
-        //  _Notification_aws.publish_Android("frFpJt3qxzc:APA91bFS8J2Vwz6VvVWXuC91gOWsrzOx-JxEQgzJffBFK1dOp9lWxJtAUOj7RfmRjOHBxJRgoAbGVRUVXjx1h28iIaPTPRQH1QBJlxAIzEOFLNHRFdFo8rYZWdTpFX--RNA6I4d-0CIz",messagePayload);
+                if(iphoneId){
+                    _Notification_aws.publish_IOS(iphoneId,messagePayload,issos);
+                }
 
-        if(iphoneId){
-            // _notificationMqtt.publish(receiverId,messagePayload);
-            _Notification_aws.publish_IOS(iphoneId,messagePayload,issos);
+                if (GCM_Id){
+                    _Notification_aws.publish_Android(GCM_Id,messagePayload);
+                }
+            });
+        }
+        else {
+            messagePayload = {
+                gid : groupId,
+                message : _notificationMqtt.limitMessage(message,msgBytes),
+                s_title : senderTitle,
+                g_title : groupTitle,
+                type : messageType,
+                ts : moment().format("YYYY-MM-DD HH:mm:ss"),
+                op: operationType,
+                mid : messageId,
+                masterid : masterId,
+                lat : latitude,
+                long : longitude,
+                priority : priority,
+                date_time : dateTime,
+                a_filename : a_name,
+                msgUserid : msgUserid,
+                job_id : jobId,
+                a_url : aUrl,
+                tx_id : txId,
+                data : data
+            };
+
+            if(iphoneId){
+                _Notification_aws.publish_IOS(iphoneId,messagePayload,issos);
+            }
+
+            if (GCM_Id){
+                _Notification_aws.publish_Android(GCM_Id,messagePayload);
+            }
         }
 
-        if (GCM_Id){
-            console.log("Entered...");
-            _Notification_aws.publish_Android(GCM_Id,messagePayload);
-        }
-
-        /**
-         * If IPhone ID is there for this user then send notification to his iphone id also
-         */
-        // if(iphoneId){
-        //     try{
-        //         var procQuery = 'SELECT ifnull(isWhatMate,0) as "isWhatMate" FROM tloginout WHERE masterid= (SELECT tmgroups.AdminID FROM tmgroups WHERE tmgroups.tid=' + receiverId + ') order by tloginout.tid desc limit 0,1';
-        //         console.log(procQuery);
-        //         st.db.query(procQuery,function(err,result) {
-        //
-        //             if(!err && result &&  result[0] ){
-        //                 isWhatMate = result[0].isWhatMate;
-        //                 _apnsNotification.sendAppleNS(iphoneId,messagePayload,issos,isWhatMate);
-        //             }
-        //             else if(err){
-        //                 console.log("errerrerrerrerrerr",err);
-        //             }
-        //             else{
-        //                 isWhatMate =0 ;
-        //                 _apnsNotification.sendAppleNS(iphoneId,messagePayload,issos,isWhatMate);
-        //             }
-        //
-        //         });
-        //
-        //     }
-        //     catch(ex){
-        //         console.log('APNS Notification error',ex);
-        //     }
-        // }
 
     }
 

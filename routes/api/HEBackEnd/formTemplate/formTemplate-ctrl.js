@@ -60,6 +60,8 @@ formTemplateCtrl.saveFormTemplate = function(req,res,next){
                 req.body.approvalType = (req.body.approvalType) ? req.body.approvalType : 0;
                 req.body.layoutJSON = (req.body.layoutJSON) ? req.body.layoutJSON : null ;
                 req.body.receiverAllocation = (req.body.receiverAllocation) ? req.body.receiverAllocation : 0 ;
+                req.body.helpTitle = (req.body.helpTitle) ? req.body.helpTitle : "" ;
+                req.body.keywords = (req.body.keywords) ? req.body.keywords : "" ;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -77,7 +79,9 @@ formTemplateCtrl.saveFormTemplate = function(req,res,next){
                     req.st.db.escape(req.body.approversCount),
                     req.st.db.escape(req.body.approvalType),
                     req.st.db.escape(req.body.receiverAllocation),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.body.helpTitle),
+                    req.st.db.escape(req.body.keywords)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -92,7 +96,7 @@ formTemplateCtrl.saveFormTemplate = function(req,res,next){
                         response.status = true;
                         response.message = "Form Template saved successfully";
                         response.error = null;
-                        response.formTemplateId = formTemplateResult[0][0].formTemplateId
+                        response.formTemplateId = formTemplateResult[0][0].formTemplateId;
                         res.status(200).json(response);
 
                     }
@@ -167,6 +171,8 @@ formTemplateCtrl.updateFormTemplate = function(req,res,next){
                 req.body.approvalType = (req.body.approvalType) ? req.body.approvalType : 0;
                 req.body.layoutJSON = (req.body.layoutJSON) ? req.body.layoutJSON : null;
                 req.body.receiverAllocation = (req.body.receiverAllocation) ? req.body.receiverAllocation : 0 ;
+                req.body.helpTitle = (req.body.helpTitle) ? req.body.helpTitle : "" ;
+                req.body.keywords = (req.body.keywords) ? req.body.keywords : "" ;
 
 
                 var procParams = [
@@ -185,7 +191,10 @@ formTemplateCtrl.updateFormTemplate = function(req,res,next){
                     req.st.db.escape(req.body.approversCount),
                     req.st.db.escape(req.body.approvalType),
                     req.st.db.escape(req.body.receiverAllocation),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.body.helpTitle),
+                    req.st.db.escape(req.body.keywords)
+
                 ];
                 /**
                  * Calling procedure to save form template
@@ -198,7 +207,7 @@ formTemplateCtrl.updateFormTemplate = function(req,res,next){
                         response.status = true;
                         response.message = "Form Template saved successfully";
                         response.error = null;
-                        response.formTemplateId = formTemplateResult[0][0].formTemplateId
+                        response.formTemplateId = formTemplateResult[0][0].formTemplateId;
                         res.status(200).json(response);
 
                     }

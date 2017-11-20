@@ -15,6 +15,9 @@ var fs = require('fs');
 var queryCtrl = {};
 var error = {};
 
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 
 queryCtrl.saveHRQuery = function(req,res,next){
     var response = {
@@ -142,7 +145,8 @@ queryCtrl.saveHRQuery = function(req,res,next){
 
                                         }
                                     },
-                                    null,tokenResult[0].isWhatMate);
+                                    null,tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -179,7 +183,11 @@ queryCtrl.saveHRQuery = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -325,7 +333,8 @@ queryCtrl.saveAccountsQuery = function(req,res,next){
 
                                         }
                                     },
-                                    null,tokenResult[0].isWhatMate);
+                                    null,tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -362,7 +371,11 @@ queryCtrl.saveAccountsQuery = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -509,7 +522,8 @@ queryCtrl.saveAdminQuery = function(req,res,next){
 
                                         }
                                     },
-                                    null,tokenResult[0].isWhatMate);
+                                    null,tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -546,7 +560,11 @@ queryCtrl.saveAdminQuery = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -693,7 +711,8 @@ queryCtrl.saveFrontOfficeQuery = function(req,res,next){
 
                                         }
                                     },
-                                    null,tokenResult[0].isWhatMate);
+                                    null,tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -730,7 +749,11 @@ queryCtrl.saveFrontOfficeQuery = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;

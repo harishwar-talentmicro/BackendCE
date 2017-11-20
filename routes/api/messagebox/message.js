@@ -18,6 +18,9 @@ var notificationTemplater = new NotificationTemplater();
 var Notification = require('../../modules/notification/notification-master.js');
 var notification = new Notification();
 var fs = require('fs');
+var zlib = require('zlib');
+var AES_256_encryption = require('../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 
 /**
  * Method : POST
@@ -229,13 +232,14 @@ router.post('/', function(req,res,next){
                                 /**
                                  * call p_v1_ComposeMessage to compose message to anyone(group or individual)
                                  * */
+                                req.body.expiryDate = req.body.expiryDate != undefined ? req.body.expiryDate : "2099-11-11 23:59";
                                 var procParams = [
                                     req.db.escape(req.body.token) ,
                                     req.db.escape(message) ,
                                     req.db.escape(req.body.messageType) ,
                                     req.db.escape(req.body.priority) ,
                                     req.db.escape(req.body.taskTargetDate) ,
-                                    req.db.escape(req.body.taskExpiryDate) ,
+                                    req.db.escape(req.body.expiryDate) ,
                                     req.db.escape(req.body.receiverGroupId) ,
                                     req.db.escape(explicitMemberGroupIdList) ,
                                     req.db.escape(autoJoinResults[0][0].groupRelationStatus) ,
@@ -246,7 +250,7 @@ router.post('/', function(req,res,next){
                                      req.db.escape(tokenResult[0].pin) ,
                                      req.db.escape(req.body.receiverGroupId)
                                      ];
-                                 console.log(req.body.messageType,"req.body.messageType");
+
                                 var procQuery = 'CALL p_v1_ComposeMessage(' + procParams.join(', ') + ');CALL get_v1_contact(' + contactParams.join(', ') + ');';
                                console.log(procQuery);
                                 req.db.query(procQuery, function (err, results) {
@@ -465,7 +469,8 @@ router.post('/', function(req,res,next){
                                                                         groupType : results[0][0].groupType
                                                                     }
                                                                 },
-                                                                null,tokenResult[0].isWhatMate);
+                                                                null,tokenResult[0].isWhatMate,
+                                                                results[1][i].secretKey);
                                                             console.log('postNotification : notification for compose_message is sent successfully');
                                                         }
                                                         else{
@@ -835,6 +840,7 @@ router.get('/', function(req,res,next){
                                             senderName: results[0][i].senderName,
                                             senderId: results[0][i].senderId,
                                             receiverId: results[0][i].receiverId,
+                                            expiryDate: results[0][i].expiryDate,
                                             transId : results[0][i].transId ? results[0][i].transId : 0,
                                             formId : results[0][i].formId ? results[0][i].formId : 0,
                                             currentStatus : results[0][i].currentStatus ? results[0][i].currentStatus : 0,
@@ -849,15 +855,20 @@ router.get('/', function(req,res,next){
                                     // console.log("results[5][0].GCM_Id",results[5][0].GCM_Id);
                                     responseMessage.data = {
                                         messageList : output,
-                                        deleteMessageIdList : (results[2]) ? results[2] : [],
-                                        feedback : (results[3]) ? results[3] : [],
-                                        APNSId : (results[4] && results[4][0]) ? JSON.parse(results[4][0].APNS_Id) : [],
-                                        GCMId : (results[5] && results[5][0]) ? JSON.parse(results[5][0].GCM_Id) : []
+                                        deleteMessageIdList : [],
+                                        feedback : (results[2]) ? results[2] : [],
+                                        APNSId : (results[3] && results[3][0]) ? JSON.parse(results[3][0].APNS_Id) : [],
+                                        GCMId : (results[4] && results[4][0]) ? JSON.parse(results[4][0].GCM_Id) : []
                                         // supportFeedback : (results[4]) ? results[4] : []
                                     };
 
                                     // console.log('deleteMessageIdList',results[2]);
-                                    res.status(200).json(responseMessage);
+                                    var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        responseMessage.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(responseMessage);
+                                    });
+
                                 }
                                 else {
                                     responseMessage.status = true;
@@ -868,10 +879,14 @@ router.get('/', function(req,res,next){
                                     responseMessage.data = {
                                         messageList : [],
                                         deleteMessageIdList : [],
-                                        APNSId : (results[4] && results[4][0]) ? JSON.parse(results[4][0].APNS_Id) : [],
-                                        GCMId : (results[5] && results[5][0]) ? JSON.parse(results[5][0].GCM_Id) : []
+                                        APNSId : (results[3] && results[3][0]) ? JSON.parse(results[3][0].APNS_Id) : [],
+                                        GCMId : (results[4] && results[4][0]) ? JSON.parse(results[4][0].GCM_Id) : []
                                     };
-                                    res.status(200).json(responseMessage);
+                                    var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        responseMessage.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(responseMessage);
+                                    });
                                 }
                             }
                             else {
@@ -1166,7 +1181,9 @@ router.post('/delete/all', function(req,res,next){
                         response.status = true;
                         response.message = "Messages deleted successfully";
                         response.error = null;
-                        response.data = null ;
+                        response.data = {
+                            groupId : messageData[0][0].groupId
+                        } ;
                         res.status(200).json(response);
                     }
                     else {

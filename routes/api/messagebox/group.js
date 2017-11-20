@@ -1105,7 +1105,6 @@ router.get('/details', function(req,res,next){
     }
 });
 
-
 /**
  * Method : POST
  * @param req
@@ -1282,7 +1281,6 @@ router.post('/change_admin', function(req,res,next){
     }
 
 });
-
 
 /**
  * Method : DELETE
@@ -1601,7 +1599,6 @@ router.put('/leave', function(req,res,next){
         }
     }
 });
-
 
 /**
  * Method : GET

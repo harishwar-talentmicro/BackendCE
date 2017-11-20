@@ -14,6 +14,9 @@ var fs = require('fs');
 var helpdeskCtrl = {};
 var error = {};
 
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 
 helpdeskCtrl.saveHelpdesk = function(req,res,next){
     var response = {
@@ -141,7 +144,8 @@ helpdeskCtrl.saveHelpdesk = function(req,res,next){
 
                                         }
                                     },
-                                    null,tokenResult[0].isWhatMate);
+                                    null,tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -178,7 +182,11 @@ helpdeskCtrl.saveHelpdesk = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -197,6 +205,5 @@ helpdeskCtrl.saveHelpdesk = function(req,res,next){
 
 
 };
-
 
 module.exports = helpdeskCtrl;

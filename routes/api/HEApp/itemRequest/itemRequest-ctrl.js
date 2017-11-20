@@ -14,6 +14,10 @@ var fs = require('fs');
 var itemRequestCtrl = {};
 var error = {};
 
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
 itemRequestCtrl.saveStationaryRequest = function(req,res,next){
     var response = {
         status : false,
@@ -139,7 +143,8 @@ itemRequestCtrl.saveStationaryRequest = function(req,res,next){
                                         }
                                     },
                                     null,
-                                    tokenResult[0].isWhatMate);
+                                    tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -176,7 +181,11 @@ itemRequestCtrl.saveStationaryRequest = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -320,7 +329,8 @@ itemRequestCtrl.savePantryRequest = function(req,res,next){
                                         }
                                     },
                                     null,
-                                    tokenResult[0].isWhatMate);
+                                    tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -357,7 +367,11 @@ itemRequestCtrl.savePantryRequest = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -506,7 +520,8 @@ itemRequestCtrl.saveAssetRequest = function(req,res,next){
 
                                         }
                                     },
-                                    null,tokenResult[0].isWhatMate);
+                                    null,tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -543,7 +558,11 @@ itemRequestCtrl.saveAssetRequest = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -693,7 +712,8 @@ itemRequestCtrl.saveDocRequestToHR = function(req,res,next){
 
                                         }
                                     },
-                                    null,tokenResult[0].isWhatMate);
+                                    null,tokenResult[0].isWhatMate,
+                                    results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {
@@ -730,7 +750,11 @@ itemRequestCtrl.saveDocRequestToHR = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;

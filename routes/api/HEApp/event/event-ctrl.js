@@ -1,13 +1,15 @@
 /**
  * Created by Jana1 on 01-10-2017.
  */
-
 var eventCtrl = {};
 var error = {};
-
 var Notification_aws = require('../../../modules/notification/aws-sns-push.js');
 
 var _Notification_aws = new  Notification_aws();
+
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 
 eventCtrl.getWhatMateBanners = function(req,res,next){
     var response = {
@@ -46,6 +48,7 @@ eventCtrl.getWhatMateBanners = function(req,res,next){
                         res1.wmId = homePageData[0][i].wmId;
                         res1.landingPage = homePageData[0][i].landingPage;
                         res1.type = homePageData[0][i].type;
+                        res1.groupId = homePageData[0][i].groupId;
                         res1.banner = homePageData[0][i].banner ? (req.CONFIG.CONSTANT.GS_URL +
                             req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + homePageData[0][i].banner) : "";
                         output.push(res1);
@@ -60,6 +63,7 @@ eventCtrl.getWhatMateBanners = function(req,res,next){
                             res2.landingPage = homePageData[1][j].landingPage;
                             res2.tileStyle = homePageData[1][j].tileStyle;
                             res2.type = homePageData[1][j].type;
+                            res2.groupId = homePageData[1][j].groupId;
                             res2.banner = homePageData[1][j].banner ? (req.CONFIG.CONSTANT.GS_URL +
                                 req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + homePageData[1][j].banner) : "";
                             WMoutput.push(res2);
@@ -74,6 +78,7 @@ eventCtrl.getWhatMateBanners = function(req,res,next){
                             res3.landingPage = homePageData[2][k].landingPage;
                             res3.tileStyle = homePageData[2][k].tileStyle;
                             res3.type = homePageData[2][k].type;
+                            res3.groupId = homePageData[2][k].groupId;
                             res3.banner = homePageData[2][k].banner ? (req.CONFIG.CONSTANT.GS_URL +
                                 req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + homePageData[2][k].banner) : "";
                             WMoutput.push(res3);
@@ -87,6 +92,7 @@ eventCtrl.getWhatMateBanners = function(req,res,next){
                             res4.landingPage = homePageData[3][l].landingPage;
                             res4.tileStyle = homePageData[3][l].tileStyle;
                             res4.type = homePageData[3][l].type;
+                            res4.groupId = homePageData[3][l].groupId;
                             res4.banner = homePageData[3][l].banner ? (req.CONFIG.CONSTANT.GS_URL +
                                 req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + homePageData[3][l].banner) : "";
                             WMoutput.push(res4);
@@ -141,6 +147,8 @@ eventCtrl.getWMHomeData = function(req,res,next){
      * Calling procedure to get form template
      * @type {string}
      */
+    req.st.validateToken(req.query.token,function(err,tokenResult){
+        if((!err) && tokenResult){
     var procQuery = 'CALL wm_get_homeEventData( ' + procParams.join(',') + ')';
     console.log(procQuery);
     req.db.query(procQuery,function(err,homePageData){
@@ -195,8 +203,12 @@ eventCtrl.getWMHomeData = function(req,res,next){
                 eventData : output[0],
                 sponserList : WMoutput
             };
-            res.status(200).json(response);
 
+            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+            zlib.gzip(buf, function (_, result) {
+                response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                res.status(200).json(response);
+            });
         }
         else if(!err){
             response.status = true;
@@ -211,6 +223,11 @@ eventCtrl.getWMHomeData = function(req,res,next){
             response.error = null;
             response.data = null;
             res.status(500).json(response);
+        }
+    });
+        }
+        else{
+            res.status(401).json(response);
         }
     });
 
@@ -238,52 +255,62 @@ eventCtrl.getWMEventAgenda = function(req,res,next){
      * Calling procedure to get form template
      * @type {string}
      */
+    req.st.validateToken(req.query.token,function(err,tokenResult) {
+        if ((!err) && tokenResult) {
+            var procQuery = 'CALL wm_get_eventAgenda( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery, function (err, agendaData) {
+                if (!err && agendaData && agendaData[0] && agendaData[0][0]) {
+                    var output = [];
+                    for (var i = 0; i < agendaData[0].length; i++) {
+                        var res1 = {};
+                        res1.description = agendaData[0][i].description;
+                        res1.duration = agendaData[0][i].duration;
+                        res1.sessionDate = agendaData[0][i].sessionDate;
+                        res1.title = agendaData[0][i].title;
+                        res1.venue = agendaData[0][i].venue;
+                        res1.sessionId = agendaData[0][i].sessionId;
+                        res1.feedback = (agendaData[0][i].feedback) ? JSON.parse(agendaData[0][i].feedback) : null;
+                        output.push(res1);
+                    }
+                    response.status = true;
+                    response.message = "Agenda data loaded successfully";
+                    response.error = null;
+                    response.data = {
+                        agendaData: output,
+                        eventDetails: {
+                            startDateTime: agendaData[1][0].startDateTime,
+                            endDateTime: agendaData[1][0].endDateTime,
+                            eventId: agendaData[1][0].eventId,
+                            status: agendaData[1][0].status,
+                            dateDiff: agendaData[1][0].dateDiff
+                        }
+                    };
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
 
-    var procQuery = 'CALL wm_get_eventAgenda( ' + procParams.join(',') + ')';
-    console.log(procQuery);
-    req.db.query(procQuery,function(err,agendaData){
-        if(!err && agendaData && agendaData[0] && agendaData[0][0] ){
-            var output = [];
-            for(var i = 0; i < agendaData[0].length; i++) {
-                var res1 = {};
-                res1.description = agendaData[0][i].description;
-                res1.duration = agendaData[0][i].duration;
-                res1.sessionDate = agendaData[0][i].sessionDate;
-                res1.title = agendaData[0][i].title;
-                res1.venue = agendaData[0][i].venue;
-                res1.sessionId = agendaData[0][i].sessionId;
-                res1.feedback = (agendaData[0][i].feedback) ? JSON.parse(agendaData[0][i].feedback) : null ;
-                output.push(res1);
-            }
-            response.status = true;
-            response.message = "Agenda data loaded successfully";
-            response.error = null;
-            response.data = {
-                agendaData : output,
-                eventDetails : {
-                    startDateTime : agendaData[1][0].startDateTime,
-                    endDateTime : agendaData[1][0].endDateTime,
-                    eventId : agendaData[1][0].eventId,
-                    status : agendaData[1][0].status,
-                    dateDiff : agendaData[1][0].dateDiff
                 }
-            };
-            res.status(200).json(response);
-
+                else if (!err) {
+                    response.status = true;
+                    response.message = "Agenda data loaded successfully";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                }
+                else {
+                    response.status = false;
+                    response.message = "Error while getting agenda data ";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
         }
-        else if(!err){
-            response.status = true;
-            response.message = "Agenda data loaded successfully";
-            response.error = null;
-            response.data = null;
-            res.status(200).json(response);
-        }
-        else{
-            response.status = false;
-            response.message = "Error while getting agenda data ";
-            response.error = null;
-            response.data = null;
-            res.status(500).json(response);
+        else {
+            res.status(401).json(response);
         }
     });
 
@@ -305,6 +332,8 @@ eventCtrl.getWMEventSpeakers = function(req,res,next){
      * Calling procedure to get form template
      * @type {string}
      */
+    req.st.validateToken(req.query.token,function(err,tokenResult){
+        if((!err) && tokenResult){
     var procQuery = 'CALL wm_get_eventSpeakers( ' + procParams.join(',') + ')';
     console.log(procQuery);
     req.db.query(procQuery,function(err,speakersData){
@@ -326,7 +355,11 @@ eventCtrl.getWMEventSpeakers = function(req,res,next){
             response.data = {
                 speakerList : output
             };
-            res.status(200).json(response);
+            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+            zlib.gzip(buf, function (_, result) {
+                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                res.status(200).json(response);
+            });
 
         }
         else if(!err){
@@ -344,6 +377,11 @@ eventCtrl.getWMEventSpeakers = function(req,res,next){
             res.status(500).json(response);
         }
     });
+        }
+        else{
+            res.status(401).json(response);
+        }
+    });
 
 };
 
@@ -355,7 +393,8 @@ eventCtrl.getWMEventModerator = function(req,res,next){
         error : null
     };
     req.query.WMId = req.query.WMId ? req.query.WMId : 0;
-
+    req.st.validateToken(req.query.token,function(err,tokenResult){
+        if((!err) && tokenResult){
     var procParams = [
         req.st.db.escape(req.query.WMId)
     ];
@@ -383,7 +422,12 @@ eventCtrl.getWMEventModerator = function(req,res,next){
             response.data = {
                 speakerList : output
             };
-            res.status(200).json(response);
+
+            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+            zlib.gzip(buf, function (_, result) {
+                response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                res.status(200).json(response);
+            });
 
         }
         else if(!err){
@@ -399,6 +443,11 @@ eventCtrl.getWMEventModerator = function(req,res,next){
             response.error = null;
             response.data = null;
             res.status(500).json(response);
+        }
+    });
+        }
+        else{
+            res.status(401).json(response);
         }
     });
 
@@ -472,7 +521,11 @@ eventCtrl.getWMEventQuestions = function(req,res,next){
                             askedQuestionCount : (questionsData && questionsData[1] && questionsData[1][0]) ? questionsData[1][0].askedQuestionCount : 0,
                             questions: output
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
 
                     }
                     else if (!err) {
@@ -489,7 +542,11 @@ eventCtrl.getWMEventQuestions = function(req,res,next){
                             askedQuestionCount : (questionsData && questionsData[1] && questionsData[1][0]) ? questionsData[1][0].askedQuestionCount : 0,
                             questions: []
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else {
                         response.status = false;
@@ -847,7 +904,11 @@ eventCtrl.getWMEventUsers = function(req,res,next){
                                 eventId : userData[1][0].eventId,
                                 userList : output
                             };
-                            res.status(200).json(response);
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
 
                         }
                         else if (!err) {
@@ -1102,7 +1163,11 @@ eventCtrl.getEventMessage = function(req,res,next){
                         response.data = {
                             messageList : (messageData && messageData[0] && messageData[0][0] ) ? messageData[0] : []
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else {
                         response.status = false;
@@ -1258,7 +1323,12 @@ eventCtrl.getEventMessageLog = function(req,res,next){
                         response.data = {
                             messageLogList : (messageData && messageData[0] && messageData[0][0] ) ? messageData[0] : []
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
                     }
                     else {
                         response.status = false;
@@ -1516,7 +1586,11 @@ eventCtrl.getJoinSearch = function(req,res,next){
                             joinedList: WMoutput,
                             WMList: output
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
 
                     }
                     else if (!err) {
@@ -1527,7 +1601,11 @@ eventCtrl.getJoinSearch = function(req,res,next){
                             joinedList : [],
                             WMList : []
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else {
                         response.status = false;
@@ -1593,7 +1671,11 @@ eventCtrl.getStatusOfWMList = function(req,res,next){
                         response.data = {
                             details : homePageData[0][0]
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
 
                     }
                     else if (!err) {
@@ -1930,7 +2012,11 @@ eventCtrl.getWMEventSpeakerDetails = function(req,res,next){
                     picture : speakersData[0][0].picture ? (req.CONFIG.CONSTANT.GS_URL +
                     req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + speakersData[0][0].picture) : ""
                 } ;
-                res.status(200).json(response);
+                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                zlib.gzip(buf, function (_, result) {
+                    response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                    res.status(200).json(response);
+                });
 
             }
             else if (!err) {
@@ -2013,7 +2099,11 @@ eventCtrl.getWMEventAgendaDetails = function(req,res,next){
                             feedback: agendaData[3][0],
                             speakerList : output
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
 
                     }
                     else if (!err) {
@@ -2188,7 +2278,11 @@ eventCtrl.getFeedbackMessage = function(req,res,next){
                             message: feedbackData[0][0].message,
                             userCount: feedbackData[0][0].userCount
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
 
                     }
                     else if (!err) {

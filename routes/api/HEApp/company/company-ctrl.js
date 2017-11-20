@@ -5,6 +5,11 @@
 var companyCtrl = {};
 var error = {};
 
+
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
 companyCtrl.searchComapny = function(req,res,next){
     var response = {
         status : false,
@@ -71,15 +76,26 @@ companyCtrl.searchComapny = function(req,res,next){
                         response.data = {
                             company : output
                         };
-                        res.status(200).json(response);
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
 
                     }
                     else if(!err){
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null;
-                        res.status(200).json(response);
+                        response.data = {
+                            company : []
+                        };
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;
@@ -245,6 +261,8 @@ companyCtrl.getComapnyMasters = function(req,res,next){
                  */
                 var procQuery = 'CALL wm_get_companyMasters( ' + procParams.join(',') + ')';
                 console.log(procQuery);
+                var buf = new Buffer();
+
                 req.db.query(procQuery,function(err,companyMasters){
                     if(!err && companyMasters ){
                         response.status = true;
@@ -253,17 +271,31 @@ companyCtrl.getComapnyMasters = function(req,res,next){
                         response.data = {
                             departments : (companyMasters[0]) ? companyMasters[0] : [],
                             grades : (companyMasters[1]) ? companyMasters[1] : [],
-                            locations : (companyMasters[2]) ? companyMasters[2] : [],
+                            locations : (companyMasters[2]) ? companyMasters[2] : []
                         };
-                        res.status(200).json(response);
 
+                        buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if(!err){
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null;
-                        res.status(200).json(response);
+                        response.data = {
+                            departments : [],
+                            grades : [],
+                            locations : []
+                        };
+
+                        buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
                     }
                     else{
                         response.status = false;
