@@ -18,6 +18,11 @@ var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 
+var travelClaimReport = require('../travelClaim/travelClaimReport.js');
+var htmlpdf = require('html-pdf');
+var Mailer = require('../../../../mail/mailer.js');
+var mailerApi = new Mailer();
+
 travelClaimCtrl.saveTravelClaim = function(req,res,next){
     var response = {
         status : false,
@@ -175,6 +180,41 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                         }
+
+                        // pdf generation starts
+                        if(results[2] && results[2][0] && results[3] && results[4] ){
+                            var reportData = {
+                                expense : results[2] ,
+                                name : results[3][0].name,
+                                employeeCode : results[3][0].employeeCode,
+                                starts : results[5][0].starts,
+                                ends : results[5][0].ends,
+                                justification : results[5][0].justification
+                            };
+
+                            req.data = JSON.parse(JSON.stringify(reportData));
+                            (0,travelClaimReport.expenseReport)(req, res);
+                            var options = { format: 'A4', width: '8in', height: '10.5in', border: '0', timeout: 30000, "zoomFactor": "1" };
+
+                            htmlpdf.create(res.data,options).toBuffer(function (err, buffer) {
+                                console.log('This is a buffer:', Buffer.isBuffer(buffer));
+                                var attachmentObjectsList = [{
+                                    filename: results[3][0].name + '.pdf',
+                                    content: buffer
+                                }];
+
+                                for (var z = 0; z < results[4].length; z++ ) {
+                                    mailerApi.sendMailNew('travelClaim', {
+                                        name : results[4][z].name,
+                                        senderName : results[3][0].name
+                                    }, '', results[4][z].emailId, attachmentObjectsList);
+                                }
+
+                            });
+
+
+                        }
+                        // pdf generation ends
 
                         response.status = true;
                         response.message = "Travel claim saved successfully";

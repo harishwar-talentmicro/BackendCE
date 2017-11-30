@@ -61,8 +61,8 @@
   "VERSION_LIST" : {
     "IOS" : [[],[23,24]],
     "ANDROID" : [46],
-    "WhatMateIOS" : [[],[12,13]],
-    "WhatMateANDROID" : [19],
+    "WhatMateIOS" : [[],[13,14]],
+    "WhatMateANDROID" : [20],
     "WEB" : [1]
   },
   "NOTIFICATION" : {
@@ -187,7 +187,7 @@
     "APP_NAME": "EZEOne",
     "MAIL_USER": "root",
     "MAIL_PASS": "Password",
-    "SENDER": "noreply@ezeone.com",
+    "SENDER": "noreply@talentmicro.com",
     "DISCLAIMER": "Copyright &copy; Example",
     "OPTIONS": null,
     "TEMPLATES": {
@@ -329,6 +329,16 @@
         "params" : ["crashReport", "projectName"],
         "file" : "crash-report.html",
         "subject" : "Crash Report Details"
+      },
+      "expenseClaim": {
+        "params": ["name","senderName"],
+        "file": "expenseClaim.html",
+        "subject": "Expense Claim"
+      },
+      "travelClaim": {
+        "params": ["name","senderName"],
+        "file": "travelClaim.html",
+        "subject": "Travel Claim"
       },
       "default": {
         "params": ["HTML"],

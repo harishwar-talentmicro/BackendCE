@@ -418,7 +418,8 @@ router.put('/status', function(req,res,next){
                     ];
                     var notifyParams = [
                         req.db.escape(req.body.token) ,
-                        req.db.escape(req.body.groupId)
+                        req.db.escape(req.body.groupId),
+                        req.db.escape(req.body.userGroupId)
                     ];
                     /**
                      * call p_v1_UpdateUserStatus to change the status like accept/reject/block
@@ -431,8 +432,6 @@ router.put('/status', function(req,res,next){
                             /**
                              * if proc executed successfully then give response true
                              * */
-                            console.log('updateResult',updateResult);
-
 
                             if (updateResult
                                 && updateResult[0]
@@ -547,7 +546,6 @@ router.put('/status', function(req,res,next){
                                 //}
                                 console.log('FnUpdateUserStatus: User status updated successfully');
 
-                                console.log(updateResult[0][0].status,"updateResult[0][0].status");
                                 /**
                                  * all active member of group will get silent notification
                                  * */
@@ -1024,7 +1022,6 @@ router.post('/addressBook',function(req, res, next){
                                                             /**
                                                              * if not getting any error from db and proc called successfully then send response with status true
                                                              **/
-                                                            console.log(results, "results");
                                                             if (results && results[0] && results[0].length > 0 && results[0][0].messageId) {
 
                                                                 switch (req.body.messageType) {
@@ -1056,9 +1053,6 @@ router.post('/addressBook',function(req, res, next){
                                                                 }
                                                                 /**notification send to user to whome message is sending*/
                                                                 if (results[1] && results[1].length > 0) {
-                                                                    console.log(results[0][0].groupId, "groupId");
-                                                                    console.log(results[0][0].senderId, "sender");
-                                                                    console.log(results[0][0].groupType, "groupType");
                                                                     if (results[0][0].groupType == 0) {
                                                                         senderGroupId = results[0][0].groupId;
                                                                         var notificationTemplaterRes = notificationTemplater.parse('compose_message_group', {
@@ -1073,7 +1067,7 @@ router.post('/addressBook',function(req, res, next){
                                                                             senderName: results[0][0].senderName
                                                                         });
                                                                     }
-                                                                    console.log(results[0][0].messageType, "messageType");
+
 
                                                                     /**
                                                                      * Condtion should be like this in restricted reply case
@@ -1155,7 +1149,8 @@ router.post('/addressBook',function(req, res, next){
                                                                                         }
 
                                                                                     },
-                                                                                    null,tokenResult[0].isWhatMate);
+                                                                                    null,tokenResult[0].isWhatMate,
+                                                                                    results[1][i].secretKey);
                                                                                 console.log('postNotification : notification for compose_message is sent successfully');
                                                                             }
                                                                             else {
@@ -1165,8 +1160,6 @@ router.post('/addressBook',function(req, res, next){
                                                                             }
                                                                         }
                                                                         else {
-                                                                            console.log(autoJoinResults[0][0].groupuserid, "groupuserid2");
-                                                                            console.log((results[1][i].iphoneId), "iphoneId");
                                                                             if (notificationTemplaterRes.parsedTpl) {
                                                                                 notification.publish(
                                                                                     results[1][i].receiverGroupId,
@@ -1225,7 +1218,8 @@ router.post('/addressBook',function(req, res, next){
                                                                                             groupType: results[0][0].groupType
                                                                                         }
                                                                                     },
-                                                                                    null,tokenResult[0].isWhatMate);
+                                                                                    null,tokenResult[0].isWhatMate,
+                                                                                    results[1][i].secretKey);
                                                                                 console.log('postNotification : notification for compose_message is sent successfully');
                                                                             }
                                                                             else {
@@ -1531,7 +1525,8 @@ router.post('/archieveDelete', function(req,res,next){
                     var queryParams = [
                         req.db.escape(req.query.token) ,
                         req.db.escape(req.body.groupUserId) ,
-                        req.db.escape(req.body.groupState)
+                        req.db.escape(req.body.groupState),
+                        req.db.escape(req.body.groupId)
                     ];
 
                     var query = 'CALL p_v1_deleteOrArchieve(' + queryParams.join(',') + ');' ;

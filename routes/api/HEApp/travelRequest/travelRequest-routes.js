@@ -8,5 +8,6 @@ var router = express.Router();
 var travelRequestCtrl = require('./travelRequest-ctrl');
 
 router.post('/',travelRequestCtrl.saveTravelRequest);
+router.get('/master',travelRequestCtrl.masterData);
 
 module.exports = router;

@@ -18,7 +18,7 @@ try{
     if(conf){
         var jConf = JSON.parse(conf);
         if(typeof(jConf) == 'object'){
-            defaultConfig = jConf;
+            const  defaultConfig = jConf;
         }
     }
 }

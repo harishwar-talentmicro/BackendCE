@@ -1824,19 +1824,19 @@ Auth.prototype.loginNew = function(req,res,next){
                                                                     }
 
                                                                     // saving ios device id to database
-                                                                    if (isIphone == 1) {
-                                                                        var queryParams1 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
-                                                                        var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
-                                                                        //console.log(query);
-                                                                        st.db.query(query1, function (err, deviceResult) {
-                                                                            if (!err) {
-                                                                                console.log('FnLogin:Ios Device Id saved successfully');
-                                                                            }
-                                                                            else {
-                                                                                console.log(err);
-                                                                            }
-                                                                        });
-                                                                    }
+                                                                    // if (isIphone == 1) {
+                                                                    //     var queryParams1 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
+                                                                    //     var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
+                                                                    //     //console.log(query);
+                                                                    //     st.db.query(query1, function (err, deviceResult) {
+                                                                    //         if (!err) {
+                                                                    //             console.log('FnLogin:Ios Device Id saved successfully');
+                                                                    //         }
+                                                                    //         else {
+                                                                    //             console.log(err);
+                                                                    //         }
+                                                                    //     });
+                                                                    // }
                                                                     response.status = true;
                                                                     response.message = "Logged in successfully";
                                                                     response.error = null;

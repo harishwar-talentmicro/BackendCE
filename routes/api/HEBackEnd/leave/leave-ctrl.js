@@ -46,6 +46,7 @@ leaveCtrl.saveLeaveTypes = function(req,res,next){
             if((!err) && tokenResult){
                 req.body.leaveDescription = (req.body.leaveDescription) ? req.body.leaveDescription : '';
                 req.body.leaveTypeId = (req.body.leaveTypeId) ? req.body.leaveTypeId : 0;
+                req.body.backdatePeriod = (req.body.backdatePeriod != undefined) ? req.body.backdatePeriod : 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -53,7 +54,8 @@ leaveCtrl.saveLeaveTypes = function(req,res,next){
                     req.st.db.escape(req.body.shortCode),
                     req.st.db.escape(req.body.leaveTitle),
                     req.st.db.escape(req.body.leaveDescription),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.body.backdatePeriod)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -130,6 +132,7 @@ leaveCtrl.updateLeaveTypes = function(req,res,next){
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
                 req.body.leaveDescription = (req.body.leaveDescription) ? req.body.leaveDescription : '';
+                req.body.backdatePeriod = (req.body.backdatePeriod != undefined) ? req.body.backdatePeriod : 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -137,7 +140,8 @@ leaveCtrl.updateLeaveTypes = function(req,res,next){
                     req.st.db.escape(req.body.shortCode),
                     req.st.db.escape(req.body.leaveTitle),
                     req.st.db.escape(req.body.leaveDescription),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.body.backdatePeriod)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -209,7 +213,7 @@ leaveCtrl.getLeaveTypes = function(req,res,next){
                         response.error = null;
                         response.data = {
                             leaveTypeList : leaveTypeResult[0]
-                        }
+                        };
                         res.status(200).json(response);
 
                     }

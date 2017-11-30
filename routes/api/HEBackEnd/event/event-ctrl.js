@@ -66,6 +66,8 @@ eventCtrl.saveEvent = function(req,res,next){
                 req.body.sponsorshipEmailId = (req.body.sponsorshipEmailId) ? req.body.sponsorshipEmailId : '';
                 req.body.enquiryEmailId = (req.body.enquiryEmailId) ? req.body.enquiryEmailId : '';
                 req.body.status = (req.body.status) ? req.body.status : 1;
+                req.body.eventType = (req.body.eventType) ? req.body.eventType : 0;  // 0=public 1=private
+                req.body.enableTravelRequest = (req.body.enableTravelRequest != undefined) ? req.body.enableTravelRequest : 0;  // 0=not enabled 1=enabled
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -85,7 +87,9 @@ eventCtrl.saveEvent = function(req,res,next){
                     req.st.db.escape(req.body.enquiryEmailId),
                     req.st.db.escape(JSON.stringify(sponsors)),
                     req.st.db.escape(req.body.status),
-                    req.st.db.escape(JSON.stringify(sessions))
+                    req.st.db.escape(JSON.stringify(sessions)),
+                    req.st.db.escape(req.body.eventType),
+                    req.st.db.escape(req.body.enableTravelRequest)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -897,6 +901,8 @@ eventCtrl.saveBasicEventInfo = function(req,res,next){
                 req.body.eventId = (req.body.eventId) ? req.body.eventId : 0;
                 req.body.aboutEvent = (req.body.aboutEvent) ? req.body.aboutEvent : '';
                 req.body.selfCheckInCode = (req.body.selfCheckInCode) ? req.body.selfCheckInCode : '';
+                req.body.eventType = (req.body.eventType) ? req.body.eventType : 0;  // 0=public 1=private
+                req.body.enableTravelRequest = (req.body.enableTravelRequest != undefined) ? req.body.enableTravelRequest : 0;  // 0=not enabled 1=enabled
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -906,7 +912,9 @@ eventCtrl.saveBasicEventInfo = function(req,res,next){
                     req.st.db.escape(req.body.aboutEvent),
                     req.st.db.escape(req.body.startDateTime),
                     req.st.db.escape(req.body.endDateTime),
-                    req.st.db.escape(req.body.selfCheckInCode)
+                    req.st.db.escape(req.body.selfCheckInCode),
+                    req.st.db.escape(req.body.eventType),
+                    req.st.db.escape(req.body.enableTravelRequest)
                 ];
 
                 /**
@@ -1357,7 +1365,8 @@ eventCtrl.getEventDetails = function(req,res,next){
                             LinkedInDescription : eventResult[0][0].LinkedInDescription,
                             LinkedInBanner : eventResult[0][0].LinkedInBanner,
                             selfCheckInCode : eventResult[0][0].selfCheckInCode,
-                            eventType : eventResult[0][0].eventType
+                            eventType : eventResult[0][0].eventType,
+                            enableTravelRequest : eventResult[0][0].enableTravelRequest
                         };
                         res.status(200).json(response);
                     }

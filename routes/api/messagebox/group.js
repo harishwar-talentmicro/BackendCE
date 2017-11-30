@@ -989,7 +989,6 @@ router.get('/members', function(req,res,next){
     }
 });
 
-
 /**
  * Method : GET
  * @param req

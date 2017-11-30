@@ -60,9 +60,9 @@ userCtrl.saveUser = function(req,res,next){
             if((!err) && tokenResult){
                 req.body.employeeCode = (req.body.employeeCode) ? req.body.employeeCode : '';
                 req.body.jobTitle = (req.body.jobTitle) ? req.body.jobTitle : '';
-                req.body.departmentTitle = (req.body.departmentTitle) ? req.body.departmentTitle : '';
+                req.body.departmentTitle = (req.body.departmentTitle != undefined) ? req.body.departmentTitle : 0;
                 req.body.locationTitle = (req.body.locationTitle) ? req.body.locationTitle : '';
-                req.body.grade = (req.body.grade) ? req.body.grade : '';
+                req.body.grade = (req.body.grade != undefined) ? req.body.grade : 0;
                 req.body.status = (req.body.status) ? req.body.status : 1;
                 req.body.trackTemplateId = (req.body.trackTemplateId) ? req.body.trackTemplateId : 0;
                 req.body.workLocationId = (req.body.workLocationId) ? req.body.workLocationId : 0;

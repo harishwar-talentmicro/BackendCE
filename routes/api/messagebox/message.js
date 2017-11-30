@@ -18,6 +18,7 @@ var notificationTemplater = new NotificationTemplater();
 var Notification = require('../../modules/notification/notification-master.js');
 var notification = new Notification();
 var fs = require('fs');
+
 var zlib = require('zlib');
 var AES_256_encryption = require('../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
@@ -400,7 +401,8 @@ router.post('/', function(req,res,next){
                                                                         groupType : results[0][0].groupType
                                                                     }
                                                                 },
-                                                                null,tokenResult[0].isWhatMate);
+                                                                null,tokenResult[0].isWhatMate,
+                                                                results[1][i].secretKey);
                                                             console.log('postNotification : notification for compose_message is sent successfully');
                                                         }
                                                         else{
@@ -862,7 +864,6 @@ router.get('/', function(req,res,next){
                                         // supportFeedback : (results[4]) ? results[4] : []
                                     };
 
-                                    // console.log('deleteMessageIdList',results[2]);
                                     var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
                                     zlib.gzip(buf, function (_, result) {
                                         responseMessage.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
@@ -982,7 +983,7 @@ router.post('/delete', function(req,res,next){
                             var comDeleteMessageQuery = "";
                             for (var i = 0; i < messageIdList.length; i++) {
                                 var procParams = [
-                                    req.db.escape(req.body.token) ,
+                                    req.db.escape(req.body.token),
                                     req.db.escape(messageIdList[i].messageId)
                                 ];
                                 var procQuery = 'CALL p_v1_deletemessage(' + procParams.join(',') + ');';

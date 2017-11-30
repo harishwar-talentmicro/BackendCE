@@ -23,7 +23,7 @@ try{
     if(conf){
         var jConf = JSON.parse(conf);
         if(typeof(jConf) == 'object'){
-            defaultConfig = jConf;
+           var defaultConfig = jConf;
         }
     }
 }
@@ -53,12 +53,14 @@ Ezeone.prototype.renderTemplate = function(mailType,params){
  */
 Ezeone.prototype.renderTemplateNew = function(mailType,params){
     var mDirectory = 'templates';
-    var genericTemplate = fs.readFileSync(__dirname + separator + mDirectory + separator +this.CONFIG.TEMPLATES["generic"].file,'utf-8');
+    var genericTemplate = fs.readFileSync(__dirname + separator + mDirectory + separator + this.CONFIG.TEMPLATES["generic"].file,'utf-8');
+
     var innerMailTemplate = fs.readFileSync(__dirname + separator + mDirectory + separator +parseDirectorySeparator(this.CONFIG.TEMPLATES[mailType].file),'utf-8');
 
     var pseudoTemplate = ejs.render(genericTemplate,{ innerMailTemplate : innerMailTemplate});
 
-    return ejs.render(pseudoTemplate,params);
+
+    return ejs.render(innerMailTemplate,params);
 };
 
 
@@ -183,6 +185,8 @@ Ezeone.prototype.sendMailNew = function(type,parameters,subject,receiverEmail,at
             }
             else{
                 var htmlContent = _this.renderTemplateNew(type,mParams);
+                console.log("htmlContent",htmlContent);
+
                 if(htmlContent){
                     var preparedEmail = new sendgrid.Email({
                         from: _this.CONFIG.SENDER, // sender address

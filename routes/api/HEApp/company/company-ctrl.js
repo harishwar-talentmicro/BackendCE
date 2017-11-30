@@ -261,7 +261,7 @@ companyCtrl.getComapnyMasters = function(req,res,next){
                  */
                 var procQuery = 'CALL wm_get_companyMasters( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                var buf = new Buffer();
+
 
                 req.db.query(procQuery,function(err,companyMasters){
                     if(!err && companyMasters ){
@@ -274,7 +274,7 @@ companyCtrl.getComapnyMasters = function(req,res,next){
                             locations : (companyMasters[2]) ? companyMasters[2] : []
                         };
 
-                        buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
@@ -290,7 +290,7 @@ companyCtrl.getComapnyMasters = function(req,res,next){
                             locations : []
                         };
 
-                        buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);

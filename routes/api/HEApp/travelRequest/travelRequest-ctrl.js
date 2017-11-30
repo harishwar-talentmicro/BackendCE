@@ -48,6 +48,14 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
         attachmentList = [] ;
     }
 
+    var travelRequests = req.body.travelRequests;
+    if(typeof(travelRequests) == "string") {
+        travelRequests = JSON.parse(travelRequests);
+    }
+    if(!travelRequests){
+        travelRequests = [] ;
+    }
+
     var senderGroupId;
 
     if (!validationFlag){
@@ -81,6 +89,7 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
                 req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                 req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                 req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                req.body.travelRequestType = req.body.travelRequestType ? req.body.travelRequestType : 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -105,7 +114,9 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
                     req.st.db.escape(JSON.stringify(attachmentList)),
                     req.st.db.escape(req.body.approverCount),
                     req.st.db.escape(req.body.receiverCount),
-                    req.st.db.escape(req.body.isAdvanceAmountRequired)
+                    req.st.db.escape(req.body.isAdvanceAmountRequired),
+                    req.st.db.escape(JSON.stringify(travelRequests)),
+                    req.st.db.escape(req.body.travelRequestType)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -228,6 +239,82 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
         });
     }
 
+};
+
+travelRequestCtrl.masterData = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    req.st.validateToken(req.query.token,function(err,tokenResult){
+        if((!err) && tokenResult){
+
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.query.groupId)
+            ];
+            /**
+             * Calling procedure to get form template
+             * @type {string}
+             */
+            var procQuery = 'CALL HE_get_master_travelRequest( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,currencyMaster){
+                if(!err && currencyMaster ){
+                    response.status = true;
+                    response.message = "Master data loaded successfully";
+                    response.error = null;
+                    response.data = {
+                        currencyList : (currencyMaster && currencyMaster[0]) ? currencyMaster[0] : [],
+                        defaultUserCurrency : {
+                            currencyId : (currencyMaster && currencyMaster[1] && currencyMaster[1][0] && currencyMaster[1][0].currencyId) ? currencyMaster[1][0].currencyId : 0,
+                            currencySymbol : (currencyMaster && currencyMaster[1] && currencyMaster[1][0] && currencyMaster[1][0].currencySymbol) ? currencyMaster[1][0].currencySymbol : "",
+                            conversionRate : (currencyMaster && currencyMaster[1] && currencyMaster[1][0] && currencyMaster[1][0].conversionRate) ? currencyMaster[1][0].conversionRate : 0
+                        },
+                        travelMode : (currencyMaster && currencyMaster[2] ) ? currencyMaster[2] : [],
+                        locations : (currencyMaster && currencyMaster[3] ) ? currencyMaster[3] : []
+                    };
+
+
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
+
+                }
+                else if(!err){
+                    response.status = true;
+                    response.message = "No data found";
+                    response.error = null;
+                    response.data = {
+                        currencyList : [],
+                        defaultUserCurrency : {
+                            currencyId : 0,
+                            currencySymbol : "",
+                            conversionRate : 0
+                        },
+                        travelMode : [],
+                        locations : []
+                    };
+                    res.status(200).json(response);
+                }
+                else{
+                    response.status = false;
+                    response.message = "Error while getting data";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else{
+            res.status(401).json(response);
+        }
+    });
 };
 
 module.exports = travelRequestCtrl;

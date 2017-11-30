@@ -1987,7 +1987,8 @@ eventCtrl.getWMEventSpeakerDetails = function(req,res,next){
     }
     else {
 
-
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
         var procParams = [
             req.st.db.escape(req.query.userMasterId)
         ];
@@ -2032,6 +2033,12 @@ eventCtrl.getWMEventSpeakerDetails = function(req,res,next){
                 response.error = null;
                 response.data = null;
                 res.status(500).json(response);
+            }
+        });
+
+            }
+            else {
+                res.status(401).json(response);
             }
         });
     }

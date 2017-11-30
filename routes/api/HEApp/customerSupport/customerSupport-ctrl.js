@@ -74,6 +74,15 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                 req.body.clientCompany = req.body.clientCompany ? req.body.clientCompany : "";
                 req.body.clientJobTitle = req.body.clientJobTitle ? req.body.clientJobTitle : "";
                 req.body.priority = req.body.priority ? req.body.priority : 0;
+                req.body.isdPhone  = req.body.isdPhone != undefined  ? req.body.isdPhone  : "";
+                req.body.phoneNo  = req.body.phoneNo != undefined  ? req.body.phoneNo  : "";
+                req.body.lastName  = req.body.lastName != undefined  ? req.body.lastName  : "";
+                req.body.notes  = req.body.notes != undefined  ? req.body.notes  : "";
+                req.body.contactId  = req.body.contactId != undefined  ? req.body.contactId  : 0;
+
+                if(req.body.phoneNo == ""){
+                    req.body.isdPhone = "";
+                }
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -98,9 +107,13 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                     req.st.db.escape(req.body.clientMobile),
                     req.st.db.escape(req.body.clientEmail),
                     req.st.db.escape(req.body.clientCompany),
-                    req.st.db.escape(req.body.clientJobTitle)
+                    req.st.db.escape(req.body.clientJobTitle),
+                    req.st.db.escape(req.body.isdPhone),
+                    req.st.db.escape(req.body.phoneNo),
+                    req.st.db.escape(req.body.lastName),
+                    req.st.db.escape(req.body.notes),
+                    req.st.db.escape(req.body.contactId)
                 ];
-
 
                 /**
                  * Calling procedure for sales request

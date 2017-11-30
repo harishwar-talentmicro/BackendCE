@@ -82,6 +82,7 @@ var eventApp = require('./HEApp/event.js');
 var taxDeclarations = require('./tax/tax-routes');
 var taxWebSavings = require('./HEBackEnd/taxSaving.js');
 var policeStations = require('./HEApp/police.js');
+var travelMode = require('./HEBackEnd/travelMode.js');
 
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
@@ -169,6 +170,7 @@ router.use('/helloEZE/app',eventApp);
 router.use('/helloEZE/app',taxDeclarations);
 router.use('/helloEZE',taxWebSavings);
 router.use('/helloEZE/app',policeStations);
+router.use('/helloEZE',travelMode);
 
 //router.use('/test_info',testInfoV1);
 //router.use('/association-ap',associationAPV1);

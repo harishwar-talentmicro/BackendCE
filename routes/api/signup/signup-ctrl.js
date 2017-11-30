@@ -8,6 +8,7 @@ var fs = require('fs');
 var path = require('path');
 var signupCtrl = {};
 var bcrypt = null;
+var EZEIDEmail = 'noreply@talentmicro.com';
 
 try{
     bcrypt = require('bcrypt');
@@ -21,6 +22,8 @@ signupCtrl.sendOtp = function(req,res,next) {
 
     var mobileNo= req.body.mobileNo;
     var isdMobile = req.body.isdMobile ;
+    var displayName = req.body.displayName ;
+    var emailId = req.body.emailId ;
 
     var status = true, error = {};
     var respMsg = {
@@ -42,6 +45,7 @@ signupCtrl.sendOtp = function(req,res,next) {
         try {
             var isWhatMate= req.body.isWhatMate ? req.body.isWhatMate : 0;
             var message="";
+            var resMessage = "" ;
 
                 //generate otp 6 digit random number
                 var code = "";
@@ -157,16 +161,61 @@ signupCtrl.sendOtp = function(req,res,next) {
                         });
 
                     }
+
+                    if(emailId != ""){
+                        var file = path.join(__dirname, '../../../mail/templates/sendOTP.html');
+
+                        fs.readFile(file, "utf8", function (err, data) {
+
+                            if (!err) {
+                                data = data.replace("[DisplayName]", displayName);
+                                data = data.replace("[code]", code);
+
+                                var mailOptions = {
+                                    from: EZEIDEmail,
+                                    to: emailId,
+                                    subject: 'WhatMate OTP',
+                                    html: data // html body
+                                };
+
+                                // send mail with defined transport object
+                                //message Type 7 - Forgot password mails service
+                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                var email = new sendgrid.Email();
+                                email.from = mailOptions.from;
+                                email.to = mailOptions.to;
+                                email.subject = mailOptions.subject;
+                                email.html = mailOptions.html;
+
+                                sendgrid.send(email, function (err, result) {
+                                    if (!err) {
+                                        console.log('Mail sent');
+                                    }
+                                    else {
+                                        console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+                                    }
+                                });
+                            }
+                            else{
+                                console.log('FnForgetPassword: readfile '+err);
+                            }
+                        });
+                        resMessage = "OTP sent successfully to mobile and email Id ";
+                    }
+                    else {
+                        resMessage = 'OTP Sent Successfully';
+                    }
+
                     respMsg.status = true;
-                    respMsg.message = 'OTP Sent Successfully';
+                    respMsg.message = resMessage ;
                     respMsg.data = {
-                        mobileNo : mobileNo,
-                        message : message,
-                        user_name : 'janardana@hirecraft.com',
-                        password : 'Ezeid2015',
-                        sender_id : 'EZEONE',
-                        service : 'TRANS',
-                        method : 'send_sms'
+                        mobileNo : mobileNo
+                        // message : message,
+                        // user_name : 'janardana@hirecraft.com',
+                        // password : 'Ezeid2015',
+                        // sender_id : 'EZEONE',
+                        // service : 'TRANS',
+                        // method : 'send_sms'
                     };
                     res.status(200).json(respMsg);
                 }
@@ -229,6 +278,7 @@ signupCtrl.verifyOTP = function(req,res,next){
             var pictureURL = req.body.pictureURL ? req.body.pictureURL : "";
             var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
             var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
+            var secretKey = (req.body.secretKey) ? (req.body.secretKey) : "";
             var isOTPRequired = (req.body.isOTPRequired) ? (req.body.isOTPRequired) : 0;
             var otp = (req.body.otp) ? (req.body.otp) : 0;
             if (req.body.otp == ""){
@@ -281,8 +331,7 @@ signupCtrl.verifyOTP = function(req,res,next){
                         req.socket.remoteAddress;
                     var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
-                    req.st.generateToken(ip, userAgent, EZEOneId,isWhatMate,APNS_Id,GCM_Id, function (err, token) {
-                        console.log("token",token);
+                    req.st.generateToken(ip, userAgent, EZEOneId,isWhatMate,APNS_Id,GCM_Id,secretKey, function (err, token) {
                         if (err) {
                             respMsg.status = false;
                             respMsg.message = "Error while generating token";

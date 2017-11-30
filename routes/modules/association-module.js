@@ -1566,9 +1566,7 @@ Association.prototype.imageUploadWithThumbnail = function(req,res,next){
                             console.log(uniqueFileName);
                             uploadDocumentToCloud(uniqueFileName, readStream, function (err) {
                                 if (!err) {
-                                    console.log("before delete");
                                     deleteTempFile();
-                                    console.log("Afeter delete");
                                     uploadDocumentToCloud(tnUniqueFileName, resizedReadStream, function (err) {
                                         if (!err) {
                                             responseMessage.status = true;

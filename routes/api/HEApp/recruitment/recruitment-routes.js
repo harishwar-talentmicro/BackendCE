@@ -18,5 +18,6 @@ router.get('/assessmentList',recruitmentCtrl.getAssessmentList);
 router.post('/interviewScheduler',recruitmentCtrl.interviewScheduler);
 
 router.get('/informationFinder',recruitmentCtrl.getInformationFinder);
+router.get('/speechContent',recruitmentCtrl.extractTextFromFile);
 
 module.exports = router;

@@ -4,11 +4,15 @@
 
 var notification = null;
 var moment = require('moment');
+var http = require('https');
 var NotificationTemplater = require('../../../lib/NotificationTemplater.js');
 var notificationTemplater = new NotificationTemplater();
 var Notification = require('../../../modules/notification/notification-master.js');
 var notification = new Notification();
 var fs = require('fs');
+
+var path = require('path');
+var textract = require('textract');
 
 var recruitmentCtrl = {};
 var error = {};
@@ -16,7 +20,6 @@ var error = {};
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
-
 
 recruitmentCtrl.manpowerRequest = function(req,res,next){
     var response = {
@@ -1131,6 +1134,7 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
         error : null
     };
     var validationFlag = true;
+    var isTrue = false;
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
@@ -1170,28 +1174,37 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,informationResult){
                     if(!err && informationResult && informationResult[0] && informationResult[0][0]){
+                        var filePath = "";
                         response.status = true;
                         response.message = "Information loaded successfully";
                         response.error = null;
                         var output = [];
+                        var speech = "";
+                        var fileName = "";
+
                         for(var i = 0; i < informationResult[0].length; i++) {
                             var res1 = {};
                             res1.docTitle = informationResult[0][i].docTitle;
                             res1.contentType = informationResult[0][i].contentType;
                             res1.versionDate = informationResult[0][i].versionDate;
                             res1.latestVersion = informationResult[0][i].latestVersion;
-                            res1.fileName = (informationResult[0][i].contentType == 1 ) ? informationResult[0][i].fileName : (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + informationResult[0][i].fileName);
+                            // res1.fileName = (informationResult[0][i].contentType == 1 ) ? informationResult[0][i].fileName : (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + informationResult[0][i].fileName);
+                            res1.fileName = (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + informationResult[0][i].fileName);
+                            res1.speechContent = "";
+                            console.log("res1.fileName",res1.fileName);
                             output.push(res1);
                         }
                         response.data =  {
                             information : output,
                             count : informationResult[1][0].count
                         };
+
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
+
                     }
                     else if(!err){
                         response.status = true;
@@ -1214,6 +1227,84 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
         });
     }
 
+};
+
+recruitmentCtrl.extractTextFromFile = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.fileName)
+    {
+        error.fileName = 'Invalid fileName';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                http.get(req.query.fileName, function(fileResponse){
+                        var bufs = [];
+                    fileResponse.on('data', function(d){ bufs.push(d); });
+                    fileResponse.on('end', function() {
+                                var buf = Buffer.concat(bufs);
+                                textract.fromBufferWithName(req.query.fileName,buf, function( error, text ) {
+                                    if (!error) {
+                                        response.status = true;
+                                        response.message = "Information not found";
+                                        response.error = null;
+                                        response.data = {
+                                            speechContent : text
+                                        };
+
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        });
+
+                                    }
+                                    else {
+                                        response.status = false;
+                                        response.message = "Something went wrong .";
+                                        response.error = error;
+                                        response.data = {
+                                            speechContent : ""
+                                        };
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                            res.status(500).json(response);
+                                        });
+
+                                    }
+                                })
+                            }
+                        );
+                    }
+                );
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
 };
 
 module.exports = recruitmentCtrl;

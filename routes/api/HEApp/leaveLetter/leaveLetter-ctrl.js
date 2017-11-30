@@ -69,6 +69,8 @@ leaveLetterCtrl.saveLeaveLetter = function(req,res,next){
                 req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                 req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                 req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                req.body.senderInstructions = req.body.senderInstructions ? req.body.senderInstructions : '';
+                req.body.backdatePeriod = req.body.backdatePeriod ? req.body.backdatePeriod : null;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -89,7 +91,9 @@ leaveLetterCtrl.saveLeaveLetter = function(req,res,next){
                     req.st.db.escape(req.body.receiverCount),
                     req.st.db.escape(req.body.openingLeaves),
                     req.st.db.escape(req.body.negativeLeaves),
-                    req.st.db.escape(req.body.leaveTypeTitle)
+                    req.st.db.escape(req.body.leaveTypeTitle),
+                    req.st.db.escape(req.body.senderInstructions),
+                    req.st.db.escape(req.body.backdatePeriod)
                 ];
                 /**
                  * Calling procedure to save form template

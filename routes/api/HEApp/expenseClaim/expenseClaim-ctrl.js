@@ -10,8 +10,14 @@ var Notification = require('../../../modules/notification/notification-master.js
 var notification = new Notification();
 var fs = require('fs');
 
+var htmlpdf = require('html-pdf');
+var expenseClaimReport = require('../expenseClaim/expenseClaimReport.js');
+var Mailer = require('../../../../mail/mailer.js');
+var mailerApi = new Mailer();
 var expenseClaimCtrl = {};
 var error = {};
+var path = require('path');
+var EZEIDEmail = 'noreply@talentmicro.com';
 
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
@@ -172,6 +178,38 @@ expenseClaimCtrl.saveExpenseClaim = function(req,res,next){
                             }
                         }
 
+                        // pdf generation starts
+                        if(results[2] && results[2][0] && results[3] && results[4] ){
+                            console.log("results[2]",results[2]);
+                            var reportData = {
+                                expense : results[2] ,
+                                name : results[3][0].name,
+                                employeeCode : results[3][0].employeeCode
+                            };
+
+                            req.data = JSON.parse(JSON.stringify(reportData));
+                            (0,expenseClaimReport.expenseReport)(req, res);
+                            var options = { format: 'A4', width: '8in', height: '10.5in', border: '0', timeout: 30000, "zoomFactor": "1" };
+
+                            htmlpdf.create(res.data,options).toBuffer(function (err, buffer) {
+                                console.log('This is a buffer:', Buffer.isBuffer(buffer));
+                                var attachmentObjectsList = [{
+                                    filename: results[3][0].name + '.pdf',
+                                    content: buffer
+                                }];
+
+                                for (var z = 0; z < results[4].length; z++ ) {
+                                    mailerApi.sendMailNew('expenseClaim', {
+                                        name : results[4][z].name,
+                                        senderName : results[3][0].name
+                                    }, '', results[4][z].emailId, attachmentObjectsList);
+                                }
+
+                            });
+
+
+                        }
+                        // pdf generation ends
                         response.status = true;
                         response.message = "Expense claim saved successfully";
                         response.error = null;

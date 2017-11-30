@@ -198,6 +198,15 @@ salesCtrl.saveSalesRequest = function(req,res,next){
                 req.body.discount  = req.body.discount  ? req.body.discount  : 0;
                 req.body.itemCurrencyId  = req.body.itemCurrencyId  ? req.body.itemCurrencyId  : 0;
                 req.body.itemCurrencySymbol  = req.body.itemCurrencySymbol  ? req.body.itemCurrencySymbol  : 0;
+                req.body.isdPhone  = req.body.isdPhone != undefined  ? req.body.isdPhone  : "";
+                req.body.phoneNo  = req.body.phoneNo != undefined  ? req.body.phoneNo  : "";
+                req.body.lastName  = req.body.lastName != undefined  ? req.body.lastName  : "";
+                req.body.notes  = req.body.notes != undefined  ? req.body.notes  : "";
+                req.body.contactId  = req.body.contactId != undefined  ? req.body.contactId  : 0;
+
+                if(req.body.phoneNo == ""){
+                    req.body.isdPhone = "";
+                }
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -233,9 +242,13 @@ salesCtrl.saveSalesRequest = function(req,res,next){
                     req.st.db.escape(req.body.discount),
                     req.st.db.escape(JSON.stringify(items)),
                     req.st.db.escape(req.body.itemCurrencyId),
-                    req.st.db.escape(req.body.itemCurrencySymbol)
+                    req.st.db.escape(req.body.itemCurrencySymbol),
+                    req.st.db.escape(req.body.isdPhone),
+                    req.st.db.escape(req.body.phoneNo),
+                    req.st.db.escape(req.body.lastName),
+                    req.st.db.escape(req.body.notes),
+                    req.st.db.escape(req.body.contactId)
                 ];
-
 
                 /**
                  * Calling procedure for sales request
@@ -599,11 +612,13 @@ salesCtrl.findHECustomer = function(req,res,next){
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
                 req.query.keyword = req.query.keyword ? req.query.keyword : "" ;
+                req.query.isSupport = req.query.isSupport != undefined ? req.query.isSupport : 0 ;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.groupId),
-                    req.st.db.escape(req.query.keyword)
+                    req.st.db.escape(req.query.keyword),
+                    req.st.db.escape(req.query.isSupport)
                 ];
 
                 /**
@@ -617,8 +632,27 @@ salesCtrl.findHECustomer = function(req,res,next){
                         response.status = true;
                         response.message = "Client loaded successfully";
                         response.error = null;
+                        var output = [];
+
+                        for(var i = 0; i < userResult[0].length; i++) {
+                            var res1 = {};
+                            res1.clientId = userResult[0][i].clientId;
+                            res1.contactId = userResult[0][i].contactId;
+                            res1.name = userResult[0][i].name;
+                            res1.isdMobile = userResult[0][i].isdMobile;
+                            res1.mobile = userResult[0][i].mobile;
+                            res1.emailId = userResult[0][i].emailId;
+                            res1.companyName = userResult[0][i].companyName;
+                            res1.jobTitle = userResult[0][i].jobTitle;
+                            res1.isdPhone = userResult[0][i].isdPhone;
+                            res1.phoneNo = userResult[0][i].phoneNo;
+                            res1.lastName = userResult[0][i].lastName;
+                            res1.notes = userResult[0][i].notes;
+                            res1.updaterDetails = (userResult[0][i].updaterDetails) ? JSON.parse(userResult[0][i].updaterDetails) : null;
+                            output.push(res1);
+                        }
                         response.data = {
-                            client : userResult[0]
+                            client : output
                         };
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
@@ -629,7 +663,7 @@ salesCtrl.findHECustomer = function(req,res,next){
                     }
                     else if(!err){
                         response.status = true;
-                        response.message = "Client loaded successfully";
+                        response.message = "No clients found";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
