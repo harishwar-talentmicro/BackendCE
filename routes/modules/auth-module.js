@@ -1550,6 +1550,7 @@ Auth.prototype.loginNew = function(req,res,next){
     var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
     var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
     var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
+    console.log("secretKey",secretKey);
 
     var responseMessage = {
         Token: '',

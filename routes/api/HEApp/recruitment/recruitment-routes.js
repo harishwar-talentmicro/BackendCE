@@ -20,4 +20,9 @@ router.post('/interviewScheduler',recruitmentCtrl.interviewScheduler);
 router.get('/informationFinder',recruitmentCtrl.getInformationFinder);
 router.get('/speechContent',recruitmentCtrl.extractTextFromFile);
 
+router.post('/document/feedback',recruitmentCtrl.saveDocFeedback);
+router.post('/document/readStatus',recruitmentCtrl.saveDocReadStatus);
+
+router.get('/messageDetails',recruitmentCtrl.getmessageDetails);
+
 module.exports = router;

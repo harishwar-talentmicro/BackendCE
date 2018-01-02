@@ -184,7 +184,9 @@ expenseClaimCtrl.saveExpenseClaim = function(req,res,next){
                             var reportData = {
                                 expense : results[2] ,
                                 name : results[3][0].name,
-                                employeeCode : results[3][0].employeeCode
+                                employeeCode : results[3][0].employeeCode,
+                                total : results[3][0].total,
+                                amount : results[3][0].amount
                             };
 
                             req.data = JSON.parse(JSON.stringify(reportData));

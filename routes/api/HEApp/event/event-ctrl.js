@@ -623,7 +623,7 @@ eventCtrl.saveEventQuestions = function(req,res,next){
                             message : questionsData[0][0].question,
                             type : 71,
                             alarmType : 4
-                        } ;
+                        };
 
                         if(questionsData[1][0].APNS_Id){
                             _Notification_aws.publish_IOS(questionsData[1][0].APNS_Id,messagePayload,0);
@@ -1661,6 +1661,7 @@ eventCtrl.getStatusOfWMList = function(req,res,next){
                  * Calling procedure to get form template
                  * @type {string}
                  */
+
                 var procQuery = 'CALL wm_get_statusOfWMList( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, homePageData) {

@@ -1,6 +1,7 @@
 /**
- * Created by Jana1 on 22-03-2017.
+ * Created by vedha on 24-12-2017.
  */
+
 
 var notification = null;
 var moment = require('moment');
@@ -10,14 +11,14 @@ var Notification = require('../../../modules/notification/notification-master.js
 var notification = new Notification();
 var fs = require('fs');
 
-var taskCtrl = {};
-
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 
+var generalRequestCtrl = {};
+var error = {};
 
-taskCtrl.saveTask = function(req,res,next){
+generalRequestCtrl.saveGeneralRequest = function(req,res,next){
     var response = {
         status : false,
         message : "Invalid token",
@@ -30,47 +31,12 @@ taskCtrl.saveTask = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.body.title) {
-        error.token = 'Invalid title';
+    if (!req.body.generalRequestType) {
+        error.generalRequestType = 'Invalid generalRequestType';
         validationFlag *= false;
-    }
-
-    if (!req.body.starts) {
-        error.token = 'Invalid start date';
-        validationFlag *= false;
-    }
-
-    if (!req.body.ends) {
-        error.token = 'Invalid end date';
-        validationFlag *= false;
-    }
-
-    var memberList =req.body.memberList;
-    if(typeof(memberList) == "string") {
-        memberList = JSON.parse(memberList);
-    }
-    if(!memberList){
-        memberList = [];
-    }
-
-    var sharedMemberList =req.body.sharedMemberList;
-    if(typeof(sharedMemberList) == "string") {
-        sharedMemberList = JSON.parse(sharedMemberList);
-    }
-    if(!sharedMemberList){
-        sharedMemberList = [];
-    }
-
-    var attachmentList =req.body.attachmentList;
-    if(typeof(attachmentList) == "string") {
-        attachmentList = JSON.parse(attachmentList);
-    }
-    if(!attachmentList){
-        attachmentList = [];
     }
 
     var senderGroupId;
-
 
     if (!validationFlag){
         response.error = error;
@@ -83,54 +49,54 @@ taskCtrl.saveTask = function(req,res,next){
             if((!err) && tokenResult){
 
                 req.body.parentId = req.body.parentId ? req.body.parentId : 0;
-                req.body.description = req.body.description ? req.body.description : '';
-                req.body.progress = req.body.progress ? req.body.progress : 0;
-                req.body.status = req.body.status ? req.body.status : 0;
-                req.body.notes = req.body.notes ? req.body.notes : '';
+                req.body.status = req.body.status ? req.body.status : 1;
+
+                req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
+                req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
                 req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
+                req.body.justification = req.body.justification ? req.body.justification : '';
+
                 req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
+                req.body.accessUserType  = req.body.accessUserType  ? req.body.accessUserType  : 0;
+
                 req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                 req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                 req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
-                req.body.type = req.body.type ? req.body.type : 0;  // 1-Task 2-Meeting
-                req.body.isRepeats = req.body.isRepeats ? req.body.isRepeats : 0;
-                req.body.repeatCount = req.body.repeatCount != undefined ? req.body.repeatCount : 1;
-                req.body.repeatType = req.body.repeatType ? req.body.repeatType : 3;
-                req.body.isEndDate = req.body.isEndDate ? req.body.isEndDate : 0;
-                req.body.alertType = req.body.alertType ? req.body.alertType : 0;
-                req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : "";
+                req.body.budgetCurrencyId = req.body.budgetCurrencyId ? req.body.budgetCurrencyId : 0;
+                req.body.budgetAmount = req.body.budgetAmount ? req.body.budgetAmount : 0;
+                req.body.budgetFrequency = req.body.budgetFrequency !=undefined ? req.body.budgetFrequency : 0;
+                req.body.isBudget = req.body.isBudget !=undefined ? req.body.isBudget : 0;
+                req.body.budgetLabel = req.body.budgetLabel !=undefined ? req.body.budgetLabel : 0;
+                req.body.budgetFrequencyTitle = req.body.budgetFrequencyTitle !=undefined ? req.body.budgetFrequencyTitle : 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.parentId),
-                    req.st.db.escape(req.body.title),
-                    req.st.db.escape(req.body.description),
-                    req.st.db.escape(req.body.starts),
-                    req.st.db.escape(req.body.ends),
-                    req.st.db.escape(req.body.progress),
                     req.st.db.escape(req.body.status),
-                    req.st.db.escape(req.body.notes),
+                    req.st.db.escape(req.body.generalRequestType),
+                    req.st.db.escape(req.body.generalRequestTypeTitle),
+                    req.st.db.escape(req.body.approverNotes),
+                    req.st.db.escape(req.body.justification),
                     req.st.db.escape(req.body.changeLog),
-                    req.st.db.escape(JSON.stringify(memberList)),
-                    req.st.db.escape(JSON.stringify(attachmentList)),
                     req.st.db.escape(req.body.groupId),
                     req.st.db.escape(req.body.learnMessageId),
+                    req.st.db.escape(req.body.accessUserType),
+                    req.st.db.escape(req.body.receiverNotes),
                     req.st.db.escape(req.body.approverCount),
                     req.st.db.escape(req.body.receiverCount),
-                    req.st.db.escape(req.body.type),
-                    req.st.db.escape(req.body.isRepeats),
-                    req.st.db.escape(req.body.repeatCount),
-                    req.st.db.escape(req.body.repeatType),
-                    req.st.db.escape(req.body.isEndDate),
-                    req.st.db.escape(req.body.alertType),
-                    req.st.db.escape(JSON.stringify(sharedMemberList)),
-                    req.st.db.escape(req.body.senderNotes)
+                    req.st.db.escape(req.body.budgetCurrencyId),
+                    req.st.db.escape(req.body.budgetCurrencyTitle),
+                    req.st.db.escape(req.body.budgetAmount),
+                    req.st.db.escape(req.body.budgetFrequency),
+                    req.st.db.escape(req.body.isBudget),
+                    req.st.db.escape(req.body.budgetLabel),
+                    req.st.db.escape(req.body.budgetFrequencyTitle)
                 ];
                 /**
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_taskForm( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_generalRequest( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     console.log(results);
@@ -142,16 +108,14 @@ taskCtrl.saveTask = function(req,res,next){
 
                         for (var i = 0; i < results[1].length; i++ ) {
                             if (notificationTemplaterRes.parsedTpl) {
-                                console.log(results[1][0].senderId , "results[1][0].senderIdresults[1][0].senderIdresults[1][0].senderId");
                                 notification.publish(
                                     results[1][i].receiverId,
                                     (results[0][0].groupName) ? (results[0][0].groupName) : '',
                                     (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                    results[1][0].senderId,
+                                    results[0][0].senderId,
                                     notificationTemplaterRes.parsedTpl,
                                     31,
-                                    0,
-                                    (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                    0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
                                     (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
                                     0,
                                     0,
@@ -187,10 +151,11 @@ taskCtrl.saveTask = function(req,res,next){
                                             accessUserType : results[1][i].accessUserType,
                                             heUserId : results[1][i].heUserId,
                                             formData : JSON.parse(results[1][i].formDataJSON)
-                                        },
-                                        contactList : null
+
+                                        }
                                     },
-                                    null,tokenResult[0].isWhatMate,
+                                    null,
+                                    tokenResult[0].isWhatMate,
                                     results[1][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
@@ -202,7 +167,7 @@ taskCtrl.saveTask = function(req,res,next){
                         }
 
                         response.status = true;
-                        response.message = "Task saved successfully";
+                        response.message = "General request saved successfully";
                         response.error = null;
                         response.data = {
                             messageList: {
@@ -215,10 +180,10 @@ taskCtrl.saveTask = function(req,res,next){
                                 priority: results[0][0].priority,
                                 senderName: results[0][0].senderName,
                                 senderId: results[0][0].senderId,
-                                groupId: req.body.groupId,
                                 receiverId: results[0][0].receiverId,
                                 transId : results[0][0].transId,
                                 formId : results[0][0].formId,
+                                groupId: req.body.groupId,
                                 currentStatus : results[0][0].currentStatus,
                                 currentTransId : results[0][0].currentTransId,
                                 localMessageId : req.body.localMessageId,
@@ -237,7 +202,7 @@ taskCtrl.saveTask = function(req,res,next){
                     }
                     else{
                         response.status = false;
-                        response.message = "Error while saving task";
+                        response.message = "Error while saving general request";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
@@ -252,7 +217,84 @@ taskCtrl.saveTask = function(req,res,next){
 
 };
 
-taskCtrl.getTask = function(req,res,next){
+generalRequestCtrl.getMasterData = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    req.st.validateToken(req.query.token,function(err,tokenResult){
+        if((!err) && tokenResult){
+
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.query.groupId)
+            ];
+            /**
+             * Calling procedure to get form template
+             * @type {string}
+             */
+            var procQuery = 'CALL HE_get_GeneralRequestMasters( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,currencyMaster){
+                if(!err && currencyMaster && currencyMaster[0] && currencyMaster[0][0]){
+                    response.status = true;
+                    response.message = "Master data loaded successfully";
+                    response.error = null;
+                    if(!err && currencyMaster[1][0]){
+                        response.data = {
+                            generalRequestTypes : currencyMaster[0],
+                            defaultUserCurrency : {
+                                currencyId : currencyMaster[1][0].currencyId ? currencyMaster[1][0].currencyId : 0,
+                                currencySymbol : currencyMaster[1][0].currencySymbol ? currencyMaster[1][0].currencySymbol : "",
+                                conversionRate : currencyMaster[1][0].conversionRate ? currencyMaster[1][0].conversionRate : 0
+                            }
+                        };
+                    }
+                    else {
+                        response.data = {
+                            generalRequestTypes : currencyMaster[0] ? currencyMaster[0] : [],
+                            defaultUserCurrency : {
+                                currencyId :  0,
+                                currencySymbol : "",
+                                conversionRate : 0
+                            }
+                        };
+                    }
+                    // res.status(200).json(response);
+
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
+
+                }
+                else if(!err){
+                    response.status = true;
+                    response.message = "No data found";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                }
+                else{
+                    response.status = false;
+                    response.message = "Error while getting master data";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else{
+            res.status(401).json(response);
+        }
+    });
+};
+
+generalRequestCtrl.getGeneralRequest = function(req,res,next){
     var response = {
         status : false,
         message : "Invalid token",
@@ -282,7 +324,6 @@ taskCtrl.getTask = function(req,res,next){
             if((!err) && tokenResult){
                 req.query.limit = (req.query.limit) ? (req.query.limit) : 10;
                 req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
-                req.query.status = (req.query.status) ? (req.query.status) : 1;
 
                 var startPage = 0;
 
@@ -291,7 +332,6 @@ taskCtrl.getTask = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.groupId),
-                    req.st.db.escape(req.query.status),
                     req.st.db.escape(startPage),
                     req.st.db.escape(req.query.limit)
                 ];
@@ -299,16 +339,18 @@ taskCtrl.getTask = function(req,res,next){
                  * Calling procedure to My self and my team leave apllications
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_get_scheduledTaskList( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_get_generalRequest( ' + procParams.join(',') + ')';
                 console.log(procQuery);
+                console.log("tokenResult[0].secretKey",tokenResult[0].secretKey);
                 req.db.query(procQuery,function(err,results){
                     console.log(results);
                     if(!err && results && results[0] ){
+
                         response.status = true;
-                        response.message = "Task requests loaded successfully";
+                        response.message = "General requests loaded successfully";
                         response.error = null;
                         response.data = {
-                            taskList : results[0],
+                            generalRequests : results[0],
                             count : results[1][0].count
                         };
                         // res.status(200).json(response);
@@ -320,10 +362,10 @@ taskCtrl.getTask = function(req,res,next){
                     }
                     else if(!err){
                         response.status = true;
-                        response.message = "No task requests found";
+                        response.message = "No general requests found";
                         response.error = null;
                         response.data = {
-                            taskList : [],
+                            generalRequests : [],
                             count : 0
                         };
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -334,7 +376,7 @@ taskCtrl.getTask = function(req,res,next){
                     }
                     else{
                         response.status = false;
-                        response.message = "Error while getting task requests";
+                        response.message = "Error while getting general requests";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
@@ -349,69 +391,4 @@ taskCtrl.getTask = function(req,res,next){
 
 };
 
-taskCtrl.updateTaskStatus = function(req,res,next){
-    var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
-    };
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-
-    if (!req.body.scheduledId) {
-        error.scheduledId = 'Invalid scheduledId';
-        validationFlag *= false;
-    }
-
-    if (!validationFlag){
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
-
-                var procParams = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.scheduledId),
-                    req.st.db.escape(req.body.status)
-                ];
-                /**
-                 * Calling procedure to My self and my team leave apllications
-                 * @type {string}
-                 */
-                var procQuery = 'CALL HE_save_taskStatus( ' + procParams.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
-                    console.log(results);
-                    if(!err){
-                        response.status = true;
-                        response.message = "Task status updated successfully";
-                        response.error = null;
-                        response.data = null ;
-                        res.status(200).json(response);
-                    }
-                    else{
-                        response.status = false;
-                        response.message = "Error while updating task status";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
-            }
-            else{
-                res.status(401).json(response);
-            }
-        });
-    }
-
-};
-
-module.exports = taskCtrl;
+module.exports = generalRequestCtrl;

@@ -705,6 +705,9 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
                 var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
                 aUrl = uniqueId + '.' + filetype;
                 aFilename = req.files.attachment.originalname;
+                console.log("aFilenameaFilename",aFilename);
+                console.log("req.files.attachment.path",req.files.attachment.path);
+
                 var readStream = fs.createReadStream(req.files.attachment.path);
 
                 uploadDocumentToCloud(aUrl, readStream, function (err) {

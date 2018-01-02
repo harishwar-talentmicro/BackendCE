@@ -189,15 +189,23 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                                 employeeCode : results[3][0].employeeCode,
                                 starts : results[5][0].starts,
                                 ends : results[5][0].ends,
-                                justification : results[5][0].justification
+                                justification : results[5][0].justification,
+                                total : results[3][0].total,
+                                totalAmount : results[3][0].totalAmount,
+                                advance : results[3][0].advance,
+                                advanceAmount : results[3][0].advanceAmount,
+                                totalPayable : results[3][0].totalPayable,
+                                totalPayableAmount : results[3][0].totalPayableAmount
                             };
 
+
                             req.data = JSON.parse(JSON.stringify(reportData));
+
                             (0,travelClaimReport.expenseReport)(req, res);
+
                             var options = { format: 'A4', width: '8in', height: '10.5in', border: '0', timeout: 30000, "zoomFactor": "1" };
 
                             htmlpdf.create(res.data,options).toBuffer(function (err, buffer) {
-                                console.log('This is a buffer:', Buffer.isBuffer(buffer));
                                 var attachmentObjectsList = [{
                                     filename: results[3][0].name + '.pdf',
                                     content: buffer

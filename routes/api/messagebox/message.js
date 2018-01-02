@@ -319,7 +319,7 @@ router.post('/', function(req,res,next){
                                                 else{
                                                     senderGroupId = results[0][0].senderId;
                                                     notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                                                        senderName : results[0][0].senderName
+                                                        senderName : results[0][0].senderName + " " + results[0][0].message
                                                     });
                                                 }
 

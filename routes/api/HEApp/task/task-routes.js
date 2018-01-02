@@ -8,5 +8,7 @@ var router = express.Router();
 var taskCtrl = require('./task-ctrl');
 
 router.post('/',taskCtrl.saveTask);
+router.get('/',taskCtrl.getTask);
+router.post('/status',taskCtrl.updateTaskStatus);
 
 module.exports = router;

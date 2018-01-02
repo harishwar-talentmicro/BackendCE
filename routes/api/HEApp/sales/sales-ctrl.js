@@ -541,7 +541,7 @@ salesCtrl.assignToUser = function(req,res,next){
                                     },
                                     null,
                                     tokenResult[0].isWhatMate,
-                                    results[1][i].secretKey);
+                                    results[0][i].secretKey);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
                             else {

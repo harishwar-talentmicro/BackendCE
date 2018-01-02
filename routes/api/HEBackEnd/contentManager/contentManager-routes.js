@@ -12,4 +12,9 @@ router.get('/',contentManagerCtrl.findDocument);
 router.get('/details',contentManagerCtrl.getDocumentDetails);
 router.delete('/',contentManagerCtrl.deleteDoc);
 
+router.get('/relatedDocument/find',contentManagerCtrl.findRelatedDocument);
+router.get('/relatedDocuments',contentManagerCtrl.getRelatedDocument);
+router.post('/relatedDocument',contentManagerCtrl.saveRelatedDocument);
+router.delete('/relatedDocument',contentManagerCtrl.deleteRelatedDocument);
+
 module.exports = router;

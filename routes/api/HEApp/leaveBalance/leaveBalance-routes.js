@@ -9,4 +9,6 @@ var leaveBalanceCtrl = require('./leaveBalance-ctrl');
 router.get('/form',leaveBalanceCtrl.getLeaveBalanceForm);
 router.get('/',leaveBalanceCtrl.getLeaveBalance);
 
+router.get('/applications',leaveBalanceCtrl.getLeaveApplications);
+
 module.exports = router;

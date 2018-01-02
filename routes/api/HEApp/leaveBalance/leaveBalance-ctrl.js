@@ -245,4 +245,102 @@ leaveBalanceCtrl.getLeaveBalance = function(req,res,next){
 
 };
 
+leaveBalanceCtrl.getLeaveApplications = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.isMySelf = req.query.isMySelf ? req.query.isMySelf : 0;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 10;
+                req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
+
+                var startPage = 0;
+
+                startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(req.query.isMySelf),
+                    req.st.db.escape(startPage),
+                    req.st.db.escape(req.query.limit)
+                ];
+                /**
+                 * Calling procedure to My self and my team leave apllications
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_get_leaveApplications( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+                    console.log(results);
+                    if(!err && results && results[0] ){
+
+                        response.status = true;
+                        response.message = "Leave applications loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            leaveApplications : results[0],
+                            count : results[1][0].count
+                        };
+                        // res.status(200).json(response);
+                         buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "No leave applications found";
+                        response.error = null;
+                        response.data = {
+                            leaveApplications : [],
+                            count : 0
+                        };
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting leave applications";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 module.exports = leaveBalanceCtrl;

@@ -5,6 +5,10 @@
 var contentManagerCtrl = {};
 var error = {};
 
+var Notification_aws = require('../../../modules/notification/aws-sns-push');
+
+var _Notification_aws = new  Notification_aws();
+
 contentManagerCtrl.saveContent = function(req,res,next){
     var response = {
         status : false,
@@ -95,6 +99,18 @@ contentManagerCtrl.saveContent = function(req,res,next){
                 req.db.query(procQuery,function(err,contentResult){
                     console.log(err);
                     if(!err && contentResult && contentResult[0] && contentResult[0][0] ){
+                        var messagePayload = {
+                            information : contentResult[3],
+                            type : 100
+                        };
+console.log("messagePayload",messagePayload);
+                        if(contentResult[1] && contentResult[1][0].APNS_Id){
+                            _Notification_aws.publish_IOS(contentResult[1][0].APNS_Id,messagePayload,0);
+                        }
+                        if(contentResult[2] && contentResult[2][0].GCM_Id){
+                            _Notification_aws.publish_Android(contentResult[2][0].GCM_Id ,messagePayload);
+                        }
+
                         response.status = true;
                         response.message = "Content saved successfully";
                         response.error = null;
@@ -374,6 +390,307 @@ contentManagerCtrl.deleteDoc = function(req,res,next){
             }
         });
     }
+};
+
+contentManagerCtrl.findRelatedDocument = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+    if (!req.query.docCode)
+    {
+        error.docCode = 'Invalid docCode';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.isTitle = req.query.isTitle ? req.query.isTitle : 0;
+                req.query.keywords = req.query.keywords ? req.query.keywords : "" ;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.query.docCode)
+                ];
+
+                var procQuery = 'CALL he_find_knowledgeDoc( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,documentResult){
+                    console.log(err);
+                    if(!err && documentResult && documentResult[0] && documentResult[0][0] ){
+                        response.status = true;
+                        response.message = "Document loaded successfully";
+                        response.error = null;
+                        response.data = documentResult[0][0];
+                        res.status(200).json(response);
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "No document found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while loading document";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+contentManagerCtrl.getRelatedDocument = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+    if (!req.query.docId)
+    {
+        error.docId = 'Invalid docId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.query.docId)
+                ];
+
+                var procQuery = 'CALL he_get_relatedDocs( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,documentResult){
+                    console.log(err);
+                    if(!err && documentResult && documentResult[0] && documentResult[0][0] ){
+                        response.status = true;
+                        response.message = "Document loaded successfully";
+                        response.error = null;
+                        response.data = documentResult[0];
+                        res.status(200).json(response);
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "No document found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while loading document";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+contentManagerCtrl.saveRelatedDocument = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+    if (!req.body.docId)
+    {
+        error.docId = 'Invalid docId';
+        validationFlag *= false;
+    }
+    if (!req.body.relatedDocId)
+    {
+        error.relatedDocId = 'Invalid relatedDocId';
+        validationFlag *= false;
+    }
+
+    if (!req.body.relatedDocTitle)
+    {
+        error.relatedDocTitle = 'Invalid relatedDocTitle';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.body.docId),
+                    req.st.db.escape(req.body.relatedDocId),
+                    req.st.db.escape(req.body.relatedDocTitle)
+                ];
+
+                var procQuery = 'CALL he_save_relatedDocs( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,documentResult){
+                    console.log(err);
+                    if(!err && documentResult && documentResult[0] && documentResult[0][0] ){
+                        response.status = true;
+                        response.message = "Document saved successfully";
+                        response.error = null;
+                        response.data = documentResult[0][0];
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving document";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+contentManagerCtrl.deleteRelatedDocument = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+    if (!req.query.id)
+    {
+        error.id = 'Invalid id';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.query.id)
+                ];
+
+                var procQuery = 'CALL he_delete_relatedDocs( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,documentResult){
+                    console.log(err);
+                    if(!err ){
+                        response.status = true;
+                        response.message = "Document deleted successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while deleting document";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
 };
 
 module.exports = contentManagerCtrl;

@@ -1146,11 +1146,7 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.keywords)
-    {
-        error.keywords = 'Invalid keywords';
-        validationFlag *= false;
-    }
+
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
@@ -1160,11 +1156,19 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 10;
+                req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
+
+                var startPage = 0;
+
+                startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.groupId),
-                    req.st.db.escape(req.query.keywords)
+                    req.st.db.escape(req.query.keywords),
+                    req.st.db.escape(startPage),
+                    req.st.db.escape(req.query.limit)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -1185,13 +1189,14 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
                         for(var i = 0; i < informationResult[0].length; i++) {
                             var res1 = {};
                             res1.docTitle = informationResult[0][i].docTitle;
+                            res1.docDetailId = informationResult[0][i].docDetailId;
                             res1.contentType = informationResult[0][i].contentType;
                             res1.versionDate = informationResult[0][i].versionDate;
                             res1.latestVersion = informationResult[0][i].latestVersion;
                             // res1.fileName = (informationResult[0][i].contentType == 1 ) ? informationResult[0][i].fileName : (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + informationResult[0][i].fileName);
                             res1.fileName = (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + informationResult[0][i].fileName);
                             res1.speechContent = "";
-                            console.log("res1.fileName",res1.fileName);
+                            res1.relatedDocuments = (informationResult[0][i].relatedDocuments) ? JSON.parse(informationResult[0][i].relatedDocuments) : [] ;
                             output.push(res1);
                         }
                         response.data =  {
@@ -1199,12 +1204,13 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
                             count : informationResult[1][0].count
                         };
 
+                        // res.status(200).json(response);
+
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
-
                     }
                     else if(!err){
                         response.status = true;
@@ -1306,5 +1312,253 @@ recruitmentCtrl.extractTextFromFile = function(req,res,next){
         });
     }
 };
+
+recruitmentCtrl.saveDocFeedback = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    var isTrue = false;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.body.docDetailId)
+    {
+        error.docDetailId = 'Invalid docDetailId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.docDetailId),
+                    req.st.db.escape(req.body.readStatus),
+                    req.st.db.escape(req.body.rating),
+                    req.st.db.escape(req.body.comments),
+                    req.st.db.escape(req.body.signature)
+                ];
+                /**
+                 * Calling procedure to save feedback
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_save_docFeedback( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,informationResult){
+                    if(!err){
+                        var filePath = "";
+                        response.status = true;
+                        response.message = "Feedback saved successfully";
+                        response.error = null;
+                        response.data =  null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving feedback";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+recruitmentCtrl.saveDocReadStatus = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    var isTrue = false;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.body.docDetailId)
+    {
+        error.docDetailId = 'Invalid docDetailId';
+        validationFlag *= false;
+    }
+
+    if (!req.body.groupId)
+    {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.groupId),
+                    req.st.db.escape(req.body.docDetailId)
+                ];
+                /**
+                 * Calling procedure to save feedback
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_save_docReadStatus( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,informationResult){
+                    if(!err){
+                        response.status = true;
+                        response.message = "Read status saved successfully";
+                        response.error = null;
+                        response.data =  null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving read status";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+recruitmentCtrl.getmessageDetails = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.transId) {
+        error.transId = 'Invalid transId';
+        validationFlag *= false;
+    }
+    if (!req.query.parentId) {
+        error.parentId = 'Invalid parentId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.transId),
+                    req.st.db.escape(req.query.parentId),
+                    req.st.db.escape(req.query.formId)
+                ];
+                /**
+                 * Calling procedure to My self and my team leave apllications
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_get_leaveApplication_details( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+                    console.log(results);
+                    if(!err && results && results[0] ){
+
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            messageId: results[0][0].messageId,
+                            message: results[0][0].message,
+                            messageLink: results[0][0].messageLink,
+                            createdDate: results[0][0].createdDate,
+                            messageType: results[0][0].messageType,
+                            messageStatus: results[0][0].messageStatus,
+                            priority: results[0][0].priority,
+                            senderName: results[0][0].senderName,
+                            senderId: results[0][0].senderId,
+                            receiverId: results[0][0].receiverId,
+                            groupId: results[0][0].senderId,
+                            groupType: 2,
+                            transId : results[0][0].transId,
+                            formId : results[0][0].formId,
+                            currentStatus : results[0][0].currentStatus,
+                            currentTransId : results[0][0].currentTransId,
+                            parentId : results[0][0].parentId,
+                            accessUserType : results[0][0].accessUserType,
+                            heUserId : results[0][0].heUserId,
+                            formData : JSON.parse(results[0][0].formDataJSON)
+                        };
+                        // res.status(200).json(response);
+                        buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 
 module.exports = recruitmentCtrl;

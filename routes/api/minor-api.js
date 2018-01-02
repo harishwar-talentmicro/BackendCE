@@ -83,6 +83,10 @@ var taxDeclarations = require('./tax/tax-routes');
 var taxWebSavings = require('./HEBackEnd/taxSaving.js');
 var policeStations = require('./HEApp/police.js');
 var travelMode = require('./HEBackEnd/travelMode.js');
+var generalRequest = require('./HEBackEnd/generalRequest.js');
+var WMWindowsApp = require('./WMWindowsApp/WMWindowsApp-routes');
+var zoom = require('./zoomMeeting/zoomMeeting-routes');
+var appGeneralRequest = require('./HEApp/generalRequest.js');
 
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
@@ -171,6 +175,10 @@ router.use('/helloEZE/app',taxDeclarations);
 router.use('/helloEZE',taxWebSavings);
 router.use('/helloEZE/app',policeStations);
 router.use('/helloEZE',travelMode);
+router.use('/helloEZE',generalRequest);
+router.use('/helloEZE/app',appGeneralRequest);
+router.use('/helloEZE/app',zoom);
+router.use('/WhatMate/Windows',WMWindowsApp);
 
 //router.use('/test_info',testInfoV1);
 //router.use('/association-ap',associationAPV1);
@@ -277,5 +285,11 @@ router.get('/test',function(req,res,next){
 
 });
 
+// JobRaiser Project starts from here
+var jobModule = require('./JobRaiser/job.js');
+var masterModule = require('./JobRaiser/master.js');
+
+router.use('/WM',jobModule);
+router.use('/WM',masterModule);
 
 module.exports = router;

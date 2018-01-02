@@ -668,6 +668,8 @@ User.prototype.changePassword = function(req,res,next){
         var OldPassword = req.body.OldPassword;
         var NewPassword = req.body.NewPassword;
         var RtnMessage = {
+            status : true,
+            message : "Invalid token",
             IsChanged: false
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
@@ -682,6 +684,8 @@ User.prototype.changePassword = function(req,res,next){
                             if(err){
                                 console.log('Error : FnChangePassword - During old password retrieval; Procedure: pgetoldpassword');
                                 console.log(err);
+                                RtnMessage.status = false;
+                                RtnMessage.message = "Something went wrong";
                                 res.status(400).json(RtnMessage);
                             }
                             else{
@@ -690,6 +694,7 @@ User.prototype.changePassword = function(req,res,next){
                                     if(oldPassResult[0]){
                                         if(oldPassResult[0][0]){
                                             if(oldPassResult[0][0].Password){
+
                                                 if(comparePassword(OldPassword,oldPassResult[0][0].Password)){
                                                     var ip = req.headers['x-forwarded-for'] ||
                                                         req.connection.remoteAddress ||
@@ -709,48 +714,66 @@ User.prototype.changePassword = function(req,res,next){
                                                         if(err){
                                                             console.log('Error FnChangePassword :  procedure pChangePassword');
                                                             console.log(err);
-                                                            res.status(400).json(RtnMessage);
+                                                            RtnMessage.status = false;
+                                                            RtnMessage.message = "Something went wrong";
+                                                            res.status(500).json(RtnMessage);
                                                         }
                                                         else{
                                                             if(passChangeResult){
-                                                                console.log(passChangeResult);
                                                                 RtnMessage.IsChanged = true;
+                                                                RtnMessage.status = true;
+                                                                RtnMessage.message = "Password changed ..";
                                                                 res.status(200).json(RtnMessage);
                                                             }
                                                             else{
+                                                                RtnMessage.status = true;
+                                                                RtnMessage.message = "Password changed ..";
                                                                 res.status(200).status(RtnMessage);
                                                             }
                                                         }
                                                     });
                                                 }
                                                 else{
+                                                    RtnMessage.status = false;
+                                                    RtnMessage.message = "Password do not match. Please re-enter password..";
                                                     res.status(200).json(RtnMessage);
                                                 }
                                             }
                                             else{
+                                                RtnMessage.status = false;
+                                                RtnMessage.message = "Unable to fetch old password ..";
                                                 res.status(401).json(RtnMessage);
                                             }
                                         }
                                         else{
+                                            RtnMessage.status = false;
+                                            RtnMessage.message = "Unable to fetch old password ..";
                                             res.status(401).json(RtnMessage);
                                         }
                                     }
                                     else{
+                                        RtnMessage.status = false;
+                                        RtnMessage.message = "Unable to fetch old password ..";
                                         res.status(401).json(RtnMessage);
                                     }
                                 }
                                 else{
+                                    RtnMessage.status = false;
+                                    RtnMessage.message = "Unable to fetch old password ..";
                                     res.status(401).json(RtnMessage);
                                 }
                             }
                         });
 
                     } else {
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
+                        RtnMessage.status = false;
+                        RtnMessage.message = "Invalid token..";
+                        res.status(401).json(RtnMessage);
                         console.log('FnChangePassword:pChangePassword: Invalid Token');
                     }
                 } else {
+                    RtnMessage.status = false;
+                    RtnMessage.message = "Something went wrong..";
                     res.statusCode = 500;
                     res.send(RtnMessage);
                     console.log('FnChangePassword:pChangePassword: Error in validating token:  ' + err);
@@ -767,6 +790,8 @@ User.prototype.changePassword = function(req,res,next){
             else if (!TokenNo) {
                 console.log('FnChangePassword: TokenNo is empty');
             }
+            RtnMessage.status = false;
+            RtnMessage.message = "Fill all required fields..";
             res.statusCode = 400;
             res.send(RtnMessage);
         }
@@ -775,6 +800,8 @@ User.prototype.changePassword = function(req,res,next){
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnChangePassword error:' + ex);
+        RtnMessage.status = false;
+        RtnMessage.message = "Something went wrong..";
         res.status(400).json(RtnMessage);
 
     }

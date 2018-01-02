@@ -43,7 +43,6 @@ taxCtrl.getTaxDeclarations = function(req,res,next){
                      * @type {string}
                      */
                     var procQuery = 'CALL he_get_tax_declaration( ' + procParams.join(',') + ')';
-                    console.log(procQuery);
                     req.db.query(procQuery,function(err,taxDeclaration){
                         if(!err && taxDeclaration && taxDeclaration[0] && taxDeclaration[0][0] ){
                             var output = [];
@@ -55,8 +54,6 @@ taxCtrl.getTaxDeclarations = function(req,res,next){
                                 res1.actualAmount = taxDeclaration[1][i].actualAmount;
 
                                 for(var j = 0; j < taxDeclaration[2].length; j++) {
-                                    console.log("taxDeclaration[1][i].taxGroupId",taxDeclaration[1][i].taxGroupId);
-                                    console.log("taxDeclaration[2][j].taxGroupId",taxDeclaration[2][j].taxGroupId);
 
                                     if (taxDeclaration[1][i].taxGroupId == taxDeclaration[2][j].taxGroupId){
                                         res1.items = (taxDeclaration[2][j].items) ?  JSON.parse("[" + taxDeclaration[2][j].items + "]") : [];
@@ -67,10 +64,8 @@ taxCtrl.getTaxDeclarations = function(req,res,next){
                                         res1.items = [] ;
                                     }
                                 }
-
                                 output.push(res1);
                             }
-
                             response.status = true;
                             response.message = "Tax declaration loaded successfully";
                             response.error = null;

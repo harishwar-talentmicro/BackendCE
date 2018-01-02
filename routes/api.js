@@ -19,7 +19,6 @@ router.all('*',function(req,res,next){
     req.db = db;
     req.st = stdLib;
 
-
     /**
      * User Agent Detection Code
      *
