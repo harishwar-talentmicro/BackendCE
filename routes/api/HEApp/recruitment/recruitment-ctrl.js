@@ -1183,34 +1183,59 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
                         response.message = "Information loaded successfully";
                         response.error = null;
                         var output = [];
+                        var output1 = [];
                         var speech = "";
                         var fileName = "";
+                        var docDetails = JSON.parse(informationResult[0][0].details) ;
+                        for(var i = 0; i < docDetails.length; i++) {
+                            var res2 = {};
+                            res2.groupTitle = docDetails[i].groupTitle;
+                            var docs = JSON.parse(docDetails[i].docs);
 
-                        for(var i = 0; i < informationResult[0].length; i++) {
-                            var res1 = {};
-                            res1.docTitle = informationResult[0][i].docTitle;
-                            res1.docDetailId = informationResult[0][i].docDetailId;
-                            res1.contentType = informationResult[0][i].contentType;
-                            res1.versionDate = informationResult[0][i].versionDate;
-                            res1.latestVersion = informationResult[0][i].latestVersion;
-                            // res1.fileName = (informationResult[0][i].contentType == 1 ) ? informationResult[0][i].fileName : (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + informationResult[0][i].fileName);
-                            res1.fileName = (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + informationResult[0][i].fileName);
-                            res1.speechContent = "";
-                            res1.relatedDocuments = (informationResult[0][i].relatedDocuments) ? JSON.parse(informationResult[0][i].relatedDocuments) : [] ;
-                            output.push(res1);
+                            for(var j = 0; j < docs.length; j++) {
+                                    var res1 = {};
+                                    res1.docTitle = docs[j].docTitle;
+                                    res1.docDetailId = docs[j].docDetailId;
+                                    res1.contentType = docs[j].contentType;
+                                    res1.versionDate = docs[j].versionDate;
+                                    res1.latestVersion = docs[j].latestVersion;
+                                    res1.readStatus = docs[j].readStatus;
+                                    // res1.fileName = (informationResult[0][i].contentType == 1 ) ? informationResult[0][i].fileName : (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + informationResult[0][i].fileName);
+                                    res1.fileName = (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + docs[j].fileName);
+                                    res1.speechContent = "";
+                                    res1.relatedDocuments = (docs[j].relatedDocuments) ? JSON.parse(docs[j].relatedDocuments) : [] ;
+                                    output1.push(res1);
+                            }
+                            res2.docs = output1 ;
+                            output.push(res2);
                         }
+
+                        // for(var i = 0; i < informationResult[0].length; i++) {
+                        //     var res1 = {};
+                        //     res1.docTitle = informationResult[0][i].docTitle;
+                        //     res1.docDetailId = informationResult[0][i].docDetailId;
+                        //     res1.contentType = informationResult[0][i].contentType;
+                        //     res1.versionDate = informationResult[0][i].versionDate;
+                        //     res1.latestVersion = informationResult[0][i].latestVersion;
+                        //     res1.readStatus = informationResult[0][i].readStatus;
+                        //     // res1.fileName = (informationResult[0][i].contentType == 1 ) ? informationResult[0][i].fileName : (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + informationResult[0][i].fileName);
+                        //     res1.fileName = (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + informationResult[0][i].fileName);
+                        //     res1.speechContent = "";
+                        //     res1.relatedDocuments = (informationResult[0][i].relatedDocuments) ? JSON.parse(informationResult[0][i].relatedDocuments) : [] ;
+                        //     output.push(res1);
+                        // }
                         response.data =  {
                             information : output,
                             count : informationResult[1][0].count
                         };
 
-                        // res.status(200).json(response);
+                        res.status(200).json(response);
 
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        //     res.status(200).json(response);
+                        // });
                     }
                     else if(!err){
                         response.status = true;
@@ -1279,12 +1304,11 @@ recruitmentCtrl.extractTextFromFile = function(req,res,next){
                                             speechContent : text
                                         };
 
-                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                         zlib.gzip(buf, function (_, result) {
                                             response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
                                             res.status(200).json(response);
                                         });
-
                                     }
                                     else {
                                         response.status = false;
@@ -1293,7 +1317,7 @@ recruitmentCtrl.extractTextFromFile = function(req,res,next){
                                         response.data = {
                                             speechContent : ""
                                         };
-                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                         zlib.gzip(buf, function (_, result) {
                                             response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
                                             res.status(500).json(response);

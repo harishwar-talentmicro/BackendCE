@@ -276,6 +276,7 @@ leaveBalanceCtrl.getLeaveApplications = function(req,res,next){
                 req.query.isMySelf = req.query.isMySelf ? req.query.isMySelf : 0;
                 req.query.limit = (req.query.limit) ? (req.query.limit) : 10;
                 req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
+                req.query.keywords = (req.query.keywords) ? (req.query.keywords) : "";
 
                 var startPage = 0;
 
@@ -286,7 +287,8 @@ leaveBalanceCtrl.getLeaveApplications = function(req,res,next){
                     req.st.db.escape(req.query.groupId),
                     req.st.db.escape(req.query.isMySelf),
                     req.st.db.escape(startPage),
-                    req.st.db.escape(req.query.limit)
+                    req.st.db.escape(req.query.limit),
+                    req.st.db.escape(req.query.keywords)
                 ];
                 /**
                  * Calling procedure to My self and my team leave apllications

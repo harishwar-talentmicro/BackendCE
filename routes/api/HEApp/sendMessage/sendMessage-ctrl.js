@@ -29,14 +29,6 @@ sendMessageCtrl.sendMessage = function(req,res,next){
         validationFlag *= false;
     }
 
-    var groupList =req.body.groupList;
-    if(typeof(groupList) == "string") {
-        groupList = JSON.parse(groupList);
-    }
-    if(!groupList){
-        groupList = [];
-    }
-
     var attachmentList =req.body.attachmentList;
     if(typeof(attachmentList) == "string") {
         attachmentList = JSON.parse(attachmentList);
@@ -73,18 +65,17 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.parentId),
                     req.st.db.escape(req.body.message),
-                    req.st.db.escape(req.body.notes),
-                    req.st.db.escape(req.body.status),
-                    req.st.db.escape(req.body.approverNotes),
-                    req.st.db.escape(req.body.changeLog),
                     req.st.db.escape(req.body.groupId),
                     req.st.db.escape(req.body.learnMessageId),
                     req.st.db.escape(req.body.accessUserType),
                     req.st.db.escape(JSON.stringify(attachmentList)),
-                    req.st.db.escape(JSON.stringify(groupList)),
-                    req.st.db.escape(req.body.approverCount),
-                    req.st.db.escape(req.body.recordedVoiceUrl),
-                    req.st.db.escape(req.body.receiverCount)
+                    req.st.db.escape(req.body.changeLog),
+                    req.st.db.escape(req.body.userList),
+                    req.st.db.escape(req.body.branchList),
+                    req.st.db.escape(req.body.departmentList),
+                    req.st.db.escape(req.body.gradeList),
+                    req.st.db.escape(req.body.groupList),
+                    req.st.db.escape(req.body.alarmType)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -197,6 +188,156 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                     else{
                         response.status = false;
                         response.message = "Error while sending message";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+sendMessageCtrl.getUserConfig = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.groupId)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_Get_UserMsgMapDetails( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,configResult){
+                    if(!err && configResult ){
+                        response.status = true;
+                        response.message = "Configurations loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            branchList : configResult[0] ? configResult[0] : [],
+                            departmentList : configResult[1] ? configResult[1] : [],
+                            gradeList : configResult[2] ? configResult[2] : [],
+                            groupList : configResult[3] ? configResult[3] : []
+                        };
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting configuration";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+sendMessageCtrl.getMemberCount = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.body.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                var branchList = req.body.branchList!=undefined ? req.body.branchList : "";
+                var departmentList = req.body.departmentList!=undefined ? req.body.departmentList : "";
+                var gradeList = req.body.gradeList!=undefined ? req.body.gradeList : "";
+                var groupList = req.body.groupList!=undefined ? req.body.groupList : "";
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.groupId),
+                    req.st.db.escape(JSON.stringify(branchList)),
+                    req.st.db.escape(JSON.stringify(departmentList)),
+                    req.st.db.escape(JSON.stringify(gradeList)),
+                    req.st.db.escape(JSON.stringify(groupList))
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_Get_sendMsgUserCount( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,configResult){
+                    if(!err && configResult ){
+                        response.status = true;
+                        response.message = "Member count loaded successfully .";
+                        response.error = null;
+                        response.data = {
+                            memberCount : configResult[0][0].count
+                        };
+                        res.status(200).json(response);
+
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        //     res.status(200).json(response);
+                        // });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting member count";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

@@ -9,5 +9,7 @@ var router = express.Router();
 var messageCtrl = require('./sendMessage-ctrl');
 
 router.post('/',messageCtrl.sendMessage);
+router.get('/userConfiguration',messageCtrl.getUserConfig);
+router.post('/memberCount',messageCtrl.getMemberCount);
 
 module.exports = router;

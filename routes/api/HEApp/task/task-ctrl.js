@@ -16,7 +16,6 @@ var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 
-
 taskCtrl.saveTask = function(req,res,next){
     var response = {
         status : false,
@@ -37,11 +36,6 @@ taskCtrl.saveTask = function(req,res,next){
 
     if (!req.body.starts) {
         error.token = 'Invalid start date';
-        validationFlag *= false;
-    }
-
-    if (!req.body.ends) {
-        error.token = 'Invalid end date';
         validationFlag *= false;
     }
 
@@ -71,7 +65,6 @@ taskCtrl.saveTask = function(req,res,next){
 
     var senderGroupId;
 
-
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
@@ -99,6 +92,11 @@ taskCtrl.saveTask = function(req,res,next){
                 req.body.isEndDate = req.body.isEndDate ? req.body.isEndDate : 0;
                 req.body.alertType = req.body.alertType ? req.body.alertType : 0;
                 req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : "";
+                req.body.ends = req.body.ends != undefined ? req.body.ends : null;
+
+                if(req.body.ends == ""){
+                    req.body.ends = null
+                }
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -410,6 +408,49 @@ taskCtrl.updateTaskStatus = function(req,res,next){
                 res.status(401).json(response);
             }
         });
+    }
+
+};
+
+taskCtrl.scheduleTask = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+                var procQuery = 'CALL he_schedule_tasks()';
+                console.log(procQuery);
+
+                req.db.query(procQuery,function(err,results){
+                    console.log(results);
+                    if(!err){
+                        response.status = true;
+                        response.message = "Task Scheduled successfully";
+                        response.error = null;
+                        response.data = null ;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while scheduling task";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+
+
+
     }
 
 };

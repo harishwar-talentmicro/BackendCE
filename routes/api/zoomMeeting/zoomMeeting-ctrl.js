@@ -63,6 +63,7 @@ zoomCtrl.saveZoomMeeting = function(req,res,next){
                         var messagePayload = {
                             message : questionsData[0][0].message,
                             meetingId : questionsData[0][0].meetingId,
+                            title : questionsData[0][0].title,
                             type : 91
                         };
                         console.log("messagePayload",messagePayload);

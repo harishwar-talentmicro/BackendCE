@@ -9,6 +9,7 @@
 var express = require('express');
 var router = express.Router();
 
+
 var DbHelper = require('./../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
 
@@ -695,5 +696,6 @@ router.post('/association_invite',AssociationtModule.associationInvite);
 router.all('*',function(req,res,next){
     res.status(404).json({ status : false, error : { api : 'API'}, message : 'Not found'});
 });
+
 
 module.exports = router;

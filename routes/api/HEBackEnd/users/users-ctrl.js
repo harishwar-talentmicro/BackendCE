@@ -128,7 +128,6 @@ userCtrl.getMasterData = function(req,res,next){
 
     if (!req.query.APIKey)
     {
-        console.log("Entered....");
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
@@ -166,7 +165,8 @@ userCtrl.getMasterData = function(req,res,next){
                             workLocationList : masterDataResult[4],
                             trackTemplateList : masterDataResult[5],
                             formTemplateList : masterDataResult[6],
-                            gradeList : masterDataResult[7]
+                            gradeList : masterDataResult[7],
+                            docGroupList : masterDataResult[8]
                         };
                         res.status(200).json(response);
 

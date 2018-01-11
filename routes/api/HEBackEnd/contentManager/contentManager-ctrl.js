@@ -75,6 +75,7 @@ contentManagerCtrl.saveContent = function(req,res,next){
             if((!err) && tokenResult){
 
                 req.body.helpCode = req.body.helpCode ? req.body.helpCode : "";
+                req.body.groupTitle = req.body.groupTitle ? req.body.groupTitle : "";
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -91,7 +92,8 @@ contentManagerCtrl.saveContent = function(req,res,next){
                     req.st.db.escape(JSON.stringify(grade)),
                     req.st.db.escape(JSON.stringify(department)),
                     req.st.db.escape(JSON.stringify(location)),
-                    req.st.db.escape(req.body.helpCode)
+                    req.st.db.escape(req.body.helpCode),
+                    req.st.db.escape(req.body.groupTitle)
                 ];
 
                 var procQuery = 'CALL he_save_documents( ' + procParams.join(',') + ')';
@@ -103,7 +105,7 @@ contentManagerCtrl.saveContent = function(req,res,next){
                             information : contentResult[3],
                             type : 100
                         };
-console.log("messagePayload",messagePayload);
+                        console.log("messagePayload",messagePayload);
                         if(contentResult[1] && contentResult[1][0].APNS_Id){
                             _Notification_aws.publish_IOS(contentResult[1][0].APNS_Id,messagePayload,0);
                         }
@@ -291,6 +293,7 @@ contentManagerCtrl.getDocumentDetails = function(req,res,next){
                             res1.grade = (documentResult[0][i].grade) ? JSON.parse(documentResult[0][i].grade) : null;
                             res1.location = (documentResult[0][i].location) ? JSON.parse(documentResult[0][i].location) : null;
                             res1.helpCode = documentResult[0][i].helpCode;
+                            res1.groupTitle = documentResult[0][i].groupTitle;
                             output.push(res1);
                         }
                         response.data = output;

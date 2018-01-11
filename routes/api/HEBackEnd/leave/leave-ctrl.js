@@ -47,6 +47,19 @@ leaveCtrl.saveLeaveTypes = function(req,res,next){
                 req.body.leaveDescription = (req.body.leaveDescription) ? req.body.leaveDescription : '';
                 req.body.leaveTypeId = (req.body.leaveTypeId) ? req.body.leaveTypeId : 0;
                 req.body.backdatePeriod = (req.body.backdatePeriod != undefined) ? req.body.backdatePeriod : 0;
+                req.body.leaveLimit = (req.body.leaveLimit != undefined) ? req.body.leaveLimit : 2;
+
+                req.body.resetType = (req.body.resetType != undefined) ? req.body.resetType : 0;
+                req.body.lastResetDate = (req.body.lastResetDate != undefined) ? req.body.lastResetDate : null;
+                req.body.resetDuration = (req.body.resetDuration != undefined) ? req.body.resetDuration : 0;
+                req.body.resetFrequency = (req.body.resetFrequency != undefined) ? req.body.resetFrequency : 0;
+                req.body.initialValue = (req.body.initialValue != undefined) ? req.body.initialValue : 0;
+                req.body.incrementValue = (req.body.incrementValue != undefined) ? req.body.incrementValue : 0;
+                req.body.lastIncrementDate = (req.body.lastIncrementDate != undefined) ? req.body.lastIncrementDate : null;
+                req.body.incrementDuration = (req.body.incrementDuration != undefined) ? req.body.incrementDuration : 0;
+                req.body.incrementFrequency = (req.body.incrementFrequency != undefined) ? req.body.incrementFrequency : 0;
+                req.body.nextResetDate = (req.body.nextResetDate != undefined) ? req.body.nextResetDate : null;
+                req.body.nextIncrementDate = (req.body.nextIncrementDate != undefined) ? req.body.nextIncrementDate : null;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -55,7 +68,17 @@ leaveCtrl.saveLeaveTypes = function(req,res,next){
                     req.st.db.escape(req.body.leaveTitle),
                     req.st.db.escape(req.body.leaveDescription),
                     req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(req.body.backdatePeriod)
+                    req.st.db.escape(req.body.backdatePeriod),
+                    req.st.db.escape(req.body.leaveLimit),
+                    req.st.db.escape(req.body.resetType),
+                    req.st.db.escape(req.body.lastResetDate),
+                    req.st.db.escape(req.body.resetDuration),
+                    req.st.db.escape(req.body.resetFrequency),
+                    req.st.db.escape(req.body.initialValue),
+                    req.st.db.escape(req.body.incrementValue),
+                    req.st.db.escape(req.body.lastIncrementDate),
+                    req.st.db.escape(req.body.incrementDuration),
+                    req.st.db.escape(req.body.incrementFrequency)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -133,6 +156,19 @@ leaveCtrl.updateLeaveTypes = function(req,res,next){
             if((!err) && tokenResult){
                 req.body.leaveDescription = (req.body.leaveDescription) ? req.body.leaveDescription : '';
                 req.body.backdatePeriod = (req.body.backdatePeriod != undefined) ? req.body.backdatePeriod : 0;
+                req.body.leaveLimit = (req.body.leaveLimit != undefined) ? req.body.leaveLimit : 2;
+
+                req.body.resetType = (req.body.resetType != undefined) ? req.body.resetType : 0;
+                req.body.lastResetDate = (req.body.lastResetDate != undefined) ? req.body.lastResetDate : null;
+                req.body.resetDuration = (req.body.resetDuration != undefined) ? req.body.resetDuration : 0;
+                req.body.resetFrequency = (req.body.resetFrequency != undefined) ? req.body.resetFrequency : 0;
+                req.body.initialValue = (req.body.initialValue != undefined) ? req.body.initialValue : 0;
+                req.body.incrementValue = (req.body.incrementValue != undefined) ? req.body.incrementValue : 0;
+                req.body.lastIncrementDate = (req.body.lastIncrementDate != undefined) ? req.body.lastIncrementDate : null;
+                req.body.incrementDuration = (req.body.incrementDuration != undefined) ? req.body.incrementDuration : 0;
+                req.body.incrementFrequency = (req.body.incrementFrequency != undefined) ? req.body.incrementFrequency : 0;
+                // req.body.nextResetDate = (req.body.nextResetDate != undefined) ? req.body.nextResetDate : null;
+                // req.body.nextIncrementDate = (req.body.nextIncrementDate != undefined) ? req.body.nextIncrementDate : null;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -141,7 +177,17 @@ leaveCtrl.updateLeaveTypes = function(req,res,next){
                     req.st.db.escape(req.body.leaveTitle),
                     req.st.db.escape(req.body.leaveDescription),
                     req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(req.body.backdatePeriod)
+                    req.st.db.escape(req.body.backdatePeriod),
+                    req.st.db.escape(req.body.leaveLimit),
+                    req.st.db.escape(req.body.resetType),
+                    req.st.db.escape(req.body.lastResetDate),
+                    req.st.db.escape(req.body.resetDuration),
+                    req.st.db.escape(req.body.resetFrequency),
+                    req.st.db.escape(req.body.initialValue),
+                    req.st.db.escape(req.body.incrementValue),
+                    req.st.db.escape(req.body.lastIncrementDate),
+                    req.st.db.escape(req.body.incrementDuration),
+                    req.st.db.escape(req.body.incrementFrequency)
                 ];
                 /**
                  * Calling procedure to save form template

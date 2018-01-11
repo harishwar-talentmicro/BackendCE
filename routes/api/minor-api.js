@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var Ajv = require('ajv');
+var cron = require('node-cron');
+var DbHelper = require('../../helpers/DatabaseHandler'),
+    db = DbHelper.getDBContext();
 
 var configurationV1 =  require('./configuration.js');
 var recruitmentV1 =  require('./recruitment/recruitment-master.js');
@@ -291,5 +294,24 @@ var masterModule = require('./JobRaiser/master.js');
 
 router.use('/WM',jobModule);
 router.use('/WM',masterModule);
+
+// cron
+// var taskScheduler = require('../api/HEApp/task/task-ctrl');
+cron.schedule('* * * * *', function(){
+    console.log('running a task every minute');
+    var procQuery = 'CALL he_schedule_tasks()';
+    console.log(procQuery);
+
+    db.query(procQuery,function(err,results){
+        console.log(results);
+        if(!err){
+            console.log(err);
+        }
+        else{
+            console.log("success");
+        }
+    });
+
+});
 
 module.exports = router;

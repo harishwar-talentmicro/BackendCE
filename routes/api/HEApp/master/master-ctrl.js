@@ -37,8 +37,19 @@ masterCtrl.searchUsers = function(req,res,next){
                     response.status = true;
                     response.message = "User list loaded successfully";
                     response.error = null;
+                    var output = [];
+                    for(var j = 0; j < userResult[0].length; j++) {
+                        var res1 = {};
+                        res1.HEUserId = userResult[0][j].HEUserId;
+                        res1.name = userResult[0][j].name;
+                        res1.jobTitle = userResult[0][j].jobTitle;
+                        res1.userType = userResult[0][j].userType;
+                        res1.groupId = userResult[0][j].groupId;
+                        res1.pictureUrl = userResult[0][j].pictureUrl ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + userResult[0][j].pictureUrl) : "";
+                        output.push(res1);
+                    }
                     response.data = {
-                        userList : userResult[0]
+                        userList : output
                     };
                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                     zlib.gzip(buf, function (_, result) {
