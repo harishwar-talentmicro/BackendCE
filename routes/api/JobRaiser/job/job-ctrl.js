@@ -21,7 +21,7 @@ jobCtrl.saveJobDefaults = function(req,res,next){
     };
     var validationFlag = true;
     if (!req.query.token) {
-        error.token = 'Invalid token';
+        error.token = 'Invalid inputs token';
         validationFlag *= false;
     }
 
