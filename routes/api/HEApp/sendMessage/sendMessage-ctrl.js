@@ -36,6 +36,54 @@ sendMessageCtrl.sendMessage = function(req,res,next){
     if(!attachmentList){
         attachmentList = [];
     }
+    // embededImages
+    var embededImages =req.body.embededImages;
+    if(typeof(embededImages) == "string") {
+        embededImages = JSON.parse(embededImages);
+    }
+    if(!embededImages){
+        embededImages = [];
+    }
+
+    var userList =req.body.userList;
+    if(typeof(userList) == "string") {
+        userList = JSON.parse(userList);
+    }
+    if(!userList){
+        userList = [];
+    }
+
+    var branchList =req.body.branchList;
+    if(typeof(branchList) == "string") {
+        branchList = JSON.parse(branchList);
+    }
+    if(!branchList){
+        branchList = [];
+    }
+
+    var departmentList =req.body.departmentList;
+    if(typeof(departmentList) == "string") {
+        departmentList = JSON.parse(departmentList);
+    }
+    if(!departmentList){
+        departmentList = [];
+    }
+
+    var gradeList =req.body.gradeList;
+    if(typeof(gradeList) == "string") {
+        gradeList = JSON.parse(gradeList);
+    }
+    if(!gradeList){
+        gradeList = [];
+    }
+
+    var groupList =req.body.groupList;
+    if(typeof(groupList) == "string") {
+        groupList = JSON.parse(groupList);
+    }
+    if(!groupList){
+        groupList = [];
+    }
 
     var senderGroupId;
 
@@ -60,6 +108,8 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                 req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
                 req.body.recordedVoiceUrl = req.body.recordedVoiceUrl ? req.body.recordedVoiceUrl : '';
                 req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                req.body.groupType = req.body.groupType ? req.body.groupType : 0;
+                req.body.memberCount = req.body.memberCount ? req.body.memberCount : 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -70,12 +120,15 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                     req.st.db.escape(req.body.accessUserType),
                     req.st.db.escape(JSON.stringify(attachmentList)),
                     req.st.db.escape(req.body.changeLog),
-                    req.st.db.escape(req.body.userList),
-                    req.st.db.escape(req.body.branchList),
-                    req.st.db.escape(req.body.departmentList),
-                    req.st.db.escape(req.body.gradeList),
-                    req.st.db.escape(req.body.groupList),
-                    req.st.db.escape(req.body.alarmType)
+                    req.st.db.escape(JSON.stringify(userList)),
+                    req.st.db.escape(JSON.stringify(branchList)),
+                    req.st.db.escape(JSON.stringify(departmentList)),
+                    req.st.db.escape(JSON.stringify(gradeList)),
+                    req.st.db.escape(JSON.stringify(groupList)),
+                    req.st.db.escape(req.body.alarmType),
+                    req.st.db.escape(JSON.stringify(embededImages)),
+                    req.st.db.escape(req.body.groupType),
+                    req.st.db.escape(req.body.memberCount)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -179,6 +232,7 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                                 formData : JSON.parse(results[0][0].formDataJSON)
                             }
                         };
+                        // res.status(200).json(response);
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');

@@ -63,8 +63,7 @@ currencyCtrl.saveCurrency = function(req,res,next){
                                 response.message = "Only one default currency can be created";
                                 response.error = null;
                                 res.status(200).json(response);
-                                break ;
-
+                                break;
                             default:
                                 break;
                         }

@@ -1229,13 +1229,13 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
                             count : informationResult[1][0].count
                         };
 
-                        res.status(200).json(response);
+                        // res.status(200).json(response);
 
-                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        // zlib.gzip(buf, function (_, result) {
-                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                        //     res.status(200).json(response);
-                        // });
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if(!err){
                         response.status = true;

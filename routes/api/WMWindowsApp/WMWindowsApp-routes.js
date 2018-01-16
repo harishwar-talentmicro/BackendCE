@@ -8,6 +8,8 @@ var router = express.Router();
 var WMWindowsCtrl = require('./WMWindowsApp-ctrl');
 
 router.post('/',WMWindowsCtrl.uploadPaySlip);
+router.post('/form16',WMWindowsCtrl.uploadForm16);
+
 router.post('/file',WMWindowsCtrl.uploadPaySlipFile);
 
 module.exports = router;

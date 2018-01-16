@@ -9,5 +9,6 @@ var payslipCtrl = require('./payslip-ctrl');
 
 router.post('/payslip',payslipCtrl.uploadPaySlip);
 router.get('/payslip',payslipCtrl.getPaySlips);
+router.delete('/payslip',payslipCtrl.deletePaySlip);
 
 module.exports = router;

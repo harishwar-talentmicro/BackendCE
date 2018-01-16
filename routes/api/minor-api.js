@@ -299,6 +299,8 @@ router.use('/WM',masterModule);
 // var taskScheduler = require('../api/HEApp/task/task-ctrl');
 cron.schedule('* * * * *', function(){
     console.log('running a task every minute');
+    var datetime = new Date();
+    console.log(datetime);
     var procQuery = 'CALL he_schedule_tasks()';
     console.log(procQuery);
 
@@ -313,5 +315,22 @@ cron.schedule('* * * * *', function(){
     });
 
 });
+
+cron.schedule('* * * * *', function(){
+    console.log('running a leave calculation every minute');
+    var procQuery = 'CALL he_leave_calculator()';
+    console.log(procQuery);
+    db.query(procQuery,function(err,results){
+        console.log(results);
+        if(!err){
+            console.log(err);
+        }
+        else{
+            console.log("success");
+        }
+    });
+
+});
+
 
 module.exports = router;
