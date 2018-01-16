@@ -90,6 +90,7 @@ var generalRequest = require('./HEBackEnd/generalRequest.js');
 var WMWindowsApp = require('./WMWindowsApp/WMWindowsApp-routes');
 var zoom = require('./zoomMeeting/zoomMeeting-routes');
 var appGeneralRequest = require('./HEApp/generalRequest.js');
+var WGRM = require('./HEBackEnd/WGRMTemplates.js');
 
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
@@ -181,6 +182,7 @@ router.use('/helloEZE',travelMode);
 router.use('/helloEZE',generalRequest);
 router.use('/helloEZE/app',appGeneralRequest);
 router.use('/helloEZE/app',zoom);
+router.use('/helloEZE/',WGRM);
 router.use('/WhatMate/Windows',WMWindowsApp);
 
 //router.use('/test_info',testInfoV1);
