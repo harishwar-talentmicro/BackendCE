@@ -98,7 +98,7 @@ jobCtrl.saveJob = function(req,res,next){
     };
     var validationFlag = true;
     if (!req.query.token) {
-        error.token = 'Invalid token';
+        error.token = 'This is Invalid token';
         validationFlag *= false;
     }
 
