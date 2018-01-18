@@ -43,7 +43,7 @@ masterCtrl.getReqMasterData = function(req,res,next){
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,result){
                     console.log(err);
-                    if(!err && result ||(result[0] && result[0][0]) ||(result[1] && result[1][0]) ||(result[2] && result[2][0])||(result[3] && result[3][0])||(result[4] && result[4][0])|| (result[5] && result[5][0])|| (result[6] && result[6][0])){
+                    if(!err && result ||(result[0] && result[0][0]) ||(result[1] && result[1][0]) ||(result[2] && result[2][0])||(result[3] && result[3][0])||(result[4] && result[4][0])|| (result[5] && result[5][0])|| (result[6] && result[6][0])|| (result[7] && result[7][0])){
                         response.status = true;
                         response.message = "Master data loaded successfully";
                         response.error = null;
@@ -54,7 +54,8 @@ masterCtrl.getReqMasterData = function(req,res,next){
                             scale: result[3],
                             duration:result[4],
                             education:result[5],
-                            country:result[6]
+                            country:result[6],
+                            location : result[7]
                         };
 
                         res.status(200).json(response);

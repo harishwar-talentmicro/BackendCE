@@ -26,5 +26,8 @@ router.get('/contactlist',jobCtrl.getcontactlist);
 router.post('/saveContact',jobCtrl.saveContact);
 
 router.post('/saveEducation',jobCtrl.saveEducation);
+router.post('/saveLocation',jobCtrl.saveLocation);
+
+router.post('/saveRequirement',jobCtrl.saveRequirement);
 module.exports = router;
 
