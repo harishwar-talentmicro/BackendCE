@@ -12,4 +12,9 @@ router.post('/',messageCtrl.sendMessage);
 router.get('/userConfiguration',messageCtrl.getUserConfig);
 router.post('/memberCount',messageCtrl.getMemberCount);
 
+router.get('/masterData',messageCtrl.getMasterData);
+
+router.get('/config/searchUser',messageCtrl.getusersData);
+
+
 module.exports = router;

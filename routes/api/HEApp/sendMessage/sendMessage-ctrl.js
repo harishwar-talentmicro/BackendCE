@@ -406,4 +406,165 @@ sendMessageCtrl.getMemberCount = function(req,res,next){
 
 };
 
+sendMessageCtrl.getMasterData = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.HEMasterId = req.query.HEMasterId ? req.query.HEMasterId : 0;
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.HEMasterId)
+                ];
+
+                var procQuery = 'CALL He_get_MsgMasterData( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,masterResult){
+                    if(!err && masterResult && masterResult[0] && masterResult[0][1] && masterResult [1] && masterResult [1][0] && masterResult [2] && masterResult [3] && masterResult[3][0]){
+                        response.status = true;
+                        response.message = "Master data loaded successfully .";
+                        response.error = null;
+                        response.data = [{
+                            branches : masterResult[0],
+                            departments: masterResult[1],
+                            grades: masterResult[2],
+                            RMGroups: masterResult[3]
+                        }];
+                        // res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                         });
+
+                    }
+                    else if(!err){
+                        response.status = false;
+                        response.message = "master data is null";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting master data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+sendMessageCtrl.getusersData = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.keywords) {
+        error.keywords = 'Invalid keyword';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.keywords = req.query.keywords ? req.query.keywords : '';
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.keywords)
+                ];
+
+                var procQuery = 'CALL He_get_UsersData( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,userResult){
+                    if(!err && userResult && userResult[0]  && userResult [1] && userResult [2] && userResult [3] && userResult[3][0] && userResult[4] && userResult[4][0]){
+                        response.status = true;
+                        response.message = "User data loaded successfully .";
+                        response.error = null;
+                        response.data = [{
+                            userDetailes : userResult[0],
+                           configdetailes: {
+                                branches:userResult[1],
+                               departments: userResult[2],
+                               grades: userResult[3],
+                               RMGroups: userResult[4]
+                           }
+                        }];
+                         // res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                         res.status(200).json(response);
+                        });
+
+                    }
+                    else if(!err){
+                        response.status = false;
+                        response.message = "User data is null";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting User data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+
+
 module.exports = sendMessageCtrl;
