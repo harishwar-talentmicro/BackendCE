@@ -188,6 +188,10 @@ taxSavingCtrl.saveTaxItem = function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+    if (!req.body.itemTag) {
+        error.itemTag = 'Invalid itemTag';
+        validationFlag *= false;
+    }
 
     if (!req.query.APIKey)
     {
@@ -216,7 +220,9 @@ taxSavingCtrl.saveTaxItem = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.body.taxItemId),
                     req.st.db.escape(req.body.itemName),
-                    req.st.db.escape(req.body.seqNo)
+                    req.st.db.escape(req.body.seqNo),
+                    req.st.db.escape(req.body.itemTag)
+
 
                 ];
                 /**
