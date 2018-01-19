@@ -188,10 +188,10 @@ taxSavingCtrl.saveTaxItem = function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.body.itemTag) {
+  /*  if (!req.body.itemTag) {
         error.itemTag = 'Invalid itemTag';
         validationFlag *= false;
-    }
+    }*/
 
     if (!req.query.APIKey)
     {
@@ -1258,6 +1258,211 @@ taxSavingCtrl.deleteSavingMaster = function(req,res,next){
             }
         });
     }
+};
+
+
+
+taxSavingCtrl.saveItemQuestion = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.body.itemId)
+    {
+        error.itemId = 'Invalid itemId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.body.tId = (req.body.tId) ? req.body.tId : 0;
+                req.body.question = (req.body.question) ? req.body.question : 0;
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.tId),
+                    req.st.db.escape(req.body.itemId),
+                    req.st.db.escape(req.body.question)
+
+                ];
+
+                var procQuery = 'CALL he_save_item_questions( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, Result) {
+                    console.log(err);
+                    if (!err && Result ) {
+                        response.status = true;
+                        response.message = "Questions saved successfully";
+                        response.data = {
+                            ItemQuestionID: Result[0]
+                        };
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving question";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+taxSavingCtrl.getItemQuestionlist = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.itemId)
+    {
+        error.itemId = 'Invalid itemId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.itemId)
+
+                ];
+
+                var procQuery = 'CALL he_get_item_questions( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, Result) {
+                    console.log(err);
+                    if (!err && Result ) {
+                        response.status = true;
+                        response.message = "Questions loaded successfully";
+                        response.data = {
+                            ItemQuestionList: Result[0]
+                        };
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading questions";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+taxSavingCtrl.deleteItemQuestion = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.itemId)
+    {
+        error.itemId = 'Invalid itemId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.itemId)
+
+                ];
+
+                var procQuery = 'CALL he_delete_item_questions( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, Result) {
+                    console.log(err);
+                    if (!err && Result ) {
+                        response.status = true;
+                        response.message = "Questions deleted successfully";
+                        response.data = null;
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while deleting questions";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
 };
 
 module.exports = taxSavingCtrl;
