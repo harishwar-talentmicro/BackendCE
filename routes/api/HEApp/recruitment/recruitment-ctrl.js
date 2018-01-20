@@ -726,7 +726,6 @@ recruitmentCtrl.getSalaryLedger = function(req,res,next){
                             res1.payAmount = salaryLedger[0][i].payAmount;
                             res1.paySlipDate = salaryLedger[0][i].paySlipDate;
                             res1.paySlip = (salaryLedger[0][i].paySlip) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + salaryLedger[0][i].paySlip) : "";
-                            res1.taxFCFile = (salaryLedger[0][i].taxFCFile) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + salaryLedger[0][i].taxFCFile) : "";
                             output.push(res1);
                         }
                         response.data =  {
@@ -1187,13 +1186,12 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
                         var output1 = [];
                         var speech = "";
                         var fileName = "";
-                        var docDetails = JSON.parse(informationResult[0][0].details);
+                        var docDetails = JSON.parse(informationResult[0][0].details) ;
                         for(var i = 0; i < docDetails.length; i++) {
                             var res2 = {};
                             res2.groupTitle = docDetails[i].groupTitle;
                             var docs = JSON.parse(docDetails[i].docs);
-                            // console.log(docs[0].length);
-                            output1 = [];
+
                             for(var j = 0; j < docs.length; j++) {
                                     var res1 = {};
                                     res1.docTitle = docs[j].docTitle;

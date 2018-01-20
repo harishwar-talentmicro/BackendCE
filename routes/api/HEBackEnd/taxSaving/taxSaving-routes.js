@@ -29,4 +29,10 @@ router.delete('/templateGroupMap',taxSavingsCtrl.deleteTaxTemplateGroupMap);
 router.delete('/groupItemMap',taxSavingsCtrl.deleteTaxGroupItemMap);
 router.delete('/savingMaster',taxSavingsCtrl.deleteSavingMaster);
 
+router.post('/itemQuestion',taxSavingsCtrl.saveItemQuestion);
+router.get('/itemQuestion',taxSavingsCtrl.getItemQuestionlist);
+router.delete('/itemQuestion',taxSavingsCtrl.deleteItemQuestion);
+
+
+
 module.exports = router;

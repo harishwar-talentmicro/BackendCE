@@ -42,7 +42,6 @@ taxCtrl.getTaxDeclarations = function(req,res,next){
                      * @type {string}
                      */
                     var procQuery = 'CALL he_get_tax_declaration( ' + procParams.join(',') + ')';
-                    console.log(procQuery);
                     req.db.query(procQuery,function(err,taxDeclaration){
                         if(!err && taxDeclaration && taxDeclaration[0] && taxDeclaration[0][0] ){
                             var output = [];
@@ -76,8 +75,7 @@ taxCtrl.getTaxDeclarations = function(req,res,next){
                                 helpUrlLink : taxDeclaration[0][0].helpUrlLink,
                                 totalPlannedAmount : taxDeclaration[0][0].totalPlannedAmount,
                                 actualAmount : taxDeclaration[0][0].actualAmount,
-                                groupList : output,
-                                form16 : (taxDeclaration[3] && taxDeclaration[3][0] && taxDeclaration[3][0].file) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + taxDeclaration[3][0].file) : ""
+                                groupList : output
                             };
                             res.status(200).json(response);
 
