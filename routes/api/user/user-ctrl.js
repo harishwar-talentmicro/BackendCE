@@ -1322,4 +1322,65 @@ UserCtrl.changePassword = function(req,res,next){
 
 };
 
+UserCtrl.verifyUpdateOTP = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if(!req.body.otp){
+        error.otp = 'Invalid otp';
+        validationFlag *= false;
+    }
+    if(!req.body.mobile){
+        error.mobile = 'Invalid mobile';
+        validationFlag *= false;
+    }
+
+    if(!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        var procParams = [
+            req.st.db.escape(req.query.token),
+            req.st.db.escape(req.body.mobile),
+            req.st.db.escape(req.body.isdMobile),
+            req.st.db.escape(req.body.otp)
+        ];
+
+        var procQuery = 'CALL verify_mobile( ' + procParams.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery,function(err,result){
+            if(!err && result && result[0] && result[0][0] && result[0][0].message){
+                if(result[0][0].message == "INVALID_OTP"){
+                    response.status = false;
+                    response.message = "In valid OTP";
+                    response.error = null;
+                    response.data =null;
+                    res.status(200).json(response);
+                }
+
+            }
+            else{
+                response.status = true;
+                response.message = "Validated,mobile number is updated ";
+                response.error = null;
+                response.data = null;
+                res.status(200).json(response);
+            }
+        });
+    }
+};
+
 module.exports = UserCtrl;

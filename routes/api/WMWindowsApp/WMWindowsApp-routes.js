@@ -11,5 +11,6 @@ router.post('/',WMWindowsCtrl.uploadPaySlip);
 router.post('/form16',WMWindowsCtrl.uploadForm16);
 
 router.post('/file',WMWindowsCtrl.uploadPaySlipFile);
+router.post('/taxDeclaration',WMWindowsCtrl.uploadTaxDeclaration);
 
 module.exports = router;

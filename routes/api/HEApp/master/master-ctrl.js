@@ -657,4 +657,78 @@ masterCtrl.getWorkGroup = function(req,res,next){
     });
 };
 
+masterCtrl.getWhatMateCompaniesList = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if(!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token)
+                ];
+                /**
+                 * Calling procedure to save deal
+                 * @type {string}
+                 */
+                var procQuery = 'CALL get_whatmate_companies( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,result){
+                    if(!err && result && result[0]){
+                        response.status = true;
+                        response.message = "Companies list loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            companyList : result[0]
+                        };
+                        // res.status(200).json(response);
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else if(!err ){
+                        response.status = true;
+                        response.message = "No Companies found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting companies list";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
 module.exports = masterCtrl;

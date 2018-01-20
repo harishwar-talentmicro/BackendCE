@@ -2,7 +2,6 @@
  * Created by vedha on 17-10-2017.
  */
 
-
 var taxCtrl = {};
 var error = {};
 
@@ -425,6 +424,158 @@ taxCtrl.saveTaxGroupPlannedAmount = function(req,res,next){
                         else{
                             response.status = false;
                             response.message = "Error while saving planned amount";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+            }
+        );
+    }
+
+};
+
+taxCtrl.getTaxItemQuestions = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+    if (!req.query.itemId) {
+        error.itemId = 'Invalid itemId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.itemId),
+                        req.st.db.escape(req.query.groupId)
+                    ];
+                    /**
+                     * Calling procedure to get form template
+                     * @type {string}
+                     */
+                    var procQuery = 'CALL he_get_itemQuestions( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery,function(err,taxDeclaration){
+                        if(!err && taxDeclaration && taxDeclaration[0] && taxDeclaration[0][0] ){
+                            response.status = true;
+                            response.message = "Questions loaded successfully";
+                            response.error = null;
+                            response.data = {
+                                questions : taxDeclaration[0]
+                            };
+                            res.status(200).json(response);
+
+                        }
+                        else if(!err){
+                            response.status = false;
+                            response.message = "No data found";
+                            response.error = null;
+                            response.data = null ;
+                            res.status(200).json(response);
+                        }
+                        else{
+                            response.status = false;
+                            response.message = "Error while getting questions";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+            }
+        );
+    }
+
+};
+
+taxCtrl.saveTaxItemQuestions = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.body.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+    if (!req.body.itemId) {
+        error.itemId = 'Invalid itemId';
+        validationFlag *= false;
+    }
+
+    var questions =req.body.questions;
+    if(typeof(questions) == "string") {
+        questions = JSON.parse(questions);
+    }
+    if(!questions){
+        questions = [];
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.body.itemId),
+                        req.st.db.escape(req.body.groupId),
+                        req.st.db.escape(JSON.stringify(questions))
+                    ];
+                    /**
+                     * Calling procedure to get form template
+                     * @type {string}
+                     */
+                    var procQuery = 'CALL he_save_itemQuestions( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery,function(err,taxDeclaration){
+                        if(!err ){
+                            response.status = true;
+                            response.message = "Questions saved successfully";
+                            response.error = null;
+                            response.data = {
+                                questions : taxDeclaration[0]
+                            };
+                            res.status(200).json(response);
+
+                        }
+                        else{
+                            response.status = false;
+                            response.message = "Error while saving questions";
                             response.error = null;
                             response.data = null;
                             res.status(500).json(response);

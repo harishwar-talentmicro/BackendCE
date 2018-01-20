@@ -12,5 +12,7 @@ router.post('/tax/item',taxCtrl.saveTaxItems);
 router.get('/tax/item',taxCtrl.getTaxItems);
 router.delete('/tax/item',taxCtrl.deleteTaxItems);
 router.post('/tax/plannedAmount',taxCtrl.saveTaxGroupPlannedAmount);
+router.get('/tax/questions',taxCtrl.getTaxItemQuestions);
+router.post('/tax/questions',taxCtrl.saveTaxItemQuestions);
 
 module.exports = router;

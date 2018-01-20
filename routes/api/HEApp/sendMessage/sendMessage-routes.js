@@ -14,7 +14,9 @@ router.post('/memberCount',messageCtrl.getMemberCount);
 
 router.get('/masterData',messageCtrl.getMasterData);
 
-router.get('/config/searchUser',messageCtrl.getusersData);
-
+router.get('/config/searchUser',messageCtrl.searchusersData);
+router.get('/config/msgMapUserList',messageCtrl.GetMsgMapUsersData);
+router.post('/config/msgMapData',messageCtrl.saveMsgMapUsersData);
+router.delete('/config/user',messageCtrl.DeleteMsgMapUsersData);
 
 module.exports = router;
