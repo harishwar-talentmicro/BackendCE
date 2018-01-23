@@ -453,6 +453,4 @@ WGRMTemplateCtrl.getRMTemplatedetailes = function(req,res,next){
 
 };
 
-
-
 module.exports = WGRMTemplateCtrl;
