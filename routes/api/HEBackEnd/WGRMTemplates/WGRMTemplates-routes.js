@@ -16,5 +16,9 @@ router.get('/RMdetailes',WGRMTemplateCtrl.getRMTemplatedetailes);
 router.delete('/WGdetailes',WGRMTemplateCtrl.deleteWGTemplatedetailes);
 router.delete('/RMdetailes',WGRMTemplateCtrl.deleteRMTemplatedetailes);
 
+
+
+
+
 module.exports = router;
 
