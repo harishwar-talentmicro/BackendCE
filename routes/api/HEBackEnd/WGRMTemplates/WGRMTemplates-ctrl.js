@@ -523,7 +523,6 @@ WGRMTemplateCtrl.deleteWGTemplatedetailes = function(req,res,next){
     }
 
 };
-
 WGRMTemplateCtrl.deleteRMTemplatedetailes = function(req,res,next){
     var response = {
         status : false,
@@ -602,5 +601,4 @@ WGRMTemplateCtrl.deleteRMTemplatedetailes = function(req,res,next){
     }
 
 };
-
 module.exports = WGRMTemplateCtrl;
