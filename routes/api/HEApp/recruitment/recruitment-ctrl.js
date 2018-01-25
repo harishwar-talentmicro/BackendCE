@@ -726,7 +726,6 @@ recruitmentCtrl.getSalaryLedger = function(req,res,next){
                             res1.payAmount = salaryLedger[0][i].payAmount;
                             res1.paySlipDate = salaryLedger[0][i].paySlipDate;
                             res1.paySlip = (salaryLedger[0][i].paySlip) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + salaryLedger[0][i].paySlip) : "";
-                            res1.taxFCFile = (salaryLedger[0][i].taxFCFile) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + salaryLedger[0][i].taxFCFile) : "";
                             output.push(res1);
                         }
                         response.data =  {

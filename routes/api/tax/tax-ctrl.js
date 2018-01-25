@@ -78,7 +78,7 @@ taxCtrl.getTaxDeclarations = function(req,res,next){
                                 form16 : (taxDeclaration[3] && taxDeclaration[3][0] && taxDeclaration[3][0].file) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + taxDeclaration[3][0].file) : "",
                                 groupList : output,
                                 uploadLockStatus : (taxDeclaration[4] && taxDeclaration[4][0]) ? taxDeclaration[4][0].uploadLockStatus : 1,
-                                plannedLockStatus : (taxDeclaration[5] && taxDeclaration[5][0]) ? taxDeclaration[5][0].plannedLockStatus : 1,
+                                plannedLockStatus : (taxDeclaration[5] && taxDeclaration[5][0]) ? taxDeclaration[5][0].plannedLockStatus : 1
                             };
                             res.status(200).json(response);
 
