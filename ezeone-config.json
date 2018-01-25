@@ -62,7 +62,7 @@
     "IOS" : [[],[23,24]],
     "ANDROID" : [46],
     "WhatMateIOS" : [[],[18]],
-    "WhatMateANDROID" : [29],
+    "WhatMateANDROID" : [31],
     "WEB" : [1]
   },
   "NOTIFICATION" : {

@@ -60,7 +60,7 @@ taxCtrl.getTaxDeclarations = function(req,res,next){
                                     }
                                     else
                                     {
-                                        res1.items = [] ;
+                                        res1.items = [];
                                     }
                                 }
                                 output.push(res1);
@@ -76,7 +76,9 @@ taxCtrl.getTaxDeclarations = function(req,res,next){
                                 totalPlannedAmount : taxDeclaration[0][0].totalPlannedAmount,
                                 actualAmount : taxDeclaration[0][0].actualAmount,
                                 form16 : (taxDeclaration[3] && taxDeclaration[3][0] && taxDeclaration[3][0].file) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + taxDeclaration[3][0].file) : "",
-                                groupList : output
+                                groupList : output,
+                                uploadLockStatus : (taxDeclaration[4] && taxDeclaration[4][0]) ? taxDeclaration[4][0].uploadLockStatus : 1,
+                                plannedLockStatus : (taxDeclaration[5] && taxDeclaration[5][0]) ? taxDeclaration[5][0].plannedLockStatus : 1,
                             };
                             res.status(200).json(response);
 
@@ -567,7 +569,7 @@ taxCtrl.saveTaxItemQuestions = function(req,res,next){
                             response.message = "Questions saved successfully";
                             response.error = null;
                             response.data = {
-                                questions : taxDeclaration[0]
+                                mandatoryQuestionCount : taxDeclaration[0][0].mandatoryQuestionCount
                             };
                             res.status(200).json(response);
 
