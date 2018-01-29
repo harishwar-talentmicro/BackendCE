@@ -14,6 +14,7 @@ userCtrl.saveUser = function(req,res,next){
         error : null
     };
     var validationFlag = true;
+
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
@@ -23,30 +24,18 @@ userCtrl.saveUser = function(req,res,next){
         validationFlag *= false;
     }
 
-    if(!req.body.formTemplateId){
-        error.formTemplateId = 'Invalid formTemplateId';
+    if(!req.body.workGroupId){
+        error.workGroupId = 'Invalid workGroupId';
+        validationFlag *= false;
+    }
+    if(!req.body.RMGroupId){
+        error.RMGroupId = 'Invalid RMGroupId';
         validationFlag *= false;
     }
     if (!req.query.APIKey)
     {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
-    }
-
-    var approverGroups =req.body.approverGroups;
-    if(typeof(approverGroups) == "string") {
-        approverGroups = JSON.parse(approverGroups);
-    }
-    if(!approverGroups){
-        approverGroups = [];
-    }
-
-    var receiverGroups =req.body.receiverGroups;
-    if(typeof(receiverGroups) == "string") {
-        receiverGroups = JSON.parse(receiverGroups);
-    }
-    if(!receiverGroups){
-        receiverGroups = [];
     }
 
     if (!validationFlag){
@@ -66,6 +55,7 @@ userCtrl.saveUser = function(req,res,next){
                 req.body.status = (req.body.status) ? req.body.status : 1;
                 req.body.trackTemplateId = (req.body.trackTemplateId) ? req.body.trackTemplateId : 0;
                 req.body.workLocationId = (req.body.workLocationId) ? req.body.workLocationId : 0;
+                req.body.userType = (req.body.userType) ? req.body.userType : 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -79,9 +69,10 @@ userCtrl.saveUser = function(req,res,next){
                     req.st.db.escape(req.body.trackTemplateId),
                     req.st.db.escape(req.body.workLocationId),
                     req.st.db.escape(req.body.formTemplateId),
-                    req.st.db.escape(JSON.stringify(approverGroups)),
-                    req.st.db.escape(JSON.stringify(receiverGroups)),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.body.userType),
+                    req.st.db.escape(req.body.workGroupId),
+                    req.st.db.escape(req.body.RMGroupId)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -166,7 +157,9 @@ userCtrl.getMasterData = function(req,res,next){
                             trackTemplateList : masterDataResult[5],
                             formTemplateList : masterDataResult[6],
                             gradeList : masterDataResult[7],
-                            docGroupList : masterDataResult[8]
+                            docGroupList : masterDataResult[8],
+                            workGroupList : masterDataResult[9],
+                            RMGroupList : masterDataResult[10]
                         };
                         res.status(200).json(response);
 
@@ -267,10 +260,11 @@ userCtrl.getUserDetails = function(req,res,next){
                             trackTemplateTitle : userData[0][0].trackTemplateTitle,
                             workLocationId : userData[0][0].workLocationId,
                             workLocationTitle : userData[0][0].workLocationTitle ,
-                            formTemplateId : userData[0][0].formTemplateId ,
-                            formTemplateTitle : userData[0][0].formTemplateTitle ,
-                            approverGroups : (userData[0][0].approverGroups) ? JSON.parse(userData[0][0].approverGroups) : [],
-                            receiverGroups : (userData[0][0].receiverGroups) ? JSON.parse(userData[0][0].receiverGroups) : []
+                            userType : userData[0][0].userType ,
+                            workGroupId : userData[0][0].workGroupId ,
+                            workGroupTitle : userData[0][0].workGroupTitle ,
+                            RMGroupId : userData[0][0].RMGroupId ,
+                            RMGroupTitle : userData[0][0].RMGroupTitle
                         };
 
 

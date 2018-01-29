@@ -19,4 +19,6 @@ router.get('/config/msgMapUserList',messageCtrl.GetMsgMapUsersData);
 router.post('/config/msgMapData',messageCtrl.saveMsgMapUsersData);
 router.delete('/config/user',messageCtrl.DeleteMsgMapUsersData);
 
+router.get('/master/announcementTypes',messageCtrl.GetAnnouncementType);
+
 module.exports = router;

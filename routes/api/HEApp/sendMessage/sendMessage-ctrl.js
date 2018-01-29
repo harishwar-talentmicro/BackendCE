@@ -110,6 +110,11 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                 req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
                 req.body.groupType = req.body.groupType ? req.body.groupType : 0;
                 req.body.memberCount = req.body.memberCount ? req.body.memberCount : 0;
+                req.body.title = req.body.title!=undefined ? req.body.title : "";
+                req.body.announcementType = req.body.announcementType!=undefined ? req.body.announcementType : 1;
+                req.body.lockType = req.body.lockType!=undefined ? req.body.lockType : 1;
+                req.body.startDate = req.body.startDate!=undefined ? req.body.startDate : null;
+                req.body.endDate = req.body.endDate!=undefined ? req.body.endDate : null;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -128,7 +133,12 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                     req.st.db.escape(req.body.alarmType),
                     req.st.db.escape(JSON.stringify(embededImages)),
                     req.st.db.escape(req.body.groupType),
-                    req.st.db.escape(req.body.memberCount)
+                    req.st.db.escape(req.body.memberCount),
+                    req.st.db.escape(req.body.title),
+                    req.st.db.escape(req.body.announcementType),
+                    req.st.db.escape(req.body.lockType),
+                    req.st.db.escape(req.body.startDate),
+                    req.st.db.escape(req.body.endDate)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -628,6 +638,8 @@ sendMessageCtrl.GetMsgMapUsersData = function(req,res,next){
                         for(var i = 0; i < userResult[0].length; i++) {
                             var res2 = {};
                             res2.HEUserId = userResult[0][i].HEUserId;
+                            res2.isNormal = userResult[0][i].isNormal;
+                            res2.isTaxSaving = userResult[0][i].isTaxSaving;
                             res2.name = userResult[0][i].name;
                             res2.branches = userResult[0][i].branch ? JSON.parse(userResult[0][i].branch) : [];
                             res2.departments = userResult[0][i].department ? JSON.parse(userResult[0][i].department) : [];
@@ -739,6 +751,8 @@ sendMessageCtrl.saveMsgMapUsersData = function(req,res,next){
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
                 req.query.keywords = req.query.keywords ? req.query.keywords : '';
+                req.query.isNormal = req.query.isNormal!=undefined ? req.query.isNormal : 0;
+                req.query.isTaxSaving = req.query.isTaxSaving!=undefined ? req.query.isTaxSaving : 0;
 
 
                 var procParams = [
@@ -748,7 +762,9 @@ sendMessageCtrl.saveMsgMapUsersData = function(req,res,next){
                     req.st.db.escape(JSON.stringify(branches)),
                     req.st.db.escape(JSON.stringify(departments)),
                     req.st.db.escape(JSON.stringify(grades)),
-                    req.st.db.escape(JSON.stringify(RMGroups))
+                    req.st.db.escape(JSON.stringify(RMGroups)),
+                    req.st.db.escape(req.body.isNormal),
+                    req.st.db.escape(req.body.isTaxSaving)
                 ];
 
                 var procQuery = 'CALL he_save_msgMapDetails( ' + procParams.join(',') + ')';
@@ -779,7 +795,6 @@ sendMessageCtrl.saveMsgMapUsersData = function(req,res,next){
     }
 
 };
-
 
 sendMessageCtrl.DeleteMsgMapUsersData = function(req,res,next){
     var response = {
@@ -829,6 +844,87 @@ sendMessageCtrl.DeleteMsgMapUsersData = function(req,res,next){
                     else{
                         response.status = false;
                         response.message = "Error while deleting User data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+sendMessageCtrl.GetAnnouncementType = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.groupId)
+                ];
+
+                var procQuery = 'CALL he_get_announcementType( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,userResult){
+                    if(!err && userResult && userResult[0]){
+                        response.status = true;
+                        response.message = "Data loaded successfully .";
+                        response.error = null;
+
+                        response.data = {
+                            isNormal : (userResult[0] && userResult[0][0] && userResult[0][0].isNormal) ? userResult[0][0].isNormal : 0,
+                            isTaxSaving : (userResult[0] && userResult[0][0] && userResult[0][0].isTaxSaving) ? userResult[0][0].isTaxSaving : 0,
+                            fStartDate : (userResult[1] && userResult[1][0] && userResult[1][0].startDate) ? userResult[1][0].startDate : null ,
+                            fEndDate :(userResult[1] && userResult[1][0] && userResult[1][0].startDate) ? userResult[1][0].endDate : null
+                        };
+
+                        // res.status(200).json(response);
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting User data";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
