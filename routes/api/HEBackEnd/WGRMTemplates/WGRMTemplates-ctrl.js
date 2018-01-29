@@ -347,7 +347,6 @@ WGRMTemplateCtrl.getWGTemplatedetailes = function(req,res,next){
                         var output=[];
                         for(var i=0; i<workgroupresult[2].length; i++){
                             var res2={};
-                            res2.formId=workgroupresult[2][i].formId,
                                 res2.heFormId=workgroupresult[2][i].heFormId,
                                 res2.formTitle=workgroupresult[2][i].title,
                                 res2.receivers=workgroupresult[2][i].receivers ? JSON.parse(workgroupresult[2][i].receivers):[];
