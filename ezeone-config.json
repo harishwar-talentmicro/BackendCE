@@ -349,6 +349,11 @@
         "params": ["name","UserName","Password"],
         "file": "NewUserUpload.html",
         "subject": "Your user Credentials for WhatMate App"
+      },
+      "existingUsers": {
+        "params": ["name","UserName","CompanyName"],
+        "file": "existingUsers.html",
+        "subject": "Your user Credentials for WhatMate App"
       }
     }
   },
