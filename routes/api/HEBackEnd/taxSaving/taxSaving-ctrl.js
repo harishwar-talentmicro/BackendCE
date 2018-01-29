@@ -797,7 +797,10 @@ taxSavingCtrl.saveSavingsMaster = function(req,res,next){
                     req.st.db.escape(req.body.savingMasterId),
                     req.st.db.escape(req.body.startDate),
                     req.st.db.escape(req.body.endDate),
-                    req.st.db.escape(req.body.lockStatus)
+                    req.st.db.escape(req.body.lockStatus),
+                    req.st.db.escape(req.body.uploadStartDate),
+                    req.st.db.escape(req.body.uploadEndDate)
+
 
                 ];
                 /**
