@@ -712,7 +712,7 @@ router.post('/attachment',function(req,res,next){
  * @param limit <int> limit till that we will give results
  * @discription : API to change admin of group
  */
-router.get('/', function(req,res,next){
+router.post('/sync', function(req,res,next){
     /**
      * pageNo and limit is for pagination
      * flag: if flag is 0 then latest message will come according to pagination
@@ -764,6 +764,14 @@ router.get('/', function(req,res,next){
         error.groupId = 'Invalid group id';
         validationFlag *= false;
     }
+    var messageList =req.body.messageList;
+    if(typeof(messageList) == "string") {
+        messageList = JSON.parse(messageList);
+    }
+    if(!messageList){
+        messageList = [];
+    }
+
     if (!validationFlag) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
@@ -779,9 +787,11 @@ router.get('/', function(req,res,next){
                         var procParams = [
                             req.db.escape(req.query.groupId) ,
                             req.db.escape(req.query.token) ,
-                            req.db.escape(req.query.pageNo), req.db.escape(req.query.limit) ,
+                            req.db.escape(req.query.pageNo),
+                            req.db.escape(req.query.limit) ,
                             req.db.escape( req.query.lastSyncTimeStamp),
-                            req.db.escape(req.query.currentTimeStamp)
+                            req.db.escape(req.query.currentTimeStamp),
+                            req.db.escape(JSON.stringify(messageList))
                         ];
                         var procQuery = 'CALL p_v1_LoadMessagesofGroup(' + procParams.join(',') + ')';
                         console.log(procQuery);
@@ -845,6 +855,9 @@ router.get('/', function(req,res,next){
                                             expiryDate: results[0][i].expiryDate,
                                             transId : results[0][i].transId ? results[0][i].transId : 0,
                                             formId : results[0][i].formId ? results[0][i].formId : 0,
+                                            readStatus : results[0][i].readStatus ? results[0][i].readStatus : 0,
+                                            readSyncStatus : results[0][i].readSyncStatus ? results[0][i].readSyncStatus : 0,
+                                            readDateTime : results[0][i].readDateTime ? results[0][i].readDateTime : null,
                                             currentStatus : results[0][i].currentStatus ? results[0][i].currentStatus : 0,
                                             currentTransId : results[0][i].currentTransId ? results[0][i].currentTransId : 0,
                                             parentId : results[0][i].parentId ? results[0][i].parentId : 0,
@@ -1203,6 +1216,239 @@ router.post('/delete/all', function(req,res,next){
     }
 });
 
+
+router.get('', function(req,res,next){
+    /**
+     * pageNo and limit is for pagination
+     * flag: if flag is 0 then latest message will come according to pagination
+     * and if not 0 then older messages will come
+     * */
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+    req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
+    req.query.limit = (req.query.limit) ? (req.query.limit):100;
+    req.query.flag = (req.query.flag) ? (req.query.flag):0;
+
+    if(req.query.lastSyncTimeStamp){
+        if(moment(req.query.lastSyncTimeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
+            req.query.lastSyncTimeStamp = moment(req.query.lastSyncTimeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+        }
+        else{
+            error.lastSyncTimeStamp = 'Invalid timeStamp';
+            validationFlag *= false;
+        }
+    }
+    else{
+        req.query.lastSyncTimeStamp = null;
+
+    }
+
+    if(req.query.currentTimeStamp){
+        if(moment(req.query.currentTimeStamp,'YYYY-MM-DD HH:mm:ss').isValid()){
+            req.query.currentTimeStamp = moment(req.query.currentTimeStamp,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+        }
+        else{
+            error.currentTimeStamp = 'Invalid timeStamp';
+            validationFlag *= false;
+        }
+    }
+    else{
+        error.currentTimeStamp = 'Invalid timeStamp';
+        validationFlag *= false;
+
+    }
+
+
+    if (isNaN(parseInt(req.query.groupId)) || (req.query.groupId) < 0 ) {
+        error.groupId = 'Invalid group id';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    var message;
+                    if (tokenResult) {
+                        var procParams = [
+                            req.db.escape(req.query.groupId) ,
+                            req.db.escape(req.query.token) ,
+                            req.db.escape(req.query.pageNo),
+                            req.db.escape(req.query.limit) ,
+                            req.db.escape( req.query.lastSyncTimeStamp),
+                            req.db.escape(req.query.currentTimeStamp)
+                        ];
+                        var procQuery = 'CALL p_v1_LoadMessagesofGroup(' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                //console.log(results,"results");
+                                if (results && results[0] && results[0].length > 0) {
+                                    var messageObj;
+                                    for(var messageCounter = 0;messageCounter < results[0].length;messageCounter++){
+                                        switch (results[0][messageCounter].messageType) {
+                                            case 0:
+                                                message = results[0][messageCounter].message;
+                                                break;
+
+                                            case 2 :
+                                                message = results[0][messageCounter].message;
+                                                messageObj = JSON.parse(message);
+                                                messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                    req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
+                                                messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                    req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
+                                                results[0][messageCounter].message = messageObj;
+                                                break;
+                                            case 3:
+                                                message = results[0][messageCounter].message;
+                                                console.log("-----------------------------------------------------------");
+                                                console.log(message);
+                                                console.log("-----------------------------------------------------------");
+                                                messageObj = JSON.parse(message);
+
+                                                messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                    req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
+                                                messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                    req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
+                                                results[0][messageCounter].message = messageObj;
+                                                break;
+
+                                            default:
+                                                break;
+                                        }
+
+                                    }
+                                    //console.log(results[0],"results[0]");
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Messages of group loaded successfully';
+                                    responseMessage.totalCount = (results[1] && results[1][0] && results[1][0].count) ? results[1][0].count : 0;
+                                    var output =[];
+                                    for (var i = 0; i < results[0].length; i++ ) {
+                                        output.push({
+                                            messageId: results[0][i].messageId,
+                                            message: results[0][i].message,
+                                            messageLink: results[0][i].messageLink,
+                                            createdDate: results[0][i].createdDate,
+                                            messageType: results[0][i].messageType,
+                                            messageStatus: results[0][i].messageStatus,
+                                            priority: results[0][i].priority,
+                                            senderName: results[0][i].senderName,
+                                            senderId: results[0][i].senderId,
+                                            receiverId: results[0][i].receiverId,
+                                            expiryDate: results[0][i].expiryDate,
+                                            transId : results[0][i].transId ? results[0][i].transId : 0,
+                                            formId : results[0][i].formId ? results[0][i].formId : 0,
+                                            readStatus : results[0][i].readStatus ? results[0][i].readStatus : 0,
+                                            readSyncStatus : results[0][i].readSyncStatus ? results[0][i].readSyncStatus : 0,
+                                            readDateTime : results[0][i].readDateTime ? results[0][i].readDateTime : null,
+                                            currentStatus : results[0][i].currentStatus ? results[0][i].currentStatus : 0,
+                                            currentTransId : results[0][i].currentTransId ? results[0][i].currentTransId : 0,
+                                            parentId : results[0][i].parentId ? results[0][i].parentId : 0,
+                                            accessUserType : results[0][i].accessUserType ? results[0][i].accessUserType : 0,
+                                            heUserId : results[0][i].heUserId ? results[0][i].heUserId : 0,
+                                            formData : results[0][i].formDataJSON ? JSON.parse(results[0][i].formDataJSON) : null
+                                        });
+                                    }
+
+                                    // console.log("results[5][0].GCM_Id",results[5][0].GCM_Id);
+                                    responseMessage.data = {
+                                        messageList : output,
+                                        deleteMessageIdList : [],
+                                        feedback : (results[2]) ? results[2] : [],
+                                        APNSId : (results[3] && results[3][0]) ? JSON.parse(results[3][0].APNS_Id) : [],
+                                        GCMId : (results[4] && results[4][0]) ? JSON.parse(results[4][0].GCM_Id) : []
+                                        // supportFeedback : (results[4]) ? results[4] : []
+                                    };
+
+                                    var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        responseMessage.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(responseMessage);
+                                    });
+
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.totalCount = 0;
+                                    responseMessage.message = 'Messages of group not available';
+                                    // console.log("results[5][0].GCM_Id",results[5][0].GCM_Id);
+                                    responseMessage.data = {
+                                        messageList : [],
+                                        deleteMessageIdList : [],
+                                        APNSId : (results[3] && results[3][0]) ? JSON.parse(results[3][0].APNS_Id) : [],
+                                        GCMId : (results[4] && results[4][0]) ? JSON.parse(results[4][0].GCM_Id) : []
+                                    };
+                                    var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        responseMessage.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(responseMessage);
+                                    });
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : p_v1_LoadMessagesofGroup ', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('Invalid token');
+                    }
+
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error :', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error p_v1_LoadMessagesofGroup : ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+});
 module.exports = router;
 
 

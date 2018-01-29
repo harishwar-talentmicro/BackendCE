@@ -14,6 +14,7 @@ userCtrl.saveUser = function(req,res,next){
         error : null
     };
     var validationFlag = true;
+
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
@@ -68,8 +69,6 @@ userCtrl.saveUser = function(req,res,next){
                     req.st.db.escape(req.body.trackTemplateId),
                     req.st.db.escape(req.body.workLocationId),
                     req.st.db.escape(req.body.formTemplateId),
-                    req.st.db.escape(JSON.stringify(approverGroups)),
-                    req.st.db.escape(JSON.stringify(receiverGroups)),
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.body.userType),
                     req.st.db.escape(req.body.workGroupId),
@@ -261,10 +260,11 @@ userCtrl.getUserDetails = function(req,res,next){
                             trackTemplateTitle : userData[0][0].trackTemplateTitle,
                             workLocationId : userData[0][0].workLocationId,
                             workLocationTitle : userData[0][0].workLocationTitle ,
-                            formTemplateId : userData[0][0].formTemplateId ,
-                            formTemplateTitle : userData[0][0].formTemplateTitle ,
-                            approverGroups : (userData[0][0].approverGroups) ? JSON.parse(userData[0][0].approverGroups) : [],
-                            receiverGroups : (userData[0][0].receiverGroups) ? JSON.parse(userData[0][0].receiverGroups) : []
+                            userType : userData[0][0].userType ,
+                            workGroupId : userData[0][0].workGroupId ,
+                            workGroupTitle : userData[0][0].workGroupTitle ,
+                            RMGroupId : userData[0][0].RMGroupId ,
+                            RMGroupTitle : userData[0][0].RMGroupTitle
                         };
 
 

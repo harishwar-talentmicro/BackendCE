@@ -47,6 +47,7 @@
     "pdfkit": "~0.7.1",
     "querystring": "~0.2.0",
     "random-string": "0.1.2",
+    "randomstring": "^1.1.5",
     "request": "~2.53.0",
     "sendgrid": "~1.9.0",
     "serve-favicon": "~2.2.0",
