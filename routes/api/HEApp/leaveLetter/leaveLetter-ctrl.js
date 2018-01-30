@@ -99,7 +99,7 @@ leaveLetterCtrl.saveLeaveLetter = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_leaveapplication( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_leaveapplication_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     console.log(results);

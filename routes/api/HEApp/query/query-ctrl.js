@@ -88,7 +88,7 @@ queryCtrl.saveHRQuery = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_HRQuery( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_HRQuery_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     if(!err && results && results[0] ){
@@ -276,7 +276,7 @@ queryCtrl.saveAccountsQuery = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_AccountsQuery( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_AccountsQuery_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     if(!err && results && results[0] ){
@@ -465,7 +465,7 @@ queryCtrl.saveAdminQuery = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_AdminQuery( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_AdminQuery_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     if(!err && results && results[0] ){
@@ -654,7 +654,7 @@ queryCtrl.saveFrontOfficeQuery = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_FrontOfficeQuery( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_FrontOfficeQuery_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     if(!err && results && results[0] ){

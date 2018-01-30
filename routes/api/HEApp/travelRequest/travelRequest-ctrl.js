@@ -122,7 +122,7 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_travelRequest( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_travelRequest_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     console.log(results);
