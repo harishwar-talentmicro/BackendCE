@@ -409,7 +409,7 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                 UserName : userResult[0][0].whatmateId,
                                 Password : password
                             }, '',Qndata[0].email,[]);
-                            message = '' + Qndata[0].name  + ', Your WhatMate credentials, Login ID: ' + userResult[0][0].whatmateId + ',Password: ' + password ;
+                            message = 'Dear ' + Qndata[0].name  + ', Your WhatMate credentials, Login ID: ' + userResult[0][0].whatmateId + ',Password: ' + password ;
 
                             if(Qndata[0].mobile !="")
                             {
@@ -495,7 +495,7 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                 CompanyName : req.query.CompanyName
                             }, '',Qndata[0].email,[]);
 
-                            message = ' ' + Qndata[0].name  + ', Your existing profile on WhatMate is successfully linked to ' + req.query.CompanyName + ' now.';
+                            message = 'Dear ' + Qndata[0].name  + ', Your existing profile on WhatMate is successfully linked to ' + req.query.CompanyName + ' now.';
 
                             if(Qndata[0].mobile !="")
                             {
