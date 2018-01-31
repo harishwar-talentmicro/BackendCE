@@ -2,9 +2,11 @@
  * Created by vedha on 20-12-2017.
  */
 
+var request = require('request');
 var randomstring = require("randomstring");
 var windowsCtrl = {};
 var error = {};
+var Mailer = require('../../../mail/mailer.js');
 var mailerApi = new Mailer();
 
 windowsCtrl.uploadPaySlip = function(req,res,next){
@@ -394,17 +396,20 @@ windowsCtrl.uploadUsers = function(req,res,next){
                     req.st.db.escape(Qndata[0].email)
                 ];
 
+                //CompanyName
                 var procQuery = 'CALL he_import_bulkUsers( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,userResult){
                     if (!err && userResult && userResult[0] ){
+                        console.log("userResult[0][0].status",userResult[0][0].status);
+
                         if (userResult[0][0].status == "New" && Qndata[0].email != "" ){
                             mailerApi.sendMailNew('NewUserUpload', {
                                 name : Qndata[0].name,
                                 UserName : userResult[0][0].whatmateId,
                                 Password : password
                             }, '',Qndata[0].email,[]);
-                            message = 'Your user Credentials for WhatMate App';
+                            message = '' + Qndata[0].name  + ', Your WhatMate credentials, Login ID: ' + userResult[0][0].whatmateId + ',Password: ' + password ;
 
                             if(Qndata[0].mobile !="")
                             {
@@ -483,14 +488,98 @@ windowsCtrl.uploadUsers = function(req,res,next){
                             }
 
                         }
-                        // else {
-                        //
-                        // }
+                        else if(userResult[0][0].status == "Existing" && Qndata[0].email != "") {
+                            mailerApi.sendMailNew('existingUsers', {
+                                name : Qndata[0].name,
+                                UserName : userResult[0][0].whatmateId,
+                                CompanyName : req.query.CompanyName
+                            }, '',Qndata[0].email,[]);
+
+                            message = ' ' + Qndata[0].name  + ', Your existing profile on WhatMate is successfully linked to ' + req.query.CompanyName + ' now.';
+
+                            if(Qndata[0].mobile !="")
+                            {
+                                if(Qndata[0].isdmobile == "+977"){
+                                    request({
+                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                        qs: {
+                                            token : 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                            to : Qndata[0].mobile,
+                                            message: message,
+                                            sender: 'Techingen'
+                                        },
+                                        method: 'GET'
+
+                                    }, function (error, response, body) {
+                                        if(error)
+                                        {
+                                            console.log(error,"SMS");
+                                        }
+                                        else{
+                                            console.log("SUCCESS","SMS response");
+                                        }
+
+                                    });
+                                }
+                                else if(Qndata[0].isdmobile == "+91")
+                                {
+                                    request({
+                                        url: 'https://aikonsms.co.in/control/smsapi.php',
+                                        qs: {
+                                            user_name : 'janardana@hirecraft.com',
+                                            password : 'Ezeid2015',
+                                            sender_id : 'EZEONE',
+                                            service : 'TRANS',
+                                            mobile_no: Qndata[0].mobile,
+                                            message: message,
+                                            method : 'send_sms'
+                                        },
+                                        method: 'GET'
+
+                                    }, function (error, response, body) {
+                                        if(error)
+                                        {
+                                            console.log(error,"SMS");
+                                        }
+                                        else{
+                                            console.log("SUCCESS","SMS response");
+                                        }
+                                    });
+                                }
+                                else if(Qndata[0].isdmobile != "")
+                                {
+                                    request({
+                                        url: 'https://rest.nexmo.com/sms/json',
+                                        qs: {
+                                            api_key : '4405b7b5 ',
+                                            api_secret : '77dfad076c27e4c8',
+                                            to: Qndata[0].isdmobile.replace("+","") + Qndata[0].mobile,
+                                            from : 'WtMate',
+                                            text: message
+                                        },
+                                        method: 'POST'
+
+                                    }, function (error, response, body) {
+                                        if(error)
+                                        {
+                                            console.log(error,"SMS");
+                                        }
+                                        else{
+                                            console.log("SUCCESS","SMS response");
+                                        }
+                                    });
+
+                                }
+
+                            }
+                        }
 
                         response.status = true;
                         response.message = "Tax declaration uploaded successfully";
                         response.error = null;
-                        response.data = null;
+                        response.data = {
+                            status : userResult[0][0].status
+                        };
                         res.status(200).json(response);
                     }
                     else{
