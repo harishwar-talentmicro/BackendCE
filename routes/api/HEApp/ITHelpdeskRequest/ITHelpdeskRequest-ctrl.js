@@ -87,7 +87,7 @@ helpdeskCtrl.saveHelpdesk = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_ITHelpdesk( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_ITHelpdesk_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     if(!err && results && results[0] ){

@@ -255,7 +255,7 @@ salesCtrl.saveSalesRequest = function(req,res,next){
                  * @type {string}
                  */
 
-                var procQuery = 'CALL he_save_salesRequest( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL he_save_salesRequest_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     console.log(results);

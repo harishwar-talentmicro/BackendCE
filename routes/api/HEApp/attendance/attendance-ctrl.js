@@ -97,7 +97,7 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_attendenceForm( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_attendenceForm_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     console.log(results);
