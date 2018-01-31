@@ -58,7 +58,7 @@ WGRMTemplateCtrl.saveWGTemplate = function(req,res,next){
 
                     if(!err && workgroupresult && workgroupresult[0]){
                         response.status = true;
-                        response.message = "Formgroup Template saved successfully";
+                        response.message = "Workgroup Template saved successfully";
                         response.error = null;
                         response.data = {
                             workGroupId : workgroupresult[0][0].workGroupId
@@ -67,9 +67,18 @@ WGRMTemplateCtrl.saveWGTemplate = function(req,res,next){
                         res.status(200).json(response);
 
                     }
+                   else if(!err){
+                        response.status = true;
+                        response.message = "Workgroup  Template Title already in use";
+                        response.error = null;
+                        response.data = null;
+
+                        res.status(200).json(response);
+
+                    }
                     else{
                         response.status = false;
-                        response.message = "Error while saving Formgrou template";
+                        response.message = "Error while saving Workgroup template";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
@@ -140,6 +149,15 @@ WGRMTemplateCtrl.saveRMTemplate = function(req,res,next){
                         response.data = {
                             rmGroupId : rmgroupresult[0][0].rmGroupId
                         };
+
+                        res.status(200).json(response);
+
+                    }
+                   else if(!err){
+                        response.status = true;
+                        response.message = "RM group Template Title already in use";
+                        response.error = null;
+                        response.data = null;
 
                         res.status(200).json(response);
 
@@ -506,14 +524,14 @@ WGRMTemplateCtrl.deleteWGTemplatedetailes = function(req,res,next){
                     }
                     else if(!err ) {
                         response.status = true;
-                        response.message = " Formgrou Template detailes deleted successfully";
+                        response.message = " Workgroup Template detailes deleted successfully";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
                     else{
                         response.status = false;
-                        response.message = "Error while deleting Formgrou template detailes";
+                        response.message = "Error while deleting Workgroup template detailes";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
