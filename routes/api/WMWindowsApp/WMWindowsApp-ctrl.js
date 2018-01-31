@@ -7,7 +7,6 @@ var randomstring = require("randomstring");
 var windowsCtrl = {};
 var error = {};
 var Mailer = require('../../../mail/mailer.js');
-
 var mailerApi = new Mailer();
 
 windowsCtrl.uploadPaySlip = function(req,res,next){
@@ -410,7 +409,7 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                 UserName : userResult[0][0].whatmateId,
                                 Password : password
                             }, '',Qndata[0].email,[]);
-                            message = ' ' + Qndata[0].name  + ', Your WhatMate credentials, Login ID: ' + userResult[0][0].whatmateId + ',Password: ' + password + ' Pls change password on first use.';
+                            message = '' + Qndata[0].name  + ', Your WhatMate credentials, Login ID: ' + userResult[0][0].whatmateId + ',Password: ' + password ;
 
                             if(Qndata[0].mobile !="")
                             {

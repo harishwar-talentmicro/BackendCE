@@ -364,10 +364,10 @@ sendMessageCtrl.getMemberCount = function(req,res,next){
     else{
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
-                var branchList = req.body.branchList!=undefined ? req.body.branchList : "";
-                var departmentList = req.body.departmentList!=undefined ? req.body.departmentList : "";
-                var gradeList = req.body.gradeList!=undefined ? req.body.gradeList : "";
-                var groupList = req.body.groupList!=undefined ? req.body.groupList : "";
+                var branchList = req.body.branchList!=undefined ? req.body.branchList : [];
+                var departmentList = req.body.departmentList!=undefined ? req.body.departmentList : [];
+                var gradeList = req.body.gradeList!=undefined ? req.body.gradeList : [];
+                var groupList = req.body.groupList!=undefined ? req.body.groupList : [];
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
