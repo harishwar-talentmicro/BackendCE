@@ -10,6 +10,9 @@ var bcrypt = null;
 var fs = require('fs');
 var path = require('path');
 var EZEIDEmail = 'noreply@talentmicro.com';
+const accountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
+const authToken = '3abf04f536ede7f6964919936a35e614';
+const client = require('twilio')(accountSid, authToken);
 
 try{
     bcrypt = require('bcrypt');
@@ -248,7 +251,7 @@ UserCtrl.saveAddress = function(req,res,next){
                                         var mailOptions = {
                                             from: EZEIDEmail,
                                             to: emailId,
-                                            subject: 'Sign Up Process Successful',
+                                            subject: 'Welcome to WhatMate™',
                                             html: data // html body
                                         };
 
@@ -781,6 +784,7 @@ UserCtrl.login = function(req,res,next){
                                     responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
                                     responseMessage.cvid = loginDetails[0].cvid;
                                     responseMessage.profile_status = loginDetails[0].ps;
+                                    responseMessage.isNewUser = loginDetails[0].isNewUser;
                                     responseMessage.userDetails = UserDetailsResult[0];
 
                                     console.log('FnLogin: Login success');
@@ -1136,26 +1140,43 @@ UserCtrl.sendPasswordResetOTP = function(req,res,next) {
             }
             else if(otpResult[0][0].isd != "")
             {
-                request({
-                    url: 'https://rest.nexmo.com/sms/json',
-                    qs: {
-                        api_key : '4405b7b5 ',
-                        api_secret : '77dfad076c27e4c8',
-                        to: otpResult[0][0].isd.replace("+","") + otpResult[0][0].mobile,
-                        from : 'WtMate',
-                        text: message
-                    },
-                    method: 'POST'
-
-                }, function (error, response, body) {
-                    if(error)
+                client.messages.create(
                     {
-                        console.log(error,"SMS");
+                        body: message,
+                        to: otpResult[0][0].isd + otpResult[0][0].mobile,
+                        from: '+14434322305'
+                    },
+                    function (error, response) {
+                        if(error)
+                        {
+                            console.log(error,"SMS");
+                        }
+                        else{
+                            console.log("SUCCESS","SMS response");
+                        }
                     }
-                    else{
-                        console.log("SUCCESS","SMS response");
-                    }
-                });
+                );
+
+                // request({
+                //     url: 'https://rest.nexmo.com/sms/json',
+                //     qs: {
+                //         api_key : '4405b7b5 ',
+                //         api_secret : '77dfad076c27e4c8',
+                //         to: otpResult[0][0].isd.replace("+","") + otpResult[0][0].mobile,
+                //         from : 'WtMate',
+                //         text: message
+                //     },
+                //     method: 'POST'
+                //
+                // }, function (error, response, body) {
+                //     if(error)
+                //     {
+                //         console.log(error,"SMS");
+                //     }
+                //     else{
+                //         console.log("SUCCESS","SMS response");
+                //     }
+                // });
 
             }
         }
