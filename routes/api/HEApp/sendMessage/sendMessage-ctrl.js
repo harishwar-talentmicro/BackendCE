@@ -86,6 +86,7 @@ sendMessageCtrl.sendMessage = function(req,res,next){
     }
 
     var senderGroupId;
+    var isweb;
 
     if (!validationFlag){
         response.error = error;
@@ -113,6 +114,7 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                 req.body.title = req.body.title!=undefined ? req.body.title : "";
                 req.body.announcementType = req.body.announcementType!=undefined ? req.body.announcementType : 1;
                 req.body.lockType = req.body.lockType!=undefined ? req.body.lockType : 1;
+                req.query.isweb = req.query.isweb ? req.query.isweb : 0;
                 req.body.startDate = req.body.startDate!=undefined ? req.body.startDate : null;
                 req.body.endDate = req.body.endDate!=undefined ? req.body.endDate : null;
 
@@ -243,11 +245,19 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                             }
                         };
                         // res.status(200).json(response);
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        if (req.query.isweb==0) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+
+                            });
+                        }
+                        else{
                             res.status(200).json(response);
-                        });
+                        }
+
+
                     }
                     else{
                         response.status = false;
@@ -273,6 +283,7 @@ sendMessageCtrl.getUserConfig = function(req,res,next){
         data : null,
         error : null
     };
+    var isweb;
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -292,6 +303,8 @@ sendMessageCtrl.getUserConfig = function(req,res,next){
     else{
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
+                req.query.isweb = req.query.isweb ? req.query.isweb : 0;
+
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -314,12 +327,18 @@ sendMessageCtrl.getUserConfig = function(req,res,next){
                             gradeList : configResult[2] ? configResult[2] : [],
                             groupList : configResult[3] ? configResult[3] : []
                         };
+                        if(req.query.isweb ==0) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
 
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            });
+                        }
+                        else {
                             res.status(200).json(response);
-                        });
+
+                        }
                     }
                     else{
                         response.status = false;
@@ -345,6 +364,7 @@ sendMessageCtrl.getMemberCount = function(req,res,next){
         data : null,
         error : null
     };
+    var isweb;
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -368,6 +388,7 @@ sendMessageCtrl.getMemberCount = function(req,res,next){
                 var departmentList = req.body.departmentList!=undefined ? req.body.departmentList : [];
                 var gradeList = req.body.gradeList!=undefined ? req.body.gradeList : [];
                 var groupList = req.body.groupList!=undefined ? req.body.groupList : [];
+
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -424,6 +445,7 @@ sendMessageCtrl.getMasterData = function(req,res,next){
         error : null
     };
     var validationFlag = true;
+    var isweb;
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
@@ -435,6 +457,7 @@ sendMessageCtrl.getMasterData = function(req,res,next){
         res.status(400).json(response);
         console.log(response);
     }
+
     else{
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
@@ -460,11 +483,16 @@ sendMessageCtrl.getMasterData = function(req,res,next){
                             RMGroups: masterResult[3] ? masterResult[3] : []
                         };
                         // res.status(200).json(response);
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                        res.status(200).json(response);
-                         });
+                       // if (isweb==0) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                       // }
+                       //  else {
+                       //      res.status(200).json(response);
+                       //  }
 
                     }
                     else if(!err){
@@ -866,6 +894,8 @@ sendMessageCtrl.GetAnnouncementType = function(req,res,next){
         data : null,
         error : null
     };
+    var isweb;
+
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -885,6 +915,8 @@ sendMessageCtrl.GetAnnouncementType = function(req,res,next){
     else{
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
+                req.query.isweb = req.query.isweb ? req.query.isweb : 0;
+
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -906,13 +938,18 @@ sendMessageCtrl.GetAnnouncementType = function(req,res,next){
                             fEndDate :(userResult[1] && userResult[1][0] && userResult[1][0].startDate) ? userResult[1][0].endDate : null
                         };
 
-                        // res.status(200).json(response);
-
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        // res.status(200).json(response)
+                        if(req.query.isweb == 0) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else{
                             res.status(200).json(response);
-                        });
+
+                        }
 
                     }
                     else if(!err){

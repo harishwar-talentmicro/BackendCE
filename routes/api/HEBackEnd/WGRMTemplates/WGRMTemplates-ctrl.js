@@ -68,7 +68,7 @@ WGRMTemplateCtrl.saveWGTemplate = function(req,res,next){
 
                     }
                    else if(!err){
-                        response.status = true;
+                        response.status = false;
                         response.message = "Workgroup  Template Title already in use";
                         response.error = null;
                         response.data = null;
@@ -154,7 +154,7 @@ WGRMTemplateCtrl.saveRMTemplate = function(req,res,next){
 
                     }
                    else if(!err){
-                        response.status = true;
+                        response.status = false;
                         response.message = "RM group Template Title already in use";
                         response.error = null;
                         response.data = null;
@@ -515,7 +515,7 @@ WGRMTemplateCtrl.deleteWGTemplatedetailes = function(req,res,next){
                     console.log(err);
 
                     if(!err && workgroupresult && workgroupresult[0]){
-                        response.status = true;
+                        response.status = false;
                         response.message = "alraedy in use";
                         response.error = null;
                         response.data = null;
@@ -589,7 +589,7 @@ WGRMTemplateCtrl.deleteRMTemplatedetailes = function(req,res,next){
                     console.log(err);
 
                     if(!err && rmgroupresult && rmgroupresult[0]){
-                        response.status = true;
+                        response.status = false;
                         response.message = "alraedy in use";
                         response.error = null;
                         response.data = null;
