@@ -462,26 +462,43 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                 }
                                 else if(Qndata[0].isdmobile != "")
                                 {
-                                    request({
-                                        url: 'https://rest.nexmo.com/sms/json',
-                                        qs: {
-                                            api_key : '4405b7b5 ',
-                                            api_secret : '77dfad076c27e4c8',
-                                            to: Qndata[0].isdmobile.replace("+","") + Qndata[0].mobile,
-                                            from : 'WtMate',
-                                            text: message
-                                        },
-                                        method: 'POST'
-
-                                    }, function (error, response, body) {
-                                        if(error)
+                                    client.messages.create(
                                         {
-                                            console.log(error,"SMS");
+                                            body: message,
+                                            to: Qndata[0].isdmobile + Qndata[0].mobile,
+                                            from: '+14434322305'
+                                        },
+                                        function (error, response) {
+                                            if(error)
+                                            {
+                                                console.log(error,"SMS");
+                                            }
+                                            else{
+                                                console.log("SUCCESS","SMS response");
+                                            }
                                         }
-                                        else{
-                                            console.log("SUCCESS","SMS response");
-                                        }
-                                    });
+                                    );
+
+                                    // request({
+                                    //     url: 'https://rest.nexmo.com/sms/json',
+                                    //     qs: {
+                                    //         api_key : '4405b7b5 ',
+                                    //         api_secret : '77dfad076c27e4c8',
+                                    //         to: Qndata[0].isdmobile.replace("+","") + Qndata[0].mobile,
+                                    //         from : 'WtMate',
+                                    //         text: message
+                                    //     },
+                                    //     method: 'POST'
+                                    //
+                                    // }, function (error, response, body) {
+                                    //     if(error)
+                                    //     {
+                                    //         console.log(error,"SMS");
+                                    //     }
+                                    //     else{
+                                    //         console.log("SUCCESS","SMS response");
+                                    //     }
+                                    // });
 
                                 }
 
@@ -548,26 +565,42 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                 }
                                 else if(Qndata[0].isdmobile != "")
                                 {
-                                    request({
-                                        url: 'https://rest.nexmo.com/sms/json',
-                                        qs: {
-                                            api_key : '4405b7b5 ',
-                                            api_secret : '77dfad076c27e4c8',
-                                            to: Qndata[0].isdmobile.replace("+","") + Qndata[0].mobile,
-                                            from : 'WtMate',
-                                            text: message
-                                        },
-                                        method: 'POST'
-
-                                    }, function (error, response, body) {
-                                        if(error)
+                                    client.messages.create(
                                         {
-                                            console.log(error,"SMS");
+                                            body: message,
+                                            to: Qndata[0].isdmobile + Qndata[0].mobile,
+                                            from: '+14434322305'
+                                        },
+                                        function (error, response) {
+                                            if(error)
+                                            {
+                                                console.log(error,"SMS");
+                                            }
+                                            else{
+                                                console.log("SUCCESS","SMS response");
+                                            }
                                         }
-                                        else{
-                                            console.log("SUCCESS","SMS response");
-                                        }
-                                    });
+                                    );
+                                    // request({
+                                    //     url: 'https://rest.nexmo.com/sms/json',
+                                    //     qs: {
+                                    //         api_key : '4405b7b5 ',
+                                    //         api_secret : '77dfad076c27e4c8',
+                                    //         to: Qndata[0].isdmobile.replace("+","") + Qndata[0].mobile,
+                                    //         from : 'WtMate',
+                                    //         text: message
+                                    //     },
+                                    //     method: 'POST'
+                                    //
+                                    // }, function (error, response, body) {
+                                    //     if(error)
+                                    //     {
+                                    //         console.log(error,"SMS");
+                                    //     }
+                                    //     else{
+                                    //         console.log("SUCCESS","SMS response");
+                                    //     }
+                                    // });
 
                                 }
 

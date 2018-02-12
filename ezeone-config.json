@@ -61,8 +61,8 @@
   "VERSION_LIST" : {
     "IOS" : [[],[23,24]],
     "ANDROID" : [46],
-    "WhatMateIOS" : [[],[18,19]],
-    "WhatMateANDROID" : [32],
+    "WhatMateIOS" : [[],[19]],
+    "WhatMateANDROID" : [33],
     "WEB" : [1]
   },
   "NOTIFICATION" : {

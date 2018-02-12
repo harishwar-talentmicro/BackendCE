@@ -20,6 +20,7 @@ masterCtrl.searchUsers = function(req,res,next){
         if((!err) && tokenResult){
 
             req.query.syncDate = req.query.syncDate ? req.query.syncDate : null;
+            req.query.isweb = req.query.isweb ? req.query.isweb : 0;
 
             var procParams = [
                 req.st.db.escape(req.query.token),
@@ -51,11 +52,16 @@ masterCtrl.searchUsers = function(req,res,next){
                     response.data = {
                         userList : output
                     };
-                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                    zlib.gzip(buf, function (_, result) {
-                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                    if(req.query.isweb == 0){
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else {
                         res.status(200).json(response);
-                    });
+                    }
 
                 }
                 else if(!err){

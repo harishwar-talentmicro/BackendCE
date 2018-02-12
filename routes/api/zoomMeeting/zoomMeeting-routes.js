@@ -11,4 +11,9 @@ router.post('/zoom/meeting',zoomCtrl.saveZoomMeeting);
 router.post('/zoom/meeting/stop',zoomCtrl.stopMeeting);
 router.get('/zoom/meeting',zoomCtrl.getMeetingList);
 
+// twilio
+router.get('/twilio/accessToken',zoomCtrl.getAccessTokenVideo);
+router.get('/twilio/voice/accessToken',zoomCtrl.getAccessTokenVoice);
+router.post('/twilio/makeCall',zoomCtrl.makeCall);
+
 module.exports = router;

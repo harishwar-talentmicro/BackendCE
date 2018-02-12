@@ -6,9 +6,17 @@ var moment = require('moment');
 var request = require('request');
 var fs = require('fs');
 var path = require('path');
+var uuid = require('node-uuid');
+var http = require('http');
+var Readable = require('stream').Readable
 var signupCtrl = {};
 var bcrypt = null;
 var EZEIDEmail = 'noreply@talentmicro.com';
+const accountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
+const authToken = '3abf04f536ede7f6964919936a35e614';
+const client = require('twilio')(accountSid, authToken);
+const VoiceResponse = require('twilio').twiml.VoiceResponse;
+
 
 try{
     bcrypt = require('bcrypt');
@@ -62,7 +70,7 @@ signupCtrl.sendOtp = function(req,res,next) {
                 message='Your EZEOne verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed.';
             }
             else{
-                message='Your WhatMate verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed.';
+                message='Your WhatMate verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed --WhatMate Helpdesk.';
             }
 
             var query = req.st.db.escape(mobileNo) + ',' + req.st.db.escape(code);
@@ -117,18 +125,33 @@ signupCtrl.sendOtp = function(req,res,next) {
                     }
                     else if(isdMobile != "")
                     {
+                        client.messages.create(
+                            {
+                                body: message,
+                                to: isdMobile + mobileNo,
+                                from: '+14434322305'
+                            },
+                            function (error, response) {
+                                if(error)
+                                {
+                                    console.log(error,"SMS");
+                                }
+                                else{
+                                    console.log("SUCCESS","SMS response");
+                                }
+                            }
+                        );
+
                         // request({
-                        //     url: 'https://aikonsms.co.in/control/smsapi.php',
+                        //     url: 'https://rest.nexmo.com/sms/json',
                         //     qs: {
-                        //         user_name : 'janardana@hirecraft.com',
-                        //         password : 'Ezeid2015',
-                        //         sender_id : 'WtMate',
-                        //         service : 'INTSMS',
-                        //         mobile_no: "00" + isdMobile.replace("+","") + mobileNo,
-                        //         message: message,
-                        //         method : 'send_intsms'
+                        //         api_key : '4405b7b5 ',
+                        //         api_secret : '77dfad076c27e4c8',
+                        //         to: isdMobile.replace("+","") + mobileNo,
+                        //         from : 'WtMate',
+                        //         text: message
                         //     },
-                        //     method: 'GET'
+                        //     method: 'POST'
                         //
                         // }, function (error, response, body) {
                         //     if(error)
@@ -139,26 +162,6 @@ signupCtrl.sendOtp = function(req,res,next) {
                         //         console.log("SUCCESS","SMS response");
                         //     }
                         // });
-                        request({
-                            url: 'https://rest.nexmo.com/sms/json',
-                            qs: {
-                                api_key : '4405b7b5 ',
-                                api_secret : '77dfad076c27e4c8',
-                                to: isdMobile.replace("+","") + mobileNo,
-                                from : 'WtMate',
-                                text: message
-                            },
-                            method: 'POST'
-
-                        }, function (error, response, body) {
-                            if(error)
-                            {
-                                console.log(error,"SMS");
-                            }
-                            else{
-                                console.log("SUCCESS","SMS response");
-                            }
-                        });
 
                     }
 
@@ -540,6 +543,100 @@ signupCtrl.verifyEmailId = function(req,res,next){
                         res.status(500).json(response);
                     }
                 });
+    }
+};
+
+signupCtrl.testOtp = function(req,res,next) {
+
+    var status = true, error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+
+    if (status) {
+        try {
+        //     client.messages.create(
+        //         {
+        //             body: "WhatMate test,please confirm receipt - Janardana",
+        //             to: '+919945232397',
+        //             from: '+14434322305'
+        //         },
+        //         function (error, response) {
+        //             if(error)
+        //             {
+        //                 console.log(error,"SMS");
+        //             }
+        //             else{
+        //                 console.log("SUCCESS","SMS response");
+        //             }
+        //         }
+        // );
+            const response = new VoiceResponse();
+            response.say('Hello');
+            var s = new Readable;
+            // s.push(response.toString());
+            s.push('<Response><Say >Thanks for trying our documentation. vedha!</Say></Response>');
+
+            s.push(null);
+            var uniqueFileName = uuid.v4() + '.xml';
+            var fileName = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + uniqueFileName;
+            console.log("uniqueFileName",fileName);
+
+            req.st.uploadXMLToCloud(uniqueFileName, s, function (err) {
+                if (!err) {
+                    console.log("success");
+                    client.calls
+                        .create({
+                                url: fileName,
+                                to: '+919743883221',
+                                from: '+14434322305',
+                                method: 'GET'
+                            },
+                            function (error, response){
+                                if(error)
+                                {
+                                    req.st.deleteDocumentFromCloud(uniqueFileName);
+                                    console.log(error,"phone");
+                                }
+                                else{
+                                    req.st.deleteDocumentFromCloud(uniqueFileName);
+                                    console.log("SUCCESS","phone call");
+                                }
+                            });
+
+                    // client.calls
+                    //     .create({
+                    //         url: fileName,
+                    //         to: '+919743883221',
+                    //         from: '+14434322305',
+                    //         method: 'GET'
+                    //     });
+
+                }
+                else {
+                    console.log(err);
+                }
+            });
+
+
+        }
+        catch (ex) {
+            console.log('Error : FnSendOtp ' + ex);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = {server: 'Internal Server Error'};
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
     }
 };
 
