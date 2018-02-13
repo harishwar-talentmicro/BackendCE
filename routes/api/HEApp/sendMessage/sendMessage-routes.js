@@ -21,4 +21,9 @@ router.delete('/config/user',messageCtrl.DeleteMsgMapUsersData);
 
 router.get('/master/announcementTypes',messageCtrl.GetAnnouncementType);
 
+router.get('/announcementList',messageCtrl.GetAnnouncementSummaryList);
+router.get('/announcement/detailedReport',messageCtrl.GetAnnouncementDetailedSummary);
+
+router.post('/draft',messageCtrl.saveAsDraft);
+
 module.exports = router;

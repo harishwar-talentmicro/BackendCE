@@ -640,4 +640,121 @@ signupCtrl.testOtp = function(req,res,next) {
     }
 };
 
+signupCtrl.sendOtpPhone = function(req,res,next) {
+
+    var status = true, error = {};
+    var mobileNo= req.body.mobileNo;
+    var isdMobile = req.body.isdMobile ;
+
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+    if (!mobileNo) {
+        error['mobile'] = 'mobile no is mandatory';
+        status *= false;
+    }
+    if (!isdMobile) {
+        error['isdMobile'] = 'isd mobile is mandatory';
+        status *= false;
+    }
+
+    if (status) {
+        try {
+            var code = "";
+            var possible = "1234567890";
+
+            for (var i = 0; i <= 5; i++) {
+
+                code += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+
+            var query = req.st.db.escape(mobileNo);
+            req.st.db.query('CALL generate_otp(' + query + ')', function (err, insertResult) {
+                if (!err && insertResult && insertResult[0] && insertResult[0][0].otp ) {
+                    code = insertResult[0][0].otp ;
+                }
+            });
+
+            var message='Your WhatMate verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed --WhatMate Helpdesk.';
+
+            const response = new VoiceResponse();
+            // response.say(message);
+            response.say(
+                {
+                    voice: 'alice',
+                    loop: 2
+                },
+                message
+            );
+
+            var s = new Readable;
+            s.push(response.toString());
+            console.log(response.toString());
+            // s.push('<Response><Say >Thanks for trying our documentation. vedha!</Say></Response>');
+
+            s.push(null);
+            var uniqueFileName = 'phone_' +uuid.v4() + '.xml';
+            var fileName = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + uniqueFileName;
+
+            req.st.uploadXMLToCloud(uniqueFileName, s, function (err) {
+                if (!err) {
+                    client.calls
+                        .create({
+                                url: fileName,
+                                to: isdMobile+mobileNo,
+                                from: '+14434322305',
+                                method: 'GET'
+                            },
+                            function (error, response){
+                                if(error)
+                                {
+                                    // req.st.deleteDocumentFromCloud(uniqueFileName);
+                                    console.log(error,"phone");
+                                    respMsg.status = false;
+                                    respMsg.message = 'Something went wrong';
+                                    res.status(500).json(respMsg);
+
+                                }
+                                else{
+                                    // req.st.deleteDocumentFromCloud(uniqueFileName);
+                                    console.log("SUCCESS","phone call");
+                                    respMsg.status = true;
+                                    respMsg.message = 'success';
+                                    res.status(200).json(respMsg);
+
+                                }
+                            });
+
+                }
+                else {
+                    console.log(err);
+                    respMsg.status = false;
+                    respMsg.message = 'Something went wrong';
+                    res.status(500).json(respMsg);
+
+                }
+            });
+
+
+        }
+        catch (ex) {
+            console.log('Error : FnSendOtp ' + ex);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = {server: 'Internal Server Error'};
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
+    }
+};
+
 module.exports = signupCtrl;

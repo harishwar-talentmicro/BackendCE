@@ -117,6 +117,7 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                 req.query.isweb = req.query.isweb ? req.query.isweb : 0;
                 req.body.startDate = req.body.startDate!=undefined ? req.body.startDate : null;
                 req.body.endDate = req.body.endDate!=undefined ? req.body.endDate : null;
+                req.body.isDraft = req.body.isDraft!=undefined ? req.body.isDraft : 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -140,7 +141,8 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                     req.st.db.escape(req.body.announcementType),
                     req.st.db.escape(req.body.lockType),
                     req.st.db.escape(req.body.startDate),
-                    req.st.db.escape(req.body.endDate)
+                    req.st.db.escape(req.body.endDate),
+                    req.st.db.escape(req.body.isDraft)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -886,7 +888,6 @@ sendMessageCtrl.DeleteMsgMapUsersData = function(req,res,next){
 
 };
 
-
 sendMessageCtrl.GetAnnouncementType = function(req,res,next){
     var response = {
         status : false,
@@ -962,6 +963,351 @@ sendMessageCtrl.GetAnnouncementType = function(req,res,next){
                     else{
                         response.status = false;
                         response.message = "Error while getting User data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+sendMessageCtrl.GetAnnouncementSummaryList = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var isweb;
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.isweb = req.query.isweb ? req.query.isweb : 0;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                var startPage = 0;
+
+                startPage = ((((parseInt(req.query.pageNo)) * req.query.limit) + 1) - req.query.limit) - 1;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(startPage),
+                    req.st.db.escape(req.query.limit),
+                    req.st.db.escape(req.query.type),
+                    req.st.db.escape(req.query.groupId)
+                ];
+
+                var procQuery = 'CALL he_get_announcementList( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,announcementResult){
+                    if(!err && announcementResult && announcementResult[0]){
+                        response.status = true;
+                        response.message = "Data loaded successfully .";
+                        response.error = null;
+                        response.data = {
+                            announcementList : announcementResult[0],
+                            count : announcementResult[1][0].count
+                        };
+
+                        // res.status(200).json(response)
+                        if(req.query.isweb == 0) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else{
+                            res.status(200).json(response);
+                        }
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting announcement data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+sendMessageCtrl.GetAnnouncementDetailedSummary = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var isweb;
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.isweb = req.query.isweb ? req.query.isweb : 0;
+                req.query.status = req.query.status ? req.query.status : 0;
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.parentId),
+                    req.st.db.escape(req.query.transId),
+                    req.st.db.escape(req.query.status)
+                ];
+
+                var procQuery = 'CALL he_get_announcementDetailedSummary( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,announcementResult){
+                    if(!err && announcementResult && announcementResult[0]){
+                        response.status = true;
+                        response.message = "Data loaded successfully .";
+                        response.error = null;
+                        var output = [];
+                        for(var i = 0; i < announcementResult[0].length; i++) {
+                            var res1 = {};
+                            res1.name = announcementResult[0][i].name;
+                            res1.jobTitle = announcementResult[0][i].jobTitle;
+                            res1.department = announcementResult[0][i].department;
+                            res1.location = announcementResult[0][i].location;
+                            res1.status = announcementResult[0][i].status;
+                            res1.readDateTime = announcementResult[0][i].readDateTime;
+                            res1.image = (announcementResult[0][i].imageUrl) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + announcementResult[0][i].imageUrl) : ""
+                            output.push(res1);
+                        }
+
+                        response.data = {
+                            userDetails : output
+                        };
+
+                        // res.status(200).json(response)
+                        if(req.query.isweb == 0) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else{
+                            res.status(200).json(response);
+                        }
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting user data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+sendMessageCtrl.saveAsDraft = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    var attachmentList =req.body.attachmentList;
+    if(typeof(attachmentList) == "string") {
+        attachmentList = JSON.parse(attachmentList);
+    }
+    if(!attachmentList){
+        attachmentList = [];
+    }
+    // embededImages
+    var embededImages =req.body.embededImages;
+    if(typeof(embededImages) == "string") {
+        embededImages = JSON.parse(embededImages);
+    }
+    if(!embededImages){
+        embededImages = [];
+    }
+
+    var userList =req.body.userList;
+    if(typeof(userList) == "string") {
+        userList = JSON.parse(userList);
+    }
+    if(!userList){
+        userList = [];
+    }
+
+    var branchList =req.body.branchList;
+    if(typeof(branchList) == "string") {
+        branchList = JSON.parse(branchList);
+    }
+    if(!branchList){
+        branchList = [];
+    }
+
+    var departmentList =req.body.departmentList;
+    if(typeof(departmentList) == "string") {
+        departmentList = JSON.parse(departmentList);
+    }
+    if(!departmentList){
+        departmentList = [];
+    }
+
+    var gradeList =req.body.gradeList;
+    if(typeof(gradeList) == "string") {
+        gradeList = JSON.parse(gradeList);
+    }
+    if(!gradeList){
+        gradeList = [];
+    }
+
+    var groupList =req.body.groupList;
+    if(typeof(groupList) == "string") {
+        groupList = JSON.parse(groupList);
+    }
+    if(!groupList){
+        groupList = [];
+    }
+
+    var senderGroupId;
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.body.parentId = req.body.parentId ? req.body.parentId : 0;
+                req.body.message = req.body.message ? req.body.message : '';
+                req.body.notes = req.body.notes ? req.body.notes : '';
+                req.body.status = req.body.status ? req.body.status : 0;
+                req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
+                req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
+                req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
+                req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
+                req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
+                req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
+                req.body.recordedVoiceUrl = req.body.recordedVoiceUrl ? req.body.recordedVoiceUrl : '';
+                req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                req.body.groupType = req.body.groupType ? req.body.groupType : 0;
+                req.body.memberCount = req.body.memberCount ? req.body.memberCount : 0;
+                req.body.title = req.body.title!=undefined ? req.body.title : "";
+                req.body.announcementType = req.body.announcementType!=undefined ? req.body.announcementType : 1;
+                req.body.lockType = req.body.lockType!=undefined ? req.body.lockType : 1;
+                req.query.isweb = req.query.isweb ? req.query.isweb : 0;
+                req.body.startDate = req.body.startDate!=undefined ? req.body.startDate : null;
+                req.body.endDate = req.body.endDate!=undefined ? req.body.endDate : null;
+                req.body.isDraft = req.body.isDraft!=undefined ? req.body.isDraft : 1;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.parentId),
+                    req.st.db.escape(req.body.message),
+                    req.st.db.escape(req.body.groupId),
+                    req.st.db.escape(req.body.learnMessageId),
+                    req.st.db.escape(req.body.accessUserType),
+                    req.st.db.escape(JSON.stringify(attachmentList)),
+                    req.st.db.escape(req.body.changeLog),
+                    req.st.db.escape(JSON.stringify(userList)),
+                    req.st.db.escape(JSON.stringify(branchList)),
+                    req.st.db.escape(JSON.stringify(departmentList)),
+                    req.st.db.escape(JSON.stringify(gradeList)),
+                    req.st.db.escape(JSON.stringify(groupList)),
+                    req.st.db.escape(req.body.alarmType),
+                    req.st.db.escape(JSON.stringify(embededImages)),
+                    req.st.db.escape(req.body.groupType),
+                    req.st.db.escape(req.body.memberCount),
+                    req.st.db.escape(req.body.title),
+                    req.st.db.escape(req.body.announcementType),
+                    req.st.db.escape(req.body.lockType),
+                    req.st.db.escape(req.body.startDate),
+                    req.st.db.escape(req.body.endDate),
+                    req.st.db.escape(req.body.isDraft)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL HE_save_sendMessage( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+
+                    if(!err){
+                        response.status = true;
+                        response.message = "Message saved successfully";
+                        response.error = null;
+                        response.data = null ;
+                        // res.status(200).json(response);
+                        res.status(200).json(response);
+
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving message";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
