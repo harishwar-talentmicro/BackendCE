@@ -1030,8 +1030,8 @@ sendMessageCtrl.GetAnnouncementSummaryList = function(req,res,next){
                         response.data = {
                             announcementList : announcementResult[0],
                             count : announcementResult[1][0].count,
-                            isNormal : announcementResult[2][0].isNormal,
-                            isTaxSaving : announcementResult[2][0].isTaxSaving
+                            isNormal : (announcementResult[2] && announcementResult[2][0] && announcementResult[2][0].isNormal) ? announcementResult[2][0].isNormal : 0,
+                            isTaxSaving :(announcementResult[2] && announcementResult[2][0] && announcementResult[2][0].isTaxSaving) ?  announcementResult[2][0].isTaxSaving : 0
                         };
 
                         // res.status(200).json(response)
