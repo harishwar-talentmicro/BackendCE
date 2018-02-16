@@ -49,11 +49,11 @@ userCtrl.saveUser = function(req,res,next){
             if((!err) && tokenResult){
                 req.body.employeeCode = (req.body.employeeCode) ? req.body.employeeCode : '';
                 req.body.jobTitle = (req.body.jobTitle) ? req.body.jobTitle : '';
-                req.body.departmentTitle = (req.body.departmentTitle != undefined) ? req.body.departmentTitle : 0;
+                req.body.departmentId = (req.body.departmentId != undefined) ? req.body.departmentId : 0;
                 req.body.locationTitle = (req.body.locationTitle) ? req.body.locationTitle : '';
                 req.body.grade = (req.body.grade != undefined) ? req.body.grade : 0;
                 req.body.status = (req.body.status) ? req.body.status : 1;
-                req.body.trackTemplateId = (req.body.trackTemplateId) ? req.body.trackTemplateId : 0;
+                // req.body.trackTemplateId = (req.body.trackTemplateId) ? req.body.trackTemplateId : 0;
                 req.body.workLocationId = (req.body.workLocationId) ? req.body.workLocationId : 0;
                 req.body.userType = (req.body.userType) ? req.body.userType : 0;
 
@@ -66,7 +66,7 @@ userCtrl.saveUser = function(req,res,next){
                     req.st.db.escape(req.body.locationTitle),
                     req.st.db.escape(req.body.grade),
                     req.st.db.escape(req.body.status),
-                    req.st.db.escape(req.body.trackTemplateId),
+                    req.st.db.escape(JSON.stringify(req.body.trackTemplate)),
                     req.st.db.escape(req.body.workLocationId),
                     req.st.db.escape(req.body.formTemplateId),
                     req.st.db.escape(req.query.APIKey),
@@ -240,7 +240,15 @@ userCtrl.getUserDetails = function(req,res,next){
                         //         result.accessType = JSON.parse("[" + userRights[i].accessType + "]")
                         //             outputArray.push(result);
                         // }
-
+                        var output=[];
+                        var usertemplate = JSON.parse(userData[0][0].tracktemplate);
+                        console.log(usertemplate);
+                        for(var i=0; i<usertemplate.length; i++){
+                            var res2={};
+                            res2.trackTemplateId=usertemplate[i].templateId,
+                                res2.trackTemplateTitle=usertemplate[i].title
+                            output.push(res2);
+                        }
                         response.status = true;
                         response.message = "User details loaded successfully";
                         response.error = null;
@@ -256,8 +264,8 @@ userCtrl.getUserDetails = function(req,res,next){
                             grade : userData[0][0].grade,
                             gradeTitle : userData[0][0].gradeTitle,
                             status : userData[0][0].status,
-                            trackTemplateId : userData[0][0].trackTemplateId,
-                            trackTemplateTitle : userData[0][0].trackTemplateTitle,
+                            trackTemplateList : output,
+                            // trackTemplateTitle : userData[0][0].trackTemplateTitle,
                             workLocationId : userData[0][0].workLocationId,
                             workLocationTitle : userData[0][0].workLocationTitle ,
                             userType : userData[0][0].userType ,
