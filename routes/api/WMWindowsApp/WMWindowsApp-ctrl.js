@@ -403,12 +403,15 @@ windowsCtrl.uploadUsers = function(req,res,next){
                     if (!err && userResult && userResult[0] ){
                         console.log("userResult[0][0].status",userResult[0][0].status);
 
-                        if (userResult[0][0].status == "New" && Qndata[0].email != "" ){
-                            mailerApi.sendMailNew('NewUserUpload', {
-                                name : Qndata[0].name,
-                                UserName : userResult[0][0].whatmateId,
-                                Password : password
-                            }, '',Qndata[0].email,[]);
+                        if (userResult[0][0].status == "New" ){
+                            if(Qndata[0].email != ""){
+                                mailerApi.sendMailNew('NewUserUpload', {
+                                    name : Qndata[0].name,
+                                    UserName : userResult[0][0].whatmateId,
+                                    Password : password
+                                }, '',Qndata[0].email,[]);
+                            }
+
                             message = 'Dear ' + Qndata[0].name  + ', Your WhatMate credentials, Login ID: ' + userResult[0][0].whatmateId + ',Password: ' + password ;
 
                             if(Qndata[0].mobile !="")
@@ -505,12 +508,14 @@ windowsCtrl.uploadUsers = function(req,res,next){
                             }
 
                         }
-                        else if(userResult[0][0].status == "Existing" && Qndata[0].email != "") {
-                            mailerApi.sendMailNew('existingUsers', {
-                                name : Qndata[0].name,
-                                UserName : userResult[0][0].whatmateId,
-                                CompanyName : req.query.CompanyName
-                            }, '',Qndata[0].email,[]);
+                        else if(userResult[0][0].status == "Existing") {
+                            if(Qndata[0].email != ""){
+                                mailerApi.sendMailNew('existingUsers', {
+                                    name : Qndata[0].name,
+                                    UserName : userResult[0][0].whatmateId,
+                                    CompanyName : req.query.CompanyName
+                                }, '',Qndata[0].email,[]);
+                            }
 
                             message = 'Dear ' + Qndata[0].name  + ', Your existing profile on WhatMate is successfully linked to ' + req.query.CompanyName + ' now.';
 
@@ -608,7 +613,7 @@ windowsCtrl.uploadUsers = function(req,res,next){
                         }
 
                         response.status = true;
-                        response.message = "Tax declaration uploaded successfully";
+                        response.message = "Users uploaded successfully";
                         response.error = null;
                         response.data = {
                             status : userResult[0][0].status
@@ -617,7 +622,7 @@ windowsCtrl.uploadUsers = function(req,res,next){
                     }
                     else{
                         response.status = false;
-                        response.message = "Error while uploading tax declaration";
+                        response.message = "Error while uploading users";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

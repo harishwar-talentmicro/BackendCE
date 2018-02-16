@@ -874,4 +874,106 @@ salesCtrl.getSalesItems = function(req,res,next){
 
 };
 
+salesCtrl.getSalesTracker = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.groupId)
+    {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.type = req.query.type ? req.query.type : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
+                var startPage = 0;
+
+                startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(req.query.type),
+                    req.st.db.escape(startPage),
+                    req.st.db.escape(req.query.limit)
+                ];
+                /**
+                 * Calling procedure to save form sales items
+                 */
+                var procQuery = 'CALL HE_get_salesTracker( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,salesItems){
+                    if(!err && salesItems && salesItems[0]){
+
+                        response.status = true;
+                        response.message = "Sales tracker data loaded successfully";
+                        response.data = {
+                            chartData : salesItems[0],
+                            transactionData : salesItems[1],
+                            count : salesItems[2][0].count
+                        };
+
+                        response.error = null;
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
+                    }
+                    else if (!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.data = {
+                            chartData : [],
+                            transactionData : [],
+                            count : 0
+                        };
+                        response.error = null;
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting sales tracker";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 module.exports = salesCtrl;

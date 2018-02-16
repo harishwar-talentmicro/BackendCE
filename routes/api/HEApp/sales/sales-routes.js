@@ -16,4 +16,6 @@ router.get('/sales/client',salesCtrl.findHECustomer);
 router.post('/feedback',salesCtrl.saveSalesFeedback);
 router.get('/sales/items',salesCtrl.getSalesItems);
 
+router.get('/sales/tracker',salesCtrl.getSalesTracker);
+
 module.exports = router;

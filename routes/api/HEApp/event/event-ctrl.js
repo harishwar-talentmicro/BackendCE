@@ -1666,6 +1666,13 @@ eventCtrl.getStatusOfWMList = function(req,res,next){
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, homePageData) {
                     if (!err && homePageData && homePageData[0] && homePageData[0][0] ) {
+
+                        if(homePageData[0][0].trackTemplateDetails){
+                            for(var i = 0; i < homePageData[0].length; i++){
+                                homePageData[0][i].trackTemplateDetails = (homePageData[0][i].trackTemplateDetails) ? JSON.parse(homePageData[0][i].trackTemplateDetails) : [] ;
+                            }
+                        }
+
                         response.status = true;
                         response.message = "Details loaded successfully";
                         response.error = null;

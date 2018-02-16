@@ -675,68 +675,73 @@ signupCtrl.sendOtpPhone = function(req,res,next) {
             req.st.db.query('CALL generate_otp(' + query + ')', function (err, insertResult) {
                 if (!err && insertResult && insertResult[0] && insertResult[0][0].otp ) {
                     code = insertResult[0][0].otp ;
-                }
-            });
+                    var message='Your WhatMate verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed --WhatMate Helpdesk.';
 
-            var message='Your WhatMate verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed --WhatMate Helpdesk.';
+                    const response = new VoiceResponse();
+                    response.say(
+                        {
+                            voice: 'alice',
+                            language : 'en',
+                            loop: 2
+                        },
+                        message
+                    );
 
-            const response = new VoiceResponse();
-            // response.say(message);
-            response.say(
-                {
-                    voice: 'alice',
-                    loop: 2
-                },
-                message
-            );
+                    var s = new Readable;
+                    s.push(response.toString());
+                    console.log(response.toString());
+                    s.push(null);
+                    var uniqueFileName = 'phone_' +uuid.v4() + '.xml';
+                    var fileName = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + uniqueFileName;
 
-            var s = new Readable;
-            s.push(response.toString());
-            console.log(response.toString());
-            // s.push('<Response><Say >Thanks for trying our documentation. vedha!</Say></Response>');
+                    req.st.uploadXMLToCloud(uniqueFileName, s, function (err) {
+                        if (!err) {
+                            client.calls
+                                .create({
+                                        url: fileName,
+                                        to: isdMobile+mobileNo,
+                                        from: '+14434322305',
+                                        method: 'GET'
+                                    },
+                                    function (error, response){
+                                        if(error)
+                                        {
+                                            // req.st.deleteDocumentFromCloud(uniqueFileName);
+                                            console.log(error,"phone");
+                                            respMsg.status = false;
+                                            respMsg.message = 'Something went wrong';
+                                            res.status(500).json(respMsg);
 
-            s.push(null);
-            var uniqueFileName = 'phone_' +uuid.v4() + '.xml';
-            var fileName = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + uniqueFileName;
+                                        }
+                                        else{
+                                            // req.st.deleteDocumentFromCloud(uniqueFileName);
+                                            console.log("SUCCESS","phone call");
+                                            respMsg.status = true;
+                                            respMsg.message = 'success';
+                                            res.status(200).json(respMsg);
 
-            req.st.uploadXMLToCloud(uniqueFileName, s, function (err) {
-                if (!err) {
-                    client.calls
-                        .create({
-                                url: fileName,
-                                to: isdMobile+mobileNo,
-                                from: '+14434322305',
-                                method: 'GET'
-                            },
-                            function (error, response){
-                                if(error)
-                                {
-                                    // req.st.deleteDocumentFromCloud(uniqueFileName);
-                                    console.log(error,"phone");
-                                    respMsg.status = false;
-                                    respMsg.message = 'Something went wrong';
-                                    res.status(500).json(respMsg);
+                                        }
+                                    });
 
-                                }
-                                else{
-                                    // req.st.deleteDocumentFromCloud(uniqueFileName);
-                                    console.log("SUCCESS","phone call");
-                                    respMsg.status = true;
-                                    respMsg.message = 'success';
-                                    res.status(200).json(respMsg);
+                        }
+                        else {
+                            console.log(err);
+                            respMsg.status = false;
+                            respMsg.message = 'Something went wrong';
+                            res.status(500).json(respMsg);
 
-                                }
-                            });
+                        }
+                    });
 
                 }
                 else {
-                    console.log(err);
                     respMsg.status = false;
                     respMsg.message = 'Something went wrong';
                     res.status(500).json(respMsg);
-
                 }
             });
+
+
 
 
         }
