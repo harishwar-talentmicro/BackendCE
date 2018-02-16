@@ -242,6 +242,8 @@ router.get('/', function(req,res,next){
                                             console.log('contactResults[0][i].thumbnailImage',contactResults[0][i].thumbnailImage);
                                             groupId = contactResults[0][i].groupId;
 
+                                            contactResults[0][i].trackTemplateDetails = (contactResults[0][i].trackTemplateDetails) ? JSON.parse(contactResults[0][i].trackTemplateDetails) : [] ;
+
                                             // contactResults[0][i].attendence = isAttendence;
 
                                             for (var j = 0; j < countResults[0].length; j++) {
@@ -263,6 +265,8 @@ router.get('/', function(req,res,next){
                                         responseMessage.data = {
                                             contactList:contactResults[0]
                                         };
+                                        // res.status(200).json(responseMessage);
+
                                         var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
                                         zlib.gzip(buf, function (_, result) {
                                             responseMessage.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
@@ -276,6 +280,8 @@ router.get('/', function(req,res,next){
                                             contactResults[0][i].thumbnailImage = (contactResults[0][i].groupType == 1) ?
                                                 ((contactResults[0][i].thumbnailImage) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(contactResults[0][i].thumbnailImage) : '') :
                                                 req.CONFIG.CONSTANT.GROUP_ICON_URL;
+                                            contactResults[0][i].trackTemplateDetails = (contactResults[0][i].trackTemplateDetails) ? JSON.parse(contactResults[0][i].trackTemplateDetails) : [] ;
+
 
                                         }
 
@@ -285,6 +291,8 @@ router.get('/', function(req,res,next){
                                         responseMessage.data = {
                                             contactList:contactResults[0]
                                         };
+                                        // res.status(200).json(responseMessage);
+
                                         var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
                                         zlib.gzip(buf, function (_, result) {
                                             responseMessage.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
