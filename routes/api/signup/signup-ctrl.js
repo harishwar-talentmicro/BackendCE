@@ -8,7 +8,7 @@ var fs = require('fs');
 var path = require('path');
 var uuid = require('node-uuid');
 var http = require('http');
-var Readable = require('stream').Readable
+var Readable = require('stream').Readable;
 var signupCtrl = {};
 var bcrypt = null;
 var EZEIDEmail = 'noreply@talentmicro.com';
@@ -671,7 +671,7 @@ signupCtrl.sendOtpPhone = function(req,res,next) {
                 code += possible.charAt(Math.floor(Math.random() * possible.length));
             }
 
-            var query = req.st.db.escape(mobileNo);
+            var query = req.st.db.escape(mobileNo) + ',' + req.st.db.escape(code);
             req.st.db.query('CALL generate_otp(' + query + ')', function (err, insertResult) {
                 if (!err && insertResult && insertResult[0] && insertResult[0][0].otp ) {
                     code = insertResult[0][0].otp ;

@@ -13,6 +13,9 @@ var EZEIDEmail = 'noreply@talentmicro.com';
 const accountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
 const authToken = '3abf04f536ede7f6964919936a35e614';
 const client = require('twilio')(accountSid, authToken);
+const VoiceResponse = require('twilio').twiml.VoiceResponse;
+var Readable = require('stream').Readable;
+var uuid = require('node-uuid');
 
 try{
     bcrypt = require('bcrypt');
@@ -1401,6 +1404,125 @@ UserCtrl.verifyUpdateOTP = function(req,res,next){
                 res.status(200).json(response);
             }
         });
+    }
+};
+
+UserCtrl.sendPasswordResetOtpPhone = function(req,res,next) {
+
+    var status = true, error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+    if (!req.body.WhatMateId) {
+        error['WhatMateId'] = 'WhatMateId is mandatory';
+        status *= false;
+    }
+
+
+    if (status) {
+        try {
+            var code = "";
+            var possible = "1234567890";
+            var isdMobile = "";
+            var mobileNo = "";
+
+            for (var i = 0; i <= 5; i++) {
+
+                code += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+
+            var query = [
+                req.st.db.escape(req.body.WhatMateId),
+                req.st.db.escape(code)
+            ];
+
+            req.st.db.query('CALL pvalidateEZEOne(' + query + ')',function (err, insertResult) {
+                if (!err && insertResult && insertResult[0] && insertResult[0][0].otp ) {
+                    code = insertResult[0][0].otp ;
+                    isdMobile = insertResult[0][0].isd ;
+                    mobileNo = insertResult[0][0].mobile ;
+                }
+            });
+            console.log("isdMobile",isdMobile);
+            console.log("mobileNo",mobileNo);
+
+            var message='Your WhatMate password reset OTP is ' + code + ' .';
+
+            const response = new VoiceResponse();
+            // response.say(message);
+            response.say(
+                {
+                    voice: 'alice',
+                    loop: 2
+                },
+                message
+            );
+
+            var s = new Readable;
+            s.push(response.toString());
+            console.log(response.toString());
+
+            s.push(null);
+            var uniqueFileName = 'phone_' +uuid.v4() + '.xml';
+            var fileName = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + uniqueFileName;
+
+            req.st.uploadXMLToCloud(uniqueFileName, s, function (err) {
+                if (!err) {
+                    client.calls
+                        .create({
+                                url: fileName,
+                                to: isdMobile+mobileNo,
+                                from: '+14434322305',
+                                method: 'GET'
+                            },
+                            function (error, response){
+                                if(error)
+                                {
+                                    // req.st.deleteDocumentFromCloud(uniqueFileName);
+                                    console.log("error",error);
+                                    respMsg.status = false;
+                                    respMsg.message = 'Something went wrong';
+                                    res.status(500).json(respMsg);
+
+                                }
+                                else{
+                                    // req.st.deleteDocumentFromCloud(uniqueFileName);
+                                    respMsg.status = true;
+                                    respMsg.message = 'success';
+                                    res.status(200).json(respMsg);
+
+                                }
+                            });
+
+                }
+                else {
+                    console.log(err);
+                    respMsg.status = false;
+                    respMsg.message = 'Something went wrong';
+                    res.status(500).json(respMsg);
+
+                }
+            });
+
+
+        }
+        catch (ex) {
+            console.log('Error : FnSendOtp ' + ex);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = {server: 'Internal Server Error'};
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
     }
 };
 

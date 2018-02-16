@@ -15,9 +15,11 @@ router.get('',userCtrl.getProfileData);
 
 router.post('',userCtrl.saveProfileData);
 router.post('/passwordReset',userCtrl.sendPasswordResetOTP);
+
 router.get('/password/verifyOTP',userCtrl.verifyPasswordResetOTP);
 router.post('/password/change',userCtrl.changePassword);
 
 router.post('/verifyMobile',userCtrl.verifyUpdateOTP);
 
+router.post('/passwordReset/phone',userCtrl.sendPasswordResetOtpPhone);
 module.exports = router;

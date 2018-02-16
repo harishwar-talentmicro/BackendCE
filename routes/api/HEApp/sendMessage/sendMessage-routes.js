@@ -25,5 +25,6 @@ router.get('/announcementList',messageCtrl.GetAnnouncementSummaryList);
 router.get('/announcement/detailedReport',messageCtrl.GetAnnouncementDetailedSummary);
 
 router.post('/draft',messageCtrl.saveAsDraft);
+router.post('/unReadUserAnnouncements',messageCtrl.sendUnReadUsersAnnouncement);
 
 module.exports = router;
