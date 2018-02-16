@@ -241,7 +241,7 @@ userCtrl.getUserDetails = function(req,res,next){
                         //             outputArray.push(result);
                         // }
                         var output=[];
-                        var usertemplate = JSON.parse(userData[0][0].tracktemplate);
+                        var usertemplate = (JSON.parse( userData[0][0].tracktemplate )) ? (JSON.parse(userData[0][0].tracktemplate )):[];
                         console.log(usertemplate);
                         for(var i=0; i<usertemplate.length; i++){
                             var res2={};
