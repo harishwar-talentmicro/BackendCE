@@ -60,6 +60,7 @@ leaveCtrl.saveLeaveTypes = function(req,res,next){
                 req.body.incrementFrequency = (req.body.incrementFrequency != undefined) ? req.body.incrementFrequency : 0;
                 req.body.nextResetDate = (req.body.nextResetDate != undefined) ? req.body.nextResetDate : null;
                 req.body.nextIncrementDate = (req.body.nextIncrementDate != undefined) ? req.body.nextIncrementDate : null;
+                req.body.calculationType= req.body.calculationType ? req.body.calculationType:0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -78,7 +79,8 @@ leaveCtrl.saveLeaveTypes = function(req,res,next){
                     req.st.db.escape(req.body.incrementValue),
                     req.st.db.escape(req.body.lastIncrementDate),
                     req.st.db.escape(req.body.incrementDuration),
-                    req.st.db.escape(req.body.incrementFrequency)
+                    req.st.db.escape(req.body.incrementFrequency),
+                    req.st.db.escape(req.body.calculationType)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -169,6 +171,7 @@ leaveCtrl.updateLeaveTypes = function(req,res,next){
                 req.body.incrementFrequency = (req.body.incrementFrequency != undefined) ? req.body.incrementFrequency : 0;
                 // req.body.nextResetDate = (req.body.nextResetDate != undefined) ? req.body.nextResetDate : null;
                 // req.body.nextIncrementDate = (req.body.nextIncrementDate != undefined) ? req.body.nextIncrementDate : null;
+                req.body.calculationType= req.body.calculationType ? req.body.calculationType:0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -187,7 +190,9 @@ leaveCtrl.updateLeaveTypes = function(req,res,next){
                     req.st.db.escape(req.body.incrementValue),
                     req.st.db.escape(req.body.lastIncrementDate),
                     req.st.db.escape(req.body.incrementDuration),
-                    req.st.db.escape(req.body.incrementFrequency)
+                    req.st.db.escape(req.body.incrementFrequency),
+                    req.st.db.escape(req.body.calculationType)
+
                 ];
                 /**
                  * Calling procedure to save form template
