@@ -79,9 +79,12 @@ salesCtrl.getMasterData = function(req,res,next){
                             currency : {
                                 currencySymbol : (masterData[5] && masterData[5][0] && masterData[5][0].currencySymbol) ? masterData[5][0].currencySymbol : '',
                                 currencyId : (masterData[5] && masterData[5][0] && masterData[5][0].currencyId) ? masterData[5][0].currencyId : 0
-                            }
+                            },
+                            probability : masterData[6] ? masterData[6] : []
                         } ;
                         response.error = null;
+                        // res.status(200).json(response);
+
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
@@ -203,6 +206,7 @@ salesCtrl.saveSalesRequest = function(req,res,next){
                 req.body.lastName  = req.body.lastName != undefined  ? req.body.lastName  : "";
                 req.body.notes  = req.body.notes != undefined  ? req.body.notes  : "";
                 req.body.contactId  = req.body.contactId != undefined  ? req.body.contactId  : 0;
+                req.body.targetDate  = req.body.targetDate != undefined  ? req.body.targetDate  : null;
 
                 if(req.body.phoneNo == ""){
                     req.body.isdPhone = "";
@@ -247,7 +251,8 @@ salesCtrl.saveSalesRequest = function(req,res,next){
                     req.st.db.escape(req.body.phoneNo),
                     req.st.db.escape(req.body.lastName),
                     req.st.db.escape(req.body.notes),
-                    req.st.db.escape(req.body.contactId)
+                    req.st.db.escape(req.body.contactId),
+                    req.st.db.escape(req.body.targetDate)
                 ];
 
                 /**
@@ -952,6 +957,317 @@ salesCtrl.getSalesTracker = function(req,res,next){
                             count : 0
                         };
                         response.error = null;
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting sales tracker";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+salesCtrl.getSalesSummary = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.HEMasterId)
+    {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.HEMasterId)
+                ];
+                /**
+                 * Calling procedure to save form sales items
+                 */
+                var procQuery = 'CALL HE_get_salesSummary( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,salesItems){
+                    if(!err && salesItems && salesItems[0]){
+
+                        response.status = true;
+                        response.message = "Sales summary data loaded successfully";
+                        response.data = {
+                            probabilityData : salesItems[0],
+                            timeLineData : (salesItems[1] && salesItems[1][0]) ? salesItems[1] : []
+                        };
+
+                        response.error = null;
+                        // res.status(200).json(response);
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
+                    }
+                    else if (!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.data = {
+                            chartData : [],
+                            transactionData : [],
+                            count : 0
+                        };
+                        response.error = null;
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting sales tracker";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+salesCtrl.getSalesUserPerformanceByProbability = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.HEMasterId)
+    {
+        error.HEMasterId = 'Invalid HEMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.type = req.query.type ? req.query.type : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
+                var startPage = 0;
+
+                startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.HEMasterId),
+                    req.st.db.escape(startPage),
+                    req.st.db.escape(req.query.limit)
+                ];
+                /**
+                 * Calling procedure to save form sales items
+                 */
+                var procQuery = 'CALL he_get_salesUserByProbability( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,salesItems){
+                    if(!err && salesItems && salesItems[0]){
+
+                        response.status = true;
+                        response.message = "Sales tracker data loaded successfully";
+                        var output = [];
+                        for(var i = 0; i < salesItems[0].length; i++) {
+                            var res1 = {};
+                            res1.name = salesItems[0][i].name;
+                            res1.probabilityData = salesItems[0][i].probabilityData ? JSON.parse(salesItems[0][i].probabilityData) : [];
+                            output.push(res1);
+                        }
+
+                        response.data = {
+                            transactionData : output,
+                            count : salesItems[1][0].count,
+                            probabilities : salesItems[2]
+                        };
+
+                        response.error = null;
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
+                    }
+                    else if (!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.data = {
+                            chartData : [],
+                            transactionData : [],
+                            count : 0
+                        };
+                        response.error = null;
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting sales tracker";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+salesCtrl.getSalesUserPerformanceByTimeLine = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.HEMasterId)
+    {
+        error.HEMasterId = 'Invalid HEMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.type = req.query.type ? req.query.type : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
+                var startPage = 0;
+
+                startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.HEMasterId),
+                    req.st.db.escape(startPage),
+                    req.st.db.escape(req.query.limit)
+                ];
+                /**
+                 * Calling procedure to save form sales items
+                 */
+                var procQuery = 'CALL he_get_salesUserByTimeLine( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,salesItems){
+                    if(!err && salesItems && salesItems[0] && salesItems[0][0].message != "no_data_found" ){
+
+                        response.status = true;
+                        response.message = "Sales tracker data loaded successfully";
+                        var output = [];
+                        for(var i = 0; i < salesItems[0].length; i++) {
+                            var res1 = {};
+                            res1.name = salesItems[0][i].name;
+                            res1.timeLineData = salesItems[0][i].timeLineData ? JSON.parse(salesItems[0][i].timeLineData) : [];
+                            output.push(res1);
+                        }
+
+                        response.data = {
+                            transactionData : output,
+                            count : salesItems[1][0].count,
+                            timeLineMaster : salesItems[2]
+                        };
+
+                        response.error = null;
+
+                        // res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else if (!err){
+                        response.status = true;
+                        response.message = "No data found";
+                        response.data = {
+                            chartData : [],
+                            transactionData : [],
+                            count : 0
+                        };
+                        response.error = null;
+                        // res.status(200).json(response);
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {

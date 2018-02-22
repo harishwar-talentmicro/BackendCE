@@ -93,9 +93,11 @@ zoomCtrl.saveZoomMeeting = function(req,res,next){
                             message : questionsData[0][0].message,
                             meetingId : questionsData[0][0].meetingId,
                             title : questionsData[0][0].title,
+                            startDate : questionsData[0][0].startDate,
+                            members : questionsData[0][0].members,
                             type : 91
                         };
-                        console.log("messagePayload",messagePayload);
+
                         if(questionsData[1] && questionsData[1][0].APNS_Id){
                             _Notification_aws.publish_IOS(questionsData[1][0].APNS_Id,messagePayload,0);
                         }
@@ -163,6 +165,19 @@ zoomCtrl.stopMeeting = function(req,res,next){
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, questionsData) {
                     if (!err) {
+                        var messagePayload = {
+                            message : questionsData[0][0].message,
+                            meetingId : req.body.meetingId,
+                            type : 92
+                        };
+
+                        if(questionsData[1] && questionsData[1][0].APNS_Id){
+                            _Notification_aws.publish_IOS(questionsData[1][0].APNS_Id,messagePayload,0);
+                        }
+                        if(questionsData[2] && questionsData[2][0].GCM_Id){
+                            _Notification_aws.publish_Android(questionsData[2][0].GCM_Id ,messagePayload);
+                        }
+
                         response.status = true;
                         response.message = "Meeting stopped successfully.";
                         response.error = null;
@@ -455,6 +470,84 @@ zoomCtrl.makeCall = function (req,res,next) {
     }
 
 
+};
+
+zoomCtrl.stopMeetingForSingleUser = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.body.meetingId) {
+        error.meetingId = 'Invalid meetingId';
+        validationFlag *= false;
+    }
+    if (!req.body.ezeoneId) {
+        error.ezeoneId = 'Invalid ezeoneId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.meetingId),
+                    req.st.db.escape(req.body.ezeoneId)
+                ];
+
+                var procQuery = 'CALL HE_stop_zoomMeeting_user( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, questionsData) {
+                    if (!err) {
+                        var messagePayload = {
+                            message : questionsData[0][0].message,
+                            meetingId : req.body.meetingId,
+                            type : 92
+                        };
+
+                        if(questionsData[1] && questionsData[1][0].APNS_Id){
+                            _Notification_aws.publish_IOS(questionsData[1][0].APNS_Id,messagePayload,0);
+                        }
+                        if(questionsData[2] && questionsData[2][0].GCM_Id){
+                            _Notification_aws.publish_Android(questionsData[2][0].GCM_Id ,messagePayload);
+                        }
+
+                        response.status = true;
+                        response.message = "Meeting stopped successfully.";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving ";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
 };
 
 module.exports = zoomCtrl;

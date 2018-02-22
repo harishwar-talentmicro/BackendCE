@@ -8,6 +8,10 @@ var windowsCtrl = {};
 var error = {};
 var Mailer = require('../../../mail/mailer.js');
 var mailerApi = new Mailer();
+const accountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
+const authToken = '3abf04f536ede7f6964919936a35e614';
+const client = require('twilio')(accountSid, authToken);
+const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
 windowsCtrl.uploadPaySlip = function(req,res,next){
     var response = {

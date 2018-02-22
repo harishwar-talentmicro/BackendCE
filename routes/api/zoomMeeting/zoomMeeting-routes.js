@@ -9,6 +9,7 @@ var zoomCtrl = require('./zoomMeeting-ctrl');
 
 router.post('/zoom/meeting',zoomCtrl.saveZoomMeeting);
 router.post('/zoom/meeting/stop',zoomCtrl.stopMeeting);
+router.post('/zoom/meeting/stop/user',zoomCtrl.stopMeetingForSingleUser);
 router.get('/zoom/meeting',zoomCtrl.getMeetingList);
 
 // twilio

@@ -1046,13 +1046,13 @@ UserCtrl.sendPasswordResetOTP = function(req,res,next) {
             }
 
 
-            if(isWhatMate ==0 )
-            {
-                message='Your EZEOne password reset OTP is ' + code + ' .';
-            }
-            else{
-                message='Your WhatMate password reset OTP is ' + code + ' .';
-            }
+            // if(isWhatMate ==0 )
+            // {
+            //     message='Your EZEOne password reset OTP is ' + code + ' .';
+            // }
+            // else{
+            //     message='Your WhatMate password reset OTP is ' + code + ' .';
+            // }
 
             var query = [
                 req.st.db.escape(req.body.WhatMateId),
@@ -1061,8 +1061,10 @@ UserCtrl.sendPasswordResetOTP = function(req,res,next) {
 
             req.st.db.query('CALL pvalidateEZEOne(' + query + ')', function (err, otpResult) {
 
-                if (!err) {
+                if (!err && otpResult && otpResult[0] && otpResult[0][0].otp ) {
                     console.log("otpResult[0][0].name",otpResult[0][0].name);
+                    code = otpResult[0][0].otp ;
+                    message='Your WhatMate password reset OTP is ' + code + ' .';
 
                 if(otpResult[0][0].email) {
                     var file = path.join(__dirname, '../../../mail/templates/passwordResetOTP.html');
