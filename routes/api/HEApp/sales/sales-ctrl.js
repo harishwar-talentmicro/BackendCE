@@ -1292,4 +1292,485 @@ salesCtrl.getSalesUserPerformanceByTimeLine = function(req,res,next){
 
 };
 
+
+salesCtrl.saveprobability = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.body.HEMasterId)
+    {
+        error.HEMasterId = 'Invalid HEMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.body.probabilityId = (req.body.probabilityId) ? (req.body.probabilityId) : 0;
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.probabilityId),
+                    req.st.db.escape(req.body.HEMasterId),
+                    req.st.db.escape(req.body.percentage),
+                    req.st.db.escape(req.body.title)
+
+                ];
+
+                /**
+                 * Calling procedure for sales request
+                 * @type {string}
+                 */
+
+                var procQuery = 'CALL he_save_probabilities( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+                    console.log(results);
+                    if(!err && results){
+                        response.status = true;
+                        response.message = "Probability saved successfully";
+                        response.error = null;
+                        response.data = null;
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        //});
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving probability";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+salesCtrl.savetimeline = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.body.HEMasterId)
+    {
+        error.HEMasterId = 'Invalid HEMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.body.timelineId = (req.body.timelineId) ? (req.body.timelineId) : 0;
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.timelineId),
+
+                    req.st.db.escape(req.body.HEMasterId),
+                    req.st.db.escape(req.body.from),
+                    req.st.db.escape(req.body.to),
+                    req.st.db.escape(req.body.title)
+
+                ];
+
+                /**
+                 * Calling procedure for sales request
+                 * @type {string}
+                 */
+
+                var procQuery = 'CALL he_save_mheperformancetimeline( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+                    console.log(results);
+                    if(!err && results){
+                        response.status = true;
+                        response.message = "Timeline data saved successfully";
+                        response.error = null;
+                        response.data = null;
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                       // });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving Timeline data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+salesCtrl.getprobability = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.HEMasterId)
+    {
+        error.HEMasterId = 'Invalid HEMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.HEMasterId)
+                ];
+
+                /**
+                 * Calling procedure for sales request
+                 * @type {string}
+                 */
+
+                var procQuery = 'CALL he_get_probabilities( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+                    console.log(results);
+                    if(!err && results){
+                        response.status = true;
+                        response.message = "Probability loaded successfully";
+                        response.error = null;
+                        response.data =
+                            {
+                                probabilityList:results[0]
+                            };
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                       // });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while loading probability";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+salesCtrl.gettimeline = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.HEMasterId)
+    {
+        error.HEMasterId = 'Invalid HEMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.HEMasterId)
+
+                ];
+
+                /**
+                 * Calling procedure for sales request
+                 * @type {string}
+                 */
+
+                var procQuery = 'CALL he_get_mheperformancetimeline( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+                    console.log(results);
+                    if(!err && results){
+                        response.status = true;
+                        response.message = "Timeline data loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            timelineList:results[0]
+                        };
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                       // });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while loading Timeline data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+salesCtrl.deleteprobability = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.HEMasterId)
+    {
+        error.HEMasterId = 'Invalid HEMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.HEMasterId),
+                    req.st.db.escape(req.query.probabilityId)
+
+                ];
+
+                /**
+                 * Calling procedure for sales request
+                 * @type {string}
+                 */
+
+                var procQuery = 'CALL he_delete_probabilities( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+                    console.log(results);
+                    if(!err && results && results[0] && results[0][0]){
+                        response.status = false;
+                        response.message = "Probability is already in use";
+                        response.error = null;
+                        response.data = results[0];
+
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        //});
+                    }
+
+                    else if(!err && results ){
+                        response.status = true;
+                        response.message = "Probability deleted successfully";
+                        response.error = null;
+                        response.data = null;
+
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                       // });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while deleting probability";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+salesCtrl.deletetimeline = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.HEMasterId)
+    {
+        error.HEMasterId = 'Invalid HEMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else{
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.HEMasterId),
+                    req.st.db.escape(req.query.timelineId)
+
+                ];
+
+                /**
+                 * Calling procedure for sales request
+                 * @type {string}
+                 */
+
+                var procQuery = 'CALL he_delete_mheperformancetimeline( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+                    console.log(results);
+                    if(!err && results){
+                        response.status = true;
+                        response.message = "Timeline data deleted successfully";
+                        response.error = null;
+                        response.data = null;
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        //});
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while deleting Timeline data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+
+
 module.exports = salesCtrl;
