@@ -7,7 +7,7 @@ var request = require('request');
 var fs = require('fs');
 var path = require('path');
 var uuid = require('node-uuid');
-var http = require('http');
+var http = require('https');
 var Readable = require('stream').Readable;
 var signupCtrl = {};
 var bcrypt = null;
@@ -17,6 +17,17 @@ const authToken = '3abf04f536ede7f6964919936a35e614';
 const client = require('twilio')(accountSid, authToken);
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
+var qs = require("querystring");
+var options = {
+    "method": "POST",
+    "hostname": "www.smsgateway.center",
+    "port": null,
+    "path": "/SMSApi/rest/send",
+    "headers": {
+        "content-type": "application/x-www-form-urlencoded",
+        "cache-control": "no-cache"
+    }
+};
 
 try{
     bcrypt = require('bcrypt');
@@ -55,23 +66,24 @@ signupCtrl.sendOtp = function(req,res,next) {
             var message="";
             var resMessage = "" ;
 
-                //generate otp 6 digit random number
-                var code = "";
-                var possible = "1234567890";
+            //generate otp 6 digit random number
+            var code = "";
+            var possible = "1234567890";
 
-                for (var i = 0; i <= 5; i++) {
+            for (var i = 0; i <= 5; i++) {
 
-                    code += possible.charAt(Math.floor(Math.random() * possible.length));
-                }
-
-
-            if(isWhatMate ==0 )
-            {
-                message='Your EZEOne verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed.';
+                code += possible.charAt(Math.floor(Math.random() * possible.length));
             }
-            else{
-                message='Your WhatMate verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed --WhatMate Helpdesk.';
-            }
+
+            // if(isWhatMate ==0 )
+            // {
+            //     message='Your EZEOne verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed.';
+            // }
+            // else{
+            //     message='Your WhatMate verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed --WhatMate Helpdesk.';
+            // }
+
+            message='Your WhatMate verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed --WhatMate Helpdesk.';
 
             var query = req.st.db.escape(mobileNo) + ',' + req.st.db.escape(code);
             req.st.db.query('CALL generate_otp(' + query + ')', function (err, insertResult) {
@@ -122,6 +134,32 @@ signupCtrl.sendOtp = function(req,res,next) {
                                 console.log("SUCCESS","SMS response");
                             }
                         });
+
+                        var req = http.request(options, function (res) {
+                            var chunks = [];
+
+                            res.on("data", function (chunk) {
+                                chunks.push(chunk);
+                            });
+
+                            res.on("end", function () {
+                                var body = Buffer.concat(chunks);
+                                console.log(body.toString());
+                            });
+                        });
+
+                        req.write(qs.stringify({ userId: 'talentmicro',
+                            password: 'TalentMicro@123',
+                            senderId: 'DEMOSG',
+                            sendMethod: 'simpleMsg',
+                            msgType: 'text',
+                            mobile: isdMobile.replace("+","") + mobileNo,
+                            msg: message,
+                            duplicateCheck: 'true',
+                            format: 'json' }));
+                        req.end();
+
+
                     }
                     else if(isdMobile != "")
                     {

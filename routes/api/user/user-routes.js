@@ -22,4 +22,7 @@ router.post('/password/change',userCtrl.changePassword);
 router.post('/verifyMobile',userCtrl.verifyUpdateOTP);
 
 router.post('/passwordReset/phone',userCtrl.sendPasswordResetOtpPhone);
+
+router.post('/invite/public',userCtrl.invitePublicProfile);
+
 module.exports = router;

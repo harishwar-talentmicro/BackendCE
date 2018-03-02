@@ -5,6 +5,7 @@
 var request = require('request');
 var randomstring = require("randomstring");
 var windowsCtrl = {};
+var http = require('https');
 var error = {};
 var Mailer = require('../../../mail/mailer.js');
 var mailerApi = new Mailer();
@@ -466,6 +467,32 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                             console.log("SUCCESS","SMS response");
                                         }
                                     });
+
+                                    var req = http.request(options, function (res) {
+                                        var chunks = [];
+
+                                        res.on("data", function (chunk) {
+                                            chunks.push(chunk);
+                                        });
+
+                                        res.on("end", function () {
+                                            var body = Buffer.concat(chunks);
+                                            console.log(body.toString());
+                                        });
+                                    });
+
+                                    req.write(qs.stringify({ userId: 'talentmicro',
+                                        password: 'TalentMicro@123',
+                                        senderId: 'DEMOSG',
+                                        sendMethod: 'simpleMsg',
+                                        msgType: 'text',
+                                        mobile: Qndata[0].isdmobile.replace("+","") + Qndata[0].mobile,
+                                        msg: message,
+                                        duplicateCheck: 'true',
+                                        format: 'json' }));
+                                    req.end();
+
+
                                 }
                                 else if(Qndata[0].isdmobile != "")
                                 {
@@ -571,6 +598,31 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                             console.log("SUCCESS","SMS response");
                                         }
                                     });
+
+                                    req = http.request(options, function (res) {
+                                        var chunks = [];
+
+                                        res.on("data", function (chunk) {
+                                            chunks.push(chunk);
+                                        });
+
+                                        res.on("end", function () {
+                                            var body = Buffer.concat(chunks);
+                                            console.log(body.toString());
+                                        });
+                                    });
+
+                                    req.write(qs.stringify({ userId: 'talentmicro',
+                                        password: 'TalentMicro@123',
+                                        senderId: 'DEMOSG',
+                                        sendMethod: 'simpleMsg',
+                                        msgType: 'text',
+                                        mobile: Qndata[0].isdmobile.replace("+","") + Qndata[0].mobile,
+                                        msg: message,
+                                        duplicateCheck: 'true',
+                                        format: 'json' }));
+                                    req.end();
+
                                 }
                                 else if(Qndata[0].isdmobile != "")
                                 {
