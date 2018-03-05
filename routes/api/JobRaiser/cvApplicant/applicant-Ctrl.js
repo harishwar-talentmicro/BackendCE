@@ -313,11 +313,11 @@ applicantCtrl.saveApplicant=function(req,res,next){
                 });
 
                                        
-                                    }
-                                    
-                                });
-                            });
-                    });
+                    }
+                    
+            });
+        });
+    });
 
                 
             }
@@ -847,8 +847,8 @@ applicantCtrl.getreqAppStageStatus = function(req,res,next){
                         response.message = "transaction History and current scenario loaded successfully";
                         response.error = null;
                         response.data = {
-                            transactionHistory : statusResult[0],
-                            currentScenario : statusResult[1][0]
+                            transactionHistory : statusResult[0] ? statusResult[0]: [],
+                            currentScenario : statusResult[1][0] ? statusResult[0]:[]
                         };
                         isWeb=req.query.isWeb;
                         if (isWeb==0) {
@@ -1378,88 +1378,6 @@ applicantCtrl.getApplicantDetails = function(req,res,next){
 };
 
 
-
-applicantCtrl.applicantExtractText = function(req,res,next){
-    
-
-    var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
-    };
-    var validationFlag = true;
-
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-
-    if (!req.query.cvPath)
-    {
-        error.cvPath = 'Invalid cvPath';
-        validationFlag *= false;
-    }
-
-    if (!validationFlag){
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
-
-                // var cv=req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +req.query.cvPath;
-                // console.log(req.CONFIG.CONSTANT.GS_URL);
-                // console.log(req.CONFIG.CONSTANT.STORAGE_BUCKET);
-                // console.log(req.query.cvPath);
-                // console.log(cv);
-
-                http.get(req.query.cvPath, function(fileResponse){
-                        var bufs = [];
-                    fileResponse.on('data', function(d){ bufs.push(d); });
-                    fileResponse.on('end', function() {
-                                var buf = Buffer.concat(bufs);
-                                textract.fromBufferWithName(req.query.cvPath,buf, function( error, text ) {
-                                    if (!error) {
-                                        response.status = true;
-                                        response.message = " succesffully converted to text";
-                                        response.error = null;
-                                        response.data = {
-                                            cvKeywords : text
-                                        };
-
-                                        res.status(200).json(response);
-                                       
-                                    }
-                                    else {
-                                        response.status = false;
-                                        response.message = "Something went wrong .";
-                                        response.error = error;
-                                        response.data = {
-                                            cvKeywords : ""
-                                        };
-                                        
-                                            res.status(500).json(response);
-                                    
-
-                                    }
-                                })
-                            }
-                        );
-                    }
-                );
-            }
-            else{
-                res.status(401).json(response);
-            }
-        });
-    }
-};
-
-
 applicantCtrl.getApplicantNames = function(req,res,next){
     var response = {
         status : false,
@@ -1507,7 +1425,7 @@ applicantCtrl.getApplicantNames = function(req,res,next){
                         response.error = null;
                         response.data =
                             {
-                                applicantList:result[0]
+                                applicantList:result[0] ? result[0]: []
                             };
 
                         res.status(200).json(response);

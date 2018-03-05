@@ -479,7 +479,7 @@ jobCtrl.getJobDefaultMemberList = function(req,res,next){
                         response.message = "Requirement default member list is";
                         response.error = null;
                         response.data = {
-                            memberList:memberList[0]
+                            memberList:memberList[0] ? memberList: []
 
                         };
                         
@@ -489,7 +489,9 @@ jobCtrl.getJobDefaultMemberList = function(req,res,next){
                         response.status = true;
                         response.message = "memberList not found";
                         response.error = null;
-                        response.data = null;
+                        response.data = {
+                            memberList:[]
+                        };
                         res.status(200).json(response);
                     }
                     else{
@@ -558,18 +560,7 @@ jobCtrl.getJobDefaults = function(req,res,next){
                         response.message = "Requirement default data is";
                         response.error = null;
                         response.data =JSON.parse(results[0][0].defaultFormData) ? JSON.parse(results[0][0].defaultFormData) : [];
-                        
-                        // // {
-                        //     // defId: results[0][0].defId,
-                        //     // heMasterId:results[0][0].heMasterId,
-                        //     // purpose:results[0][0].purpose,
-                        //     // jobType: results[0][0].jobtype,
-                        //     // currency: results[0][0].currency,
-                        //     // scale: results[0][0].scale,
-                        //     // duration: results[0][0].duration,
-                        //     // departments:results[1]
-                        // };
-                        
+                       
                         res.status(200).json(response);
                     }
                     else if(!err && results){

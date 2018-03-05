@@ -128,7 +128,7 @@ masterCtrl.getReqMasterData = function(req,res,next){
 
 };
 
-masterCtrl.getSpecilizations = function(req,res,next){
+masterCtrl.getSpecializations = function(req,res,next){
     var response = {
         status : false,
         message : "Invalid token",
@@ -670,7 +670,7 @@ masterCtrl.getmailTemplate=function(req,res,next){
                         response.message = "mail template list";
                         response.error = null;
                         response.data ={
-                            mailTemplateList: result[0]
+                            mailTemplateList: result[0] ? result[0]: []
                         };
                         res.status(200).json(response);
                     }
@@ -1526,7 +1526,7 @@ var response = {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if(!err && results ){
+                    if(!err && results && results[0]){
                         response.status = true;
                         response.message = " Requirement View loaded sucessfully";
                         response.error = null;
@@ -1561,7 +1561,15 @@ var response = {
                         res.status(200).json(response);
                         
                     }
+                    else if(!err && results){
+                        response.status = true;
+                        response.message = " Requirement View is empty";
+                        response.error = null;
+                        response.data={
+                            requirementView :[]
 
+                        };
+                    }
                     else{
                         response.status = false;
                         response.message = "Error while loading Requirement View";
@@ -1702,9 +1710,9 @@ var response = {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if(!err && results ){
+                    if(!err && results && results[0]){
                         response.status = true;
-                        response.message = " Requirement View loaded sucessfully";
+                        response.message = " client View loaded sucessfully";
                         response.error = null;
                          var output=[];
                           for(var i=0; i<results[0].length; i++){
@@ -1716,24 +1724,24 @@ var response = {
                              res2.notes= results[0][i].notes ? results[0][i].notes: 0
                              output.push(res2);
                             }     
-                        //     res2.keywords=results[0][i].keywords ? results[0][i].keywords: '',
-                        //     res2.contactList= JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList): [],
-                        //     res2.stageDetail= JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail): []
-                         
                         response.data =
                         { 
-                                clientView : output
-
-                                    
+                                clientView : output                                    
                          };
-
-                        res.status(200).json(response);
-                        
+                        res.status(200).json(response);                        
                     }
+                    else if(!err && results){
+                        response.status = true;
+                        response.message = " client View is empty";
+                        response.error = null;
+                        response.data ={
+                            clientView :[]
+                        };
+                    };
 
                     else{
                         response.status = false;
-                        response.message = "Error while loading Requirement View";
+                        response.message = "Error while loading client View";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
@@ -1902,8 +1910,8 @@ masterCtrl.getmasterStageStatusTypes=function(req,res,next){
                         response.message = "stage and status loaded successfully";
                         response.error = null;
                         response.data ={
-                            Stage: result[0],
-                            Status:result[1]
+                            Stage: result[0] ? result[0]:[],
+                            Status:result[1] ? result[1]:[]
 
                         };
                         res.status(200).json(response);
