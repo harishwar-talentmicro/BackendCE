@@ -1561,7 +1561,7 @@ var response = {
                         res.status(200).json(response);
                         
                     }
-                    else if(!err && results){
+                    else if(!err){
                         response.status = true;
                         response.message = " Requirement View is empty";
                         response.error = null;
@@ -1569,6 +1569,8 @@ var response = {
                             requirementView :[]
 
                         };
+                        res.status(200).json(response);
+
                     }
                     else{
                         response.status = false;
@@ -1724,20 +1726,20 @@ var response = {
                              res2.notes= results[0][i].notes ? results[0][i].notes: 0
                              output.push(res2);
                             }     
-                        response.data =
-                        { 
+                        response.data ={ 
                                 clientView : output                                    
                          };
                         res.status(200).json(response);                        
                     }
-                    else if(!err && results){
-                        response.status = true;
-                        response.message = " client View is empty";
-                        response.error = null;
-                        response.data ={
-                            clientView :[]
-                        };
-                    };
+                    // else if(!err ){
+                    //     response.status = true;
+                    //     response.message = " client View is empty";
+                    //     response.error = null;
+                    //     response.data ={
+                    //         clientView :[]
+                    //     };
+                    //      res.status(200).json(response);
+                    // };
 
                     else{
                         response.status = false;
