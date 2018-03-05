@@ -23,7 +23,7 @@ router.get('/requirementList',applicantCtrl.getrequirementList);
 router.post('/resumeSearch',applicantCtrl.resumeSearch);
 router.post('/reqappMap',applicantCtrl.saveReqAppMapResult);
 
-router.get('/cvExtract',applicantCtrl.applicantExtractText);
+//router.get('/cvExtract',applicantCtrl.applicantExtractText);
 
 router.get('/names',applicantCtrl.getApplicantNames);
 
