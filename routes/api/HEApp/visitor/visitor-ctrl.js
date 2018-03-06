@@ -99,7 +99,7 @@ visitorCtrl.saveGatePassRequest = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_visitorGatePassRequest( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_visitorGatePassRequest_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     if(!err && results && results[0] ){
@@ -370,7 +370,7 @@ visitorCtrl.saveGateAssetPassRequest = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_visitorAssetPassRequest( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_visitorAssetPassRequest_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     if(!err && results && results[0] ){
@@ -661,7 +661,7 @@ visitorCtrl.saveGuestHospitalityRequest = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_GuestHospitalityRequest( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_GuestHospitalityRequest_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     if(!err && results && results[0] ){
@@ -874,7 +874,7 @@ visitorCtrl.saveInternetRequest = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_visitorInternetRequest( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_visitorInternetRequest_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     if(!err && results && results[0] ){

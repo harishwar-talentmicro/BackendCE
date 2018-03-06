@@ -36,18 +36,15 @@ WGRMTemplateCtrl.saveWGTemplate = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
-                req.body.tId = (req.body.tId) ? req.body.tId : 0;
+                req.body.workGroupId = (req.body.workGroupId) ? req.body.workGroupId : 0;
                 req.body.title = (req.body.title) ? req.body.title : "";
-                req.body.userType = (req.body.userType) ? req.body.userType : "";
-                req.body.heMasterId = (req.body.heMasterId) ? req.body.heMasterId : 0;
 
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.tId),
-                    req.st.db.escape(req.body.heMasterId),
+                    req.st.db.escape(req.body.workGroupId),
                     req.st.db.escape(req.body.title),
-                    req.st.db.escape(req.body.userType),
+                    req.st.db.escape(JSON.stringify(req.body.userType)),
                     req.st.db.escape(JSON.stringify(req.body.workGroup)),
                     req.st.db.escape(req.query.APIKey)
 
@@ -61,7 +58,7 @@ WGRMTemplateCtrl.saveWGTemplate = function(req,res,next){
 
                     if(!err && workgroupresult && workgroupresult[0]){
                         response.status = true;
-                        response.message = "workgroup Template saved successfully";
+                        response.message = "Workgroup Template saved successfully";
                         response.error = null;
                         response.data = {
                             workGroupId : workgroupresult[0][0].workGroupId
@@ -70,9 +67,18 @@ WGRMTemplateCtrl.saveWGTemplate = function(req,res,next){
                         res.status(200).json(response);
 
                     }
+                   else if(!err){
+                        response.status = false;
+                        response.message = "Workgroup  Template Title already in use";
+                        response.error = null;
+                        response.data = null;
+
+                        res.status(200).json(response);
+
+                    }
                     else{
                         response.status = false;
-                        response.message = "Error while saving workgroup template";
+                        response.message = "Error while saving Workgroup template";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
@@ -118,18 +124,16 @@ WGRMTemplateCtrl.saveRMTemplate = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
-                req.body.tId = (req.body.tId) ? req.body.tId : 0;
+                req.body.rmGroupId = (req.body.rmGroupId) ? req.body.rmGroupId : 0;
                 req.body.title = (req.body.title) ? req.body.title : "";
-                req.body.heMasterId = (req.body.heMasterId) ? req.body.heMasterId : 0;
 
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.tId),
-                    req.st.db.escape(req.body.heMasterId),
+                    req.st.db.escape(req.body.rmGroupId),
                     req.st.db.escape(req.body.title),
                     req.st.db.escape(JSON.stringify(req.body.approvers)),
-                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.query.APIKey)
 
                 ];
 
@@ -145,6 +149,15 @@ WGRMTemplateCtrl.saveRMTemplate = function(req,res,next){
                         response.data = {
                             rmGroupId : rmgroupresult[0][0].rmGroupId
                         };
+
+                        res.status(200).json(response);
+
+                    }
+                   else if(!err){
+                        response.status = false;
+                        response.message = "RM group Template Title already in use";
+                        response.error = null;
+                        response.data = null;
 
                         res.status(200).json(response);
 
@@ -194,12 +207,9 @@ WGRMTemplateCtrl.getWGTemplate = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
-                req.query.heMasterId = (req.query.heMasterId) ? req.query.heMasterId : 0;
-
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.query.APIKey)
 
                 ];
@@ -265,12 +275,9 @@ WGRMTemplateCtrl.getRMTemplate = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
-                req.query.heMasterId = (req.query.heMasterId) ? req.query.heMasterId : 0;
-
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.query.APIKey)
 
                 ];
@@ -355,11 +362,19 @@ WGRMTemplateCtrl.getWGTemplatedetailes = function(req,res,next){
                         response.status = true;
                         response.message = " Workgroup Template detailes loaded successfully";
                         response.error = null;
+                        var output=[];
+                        for(var i=0; i<workgroupresult[2].length; i++){
+                            var res2={};
+                                res2.heFormId=workgroupresult[2][i].heFormId,
+                                res2.formTitle=workgroupresult[2][i].title,
+                                res2.receivers=workgroupresult[2][i].receivers ? JSON.parse(workgroupresult[2][i].receivers):[];
+                            output.push(res2);
+                        }
                         response.data = {
-                            formId : workgroupresult[0][0].formId,
-                            heFormId :workgroupresult[0][0].heFormId,
-                            receivers:workgroupresult[1]
-
+                            workGroupId: workgroupresult[0][0].workGroupId,
+                            workGroupTitle: workgroupresult[0][0].workGroupTitle,
+                            userType: workgroupresult[1],
+                            workGroup:output
                         };
 
                         res.status(200).json(response);
@@ -430,7 +445,9 @@ WGRMTemplateCtrl.getRMTemplatedetailes = function(req,res,next){
                         response.message = " RMgroup Template detailes loaded successfully";
                         response.error = null;
                         response.data = {
-                            approvers:rmgroupresult[0]
+                            rmGroupId:rmgroupresult[0][0].rmGroupId,
+                            rmGroupTitle:rmgroupresult[0][0].rmGroupTitle,
+                            approvers:rmgroupresult[1]
                         };
 
                         res.status(200).json(response);
@@ -453,6 +470,235 @@ WGRMTemplateCtrl.getRMTemplatedetailes = function(req,res,next){
 
 };
 
+
+WGRMTemplateCtrl.deleteWGTemplatedetailes = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.workGroupId = (req.query.workGroupId) ? req.query.workGroupId : 0;
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.workGroupId),
+                    req.st.db.escape(req.query.APIKey)
+
+                ];
+
+                var procQuery = 'CALL he_delete_workGroupDetails( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,workgroupresult){
+                    console.log(err);
+
+                    if(!err && workgroupresult && workgroupresult[0]){
+                        response.status = false;
+                        response.message = "alraedy in use";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+
+                    }
+                    else if(!err ) {
+                        response.status = true;
+                        response.message = " Workgroup Template detailes deleted successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while deleting Workgroup template detailes";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+WGRMTemplateCtrl.deleteRMTemplatedetailes = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.rmGroupId = (req.query.rmGroupId) ? req.query.rmGroupId : 0;
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.rmGroupId),
+                    req.st.db.escape(req.query.APIKey)
+
+                ];
+
+                var procQuery = 'CALL he_delete_rmGroupDetails( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,rmgroupresult){
+                    console.log(err);
+
+                    if(!err && rmgroupresult && rmgroupresult[0]){
+                        response.status = false;
+                        response.message = "alraedy in use";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+
+                    }
+                    else if(!err) {
+                    response.status = true;
+                    response.message = " RMgroup Template detailes deleted successfully";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                }
+
+                    else{
+                        response.status = false;
+                        response.message = "Error while deleting RMgroup template detailes";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+WGRMTemplateCtrl.getRMTemplatemaster = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.query.rmId = (req.query.rmId) ? req.query.rmId : 0;
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.keyword),
+                    req.st.db.escape(req.query.APIKey)
+
+                ];
+
+                var procQuery = 'CALL he_get_rmMaster( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,rmgroupresult){
+                    console.log(err);
+
+                    if(!err && rmgroupresult && rmgroupresult[0][0]){
+                        response.status = true;
+                        response.message = " heUser  loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            user:rmgroupresult[0]
+                        };
+
+                        res.status(200).json(response);
+
+                    }
+                    else if(!err ){
+                        response.status = true;
+                        response.message = " heUser is null";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while loading heUser ";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
 
 
 module.exports = WGRMTemplateCtrl;

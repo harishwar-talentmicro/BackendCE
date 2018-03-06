@@ -61,8 +61,8 @@
   "VERSION_LIST" : {
     "IOS" : [[],[23,24]],
     "ANDROID" : [46],
-    "WhatMateIOS" : [[],[17,18]],
-    "WhatMateANDROID" : [28],
+    "WhatMateIOS" : [[],[19,20]],
+    "WhatMateANDROID" : [33],
     "WEB" : [1]
   },
   "NOTIFICATION" : {
@@ -344,6 +344,11 @@
         "params": ["HTML"],
         "file": "default.html",
         "subject": ""
+      },
+      "NewUserUpload": {
+        "params": ["name","UserName","Password"],
+        "file": "NewUserUpload.html",
+        "subject": "Your user Credentials for WhatMate App"
       }
     }
   },

@@ -59,12 +59,22 @@ trackTemplateCtrl.saveTrackTemplate = function(req,res,next){
                 req.body.FRIEndHour = (req.body.FRIEndHour) ? req.body.FRIEndHour : null;
                 req.body.SATStartHour = (req.body.SATStartHour) ? req.body.SATStartHour : null;
                 req.body.SATEndHour = (req.body.SATEndHour) ? req.body.SATEndHour : null;
-                req.body.changeDistance = (req.body.changeDistance) ? req.body.changeDistance : 200;
+                req.body.saturdayWorking = (req.body.saturdayWorking) ? req.body.saturdayWorking : 0;
                 req.body.isAttendanceTracking = (req.body.isAttendanceTracking) ? req.body.isAttendanceTracking : 0;
                 req.body.isLocationTracking = (req.body.isLocationTracking) ? req.body.isLocationTracking : 0;
                 req.body.proximity = (req.body.proximity) ? req.body.proximity : 0;
                 req.body.holidayTemplateId = (req.body.holidayTemplateId) ? req.body.holidayTemplateId : 0;
-                req.body.toleranceTime = (req.body.toleranceTime) ? req.body.toleranceTime : 0;
+              //  req.body.toleranceTime = (req.body.toleranceTime) ? req.body.toleranceTime : 0;
+                req.body.locationTrackingType = (req.body.locationTrackingType) ? req.body.locationTrackingType : 0;
+                req.body.enableOT = (req.body.enableOT) ? req.body.enableOT : 0;
+                req.body.considerAsOT = (req.body.considerAsOT) ? req.body.considerAsOT : 0;
+                req.body.workingHours_per_day = (req.body.workingHours_per_day) ? req.body.workingHours_per_day : 0;
+                req.body.calendarHours_per_day = (req.body.calendarHours_per_day) ? req.body.calendarHours_per_day : 0;
+                req.body.address = (req.body.address) ? req.body.address : '';
+                req.body.latitude = (req.body.latitude) ? req.body.latitude : 0;
+                req.body.longitude = (req.body.longitude) ? req.body.longitude : 0;
+
+
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -84,13 +94,21 @@ trackTemplateCtrl.saveTrackTemplate = function(req,res,next){
                     req.st.db.escape(req.body.FRIEndHour),
                     req.st.db.escape(req.body.SATStartHour),
                     req.st.db.escape(req.body.SATEndHour),
-                    req.st.db.escape(req.body.changeDistance),
+                    req.st.db.escape(req.body.saturdayWorking),
                     req.st.db.escape(req.body.isAttendanceTracking),
                     req.st.db.escape(req.body.proximity),
                     req.st.db.escape(req.body.holidayTemplateId),
                     req.st.db.escape(req.body.isLocationTracking),
-                    req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(req.body.toleranceTime)
+                 //   req.st.db.escape(req.body.toleranceTime),
+                    req.st.db.escape(req.body.locationTrackingType),
+                    req.st.db.escape(req.body.enableOT),
+                    req.st.db.escape(req.body.considerAsOT),
+                    req.st.db.escape(req.body.workingHours_per_day),
+                    req.st.db.escape(req.body.calendarHours_per_day),
+                    req.st.db.escape(req.body.address),
+                    req.st.db.escape(req.body.latitude),
+                    req.st.db.escape(req.body.longitude),
+                    req.st.db.escape(req.query.APIKey)
                 ];
                 /**
                  * Calling procedure to save track template
@@ -177,12 +195,22 @@ trackTemplateCtrl.updateTrackTemplate = function(req,res,next){
                 req.body.FRIEndHour = (req.body.FRIEndHour) ? req.body.FRIEndHour : null;
                 req.body.SATStartHour = (req.body.SATStartHour) ? req.body.SATStartHour : null;
                 req.body.SATEndHour = (req.body.SATEndHour) ? req.body.SATEndHour : null;
-                req.body.changeDistance = (req.body.changeDistance) ? req.body.changeDistance : 200;
+                req.body.saturdayWorking = (req.body.saturdayWorking) ? req.body.saturdayWorking : 0;
                 req.body.isAttendanceTracking = (req.body.isAttendanceTracking) ? req.body.isAttendanceTracking : 0;
                 req.body.isLocationTracking = (req.body.isLocationTracking) ? req.body.isLocationTracking : 0;
                 req.body.proximity = (req.body.proximity) ? req.body.proximity : 0;
                 req.body.holidayTemplateId = (req.body.holidayTemplateId) ? req.body.holidayTemplateId : 0;
-                req.body.toleranceTime = (req.body.toleranceTime) ? req.body.toleranceTime : 0;
+              //  req.body.toleranceTime = (req.body.toleranceTime) ? req.body.toleranceTime : 0;
+
+                req.body.locationTrackingType = (req.body.locationTrackingType) ? req.body.locationTrackingType : 0;
+                req.body.enableOT = (req.body.enableOT) ? req.body.enableOT : 0;
+                req.body.considerAsOT = (req.body.considerAsOT) ? req.body.considerAsOT : 0;
+                req.body.workingHours_per_day = (req.body.workingHours_per_day) ? req.body.workingHours_per_day : 0;
+                req.body.calendarHours_per_day = (req.body.calendarHours_per_day) ? req.body.calendarHours_per_day : 0;
+                req.body.address = (req.body.address) ? req.body.address : '';
+                req.body.latitude = (req.body.latitude) ? req.body.latitude : 0.0;
+                req.body.longitude = (req.body.longitude) ? req.body.longitude : 0.0;
+
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -202,13 +230,23 @@ trackTemplateCtrl.updateTrackTemplate = function(req,res,next){
                     req.st.db.escape(req.body.FRIEndHour),
                     req.st.db.escape(req.body.SATStartHour),
                     req.st.db.escape(req.body.SATEndHour),
-                    req.st.db.escape(req.body.changeDistance),
+                    req.st.db.escape(req.body.saturdayWorking),
                     req.st.db.escape(req.body.isAttendanceTracking),
                     req.st.db.escape(req.body.proximity),
                     req.st.db.escape(req.body.holidayTemplateId),
                     req.st.db.escape(req.body.isLocationTracking),
-                    req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(req.body.toleranceTime)
+                 //   req.st.db.escape(req.body.toleranceTime),
+                    req.st.db.escape(req.body.locationTrackingType),
+                    req.st.db.escape(req.body.enableOT),
+                    req.st.db.escape(req.body.considerAsOT),
+                    req.st.db.escape(req.body.workingHours_per_day),
+                    req.st.db.escape(req.body.calendarHours_per_day),
+                    req.st.db.escape(req.body.address),
+                    req.st.db.escape(req.body.latitude),
+                    req.st.db.escape(req.body.longitude),
+                    req.st.db.escape(req.query.APIKey)
+
+
                 ];
                 /**
                  * Calling procedure to save track template

@@ -100,7 +100,7 @@ transportCtrl.saveTransportRequest = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_Save_TransportRequest( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_Save_TransportRequest_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     if(!err && results && results[0] ){

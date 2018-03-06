@@ -1816,6 +1816,7 @@ Auth.prototype.loginNew = function(req,res,next){
                                                                     responseMessage.displayName = loginDetails[0].displayName;
                                                                     responseMessage.whatMateCount = loginDetails[0].whatMateCount;
                                                                     responseMessage.isEmployee = loginDetails[0].isEmployee;
+                                                                    responseMessage.isNewUser = loginDetails[0].isNewUser;
                                                                     responseMessage.userDetails = UserDetailsResult[0];
                                                                     if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
                                                                         responseMessage.contactDetails = contactResult[0];
@@ -1925,6 +1926,7 @@ Auth.prototype.loginNew = function(req,res,next){
                                     responseMessage.profile_status = loginDetails[0].ps;
                                     responseMessage.isHelloEZE = loginDetails[0].isHelloEZE;
                                     responseMessage.isWMAdmin = loginDetails[0].isWMAdmin;
+                                    responseMessage.isNewUser = loginDetails[0].isNewUser;
 
                                     response.status = true;
                                     response.message = "Logged in successfully";

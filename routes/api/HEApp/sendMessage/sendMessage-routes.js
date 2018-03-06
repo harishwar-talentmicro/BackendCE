@@ -19,4 +19,14 @@ router.get('/config/msgMapUserList',messageCtrl.GetMsgMapUsersData);
 router.post('/config/msgMapData',messageCtrl.saveMsgMapUsersData);
 router.delete('/config/user',messageCtrl.DeleteMsgMapUsersData);
 
+router.get('/master/announcementTypes',messageCtrl.GetAnnouncementType);
+
+router.get('/announcementList',messageCtrl.GetAnnouncementSummaryList);
+router.get('/announcement/detailedReport',messageCtrl.GetAnnouncementDetailedSummary);
+
+router.post('/draft',messageCtrl.saveAsDraft);
+router.post('/unReadUserAnnouncements',messageCtrl.sendUnReadUsersAnnouncement);
+
+router.get('/announcementDetail',messageCtrl.GetAnnouncementDetail);
+
 module.exports = router;

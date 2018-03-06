@@ -84,7 +84,7 @@ itemRequestCtrl.saveStationaryRequest = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_stationaryRequest( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_stationaryRequest_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     console.log(results);
@@ -270,7 +270,7 @@ itemRequestCtrl.savePantryRequest = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_pantryRequest( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_pantryRequest_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     console.log(results);
@@ -462,7 +462,7 @@ itemRequestCtrl.saveAssetRequest = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_assetRequest( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_assetRequest_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     console.log(results);
@@ -655,7 +655,7 @@ itemRequestCtrl.saveDocRequestToHR = function(req,res,next){
                  * Calling procedure to save form template
                  * @type {string}
                  */
-                var procQuery = 'CALL HE_save_docRequestToHR( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_save_docRequestToHR_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     if(!err && results && results[0] ){

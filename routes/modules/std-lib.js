@@ -35,9 +35,6 @@ bucket.acl.default.add({
 
 var thumbnailConfig = require('../../thumbnail-config.json');
 
-
-
-
 function StdLib(db){
     this.db = db;
     this.libs = {
@@ -594,5 +591,57 @@ function comparePassword(password,hash){
     return bcrypt.compareSync(password,hash);
 }
 
+StdLib.prototype.deleteDocumentFromCloud = function(uniqueName){
+    var file = bucket.file(uniqueName);
+    file.delete(function(err, apiResponse) {
+        if(err){
+            console.log("err",err);
+        }
+        else {
+            console.log("success");
+        }
+    });
+};
+
+StdLib.prototype.uploadXMLToCloud = function(uniqueName,readStream,callback){
+    // var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
+    var remoteWriteStream = bucket.file(uniqueName).createWriteStream({
+        metadata:{
+            contentType: "text/xml"
+        }
+    });
+
+    readStream.pipe(remoteWriteStream);
+
+    remoteWriteStream.on('finish', function(){
+        console.log('done');
+        if(callback){
+            if(typeof(callback)== 'function'){
+                callback(null);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+
+    remoteWriteStream.on('error', function(err){
+        if(callback){
+            if(typeof(callback)== 'function'){
+                console.log(err);
+                callback(err);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+};
 
 module.exports = StdLib;
