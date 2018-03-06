@@ -848,7 +848,7 @@ applicantCtrl.getreqAppStageStatus = function(req,res,next){
                         response.error = null;
                         response.data = {
                             transactionHistory : statusResult[0] ? statusResult[0]: [],
-                            currentScenario : statusResult[1][0] ? statusResult[0]:[]
+                            currentScenario : statusResult[1] ? statusResult[1]:[]
                         };
                         isWeb=req.query.isWeb;
                         if (isWeb==0) {
@@ -860,7 +860,8 @@ applicantCtrl.getreqAppStageStatus = function(req,res,next){
                         }
                         else{
                             res.status(200).json(response);
-                        }                    }
+                        }                    
+                    }
                     else if(!err){
                         response.status = true;
                         response.message = "History and current scenario not found";
