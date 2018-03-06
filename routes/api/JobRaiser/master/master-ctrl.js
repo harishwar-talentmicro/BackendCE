@@ -1820,7 +1820,7 @@ masterCtrl.mailTags=function(req,res,next){
                 ];
                 var mailbody_array = [];
 
-                var procQuery = 'CALL wm_get_detailsByTags( ' + inputs.join(',') + ')';
+                var procQuery = 'CALL wm_get_detailsByTags1( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,result){
                     console.log(err);

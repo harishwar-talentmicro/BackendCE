@@ -1246,13 +1246,13 @@ jobCtrl.saveRequirement=function(req,res,next){
         attachmentList=[];
     }
 
-    var status =req.body.status;
-    if(typeof(status) == "string") {
-        status = JSON.parse(status);
-    }
-    if(!status){
-        status={};
-    }
+    // var status =req.body.status;
+    // if(typeof(status) == "string") {
+    //     status = JSON.parse(status);
+    // }
+    // if(!status){
+    //     status={};
+    // }
 
     if (!validationFlag){
         response.error = error;
@@ -1296,7 +1296,8 @@ jobCtrl.saveRequirement=function(req,res,next){
                 //attachmentList =(JSON.stringify(attachmentList)) ? (JSON.stringify(attachmentList)):[];
                 //locations =(JSON.stringify(locations)) ? (JSON.stringify(locations)):[];
                 //membersInterviewRound =(JSON.stringify(membersInterviewRound)) ? (JSON.stringify(membersInterviewRound)):[];
-                req.body.status = (req.body.status) ? req.body.status : 0;
+                req.body.status = req.body.status ? req.body.status : 0;
+                req.body.statusTitle = req.body.statusTitle ? req.body.statusTitle : '';
                 req.body.expectedJoining = (req.body.expectedJoining) ? req.body.expectedJoining : 0;
 
 
@@ -1343,7 +1344,8 @@ jobCtrl.saveRequirement=function(req,res,next){
                     req.st.db.escape(JSON.stringify(locations)),        // newly added location
                     req.st.db.escape(JSON.stringify(membersInterviewRound)),
                     req.st.db.escape(JSON.stringify(attachmentList)),
-                    req.st.db.escape(JSON.stringify(status)),
+                    req.st.db.escape(req.body.status),
+                    req.st.db.escape(req.body.statusTitle),
                     req.st.db.escape(req.body.expectedJoining)
 
                 ];
