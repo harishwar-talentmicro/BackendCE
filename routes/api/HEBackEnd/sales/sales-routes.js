@@ -25,4 +25,13 @@ router.get('/categories',salesCtrl.getCategory);
 router.post('/support/member',salesCtrl.saveSupportMembers);
 router.get('/support/member',salesCtrl.getSupportMembers);
 
+router.post('/probabiltiy',salesCtrl.saveprobability);
+router.post('/timeline',salesCtrl.savetimeline);
+router.get('/probabiltiy',salesCtrl.getprobability);
+router.get('/timeline',salesCtrl.gettimeline);
+router.delete('/probabiltiy',salesCtrl.deleteprobability );
+router.delete('/timeline',salesCtrl.deletetimeline);
+
+router.get('/userstats',salesCtrl.getUserstats);
+
 module.exports = router;

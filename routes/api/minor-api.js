@@ -293,10 +293,11 @@ router.get('/test',function(req,res,next){
 // JobRaiser Project starts from here
 var jobModule = require('./JobRaiser/job.js');
 var masterModule = require('./JobRaiser/master.js');
+var applicantModule = require('./JobRaiser/cv.js');  // on feb 5th
 
 router.use('/WM',jobModule);
 router.use('/WM',masterModule);
-
+router.use('/WM',applicantModule);
 // cron
 // var taskScheduler = require('../api/HEApp/task/task-ctrl');
 cron.schedule('* * * * *', function(){

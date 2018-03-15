@@ -21,12 +21,7 @@ router.get('/sales/summary',salesCtrl.getSalesSummary);
 router.get('/sales/userPerformance/probability',salesCtrl.getSalesUserPerformanceByProbability);
 router.get('/sales/userPerformance/timeLine',salesCtrl.getSalesUserPerformanceByTimeLine);
 
-router.post('/probabiltiy',salesCtrl.saveprobability);
-router.post('/timeline',salesCtrl.savetimeline);
-router.get('/probabiltiy',salesCtrl.getprobability);
-router.get('/timeline',salesCtrl.gettimeline);
-router.delete('/probabiltiy',salesCtrl.deleteprobability );
-router.delete('/timeline',salesCtrl.deletetimeline);
+
 
 
 
