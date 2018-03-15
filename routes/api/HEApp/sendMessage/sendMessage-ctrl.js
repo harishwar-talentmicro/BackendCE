@@ -1550,7 +1550,7 @@ sendMessageCtrl.GetAnnouncementDetail = function(req,res,next){
                         // }
                         //
                         response.data = {
-                            userDetails : (JSON.parse(Result[0][0].formDataJSON))
+                            userDetails : (Result[0] && Result[0][0] && Result[0][0].formDataJSON ) ? (JSON.parse(Result[0][0].formDataJSON)) : []
                         };
 
                         // res.status(200).json(response)

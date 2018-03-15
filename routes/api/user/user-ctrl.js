@@ -3,7 +3,6 @@
  * @description Controller for signup, save address, save pin, validate ezeoneid etc for new wizard style UI
  * @since August 26, 2016 10:46 AM IST
  */
-
 var request = require('request');
 var validator = require('validator');
 var bcrypt = null;
@@ -18,6 +17,10 @@ const VoiceResponse = require('twilio').twiml.VoiceResponse;
 var Readable = require('stream').Readable;
 var uuid = require('node-uuid');
 var randomstring = require("randomstring");
+
+var Notification_aws = require('../../modules/notification/aws-sns-push');
+
+var _Notification_aws = new  Notification_aws();
 
 var qs = require("querystring");
 var options = {
@@ -1054,7 +1057,7 @@ UserCtrl.sendPasswordResetOTP = function(req,res,next) {
             var code = "";
             var possible = "1234567890";
 
-            for (var i = 0; i <= 5; i++) {
+            for (var i = 0; i <= 3; i++) {
 
                 code += possible.charAt(Math.floor(Math.random() * possible.length));
             }
@@ -1139,7 +1142,7 @@ UserCtrl.sendPasswordResetOTP = function(req,res,next) {
                     qs: {
                         user_name : 'janardana@hirecraft.com',
                         password : 'Ezeid2015',
-                        sender_id : 'EZEONE',
+                        sender_id : 'WtMate',
                         service : 'TRANS',
                         mobile_no: otpResult[0][0].mobile,
                         message: message,
@@ -1172,7 +1175,7 @@ UserCtrl.sendPasswordResetOTP = function(req,res,next) {
 
                 req.write(qs.stringify({ userId: 'talentmicro',
                     password: 'TalentMicro@123',
-                    senderId: 'DEMOSG',
+                    senderId: 'WTMATE',
                     sendMethod: 'simpleMsg',
                     msgType: 'text',
                     mobile: otpResult[0][0].isd.replace("+","") + otpResult[0][0].mobile,
@@ -1463,7 +1466,6 @@ UserCtrl.sendPasswordResetOtpPhone = function(req,res,next) {
         status *= false;
     }
 
-
     if (status) {
         try {
             var code = "";
@@ -1471,7 +1473,7 @@ UserCtrl.sendPasswordResetOtpPhone = function(req,res,next) {
             var isdMobile = "";
             var mobileNo = "";
 
-            for (var i = 0; i <= 5; i++) {
+            for (var i = 0; i <= 3; i++) {
 
                 code += possible.charAt(Math.floor(Math.random() * possible.length));
             }
@@ -1584,11 +1586,6 @@ UserCtrl.invitePublicProfile = function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.body.HEMasterId)
-    {
-        error.HEMasterId = 'Invalid HEMasterId';
-        validationFlag *= false;
-    }
 
     if (!validationFlag){
         response.error = error;
@@ -1612,7 +1609,6 @@ UserCtrl.invitePublicProfile = function(req,res,next){
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.isdmobile),
                     req.st.db.escape(req.body.mobile),
-                    req.st.db.escape(req.body.HEMasterId),
                     req.st.db.escape(req.body.name),
                     req.st.db.escape(req.body.email),
                     req.st.db.escape(req.body.meetingId),
@@ -1635,7 +1631,7 @@ UserCtrl.invitePublicProfile = function(req,res,next){
                             //     }, '',Qndata[0].email,[]);
                             // }
 
-                            message = tokenResult[0].DisplayName  + ' want you on WhatMate.Login ID: ' + userResult[0][0].ezeoneId + ',Password: ' + password ;
+                            message = tokenResult[0].DisplayName  + ' want you on WhatMate.Login ID: ' + userResult[0][0].ezeoneId + ',Password: ' + password  + '. App Links: iOS: www.goo.gl/124323  Android: www.goo.gl/123234534';
 
                             if(userResult[0][0].mobile !="")
                             {
@@ -1668,7 +1664,7 @@ UserCtrl.invitePublicProfile = function(req,res,next){
                                         qs: {
                                             user_name : 'janardana@hirecraft.com',
                                             password : 'Ezeid2015',
-                                            sender_id : 'EZEONE',
+                                            sender_id : 'WtMate',
                                             service : 'TRANS',
                                             mobile_no: userResult[0][0].mobile,
                                             message: message,
@@ -1701,7 +1697,7 @@ UserCtrl.invitePublicProfile = function(req,res,next){
 
                                     req.write(qs.stringify({ userId: 'talentmicro',
                                         password: 'TalentMicro@123',
-                                        senderId: 'DEMOSG',
+                                        senderId: 'WTMATE',
                                         sendMethod: 'simpleMsg',
                                         msgType: 'text',
                                         mobile: userResult[0][0].isd.replace("+","") + userResult[0][0].mobile,
@@ -1736,114 +1732,130 @@ UserCtrl.invitePublicProfile = function(req,res,next){
                             }
 
                         }
-                        // else if(userResult[0][0].status == "Existing") {
-                        //     // if(Qndata[0].email != ""){
-                        //     //     mailerApi.sendMailNew('existingUsers', {
-                        //     //         name : Qndata[0].name,
-                        //     //         UserName : userResult[0][0].whatmateId,
-                        //     //         CompanyName : req.query.CompanyName
-                        //     //     }, '',Qndata[0].email,[]);
-                        //     // }
-                        //
-                        //     message = 'Dear ' + Qndata[0].name  + ', Your existing profile on WhatMate is successfully linked to ' + req.query.CompanyName + ' now.';
-                        //
-                        //     if(Qndata[0].mobile !="")
-                        //     {
-                        //         if(Qndata[0].isdmobile == "+977"){
-                        //             request({
-                        //                 url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                        //                 qs: {
-                        //                     token : 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                        //                     to : Qndata[0].mobile,
-                        //                     message: message,
-                        //                     sender: 'Techingen'
-                        //                 },
-                        //                 method: 'GET'
-                        //
-                        //             }, function (error, response, body) {
-                        //                 if(error)
-                        //                 {
-                        //                     console.log(error,"SMS");
-                        //                 }
-                        //                 else{
-                        //                     console.log("SUCCESS","SMS response");
-                        //                 }
-                        //
-                        //             });
-                        //         }
-                        //         else if(Qndata[0].isdmobile == "+91")
-                        //         {
-                        //             request({
-                        //                 url: 'https://aikonsms.co.in/control/smsapi.php',
-                        //                 qs: {
-                        //                     user_name : 'janardana@hirecraft.com',
-                        //                     password : 'Ezeid2015',
-                        //                     sender_id : 'EZEONE',
-                        //                     service : 'TRANS',
-                        //                     mobile_no: Qndata[0].mobile,
-                        //                     message: message,
-                        //                     method : 'send_sms'
-                        //                 },
-                        //                 method: 'GET'
-                        //
-                        //             }, function (error, response, body) {
-                        //                 if(error)
-                        //                 {
-                        //                     console.log(error,"SMS");
-                        //                 }
-                        //                 else{
-                        //                     console.log("SUCCESS","SMS response");
-                        //                 }
-                        //             });
-                        //
-                        //             req = http.request(options, function (res) {
-                        //                 var chunks = [];
-                        //
-                        //                 res.on("data", function (chunk) {
-                        //                     chunks.push(chunk);
-                        //                 });
-                        //
-                        //                 res.on("end", function () {
-                        //                     var body = Buffer.concat(chunks);
-                        //                     console.log(body.toString());
-                        //                 });
-                        //             });
-                        //
-                        //             req.write(qs.stringify({ userId: 'talentmicro',
-                        //                 password: 'TalentMicro@123',
-                        //                 senderId: 'DEMOSG',
-                        //                 sendMethod: 'simpleMsg',
-                        //                 msgType: 'text',
-                        //                 mobile: Qndata[0].isdmobile.replace("+","") + Qndata[0].mobile,
-                        //                 msg: message,
-                        //                 duplicateCheck: 'true',
-                        //                 format: 'json' }));
-                        //             req.end();
-                        //
-                        //         }
-                        //         else if(Qndata[0].isdmobile != "")
-                        //         {
-                        //             client.messages.create(
-                        //                 {
-                        //                     body: message,
-                        //                     to: Qndata[0].isdmobile + Qndata[0].mobile,
-                        //                     from: '+14434322305'
-                        //                 },
-                        //                 function (error, response) {
-                        //                     if(error)
-                        //                     {
-                        //                         console.log(error,"SMS");
-                        //                     }
-                        //                     else{
-                        //                         console.log("SUCCESS","SMS response");
-                        //                     }
-                        //                 }
-                        //             );
-                        //
-                        //         }
-                        //
-                        //     }
-                        // }
+                        else if(userResult[0][0].status == "Existing") {
+                            // if(Qndata[0].email != ""){
+                            //     mailerApi.sendMailNew('existingUsers', {
+                            //         name : Qndata[0].name,
+                            //         UserName : userResult[0][0].whatmateId,
+                            //         CompanyName : req.query.CompanyName
+                            //     }, '',Qndata[0].email,[]);
+                            // }
+
+                            var messagePayload = {
+                                message : userResult[1][0].message,
+                                meetingId : userResult[1][0].meetingId,
+                                title : userResult[1][0].title,
+                                startDate : userResult[1][0].startDate,
+                                members : userResult[1][0].members,
+                                type : 91
+                            };
+
+                            if(userResult[2] && userResult[2][0].APNS_Id){
+                                _Notification_aws.publish_IOS(userResult[2][0].APNS_Id,messagePayload,0);
+                            }
+                            if(userResult[3] && userResult[3][0].GCM_Id){
+                                _Notification_aws.publish_Android(userResult[3][0].GCM_Id ,messagePayload);
+                            }
+
+                            // message = 'Dear ' + Qndata[0].name  + ', Your existing profile on WhatMate is successfully linked to ' + req.query.CompanyName + ' now.';
+                            //
+                            // if(Qndata[0].mobile !="")
+                            // {
+                            //     if(Qndata[0].isdmobile == "+977"){
+                            //         request({
+                            //             url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                            //             qs: {
+                            //                 token : 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                            //                 to : Qndata[0].mobile,
+                            //                 message: message,
+                            //                 sender: 'Techingen'
+                            //             },
+                            //             method: 'GET'
+                            //
+                            //         }, function (error, response, body) {
+                            //             if(error)
+                            //             {
+                            //                 console.log(error,"SMS");
+                            //             }
+                            //             else{
+                            //                 console.log("SUCCESS","SMS response");
+                            //             }
+                            //
+                            //         });
+                            //     }
+                            //     else if(Qndata[0].isdmobile == "+91")
+                            //     {
+                            //         request({
+                            //             url: 'https://aikonsms.co.in/control/smsapi.php',
+                            //             qs: {
+                            //                 user_name : 'janardana@hirecraft.com',
+                            //                 password : 'Ezeid2015',
+                            //                 sender_id : 'EZEONE',
+                            //                 service : 'TRANS',
+                            //                 mobile_no: Qndata[0].mobile,
+                            //                 message: message,
+                            //                 method : 'send_sms'
+                            //             },
+                            //             method: 'GET'
+                            //
+                            //         }, function (error, response, body) {
+                            //             if(error)
+                            //             {
+                            //                 console.log(error,"SMS");
+                            //             }
+                            //             else{
+                            //                 console.log("SUCCESS","SMS response");
+                            //             }
+                            //         });
+                            //
+                            //         req = http.request(options, function (res) {
+                            //             var chunks = [];
+                            //
+                            //             res.on("data", function (chunk) {
+                            //                 chunks.push(chunk);
+                            //             });
+                            //
+                            //             res.on("end", function () {
+                            //                 var body = Buffer.concat(chunks);
+                            //                 console.log(body.toString());
+                            //             });
+                            //         });
+                            //
+                            //         req.write(qs.stringify({ userId: 'talentmicro',
+                            //             password: 'TalentMicro@123',
+                            //             senderId: 'DEMOSG',
+                            //             sendMethod: 'simpleMsg',
+                            //             msgType: 'text',
+                            //             mobile: Qndata[0].isdmobile.replace("+","") + Qndata[0].mobile,
+                            //             msg: message,
+                            //             duplicateCheck: 'true',
+                            //             format: 'json' }));
+                            //         req.end();
+                            //
+                            //     }
+                            //     else if(Qndata[0].isdmobile != "")
+                            //     {
+                            //         client.messages.create(
+                            //             {
+                            //                 body: message,
+                            //                 to: Qndata[0].isdmobile + Qndata[0].mobile,
+                            //                 from: '+14434322305'
+                            //             },
+                            //             function (error, response) {
+                            //                 if(error)
+                            //                 {
+                            //                     console.log(error,"SMS");
+                            //                 }
+                            //                 else{
+                            //                     console.log("SUCCESS","SMS response");
+                            //                 }
+                            //             }
+                            //         );
+                            //
+                            //     }
+                            //
+                            // }
+                        }
 
                         response.status = true;
                         response.message = "Invited successfully";
@@ -1851,6 +1863,13 @@ UserCtrl.invitePublicProfile = function(req,res,next){
                         response.data = {
                             status : userResult[0][0].status
                         };
+                        res.status(200).json(response);
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Invited successfully";
+                        response.error = null;
+                        response.data = null;
                         res.status(200).json(response);
                     }
                     else{

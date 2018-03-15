@@ -884,7 +884,7 @@ router.post('/addressBook',function(req, res, next){
                                 qs: {
                                     user_name : 'janardana@hirecraft.com',
                                     password : 'Ezeid2015',
-                                    sender_id : 'EZEONE',
+                                    sender_id : 'WtMate',
                                     service : 'TRANS',
                                     mobile_no: indiaMobileList,
                                     message: " " + tokenResult[0].fullName + " requested you to join EZEOne network. Click on the following link based on your mobile phone type to download App.  Sign-up as new user and enjoy using EZEOne. " +

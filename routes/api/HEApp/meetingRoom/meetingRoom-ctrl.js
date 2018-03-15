@@ -235,6 +235,7 @@ meetingRoomCtrl.bookMeetingRoom = function(req,res,next){
                 req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                 req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                 req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                req.body.roomName = req.body.roomName ? req.body.roomName : "";
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -251,7 +252,8 @@ meetingRoomCtrl.bookMeetingRoom = function(req,res,next){
                     req.st.db.escape(req.body.changeLog),
                     req.st.db.escape(req.body.groupId),
                     req.st.db.escape(req.body.learnMessageId),
-                    req.st.db.escape(req.body.accessUserType)
+                    req.st.db.escape(req.body.accessUserType),
+                    req.st.db.escape(req.body.roomName)
                 ];
                 /**
                  * Calling procedure to save form template

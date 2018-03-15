@@ -56,6 +56,12 @@ userCtrl.saveUser = function(req,res,next){
                 // req.body.trackTemplateId = (req.body.trackTemplateId) ? req.body.trackTemplateId : 0;
                 req.body.workLocationId = (req.body.workLocationId) ? req.body.workLocationId : 0;
                 req.body.userType = (req.body.userType) ? req.body.userType : 0;
+                req.body.firstName = (req.body.firstName) ? req.body.firstName : "";
+                req.body.lastName = (req.body.lastName) ? req.body.lastName : "";
+                req.body.mobileISD = (req.body.mobileISD) ? req.body.mobileISD : "";
+                req.body.mobileNumber = (req.body.mobileNumber) ? req.body.mobileNumber : "";
+                req.body.emailId = (req.body.emailId) ? req.body.emailId : "";
+                // firstName,lastName,mobileISD,mobileNumber,emailId,displayName
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -72,7 +78,12 @@ userCtrl.saveUser = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.body.userType),
                     req.st.db.escape(req.body.workGroupId),
-                    req.st.db.escape(req.body.RMGroupId)
+                    req.st.db.escape(req.body.RMGroupId),
+                    req.st.db.escape(req.body.firstName),
+                    req.st.db.escape(req.body.lastName),
+                    req.st.db.escape(req.body.mobileISD),
+                    req.st.db.escape(req.body.mobileNumber),
+                    req.st.db.escape(req.body.emailId)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -272,9 +283,15 @@ userCtrl.getUserDetails = function(req,res,next){
                             workGroupId : userData[0][0].workGroupId ,
                             workGroupTitle : userData[0][0].workGroupTitle ,
                             RMGroupId : userData[0][0].RMGroupId ,
-                            RMGroupTitle : userData[0][0].RMGroupTitle
+                            RMGroupTitle : userData[0][0].RMGroupTitle,
+                            firstName : userData[0][0].firstName,
+                            lastName : userData[0][0].lastName,
+                            mobileISD : userData[0][0].mobileISD,
+                            mobileNumber : userData[0][0].mobileNumber,
+                            emailId : userData[0][0].emailId,
+                            displayName : userData[0][0].displayName
                         };
-
+// firstName,lastName,mobileISD,mobileNumber,emailId,displayName
 
 
                         res.status(200).json(response);
@@ -666,6 +683,72 @@ userCtrl.validateEzeoneId = function(req,res,next){
                     else{
                         response.status = false;
                         response.message = "Error while validating EZEOne ID";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+userCtrl.postToProfile = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    // if (!req.query.APIKey)
+    // {
+    //     error.APIKey = 'Invalid APIKey';
+    //     validationFlag *= false;
+    // }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.mobileISD),
+                    req.st.db.escape(req.body.mobileNumber),
+                    req.st.db.escape(req.body.emailId),
+                    req.st.db.escape(req.body.userMasterId)
+                ];
+
+                var procQuery = 'CALL he_profileDataHistory( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,searchList){
+                    if (!err)
+                    {
+                        response.status = true;
+                        response.message = "Profile data updated successfully ";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while updating data";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

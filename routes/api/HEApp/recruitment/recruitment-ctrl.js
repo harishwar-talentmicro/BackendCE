@@ -1262,6 +1262,84 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
 
 };
 
+// recruitmentCtrl.extractTextFromFile = function(req,res,next){
+//     var response = {
+//         status : false,
+//         message : "Invalid token",
+//         data : null,
+//         error : null
+//     };
+//     var validationFlag = true;
+//
+//     if (!req.query.token) {
+//         error.token = 'Invalid token';
+//         validationFlag *= false;
+//     }
+//
+//     if (!req.query.fileName)
+//     {
+//         error.fileName = 'Invalid fileName';
+//         validationFlag *= false;
+//     }
+//
+//     if (!validationFlag){
+//         response.error = error;
+//         response.message = 'Please check the errors';
+//         res.status(400).json(response);
+//         console.log(response);
+//     }
+//     else {
+//         req.st.validateToken(req.query.token,function(err,tokenResult){
+//             if((!err) && tokenResult){
+//
+//                 http.get(req.query.fileName, function(fileResponse){
+//                         var bufs = [];
+//                     fileResponse.on('data', function(d){ bufs.push(d); });
+//                     fileResponse.on('end', function() {
+//                                 var buf = Buffer.concat(bufs);
+//                                 textract.fromBufferWithName(req.query.fileName,buf, function( error, text ) {
+//                                     if (!error) {
+//                                         response.status = true;
+//                                         response.message = "Information not found";
+//                                         response.error = null;
+//                                         response.data = {
+//                                             speechContent : text
+//                                         };
+//
+//                                         buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+//                                         zlib.gzip(buf, function (_, result) {
+//                                             response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+//                                             res.status(200).json(response);
+//                                         });
+//                                     }
+//                                     else {
+//                                         response.status = false;
+//                                         response.message = "Something went wrong .";
+//                                         response.error = error;
+//                                         response.data = {
+//                                             speechContent : ""
+//                                         };
+//                                         buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+//                                         zlib.gzip(buf, function (_, result) {
+//                                             response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+//                                             res.status(500).json(response);
+//                                         });
+//
+//                                     }
+//                                 })
+//                             }
+//                         );
+//                     }
+//                 );
+//             }
+//             else{
+//                 res.status(401).json(response);
+//             }
+//         });
+//     }
+// };
+
+
 recruitmentCtrl.extractTextFromFile = function(req,res,next){
     var response = {
         status : false,
@@ -1294,8 +1372,8 @@ recruitmentCtrl.extractTextFromFile = function(req,res,next){
 
                 http.get(req.query.fileName, function(fileResponse){
                         var bufs = [];
-                    fileResponse.on('data', function(d){ bufs.push(d); });
-                    fileResponse.on('end', function() {
+                        fileResponse.on('data', function(d){ bufs.push(d); });
+                        fileResponse.on('end', function() {
                                 var buf = Buffer.concat(bufs);
                                 textract.fromBufferWithName(req.query.fileName,buf, function( error, text ) {
                                     if (!error) {
@@ -1330,7 +1408,10 @@ recruitmentCtrl.extractTextFromFile = function(req,res,next){
                             }
                         );
                     }
+
+
                 );
+
             }
             else{
                 res.status(401).json(response);

@@ -14,6 +14,19 @@ const authToken = '3abf04f536ede7f6964919936a35e614';
 const client = require('twilio')(accountSid, authToken);
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
+
+var qs = require("querystring");
+var options = {
+    "method": "POST",
+    "hostname": "www.smsgateway.center",
+    "port": null,
+    "path": "/SMSApi/rest/send",
+    "headers": {
+        "content-type": "application/x-www-form-urlencoded",
+        "cache-control": "no-cache"
+    }
+};
+
 windowsCtrl.uploadPaySlip = function(req,res,next){
     var response = {
         status : false,
@@ -450,7 +463,7 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                         qs: {
                                             user_name : 'janardana@hirecraft.com',
                                             password : 'Ezeid2015',
-                                            sender_id : 'EZEONE',
+                                            sender_id : 'WtMate',
                                             service : 'TRANS',
                                             mobile_no: Qndata[0].mobile,
                                             message: message,
@@ -483,7 +496,7 @@ windowsCtrl.uploadUsers = function(req,res,next){
 
                                     req.write(qs.stringify({ userId: 'talentmicro',
                                         password: 'TalentMicro@123',
-                                        senderId: 'DEMOSG',
+                                        senderId: 'WTMATE',
                                         sendMethod: 'simpleMsg',
                                         msgType: 'text',
                                         mobile: Qndata[0].isdmobile.replace("+","") + Qndata[0].mobile,
@@ -581,7 +594,7 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                         qs: {
                                             user_name : 'janardana@hirecraft.com',
                                             password : 'Ezeid2015',
-                                            sender_id : 'EZEONE',
+                                            sender_id : 'WtMate',
                                             service : 'TRANS',
                                             mobile_no: Qndata[0].mobile,
                                             message: message,
@@ -614,7 +627,7 @@ windowsCtrl.uploadUsers = function(req,res,next){
 
                                     req.write(qs.stringify({ userId: 'talentmicro',
                                         password: 'TalentMicro@123',
-                                        senderId: 'DEMOSG',
+                                        senderId: 'WTMATE',
                                         sendMethod: 'simpleMsg',
                                         msgType: 'text',
                                         mobile: Qndata[0].isdmobile.replace("+","") + Qndata[0].mobile,
@@ -622,7 +635,6 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                         duplicateCheck: 'true',
                                         format: 'json' }));
                                     req.end();
-
                                 }
                                 else if(Qndata[0].isdmobile != "")
                                 {

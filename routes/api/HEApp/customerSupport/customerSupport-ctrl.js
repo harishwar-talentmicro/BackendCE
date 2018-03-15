@@ -351,7 +351,7 @@ supportCtrl.assignToUser = function(req,res,next){
                                     notificationTemplaterRes.parsedTpl,
                                     31,
                                     0, (results[0][i].iphoneId) ? (results[0][i].iphoneId) : '',
-                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                    (results[0][i].GCM_Id) ? (results[0][i].GCM_Id) : '',
                                     0,
                                     0,
                                     0,
@@ -391,7 +391,7 @@ supportCtrl.assignToUser = function(req,res,next){
                                     },
                                     null,
                                     tokenResult[0].isWhatMate,
-                                    results[1][i].secretKey);
+                                    results[0][i].secretKey);
 
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }

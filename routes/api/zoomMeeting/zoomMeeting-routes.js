@@ -12,6 +12,8 @@ router.post('/zoom/meeting/stop',zoomCtrl.stopMeeting);
 router.post('/zoom/meeting/stop/user',zoomCtrl.stopMeetingForSingleUser);
 router.get('/zoom/meeting',zoomCtrl.getMeetingList);
 
+router.get('/zoom/latestMeeting',zoomCtrl.getLatestMeetingOfUser);
+
 // twilio
 router.get('/twilio/accessToken',zoomCtrl.getAccessTokenVideo);
 router.get('/twilio/voice/accessToken',zoomCtrl.getAccessTokenVoice);
