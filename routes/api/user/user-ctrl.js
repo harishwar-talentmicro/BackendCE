@@ -17,6 +17,9 @@ const VoiceResponse = require('twilio').twiml.VoiceResponse;
 var Readable = require('stream').Readable;
 var uuid = require('node-uuid');
 var randomstring = require("randomstring");
+var zlib = require('zlib');
+var AES_256_encryption = require('../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 
 var Notification_aws = require('../../modules/notification/aws-sns-push');
 
@@ -1871,6 +1874,88 @@ UserCtrl.invitePublicProfile = function(req,res,next){
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while inviting";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+UserCtrl.getWelcomeAttachments = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token)
+                ];
+
+                var procQuery = 'CALL he_get_companyAttachments( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,attachmentResult){
+                    if (!err && attachmentResult && attachmentResult[0] ){
+                        var output = [];
+                        for(var i = 0; i < attachmentResult[0].length; i++) {
+                            var res1 = {};
+                            res1.seqNo = attachmentResult[0][i].seqNo;
+                            res1.attachment = (attachmentResult[0][i].attachment) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachmentResult[0][i].attachment) : "";
+                            output.push(res1);
+                        }
+
+                        response.status = true;
+                        response.message = "Attachments loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            attachmentList : output
+                        };
+                        // res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "No attachments found";
+                        response.error = null;
+                        response.data = {
+                            attachmentList : []
+                        };
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else{
                         response.status = false;

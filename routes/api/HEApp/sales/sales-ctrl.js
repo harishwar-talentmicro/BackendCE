@@ -138,10 +138,10 @@ salesCtrl.saveSalesRequest = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.body.requirement) {
-        error.requirement = 'Invalid requirement';
-        validationFlag *= false;
-    }
+    // if (!req.body.requirement) {
+    //     error.requirement = 'Invalid requirement';
+    //     validationFlag *= false;
+    // }
 
     var attachmentList =req.body.attachmentList;
     if(typeof(attachmentList) == "string") {
@@ -267,7 +267,7 @@ salesCtrl.saveSalesRequest = function(req,res,next){
                     if(!err && results && results[0] ){
                         senderGroupId = results[0][0].senderId;
                         notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                            senderName : results[0][0].senderName
+                            senderName : results[0][0].message
                         });
 
                         for (var i = 0; i < results[1].length; i++ ) {
@@ -490,7 +490,7 @@ salesCtrl.assignToUser = function(req,res,next){
 
                         senderGroupId = results[0][0].senderId;
                         notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                            senderName : results[0][0].senderName
+                            senderName : results[0][0].message
                         });
 
                         for (var i = 0; i < results[0].length; i++ ) {

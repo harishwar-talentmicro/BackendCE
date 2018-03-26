@@ -75,7 +75,7 @@ greetingCtrl.sendGreeting = function(req,res,next){
                 if(!err && results && results[0] ){
                     senderGroupId = results[0][0].senderId;
                     notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                        senderName : results[0][0].senderName
+                        senderName : results[0][0].message
                     });
 
 

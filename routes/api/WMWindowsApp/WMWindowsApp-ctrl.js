@@ -419,7 +419,6 @@ windowsCtrl.uploadUsers = function(req,res,next){
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,userResult){
                     if (!err && userResult && userResult[0] ){
-                        console.log("userResult[0][0].status",userResult[0][0].status);
 
                         if (userResult[0][0].status == "New" ){
                             if(Qndata[0].email != ""){

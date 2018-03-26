@@ -61,6 +61,7 @@ userCtrl.saveUser = function(req,res,next){
                 req.body.mobileISD = (req.body.mobileISD) ? req.body.mobileISD : "";
                 req.body.mobileNumber = (req.body.mobileNumber) ? req.body.mobileNumber : "";
                 req.body.emailId = (req.body.emailId) ? req.body.emailId : "";
+                req.body.DOJ = (req.body.DOJ) ? req.body.DOJ : null;
                 // firstName,lastName,mobileISD,mobileNumber,emailId,displayName
 
                 var procParams = [
@@ -83,7 +84,8 @@ userCtrl.saveUser = function(req,res,next){
                     req.st.db.escape(req.body.lastName),
                     req.st.db.escape(req.body.mobileISD),
                     req.st.db.escape(req.body.mobileNumber),
-                    req.st.db.escape(req.body.emailId)
+                    req.st.db.escape(req.body.emailId),
+                    req.st.db.escape(req.body.DOJ)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -253,11 +255,11 @@ userCtrl.getUserDetails = function(req,res,next){
                         // }
                         var output=[];
                         var usertemplate = (JSON.parse( userData[0][0].tracktemplate )) ? (JSON.parse(userData[0][0].tracktemplate )):[];
-                        console.log(usertemplate);
+
                         for(var i=0; i<usertemplate.length; i++){
                             var res2={};
-                            res2.trackTemplateId=usertemplate[i].templateId,
-                                res2.trackTemplateTitle=usertemplate[i].title
+                            res2.trackTemplateId=usertemplate[i].templateId;
+                                res2.trackTemplateTitle=usertemplate[i].title;
                             output.push(res2);
                         }
                         response.status = true;
@@ -289,7 +291,8 @@ userCtrl.getUserDetails = function(req,res,next){
                             mobileISD : userData[0][0].mobileISD,
                             mobileNumber : userData[0][0].mobileNumber,
                             emailId : userData[0][0].emailId,
-                            displayName : userData[0][0].displayName
+                            displayName : userData[0][0].displayName,
+                            DOJ : userData[0][0].DOJ
                         };
 // firstName,lastName,mobileISD,mobileNumber,emailId,displayName
 

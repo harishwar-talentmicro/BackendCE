@@ -1817,6 +1817,8 @@ Auth.prototype.loginNew = function(req,res,next){
                                                                     responseMessage.whatMateCount = loginDetails[0].whatMateCount;
                                                                     responseMessage.isEmployee = loginDetails[0].isEmployee;
                                                                     responseMessage.isNewUser = loginDetails[0].isNewUser;
+                                                                    responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
+                                                                    responseMessage.attachmentCount = loginDetails[0].attachmentCount;
                                                                     responseMessage.userDetails = UserDetailsResult[0];
                                                                     if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
                                                                         responseMessage.contactDetails = contactResult[0];
@@ -1927,6 +1929,8 @@ Auth.prototype.loginNew = function(req,res,next){
                                     responseMessage.isHelloEZE = loginDetails[0].isHelloEZE;
                                     responseMessage.isWMAdmin = loginDetails[0].isWMAdmin;
                                     responseMessage.isNewUser = loginDetails[0].isNewUser;
+                                    responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
+                                    responseMessage.attachmentCount = loginDetails[0].attachmentCount;
 
                                     response.status = true;
                                     response.message = "Logged in successfully";

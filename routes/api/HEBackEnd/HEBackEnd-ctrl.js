@@ -264,7 +264,8 @@ HEBackkendCtrl.getAppSettings = function(req, res, next){
                                     var res1 = {};
                                     res1.attachmentId = result[1][i].attachmentId;
                                     res1.seqNo = result[1][i].seqNo;
-                                    res1.attachment = (result[1][i].attachment) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + result[1][i].attachment) : "";
+                                    res1.attachment = result[1][i].attachment;
+                                    // res1.attachment = (result[1][i].attachment) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + result[1][i].attachment) : "";
                                     output.push(res1);
                                 }
                             }

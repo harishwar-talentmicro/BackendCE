@@ -154,8 +154,48 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                     console.log(results);
                     if(!err && results && results[0] ){
                         senderGroupId = results[0][0].senderId;
+                        response.status = true;
+                        response.message = "Message sent successfully";
+                        response.error = null;
+                        response.data = {
+                            messageList: {
+                                messageId: results[0][0].messageId,
+                                message: results[0][0].message,
+                                messageLink: results[0][0].messageLink,
+                                createdDate: results[0][0].createdDate,
+                                messageType: results[0][0].messageType,
+                                messageStatus: results[0][0].messageStatus,
+                                priority: results[0][0].priority,
+                                senderName: results[0][0].senderName,
+                                senderId: results[0][0].senderId,
+                                groupId: req.body.groupId,
+                                receiverId: results[0][0].receiverId,
+                                transId : results[0][0].transId,
+                                formId : results[0][0].formId,
+                                currentStatus : results[0][0].currentStatus,
+                                currentTransId : results[0][0].currentTransId,
+                                localMessageId : req.body.localMessageId,
+                                parentId : results[0][0].parentId,
+                                accessUserType : results[0][0].accessUserType,
+                                heUserId : results[0][0].heUserId,
+                                formData : JSON.parse(results[0][0].formDataJSON)
+                            }
+                        };
+                        // res.status(200).json(response);
+                        if (req.query.isweb==0) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+
+                            });
+                        }
+                        else{
+                            res.status(200).json(response);
+                        }
+
                         notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                            senderName : results[0][0].senderName
+                            senderName : results[0][0].message
                         });
 
                         for (var i = 0; i < results[1].length; i++ ) {
@@ -217,46 +257,6 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                                     notificationTemplaterRes.error);
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }
-                        }
-
-                        response.status = true;
-                        response.message = "Message sent successfully";
-                        response.error = null;
-                        response.data = {
-                            messageList: {
-                                messageId: results[0][0].messageId,
-                                message: results[0][0].message,
-                                messageLink: results[0][0].messageLink,
-                                createdDate: results[0][0].createdDate,
-                                messageType: results[0][0].messageType,
-                                messageStatus: results[0][0].messageStatus,
-                                priority: results[0][0].priority,
-                                senderName: results[0][0].senderName,
-                                senderId: results[0][0].senderId,
-                                groupId: req.body.groupId,
-                                receiverId: results[0][0].receiverId,
-                                transId : results[0][0].transId,
-                                formId : results[0][0].formId,
-                                currentStatus : results[0][0].currentStatus,
-                                currentTransId : results[0][0].currentTransId,
-                                localMessageId : req.body.localMessageId,
-                                parentId : results[0][0].parentId,
-                                accessUserType : results[0][0].accessUserType,
-                                heUserId : results[0][0].heUserId,
-                                formData : JSON.parse(results[0][0].formDataJSON)
-                            }
-                        };
-                        // res.status(200).json(response);
-                        if (req.query.isweb==0) {
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                            zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                res.status(200).json(response);
-
-                            });
-                        }
-                        else{
-                            res.status(200).json(response);
                         }
 
 
@@ -1372,7 +1372,7 @@ sendMessageCtrl.sendUnReadUsersAnnouncement = function(req,res,next){
                     if(!err && results && results[0] ){
                         senderGroupId = results[0][0].senderId;
                         notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                            senderName : results[0][0].senderName
+                            senderName : results[0][0].message
                         });
 
                         for (var i = 0; i < results[1].length; i++ ) {

@@ -611,6 +611,8 @@ signupCtrl.verifyOTP = function(req,res,next){
                 req.body.otp = 0;
             }
 
+
+
             if (pictureURL != "")
             {
                 pictureURL = (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + pictureURL);
@@ -639,16 +641,23 @@ signupCtrl.verifyOTP = function(req,res,next){
             var procQuery = 'CALL verify_otp( ' + procParams.join(',') + ')';
             console.log(procQuery);
             req.db.query(procQuery,function(err,result) {
+                console.log("result",result);
                 if (!err && result && result[0] && result[0][0].message){
                     switch (result[0][0].message) {
                         case 'INVALID' :
                             respMsg.status = false;
                             respMsg.message = "Invalid OTP";
+                            respMsg.data = {
+                                code : "0"
+                            };
                             res.status(200).json(respMsg);
                             break;
                         case 'NOT_AVAILABLE' :
                             respMsg.status = false;
                             respMsg.message = "EmailId already exists";
+                            respMsg.data = {
+                                code : "0"
+                            };
                             res.status(200).json(respMsg);
                             break ;
                         case '-3' :
@@ -709,7 +718,7 @@ signupCtrl.verifyOTP = function(req,res,next){
                                         }
                                     });
 
-                                    var req = http.request(options, function (res) {
+                                    var twilioReq = http.request(options, function (res) {
                                         var chunks = [];
 
                                         res.on("data", function (chunk) {
@@ -722,7 +731,7 @@ signupCtrl.verifyOTP = function(req,res,next){
                                         });
                                     });
 
-                                    req.write(qs.stringify({ userId: 'talentmicro',
+                                    twilioReq.write(qs.stringify({ userId: 'talentmicro',
                                         password: 'TalentMicro@123',
                                         senderId: 'WTMATE',
                                         sendMethod: 'simpleMsg',
@@ -731,7 +740,7 @@ signupCtrl.verifyOTP = function(req,res,next){
                                         msg: message,
                                         duplicateCheck: 'true',
                                         format: 'json' }));
-                                    req.end();
+                                    twilioReq.end();
 
                                 }
                                 else if(isdMobile != "")
@@ -757,17 +766,17 @@ signupCtrl.verifyOTP = function(req,res,next){
 
                             }
 
-                            respMsg.status = false;
+                            respMsg.status = true;
                             respMsg.data = {
                                 code : "-3"
                             };
                             respMsg.message = "Your User ID already exists. Please Sign In using the credentials sent to your mobile and e-mail.";
                             res.status(200).json(respMsg);
+                            break ;
 
                         default:
                             break;
                     }
-
                 }
                 else if (!err && result && result[0] && result[0][0].EZEID){
                     var EZEOneId= result[0][0].EZEID;
@@ -780,12 +789,18 @@ signupCtrl.verifyOTP = function(req,res,next){
                         if (err) {
                             respMsg.status = false;
                             respMsg.message = "Error while generating token";
+                            respMsg.data = {
+                                code : "0"
+                            };
                             respMsg.data = null;
                             res.status(500).json(respMsg);
                         }
                         else {
                             respMsg.status = true;
                             respMsg.message = "OTP is matched";
+                            respMsg.data = {
+                                code : "0"
+                            };
                             respMsg.data = {
                                 // EZEOneId : result[0][0].EZEOneId,
                                 // masterId : result[0][0].masterId,
@@ -813,6 +828,9 @@ signupCtrl.verifyOTP = function(req,res,next){
                 else if (!err){
                     respMsg.status = true ;
                     respMsg.message = "OTP is matched";
+                    respMsg.data = {
+                        code : "0"
+                    };
                     res.status(200).json(respMsg);
                 }
                 else {

@@ -24,5 +24,6 @@ router.post('/document/feedback',recruitmentCtrl.saveDocFeedback);
 router.post('/document/readStatus',recruitmentCtrl.saveDocReadStatus);
 
 router.get('/messageDetails',recruitmentCtrl.getmessageDetails);
+router.get('/form16',recruitmentCtrl.getForm16);
 
 module.exports = router;

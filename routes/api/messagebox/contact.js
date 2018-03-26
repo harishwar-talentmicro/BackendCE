@@ -81,7 +81,7 @@ router.get('/query', function(req,res,next){
                     req.query.isWhatMate = req.query.isWhatMate ? req.query.isWhatMate : 0;
 
                     var procParams = [
-                        req.db.escape(title) ,
+                        req.db.escape(title),
                         req.db.escape(pin) ,
                         req.db.escape(req.query.token),
                         req.db.escape(req.query.isWhatMate)
@@ -95,6 +95,12 @@ router.get('/query', function(req,res,next){
                                 responseMessage.status = true;
                                 responseMessage.error = null;
                                 responseMessage.message = 'Contacts loaded successfully';
+
+                                if(results[0][0].trackTemplateDetails){
+                                    for(var i = 0; i < results[0].length; i++){
+                                        results[0][i].trackTemplateDetails = (results[0][i].trackTemplateDetails) ? JSON.parse(results[0][i].trackTemplateDetails) : [] ;
+                                    }
+                                }
                                 responseMessage.data = {
                                     contactSuggestionList :results[0]
                                 };
@@ -111,7 +117,7 @@ router.get('/query', function(req,res,next){
                                 responseMessage.data = {
                                     contactSuggestionList :[]
                                 };
-                                var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
+                                 buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
                                     responseMessage.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(responseMessage);

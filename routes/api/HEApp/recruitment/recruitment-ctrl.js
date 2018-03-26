@@ -105,7 +105,7 @@ recruitmentCtrl.manpowerRequest = function(req,res,next){
                     if(!err && results && results[0] ){
                         senderGroupId = results[0][0].senderId;
                         notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                            senderName : results[0][0].senderName
+                            senderName : results[0][0].message
                         });
 
                         for (var i = 0; i < results[1].length; i++ ) {
@@ -375,7 +375,7 @@ recruitmentCtrl.referCV = function(req,res,next){
                     if(!err && results && results[0] ){
                         senderGroupId = results[0][0].senderId;
                         notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                            senderName : results[0][0].senderName
+                            senderName : results[0][0].message
                         });
 
                         for (var i = 0; i < results[1].length; i++ ) {
@@ -558,7 +558,7 @@ recruitmentCtrl.contactUs = function(req,res,next){
                     if(!err && results && results[0] ){
                         senderGroupId = results[0][0].senderId;
                         notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                            senderName : results[0][0].senderName
+                            senderName : results[0][0].message
                         });
 
                         for (var i = 0; i < results[1].length; i++ ) {
@@ -1014,7 +1014,7 @@ recruitmentCtrl.interviewScheduler = function(req,res,next){
                     if(!err && results && results[0] ){
                         senderGroupId = results[0][0].senderId;
                         notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                            senderName : results[0][0].senderName
+                            senderName : results[0][0].message
                         });
 
                         for (var i = 0; i < results[1].length; i++ ) {
@@ -1339,7 +1339,6 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
 //     }
 // };
 
-
 recruitmentCtrl.extractTextFromFile = function(req,res,next){
     var response = {
         status : false,
@@ -1609,7 +1608,7 @@ recruitmentCtrl.getmessageDetails = function(req,res,next){
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     console.log(results);
-                    if(!err && results && results[0] ){
+                    if(!err && results && results[0] && results[0][0] ){
 
                         response.status = true;
                         response.message = "Data loaded successfully";
@@ -1653,6 +1652,95 @@ recruitmentCtrl.getmessageDetails = function(req,res,next){
                     else{
                         response.status = false;
                         response.message = "Error while getting data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+recruitmentCtrl.getForm16 = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.HEMasterId)
+    {
+        error.HEMasterId = 'Invalid HEMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.HEMasterId)
+                ];
+
+                var procQuery = 'CALL he_get_form16( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,form16Data){
+                    if(!err && form16Data && form16Data[0] && form16Data[0][0]){
+                        response.status = true;
+                        response.message = "Form-16 loaded successfully";
+                        response.error = null;
+                        var output = [];
+                        for(var i = 0; i < form16Data[0].length; i++) {
+                            var res1 = {};
+                            res1.startDate = form16Data[0][i].startDate;
+                            res1.endDate = form16Data[0][i].endDate;
+                            res1.fileName = (form16Data[0][i].fileName) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + form16Data[0][i].fileName) : "";
+                            output.push(res1);
+                        }
+                        response.data =  {
+                            form16 : output
+                        };
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Form-16 not found";
+                        response.error = null;
+                        response.data =  {
+                            form16 : []
+                        };
+                        buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting form-16";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

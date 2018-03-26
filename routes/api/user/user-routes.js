@@ -24,5 +24,6 @@ router.post('/verifyMobile',userCtrl.verifyUpdateOTP);
 router.post('/passwordReset/phone',userCtrl.sendPasswordResetOtpPhone);
 
 router.post('/invite/public',userCtrl.invitePublicProfile);
+router.get('/welcome/attachments',userCtrl.getWelcomeAttachments);
 
 module.exports = router;

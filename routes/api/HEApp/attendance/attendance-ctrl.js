@@ -104,8 +104,9 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                     if(!err && results && results[0] ){
                         senderGroupId = results[0][0].senderId;
                         notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                            senderName : results[0][0].senderName
+                            senderName : results[0][0].message
                         });
+                        console.log("notificationTemplaterRes.parsedTpl",notificationTemplaterRes.parsedTpl) ;
 
                         for (var i = 0; i < results[1].length; i++ ) {
                             if (notificationTemplaterRes.parsedTpl) {
