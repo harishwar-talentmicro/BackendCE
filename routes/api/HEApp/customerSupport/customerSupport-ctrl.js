@@ -127,7 +127,7 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                     if(!err && results && results[0] ){
                         senderGroupId = results[0][0].senderId;
                         notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                            senderName : results[0][0].senderName
+                            senderName : results[0][0].message
                         });
 
                         for (var i = 0; i < results[1].length; i++ ) {
@@ -335,7 +335,7 @@ supportCtrl.assignToUser = function(req,res,next){
 
                         senderGroupId = results[0][0].senderId;
                         notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                            senderName : results[0][0].senderName
+                            senderName : results[0][0].message
                         });
 
                         for (var i = 0; i < results[0].length; i++ ) {
@@ -351,7 +351,7 @@ supportCtrl.assignToUser = function(req,res,next){
                                     notificationTemplaterRes.parsedTpl,
                                     31,
                                     0, (results[0][i].iphoneId) ? (results[0][i].iphoneId) : '',
-                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                    (results[0][i].GCM_Id) ? (results[0][i].GCM_Id) : '',
                                     0,
                                     0,
                                     0,
@@ -391,7 +391,7 @@ supportCtrl.assignToUser = function(req,res,next){
                                     },
                                     null,
                                     tokenResult[0].isWhatMate,
-                                    results[1][i].secretKey);
+                                    results[0][i].secretKey);
 
                                 console.log('postNotification : notification for compose_message is sent successfully');
                             }

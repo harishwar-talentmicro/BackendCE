@@ -385,7 +385,15 @@ router.post('/members', function(req,res,next){
      * checking that groupId,token we are getting from front end or not if no then give error
      *
      * */
-    req.body.ezeoneId = req.st.alterEzeoneId(req.body.ezeoneId);
+    var memberList =req.body.memberList;
+    if(typeof(memberList) == "string") {
+        memberList = JSON.parse(memberList);
+    }
+    if(!memberList){
+        error.itemList = 'Invalid members';
+        validationFlag *= false;
+    }
+
     if (isNaN(parseInt(req.body.groupId))) {
         error.groupId = 'Invalid Group id';
         validationFlag *= false;
@@ -401,13 +409,12 @@ router.post('/members', function(req,res,next){
             /**
              * validating token of login user
              * */
-
             req.st.validateToken(req.body.token, function (err, tokenResult) {
                 if ((!err) && tokenResult) {
 
                     var queryParams = [
                         req.db.escape(req.body.groupId) ,
-                        req.db.escape(req.body.ezeoneId),
+                        req.db.escape(JSON.stringify(memberList)),
                         req.db.escape(req.body.token)
                     ];
                     /**
@@ -425,7 +432,7 @@ router.post('/members', function(req,res,next){
 
                             if (addMemberResult && addMemberResult[0] && addMemberResult[0].length>0 && addMemberResult[0][0].userGroupId){
                                 var contactParams = [
-                                    req.db.escape(addMemberResult[0][0].groupName) ,
+                                    req.db.escape(addMemberResult[0][0].groupName),
                                     req.db.escape(0) ,
                                     req.db.escape(req.body.groupId)
                                 ];
@@ -434,7 +441,6 @@ router.post('/members', function(req,res,next){
                                 req.db.query(contactQuery, function (err, contactGroupResult) {
                                     console.log(contactGroupResult,"contactGroupResult");
                                     if(!err){
-                                        //console.log(contactGroupResult,groupRelationStatus);
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Member invited to group successfully';
@@ -448,63 +454,65 @@ router.post('/members', function(req,res,next){
                                             isRequester : addMemberResult[0][0].isRequester
                                         };
                                         res.status(200).json(responseMessage);
-                                        console.log('p_v1_addmembersbygroup: Member added to group successfully');
+
                                         var notificationTemplaterRes = notificationTemplater.parse('add_members_to_group',{
                                             groupName : addMemberResult[0][0].groupName,
                                             adminName : addMemberResult[0][0].adminName
                                         });
                                         console.log(notificationTemplaterRes.parsedTpl,"notificationTemplaterRes.parsedTpl");
-                                        if(notificationTemplaterRes.parsedTpl){
-                                            notification.publish(
-                                                addMemberResult[0][0].userGroupId,
-                                                addMemberResult[0][0].fullName,
-                                                addMemberResult[0][0].groupName,
-                                                addMemberResult[0][0].senderId,
-                                                notificationTemplaterRes.parsedTpl,
-                                                33,
-                                                0, (addMemberResult[0][0].iphoneId) ? addMemberResult[0][0].iphoneId : '',
-                                                (addMemberResult[0][0].GCM_Id) ? addMemberResult[0][0].GCM_Id : '',
-                                                0,
-                                                0,
-                                                0,
-                                                0,
-                                                1,
-                                                moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                '',
-                                                0,
-                                                0,
-                                                null,
-                                                '',
-                                                /** Data object property to be sent with notification **/
-                                                {
-                                                    groupId : contactGroupResult[0][0].groupId,
-                                                    adminEzeId : contactGroupResult[0][0].adminEzeId,
-                                                    adminId : contactGroupResult[0][0].adminId,
-                                                    groupName : contactGroupResult[0][0].groupName,
-                                                    groupStatus : contactGroupResult[0][0].groupStatus,
-                                                    isAdmin : contactGroupResult[0][0].isAdminNew,
-                                                    areMembersVisible : contactGroupResult[0][0].areMembersVisible,
-                                                    isReplyRestricted : contactGroupResult[0][0].isReplyRestricted,
-                                                    groupRelationStatus : addMemberResult[0][0].groupRelationStatus,
-                                                    groupType : 0,
-                                                    luDate : contactGroupResult[0][0].luDate,
-                                                    isRequester : contactGroupResult[0][0].isRequester,
-                                                    unreadCount : contactGroupResult[0][0].unreadCount,
-                                                    luUser : contactGroupResult[0][0].luUser,
-                                                    aboutGroup : contactGroupResult[0][0].aboutGroup,
-                                                    memberCount : contactGroupResult[0][0].memberCount,
-                                                    autoJoin : contactGroupResult[0][0].autoJoin
-                                                },
-                                                null,tokenResult[0].isWhatMate);
-                                            console.log('postNotification : notification for add members to group is sent successfully');
-                                        }
-                                        else{
-                                            /**
-                                             * it will come in this block when error in notification will come
-                                             * */
-                                            console.log('Error in parsing notification add_members_to_group template - ',
-                                                notificationTemplaterRes.error);
-                                            console.log('postNotification : notification for add members to group not sent');
+                                        for (var i = 0; i < addMemberResult[0].length; i++ ) {
+                                            if(notificationTemplaterRes.parsedTpl){
+                                                notification.publish(
+                                                    addMemberResult[0][i].userGroupId,
+                                                    addMemberResult[0][i].fullName,
+                                                    addMemberResult[0][i].groupName,
+                                                    addMemberResult[0][i].senderId,
+                                                    notificationTemplaterRes.parsedTpl,
+                                                    33,
+                                                    0, (addMemberResult[0][i].iphoneId) ? addMemberResult[0][i].iphoneId : '',
+                                                    (addMemberResult[0][i].GCM_Id) ? addMemberResult[0][i].GCM_Id : '',
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    1,
+                                                    moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                    '',
+                                                    0,
+                                                    0,
+                                                    null,
+                                                    '',
+                                                    /** Data object property to be sent with notification **/
+                                                    {
+                                                        groupId : contactGroupResult[0][0].groupId,
+                                                        adminEzeId : contactGroupResult[0][0].adminEzeId,
+                                                        adminId : contactGroupResult[0][0].adminId,
+                                                        groupName : contactGroupResult[0][0].groupName,
+                                                        groupStatus : contactGroupResult[0][0].groupStatus,
+                                                        isAdmin : contactGroupResult[0][0].isAdminNew,
+                                                        areMembersVisible : contactGroupResult[0][0].areMembersVisible,
+                                                        isReplyRestricted : contactGroupResult[0][0].isReplyRestricted,
+                                                        groupRelationStatus : addMemberResult[0][i].groupRelationStatus,
+                                                        groupType : 0,
+                                                        luDate : contactGroupResult[0][0].luDate,
+                                                        isRequester : contactGroupResult[0][0].isRequester,
+                                                        unreadCount : contactGroupResult[0][0].unreadCount,
+                                                        luUser : contactGroupResult[0][0].luUser,
+                                                        aboutGroup : contactGroupResult[0][0].aboutGroup,
+                                                        memberCount : contactGroupResult[0][0].memberCount,
+                                                        autoJoin : contactGroupResult[0][0].autoJoin
+                                                    },
+                                                    null,tokenResult[0].isWhatMate);
+                                                console.log('postNotification : notification for add members to group is sent successfully');
+                                            }
+                                            else{
+                                                /**
+                                                 * it will come in this block when error in notification will come
+                                                 * */
+                                                console.log('Error in parsing notification add_members_to_group template - ',
+                                                    notificationTemplaterRes.error);
+                                                console.log('postNotification : notification for add members to group not sent');
+                                            }
                                         }
 
                                     }

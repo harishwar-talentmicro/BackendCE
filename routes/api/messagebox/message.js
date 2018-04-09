@@ -398,6 +398,7 @@ router.post('/', function(req,res,next){
                                                                         aboutGroup : results[3][0].aboutGroup,
                                                                         memberCount : results[3][0].memberCount,
                                                                         autoJoin : results[3][0].autoJoin,
+                                                                        heMasterId : results[3][0].HEMasterId,
                                                                         groupType : results[0][0].groupType
                                                                     }
                                                                 },
@@ -468,6 +469,7 @@ router.post('/', function(req,res,next){
                                                                         aboutGroup : results[3][0].aboutGroup,
                                                                         memberCount : results[3][0].memberCount,
                                                                         autoJoin : results[3][0].autoJoin,
+                                                                        heMasterId : results[3][0].HEMasterId,
                                                                         groupType : results[0][0].groupType
                                                                     }
                                                                 },

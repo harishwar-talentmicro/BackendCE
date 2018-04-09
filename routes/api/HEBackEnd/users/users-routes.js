@@ -16,5 +16,6 @@ router.get('/receiver_list',userCtrl.getReceiversList);
 router.get('/access_rights',userCtrl.getUserDataAccessRights);
 router.get('/',userCtrl.searchUser);
 router.get('/EZEOneId',userCtrl.validateEzeoneId);
+router.post('/postToProfile',userCtrl.postToProfile);
 
 module.exports = router;

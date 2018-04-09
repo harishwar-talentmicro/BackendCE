@@ -14,5 +14,4 @@ router.get('/support/priorityData',supportCtrl.getSupportUsersByPriority);
 router.get('/support/user',supportCtrl.getUser);
 
 
-
 module.exports = router;

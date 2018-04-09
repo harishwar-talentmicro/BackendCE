@@ -28,6 +28,9 @@ var options = {
         "cache-control": "no-cache"
     }
 };
+var Mailer = require('../../../mail/mailer.js');
+var mailerApi = new Mailer();
+var randomstring = require("randomstring");
 
 try{
     bcrypt = require('bcrypt');
@@ -70,7 +73,7 @@ signupCtrl.sendOtp = function(req,res,next) {
             var code = "";
             var possible = "1234567890";
 
-            for (var i = 0; i <= 5; i++) {
+            for (var i = 0; i <= 3; i++) {
 
                 code += possible.charAt(Math.floor(Math.random() * possible.length));
             }
@@ -83,9 +86,10 @@ signupCtrl.sendOtp = function(req,res,next) {
             //     message='Your WhatMate verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed --WhatMate Helpdesk.';
             // }
 
-            message='Your WhatMate verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed --WhatMate Helpdesk.';
+            message='Your WhatMate verification OTP is ' + code + ' . Please enter this 4 digit number where prompted to proceed --WhatMate Helpdesk.';
 
             var query = req.st.db.escape(mobileNo) + ',' + req.st.db.escape(code);
+            console.log("query",query);
             req.st.db.query('CALL generate_otp(' + query + ')', function (err, insertResult) {
                 if (!err) {
                     if(isdMobile == "+977"){
@@ -117,7 +121,7 @@ signupCtrl.sendOtp = function(req,res,next) {
                             qs: {
                                 user_name : 'janardana@hirecraft.com',
                                 password : 'Ezeid2015',
-                                sender_id : 'EZEONE',
+                                sender_id : 'WtMate',
                                 service : 'TRANS',
                                 mobile_no: mobileNo,
                                 message: message,
@@ -150,7 +154,7 @@ signupCtrl.sendOtp = function(req,res,next) {
 
                         req.write(qs.stringify({ userId: 'talentmicro',
                             password: 'TalentMicro@123',
-                            senderId: 'DEMOSG',
+                            senderId: 'WTMATE',
                             sendMethod: 'simpleMsg',
                             msgType: 'text',
                             mobile: isdMobile.replace("+","") + mobileNo,
@@ -286,6 +290,286 @@ signupCtrl.sendOtp = function(req,res,next) {
     }
 };
 
+//
+// signupCtrl.sendOtp = function(req,res,next) {
+//
+//     var mobileNo= req.body.mobileNo;
+//     var isdMobile = req.body.isdMobile ;
+//     var displayName = req.body.displayName ;
+//     var emailId = req.body.emailId ;
+//
+//     var status = true, error = {};
+//     var respMsg = {
+//         status: false,
+//         message: '',
+//         data: null,
+//         error: null
+//     };
+//
+//     if (!mobileNo) {
+//         error['mobile'] = 'mobile no is mandatory';
+//         status *= false;
+//     }
+//     if (!isdMobile) {
+//         error['isdMobile'] = 'isd mobile is mandatory';
+//         status *= false;
+//     }
+//     if (status) {
+//         try {
+//             var isWhatMate= req.body.isWhatMate ? req.body.isWhatMate : 0;
+//             var message="";
+//             var resMessage = "" ;
+//
+//             //generate otp 6 digit random number
+//             var code = "";
+//             var possible = "1234567890";
+//
+//             for (var i = 0; i <= 3; i++) {
+//
+//                 code += possible.charAt(Math.floor(Math.random() * possible.length));
+//             }
+//
+//             // if(isWhatMate ==0 )
+//             // {
+//             //     message='Your EZEOne verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed.';
+//             // }
+//             // else{
+//             //     message='Your WhatMate verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed --WhatMate Helpdesk.';
+//             // }
+//
+//             message='Your WhatMate verification OTP is ' + code + ' . Please enter this 4 digit number where prompted to proceed --WhatMate Helpdesk.';
+//
+//             var query = req.st.db.escape(mobileNo) + ',' + req.st.db.escape(code);
+//             console.log("query",query);
+//             req.st.db.query('CALL generate_otp(' + query + ')', function (err, insertResult) {
+//                 if (!err) {
+//                     if(isdMobile == "+977"){
+//                         request({
+//                             url: 'http://beta.thesmscentral.com/api/v3/sms?',
+//                             qs: {
+//                                 token : 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+//                                 to : mobileNo,
+//                                 message: message,
+//                                 sender: 'Techingen'
+//                             },
+//                             method: 'GET'
+//
+//                         }, function (error, response, body) {
+//                             if(error)
+//                             {
+//                                 console.log(error,"SMS");
+//                             }
+//                             else{
+//                                 console.log("SUCCESS","SMS response");
+//                             }
+//
+//                         });
+//                     }
+//                     else if(isdMobile == "+91")
+//                     {
+//                         request({
+//                             url: 'https://aikonsms.co.in/control/smsapi.php',
+//                             qs: {
+//                                 user_name : 'janardana@hirecraft.com',
+//                                 password : 'Ezeid2015',
+//                                 sender_id : 'EZEONE',
+//                                 service : 'TRANS',
+//                                 mobile_no: mobileNo,
+//                                 message: message,
+//                                 method : 'send_sms'
+//                             },
+//                             method: 'GET'
+//
+//                         }, function (error, response, body) {
+//                             if(error)
+//                             {
+//                                 console.log(error,"SMS");
+//                             }
+//                             else{
+//                                 console.log("SUCCESS","SMS response");
+//                             }
+//                         });
+//
+//                         request({
+//                             url: 'http://enterprise.smsgatewaycenter.com/OTPApi/send?',
+//                             qs: {
+//                                 apiKey : '5cfdb6fd55d645f29e097603d16e22e6',
+//                                 userId : 'talentmicro',
+//                                 password : 'TalentMicro',
+//                                 sendMethod : 'generate',
+//                                 msgType : 'text',
+//                                 senderId : 'WTMATE',
+//                                 mobile: mobileNo,
+//                                 msg: message,
+//                                 codeExpiry : '600',
+//                                 codeLength : '4',
+//                                 codeType : 'num',
+//                                 retryExpiry : '60',
+//                                 medium : 'sms'
+//                             },
+//                             method: 'GET'
+//
+//                         }, function (error, response, body) {
+//                             if(error)
+//                             {
+//                                 console.log(error,"SMS");
+//                             }
+//                             else{
+//                                 console.log("SUCCESS","SMS response");
+//                             }
+//                         });
+//
+//                         // var req = http.request(options, function (res) {
+//                         //     var chunks = [];
+//                         //
+//                         //     res.on("data", function (chunk) {
+//                         //         chunks.push(chunk);
+//                         //     });
+//                         //
+//                         //     res.on("end", function () {
+//                         //         var body = Buffer.concat(chunks);
+//                         //         console.log(body.toString());
+//                         //     });
+//                         // });
+//                         //
+//                         // req.write(qs.stringify({ userId: 'talentmicro',
+//                         //     password: 'TalentMicro@123',
+//                         //     senderId: 'WTMATE',
+//                         //     sendMethod: 'simpleMsg',
+//                         //     msgType: 'text',
+//                         //     mobile: isdMobile.replace("+","") + mobileNo,
+//                         //     msg: message,
+//                         //     duplicateCheck: 'true',
+//                         //     format: 'json' }));
+//                         // req.end();
+//
+//
+//                     }
+//                     else if(isdMobile != "")
+//                     {
+//                         client.messages.create(
+//                             {
+//                                 body: message,
+//                                 to: isdMobile + mobileNo,
+//                                 from: '+14434322305'
+//                             },
+//                             function (error, response) {
+//                                 if(error)
+//                                 {
+//                                     console.log(error,"SMS");
+//                                 }
+//                                 else{
+//                                     console.log("SUCCESS","SMS response");
+//                                 }
+//                             }
+//                         );
+//
+//                         // request({
+//                         //     url: 'https://rest.nexmo.com/sms/json',
+//                         //     qs: {
+//                         //         api_key : '4405b7b5 ',
+//                         //         api_secret : '77dfad076c27e4c8',
+//                         //         to: isdMobile.replace("+","") + mobileNo,
+//                         //         from : 'WtMate',
+//                         //         text: message
+//                         //     },
+//                         //     method: 'POST'
+//                         //
+//                         // }, function (error, response, body) {
+//                         //     if(error)
+//                         //     {
+//                         //         console.log(error,"SMS");
+//                         //     }
+//                         //     else{
+//                         //         console.log("SUCCESS","SMS response");
+//                         //     }
+//                         // });
+//
+//                     }
+//
+//                     if(emailId != ""){
+//                         var file = path.join(__dirname, '../../../mail/templates/sendOTP.html');
+//
+//                         fs.readFile(file, "utf8", function (err, data) {
+//
+//                             if (!err) {
+//                                 data = data.replace("[DisplayName]", displayName);
+//                                 data = data.replace("[code]", code);
+//
+//                                 var mailOptions = {
+//                                     from: EZEIDEmail,
+//                                     to: emailId,
+//                                     subject: 'WhatMate OTP',
+//                                     html: data // html body
+//                                 };
+//
+//                                 // send mail with defined transport object
+//                                 //message Type 7 - Forgot password mails service
+//                                 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+//                                 var email = new sendgrid.Email();
+//                                 email.from = mailOptions.from;
+//                                 email.to = mailOptions.to;
+//                                 email.subject = mailOptions.subject;
+//                                 email.html = mailOptions.html;
+//
+//                                 sendgrid.send(email, function (err, result) {
+//                                     if (!err) {
+//                                         console.log('Mail sent');
+//                                     }
+//                                     else {
+//                                         console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+//                                     }
+//                                 });
+//                             }
+//                             else{
+//                                 console.log('FnForgetPassword: readfile '+err);
+//                             }
+//                         });
+//                         resMessage = "OTP sent successfully to mobile and email Id ";
+//                     }
+//                     else {
+//                         resMessage = 'OTP Sent Successfully';
+//                     }
+//
+//                     respMsg.status = true;
+//                     respMsg.message = resMessage ;
+//                     respMsg.data = {
+//                         mobileNo : mobileNo
+//                         // message : message,
+//                         // user_name : 'janardana@hirecraft.com',
+//                         // password : 'Ezeid2015',
+//                         // sender_id : 'EZEONE',
+//                         // service : 'TRANS',
+//                         // method : 'send_sms'
+//                     };
+//                     res.status(200).json(respMsg);
+//                 }
+//                 else{
+//                     respMsg.status = false;
+//                     respMsg.message = 'Something went wrong';
+//                     res.status(500).json(respMsg);
+//                 }
+//             });
+//
+//
+//         }
+//         catch (ex) {
+//             console.log('Error : FnSendOtp ' + ex);
+//             console.log(ex);
+//             var errorDate = new Date();
+//             console.log(errorDate.toTimeString() + ' ......... error ...........');
+//             respMsg.error = {server: 'Internal Server Error'};
+//             respMsg.message = 'An error occurred ! Please try again';
+//             res.status(400).json(respMsg);
+//         }
+//     }
+//     else {
+//         respMsg.error = error;
+//         respMsg.message = 'Please check all the errors';
+//         res.status(400).json(respMsg);
+//     }
+// };
+
 signupCtrl.verifyOTP = function(req,res,next){
     var mobileNo= req.body.mobileNo;
     var isdMobile = req.body.isdMobile ;
@@ -322,15 +606,24 @@ signupCtrl.verifyOTP = function(req,res,next){
             var secretKey = (req.body.secretKey) ? (req.body.secretKey) : "";
             var isOTPRequired = (req.body.isOTPRequired) ? (req.body.isOTPRequired) : 0;
             var otp = (req.body.otp) ? (req.body.otp) : 0;
+            var name = (req.body.displayName) ? (req.body.displayName) : "";
             if (req.body.otp == ""){
                 req.body.otp = 0;
             }
+
+
 
             if (pictureURL != "")
             {
                 pictureURL = (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + pictureURL);
             }
+            var password = randomstring.generate({
+                length: 6,
+                charset: 'alphanumeric'
+            });
+            var message = "" ;
 
+            var encryptPwd = req.st.hashPassword(password);
 
             var procParams = [
                 req.st.db.escape(mobileNo),
@@ -341,29 +634,149 @@ signupCtrl.verifyOTP = function(req,res,next){
                 req.st.db.escape(req.body.idTypeId),
                 req.st.db.escape(req.query.token),
                 req.st.db.escape(req.body.isOTPRequired),
-                req.st.db.escape(emailId)
+                req.st.db.escape(emailId),
+                req.st.db.escape(encryptPwd)
             ];
 
             var procQuery = 'CALL verify_otp( ' + procParams.join(',') + ')';
             console.log(procQuery);
             req.db.query(procQuery,function(err,result) {
+                console.log("result",result);
                 if (!err && result && result[0] && result[0][0].message){
                     switch (result[0][0].message) {
                         case 'INVALID' :
                             respMsg.status = false;
                             respMsg.message = "Invalid OTP";
+                            respMsg.data = {
+                                code : "0"
+                            };
                             res.status(200).json(respMsg);
                             break;
                         case 'NOT_AVAILABLE' :
                             respMsg.status = false;
                             respMsg.message = "EmailId already exists";
+                            respMsg.data = {
+                                code : "0"
+                            };
+                            res.status(200).json(respMsg);
+                            break ;
+                        case '-3' :
+                            if(emailId){
+                                mailerApi.sendMailNew('ResendCredentials', {
+                                    name : name,
+                                    UserName : result[0][0].whatmateId,
+                                    Password : password
+                                }, '',emailId,[]);
+                            }
+                            message = 'Dear ' + name  + ', Your WhatMate credentials, Login ID: ' + result[0][0].whatmateId + ',Password: ' + password ;
+                            if(mobileNo !="")
+                            {
+                                if(isdMobile == "+977"){
+                                    request({
+                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                        qs: {
+                                            token : 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                            to : mobileNo,
+                                            message: message,
+                                            sender: 'Techingen'
+                                        },
+                                        method: 'GET'
+
+                                    }, function (error, response, body) {
+                                        if(error)
+                                        {
+                                            console.log(error,"SMS");
+                                        }
+                                        else{
+                                            console.log("SUCCESS","SMS response");
+                                        }
+
+                                    });
+                                }
+                                else if(isdMobile == "+91")
+                                {
+                                    request({
+                                        url: 'https://aikonsms.co.in/control/smsapi.php',
+                                        qs: {
+                                            user_name : 'janardana@hirecraft.com',
+                                            password : 'Ezeid2015',
+                                            sender_id : 'WtMate',
+                                            service : 'TRANS',
+                                            mobile_no: mobileNo,
+                                            message: message,
+                                            method : 'send_sms'
+                                        },
+                                        method: 'GET'
+
+                                    }, function (error, response, body) {
+                                        if(error)
+                                        {
+                                            console.log(error,"SMS");
+                                        }
+                                        else{
+                                            console.log("SUCCESS","SMS response");
+                                        }
+                                    });
+
+                                    var twilioReq = http.request(options, function (res) {
+                                        var chunks = [];
+
+                                        res.on("data", function (chunk) {
+                                            chunks.push(chunk);
+                                        });
+
+                                        res.on("end", function () {
+                                            var body = Buffer.concat(chunks);
+
+                                        });
+                                    });
+
+                                    twilioReq.write(qs.stringify({ userId: 'talentmicro',
+                                        password: 'TalentMicro@123',
+                                        senderId: 'WTMATE',
+                                        sendMethod: 'simpleMsg',
+                                        msgType: 'text',
+                                        mobile: isdMobile.replace("+","") + mobileNo,
+                                        msg: message,
+                                        duplicateCheck: 'true',
+                                        format: 'json' }));
+                                    twilioReq.end();
+
+                                }
+                                else if(isdMobile != "")
+                                {
+                                    client.messages.create(
+                                        {
+                                            body: message,
+                                            to: isdMobile + mobileNo,
+                                            from: '+14434322305'
+                                        },
+                                        function (error, response) {
+                                            if(error)
+                                            {
+                                                console.log(error,"SMS");
+                                            }
+                                            else{
+                                                console.log("SUCCESS","SMS response");
+                                            }
+                                        }
+                                    );
+
+                                }
+
+                            }
+
+                            respMsg.status = true;
+                            respMsg.data = {
+                                code : "-3"
+                            };
+                            respMsg.message = "Your User ID already exists. Please Sign In using the credentials sent to your mobile and e-mail.";
                             res.status(200).json(respMsg);
                             break ;
 
                         default:
                             break;
                     }
-
                 }
                 else if (!err && result && result[0] && result[0][0].EZEID){
                     var EZEOneId= result[0][0].EZEID;
@@ -376,12 +789,18 @@ signupCtrl.verifyOTP = function(req,res,next){
                         if (err) {
                             respMsg.status = false;
                             respMsg.message = "Error while generating token";
+                            respMsg.data = {
+                                code : "0"
+                            };
                             respMsg.data = null;
                             res.status(500).json(respMsg);
                         }
                         else {
                             respMsg.status = true;
                             respMsg.message = "OTP is matched";
+                            respMsg.data = {
+                                code : "0"
+                            };
                             respMsg.data = {
                                 // EZEOneId : result[0][0].EZEOneId,
                                 // masterId : result[0][0].masterId,
@@ -409,6 +828,9 @@ signupCtrl.verifyOTP = function(req,res,next){
                 else if (!err){
                     respMsg.status = true ;
                     respMsg.message = "OTP is matched";
+                    respMsg.data = {
+                        code : "0"
+                    };
                     res.status(200).json(respMsg);
                 }
                 else {
@@ -704,7 +1126,7 @@ signupCtrl.sendOtpPhone = function(req,res,next) {
             var code = "";
             var possible = "1234567890";
 
-            for (var i = 0; i <= 5; i++) {
+            for (var i = 0; i <= 3; i++) {
 
                 code += possible.charAt(Math.floor(Math.random() * possible.length));
             }
@@ -713,7 +1135,7 @@ signupCtrl.sendOtpPhone = function(req,res,next) {
             req.st.db.query('CALL generate_otp(' + query + ')', function (err, insertResult) {
                 if (!err && insertResult && insertResult[0] && insertResult[0][0].otp ) {
                     code = insertResult[0][0].otp ;
-                    var message='Your WhatMate verification OTP is ' + code + ' . Please enter this 6 digit number where prompted to proceed --WhatMate Helpdesk.';
+                    var message='Your WhatMate verification OTP is ' + code + ' . Please enter this 4 digit number where prompted to proceed --WhatMate Helpdesk.';
 
                     const response = new VoiceResponse();
                     response.say(

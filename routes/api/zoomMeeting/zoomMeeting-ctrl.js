@@ -550,4 +550,83 @@ zoomCtrl.stopMeetingForSingleUser = function(req,res,next){
     }
 };
 
+zoomCtrl.getLatestMeetingOfUser = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var procParams = [
+                    req.st.db.escape(req.query.token)
+                ];
+
+                var procQuery = 'CALL he_get_latestMeeting( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, meetingData) {
+                    if (!err && meetingData && meetingData[0]) {
+                        response.status = true;
+                        response.message = "Meeting data loaded successfully.";
+                        response.error = null;
+                        response.data = {
+                            message : meetingData[0][0].message,
+                            meetingId : meetingData[0][0].meetingId,
+                            title : meetingData[0][0].title,
+                            startDate : meetingData[0][0].startDate,
+                            members : meetingData[0][0].members
+                        };
+
+                        // res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else if (!err){
+                        response.status = true;
+                        response.message = "No meetings found.";
+                        response.error = null;
+                        response.data = null;
+
+                        res.status(200).json(response);
+                        // buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        //     res.status(200).json(response);
+                        // });
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting data ";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
 module.exports = zoomCtrl;
