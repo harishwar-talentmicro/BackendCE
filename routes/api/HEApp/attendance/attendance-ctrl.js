@@ -44,6 +44,13 @@ attendanceCtrl.saveAttendance = function(req,res,next){
         error.endTime = 'Invalid end time';
         validationFlag *= false;
     }
+    var attachmentList =req.body.attachmentList;
+    if(typeof(attachmentList) == "string") {
+        attachmentList = JSON.parse(attachmentList);
+    }
+    if(!attachmentList){
+        attachmentList = [];
+    }
 
     var senderGroupId;
 
@@ -73,6 +80,9 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                 req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                 req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                 req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                req.body.workedDate = req.body.workedDate ? req.body.workedDate : null;
+                req.body.availedDate = req.body.availedDate ? req.body.availedDate : null;
+                req.body.isCompOffAvailed = req.body.isCompOffAvailed ? req.body.isCompOffAvailed : 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -91,7 +101,11 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                     req.st.db.escape(req.body.isHRRecordsUpdated),
                     req.st.db.escape(req.body.receiverNotes),
                     req.st.db.escape(req.body.approverCount),
-                    req.st.db.escape(req.body.receiverCount)
+                    req.st.db.escape(req.body.receiverCount),
+                    req.st.db.escape(JSON.stringify(attachmentList)),
+                    req.st.db.escape(req.body.workedDate),
+                    req.st.db.escape(req.body.availedDate),
+                    req.st.db.escape(req.body.isCompOffAvailed)
                 ];
                 /**
                  * Calling procedure to save form template

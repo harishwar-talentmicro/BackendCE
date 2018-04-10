@@ -455,4 +455,76 @@ taskCtrl.scheduleTask = function(req,res,next){
 
 };
 
+
+taskCtrl.getStationary = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    req.st.validateToken(req.query.token,function(err,tokenResult){
+        if((!err) && tokenResult){
+
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.query.groupId)
+            ];
+            /**
+             * Calling procedure to get form template
+             * @type {string}
+             */
+            var procQuery = 'CALL HE_get_app_stationary( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,stationaryResult){
+                if(!err && stationaryResult && stationaryResult[0] && stationaryResult[0][0]){
+                    response.status = true;
+                    response.message = "Stationeries loaded successfully";
+                    response.error = null;
+                    response.data = stationaryResult[0][0];
+
+                    /*
+                     * dcrypt and again unzip and extract data */
+
+                    var bufA = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                    console.log("bufA",bufA.toString('utf-8'));
+                    zlib.unzip(bufA, function (_, resultDecrypt) {
+                        console.log("resultDecrypt",resultDecrypt.toString('utf-8'));
+                    });
+
+
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    // response.data = encryption.encrypt(buf,tokenResult[0].secretKey).toString('base64');
+                    // res.status(200).json(response);
+
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                    });
+
+                }
+                else if(!err){
+                    response.status = true;
+                    response.message = "Stationeries loaded successfully";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                }
+                else{
+                    response.status = false;
+                    response.message = "Error while getting stationeries";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else{
+            res.status(401).json(response);
+        }
+    });
+};
+
+
 module.exports = taskCtrl;

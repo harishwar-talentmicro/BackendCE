@@ -10,5 +10,6 @@ var taskCtrl = require('./task-ctrl');
 router.post('/',taskCtrl.saveTask);
 router.get('/',taskCtrl.getTask);
 router.post('/status',taskCtrl.updateTaskStatus);
+router.post('/test',taskCtrl.getStationary);
 
 module.exports = router;

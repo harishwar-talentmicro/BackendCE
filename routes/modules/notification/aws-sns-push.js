@@ -94,7 +94,7 @@ Notification_aws.prototype.publish_IOS = function(deviceId,messagePayload,issos)
     else {
         alert = messagePayload.message ;
     }
-    console.log("sound",sound);
+    // console.log("sound",sound);
 
 
     if (issos){
@@ -276,7 +276,6 @@ Notification_aws.prototype.publish_Android = function(deviceId,messagePayload) {
                 }
                 else {
                     ANDROID_SNS.sendMessage(endpointArn, params, function(err, messageId) {
-
                         if(err) {
                             console.log('An error occured sending message to device %s', endpointArn);
                             console.log(err);

@@ -4,6 +4,7 @@
 
 var notification = null;
 var moment = require('moment');
+
 var NotificationTemplater = require('../../../lib/NotificationTemplater.js');
 var notificationTemplater = new NotificationTemplater();
 var Notification = require('../../../modules/notification/notification-master.js');
@@ -15,6 +16,22 @@ var sendMessageCtrl = {};
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
+
+// thread
+const threads  = require('threads');
+const config  = threads.config;
+const spawn   = threads.spawn;
+
+// Set base paths to thread scripts
+config.set({
+    basepath : {
+        node : '../routes',
+        web  : 'http://myserver.local/thread-scripts'
+    }
+});
+
+const thread = spawn('worker.js');
+
 
 sendMessageCtrl.sendMessage = function(req,res,next){
     var response = {
@@ -1027,8 +1044,26 @@ sendMessageCtrl.GetAnnouncementSummaryList = function(req,res,next){
                         response.status = true;
                         response.message = "Data loaded successfully .";
                         response.error = null;
+
+                        var output = [];
+                        for(var i = 0; i < announcementResult[0].length; i++) {
+                            var res1 = {};
+                            res1.parentId = announcementResult[0][i].parentId;
+                            res1.transId = announcementResult[0][i].transId;
+                            res1.isDraft = announcementResult[0][i].isDraft;
+                            res1.senderName = announcementResult[0][i].senderName;
+                            res1.title = announcementResult[0][i].title;
+                            res1.message = announcementResult[0][i].message;
+                            res1.createdDate = announcementResult[0][i].createdDate;
+                            res1.total = announcementResult[0][i].read + announcementResult[0][i].unRead;
+                            res1.read = announcementResult[0][i].read;
+                            res1.unRead = announcementResult[0][i].unRead;
+                            res1.isSender = announcementResult[0][i].isSender;
+                            res1.announcementType = announcementResult[0][i].announcementType;
+                            output.push(res1);
+                        }
                         response.data = {
-                            announcementList : announcementResult[0],
+                            announcementList : output,
                             count : announcementResult[1][0].count,
                             isNormal : (announcementResult[2] && announcementResult[2][0] && announcementResult[2][0].isNormal) ? announcementResult[2][0].isNormal : 0,
                             isTaxSaving :(announcementResult[2] && announcementResult[2][0] && announcementResult[2][0].isTaxSaving) ?  announcementResult[2][0].isTaxSaving : 0
@@ -1586,6 +1621,221 @@ sendMessageCtrl.GetAnnouncementDetail = function(req,res,next){
             }
         });
     }
+};
+
+sendMessageCtrl.sendMessageTest = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    var attachmentList =req.body.attachmentList;
+    if(typeof(attachmentList) == "string") {
+        attachmentList = JSON.parse(attachmentList);
+    }
+    if(!attachmentList){
+        attachmentList = [];
+    }
+    // embededImages
+    var embededImages =req.body.embededImages;
+    if(typeof(embededImages) == "string") {
+        embededImages = JSON.parse(embededImages);
+    }
+    if(!embededImages){
+        embededImages = [];
+    }
+
+    var userList =req.body.userList;
+    if(typeof(userList) == "string") {
+        userList = JSON.parse(userList);
+    }
+    if(!userList){
+        userList = [];
+    }
+
+    var branchList =req.body.branchList;
+    if(typeof(branchList) == "string") {
+        branchList = JSON.parse(branchList);
+    }
+    if(!branchList){
+        branchList = [];
+    }
+
+    var departmentList =req.body.departmentList;
+    if(typeof(departmentList) == "string") {
+        departmentList = JSON.parse(departmentList);
+    }
+    if(!departmentList){
+        departmentList = [];
+    }
+
+    var gradeList =req.body.gradeList;
+    if(typeof(gradeList) == "string") {
+        gradeList = JSON.parse(gradeList);
+    }
+    if(!gradeList){
+        gradeList = [];
+    }
+
+    var groupList =req.body.groupList;
+    if(typeof(groupList) == "string") {
+        groupList = JSON.parse(groupList);
+    }
+    if(!groupList){
+        groupList = [];
+    }
+
+    var senderGroupId;
+    var isweb;
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                req.body.parentId = req.body.parentId ? req.body.parentId : 0;
+                req.body.message = req.body.message ? req.body.message : '';
+                req.body.notes = req.body.notes ? req.body.notes : '';
+                req.body.status = req.body.status ? req.body.status : 0;
+                req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
+                req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
+                req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
+                req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
+                req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
+                req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
+                req.body.recordedVoiceUrl = req.body.recordedVoiceUrl ? req.body.recordedVoiceUrl : '';
+                req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                req.body.groupType = req.body.groupType ? req.body.groupType : 0;
+                req.body.memberCount = req.body.memberCount ? req.body.memberCount : 0;
+                req.body.title = req.body.title!=undefined ? req.body.title : "";
+                req.body.announcementType = req.body.announcementType!=undefined ? req.body.announcementType : 1;
+                req.body.lockType = req.body.lockType!=undefined ? req.body.lockType : 1;
+                req.query.isweb = req.query.isweb ? req.query.isweb : 0;
+                req.body.startDate = req.body.startDate!=undefined ? req.body.startDate : null;
+                req.body.endDate = req.body.endDate!=undefined ? req.body.endDate : null;
+                req.body.isDraft = req.body.isDraft!=undefined ? req.body.isDraft : 0;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.parentId),
+                    req.st.db.escape(req.body.message),
+                    req.st.db.escape(req.body.groupId),
+                    req.st.db.escape(req.body.learnMessageId),
+                    req.st.db.escape(req.body.accessUserType),
+                    req.st.db.escape(JSON.stringify(attachmentList)),
+                    req.st.db.escape(req.body.changeLog),
+                    req.st.db.escape(JSON.stringify(userList)),
+                    req.st.db.escape(JSON.stringify(branchList)),
+                    req.st.db.escape(JSON.stringify(departmentList)),
+                    req.st.db.escape(JSON.stringify(gradeList)),
+                    req.st.db.escape(JSON.stringify(groupList)),
+                    req.st.db.escape(req.body.alarmType),
+                    req.st.db.escape(JSON.stringify(embededImages)),
+                    req.st.db.escape(req.body.groupType),
+                    req.st.db.escape(req.body.memberCount),
+                    req.st.db.escape(req.body.title),
+                    req.st.db.escape(req.body.announcementType),
+                    req.st.db.escape(req.body.lockType),
+                    req.st.db.escape(req.body.startDate),
+                    req.st.db.escape(req.body.endDate),
+                    req.st.db.escape(req.body.isDraft)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL HE_save_sendMessage( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+
+                    if(!err && results && results[0] ){
+                        senderGroupId = results[0][0].senderId;
+                        notificationTemplaterRes = notificationTemplater.parse('compose_message',{
+                            senderName : results[0][0].message
+                        });
+
+                        console.log("start",moment().format("YYYY-MM-DD HH:mm:ss"));
+                        console.log("count",results[1].length);
+
+                        // call cron job
+
+                        var count = 0;
+                        for (var i = 0; i < 10; i++) {
+                            thread
+                                .send(results[1][i])
+                                // The handlers come here: (none of them is mandatory)
+                                .on('message', function(response) {
+                                    console.log('AAAAA');
+                                    thread.kill();
+                                })
+                                .on('error', function(error) {
+                                    console.log('Worker errored:', error);
+                                })
+                                .on('exit', function() {
+                                    console.log('Worker has been terminated.');
+                                });
+                            if(i == 9){
+                                console.log("End",moment().format("YYYY-MM-DD HH:mm:ss"));
+                            }
+                            count=i;
+                        }
+
+                        response.status = true;
+                        response.message = "Message sent successfully";
+                        response.error = null;
+                        response.data = {
+                            messageList: {
+                                count : count,
+                                messageId: results[0][0].messageId,
+                                message: results[0][0].message,
+                                messageLink: results[0][0].messageLink,
+                                createdDate: results[0][0].createdDate,
+                                messageType: results[0][0].messageType,
+                                messageStatus: results[0][0].messageStatus,
+                                priority: results[0][0].priority,
+                                senderName: results[0][0].senderName,
+                                senderId: results[0][0].senderId,
+                                groupId: req.body.groupId,
+                                receiverId: results[0][0].receiverId,
+                                transId : results[0][0].transId,
+                                formId : results[0][0].formId,
+                                currentStatus : results[0][0].currentStatus,
+                                currentTransId : results[0][0].currentTransId,
+                                localMessageId : req.body.localMessageId,
+                                parentId : results[0][0].parentId,
+                                accessUserType : results[0][0].accessUserType,
+                                heUserId : results[0][0].heUserId,
+                                formData : JSON.parse(results[0][0].formDataJSON)
+                            }
+                        };
+                         res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while sending message";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
 };
 
 module.exports = sendMessageCtrl;

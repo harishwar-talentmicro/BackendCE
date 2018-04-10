@@ -12,6 +12,7 @@ router.post('/logInOut',TITOCtrl.saveAttendence);
 router.post('/locationTrack',TITOCtrl.saveLocationTracking);
 router.get('/attendanceRegister',TITOCtrl.getAttendanceRegister);
 router.get('/attendanceRegister/details',TITOCtrl.getAttendanceRegisterDetails);
+router.get('/teamMembers',TITOCtrl.getMyTeamMembers);
 
 module.exports = router;
 

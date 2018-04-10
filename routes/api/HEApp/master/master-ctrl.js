@@ -194,7 +194,7 @@ masterCtrl.getStationary = function(req,res,next){
                     response.error = null;
                     response.data = {
                         stationaryList : stationaryResult[0]
-                    }
+                    };
                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                     zlib.gzip(buf, function (_, result) {
                         response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
@@ -723,6 +723,92 @@ masterCtrl.getWhatMateCompaniesList = function(req,res,next){
                     else{
                         response.status = false;
                         response.message = "Error while getting companies list";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+masterCtrl.getCompanyConfig = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if(!req.query.HEMasterId){
+        error.HEMasterId = 'Invalid HEMasterId';
+        validationFlag *= false;
+    }
+
+    if(!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.HEMasterId)
+                ];
+                /**
+                 * Calling procedure to save deal
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_get_companyConfig( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,companyConfig){
+                    if(!err && companyConfig && companyConfig[0]){
+                        response.status = true;
+                        response.message = "Company config loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            workingHours : companyConfig[0],
+                            holidayList : companyConfig[1]
+                        };
+                        // res.status(200).json(response);
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else if(!err ){
+                        response.status = true;
+                        response.message = "No config found";
+                        response.error = null;
+                        response.data = {
+                            workingHours : [],
+                            holidayList : []
+                        };
+                         buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting comapany config";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

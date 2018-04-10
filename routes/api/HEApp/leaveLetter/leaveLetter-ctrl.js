@@ -45,6 +45,14 @@ leaveLetterCtrl.saveLeaveLetter = function(req,res,next){
         validationFlag *= false;
     }
 
+    var attachmentList =req.body.attachmentList;
+    if(typeof(attachmentList) == "string") {
+        attachmentList = JSON.parse(attachmentList);
+    }
+    if(!attachmentList){
+        attachmentList = [];
+    }
+
     var senderGroupId;
 
     if (!validationFlag){
@@ -93,7 +101,8 @@ leaveLetterCtrl.saveLeaveLetter = function(req,res,next){
                     req.st.db.escape(req.body.negativeLeaves),
                     req.st.db.escape(req.body.leaveTypeTitle),
                     req.st.db.escape(req.body.senderInstructions),
-                    req.st.db.escape(req.body.backdatePeriod)
+                    req.st.db.escape(req.body.backdatePeriod),
+                    req.st.db.escape(JSON.stringify(attachmentList))
                 ];
                 /**
                  * Calling procedure to save form template

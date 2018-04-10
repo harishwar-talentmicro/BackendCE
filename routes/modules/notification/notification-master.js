@@ -42,7 +42,7 @@ _ */
 Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId,GCM_Id,
                                           messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos,isWhatMate,secretKey){
 
-    console.log('It is coming to publish block of Notification');
+
     var validationStatus = true;
     var error = {};
     if(!senderTitle){

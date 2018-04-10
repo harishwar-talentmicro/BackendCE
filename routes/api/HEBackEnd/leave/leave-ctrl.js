@@ -61,6 +61,7 @@ leaveCtrl.saveLeaveTypes = function(req,res,next){
                 req.body.nextResetDate = (req.body.nextResetDate != undefined) ? req.body.nextResetDate : null;
                 req.body.nextIncrementDate = (req.body.nextIncrementDate != undefined) ? req.body.nextIncrementDate : null;
                 req.body.calculationType= req.body.calculationType ? req.body.calculationType:0;
+                req.body.minMultiplier= req.body.minMultiplier ? req.body.minMultiplier:0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -80,7 +81,8 @@ leaveCtrl.saveLeaveTypes = function(req,res,next){
                     req.st.db.escape(req.body.lastIncrementDate),
                     req.st.db.escape(req.body.incrementDuration),
                     req.st.db.escape(req.body.incrementFrequency),
-                    req.st.db.escape(req.body.calculationType)
+                    req.st.db.escape(req.body.calculationType),
+                    req.st.db.escape(req.body.minMultiplier)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -172,6 +174,7 @@ leaveCtrl.updateLeaveTypes = function(req,res,next){
                 // req.body.nextResetDate = (req.body.nextResetDate != undefined) ? req.body.nextResetDate : null;
                 // req.body.nextIncrementDate = (req.body.nextIncrementDate != undefined) ? req.body.nextIncrementDate : null;
                 req.body.calculationType= req.body.calculationType ? req.body.calculationType:0;
+                req.body.minMultiplier= req.body.minMultiplier ? req.body.minMultiplier:0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -191,7 +194,8 @@ leaveCtrl.updateLeaveTypes = function(req,res,next){
                     req.st.db.escape(req.body.lastIncrementDate),
                     req.st.db.escape(req.body.incrementDuration),
                     req.st.db.escape(req.body.incrementFrequency),
-                    req.st.db.escape(req.body.calculationType)
+                    req.st.db.escape(req.body.calculationType),
+                    req.st.db.escape(req.body.minMultiplier)
 
                 ];
                 /**
@@ -367,6 +371,9 @@ leaveCtrl.deleteLeaveTypes = function(req,res,next){
 
 };
 
+/*
+  * Leave balance api starts here  */
+
 leaveCtrl.saveLeaveBalance = function(req,res,next){
     var response = {
         status : false,
@@ -503,11 +510,11 @@ leaveCtrl.getLeaveBalance = function(req,res,next){
                     var outputArray=[];
                     for (var i = 0; i < leaveTypeResult[0].length; i++ ) {
                         var result = {};
-                        result.HEUserId = leaveTypeResult[0][i].HEUserId,
-                        result.name = leaveTypeResult[0][i].name,
-                        result.employeeCode = leaveTypeResult[0][i].employeeCode,
-                        result.updatedDate = leaveTypeResult[0][i].updatedDate,
-                        result.leaveTypes = JSON.parse(leaveTypeResult[0][i].leaveTypes)
+                        result.HEUserId = leaveTypeResult[0][i].HEUserId;
+                        result.name = leaveTypeResult[0][i].name;
+                        result.employeeCode = leaveTypeResult[0][i].employeeCode;
+                        result.updatedDate = leaveTypeResult[0][i].updatedDate;
+                        result.leaveTypes = JSON.parse(leaveTypeResult[0][i].leaveTypes);
                         outputArray.push(result);
                     }
 
@@ -528,6 +535,64 @@ leaveCtrl.getLeaveBalance = function(req,res,next){
                 else{
                     response.status = false;
                     response.message = "Error while getting Leave balance";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else{
+            res.status(401).json(response);
+        }
+    });
+};
+
+leaveCtrl.updateLeaveIncrementValue = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+    if (!req.query.APIKey)
+    {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    req.st.validateToken(req.query.token,function(err,tokenResult){
+        if((!err) && tokenResult){
+
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.query.APIKey),
+                req.st.db.escape(req.body.leaveTypeId),
+                req.st.db.escape(req.body.incrementValue)
+            ];
+            /**
+             * Calling procedure to get form template
+             * @type {string}
+             */
+            var procQuery = 'CALL he_update_leaveIncrementValue( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,leaveTypeResult){
+                if(!err ){
+                    response.status = true;
+                    response.message = "Updated successfully";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                }
+                else{
+                    response.status = false;
+                    response.message = "Error while updating increment value";
                     response.error = null;
                     response.data = null;
                     res.status(500).json(response);

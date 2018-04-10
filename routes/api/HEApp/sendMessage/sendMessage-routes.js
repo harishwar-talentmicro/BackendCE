@@ -29,4 +29,6 @@ router.post('/unReadUserAnnouncements',messageCtrl.sendUnReadUsersAnnouncement);
 
 router.get('/announcementDetail',messageCtrl.GetAnnouncementDetail);
 
+router.post('/test',messageCtrl.sendMessageTest);
+
 module.exports = router;

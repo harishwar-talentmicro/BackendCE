@@ -15,6 +15,6 @@ router.delete('/leaveType',leaveTypeCtrl.deleteLeaveTypes);
 
 router.post('/leaveBalance',leaveTypeCtrl.saveLeaveBalance);
 router.get('/leaveBalance/list',leaveTypeCtrl.getLeaveBalance);
-
+router.post('/leaveBalance/incrementValue',leaveTypeCtrl.updateLeaveIncrementValue);
 
 module.exports = router;

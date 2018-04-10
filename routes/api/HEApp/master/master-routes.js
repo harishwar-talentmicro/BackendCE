@@ -20,4 +20,6 @@ router.get('/formList',masterCtrl.getFormTypeList);
 router.get('/workGroups',masterCtrl.getWorkGroup);
 router.get('/companies',masterCtrl.getWhatMateCompaniesList);
 
+router.get('/company/config',masterCtrl.getCompanyConfig);
+
 module.exports = router;
