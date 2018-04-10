@@ -22,7 +22,7 @@ router.post('/clientbranches',masterCtrl.savebranches);
 router.get('/branchlist',masterCtrl.getbranchList); 
 
 //Mail templates
-router.post('/mailingTemplate',masterCtrl.savetemplate);  
+router.post('/mailingTemplate',masterCtrl.savetemplate);   
 router.get('/mailtemplate',masterCtrl.getmailTemplate);
 router.get('/mailtemplate/detaile',masterCtrl.getmailTemplatedetaile);
 
@@ -40,8 +40,16 @@ router.get('/clientView',masterCtrl.getClientView);
 
 router.post('/tagPreview',masterCtrl.mailTags);
 
-router.get('/stageStatusTypes',masterCtrl.getmasterStageStatusTypes);
+//router.get('/stageStatusTypes',masterCtrl.getmasterStageStatusTypes);  // why ..,can be put in master..transferred to master
 
+//router.get('/masterStageStatus',masterCtrl.getMasterStageStatus);  // why same present in master..transferred to master
+
+router.get('/clientBusinessContacts',masterCtrl.getClientLocationContacts);
+
+router.post('/assessmentTemplates',masterCtrl.saveAssessmentTemplates);
+router.get('/assessmentTemplates',masterCtrl.getAssessmentTemplates);
+
+router.post('/userManager',masterCtrl.saveUserManager);
 
 module.exports = router;
 

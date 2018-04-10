@@ -312,6 +312,7 @@ jobCtrl.saveJobStatus = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if ((!err) && tokenResult) {
+                req.query.isWeb =  req.query.isWeb ?  req.query.isWeb : 0; 
                 req.body.status = (req.body.status) ? req.body.status : 0;
                 req.body.notes = (req.body.notes) ? req.body.notes : "";
 
@@ -382,7 +383,7 @@ jobCtrl.getJobStatus = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if ((!err) && tokenResult) {
-
+                req.query.isWeb =  req.query.isWeb ?  req.query.isWeb : 0; 
                 var getStatus = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heParentId)
@@ -455,6 +456,7 @@ jobCtrl.getJobDefaultMemberList = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult) {
+                req.query.isWeb =  req.query.isWeb ?  req.query.isWeb : 0; 
                req.query.heDepartmentId = (req.query.hedepartmentId) ? req.query.heDepartmentId : 0;
                 req.query.heMasterId = (req.query.heMasterId) ? req.query.heMasterId : 0;
                 req.query.purpose = (req.query.purpose) ? req.query.purpose : 0;
@@ -977,7 +979,6 @@ jobCtrl.getdefaults=function(req,res,next) {
                             response.error = null;
                             response.data =//results[0];
                             {
-                                defId: results[0][0].defaultId ? results[0][0].defaultId:0,
                                 purpose: results[0][0].purpose ? results[0][0].purpose:0,
                                 jobType: results[0][0].jobtype ? results[0][0].jobtype:0,
                                 currency: results[0][0].currency ? results[0][0].currency:0,
@@ -1231,12 +1232,12 @@ jobCtrl.saveRequirement=function(req,res,next){
     if(!locations){
         locations=[];
     }
-    var membersInterviewRound =req.body.membersInterviewRound;
-    if(typeof(membersInterviewRound) == "string") {
-        membersInterviewRound = JSON.parse(membersInterviewRound);
+    var memberInterviewRound =req.body.memberInterviewRound;
+    if(typeof(memberInterviewRound) == "string") {
+        memberInterviewRound = JSON.parse(memberInterviewRound);
     }
-    if(!membersInterviewRound){
-        membersInterviewRound=[];
+    if(!memberInterviewRound){
+        memberInterviewRound=[];
     }
     var attachmentList =req.body.attachmentList;
     if(typeof(attachmentList) == "string") {
@@ -1263,6 +1264,7 @@ jobCtrl.saveRequirement=function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if ((!err) && tokenResult){
+                req.body.jdTemplateFlag = (req.body.jdTemplateFlag) ? req.body.jdTemplateFlag : 0; 
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0; // 1- web, 0-mobile
                 req.body.parentId = (req.body.parentId) ? req.body.parentId : 0;
                 req.body.jdTemplateTitle = (req.body.jdTemplateTitle) ? req.body.jdTemplateTitle : "";                
@@ -1295,10 +1297,11 @@ jobCtrl.saveRequirement=function(req,res,next){
                 //educationSpecialization =(JSON.stringify(educationSpecialization)) ? (JSON.stringify(educationSpecialization)):[];
                 //attachmentList =(JSON.stringify(attachmentList)) ? (JSON.stringify(attachmentList)):[];
                 //locations =(JSON.stringify(locations)) ? (JSON.stringify(locations)):[];
-                //membersInterviewRound =(JSON.stringify(membersInterviewRound)) ? (JSON.stringify(membersInterviewRound)):[];
+                //memberInterviewRound =(JSON.stringify(memberInterviewRound)) ? (JSON.stringify(memberInterviewRound)):[];
                 req.body.status = req.body.status ? req.body.status : 0;
                 req.body.statusTitle = req.body.statusTitle ? req.body.statusTitle : '';
                 req.body.expectedJoining = (req.body.expectedJoining) ? req.body.expectedJoining : 0;
+                req.body.jdTemplateId = (req.body.jdTemplateId) ? req.body.jdTemplateId : 0;
 
 
                 var procParams = [
@@ -1342,12 +1345,13 @@ jobCtrl.saveRequirement=function(req,res,next){
 
                     req.st.db.escape(JSON.stringify(members)),      // members json with contains roles for diff members
                     req.st.db.escape(JSON.stringify(locations)),        // newly added location
-                    req.st.db.escape(JSON.stringify(membersInterviewRound)),
+                    req.st.db.escape(JSON.stringify(memberInterviewRound)),
                     req.st.db.escape(JSON.stringify(attachmentList)),
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(req.body.statusTitle),
-                    req.st.db.escape(req.body.expectedJoining)
-
+                    req.st.db.escape(req.body.expectedJoining),
+                    req.st.db.escape(req.body.jdTemplateFlag),
+                    req.st.db.escape(req.body.jdTemplateId)
                 ];
 
                 var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
@@ -1461,7 +1465,6 @@ jobCtrl.saveRequirement=function(req,res,next){
                         }
                         else{
                             res.status(200).json(response);
-
                         }
 
                     }
@@ -1513,7 +1516,7 @@ jobCtrl.deleteReqContacts = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult) {
-                
+                req.query.isWeb =  req.query.isWeb ?  req.query.isWeb : 0; 
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.reqId),  // or transId
@@ -1587,7 +1590,7 @@ jobCtrl.deleteMainContacts = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult) {
-                
+                req.query.isWeb =  req.query.isWeb ?  req.query.isWeb : 0; 
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.heDepartmentId), 
@@ -1666,7 +1669,7 @@ jobCtrl.deleteMainBranches = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult) {
-                
+                req.query.isWeb =  req.query.isWeb ?  req.query.isWeb : 0; 
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.heDepartmentId), 
