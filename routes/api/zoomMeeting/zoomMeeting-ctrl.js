@@ -104,6 +104,12 @@ zoomCtrl.saveZoomMeeting = function(req,res,next){
                         if(questionsData[2] && questionsData[2][0].GCM_Id){
                             _Notification_aws.publish_Android(questionsData[2][0].GCM_Id ,messagePayload);
                         }
+                        if(questionsData[3] && questionsData[3][0].dialerAPNS_Id){
+                            _Notification_aws.publish_dialer_IOS(questionsData[3][0].dialerAPNS_Id,messagePayload,0);
+                        }
+                        if(questionsData[4] && questionsData[4][0].dialerGCM_Id){
+                            _Notification_aws.publish_dialer_Android(questionsData[4][0].dialerGCM_Id,messagePayload);
+                        }
 
                         response.status = true;
                         response.message = "Meeting request raised successfully.";
@@ -176,6 +182,12 @@ zoomCtrl.stopMeeting = function(req,res,next){
                         }
                         if(questionsData[2] && questionsData[2][0].GCM_Id){
                             _Notification_aws.publish_Android(questionsData[2][0].GCM_Id ,messagePayload);
+                        }
+                        if(questionsData[3] && questionsData[3][0].dialerAPNS_Id){
+                            _Notification_aws.publish_dialer_IOS(questionsData[3][0].dialerAPNS_Id,messagePayload,0);
+                        }
+                        if(questionsData[4] && questionsData[4][0].dialerGCM_Id){
+                            _Notification_aws.publish_dialer_Android(questionsData[4][0].dialerGCM_Id,messagePayload);
                         }
 
                         response.status = true;
@@ -526,6 +538,12 @@ zoomCtrl.stopMeetingForSingleUser = function(req,res,next){
                         }
                         if(questionsData[2] && questionsData[2][0].GCM_Id){
                             _Notification_aws.publish_Android(questionsData[2][0].GCM_Id ,messagePayload);
+                        }
+                        if(questionsData[3] && questionsData[3][0].dialerAPNS_Id){
+                            _Notification_aws.publish_dialer_IOS(questionsData[3][0].dialerAPNS_Id,messagePayload,0);
+                        }
+                        if(questionsData[4] && questionsData[4][0].dialerGCM_Id){
+                            _Notification_aws.publish_dialer_Android(questionsData[4][0].dialerGCM_Id ,messagePayload);
                         }
 
                         response.status = true;

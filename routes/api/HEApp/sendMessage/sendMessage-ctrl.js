@@ -1771,7 +1771,10 @@ sendMessageCtrl.sendMessageTest = function(req,res,next){
                         // call cron job
 
                         var count = 0;
-                        for (var i = 0; i < 10; i++) {
+                        for (var i = 0; i < results[1].length; i++) {
+                            if(i == results[1].length-1){
+                                console.log("End Notification ",moment().format("YYYY-MM-DD HH:mm:ss"));
+                            }
                             thread
                                 .send(results[1][i])
                                 // The handlers come here: (none of them is mandatory)
@@ -1785,10 +1788,8 @@ sendMessageCtrl.sendMessageTest = function(req,res,next){
                                 .on('exit', function() {
                                     console.log('Worker has been terminated.');
                                 });
-                            if(i == 9){
-                                console.log("End",moment().format("YYYY-MM-DD HH:mm:ss"));
-                            }
                             count=i;
+
                         }
 
                         response.status = true;

@@ -659,6 +659,7 @@ var EzeoneAttrbtModule = new EzeoneAttrbt(db,stdLib);
 router.get('/signup_data',EzeoneAttrbtModule.signUpData);
 router.get('/version_code',EzeoneAttrbtModule.versionCode);
 router.get('/WhatMate/version_code',EzeoneAttrbtModule.WhatMateVersionCode);
+router.get('/dialerApp/version_code',EzeoneAttrbtModule.dialerAppVersionCode);
 router.get('/sysConfig',EzeoneAttrbtModule.getSysConfig);
 
 //association-ap-module

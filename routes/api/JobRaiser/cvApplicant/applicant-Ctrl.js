@@ -23,6 +23,7 @@ var encryption = new  AES_256_encryption();
 var applicantCtrl = {};
 var error = {};
 
+
 applicantCtrl.saveApplicant=function(req,res,next){
                 var cvKeywords='';
     
@@ -89,6 +90,7 @@ applicantCtrl.saveApplicant=function(req,res,next){
     if(!secondarySkills){
         secondarySkills=[];
     }
+
     var cvSource =req.body.cvSource;
     if(typeof(cvSource) == "string") {
         cvSource = JSON.parse(cvSource);
@@ -2378,7 +2380,6 @@ applicantCtrl.getReferralResumeMaster = function(req,res,next){
 
 };
 
-
 applicantCtrl.saveInterviewSchedulerNew = function(req,res,next){
     var response = {
         status : false,
@@ -2649,7 +2650,6 @@ applicantCtrl.saveInterviewSchedulerNew = function(req,res,next){
     }
 
 };
-
 
 applicantCtrl.getInterviewApplicantList = function(req,res,next){
     var response = {
@@ -3597,7 +3597,6 @@ applicantCtrl.saveInterviewSchedulerForApplicant = function(req,res,next){
     }
 
 };
-
 
 applicantCtrl.saveOnBoarding = function(req,res,next){
     var response = {

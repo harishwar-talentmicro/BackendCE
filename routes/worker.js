@@ -7,6 +7,9 @@ var notification = new Notification();
 var moment = require('moment');
 var NotificationTemplater = require('../routes/lib/NotificationTemplater.js');
 var notificationTemplater = new NotificationTemplater();
+var DbHelper = require('./../helpers/DatabaseHandler'),
+    db = DbHelper.getDBContext();
+
 
 module.exports = function(results) {
 
@@ -64,16 +67,16 @@ module.exports = function(results) {
             null, 1,
             results.secretKey);
 
-        // var procQuery = 'insert into test_1(receiverId) values(' + results.receiverId + ')';
-        // // console.log(procQuery);
-        // req.db.query(procQuery,function(err,results) {
-        // });
-
+        var procQuery = 'insert into test_1(receiverId) values(' + results.receiverId + ')';
+        console.log(procQuery);
+        db.query(procQuery,function(err,results) {
+        });
+        // done('Awesome thread script may run in browser and node.js!');
         }
     else {
         console.log('Error in parsing notification compose_message template - ',
             notificationTemplaterRes.error);
     }
 
-    // done('Awesome thread script may run in browser and node.js!');
+
 };

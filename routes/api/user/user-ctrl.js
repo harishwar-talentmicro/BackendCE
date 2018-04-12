@@ -1974,4 +1974,92 @@ UserCtrl.getWelcomeAttachments = function(req,res,next){
 
 };
 
+UserCtrl.getUserDetails = function(req,res,next){
+    /**
+     * @todo FnGetUserDetails
+     */
+    var rtnMessage = {
+        versionStatus : 0,
+        versionMessage : "Your application is up to date"
+    };
+
+
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.token;
+        req.body.dialerAPNS_Id = req.body.dialerAPNS_Id ? req.body.dialerAPNS_Id : "";
+        req.body.dialerGCM_Id = req.body.dialerGCM_Id ? req.body.dialerGCM_Id : "";
+
+        if (Token) {
+            req.st.validateToken(Token, function (err, tokenResult) {
+                console.log(err);
+                //console.log(Result);
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.dialerAPNS_Id),
+                            req.st.db.escape(req.body.dialerGCM_Id)
+                            ];
+
+                        req.db.query('CALL pGetDialerEZEIDDetails(' + procParams.join(',') + ')', function (err, UserDetailsResult) {
+                            if (!err) {
+                                //console.log('UserDetailsResult',UserDetailsResult);
+                                if (UserDetailsResult[0]) {
+                                    if (UserDetailsResult[0].length > 0) {
+                                        UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
+                                            (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
+                                        console.log('FnGetUserDetails : tmaster: User details sent successfully');
+                                        UserDetailsResult[0][0].versionStatus = rtnMessage.versionStatus;
+                                        UserDetailsResult[0][0].versionMessage = rtnMessage.versionMessage;
+                                        res.send(UserDetailsResult[0]);
+                                    }
+                                    else {
+                                        res.json(null);
+                                        console.log('FnGetUserDetails : tmaster: No User details found');
+                                    }
+                                }
+                                else {
+                                    res.json(null);
+                                    console.log('FnGetUserDetails : tmaster: No User details found');
+                                }
+
+                            }
+                            else {
+                                res.json(null);
+                                res.statusCode = 500;
+                                console.log('FnGetUserDetails : tmaster:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnGetUserDetails: Invalid token');
+                        res.statusCode = 401;
+                        res.json(null);
+                    }
+                }
+                else {
+                    console.log('FnGetUserDetails: ' + err);
+                    res.statusCode = 500;
+                    res.json(null);
+                }
+            });
+        }
+        else {
+            res.json(null);
+            res.statusCode = 400;
+            console.log('FnGetUserDetails :  token is empty');
+        }
+    }
+    catch (ex) {
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log('FnGetUserDetails error:' + ex);
+
+    }
+};
+
 module.exports = UserCtrl;

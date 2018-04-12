@@ -1,3 +1,4 @@
+
 var notification = null;
 var moment = require('moment');
 var NotificationTemplater = require('../../../lib/NotificationTemplater.js');
