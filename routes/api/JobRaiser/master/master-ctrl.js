@@ -2,126 +2,128 @@
  * Created by Jana1 on 18-12-2017.
  */
 
-var notification = null;
 var moment = require('moment');
 var NotificationTemplater = require('../../../lib/NotificationTemplater.js');
 var notificationTemplater = new NotificationTemplater();
 var Notification = require('../../../modules/notification/notification-master.js');
 var notification = new Notification();
 var fs = require('fs');
-var bodyParser =require('body-parser');
+var bodyParser = require('body-parser');
 
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
-var encryption = new  AES_256_encryption();
+var encryption = new AES_256_encryption();
 
 var masterCtrl = {};
 var error = {};
 
-masterCtrl.getReqMasterData = function(req,res,next){
+masterCtrl.getReqMasterData = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!validationFlag){
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb=req.query.isWeb ? req.query.isWeb:0;
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId), 
+                    req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.query.purpose)
                 ];
 
                 var procQuery = 'CALL wm_get_jobtype_curr_scale_duration( ' + inputs.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
+                req.db.query(procQuery, function (err, result) {
                     console.log(err);
                     console.log(req.query.isWeb);
-                    
-                        var isWeb = req.query.isWeb;
-                        if(!err && result ){
+
+                    var isWeb = req.query.isWeb;
+                    if (!err && result) {
                         response.status = true;
                         response.message = "Master data loaded successfully";
                         response.error = null;
                         response.data = {
-                            heDepartment : (result && result[0]) ? result[0] : [],
-                            jobType:(result &&result[1]) ? result[1]:[],
-                            currency: (result && result[2]) ? result[2]:[],
-                            scale: (result && result[3]) ? result[3]:[],
-                            duration:(result && result[4]) ? result[4]:[],
-                            country:(result && result[5]) ? result[5]:[],
-                            jobTitle:(result && result[6]) ? result[6]:[],
-                            roleList: result[7] ?result[7]:[],
-                            interviewRoundList:result[8] ? result[8]:[],
-                            status:result[9] ? result[9]:[],
-                            requirementList : result[10] ? result[10] :[]
- 
-                        };
-                        if(isWeb == 1){
-                           res.status(200).json(response);    
-                        }
-                        else{
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
+                            heDepartment: (result && result[0]) ? result[0] : [],
+                            jobType: (result && result[1]) ? result[1] : [],
+                            currency: (result && result[2]) ? result[2] : [],
+                            scale: (result && result[3]) ? result[3] : [],
+                            duration: (result && result[4]) ? result[4] : [],
+                            country: (result && result[5]) ? result[5] : [],
+                            jobTitle: (result && result[6]) ? result[6] : [],
+                            roleList: result[7] ? result[7] : [],
+                            interviewRoundList: result[8] ? result[8] : [],
+                            status: result[9] ? result[9] : [],
+                            requirementList: result[10] ? result[10] : []
 
+                        };
+                        if (isWeb == 1) {
+                            res.status(200).json(response);
                         }
-                        
+                        else {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
-                        response.message = "no results found";
+                        response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            heDepartment : [],
+                            heDepartment: [],
                             jobType: [],
                             currency: [],
                             scale: [],
-                            duration:[],
-                            country:[],
-                            jobTitle:[],
-                            roleList:[],
-                            interviewRoundList:[],
-                            status:[]
+                            duration: [],
+                            country: [],
+                            jobTitle: [],
+                            roleList: [],
+                            interviewRoundList: [],
+                            status: [],
+                            requirementList: []
                         };
-                        if(isWeb == 1){
-                           res.status(200).json(response);    
-                        }
-                        else{
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        if (isWeb == 1) {
                             res.status(200).json(response);
-                        });
+                        }
+                        else {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
 
                         }
                     }
-                    else{
+                    else {
                         response.status = false;
-                        response.message = "Error while getting master data";
+                        response.message = "Error while loading master data";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -129,202 +131,112 @@ masterCtrl.getReqMasterData = function(req,res,next){
 
 };
 
-masterCtrl.getSpecializations = function(req,res,next){
+masterCtrl.getSpecializations = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
-   
+
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                 
-                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb: 0;
-                
+
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+
                 var inputs = [
                     req.st.db.escape(req.query.token)
                 ];
 
                 var procQuery = 'CALL wm_get_edu_Specialization( ' + inputs.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,specResult){
-                    console.log(err);
-                   
-                    var isWeb=req.query.isWeb;
-                    if(!err && specResult && specResult[0] && specResult[0][0] ){
-                        response.status = true;
-                        response.message = "specialization loaded successfully";
-                        response.error = null;
-                        var output=[];
-                        for(var i=0; i<specResult[0].length; i++){
-                            var res2={};
-                            res2.educationId=specResult[0][i].educationId;
-                            res2.educationTitle=specResult[0][i].EducationTitle;
-                            res2.specialization=specResult[0][i].specialization ? JSON.parse(specResult[0][i].specialization):[];
-                            output.push(res2); 
-                        }
-                        response.data ={
-                            educationList:output
-                        };
-
-                        if(isWeb == 1){
-                           res.status(200).json(response);    
-                        }
-                        else{
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
-
-                        }
-                    }
-                    else if(!err){
-                        response.status = true;
-                        response.message = "no results found";
-                        response.error = null;
-                        response.data ={
-                                educationList:[]
-                        };
-                        if(isWeb == 1){
-                           res.status(200).json(response);    
-                        }
-                        else{
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
-
-                        }
-                    }
-                    else{
-                        response.status = false;
-                        response.message = "Error while getting specializations";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
-            }
-            else{
-                res.status(401).json(response);
-            }
-        });
-    }
-
-};
-
-
-/*
-masterCtrl.getMemberList = function(req,res,next){
-    var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
-    };
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-    console.log(req.query.purpose,"req.query.purpose");
-    if (!req.query.purpose) {
-        error.purpose = 'Invalid purpose';
-        validationFlag *= false;
-    }
-
-    console.log(req.query.clientId,"req.query.clientId");
-    if (!req.query.clientId) {
-        error.clientId = 'Invalid clientId';
-        validationFlag *= false;
-    }
-
-    if (!validationFlag){
-        response.error = error;
-        response.message = 'Please check the error';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
-                req.query.clientId = (req.query.clientId) ? req.query.clientId : 0;
-                //req.query.purpose = (req.query.purpose) ? req.query.purpose : 0;
-               // req.query.HEMasterId = (req.query.HEMasterId) ? req.query.HEMasterId : 0;
-
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.clientId),
-                    req.st.db.escape(req.query.purpose)
-                  //  req.st.db.escape(req.query.HEMasterId),
-
-                ];
-                var procQuery = 'CALL WM_get_membersroles( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, results) {
+                req.db.query(procQuery, function (err, specResult) {
                     console.log(err);
 
-                    if(!err && results || (results[0] && results[0][0]) || (results[1] && results[1][0] )){
+                    var isWeb = req.query.isWeb;
+                    if (!err && specResult && specResult[0] && specResult[0][0]) {
                         response.status = true;
-                        response.message = "Requirement  memberList saved successfully ";
+                        response.message = "Educations loaded successfully";
+                        response.error = null;
+                        var output = [];
+                        for (var i = 0; i < specResult[0].length; i++) {
+                            var res2 = {};
+                            res2.educationId = specResult[0][i].educationId;
+                            res2.educationTitle = specResult[0][i].EducationTitle;
+                            res2.specialization = specResult[0][i].specialization ? JSON.parse(specResult[0][i].specialization) : [];
+                            output.push(res2);
+                        }
+                        response.data = {
+                            educationList: output
+                        };
+
+                        if (isWeb == 1) {
+                            res.status(200).json(response);
+                        }
+                        else {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+
+                        }
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            memberList: results[0],
-                            roles: results[1]
+                            educationList: []
+                        };
+                        if (isWeb == 1) {
+                            res.status(200).json(response);
                         }
-                        res.status(200).json(response);
-                    }
+                        else {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
 
-                    else if(!err ){
-                        response.status = true;
-                        response.message = "Requirement  memberList  is null";
-                        response.error = null;
-                        response.data =null;
-                        res.status(200).json(response);
+                        }
                     }
-
-                    else{
+                    else {
                         response.status = false;
-                        response.message = "Error while getting memberList";
+                        response.message = "Error while loading educations";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
                     }
-
                 });
-
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
-
-
         });
     }
-};
-*/
 
-masterCtrl.saveClients = function(req,res,next){
-var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+};
+
+
+masterCtrl.saveClients = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -337,36 +249,35 @@ var response = {
         validationFlag *= false;
     }
 
-    var heDepartment =req.body.heDepartment;
-    if(typeof(heDepartment) == "string") {
+    var heDepartment = req.body.heDepartment;
+    if (typeof (heDepartment) == "string") {
         heDepartment = JSON.parse(heDepartment);
     }
-    if(!heDepartment){
-        heDepartment=[];
+    if (!heDepartment) {
+        heDepartment = [];
     }
-    var businessLocation =req.body.businessLocation;
-    if(typeof(businessLocation) == "string") {
+    var businessLocation = req.body.businessLocation;
+    if (typeof (businessLocation) == "string") {
         businessLocation = JSON.parse(businessLocation);
     }
-    if(!businessLocation){
-        businessLocation=[];
+    if (!businessLocation) {
+        businessLocation = [];
     }
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
-                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0; 
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(JSON.stringify(heDepartment)),
                     req.st.db.escape(JSON.stringify(businessLocation))
-                    
 
                 ];
                 var procQuery = 'CALL wm_saveClientBusinessLocationContacts( ' + inputs.join(',') + ')';
@@ -374,9 +285,9 @@ var response = {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if(!err && results ){
+                    if (!err && results) {
                         response.status = true;
-                        response.message = "client businessLocation saved sucessfully";
+                        response.message = "Client saved sucessfully";
                         response.error = null;
                         response.data = {
                             heDepartmentId: results[0][0].heDepartmentId
@@ -384,9 +295,9 @@ var response = {
                         res.status(200).json(response);
                     }
 
-                    else{
+                    else {
                         response.status = false;
-                        response.message = "Error while saving client businessLocation";
+                        response.message = "Error while saving client";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
@@ -395,7 +306,7 @@ var response = {
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
 
@@ -405,12 +316,12 @@ var response = {
 };
 
 
-masterCtrl.savebranches = function(req,res,next){
+masterCtrl.savebranches = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -421,15 +332,15 @@ masterCtrl.savebranches = function(req,res,next){
         error.heDepartmentId = 'Invalid client';
         validationFlag *= false;
     }
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0; // 1- web, 0-mobile
                 req.body.tId = (req.body.tId) ? req.body.tId : 0;
                 //req.body.HEDepartmentId = (req.body.HEDepartmentId) ? req.body.HEDepartmentId : 0;
@@ -450,7 +361,7 @@ masterCtrl.savebranches = function(req,res,next){
                 req.body.EntryProcedure = (req.body.EntryProcedure) ? req.body.EntryProcedure : '';
                 req.body.currencyId = (req.body.currencyId) ? req.body.currencyId : 0;
                 //req.body.type = (req.body.type) ? req.body.type : 0;
-                req.body.timeZone = (req.body.timeZone) ? req.body.timeZone : '';                
+                req.body.timeZone = (req.body.timeZone) ? req.body.timeZone : '';
 
 
 
@@ -482,31 +393,31 @@ masterCtrl.savebranches = function(req,res,next){
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
-                    var isWeb=req.query.isWeb;
-                    if(!err && results && results[0]){
+                    var isWeb = req.query.isWeb;
+                    if (!err && results && results[0]) {
                         response.status = true;
-                        response.message = "clientbranches saved sucessfully";
+                        response.message = "Client branches saved sucessfully";
                         response.error = null;
                         response.data = {
                             clientbranchId: results[0]
                         };
 
-                        if(isWeb == 1){
-                           res.status(200).json(response);    
-                        }
-                        else{
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        if (isWeb == 1) {
                             res.status(200).json(response);
-                        });
+                        }
+                        else {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
 
                         }
                     }
 
-                    else{
+                    else {
                         response.status = false;
-                        response.message = "Error while saving clients";
+                        response.message = "Error while saving client branches";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
@@ -515,7 +426,7 @@ masterCtrl.savebranches = function(req,res,next){
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
 
@@ -525,104 +436,101 @@ masterCtrl.savebranches = function(req,res,next){
 };
 
 
-masterCtrl.getbranchList = function(req,res,next){
+masterCtrl.getbranchList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    
-    if (!validationFlag){
+
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
-                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb: 0;
-
-                //req.query.purpose = (req.query.purpose) ? req.query.purpose : 0;
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heDepartmentId)
-                    //req.st.db.escape(req.query.purpose)
-
+                   
 
                 ];
                 var procQuery = 'CALL WM_get_branches( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
-                    var isWeb=req.query.isWeb;
-                    if(!err && results){
+                    var isWeb = req.query.isWeb;
+                    if (!err && results) {
                         response.status = true;
                         response.message = "branchList loaded successfully";
                         response.error = null;
-                        var output=[];
-                         for(var i=0; i<results[3].length; i++){
-                            var res2={};
-                            res2.heDepartmentId= results[3][i].heDepartmentId ? results[3][i].heDepartmentId: 0;
-                            res2.businessLocationId= results[3][i].businessLocationId ? results[3][i].businessLocationId: 0;
-                            res2.businessLocationTitle= results[3][i].businessLocationTitle ? results[3][i].businessLocationTitle: '';
-                            res2.location= results[3][i].location ? results[3][i].location: '';
-                            res2.address= results[3][i].address ? results[3][i].address: '';
-                            res2.latitude= results[3][i].latitude ? results[3][i].latitude: 0.0;
-                            res2.longitude= results[3][i].longitude ? results[3][i].longitude: 0.0;
-                            res2.nearestParking= results[3][i].nearestParking ? results[3][i].nearestParking: '';
-                            res2.entryProcedure= results[3][i].entryProcedure ? results[3][i].entryProcedure: '';
-                            res2.contactList=JSON.parse(results[3][i].contactList) ? JSON.parse(results[3][i].contactList):[];
+                        var output = [];
+                        for (var i = 0; i < results[3].length; i++) {
+                            var res2 = {};
+                            res2.heDepartmentId = results[3][i].heDepartmentId ? results[3][i].heDepartmentId : 0;
+                            res2.businessLocationId = results[3][i].businessLocationId ? results[3][i].businessLocationId : 0;
+                            res2.businessLocationTitle = results[3][i].businessLocationTitle ? results[3][i].businessLocationTitle : '';
+                            res2.location = results[3][i].location ? results[3][i].location : '';
+                            res2.address = results[3][i].address ? results[3][i].address : '';
+                            res2.latitude = results[3][i].latitude ? results[3][i].latitude : 0.0;
+                            res2.longitude = results[3][i].longitude ? results[3][i].longitude : 0.0;
+                            res2.nearestParking = results[3][i].nearestParking ? results[3][i].nearestParking : '';
+                            res2.entryProcedure = results[3][i].entryProcedure ? results[3][i].entryProcedure : '';
+                            res2.contactList = JSON.parse(results[3][i].contactList) ? JSON.parse(results[3][i].contactList) : [];
                             output.push(res2);
-                           };
+                        };
 
                         response.data = {
-                            branchList: results[0] ? results[0]:[],
-                            detailedBranchList:results[1] ? results[1]:[],
-                            wBranchList:results[2] ? results[2]:[],
+                            branchList: results[0] ? results[0] : [],
+                            detailedBranchList: results[1] ? results[1] : [],
+                            wBranchList: results[2] ? results[2] : [],
                             branch_contacts: output
                         };
-                        if(isWeb==1){
-                        res.status(200).json(response);
-                    }
-                    else{
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        if (isWeb == 1) {
                             res.status(200).json(response);
-                        });
+                        }
+                        else {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
                     }
-                    }
-                    else if(!err ){
+                    else if (!err) {
                         response.status = true;
-                        response.message = "branches does not exist";
+                        response.message = "Branches does not exist";
                         response.error = null;
-                        response.data ={
-                                branchList:[],
-                                detailedBranchList:[],
-                                wBranchList:[],
-                                branch_contacts :[]
+                        response.data = {
+                            branchList: [],
+                            detailedBranchList: [],
+                            wBranchList: [],
+                            branch_contacts: []
                         };
-                        if(isWeb==1){
-                        res.status(200).json(response);
-                    }
-                    else{
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        if (isWeb == 1) {
                             res.status(200).json(response);
-                        });
-                    }                    
-                }
-                else{
+                        }
+                        else {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                    }
+                    else {
                         response.status = false;
                         response.message = "Error while getting branchlist";
                         response.error = null;
@@ -633,7 +541,7 @@ masterCtrl.getbranchList = function(req,res,next){
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
 
@@ -645,15 +553,15 @@ masterCtrl.getbranchList = function(req,res,next){
 
 // Mail templates section
 
-masterCtrl.getmailTemplate=function(req,res,next){
+masterCtrl.getmailTemplate = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     if (!req.query.heMasterId) {
-        error.heMasterId = 'invalid tenant';
+        error.heMasterId = 'invalid company';
         validationFlag *= false;
     }
     var validationFlag = true;
@@ -661,17 +569,17 @@ masterCtrl.getmailTemplate=function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb :0 ;
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -680,23 +588,23 @@ masterCtrl.getmailTemplate=function(req,res,next){
 
                 var procQuery = 'CALL wm_get_1010_mailtemplate( ' + inputs.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
+                req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if(!err && result && result[0] && result[0][0] ){
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
-                        response.message = "mail template list";
+                        response.message = "Mail template list";
                         response.error = null;
-                        response.data ={
-                            screeningMailer : result[0] ? result[0] :[],
-                            submissionMailer : result[1] ? result[1] :[],
-                            jobseekerMailer : result[2] ? result[2] :[],
-                            clientMailer : result[3] ? result[3] :[],
-                            interviewMailer : result[4] ? result[4] :[]
+                        response.data = {
+                            screeningMailer: result[0] ? result[0] : [],
+                            submissionMailer: result[1] ? result[1] : [],
+                            jobseekerMailer: result[2] ? result[2] : [],
+                            clientMailer: result[3] ? result[3] : [],
+                            interviewMailer: result[4] ? result[4] : []
                         };
                         res.status(200).json(response);
                     }
 
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting mail templates";
                         response.error = null;
@@ -705,7 +613,7 @@ masterCtrl.getmailTemplate=function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -713,12 +621,12 @@ masterCtrl.getmailTemplate=function(req,res,next){
 
 };
 
-masterCtrl.savetemplate=function(req,res,next){
+masterCtrl.savetemplate = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -726,79 +634,74 @@ masterCtrl.savetemplate=function(req,res,next){
         validationFlag *= false;
     }
     if (!req.body.heMasterId) {
-        error.heMasterId = 'Invalid tenant';
+        error.heMasterId = 'Invalid company';
         validationFlag *= false;
     }
     if (!req.body.templateName) {
         error.templateName = 'Invalid templateName';
         validationFlag *= false;
     }
-    var tags =req.body.tags;
-    if(typeof(tags) == "string") {
+    var tags = req.body.tags;
+    if (typeof (tags) == "string") {
         tags = JSON.parse(tags);
     }
-    if(!tags){
-        tags=[];
+    if (!tags) {
+        tags = [];
     }
-    var toMail =req.body.toMail;
-    if(typeof(toMail) == "string") {
+    var toMail = req.body.toMail;
+    if (typeof (toMail) == "string") {
         toMail = JSON.parse(toMail);
     }
-    if(!toMail){
-        toMail=[];
+    if (!toMail) {
+        toMail = [];
     }
-    var cc =req.body.cc;
-    if(typeof(cc) == "string") {
+    var cc = req.body.cc;
+    if (typeof (cc) == "string") {
         cc = JSON.parse(cc);
     }
-    if(!cc){
-        cc=[];
+    if (!cc) {
+        cc = [];
     }
-    var bcc =req.body.bcc;
-    if(typeof(bcc) == "string") {
+    var bcc = req.body.bcc;
+    if (typeof (bcc) == "string") {
         bcc = JSON.parse(bcc);
     }
-    if(!bcc){
-        bcc=[];
+    if (!bcc) {
+        bcc = [];
     }
-    var attachment =req.body.attachment;
-    if(typeof(attachment) == "string") {
+    var attachment = req.body.attachment;
+    if (typeof (attachment) == "string") {
         attachment = JSON.parse(attachment);
     }
-    if(!attachment){
-        attachment=[];
+    if (!attachment) {
+        attachment = [];
     }
-    var stage =req.body.stage;
-    if(typeof(stage) == "string") {
+    var stage = req.body.stage;
+    if (typeof (stage) == "string") {
         stage = JSON.parse(stage);
     }
-    if(!stage){
-        stage=[];
+    if (!stage) {
+        stage = [];
     }
 
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
-                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;                
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
                 req.body.templateId = (req.body.templateId) ? req.body.templateId : 0;
                 req.body.type = (req.body.type) ? req.body.type : 0;
-                //req.body.toMail = (req.body.toMail) ? req.body.toMail :'';
-                //req.body.cc = (req.body.cc) ? req.body.cc : '';
-                //req.body.bcc = (req.body.bcc) ? req.body.bcc : '';
                 req.body.subject = (req.body.subject) ? req.body.subject : '';
                 req.body.mailBody = (req.body.mailBody) ? req.body.mailBody : '';
                 req.body.replymailId = (req.body.replymailId) ? req.body.replymailId : '';
                 req.body.priority = (req.body.priority) ? req.body.priority : 0;
                 req.body.updateFlag = (req.body.updateFlag) ? req.body.updateFlag : 0;
-                //req.body.stageId = (req.body.stageId) ? req.body.stageId : 0;
-                //req.body.statusId = (req.body.statusId) ? req.body.statusId : 0;
                 req.body.SMSMessage = (req.body.SMSMessage) ? req.body.SMSMessage : '';
                 req.body.whatmateMessage = (req.body.whatmateMessage) ? req.body.whatmateMessage : '';
 
@@ -809,7 +712,7 @@ masterCtrl.savetemplate=function(req,res,next){
                     req.st.db.escape(req.body.templateName),
                     req.st.db.escape(req.body.type),
                     req.st.db.escape(JSON.stringify(toMail)),
-                    req.st.db.escape(JSON.stringify(cc)),                    
+                    req.st.db.escape(JSON.stringify(cc)),
                     req.st.db.escape(JSON.stringify(bcc)),
                     req.st.db.escape(req.body.subject),
                     req.st.db.escape(req.body.mailBody),
@@ -827,18 +730,18 @@ masterCtrl.savetemplate=function(req,res,next){
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
-                    if(!err && results && results[0]){
+                    if (!err && results && results[0]) {
                         response.status = true;
-                        response.message = "template saved successfully";
+                        response.message = "Mail template saved successfully";
                         response.error = null;
                         response.data = {
-                            templateId:results[0]
+                            templateId: results[0]
                         };
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
-                        response.message = "Error while saving form template";
+                        response.message = "Error while saving mail template";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
@@ -847,22 +750,20 @@ masterCtrl.savetemplate=function(req,res,next){
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
-
-
         });
     }
 };
 
 
-masterCtrl.getLocation = function(req,res,next){
+masterCtrl.getLocation = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -870,76 +771,73 @@ masterCtrl.getLocation = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
-                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb: 0;
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.keyword)
-                    
+
                 ];
                 var procQuery = 'CALL wm_get_location( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
-                    var isWeb=req.query.isWeb;
-                    if(!err && results && results[0]){
+                    var isWeb = req.query.isWeb;
+                    if (!err && results && results[0]) {
                         response.status = true;
-                        response.message = "locations loaded successfully";
+                        response.message = "Locations loaded successfully";
                         response.error = null;
                         response.data = {
-                           locationList:results[0] ? results[0]:[]
+                            locationList: results[0] ? results[0] : []
                         };
-                        if(isWeb == 1){
-                           res.status(200).json(response);    
-                        }
-                        else{
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        if (isWeb == 1) {
                             res.status(200).json(response);
-                        });
+                        }
+                        else {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
 
                         }
                     }
-                    else if(!err ){
+                    else if (!err) {
                         response.status = true;
-                        response.message = "locations does not exist";
+                        response.message = "Locations does not exist";
                         response.error = null;
-                        response.data ={
+                        response.data = {
                             locationList: []
                         };
-                      if(isWeb == 1){
-                           res.status(200).json(response);    
-                        }
-                        else{
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        if (isWeb == 1) {
                             res.status(200).json(response);
-                        });
-
+                        }
+                        else {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
                         }
                     }
-                    else{
+                    else {
                         response.status = false;
-                        response.message = "Error while getting lcoations";
+                        response.message = "Error while getting locations";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
                     }
-
                 });
-
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
 
@@ -947,15 +845,15 @@ masterCtrl.getLocation = function(req,res,next){
     }
 };
 
-masterCtrl.getmailTemplatedetaile=function(req,res,next){
+masterCtrl.getmailTemplatedetaile = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     if (!req.query.heMasterId) {
-        error.heMasterId = 'invalid tenant';
+        error.heMasterId = 'invalid company';
         validationFlag *= false;
     }
 
@@ -968,16 +866,16 @@ masterCtrl.getmailTemplatedetaile=function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb =  req.query.isWeb ?  req.query.isWeb : 0; 
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -988,20 +886,20 @@ masterCtrl.getmailTemplatedetaile=function(req,res,next){
 
                 var procQuery = 'CALL WM_get_1010mailTemplateDetail( ' + inputs.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
+                req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if(!err && result && result[0] ){
+                    if (!err && result && result[0]) {
                         response.status = true;
-                        response.message = "mail template detaile";
+                        response.message = "Mail template detaile";
                         response.error = null;
-                        response.data ={
+                        response.data = {
 
-                            mailTemplateDetails : JSON.parse(result[0][0].formDataJson) ? JSON.parse(result[0][0].formDataJson) :[]
+                            mailTemplateDetails: JSON.parse(result[0][0].formDataJson) ? JSON.parse(result[0][0].formDataJson) : []
                         };
-                                res.status(200).json(response);
+                        res.status(200).json(response);
                     }
-                   
-                    else{
+
+                    else {
                         response.status = false;
                         response.message = "Error while getting mail templates";
                         response.error = null;
@@ -1010,7 +908,7 @@ masterCtrl.getmailTemplatedetaile=function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1019,161 +917,12 @@ masterCtrl.getmailTemplatedetaile=function(req,res,next){
 };
 
 
-/*
-masterCtrl.getEduSpec = function(req,res,next){
+masterCtrl.getSkills = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
-    };
-   
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-    if (!validationFlag){
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if ((!err) && tokenResult) {
-
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.educationId),
-                    req.st.db.escape(req.query.specializationId)
-                ];
-
-                var procQuery = 'CALL wm_get_eduSpec( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
-                    console.log(err);
-                    if(!err && result && result[0] && result[0][0] ){
-                        response.status = true;
-                        response.message = "educationSpecialization loaded successfully";
-                        response.error = null;
-                        response.data ={
-                        eduSpecId:result[0][0].educationspecializationmapId
-                    };
-                        res.status(200).json(response);
-                    }
-                    else if(!err){
-                        response.status = true;
-                        response.message = "no results found";
-                        response.error = null;
-                        response.data = "empty array";
-                        res.status(200).json(response);
-                    }
-                    else{
-                        response.status = false;
-                        response.message = "Error while getting educationSpecialization";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
-            }
-            else{
-                res.status(401).json(response);
-            }
-        });
-    }
-};
-*/
-/*
-masterCtrl.requirementEduSpec = function(req,res,next){
-    var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
-    };
-   
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-
-    var specialization =req.body.specialization;
-    if(typeof(specialization) == "string") {
-        specialization = JSON.parse(specialization);
-    }
-    if(!specialization){
-        error.speciialization = 'Invalid specialization';
-        validationFlag *= false;
-    }
-    if (!validationFlag){
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if ((!err) && tokenResult) {
-
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.educationId),
-                    req.st.db.escape(JSON.stringify(specialization))
-                ];
-
-                var procQuery = 'CALL wm_get_requirementEduSpec( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
-                    console.log(err);
-                    if(!err && result && result[0]){
-                        response.status = true;
-                        response.message = "educationSpecialization loaded successfully";
-                        response.error = null;
-                        var output=[];
-                        for(var i=0; i<result.length-1; i++){
-                            var res2={};
-                            res2.eduSpecId=result[i][0].educationspecializationmapId;
-                            output.push(res2); 
-                        }
-                         response.data =output;
-                    //     response.data ={
-                    //     eduSpecId:result
-                    // };
-                        res.status(200).json(response);
-                    }
-                    else if(!err){
-                        response.status = true;
-                        response.message = "no results found";
-                        response.error = null;
-                        response.data = "empty array";
-                        res.status(200).json(response);
-                    }
-                    else{
-                        response.status = false;
-                        response.message = "Error while getting educationSpecialization";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
-            }
-            else{
-                res.status(401).json(response);
-            }
-        });
-    }
-};
-*/
-
-masterCtrl.getSkills = function(req,res,next){
-    var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -1181,68 +930,67 @@ masterCtrl.getSkills = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
-                 
-                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb: 0;
-                
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+
                 var inputs = [
                     req.st.db.escape(req.query.token)
-                    //req.st.db.escape(req.query.keyword)
-                    
+
                 ];
                 var procQuery = 'CALL Wm_get_skills( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
-                    
-                    var isWeb=req.query.isWeb;
-                    if(!err && results && results[0]){
+
+                    var isWeb = req.query.isWeb;
+                    if (!err && results && results[0]) {
                         response.status = true;
-                        response.message = "skills loaded successfully";
+                        response.message = "Skills loaded successfully";
                         response.error = null;
                         response.data = {
-                           skillList:results[0]
+                            skillList: results[0]
                         };
-                        if(isWeb == 1){
-                           res.status(200).json(response);    
-                        }
-                        else{
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        if (isWeb == 1) {
                             res.status(200).json(response);
-                        });
+                        }
+                        else {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
 
                         }
                     }
-                    else if(!err ){
+                    else if (!err) {
                         response.status = true;
-                        response.message = "skills does not exist";
+                        response.message = "Skills does not exist";
                         response.error = null;
-                        response.data ={
+                        response.data = {
                             skillList: []
                         };
-                      if(isWeb == 1){
-                           res.status(200).json(response);    
-                        }
-                        else{
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        if (isWeb == 1) {
                             res.status(200).json(response);
-                        });
+                        }
+                        else {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
 
                         }
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting skills";
                         response.error = null;
@@ -1253,7 +1001,7 @@ masterCtrl.getSkills = function(req,res,next){
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
 
@@ -1261,28 +1009,28 @@ masterCtrl.getSkills = function(req,res,next){
     }
 };
 
-masterCtrl.getRoleLocationMasterData = function(req,res,next){
+masterCtrl.getRoleLocationMasterData = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb=req.query.isWeb ? req.query.isWeb:0;
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.purpose),
@@ -1291,53 +1039,53 @@ masterCtrl.getRoleLocationMasterData = function(req,res,next){
 
                 var procQuery = 'CALL wm_get_location_rolemaster( ' + inputs.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
+                req.db.query(procQuery, function (err, result) {
                     console.log(err);
                     console.log(req.query.isWeb);
 
                     var isWeb = req.query.isWeb;
-                    if(!err && result ){
+                    if (!err && result) {
                         response.status = true;
                         response.message = "Master data loaded successfully";
                         response.error = null;
                         response.data = {
-                            locationList : (result && result[0]) ? result[0] : [],
-                            roles:(result &&result[1]) ? result[1]:[]
+                            locationList: (result && result[0]) ? result[0] : [],
+                            roles: (result && result[1]) ? result[1] : []
                         };
-                        if(req.query.isWeb == 1){
+                        if (req.query.isWeb == 1) {
                             res.status(200).json(response);
                         }
-                        else{
+                        else {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                             zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                 res.status(200).json(response);
                             });
 
                         }
 
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "no results found";
                         response.error = null;
                         response.data = {
-                            locationList : [],
+                            locationList: [],
                             roles: []
                         };
-                        if(req.query.isWeb == 1){
+                        if (req.query.isWeb == 1) {
                             res.status(200).json(response);
                         }
-                        else{
+                        else {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                             zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                 res.status(200).json(response);
                             });
 
                         }
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting master data";
                         response.error = null;
@@ -1346,7 +1094,7 @@ masterCtrl.getRoleLocationMasterData = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1355,36 +1103,35 @@ masterCtrl.getRoleLocationMasterData = function(req,res,next){
 };
 
 
-masterCtrl.saveClientsBusinessLocation = function(req,res,next){
+masterCtrl.saveClientsBusinessLocation = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
-                req.query.isWeb =  req.query.isWeb ?  req.query.isWeb : 0; 
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 req.body.tid = (req.body.tid) ? req.body.tid : 0;  // clientId
                 req.body.heMasterId = (req.body.heMasterId) ? req.body.heMasterId : 0;
                 req.body.clientName = (req.body.clientName) ? req.body.clientName : '';
                 req.body.title = (req.body.title) ? req.body.title : '';
                 req.body.location = (req.body.location) ? req.body.location : '';
-                //req.body.clientCode = (req.body.clientCode) ? req.body.clientCode : '';
                 req.body.address = (req.body.address) ? req.body.address : '';
-                req.body.nearestParking = req.body.nearestParking ? req.body.nearestParking:'';
+                req.body.nearestParking = req.body.nearestParking ? req.body.nearestParking : '';
                 req.body.entryProcedure = (req.body.entryProcedure) ? req.body.entryProcedure : '';
 
                 var inputs = [
@@ -1394,7 +1141,6 @@ masterCtrl.saveClientsBusinessLocation = function(req,res,next){
                     req.st.db.escape(req.body.clientName),
                     req.st.db.escape(req.body.title),
                     req.st.db.escape(req.body.location),
-                    //req.st.db.escape(req.body.clientCode),
                     req.st.db.escape(req.body.address),
                     req.st.db.escape(req.body.nearestParking),
                     req.st.db.escape(req.body.entryProcedure)
@@ -1405,15 +1151,15 @@ masterCtrl.saveClientsBusinessLocation = function(req,res,next){
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                        if(!err && results ){
-                            response.status = true;
-                            response.message = "Business Location  saved sucessfully";
-                            response.error = null;
-                            response.data = null;
-                            res.status(200).json(response);
-                        }
+                    if (!err && results) {
+                        response.status = true;
+                        response.message = "Business location  saved sucessfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
 
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving Business Location";
                         response.error = null;
@@ -1424,7 +1170,7 @@ masterCtrl.saveClientsBusinessLocation = function(req,res,next){
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
 
@@ -1433,12 +1179,12 @@ masterCtrl.saveClientsBusinessLocation = function(req,res,next){
     }
 };
 
-masterCtrl.saveMasterStageStatus = function(req,res,next){
-var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+masterCtrl.saveMasterStageStatus = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -1451,23 +1197,23 @@ var response = {
         validationFlag *= false;
     }
 
-    var stage =req.body.stage;
-    if(typeof(stage) == "string") {
+    var stage = req.body.stage;
+    if (typeof (stage) == "string") {
         stage = JSON.parse(stage);
     }
-    if(!stage){
-        stage=[];
+    if (!stage) {
+        stage = [];
     }
-    
-    if (!validationFlag){
+
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
                 var inputs = [
@@ -1480,20 +1226,20 @@ var response = {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if(!err && results){
+                    if (!err && results) {
                         response.status = true;
-                        response.message = "stage and status saved sucessfully";
+                        response.message = "Stage and status saved sucessfully";
                         response.error = null;
-                        var output=[];
-                        for(var i=0; i<results[0].length; i++){
-                            var res2={};
-                            res2.stageId=results[0][i].stageId;
-                            res2.stageName=results[0][i].stageName;
-                            res2.stageTypeId=results[0][i].stageTypeId;
-                            res2.stageTypeName=results[0][i].stageTypeName;
-                            res2.colorCode=results[0][i].colorCode;                       
-                            res2.status=JSON.parse(results[0][i].status) ? JSON.parse(results[0][i].status):[];
-                            output.push(res2); 
+                        var output = [];
+                        for (var i = 0; i < results[0].length; i++) {
+                            var res2 = {};
+                            res2.stageId = results[0][i].stageId;
+                            res2.stageName = results[0][i].stageName;
+                            res2.stageTypeId = results[0][i].stageTypeId;
+                            res2.stageTypeName = results[0][i].stageTypeName;
+                            res2.colorCode = results[0][i].colorCode;
+                            res2.status = JSON.parse(results[0][i].status) ? JSON.parse(results[0][i].status) : [];
+                            output.push(res2);
                         }
                         response.data = {
                             stage: output
@@ -1501,7 +1247,7 @@ var response = {
                         res.status(200).json(response);
                     }
 
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving stage and status";
                         response.error = null;
@@ -1512,7 +1258,7 @@ var response = {
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
 
@@ -1521,12 +1267,12 @@ var response = {
     }
 };
 
-masterCtrl.getRequirementView = function(req,res,next){
-var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+masterCtrl.getRequirementView = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -1539,93 +1285,93 @@ var response = {
         validationFlag *= false;
     }
 
-    
-    if (!validationFlag){
+
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
-                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0; 
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.status),                    
+                    req.st.db.escape(req.query.status),
                     req.st.db.escape(req.query.heMasterId)
-                                    ];
+                ];
                 var procQuery = 'CALL wm_get_requirementView( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if(!err && results && results[0]){
+                    if (!err && results && results[0]) {
                         response.status = true;
                         response.message = " Requirement View loaded sucessfully";
                         response.error = null;
-                        var output=[];
-                         for(var i=0; i<results[0].length; i++){
-                            var res2={};
-                            res2.parentId = results[0][i].parentId ? results[0][i].parentId: 0,
-                            res2.transId = results[0][i].transId ? results[0][i].transId: 0,
-                            res2.heDepartmentId = results[0][i].heDepartmentId ? results[0][i].heDepartmentId: 0,
-                            res2.positions = results[0][i].positions ? results[0][i].positions: 0,
-                            res2.positionsFilled = results[0][i].positionsFilled ? results[0][i].positionsFilled: 0,
-                            res2.departmentTitle = results[0][i].departmentTitle ? results[0][i].departmentTitle: '',
-                            res2.jobCode = results[0][i].jobCode ? results[0][i].jobCode: '',
-                            res2.jobtitleId = results[0][i].jobtitleId ? results[0][i].jobtitleId: 0,
-                            res2.title = results[0][i].title ? results[0][i].title: '',
-                            res2.jobtypeid = results[0][i].jobtypeid ? results[0][i].jobtypeid: 0,
-                            res2.jobType = results[0][i].jobType ? results[0][i].jobType: '',
-                            res2.jobDescription = results[0][i].jobDescription ? results[0][i].jobDescription: '',
-                            res2.remainingDays = results[0][i].remainingDays ? results[0][i].remainingDays: 0,
-                            res2.keywords = results[0][i].keywords ? results[0][i].keywords: '',
-                            res2.createdUserId = results[0][i].createdUserId ? results[0][i].createdUserId: 0,
-                            res2.creatorName = results[0][i].name ? results[0][i].name: '',
-                            res2.createdDate = results[0][i].createdDate,
-                            res2.branchList = JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList): [],
-                            res2.contactList = JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList): [],
-                            res2.stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail): []
+                        var output = [];
+                        for (var i = 0; i < results[0].length; i++) {
+                            var res2 = {};
+                            res2.parentId = results[0][i].parentId ? results[0][i].parentId : 0,
+                                res2.transId = results[0][i].transId ? results[0][i].transId : 0,
+                                res2.heDepartmentId = results[0][i].heDepartmentId ? results[0][i].heDepartmentId : 0,
+                                res2.positions = results[0][i].positions ? results[0][i].positions : 0,
+                                res2.positionsFilled = results[0][i].positionsFilled ? results[0][i].positionsFilled : 0,
+                                res2.departmentTitle = results[0][i].departmentTitle ? results[0][i].departmentTitle : '',
+                                res2.jobCode = results[0][i].jobCode ? results[0][i].jobCode : '',
+                                res2.jobtitleId = results[0][i].jobtitleId ? results[0][i].jobtitleId : 0,
+                                res2.title = results[0][i].title ? results[0][i].title : '',
+                                res2.jobtypeid = results[0][i].jobtypeid ? results[0][i].jobtypeid : 0,
+                                res2.jobType = results[0][i].jobType ? results[0][i].jobType : '',
+                                res2.jobDescription = results[0][i].jobDescription ? results[0][i].jobDescription : '',
+                                res2.remainingDays = results[0][i].remainingDays ? results[0][i].remainingDays : 0,
+                                res2.keywords = results[0][i].keywords ? results[0][i].keywords : '',
+                                res2.createdUserId = results[0][i].createdUserId ? results[0][i].createdUserId : 0,
+                                res2.creatorName = results[0][i].name ? results[0][i].name : '',
+                                res2.createdDate = results[0][i].createdDate,
+                                res2.branchList = JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
+                                res2.contactList = JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
+                                res2.stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : []
                             output.push(res2);
-                           } 
-                        response.data ={ 
-                                    requirementView : output
+                        }
+                        response.data = {
+                            requirementView: output
                         };
 
-                       if (req.query.isWeb==0) {
+                        if (req.query.isWeb == 0) {
                             // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                             // zlib.gzip(buf, function (_, result) {
                             //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                res.status(200).json(response);
+                            res.status(200).json(response);
                             //});
                         }
-                        else{
+                        else {
                             res.status(200).json(response);
                         }
-                        
+
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = " Requirement View is empty";
                         response.error = null;
-                        response.data={
-                            requirementView :[]
+                        response.data = {
+                            requirementView: []
 
                         };
-                        if (req.query.isWeb==0) {
+                        if (req.query.isWeb == 0) {
                             // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                             // zlib.gzip(buf, function (_, result) {
                             //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                res.status(200).json(response);
-                           // });
+                            res.status(200).json(response);
+                            // });
                         }
-                        else{
+                        else {
                             res.status(200).json(response);
                         }
 
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while loading Requirement View";
                         response.error = null;
@@ -1636,7 +1382,7 @@ var response = {
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
 
@@ -1645,13 +1391,13 @@ var response = {
     }
 };
 
-/*
-masterCtrl.saveMailingTemplate = function(req,res,next){
-var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+
+masterCtrl.getClientView = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -1663,138 +1409,47 @@ var response = {
         error.heMasterId = 'Invalid heMasterId';
         validationFlag *= false;
     }
-    var tagId =req.body.tagId;
-    if(typeof(tagId) == "string") {
-        tagId = JSON.parse(tagId);
-    }
-    if(!tagId){
-        tagId=[];
-    }
-    
-    if (!validationFlag){
+
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
-                req.body.templateId = (req.body.templateId) ? req.body.templateId : 0;
-
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.body.templateId),                    
-                    req.st.db.escape(req.body.templateName),
-                    req.st.db.escape(req.body.templateBody),
-                    req.st.db.escape(JSON.stringify(tagId))                    
-
-
-                ];
-                var procQuery = 'CALL wm_save_mailingTemplate( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, results) {
-                    console.log(err);
-
-                    if(!err && results ){
-                        response.status = true;
-                        response.message = "template saved sucessfully";
-                        response.error = null;
-                        response.data = {
-                            templateId: results[0][0].templateId
-                        };
-                        res.status(200).json(response);
-                    }
-
-                    else{
-                        response.status = false;
-                        response.message = "Error while saving template";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-
-                });
-
-            }
-            else{
-                res.status(401).json(response);
-            }
-
-
-        });
-    }
-};
-*/
-masterCtrl.getClientView = function(req,res,next){
-var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
-    };
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid heMasterId';
-        validationFlag *= false;
-    }
-    
-    if (!validationFlag){
-        response.error = error;
-        response.message = 'Please check the error';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
-                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0; 
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId)
-                                    ];
+                ];
                 var procQuery = 'CALL wm_get_clientView( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if(!err && results && results[0]){
+                    if (!err && results && results[0]) {
                         response.status = true;
-                        response.message = " client View loaded sucessfully";
+                        response.message = " Client View loaded sucessfully";
                         response.error = null;
-                         var output=[];
-                          for(var i=0; i<results[0].length; i++){
-                             var res2={};
-                             res2.stageDetail= JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail): [],                            
-                             res2.heDepartmentId= results[0][i].departmentId ? results[0][i].departmentId: 0, 
-                             res2.clientName= results[0][i].clientName ? results[0][i].clientName: 0,                             
-                             res2.requirementCount= results[0][i].count ? results[0][i].count: 0,
-                             res2.notes= results[0][i].notes ? results[0][i].notes: 0
-                             output.push(res2);
-                            }     
-                        response.data ={ 
-                                clientView : output                                    
-                         };
-                        res.status(200).json(response);                        
+                        var output = [];
+                        for (var i = 0; i < results[0].length; i++) {
+                            var res2 = {};
+                            res2.stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
+                                res2.heDepartmentId = results[0][i].departmentId ? results[0][i].departmentId : 0,
+                                res2.clientName = results[0][i].clientName ? results[0][i].clientName : 0,
+                                res2.requirementCount = results[0][i].count ? results[0][i].count : 0,
+                                res2.notes = results[0][i].notes ? results[0][i].notes : 0
+                            output.push(res2);
+                        }
+                        response.data = {
+                            clientView: output
+                        };
+                        res.status(200).json(response);
                     }
-                    // else if(!err ){
-                    //     response.status = true;
-                    //     response.message = " client View is empty";
-                    //     response.error = null;
-                    //     response.data ={
-                    //         clientView :[]
-                    //     };
-                    //      res.status(200).json(response);
-                    // };
 
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while loading client View";
                         response.error = null;
@@ -1805,7 +1460,7 @@ var response = {
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
 
@@ -1815,58 +1470,66 @@ var response = {
 };
 
 
-masterCtrl.mailTags=function(req,res,next){
-    
+masterCtrl.mailTags = function (req, res, next) {
+
     //var applicantId=36;
 
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     if (!req.query.heMasterId) {
         error.heMasterId = 'invalid tenant';
         validationFlag *= false;
     }
 
-     var tags =req.body.tags;
-    if(typeof(tags) == "string") {
+    var tags = req.body.tags;
+    if (typeof (tags) == "string") {
         tags = JSON.parse(tags);
     }
-    if(!tags){
-        tags=[];
+    if (!tags) {
+        tags = [];
     }
-    var reqApplicants =req.body.reqApplicants;
-    if(typeof(reqApplicants) == "string") {
+    var reqApplicants = req.body.reqApplicants;
+    if (typeof (reqApplicants) == "string") {
         reqApplicants = JSON.parse(reqApplicants);
     }
-    if(!reqApplicants){
-        reqApplicants=[];
+    if (!reqApplicants) {
+        reqApplicants = [];
     }
-    
-    var applicants =req.body.applicantId;
-    if(typeof(applicants) == "string") {
+
+    var applicants = req.body.applicantId;
+    if (typeof (applicants) == "string") {
         applicants = JSON.parse(applicants);
     }
-    if(!applicants){
-        applicants=[];
+    if (!applicants) {
+        applicants = [];
     }
 
-     var client =req.body.clientId;
-    if(typeof(client) == "string") {
+    var client = req.body.clientId;
+    if (typeof (client) == "string") {
         client = JSON.parse(client);
     }
-    if(!client){
-        client=[];
+    if (!client) {
+        client = [];
     }
 
-    var tableTags =req.body.tableTags;
-    if(typeof(tableTags) == "string") {
+    var clientContacts = req.body.clientContacts;
+    if (typeof (clientContacts) == "string") {
+        clientContacts = JSON.parse(clientContacts);
+    }
+    if (!clientContacts) {
+        clientContacts = [];
+    }
+
+    var tableTags = req.body.tableTags;
+    if (typeof (tableTags) == "string") {
         tableTags = JSON.parse(tableTags);
     }
-    if(!tableTags){
-        tableTags=[];
+    if (!tableTags) {
+        tableTags = [];
     }
 
     var validationFlag = true;
@@ -1874,20 +1537,20 @@ masterCtrl.mailTags=function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
                 var mailBody = req.body.mailBody;
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb :0 ;
-                req.body.mailerType = req.body.mailerType ? req.body.mailerType :0 ;
-                req.query.userId = req.query.userId ? req.query.userId :0 ;
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
+                req.query.userId = req.query.userId ? req.query.userId : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -1898,87 +1561,98 @@ masterCtrl.mailTags=function(req,res,next){
                     req.st.db.escape(JSON.stringify(client)),
                     req.st.db.escape(req.query.userId),
                     req.st.db.escape(req.body.mailerType),
-                    req.st.db.escape(JSON.stringify(tableTags))
+                    req.st.db.escape(JSON.stringify(tableTags)),
+                    req.st.db.escape(JSON.stringify(clientContacts))
 
                 ];
                 var idArray;
                 var mailbody_array = [];
-                if (req.body.mailerType == 1 || req.body.mailerType == 2){
+                if (req.body.mailerType == 1 || req.body.mailerType == 2) {
                     idArray = reqApplicants;
                 }
-                else if(req.body.mailerType == 3){
+                else if (req.body.mailerType == 3) {
                     idArray = applicants;
                 }
-                else{
+                else {
                     idArray = client;
                 }
 
                 var procQuery = 'CALL wm_get_detailsByTags1( ' + inputs.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
+                req.db.query(procQuery, function (err, result) {
                     console.log(err);
                     console.log(result);
-                    // console.log(result[0]);  
-                    if(!err && result){
-                        //console.log(tags);
+                    if (!err && result) {
                         var temp = mailBody;
-                        for (var i = 0; i < idArray.length; i++){
-                            // console.log('outer for running : ',i);
-                            //console.log('result[i]',result[0][i]);
-                    
-                               // console.log('inside');
-                                for(var j = 0; j < tags.applicant.length; j++){
-                                    // console.log(j);
-                                     //console.log('tags '+result[0][i][tags.applicant[j].tagName]);
-                                    mailBody=mailBody.replace('[applicant.'+tags.applicant[j].tagName+']',result[0][i][tags.applicant[j].tagName]);
+                        for (var i = 0; i < idArray.length; i++) {
+                            
+                            for (var j = 0; j < tags.applicant.length; j++) {
+                                mailBody = mailBody.replace('[applicant.' + tags.applicant[j].tagName + ']', result[0][i][tags.applicant[j].tagName]);
+                            }
+                            for (var j = 0; j < tags.requirement.length; j++) {
+                                mailBody = mailBody.replace('[requirement.' + tags.requirement[j].tagName + ']', result[1][i][tags.requirement[j].tagName]);
+                            }
+
+                            for (var j = 0; j < tags.client.length; j++) {
+                                mailBody = mailBody.replace('[client.' + tags.client[j].tagName + ']', result[2][i][tags.client[j].tagName]);
+                            }
+                            for (var j = 0; j < tags.clientContacts.length; j++) {
+                                mailBody = mailBody.replace('[contact.' + tags.clientContacts[j].tagName + ']', result[8][i][tags.clientContacts[j].tagName]);
+                            }
+
+                            if (tableTags.applicant.length > 0) {
+                                var position = mailBody.indexOf('@table');
+                                var tableContent = '';
+                                mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
+                                tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
+                                console.log(tableContent, 'mailbody');
+                                for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
                                 }
-                                for(var j = 0; j < tags.requirement.length; j++){
-                                    // console.log(j);
-                                    // console.log('tags '+result[1][tags.requirement[j].tagName]);
-                                    mailBody=mailBody.replace('[requirement.'+tags.requirement[j].tagName+']',result[1][i][tags.requirement[j].tagName]);
+                                tableContent += "</tr>";
+                                for (var candidateCount = 0; candidateCount < result[5].length; candidateCount++) {
+                                    tableContent += "<tr>";
+                                    for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[5][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                    }
+                                    tableContent += "</tr>";
                                 }
 
-                                for(var j = 0; j < tags.client.length; j++){
-                                    // console.log(j);
-                                    // console.log('tags '+result[2][tags.client[j].tagName]);
-                                    mailBody=mailBody.replace('[client.'+tags.client[j].tagName+']', result[2][i][tags.client[j].tagName]);
-                                }
+                                tableContent += "</table>";
+                                mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
 
-                                mailbody_array.push(mailBody);   
-                                mailBody = temp;
+                            }
+
+                            mailbody_array.push(mailBody);
+                            mailBody = temp;
                         }
-                        //console.log('asdf',mailBody);
-                        //return;
 
                         response.status = true;
-                        response.message = "tags replaced successfully";
+                        response.message = "Tags replaced successfully";
                         response.error = null;
-                        response.data ={
+                        response.data = {
                             tagsPreview: mailbody_array,
-                            applicantTable : result[5] ? result[5] : [],
-                            requirementTable : result[6] ? result[6] : [],
-                            clientTable : result[7] ? result[7] : []                           
-                            // applicantTable : result[3] ? result[3] : [],
-                            // requirementTable : result[4] ? result[4] : [],
-                            // clientTable : result[5] ? result[5] : []
+                            applicantTable: result[5] ? result[5] : [],
+                            requirementTable: result[6] ? result[6] : [],
+                            clientTable: result[7] ? result[7] : []
                         };
                         res.status(200).json(response);
                     }
 
-                    else if(!err){
+                    else if (!err) {
                         response.status = false;
-                        response.message = "no result found";
+                        response.message = "No result found";
                         response.error = null;
                         response.data = {
-                          tagsPreview: mailbody_array,
-                            applicantTable : [],
-                            requirementTable : [],
-                            clientTable :  []  
+                            tagsPreview: mailbody_array,
+                            applicantTable: [],
+                            requirementTable: [],
+                            clientTable: []
                         };
-                    res.status(200).json(response);
+                        res.status(200).json(response);
                     }
 
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while replacing tags";
                         response.error = null;
@@ -1987,89 +1661,23 @@ masterCtrl.mailTags=function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 
 };
-/*
-masterCtrl.getmasterStageStatusTypes=function(req,res,next){
+
+
+masterCtrl.getClientLocationContacts = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'invalid tenant';
-        validationFlag *= false;
-    }
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-    if (!validationFlag){
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if ((!err) && tokenResult) {
 
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb :0 ;
-
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId)
-                ];
-
-                var procQuery = 'CALL wm_get_masterStageStatusTypes( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
-                    console.log(err);
-                    if(!err && result && result[0] ){
-                        response.status = true;
-                        response.message = "stage and status loaded successfully";
-                        response.error = null;
-                        response.data ={
-                            Stage: result[0] ? result[0]:[],
-                            Status:result[1] ? result[1]:[]
-
-                        };
-                        res.status(200).json(response);
-                    }
-
-                    else{
-                        response.status = false;
-                        response.message = "Error while loading stage and status";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
-            }
-            else{
-                res.status(401).json(response);
-            }
-        });
-    }
-
-};
-*/
-/*
-masterCtrl.getMasterStageStatus = function(req,res,next){
-    var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
-    };
-   
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -2081,130 +1689,18 @@ masterCtrl.getMasterStageStatus = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                 
-                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb: 0;
-                
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId)
 
-                ];
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
-                var procQuery = 'CALL wm_get_masterStageStatus( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
-                    console.log(err);
-                   
-                    var isWeb=req.query.isWeb;
-                    if(!err && result && result[0] && result[0][0] ){
-                        response.status = true;
-                        response.message = "Masters stage and status loaded successfully";
-                        response.error = null;
-                        var output=[];
-                        for(var i=0; i<result[0].length; i++){
-                            var res2={};
-                            res2.stageId=result[0][i].stageId;
-                            res2.stageName=result[0][i].stageName;
-                            res2.stageTypeId=result[0][i].stageTypeId;
-                            res2.stageTypeName=result[0][i].stageTypeName;
-                            res2.colorCode=result[0][i].colorCode;                       
-                            res2.status=JSON.parse(result[0][i].status) ? JSON.parse(result[0][i].status):[];
-                            output.push(res2); 
-                        }
-                        response.data ={
-                            mStageStatus:output
-                        };
-
-                       
-                        if (isWeb == 0){
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
-
-                        }
-                        else{
-                           res.status(200).json(response);    
-                        }
-                    
-                    }
-                    else if(!err){
-                        response.status = true;
-                        response.message = "no results found";
-                        response.error = null;
-                        response.data ={
-                                mStageStatus:[]
-                        };
-                        if (isWeb == 0){
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
-
-                        }
-                        else{
-                           res.status(200).json(response);    
-                        }
-                    }
-                    else{
-                        response.status = false;
-                        response.message = "Error while getting stage and status";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
-            }
-            else{
-                res.status(401).json(response);
-            }
-        });
-    }
-
-};
-*/
-masterCtrl.getClientLocationContacts = function(req,res,next){
-    var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
-    };
-   
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid tenant';
-        validationFlag *= false;
-    }
-
-    if (!validationFlag){
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if ((!err) && tokenResult) {
-                 
-                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb: 0;
-                
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -2213,69 +1709,70 @@ masterCtrl.getClientLocationContacts = function(req,res,next){
 
                 var procQuery = 'CALL wm_get_clientBusinessContacts( ' + inputs.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
+                req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                   
-                    var isWeb=req.query.isWeb;
-                    if(!err && result && result[0] && result[0][0]){
+
+                    var isWeb = req.query.isWeb;
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "client data loaded successfully";
                         response.error = null;
-                        var output=[];
-                        for(var i=0; i<result[1].length; i++){
-                            var res2={};
-                            res2.businessLocationId=result[1][i].businessLocationId;
-                            res2.businessLocationTitle=result[1][i].businessLocationTitle;
-                            res2.location=result[1][i].location;
-                            res2.address=result[1][i].type;
-                            res2.latitude=result[1][i].latitude;                       
-                            res2.longitude=result[1][i].longitude;    
-                            res2.nearestParking=result[1][i].nearestParking;    
-                            res2.entryProcedure=result[1][i].entryProcedure;
-                            res2.landmark=result[1][i].landmark;    
-                            res2.contactList=JSON.parse(result[1][i].contactList) ? JSON.parse(result[1][i].contactList) :[];
-                            output.push(res2); 
+                        var output = [];
+                        for (var i = 0; i < result[1].length; i++) {
+                            var res2 = {};
+                            res2.businessLocationId = result[1][i].businessLocationId;
+                            res2.businessLocationTitle = result[1][i].businessLocationTitle;
+                            res2.location = result[1][i].location;
+                            res2.address = result[1][i].type;
+                            res2.latitude = result[1][i].latitude;
+                            res2.longitude = result[1][i].longitude;
+                            res2.nearestParking = result[1][i].nearestParking;
+                            res2.entryProcedure = result[1][i].entryProcedure;
+                            res2.landmark = result[1][i].landmark;
+                            res2.contactList = JSON.parse(result[1][i].contactList) ? JSON.parse(result[1][i].contactList) : [];
+                            output.push(res2);
                         }
-                        response.data ={
-                            // clientU : result[0],
+                        result[0][0].managers = JSON.parse(result[0][0].managers); 
+
+                        response.data = {
                             heDepartment: result[0][0],
-                            businessLocation:output
+                            businessLocation: output
                         };
 
-                       
-                        if (isWeb == 0){
+
+                        if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
 
                         }
-                        else{
-                           res.status(200).json(response);    
+                        else {
+                            res.status(200).json(response);
                         }
-                    
+
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
-                        response.message = "no results found";
+                        response.message = "No results found";
                         response.error = null;
-                        response.data ={
-                                clientData:[]
+                        response.data = {
+                            clientData: []
                         };
-                        if (isWeb == 0){
+                        if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
 
                         }
-                        else{
-                           res.status(200).json(response);    
+                        else {
+                            res.status(200).json(response);
                         }
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting client data";
                         response.error = null;
@@ -2284,19 +1781,19 @@ masterCtrl.getClientLocationContacts = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 };
 
-masterCtrl.saveAssessmentTemplates = function(req,res,next){
-var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+masterCtrl.saveAssessmentTemplates = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -2309,25 +1806,25 @@ var response = {
         validationFlag *= false;
     }
 
-    var question =req.body.question;
-    if(typeof(question) == "string") {
+    var question = req.body.question;
+    if (typeof (question) == "string") {
         question = JSON.parse(question);
     }
-    if(!question){
-        question=[];
+    if (!question) {
+        question = [];
     }
-    
-    if (!validationFlag){
+
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
-                req.query.isWeb = (req.query.isWeb) ? req.query.deleteFlag : 0;
+                req.body.deleteFlag = req.body.deleteFlag ? req.body.deleteFlag : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -2342,28 +1839,18 @@ var response = {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if(!err && results){
+                    if (!err && results) {
                         response.status = true;
-                        response.message = "assessment saved sucessfully";
+                        response.message = "Assessment saved sucessfully";
                         response.error = null;
-                        // var output=[];
-                        // for(var i=0; i<results[0].length; i++){
-                        //     var res2={};
-                        //     res2.stageId=results[0][i].stageId;
-                        //     res2.stageName=results[0][i].stageName;
-                        //     res2.stageTypeId=results[0][i].stageTypeId;
-                        //     res2.stageTypeName=results[0][i].stageTypeName;
-                        //     res2.colorCode=results[0][i].colorCode;                       
-                        //     res2.status=JSON.parse(results[0][i].status) ? JSON.parse(results[0][i].status):[];
-                        //     output.push(res2); 
-                        // }
+
                         response.data = {
                             assessmentId: results[0][0].assessmentId
                         };
                         res.status(200).json(response);
                     }
 
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving assessment";
                         response.error = null;
@@ -2374,7 +1861,7 @@ var response = {
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
 
@@ -2383,35 +1870,35 @@ var response = {
     }
 };
 
-masterCtrl.getAssessmentTemplates = function(req,res,next){
+masterCtrl.getAssessmentTemplates = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
-   
+
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
     if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid tenant';
+        error.heMasterId = 'Invalid company';
         validationFlag *= false;
     }
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                 
-                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb: 0;
-                
+
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -2420,73 +1907,63 @@ masterCtrl.getAssessmentTemplates = function(req,res,next){
 
                 var procQuery = 'CALL wm_get_assessmentDetailsByTemplate( ' + inputs.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
+                req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                   
-                    var isWeb=req.query.isWeb;
-                    if(!err && result && result[0]){
+
+                    var isWeb = req.query.isWeb;
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
-                        response.message = "assessment loaded successfully";
+                        response.message = "Assessment loaded successfully";
                         response.error = null;
-                        var output=[];
-                        for(var i=0; i<result[1].length; i++){
-                            var res2={};
-                            res2.questionId=result[1][i].questionId;
-                            res2.questionName=result[1][i].questionName;
-                            res2.questionWeightage=result[1][i].questionWeightage;
-                            res2.groupTypeId = result[1][i].groupTypeId;
-                            res2.groupTypeName = result[1][i].groupTypeName;
-                            res2.options=result[1][i].options ? JSON.parse(result[1][i].options):[];
-                            // var inside=[];
-                            // //var parsedQuestion=res2.question;
-                            // for(var j=0 ; j<result[0][i].question[0].length ; j++){
-                            //         var res3={};
-                            //         res3.questionId=result[0][i].question[0][j].questionId;
-                            //         res3.questionName=result[0][i].question[0][j].questionName;
-                            //         res3.questionWeightage=result[0][i].question[0][j].questionWeightage;
-                            //         res3.options=result[0][i].question[0][j].options ? result[0][i].question[0][j].options:[];
-                            //         inside.push(res3);
-                            // }
-                            // res2.question=inside;
-                            output.push(res2); 
+                        var output = [];
+                        for (var i = 0; i < result[1].length; i++) {
+                            var res2 = {};
+                            res2.questionId = result[1][i].questionId ? result[1][i].questionId : 0;
+                            res2.questionName = result[1][i].questionName ? result[1][i].questionName : "";
+                            res2.questionWeightage = result[1][i].questionWeightage ? result[1][i].questionWeightage : 0;
+                            res2.groupTypeId = result[1][i].groupTypeId ? result[1][i].groupTypeId : 0;
+                            res2.groupTypeName = result[1][i].groupTypeName ? result[1][i].groupTypeName : "";
+                            res2.options = result[1][i].options ? JSON.parse(result[1][i].options) : [];
+                            output.push(res2);
                         }
-                        response.data ={
-                            assessmentId : result[0][0].assessmentId,
-                            assessmentTitle : result[0][0].assessmentTitle,
-                            questions : output
+                        response.data = {
+                            assessmentId: result[0][0].assessmentId ? result[0][0].assessmentId : 0,
+                            assessmentTitle: result[0][0].assessmentTitle ? result[0][0].assessmentTitle : "",
+                            question: output ? output : []
                         };
 
-                        if(isWeb == 0){
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        if (isWeb == 0) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                 res.status(200).json(response);
-                            });                        
+                            });
                         }
-                        else{
-                               res.status(200).json(response);
+                        else {
+                            res.status(200).json(response);
                         }
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
-                        response.message = "no results found";
+                        response.message = "No results found";
                         response.error = null;
-                        response.data ={
-                               assesment : result[1],
-                            questions : output
+                        response.data = {
+                            assessmentId: 0,
+                            assessmentTitle: "",
+                            question: []
                         };
-                        if(isWeb == 0){
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        if (isWeb == 0) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                 res.status(200).json(response);
-                            });                        
+                            });
                         }
-                        else{
-                               res.status(200).json(response);
+                        else {
+                            res.status(200).json(response);
                         }
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting assessment templates";
                         response.error = null;
@@ -2495,7 +1972,7 @@ masterCtrl.getAssessmentTemplates = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -2504,60 +1981,48 @@ masterCtrl.getAssessmentTemplates = function(req,res,next){
 };
 
 
-masterCtrl.saveUserManager = function(req,res,next){
-var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+masterCtrl.saveUserManager = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    // if (!req.query.apiKey) {
-    //     error.apiKey = 'Invalid apiKey';
-    //     validationFlag *= false;
-    // }
-
 
     if (!req.query.heMasterId) {
         error.heMasterId = 'Invalid heMasterId';
         validationFlag *= false;
     }
 
-    var accessRights =req.body.accessRights;
-    if(typeof(accessRights) == "string") {
+    var accessRights = req.body.accessRights;
+    if (typeof (accessRights) == "string") {
         accessRights = JSON.parse(accessRights);
     }
-    if(!accessRights){
-        accessRights=[];
+    if (!accessRights) {
+        accessRights = [];
     }
-    var reportingTo =req.body.reportingTo;
-    if(typeof(reportingTo) == "string") {
+    var reportingTo = req.body.reportingTo;
+    if (typeof (reportingTo) == "string") {
         reportingTo = JSON.parse(reportingTo);
     }
-    if(!reportingTo){
-        reportingTo=[];
+    if (!reportingTo) {
+        reportingTo = [];
     }
-    // var transferredTo =req.body.transferredTo;
-    // if(typeof(transferredTo) == "string") {
-    //     transferredTo = JSON.parse(transferredTo);
-    // }
-    // if(!transferredTo){
-    //     transferredTo=[];
-    // }
-    
-    if (!validationFlag){
+
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult) {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 req.query.apiKey = req.query.apiKey ? req.query.apiKey : 0;
                 req.body.userMasterId = req.body.userMasterId ? req.body.userMasterId : 0;
@@ -2583,14 +2048,14 @@ var response = {
                     req.st.db.escape(req.query.apiKey),
                     req.st.db.escape(req.body.userMasterId),
                     req.st.db.escape(req.body.employeeCode),
-                    req.st.db.escape(typeof(req.body.jobTitle) == "string" ? req.body.jobTitle : JSON.stringify(req.body.jobTitle)),                    
+                    req.st.db.escape(typeof (req.body.jobTitle) == "string" ? req.body.jobTitle : JSON.stringify(req.body.jobTitle)),
                     req.st.db.escape(JSON.stringify(accessRights)),
                     req.st.db.escape(JSON.stringify(reportingTo)),
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(req.body.shortSignature),
                     req.st.db.escape(req.body.fullSignature),
                     req.st.db.escape(JSON.stringify(req.body.transferredTo)),
-                    req.st.db.escape(typeof(req.body.userType) == "string" ? req.body.userType : JSON.stringify(req.body.userType)),
+                    req.st.db.escape(typeof (req.body.userType) == "string" ? req.body.userType : JSON.stringify(req.body.userType)),
                     req.st.db.escape(req.body.firstName),
                     req.st.db.escape(req.body.lastName),
                     req.st.db.escape(req.body.mobileISD),
@@ -2609,15 +2074,15 @@ var response = {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if(!err && results){
+                    if (!err && results) {
                         response.status = true;
-                        response.message = "user data saved sucessfully";
+                        response.message = "User data saved sucessfully";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
 
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving user data";
                         response.error = null;
@@ -2628,7 +2093,7 @@ var response = {
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
 
@@ -2636,5 +2101,6 @@ var response = {
         });
     }
 };
+
 
 module.exports = masterCtrl;
