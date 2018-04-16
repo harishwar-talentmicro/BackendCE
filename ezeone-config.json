@@ -17,7 +17,7 @@
     "GROUP_ICON_URL" : "http://icons.iconarchive.com/icons/blackvariant/button-ui-system-folders-alt/512/Group-icon.png",
     "EZEONE_MAILING_LIST" : [
       "sujit.mishra3147@gmail.com",
-      "sujitkumar@hirecraft.in"
+      "sujit@talentmicro.com"
     ],
     "EZEONE_MESSAGE_ACCEPT_STATUS":1,
     "EZEONE_MESSAGE_REJECT_STATUS":2,
@@ -58,7 +58,7 @@
     "SNS_IOS_ARN" : "arn:aws:sns:us-east-1:546144508006:app/APNS/IOSPRO",
     "SNS_ANDROID_ARN" : "arn:aws:sns:us-east-1:546144508006:app/GCM/ANDROIDDEV",
     "SNS_Dialer_IOS_ARN" : "arn:aws:sns:us-east-1:546144508006:app/APNS/WM-Dialer-Production",
-    "SNS_Dialer_ANDROID_ARN" : "arn:aws:sns:us-east-1:546144508006:app/GCM/ANDROIDDEV"
+    "SNS_Dialer_ANDROID_ARN" : "arn:aws:sns:us-east-1:546144508006:app/GCM/WM-Dialer-Android"
   },
   "VERSION_LIST" : {
     "IOS" : [[],[23,24]],

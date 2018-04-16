@@ -30,20 +30,20 @@ attendanceCtrl.saveAttendance = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.body.attendanceDate) {
-        error.attendanceDate = 'Invalid attendance date';
-        validationFlag *= false;
-    }
-
-    if (!req.body.startTime) {
-        error.startTime = 'Invalid start time';
-        validationFlag *= false;
-    }
-
-    if (!req.body.endTime) {
-        error.endTime = 'Invalid end time';
-        validationFlag *= false;
-    }
+    // if (!req.body.attendanceDate) {
+    //     error.attendanceDate = 'Invalid attendance date';
+    //     validationFlag *= false;
+    // }
+    //
+    // if (!req.body.startTime) {
+    //     error.startTime = 'Invalid start time';
+    //     validationFlag *= false;
+    // }
+    //
+    // if (!req.body.endTime) {
+    //     error.endTime = 'Invalid end time';
+    //     validationFlag *= false;
+    // }
     var attachmentList =req.body.attachmentList;
     if(typeof(attachmentList) == "string") {
         attachmentList = JSON.parse(attachmentList);

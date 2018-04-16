@@ -264,12 +264,13 @@ TITOCtrl.getAttendanceRegisterDetails = function(req,res,next){
     }
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
-
+            req.query.HEUserId = req.query.HEUserId ? req.query.HEUserId : 0;
             if((!err) && tokenResult){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.date),
-                    req.st.db.escape(req.query.groupId)
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(req.query.HEUserId)
                 ];
 
                 var procQuery = 'CALL he_get_attendanceRegister_Details( ' + procParams.join(',') + ')';

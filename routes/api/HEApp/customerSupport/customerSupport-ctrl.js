@@ -195,7 +195,7 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                         response.status = true;
                         response.message = "Support request saved successfully";
                         response.error = null;
-                        var formDataJSON1 = JSON.parse(results[0][0].formDataJSON) ;
+                        var formDataJSON1 = JSON.parse(results[0][0].formDataJSON);
                         response.data = {
                             messageList: {
                                 messageId: results[0][0].messageId,

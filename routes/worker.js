@@ -11,7 +11,7 @@ var DbHelper = require('./../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
 
 
-module.exports = function(results) {
+module.exports = function(results,done) {
 
     notificationTemplaterRes = notificationTemplater.parse('compose_message',{
         senderName : results.message ? results.message : ""
@@ -70,8 +70,15 @@ module.exports = function(results) {
         var procQuery = 'insert into test_1(receiverId) values(' + results.receiverId + ')';
         console.log(procQuery);
         db.query(procQuery,function(err,results) {
+            if(!err){
+                done('Awesome thread script may run in browser and node.js!');
+            }
+            else {
+                done(err);
+            }
+
         });
-        // done('Awesome thread script may run in browser and node.js!');
+
         }
     else {
         console.log('Error in parsing notification compose_message template - ',
