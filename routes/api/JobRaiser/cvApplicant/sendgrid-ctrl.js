@@ -1,5 +1,4 @@
 
-var notification = null;
 var moment = require('moment');
 var NotificationTemplater = require('../../../lib/NotificationTemplater.js');
 var notificationTemplater = new NotificationTemplater();
@@ -45,11 +44,11 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
     var updateFlag = 0;
     var overWrite = 0;
 
-    if(req.body.overWrite){
+    if (req.body.overWrite) {
         overWrite = req.body.overWrite;
     }
 
-    if(req.body.updateFlag){
+    if (req.body.updateFlag) {
         updateFlag = req.body.updateFlag;
     }
 
@@ -136,6 +135,13 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
         client = JSON.parse(client);
     }
 
+    if (!clientContacts) {
+        clientContacts = [];
+    }
+    else if (typeof (clientContacts) == "string") {
+        clientContacts = JSON.parse(clientContacts);
+    }
+
     if (!tableTags) {
         tableTags = [];
     }
@@ -184,8 +190,8 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(client)),
                         req.st.db.escape(req.query.userId),
                         req.st.db.escape(req.body.mailerType),
-                        req.st.db.escape(JSON.stringify(tableTags))
-
+                        req.st.db.escape(JSON.stringify(tableTags)),
+                        req.st.db.escape(JSON.stringify(clientContacts))
                     ];
 
                     var procQuery = 'CALL wm_get_detailsByTags1( ' + inputs.join(',') + ')';
@@ -195,16 +201,10 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                         console.log(result);
 
                         if (!err && result) {
-                            //console.log(tags);
                             var temp = mailBody;
                             for (var i = 0; i < idArray.length; i++) {
-                                // console.log('outer for running : ',i);
-                                //console.log('result[i]',result[0][i]);
 
-                                // console.log('inside');
                                 for (var j = 0; j < tags.applicant.length; j++) {
-                                    // console.log(j);
-                                    //console.log('tags '+result[0][i][tags.applicant[j].tagName]);
                                     mailBody = mailBody.replace('[applicant.' + tags.applicant[j].tagName + ']', result[0][i][tags.applicant[j].tagName]);
                                 }
                                 for (var j = 0; j < tags.requirement.length; j++) {
@@ -219,6 +219,9 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                                 for (var j = 0; j < result[3].length; j++) {
 
                                     emailId.push(result[3][j].emailId);
+                                }
+                                for (var j = 0; j < tags.clientContact.length; j++) {
+                                    mailBody = mailBody.replace('[clientContact.' + tags.clientContact[j].tagName + ']', result[8][i][tags.clientContact[j].tagName]);
                                 }
 
                                 //table creation for table tags
@@ -243,32 +246,6 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                                     mailBody += '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script><script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>';
 
 
-
-                                    // var table = document.createElement("TABLE");
-                                    // table.setAttribute("id", "email_custom_table");
-                                    // document.getElementById('trial').appendChild(table);
-
-                                    // for (var i = 0; i < tableTags.applicant.length; i++) {
-                                    //     var thead = document.createElement("TH");
-                                    //     thead.setAttribute("id", "email_custom_table_head");
-                                    //     var theadingname = document.createTextNode(tableTags.applicant[i].tagName);
-                                    //     thead.appendChild(theadingname);
-                                    //     document.getElementById("email_custom_table").appendChild(thead);
-                                    // }
-
-                                    // var table_data = result[5];
-                                    // var table_columns = tableTags.applicant;
-                                    // for (var i = 0; i < table_data.length; i++) {
-                                    //     var y = document.createElement("TR");
-                                    //     y.setAttribute("id", "email_custom_table_tr" + i);
-                                    //     document.getElementById("email_custom_table").appendChild(y);
-                                    //     for (var j = 0; j < table_columns.length; j++) {
-                                    //         var td = document.createElement("TD");
-                                    //         var t = document.createTextNode(table_data[i][table_columns[j].tagName]);
-                                    //         td.appendChild(t);
-                                    //         document.getElementById("email_custom_table_tr" + i).appendChild(td);
-                                    //     }
-                                    // }
                                 }
 
                                 EZEIDEmail = result[4][0].fromemailId;
@@ -280,12 +257,9 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                                     to: emailId[i],
                                     subject: req.body.subject,
                                     html: mailBody
-                                    // html: data // html body
                                 };
 
 
-                                // send mail with defined transport object
-                                //message Type 7 - Forgot password mails service
                                 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
                                 var email = new sendgrid.Email();
                                 email.from = mailOptions.from;
@@ -348,14 +322,12 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                                 mailBody = temp;
                             }
 
-
                             response.status = true;
                             response.message = "mail sent successfully";
                             response.error = null;
 
                             res.status(200).json(response);
                         }
-
 
                         else {
                             response.status = false;
@@ -389,7 +361,7 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(cc)),
                     req.st.db.escape(JSON.stringify(bcc)),
                     req.st.db.escape(req.body.subject),
-                    req.st.db.escape(req.body.mailBody),
+                    req.st.db.escape(req.body.templateContent),
                     req.st.db.escape(req.body.replymailId),
                     req.st.db.escape(req.body.priority),
                     req.st.db.escape(req.body.updateFlag),

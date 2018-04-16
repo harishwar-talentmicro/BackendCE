@@ -18,7 +18,6 @@ router.get('/applicantDetails',applicantCtrl.getApplicantDetails);
 router.get('/stagestatus',applicantCtrl.getreqAppStageStatus);
 router.post('/stagestatus',applicantCtrl.saveApplicantStageStatus);
 
-//router.get('/globalData',applicantCtrl.getglobalData);
 router.get('/requirementList',applicantCtrl.getrequirementList);
 
 

@@ -18,9 +18,6 @@ router.get('/defaultMemberList',jobCtrl.getJobDefaultMemberList);
 router.get('/defaults',jobCtrl.getJobDefaults); // for web
 router.get('/getdefaults',jobCtrl.getdefaults); // for mobile
 
-
-// ***created by arun*****
-
 router.post('/contactlist',jobCtrl.getcontactlist);
 router.post('/saveContact',jobCtrl.saveContact);
 

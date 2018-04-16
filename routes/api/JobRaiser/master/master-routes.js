@@ -9,10 +9,6 @@ var masterCtrl = require('./master-ctrl');
 
 router.get('/requirement',masterCtrl.getReqMasterData);
 router.get('/specialization',masterCtrl.getSpecializations);
-//router.get('/eduSpec',masterCtrl.getEduSpec);  // feb 2nd 
-//router.post('/eduSpecId',masterCtrl.requirementEduSpec);  // feb 6th for requirement 
-
-//router.get('/memberList',masterCtrl.getMemberList); // not used old
 
 
 router.post('/saveClients',masterCtrl.saveClients);    
@@ -39,10 +35,6 @@ router.get('/requirementView',masterCtrl.getRequirementView);
 router.get('/clientView',masterCtrl.getClientView);
 
 router.post('/tagPreview',masterCtrl.mailTags);
-
-//router.get('/stageStatusTypes',masterCtrl.getmasterStageStatusTypes);  // why ..,can be put in master..transferred to master
-
-//router.get('/masterStageStatus',masterCtrl.getMasterStageStatus);  // why same present in master..transferred to master
 
 router.get('/clientBusinessContacts',masterCtrl.getClientLocationContacts);
 
