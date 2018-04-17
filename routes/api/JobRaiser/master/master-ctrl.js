@@ -2102,5 +2102,150 @@ masterCtrl.saveUserManager = function (req, res, next) {
     }
 };
 
+//for whatmate web configuration
+masterCtrl.getAssessmentGroupType = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)                    
+                ];
+
+                var procQuery = 'CALL wm_get_AssessmentgroupType( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    var isWeb = req.query.isWeb;
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Assessment groupType loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            groupType : result[0]
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = {
+                            groupType : []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting assessment groupType";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+// save Assessment groupType 
+masterCtrl.saveAssessmentGroupType = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+                req.body.deleteFlag = req.body.deleteFlag ? req.body.deleteFlag : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.groupTypeId),
+                    req.st.db.escape(req.body.groupTypeName),
+                    req.st.db.escape(req.body.deleteFlag)
+                ];
+                var procQuery = 'CALL wm_Save_AssessmentgroupType( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, results) {
+                    console.log(err);
+
+                    if (!err && results && results[0]) {
+                        response.status = true;
+                        response.message = "GroupType saved sucessfully";
+                        response.error = null;
+                        response.data = {
+                            groupType: results[0][0]
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving groupType";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
 
 module.exports = masterCtrl;

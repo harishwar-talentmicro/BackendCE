@@ -43,5 +43,8 @@ router.get('/assessmentTemplates',masterCtrl.getAssessmentTemplates);
 
 router.post('/userManager',masterCtrl.saveUserManager);
 
+router.get('/assessmentGroupType',masterCtrl.getAssessmentGroupType);
+router.post('/saveAssessmentGroupType',masterCtrl.saveAssessmentGroupType);
+
 module.exports = router;
 
