@@ -2184,6 +2184,14 @@ applicantCtrl.saveInterviewSchedulerNew = function (req, res, next) {
         interviewLocation = [];
     }
 
+    var heDepartment = req.body.heDepartment;
+    if (typeof (heDepartment) == "string") {
+        heDepartment = JSON.parse(heDepartment);
+    }
+    if (!heDepartment) {
+        heDepartment = {};
+    }    
+
     var senderGroupId;
     if (!validationFlag) {
         response.error = error;
@@ -2233,7 +2241,8 @@ applicantCtrl.saveInterviewSchedulerNew = function (req, res, next) {
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(JSON.stringify(assessmentTypeList)),
                     req.st.db.escape(JSON.stringify(skillAssessment)),
-                    req.st.db.escape(JSON.stringify(interviewLocation))
+                    req.st.db.escape(JSON.stringify(interviewLocation)),
+                    req.st.db.escape(JSON.stringify(heDepartment))
                 ];
 
                 var procQuery = 'CALL wm_save_interviewSchedular_new1( ' + procParams.join(',') + ')';
@@ -2762,7 +2771,8 @@ applicantCtrl.getMasterInterviewScheduler = function (req, res, next) {
                                 jobTitle: result[0] ? result[0] : [],
                                 assessmentList: result[1] ? result[1] : [],
                                 interviewRound: result[2] ? result[2] : [],
-                                skillLevelList: result[3] ? result[3] : []
+                                skillLevelList: result[3] ? result[3] : [],
+                                heDepartment:  result[4] ? result[4] : []
                             };
 
                         if (req.query.isWeb == 0) {
@@ -2784,7 +2794,8 @@ applicantCtrl.getMasterInterviewScheduler = function (req, res, next) {
                             jobTitle: [],
                             assessmentList: [],
                             interviewRound: [],
-                            skillLevelList: []
+                            skillLevelList: [],
+                            heDepartment:  []
                         };
 
                         if (req.query.isWeb == 0) {
@@ -2860,6 +2871,14 @@ applicantCtrl.saveInterviewSchedulerForApplicant = function (req, res, next) {
     }
     if (!skillAssessment) {
         skillAssessment = [];
+    }
+    var heDepartment = [];
+    heDepartment = req.body.heDepartment;
+    if (typeof (heDepartment) == "string") {
+        heDepartment = JSON.parse(heDepartment);
+    }
+    if (!heDepartment) {
+        heDepartment = [];
     }
 
     var interviewRound = req.body.interviewRound;
@@ -2943,7 +2962,8 @@ applicantCtrl.saveInterviewSchedulerForApplicant = function (req, res, next) {
                     req.st.db.escape(req.body.profilePicture),
                     req.st.db.escape(JSON.stringify(attachmentList[0])),
                     req.st.db.escape(JSON.stringify(assessmentTypeList)),
-                    req.st.db.escape(JSON.stringify(skillAssessment))
+                    req.st.db.escape(JSON.stringify(skillAssessment)),
+                    req.st.db.escape(JSON.stringify(heDepartment))
                 ];
 
                 var procQuery = 'CALL wm_save_interviewSchedulerOfOneApplicant( ' + procParams.join(',') + ')';

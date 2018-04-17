@@ -1585,6 +1585,7 @@ masterCtrl.mailTags = function (req, res, next) {
                     if (!err && result) {
                         var temp = mailBody;
                         for (var i = 0; i < idArray.length; i++) {
+                            console.log('i=',i);
                             
                             for (var j = 0; j < tags.applicant.length; j++) {
                                 mailBody = mailBody.replace('[applicant.' + tags.applicant[j].tagName + ']', result[0][i][tags.applicant[j].tagName]);
@@ -1598,6 +1599,8 @@ masterCtrl.mailTags = function (req, res, next) {
                             }
                             for (var j = 0; j < tags.clientContacts.length; j++) {
                                 mailBody = mailBody.replace('[contact.' + tags.clientContacts[j].tagName + ']', result[8][i][tags.clientContacts[j].tagName]);
+                                console.log('result=',result[8]);
+                                console.log('result[8][i]=',result[8][i]);
                             }
 
                             if (tableTags.applicant.length > 0) {
