@@ -1,4 +1,4 @@
-var notification = null;
+
 var moment = require('moment');
 var NotificationTemplater = require('../../../lib/NotificationTemplater.js');
 var notificationTemplater = new NotificationTemplater();
@@ -26,6 +26,10 @@ paceUsersCtrl.checkUser = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+    if (!req.query.ezeoneId) {
+        error.ezeoneId = 'Invalid ezeoneId';
+        validationFlag *= false;
+    }
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -48,25 +52,18 @@ paceUsersCtrl.checkUser = function (req, res, next) {
                     console.log(err);
                     if (!err && result) {
                         response.status = true;
-                        response.message = "user check completed successfully";
+                        response.message = "User check completed successfully";
                         response.error = null;
                         response.data = result[0];
-
-
                         res.status(200).json(response);
-
-
                     }
                     else if (!err) {
                         response.status = true;
-                        response.message = "no results found";
+                        response.message = "No results found";
                         response.error = null;
                         response.data = null;
-
                         res.status(200).json(response);
-
                     }
-
                     else {
                         response.status = false;
                         response.message = "Error while user check";
@@ -81,7 +78,6 @@ paceUsersCtrl.checkUser = function (req, res, next) {
             }
         });
     }
-
 };
 
 
@@ -95,6 +91,10 @@ paceUsersCtrl.paceLoginValidation = function (req, res, next) {
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.ezeId) {
+        error.ezeId = 'Invalid ezeId';
         validationFlag *= false;
     }
     if (!validationFlag) {
@@ -122,22 +122,15 @@ paceUsersCtrl.paceLoginValidation = function (req, res, next) {
                         response.message = "Valid Pace HCM User";
                         response.error = null;
                         response.data = result[0][0];
-
-
                         res.status(200).json(response);
-
-
                     }
                     else if (!err) {
-                        response.status = false;
-                        response.message = "no results found";
+                        response.status = true;
+                        response.message = "No results found";
                         response.error = null;
                         response.data = null;
-
                         res.status(200).json(response);
-
                     }
-
                     else {
                         response.status = false;
                         response.message = "Not a Valid Pace HCM User";
@@ -164,9 +157,9 @@ paceUsersCtrl.getUsers = function (req, res, next) {
     };
     var validationFlag = true;
 
-    if(!req.query.heMasterId){
+    if (!req.query.heMasterId) {
         validationFlag = false;
-        error.heMasterId = "Invalid Company";
+        error.heMasterId = "Invalid company";
     }
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -189,11 +182,10 @@ paceUsersCtrl.getUsers = function (req, res, next) {
                 ];
 
                 var procQuery = 'CALL wm_get_pace_users( ' + inputs.join(',') + ')';
-
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(result);
-                    if (!err && result) {
+                    if (!err && result && result[0]) {
                         response.status = true;
                         response.message = "Users loaded successfully";
                         response.error = false;
@@ -202,8 +194,76 @@ paceUsersCtrl.getUsers = function (req, res, next) {
                     }
                     else {
                         response.status = false;
-                        response.message = "Some error occurred";
+                        response.message = "Error while loading users";
                         response.error = true;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.body.heMasterId) {
+        validationFlag = false;
+        error.heMasterId = "Invalid Company";
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.body.taskId = req.body.taskId ? req.body.taskId : 0;
+                req.body.priority = req.body.priority ? req.body.priority : 1;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.taskId),
+                    req.st.db.escape(req.body.heMasterId),
+                    req.st.db.escape(req.body.heDepartmentId),
+                    req.st.db.escape(req.body.taskTitle),
+                    req.st.db.escape(req.body.taskDescription),
+                    req.st.db.escape(req.body.taskDateTime),
+                    req.st.db.escape(req.body.priority)
+                ];
+
+                var procQuery = 'CALL wm_save_pacePlanner( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(result);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Task saved successfully";
+                        response.error = null;
+                        response.data = result[0][0];
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving task";
+                        response.error = null;
                         response.data = null;
                         res.status(500).json(response);
                     }

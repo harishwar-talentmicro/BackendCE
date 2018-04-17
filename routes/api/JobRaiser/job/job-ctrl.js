@@ -589,6 +589,11 @@ jobCtrl.getcontactlist = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
     if (!req.query.heDepartmentId) {
         error.heDepartmentId = 'Invalid departments';
         validationFlag *= false;
@@ -622,6 +627,7 @@ jobCtrl.getcontactlist = function (req, res, next) {
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.query.heDepartmentId),
                     req.st.db.escape(JSON.stringify(roles)),
                     req.st.db.escape(JSON.stringify(locations))
