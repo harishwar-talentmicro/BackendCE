@@ -20,10 +20,10 @@ var cv = '';
 var text = '';
 var gs_url = '';
 var storage_bucket = '';
-var attachFile = function () {
+var attachFile = new Promise(function (resolve, reject) {
     if (cv != '') {
         cv = gs_url + storage_bucket + '/' + cv;
-        return new Promise(function (resolve, reject) {
+        
             http.get(cv, function (fileResponse) {
                 var bufs = [];
 
@@ -36,12 +36,12 @@ var attachFile = function () {
                     });
                 });
             });
-        })
+        
     }
     else {
         resolve('');
     }
-}
+})
 //var createPromise = defer.denodeify(attachFile);
 //var attachFilePromise = attachFile;
 
@@ -203,8 +203,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                 storage_bucket = req.CONFIG.CONSTANT.STORAGE_BUCKET;
 
                 console.log(cv);
-                var attachFilePromise = attachFile();
-                attachFilePromise.then(function (resp) {
+                attachFile.then(function (resp) {
                     if (1) {
 
                         cvKeywords = text;
@@ -232,6 +231,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         req.body.affirmitive = (req.body.affirmitive) ? req.body.affirmitive : '';
                         req.body.transactions = (req.body.transactions) ? req.body.transactions : '';
                         req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
+                        req.body.imageUrl = req.body.imageUrl ? req.body.imageUrl : '';
 
                         var inputs = [
                             req.st.db.escape(req.query.token),
@@ -278,7 +278,8 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(industry)),
                             req.st.db.escape(JSON.stringify(nationality)),
                             req.st.db.escape(cvKeywords),
-                            req.st.db.escape(req.body.requirementId)
+                            req.st.db.escape(req.body.requirementId),
+                            req.st.db.escape(req.body.imageUrl)
                         ];
 
                         var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -741,6 +742,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                             var res2 = {};
                             res2.reqApplicantId = Result[0][i].reqAppId;
                             res2.applicantId = Result[0][i].applicantId;
+                            res2.imageUrl = Result[0][i].imageUrl;
                             res2.createdDate = Result[0][i].createdDate;
                             res2.lastUpdatedDate = Result[0][i].lastUpdatedDate;
                             res2.reqCvCreatedUserId = Result[0][i].reqCvCreatedUserId;

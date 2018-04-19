@@ -216,93 +216,109 @@ meetingRoomCtrl.bookMeetingRoom = function(req,res,next){
         response.message = 'Please check the errors';
         console.log(response);
         res.status(400).json(response);
-
     }
     else{
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
-
-                req.body.parentId = req.body.parentId ? req.body.parentId : 0;
-                req.body.status = req.body.status ? req.body.status : 3;
-                req.body.bookedBy = req.body.bookedBy ? req.body.bookedBy : '';
-                req.body.bookedFor = req.body.bookedFor ? req.body.bookedFor : '';
-                req.body.startTime = req.body.startTime ? req.body.startTime : null;
-                req.body.endTime = req.body.endTime ? req.body.endTime : null;
-                req.body.notes = req.body.notes ? req.body.notes : '';
-                req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
-                req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
-                req.body.accessUserType  = req.body.accessUserType  ? req.body.accessUserType  : 0;
-                req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
-                req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
-                req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
-                req.body.roomName = req.body.roomName ? req.body.roomName : "";
-
-                var procParams = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.parentId),
-                    req.st.db.escape(req.body.roomId),
-                    req.st.db.escape(req.body.bookedBy),
-                    req.st.db.escape(req.body.bookedFor),
-                    req.st.db.escape(req.body.isdPhone),
-                    req.st.db.escape(req.body.phone),
-                    req.st.db.escape(req.body.startTime),
-                    req.st.db.escape(req.body.endTime),
-                    req.st.db.escape(req.body.notes),
-                    req.st.db.escape(req.body.status),
-                    req.st.db.escape(req.body.changeLog),
-                    req.st.db.escape(req.body.groupId),
-                    req.st.db.escape(req.body.learnMessageId),
-                    req.st.db.escape(req.body.accessUserType),
-                    req.st.db.escape(req.body.roomName)
-                ];
-                /**
-                 * Calling procedure to save form template
-                 * @type {string}
-                 */
-                var procQuery = 'CALL he_save_app_meetingRoom( ' + procParams.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
-                    console.log(results);
-                    if(!err && results && results[0] ){
-                        response.status = true;
-                        response.message = "Booking is successful";
-                        response.error = null;
-                        response.data = {
-                            messageList: {
-                                messageId: results[0][0].messageId,
-                                message: results[0][0].message,
-                                messageLink: results[0][0].messageLink,
-                                createdDate: results[0][0].createdDate,
-                                messageType: results[0][0].messageType,
-                                messageStatus: results[0][0].messageStatus,
-                                priority: results[0][0].priority,
-                                senderName: results[0][0].senderName,
-                                senderId: results[0][0].senderId,
-                                receiverId: results[0][0].receiverId,
-                                transId : results[0][0].transId,
-                                formId : results[0][0].formId,
-                                groupId: req.body.groupId,
-                                currentStatus : results[0][0].currentStatus,
-                                currentTransId : results[0][0].currentTransId,
-                                localMessageId : req.body.localMessageId,
-                                parentId : results[0][0].parentId,
-                                accessUserType : results[0][0].accessUserType,
-                                heUserId : results[0][0].heUserId,
-                                formData : JSON.parse(results[0][0].formDataJSON)
-                            }
-                        };
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
+                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    if (!req.body.roomId) {
+                        error.roomId = 'Invalid roomId';
+                        validationFlag *= false;
+                    }
+                    var senderGroupId;
+                
+                    if (!validationFlag){
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        console.log(response);
+                        res.status(400).json(response);
                     }
                     else{
-                        response.status = false;
-                        response.message = "Error while booking";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.body.parentId = req.body.parentId ? req.body.parentId : 0;
+                        req.body.status = req.body.status ? req.body.status : 3;
+                        req.body.bookedBy = req.body.bookedBy ? req.body.bookedBy : '';
+                        req.body.bookedFor = req.body.bookedFor ? req.body.bookedFor : '';
+                        req.body.startTime = req.body.startTime ? req.body.startTime : null;
+                        req.body.endTime = req.body.endTime ? req.body.endTime : null;
+                        req.body.notes = req.body.notes ? req.body.notes : '';
+                        req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
+                        req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
+                        req.body.accessUserType  = req.body.accessUserType  ? req.body.accessUserType  : 0;
+                        req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
+                        req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
+                        req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                        req.body.roomName = req.body.roomName ? req.body.roomName : "";
+        
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.parentId),
+                            req.st.db.escape(req.body.roomId),
+                            req.st.db.escape(req.body.bookedBy),
+                            req.st.db.escape(req.body.bookedFor),
+                            req.st.db.escape(req.body.isdPhone),
+                            req.st.db.escape(req.body.phone),
+                            req.st.db.escape(req.body.startTime),
+                            req.st.db.escape(req.body.endTime),
+                            req.st.db.escape(req.body.notes),
+                            req.st.db.escape(req.body.status),
+                            req.st.db.escape(req.body.changeLog),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(req.body.learnMessageId),
+                            req.st.db.escape(req.body.accessUserType),
+                            req.st.db.escape(req.body.roomName)
+                        ];
+                        /**
+                         * Calling procedure to save form template
+                         * @type {string}
+                         */
+                        var procQuery = 'CALL he_save_app_meetingRoom( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery,function(err,results){
+                            console.log(results);
+                            if(!err && results && results[0] ){
+                                response.status = true;
+                                response.message = "Booking is successful";
+                                response.error = null;
+                                response.data = {
+                                    messageList: {
+                                        messageId: results[0][0].messageId,
+                                        message: results[0][0].message,
+                                        messageLink: results[0][0].messageLink,
+                                        createdDate: results[0][0].createdDate,
+                                        messageType: results[0][0].messageType,
+                                        messageStatus: results[0][0].messageStatus,
+                                        priority: results[0][0].priority,
+                                        senderName: results[0][0].senderName,
+                                        senderId: results[0][0].senderId,
+                                        receiverId: results[0][0].receiverId,
+                                        transId : results[0][0].transId,
+                                        formId : results[0][0].formId,
+                                        groupId: req.body.groupId,
+                                        currentStatus : results[0][0].currentStatus,
+                                        currentTransId : results[0][0].currentTransId,
+                                        localMessageId : req.body.localMessageId,
+                                        parentId : results[0][0].parentId,
+                                        accessUserType : results[0][0].accessUserType,
+                                        heUserId : results[0][0].heUserId,
+                                        formData : JSON.parse(results[0][0].formDataJSON)
+                                    }
+                                };
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else{
+                                response.status = false;
+                                response.message = "Error while booking";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
                 });
             }
@@ -311,7 +327,6 @@ meetingRoomCtrl.bookMeetingRoom = function(req,res,next){
             }
         });
     }
-
 };
 
 module.exports = meetingRoomCtrl;
