@@ -64,9 +64,9 @@
     "IOS" : [[],[23,24]],
     "ANDROID" : [46],
     "WhatMateIOS" : [[],[23,24]],
-    "WhatMateANDROID" : [36],
+    "WhatMateANDROID" : [37],
     "dialerIOS" : [[],[1]],
-    "dialerANDROID" : [1],
+    "dialerANDROID" : [2],
     "WEB" : [1]
   },
   "NOTIFICATION" : {

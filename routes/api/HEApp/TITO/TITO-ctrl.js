@@ -7,6 +7,7 @@ var TITOCtrl = {};
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
+var error = {};
 
 TITOCtrl.saveAttendence = function(req,res,next){
     var response = {
@@ -179,7 +180,7 @@ TITOCtrl.getAttendanceRegister = function(req,res,next){
                 var procQuery = 'CALL he_get_attendance_new( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,attendanceList){
-                    if(!err && attendanceList && attendanceList[0]){
+                    if(!err && attendanceList && attendanceList[0] && attendanceList[0][0] && attendanceList[0][0].attendanceData){
 
                         response.status = true;
                         response.message = "Data loaded successfully";
