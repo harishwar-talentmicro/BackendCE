@@ -2338,18 +2338,7 @@ eventCtrl.updateReplyStatus = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.body.eventId) {
-        error.eventId = 'Invalid eventId';
-        validationFlag *= false;
-    }
-    if (!req.body.questionId) {
-        error.questionId = 'Invalid questionId';
-        validationFlag *= false;
-    }
-    if (req.body.replyStatus == undefined) {
-        error.replyStatus = 'Invalid replyStatus';
-        validationFlag *= false;
-    }
+
 
     if (!validationFlag){
         response.error = error;
@@ -2360,57 +2349,85 @@ eventCtrl.updateReplyStatus = function(req,res,next){
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.body.isModerator = (req.body.isModerator!=undefined) ? req.body.isModerator : 0;
-                req.body.isSpeaker = (req.body.isSpeaker != undefined) ? req.body.isSpeaker : 0;
-
-                var procParams = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.eventId),
-                    req.st.db.escape(req.body.questionId),
-                    req.st.db.escape(req.body.replyStatus),
-                    req.st.db.escape(req.body.isSpeaker),
-                    req.st.db.escape(req.body.isModerator)
-                ];
-
-                var procQuery = 'CALL wm_save_event_question_replyStatus( ' + procParams.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, userData) {
-                    if (!err && userData && userData[0] && userData[0][0] && userData[0][0].message ) {
-                        response.status = false;
-                        response.message = "Access denied";
-                        response.error = null;
-                        response.data = null;
-                        res.status(200).json(response);
+                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    if (!req.body.eventId) {
+                        error.eventId = 'Invalid eventId';
+                        validationFlag *= false;
                     }
-                    else if (!err && userData && userData[0] && userData[0][0]) {
+                    if (!req.body.questionId) {
+                        error.questionId = 'Invalid questionId';
+                        validationFlag *= false;
+                    }
+                    if (req.body.replyStatus == undefined) {
+                        error.replyStatus = 'Invalid replyStatus';
+                        validationFlag *= false;
+                    }
 
-                        var messagePayload = {
-                            message : "Replied to question",
-                            type : 75,
-                            alarmType : 4
-                        } ;
-
-                        if(userData && userData[0] && userData[0][0] && userData[0][0].APNS_Id){
-                            _Notification_aws.publish_IOS(userData[0][0].APNS_Id,messagePayload,0);
-                        }
-                        if(userData && userData[1] && userData[1][0] && userData[1][0].GCM_Id){
-                            _Notification_aws.publish_Android(userData[1][0].GCM_Id ,messagePayload);
-                        }
-
-                        response.status = true;
-                        response.message = "Replied successfully";
-                        response.error = null;
-                        response.data = null;
-                        res.status(200).json(response);
+                    if (!validationFlag){
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while replaying to question";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.body.isModerator = (req.body.isModerator!=undefined) ? req.body.isModerator : 0;
+                        req.body.isSpeaker = (req.body.isSpeaker != undefined) ? req.body.isSpeaker : 0;
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.eventId),
+                            req.st.db.escape(req.body.questionId),
+                            req.st.db.escape(req.body.replyStatus),
+                            req.st.db.escape(req.body.isSpeaker),
+                            req.st.db.escape(req.body.isModerator)
+                        ];
+
+                        var procQuery = 'CALL wm_save_event_question_replyStatus( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, userData) {
+                            if (!err && userData && userData[0] && userData[0][0] && userData[0][0].message ) {
+                                response.status = false;
+                                response.message = "Access denied";
+                                response.error = null;
+                                response.data = null;
+                                res.status(200).json(response);
+                            }
+                            else if (!err && userData && userData[0] && userData[0][0]) {
+
+                                var messagePayload = {
+                                    message : "Replied to question",
+                                    type : 75,
+                                    alarmType : 4
+                                } ;
+
+                                if(userData && userData[0] && userData[0][0] && userData[0][0].APNS_Id){
+                                    _Notification_aws.publish_IOS(userData[0][0].APNS_Id,messagePayload,0);
+                                }
+                                if(userData && userData[1] && userData[1][0] && userData[1][0].GCM_Id){
+                                    _Notification_aws.publish_Android(userData[1][0].GCM_Id ,messagePayload);
+                                }
+
+                                response.status = true;
+                                response.message = "Replied successfully";
+                                response.error = null;
+                                response.data = null;
+                                res.status(200).json(response);
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while replaying to question";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
+
+
             }
             else {
                 res.status(401).json(response);
