@@ -8,8 +8,6 @@ router.get('/validatePaceUser',paceUsersCtrl.paceLoginValidation);
 router.get('/getUsers',paceUsersCtrl.getUsers);
 
 router.post('/saveTask',paceUsersCtrl.saveTaskPlanner);
-
-
-
+router.get('/getTasks',paceUsersCtrl.getTaskPlanner);
 
 module.exports = router;

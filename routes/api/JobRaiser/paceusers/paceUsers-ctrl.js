@@ -175,21 +175,32 @@ paceUsersCtrl.getUsers = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.query.userMasterId = req.query.userMasterId ? req.query.userMasterId : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.userMasterId)
                 ];
 
                 var procQuery = 'CALL wm_get_pace_users( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
-                    console.log(result);
                     if (!err && result && result[0]) {
                         response.status = true;
                         response.message = "Users loaded successfully";
                         response.error = false;
-                        response.data = result[0];
+                        if (result[1].length>0){
+                            result[1][0].jobTitle=result[1][0].jobTitle ? JSON.parse(result[1][0].jobTitle): {};
+                            result[1][0].userType=result[1][0].userType ? JSON.parse(result[1][0].userType): {};
+                            result[1][0].transferredTo=result[1][0].transferredTo ? JSON.parse(result[1][0].transferredTo): {};
+                            result[1][0].reportingTo=result[1][0].reportingTo ? JSON.parse(result[1][0].reportingTo): [];
+                            result[1][0].accessRights=result[1][0].accessRights ? JSON.parse(result[1][0].accessRights): {};
+                        }
+                        response.data ={
+                            userList: result[0] ? result[0]: [],
+                            userDetail:result[1][0] ? result[1][0]: {}
+                        };
                         res.status(200).json(response);
                     }
                     else {
@@ -263,6 +274,77 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                     else {
                         response.status = false;
                         response.message = "Error while saving task";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+paceUsersCtrl.getTaskPlanner = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        validationFlag = false;
+        error.heMasterId = "Invalid Company";
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL wm_get_pacePlanner( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Tasks loaded successfully";
+                        response.error = null;
+                        response.data = 
+                        {
+                            tasks : result[0]
+                        }
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err ) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading tasks";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

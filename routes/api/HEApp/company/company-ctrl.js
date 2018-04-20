@@ -128,10 +128,6 @@ companyCtrl.joinComapny = function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.body.WMId) {
-        error.WMId = 'Invalid WMId';
-        validationFlag *= false;
-    }
 
     if (!validationFlag){
         response.error = error;
@@ -142,76 +138,92 @@ companyCtrl.joinComapny = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
-
-                req.body.HEUserId = req.body.HEUserId ? req.body.HEUserId : 0;
-                req.body.notes = req.body.notes ? req.body.notes : '';
-                req.body.code = req.body.code ? req.body.code : '';
-
-                var procParams = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.HEUserId),
-                    req.st.db.escape(req.body.WMId),
-                    req.st.db.escape(req.body.userType),
-                    req.st.db.escape(req.body.code),
-                    req.st.db.escape(req.body.departmentId),
-                    req.st.db.escape(req.body.gradeId),
-                    req.st.db.escape(req.body.locationId),
-                    req.st.db.escape(req.body.notes)
-                ];
-                /**
-                 * Calling procedure to get form template
-                 * @type {string}
-                 */
-                var procQuery = 'CALL he_join_company( ' + procParams.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery,function(err,companyResult){
-                    if(!err && companyResult && companyResult[0] && companyResult[0][0]){
-                        switch (companyResult[0][0].message) {
-                            case '1' :
-                                response.status = false;
-                                response.message = "Invalid combination of inputs.Try again...";
-                                response.error = null;
-                                res.status(200).json(response);
-                                break ;
-                            case '2' :
-                                response.status = true;
-                                response.message = "Joining successful";
-                                response.error = null;
-                                res.status(200).json(response);
-                                break ;
-                            case '3' :
-                                response.status = true;
-                                response.message = "Request submitted for activation";
-                                response.error = null;
-                                res.status(200).json(response);
-                                break ;
-                            case '4' :
-                                response.status = false;
-                                response.message = "Joining access denied";
-                                response.error = null;
-                                res.status(200).json(response);
-                                break ;
-                            case '5' :
-                                response.status = false;
-                                response.message = "You are already associate with this company";
-                                response.error = null;
-                                res.status(200).json(response);
-                                break ;
-                        }
+                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    if (!req.body.WMId) {
+                        error.WMId = 'Invalid WMId';
+                        validationFlag *= false;
                     }
-                    else if(!err){
-                        response.status = true;
-                        response.message = "No data found";
-                        response.error = null;
-                        response.data = null;
-                        res.status(200).json(response);
+                
+                    if (!validationFlag){
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
-                    else{
-                        response.status = false;
-                        response.message = "Error while getting data";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                    else {
+                        req.body.HEUserId = req.body.HEUserId ? req.body.HEUserId : 0;
+                        req.body.notes = req.body.notes ? req.body.notes : '';
+                        req.body.code = req.body.code ? req.body.code : '';
+        
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.HEUserId),
+                            req.st.db.escape(req.body.WMId),
+                            req.st.db.escape(req.body.userType),
+                            req.st.db.escape(req.body.code),
+                            req.st.db.escape(req.body.departmentId),
+                            req.st.db.escape(req.body.gradeId),
+                            req.st.db.escape(req.body.locationId),
+                            req.st.db.escape(req.body.notes)
+                        ];
+                        /**
+                         * Calling procedure to get form template
+                         * @type {string}
+                         */
+                        var procQuery = 'CALL he_join_company( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery,function(err,companyResult){
+                            if(!err && companyResult && companyResult[0] && companyResult[0][0]){
+                                switch (companyResult[0][0].message) {
+                                    case '1' :
+                                        response.status = false;
+                                        response.message = "Invalid combination of inputs.Try again...";
+                                        response.error = null;
+                                        res.status(200).json(response);
+                                        break ;
+                                    case '2' :
+                                        response.status = true;
+                                        response.message = "Joining successful";
+                                        response.error = null;
+                                        res.status(200).json(response);
+                                        break ;
+                                    case '3' :
+                                        response.status = true;
+                                        response.message = "Request submitted for activation";
+                                        response.error = null;
+                                        res.status(200).json(response);
+                                        break ;
+                                    case '4' :
+                                        response.status = false;
+                                        response.message = "Joining access denied";
+                                        response.error = null;
+                                        res.status(200).json(response);
+                                        break ;
+                                    case '5' :
+                                        response.status = false;
+                                        response.message = "You are already associate with this company";
+                                        response.error = null;
+                                        res.status(200).json(response);
+                                        break ;
+                                }
+                            }
+                            else if(!err){
+                                response.status = true;
+                                response.message = "No data found";
+                                response.error = null;
+                                response.data = null;
+                                res.status(200).json(response);
+                            }
+                            else{
+                                response.status = false;
+                                response.message = "Error while getting data";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
                 });
             }
@@ -220,8 +232,6 @@ companyCtrl.joinComapny = function(req,res,next){
             }
         });
     }
-
-
 };
 
 companyCtrl.getComapnyMasters = function(req,res,next){
