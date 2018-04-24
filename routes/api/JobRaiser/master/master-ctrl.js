@@ -356,7 +356,7 @@ masterCtrl.savebranches = function (req, res, next) {
                 req.body.billPhoneNumber = (req.body.billPhoneNumber) ? req.body.billPhoneNumber : '';
                 req.body.billLatitude = (req.body.billLatitude) ? req.body.billLatitude : 0.0;
                 req.body.billLongitude = (req.body.billLongitude) ? req.body.billLongitude : 0.0;
-                req.body.Status = (req.body.Status) ? req.body.Status : 0;
+                req.body.Status = (req.body.Status) ? req.body.Status : 1;
                 req.body.LandMark = (req.body.LandMark) ? req.body.LandMark : '';
                 req.body.EntryProcedure = (req.body.EntryProcedure) ? req.body.EntryProcedure : '';
                 req.body.currencyId = (req.body.currencyId) ? req.body.currencyId : 0;
@@ -464,7 +464,7 @@ masterCtrl.getbranchList = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heDepartmentId)
-                   
+
 
                 ];
                 var procQuery = 'CALL WM_get_branches( ' + inputs.join(',') + ')';
@@ -1481,7 +1481,7 @@ masterCtrl.mailTags = function (req, res, next) {
         error: null
     };
     if (!req.query.heMasterId) {
-        error.heMasterId = 'invalid tenant';
+        error.heMasterId = 'Invalid company';
         validationFlag *= false;
     }
 
@@ -1567,13 +1567,13 @@ masterCtrl.mailTags = function (req, res, next) {
                 ];
                 var idArray;
                 var mailbody_array = [];
-                if (req.body.mailerType == 1 || req.body.mailerType == 2) {
+                if (req.body.mailerType == 1 || req.body.mailerType == 2) {  // 1- Screening mailer, 2- Submission mailer
                     idArray = reqApplicants;
                 }
-                else if (req.body.mailerType == 3) {
+                else if (req.body.mailerType == 3) {  // 3- JobSeeker mailer
                     idArray = applicants;
                 }
-                else {
+                else {                     //Client mailer
                     idArray = client;
                 }
 
@@ -1584,51 +1584,76 @@ masterCtrl.mailTags = function (req, res, next) {
                     console.log(result);
                     if (!err && result) {
                         var temp = mailBody;
-                        for (var i = 0; i < idArray.length; i++) {
-                            console.log('i=',i);
-                            
-                            for (var j = 0; j < tags.applicant.length; j++) {
-                                mailBody = mailBody.replace('[applicant.' + tags.applicant[j].tagName + ']', result[0][i][tags.applicant[j].tagName]);
-                            }
-                            for (var j = 0; j < tags.requirement.length; j++) {
-                                mailBody = mailBody.replace('[requirement.' + tags.requirement[j].tagName + ']', result[1][i][tags.requirement[j].tagName]);
-                            }
+                        if (req.body.mailerType != 2) {
+                            for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+                                console.log('applicantIndex=', applicantIndex);
 
-                            for (var j = 0; j < tags.client.length; j++) {
-                                mailBody = mailBody.replace('[client.' + tags.client[j].tagName + ']', result[2][i][tags.client[j].tagName]);
-                            }
-                            for (var j = 0; j < tags.clientContacts.length; j++) {
-                                mailBody = mailBody.replace('[contact.' + tags.clientContacts[j].tagName + ']', result[8][i][tags.clientContacts[j].tagName]);
-                                console.log('result=',result[8]);
-                                console.log('result[8][i]=',result[8][i]);
-                            }
-
-                            if (tableTags.applicant.length > 0) {
-                                var position = mailBody.indexOf('@table');
-                                var tableContent = '';
-                                mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
-                                tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
-                                console.log(tableContent, 'mailbody');
-                                for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                                for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                    mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
                                 }
-                                tableContent += "</tr>";
-                                for (var candidateCount = 0; candidateCount < result[5].length; candidateCount++) {
-                                    tableContent += "<tr>";
+                                for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+                                    mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[1][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                }
+
+                                for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+                                    mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[2][applicantIndex][tags.client[tagIndex].tagName]);
+                                }
+
+                                mailbody_array.push(mailBody);
+                                mailBody = temp;
+                            }
+                        }
+
+                        else {
+                            for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
+                                for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+
+                                    for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                        mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                    }
+
+                                    for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+                                        mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[1][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                    }
+
+                                    for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+                                        mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[2][applicantIndex][tags.client[tagIndex].tagName]);
+                                    }
+                                }
+                                for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+                                    mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[8][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                    console.log('result=', result[8]);
+                                    console.log('result[8][k]=', result[8][clientIndex]);
+                                }
+
+                                if (tableTags.applicant.length > 0) {
+                                    var position = mailBody.indexOf('@table');
+                                    var tableContent = '';
+                                    mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
+                                    tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
+                                    console.log(tableContent, 'mailbody');
                                     for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[5][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                        tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
                                     }
                                     tableContent += "</tr>";
+                                    for (var candidateCount = 0; candidateCount < result[5].length; candidateCount++) {
+                                        tableContent += "<tr>";
+                                        for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                            tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[5][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                        }
+                                        tableContent += "</tr>";
+                                    }
+
+                                    tableContent += "</table>";
+                                    mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
+
                                 }
 
-                                tableContent += "</table>";
-                                mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
-
+                                mailbody_array.push(mailBody);
+                                mailBody = temp;
                             }
-
-                            mailbody_array.push(mailBody);
-                            mailBody = temp;
                         }
+
 
                         response.status = true;
                         response.message = "Tags replaced successfully";
@@ -1669,9 +1694,7 @@ masterCtrl.mailTags = function (req, res, next) {
             }
         });
     }
-
 };
-
 
 masterCtrl.getClientLocationContacts = function (req, res, next) {
     var response = {
@@ -1735,7 +1758,7 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                             res2.contactList = JSON.parse(result[1][i].contactList) ? JSON.parse(result[1][i].contactList) : [];
                             output.push(res2);
                         }
-                        result[0][0].managers = JSON.parse(result[0][0].managers); 
+                        result[0][0].managers = JSON.parse(result[0][0].managers);
 
                         response.data = {
                             heDepartment: result[0][0],
@@ -2029,7 +2052,7 @@ masterCtrl.saveUserManager = function (req, res, next) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 req.query.apiKey = req.query.apiKey ? req.query.apiKey : 0;
                 req.body.userMasterId = req.body.userMasterId ? req.body.userMasterId : 0;
-                req.body.status = req.body.status ? req.body.status : 0;
+                req.body.status = req.body.status ? req.body.status : 1;
                 req.body.shortSignature = req.body.shortSignature ? req.body.shortSignature : '';
                 req.body.fullSignature = req.body.userMasterId ? req.body.fullSignature : '';
                 req.body.userType = req.body.userType ? req.body.userType : 0;
@@ -2137,7 +2160,7 @@ masterCtrl.getAssessmentGroupType = function (req, res, next) {
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId)                    
+                    req.st.db.escape(req.query.heMasterId)
                 ];
 
                 var procQuery = 'CALL wm_get_AssessmentgroupType( ' + inputs.join(',') + ')';
@@ -2151,7 +2174,7 @@ masterCtrl.getAssessmentGroupType = function (req, res, next) {
                         response.message = "Assessment groupType loaded successfully";
                         response.error = null;
                         response.data = {
-                            groupType : result[0]
+                            groupType: result[0]
                         };
                         res.status(200).json(response);
                     }
@@ -2160,7 +2183,7 @@ masterCtrl.getAssessmentGroupType = function (req, res, next) {
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            groupType : []
+                            groupType: []
                         };
                         res.status(200).json(response);
                     }
