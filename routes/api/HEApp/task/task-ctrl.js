@@ -17,6 +17,8 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 var error = {};
 
+var Client = require('node-poplib-gowhich').Client;
+
 // taskCtrl.saveTask = function(req,res,next){
 //     var response = {
 //         status : false,
@@ -790,6 +792,32 @@ taskCtrl.getStationary = function(req,res,next){
         else{
             res.status(401).json(response);
         }
+    });
+};
+
+taskCtrl.getMails = function(req,res,next){
+    var client = new Client({
+        hostname: 'pop.gmail.com',
+        port:  995,
+        tls: true,
+        mailparser: true,
+        username: 'vedha14reddy@gmail.com',
+        password: 'yashodammav'
+    });
+
+    client.connect(function() {
+        client.retr(1,function(err, messages) {
+            if(!err){
+                messages.forEach(function(message) {
+                    console.log(message);
+                });
+                client.quit();
+            }
+            else {
+                console.log(err);
+            }
+
+        })
     });
 };
 
