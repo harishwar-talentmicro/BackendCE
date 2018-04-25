@@ -5,6 +5,10 @@ var cron = require('node-cron');
 var DbHelper = require('../../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
 
+var CronJob = require('cron').CronJob;
+var notifyMessages = require('../../routes/api/messagebox/notifyMessages.js');
+var notifyMessages = new notifyMessages();
+
 var configurationV1 =  require('./configuration.js');
 var recruitmentV1 =  require('./recruitment/recruitment-master.js');
 var infoV1 =  require('./info/info.js');
@@ -340,5 +344,19 @@ cron.schedule('*/15 * * * *', function(){
     });
 });
 
+var cronJobMessage = new CronJob({
+    cronTime: '20 * * * * *',
+    onTick: function() {
+        notifyMessages.getMessagesNeedToNotify();
+        /*
+         * Runs every weekday (Monday through Friday)
+         * at 11:30:00 AM. It does not run on Saturday
+         * or Sunday.
+         */
+    },
+    start: false,
+    timeZone: 'America/Los_Angeles'
+});
+cronJobMessage.start();
 
 module.exports = router;

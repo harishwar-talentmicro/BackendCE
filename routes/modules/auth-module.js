@@ -705,7 +705,6 @@ Auth.prototype.login = function(req,res,next){
         cvid : 0,
         profile_status:'',
         userDetails : []
-
     };
 // if(isWhatMate == 0){
 //     switch(req.platform){

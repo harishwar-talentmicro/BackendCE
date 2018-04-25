@@ -32,6 +32,8 @@ config.set({
 
 const thread = spawn('worker.js');
 
+var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
+var notifyMessages = new notifyMessages();
 
 sendMessageCtrl.sendMessage = function(req,res,next){
     var response = {
@@ -220,71 +222,72 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                                 else{
                                     res.status(200).json(response);
                                 }
+                                notifyMessages.getMessagesNeedToNotify();
         
-                                notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                                    senderName : results[0][0].message
-                                });
-        
-                                for (var i = 0; i < results[1].length; i++ ) {
-                                    if (notificationTemplaterRes.parsedTpl) {
-                                        console.log(results[1][0].senderId , "results[1][0].senderIdresults[1][0].senderIdresults[1][0].senderId");
-                                        notification.publish(
-                                            results[1][i].receiverId,
-                                            (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                            (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                            results[1][0].senderId,
-                                            notificationTemplaterRes.parsedTpl,
-                                            31,
-                                            0,
-                                            (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                            (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                            0,
-                                            0,
-                                            0,
-                                            0,
-                                            1,
-                                            moment().format("YYYY-MM-DD HH:mm:ss"),
-                                            '',
-                                            0,
-                                            0,
-                                            null,
-                                            '',
-                                            /** Data object property to be sent with notification **/
-                                            {
-                                                messageList: {
-                                                    messageId: results[1][i].messageId,
-                                                    message: results[1][i].message,
-                                                    messageLink: results[1][i].messageLink,
-                                                    createdDate: results[1][i].createdDate,
-                                                    messageType: results[1][i].messageType,
-                                                    messageStatus: results[1][i].messageStatus,
-                                                    priority: results[1][i].priority,
-                                                    senderName: results[1][i].senderName,
-                                                    senderId: results[1][i].senderId,
-                                                    receiverId: results[1][i].receiverId,
-                                                    groupId: results[1][i].senderId,
-                                                    groupType: 2,
-                                                    transId : results[1][i].transId,
-                                                    formId : results[1][i].formId,
-                                                    currentStatus : results[1][i].currentStatus,
-                                                    currentTransId : results[1][i].currentTransId,
-                                                    parentId : results[1][i].parentId,
-                                                    accessUserType : results[1][i].accessUserType,
-                                                    heUserId : results[1][i].heUserId,
-                                                    formData : JSON.parse(results[1][i].formDataJSON)
-                                                },
-                                                contactList : null
-                                            },
-                                            null,tokenResult[0].isWhatMate,
-                                            results[1][i].secretKey);
-                                        console.log('postNotification : notification for compose_message is sent successfully');
-                                    }
-                                    else {
-                                        console.log('Error in parsing notification compose_message template - ',
-                                            notificationTemplaterRes.error);
-                                        console.log('postNotification : notification for compose_message is sent successfully');
-                                    }
-                                }
+                                // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
+                                //     senderName : results[0][0].message
+                                // });
+                                //
+                                // for (var i = 0; i < results[1].length; i++ ) {
+                                //     if (notificationTemplaterRes.parsedTpl) {
+                                //         console.log(results[1][0].senderId , "results[1][0].senderIdresults[1][0].senderIdresults[1][0].senderId");
+                                //         notification.publish(
+                                //             results[1][i].receiverId,
+                                //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                //             results[1][0].senderId,
+                                //             notificationTemplaterRes.parsedTpl,
+                                //             31,
+                                //             0,
+                                //             (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                //             (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                //             0,
+                                //             0,
+                                //             0,
+                                //             0,
+                                //             1,
+                                //             moment().format("YYYY-MM-DD HH:mm:ss"),
+                                //             '',
+                                //             0,
+                                //             0,
+                                //             null,
+                                //             '',
+                                //             /** Data object property to be sent with notification **/
+                                //             {
+                                //                 messageList: {
+                                //                     messageId: results[1][i].messageId,
+                                //                     message: results[1][i].message,
+                                //                     messageLink: results[1][i].messageLink,
+                                //                     createdDate: results[1][i].createdDate,
+                                //                     messageType: results[1][i].messageType,
+                                //                     messageStatus: results[1][i].messageStatus,
+                                //                     priority: results[1][i].priority,
+                                //                     senderName: results[1][i].senderName,
+                                //                     senderId: results[1][i].senderId,
+                                //                     receiverId: results[1][i].receiverId,
+                                //                     groupId: results[1][i].senderId,
+                                //                     groupType: 2,
+                                //                     transId : results[1][i].transId,
+                                //                     formId : results[1][i].formId,
+                                //                     currentStatus : results[1][i].currentStatus,
+                                //                     currentTransId : results[1][i].currentTransId,
+                                //                     parentId : results[1][i].parentId,
+                                //                     accessUserType : results[1][i].accessUserType,
+                                //                     heUserId : results[1][i].heUserId,
+                                //                     formData : JSON.parse(results[1][i].formDataJSON)
+                                //                 },
+                                //                 contactList : null
+                                //             },
+                                //             null,tokenResult[0].isWhatMate,
+                                //             results[1][i].secretKey);
+                                //         console.log('postNotification : notification for compose_message is sent successfully');
+                                //     }
+                                //     else {
+                                //         console.log('Error in parsing notification compose_message template - ',
+                                //             notificationTemplaterRes.error);
+                                //         console.log('postNotification : notification for compose_message is sent successfully');
+                                //     }
+                                // }
                             }
                             else{
                                 response.status = false;
@@ -1690,6 +1693,64 @@ sendMessageCtrl.sendMessageTest = function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+    var attachmentList =req.body.attachmentList;
+    if(typeof(attachmentList) == "string") {
+        attachmentList = JSON.parse(attachmentList);
+    }
+    if(!attachmentList){
+        attachmentList = [];
+    }
+    // embededImages
+    var embededImages =req.body.embededImages;
+    if(typeof(embededImages) == "string") {
+        embededImages = JSON.parse(embededImages);
+    }
+    if(!embededImages){
+        embededImages = [];
+    }
+
+    var userList =req.body.userList;
+    if(typeof(userList) == "string") {
+        userList = JSON.parse(userList);
+    }
+    if(!userList){
+        userList = [];
+    }
+
+    var branchList =req.body.branchList;
+    if(typeof(branchList) == "string") {
+        branchList = JSON.parse(branchList);
+    }
+    if(!branchList){
+        branchList = [];
+    }
+
+    var departmentList =req.body.departmentList;
+    if(typeof(departmentList) == "string") {
+        departmentList = JSON.parse(departmentList);
+    }
+    if(!departmentList){
+        departmentList = [];
+    }
+
+    var gradeList =req.body.gradeList;
+    if(typeof(gradeList) == "string") {
+        gradeList = JSON.parse(gradeList);
+    }
+    if(!gradeList){
+        gradeList = [];
+    }
+
+    var groupList =req.body.groupList;
+    if(typeof(groupList) == "string") {
+        groupList = JSON.parse(groupList);
+    }
+    if(!groupList){
+        groupList = [];
+    }
+
+    var senderGroupId;
+    var isweb;
 
     if (!validationFlag){
         response.error = error;
@@ -1700,75 +1761,6 @@ sendMessageCtrl.sendMessageTest = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                    var attachmentList =req.body.attachmentList;
-                    if(typeof(attachmentList) == "string") {
-                        attachmentList = JSON.parse(attachmentList);
-                    }
-                    if(!attachmentList){
-                        attachmentList = [];
-                    }
-                    // embededImages
-                    var embededImages =req.body.embededImages;
-                    if(typeof(embededImages) == "string") {
-                        embededImages = JSON.parse(embededImages);
-                    }
-                    if(!embededImages){
-                        embededImages = [];
-                    }
-                
-                    var userList =req.body.userList;
-                    if(typeof(userList) == "string") {
-                        userList = JSON.parse(userList);
-                    }
-                    if(!userList){
-                        userList = [];
-                    }
-                
-                    var branchList =req.body.branchList;
-                    if(typeof(branchList) == "string") {
-                        branchList = JSON.parse(branchList);
-                    }
-                    if(!branchList){
-                        branchList = [];
-                    }
-                
-                    var departmentList =req.body.departmentList;
-                    if(typeof(departmentList) == "string") {
-                        departmentList = JSON.parse(departmentList);
-                    }
-                    if(!departmentList){
-                        departmentList = [];
-                    }
-                
-                    var gradeList =req.body.gradeList;
-                    if(typeof(gradeList) == "string") {
-                        gradeList = JSON.parse(gradeList);
-                    }
-                    if(!gradeList){
-                        gradeList = [];
-                    }
-                
-                    var groupList =req.body.groupList;
-                    if(typeof(groupList) == "string") {
-                        groupList = JSON.parse(groupList);
-                    }
-                    if(!groupList){
-                        groupList = [];
-                    }
-                
-                    var senderGroupId;
-                    var isweb;
-                
-                    if (!validationFlag){
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
                         req.body.parentId = req.body.parentId ? req.body.parentId : 0;
                         req.body.message = req.body.message ? req.body.message : '';
                         req.body.notes = req.body.notes ? req.body.notes : '';
@@ -1829,40 +1821,28 @@ sendMessageCtrl.sendMessageTest = function(req,res,next){
                                 notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                     senderName : results[0][0].message
                                 });
-        
-                                console.log("start",moment().format("YYYY-MM-DD HH:mm:ss"));
-                                console.log("count",results[1].length);
-        
-                                // call cron job
-        
-                                var count = 0;
-                                for (var i = 0; i < 10; i++) {
-                                    // if(i == results[1].length-1){
-                                    //     console.log("End Notification ",moment().format("YYYY-MM-DD HH:mm:ss"));
-                                    // }
-                                    thread
-                                        .send(results[1][i])
-                                        // The handlers come here: (none of them is mandatory)
-                                        .on('message', function(response) {
-                                            console.log('AAAAA');
-                                            thread.kill();
-                                        })
-                                        .on('error', function(error) {
-                                            console.log('Worker errored:', error);
-                                        })
-                                        .on('exit', function() {
-                                            console.log('Worker has been terminated.');
-                                        });
-                                    count=i;
-        
-                                }
+                                notifyMessages.getMessagesNeedToNotify();
+                                // var numberOfThreads = Math.ceil(results[1].length /100);
+                                // for (var i = 0; i < numberOfThreads ; i++) {
+                                //     thread
+                                //         .send({results:results[1],increment:i,limitValues:100})
+                                //         .on('message', function(response) {
+                                //             console.log('AAAAA');
+                                //             thread.kill();
+                                //         })
+                                //         .on('error', function(error) {
+                                //             console.log('Worker errored:', error);
+                                //         })
+                                //         .on('exit', function() {
+                                //             console.log('Worker has been terminated.');
+                                //         });
+                                // }
         
                                 response.status = true;
                                 response.message = "Message sent successfully";
                                 response.error = null;
                                 response.data = {
                                     messageList: {
-                                        count : count,
                                         messageId: results[0][0].messageId,
                                         message: results[0][0].message,
                                         messageLink: results[0][0].messageLink,
@@ -1895,8 +1875,8 @@ sendMessageCtrl.sendMessageTest = function(req,res,next){
                                 res.status(500).json(response);
                             }
                         });
-                    }
-                });
+
+
             }
             else{
                 res.status(401).json(response);

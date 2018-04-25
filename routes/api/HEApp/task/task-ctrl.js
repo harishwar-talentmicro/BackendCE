@@ -18,6 +18,8 @@ var encryption = new  AES_256_encryption();
 var error = {};
 
 var Client = require('node-poplib-gowhich').Client;
+var nodemailer = require('nodemailer');
+
 
 // taskCtrl.saveTask = function(req,res,next){
 //     var response = {
@@ -801,22 +803,64 @@ taskCtrl.getMails = function(req,res,next){
         port:  995,
         tls: true,
         mailparser: true,
-        username: 'vedha14reddy@gmail.com',
-        password: 'yashodammav'
+        username: 'vedha@talentmicro.com',
+        password: 'vedha@123'
     });
 
     client.connect(function() {
         client.retr(1,function(err, messages) {
+            console.log("messages",messages.attachments);
+            var fromDetails =(messages.from) ;
+            // console.log("messages.from",fromDetails[0].address);
+            // console.log("messages.subject",messages.subject);
+            // console.log("messages.html",messages.html);
+
             if(!err){
-                messages.forEach(function(message) {
-                    console.log(message);
+                // messages.forEach(function(message) {
+                //     console.log(message);
+                //
+                //
+                // });
+
+                // sending mail starts
+                var transporter = nodemailer.createTransport({
+                    host: 'smtp.gmail.com',
+                    port: 587,
+                    secure: false, // true for 465, false for other ports
+                    auth: {
+                        user: 'vedha@talentmicro.com', // generated ethereal user
+                        pass: 'vedha@123' // generated ethereal password
+                    }
                 });
+
+                // setup email data with unicode symbols
+                var mailOptions = {
+                    from: 'vedha14reddy@gmail.com', // sender address
+                    to: 'vedha@jobraiser.com', // list of receivers
+                    subject: messages.subject, // Subject line
+                    // text: 'Hello world?', // plain text body
+                    html: '<b>Received...</b>' + messages.html, // html body
+                    attachments : messages.attachments
+                };
+
+                transporter.sendMail(mailOptions, function(error, info) {
+                    if (error) {
+                        return console.log(error);
+                    }
+                    else {
+                        console.log('Message sent: %s', info.messageId);
+                    }
+
+            });
+
+
+
+                // sending mail ends
                 client.quit();
             }
             else {
                 console.log(err);
             }
-
         })
     });
 };
