@@ -23,20 +23,20 @@ var storage_bucket = '';
 var attachFile = new Promise(function (resolve, reject) {
     if (cv != '') {
         cv = gs_url + storage_bucket + '/' + cv;
-        
-            http.get(cv, function (fileResponse) {
-                var bufs = [];
 
-                fileResponse.on('data', function (d) { bufs.push(d); });
-                fileResponse.on('end', function () {
-                    var buf = Buffer.concat(bufs);
-                    textract.fromBufferWithName(cv, buf, function (error, txt) {
-                        text = txt;
-                        resolve(text);
-                    });
+        http.get(cv, function (fileResponse) {
+            var bufs = [];
+
+            fileResponse.on('data', function (d) { bufs.push(d); });
+            fileResponse.on('end', function () {
+                var buf = Buffer.concat(bufs);
+                textract.fromBufferWithName(cv, buf, function (error, txt) {
+                    text = txt;
+                    resolve(text);
                 });
             });
-        
+        });
+
     }
     else {
         resolve('');
@@ -356,10 +356,12 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.query.userMasterId = req.query.userMasterId ? req.query.userMasterId : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.userMasterId)
                 ];
 
                 var procQuery = 'CALL wm_get_masterData_for_applicant( ' + inputs.join(',') + ')';
@@ -425,7 +427,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             attachment: result[26] ? result[26] : [],
                             grade: result[28] ? result[28] : [],
                             paceUsers: result[29] ? result[29] : [],
-                            reasons: result[30] ? result[30] : []
+                            reasons: result[31] ? result[31] : [],
+                            reportingTo: result[32] ? result[32] : []
                         };
 
                         if (req.query.isWeb == 0) {
@@ -478,7 +481,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             attachment: [],
                             grade: [],
                             paceUsers: [],
-                            reasons: []
+                            reasons: [],
+                            reportingTo: []
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -2192,7 +2196,7 @@ applicantCtrl.saveInterviewSchedulerNew = function (req, res, next) {
     }
     if (!heDepartment) {
         heDepartment = {};
-    }    
+    }
 
     var senderGroupId;
     if (!validationFlag) {
@@ -2774,7 +2778,7 @@ applicantCtrl.getMasterInterviewScheduler = function (req, res, next) {
                                 assessmentList: result[1] ? result[1] : [],
                                 interviewRound: result[2] ? result[2] : [],
                                 skillLevelList: result[3] ? result[3] : [],
-                                heDepartment:  result[4] ? result[4] : []
+                                heDepartment: result[4] ? result[4] : []
                             };
 
                         if (req.query.isWeb == 0) {
@@ -2797,7 +2801,7 @@ applicantCtrl.getMasterInterviewScheduler = function (req, res, next) {
                             assessmentList: [],
                             interviewRound: [],
                             skillLevelList: [],
-                            heDepartment:  []
+                            heDepartment: []
                         };
 
                         if (req.query.isWeb == 0) {

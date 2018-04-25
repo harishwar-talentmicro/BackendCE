@@ -35,6 +35,7 @@ router.get('/jdTemplateList',jobCtrl.getJdTemplate);
 router.get('/jdTemplateDetails',jobCtrl.getJdTemplateDetails);
 
 router.get('/manpowerStatus',jobCtrl.manpowerRequirementStatus);
+router.get('/clientManagerList',jobCtrl.getClientManagerList);
 
 module.exports = router;
 

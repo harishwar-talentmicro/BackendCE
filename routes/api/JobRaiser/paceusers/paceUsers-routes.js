@@ -10,4 +10,6 @@ router.get('/getUsers',paceUsersCtrl.getUsers);
 router.post('/saveTask',paceUsersCtrl.saveTaskPlanner);
 router.get('/getTasks',paceUsersCtrl.getTaskPlanner);
 
+router.get('/dashBoard',paceUsersCtrl.getdashBoard);
+
 module.exports = router;

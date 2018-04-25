@@ -68,6 +68,14 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
         country = {};
     }
 
+    var defaultClient = req.body.defaultClient;
+    if (typeof (defaultClient) == "string") {
+        defaultClient = JSON.parse(defaultClient);
+    }
+    if (!defaultClient) {
+        defaultClient = {};
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
@@ -98,7 +106,8 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(scale)),
                     req.st.db.escape(JSON.stringify(duration)),
                     req.st.db.escape(JSON.stringify(country)),
-                    req.st.db.escape(JSON.stringify(heDepartment))
+                    req.st.db.escape(JSON.stringify(heDepartment)),
+                    req.st.db.escape(JSON.stringify(defaultClient))
                 ];
                 var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -1239,8 +1248,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                 req.body.accessUserType = (req.body.accessUserType) ? req.body.accessUserType : 0;
                 req.body.approverCount = (req.body.approverCount) ? req.body.approverCount : 0;
                 req.body.receiverCount = (req.body.receiverCount) ? req.body.receiverCount : 0;
-                req.body.status = req.body.status ? req.body.status : 0;
-                req.body.statusTitle = req.body.statusTitle ? req.body.statusTitle : '';
+                req.body.status = req.body.status ? req.body.status : 1;   // new requirement default status to pending
+                req.body.statusTitle = req.body.statusTitle ? req.body.statusTitle : 'Pending';
                 req.body.expectedJoining = (req.body.expectedJoining) ? req.body.expectedJoining : 0;
                 req.body.jdTemplateId = (req.body.jdTemplateId) ? req.body.jdTemplateId : 0;
 
@@ -1296,7 +1305,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                 console.log(procQuery);
 
                 req.db.query(procQuery, function (err, results) {
-                    console.log(err);    
+                    console.log(err);
                     var isWeb = req.query.isWeb;
 
                     if (!err && results && results[0]) {
@@ -1541,7 +1550,7 @@ jobCtrl.deleteMainContacts = function (req, res, next) {
                         response.status = true;
                         response.message = "Contacts deleted successfully";
                         response.error = null;
-                       
+
                         response.data = {
                             contacts: results[0][0].contacts
                         };
@@ -1615,7 +1624,7 @@ jobCtrl.deleteMainBranches = function (req, res, next) {
                         response.status = true;
                         response.message = "Branches deleted successfully";
                         response.error = null;
-                       
+
                         response.data = {
                             branches: results[0][0].branches
                         };
@@ -1668,7 +1677,7 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0; 
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
                 var getStatus = [
                     req.st.db.escape(req.query.token),
@@ -1768,7 +1777,7 @@ jobCtrl.getJdTemplate = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0; 
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
                 var getStatus = [
                     req.st.db.escape(req.query.token),
@@ -1784,7 +1793,7 @@ jobCtrl.getJdTemplate = function (req, res, next) {
                     if (!err && result && result[0]) {
                         response.status = true;
                         response.message = "Jd TemplateList  loaded successfully";
-                        response.error = null; 
+                        response.error = null;
                         response.data = {
                             jdTemplateList: result[0]
                         };
@@ -2024,7 +2033,81 @@ jobCtrl.manpowerRequirementStatus = function (req, res, next) {
             }
         });
     }
+};
 
+
+jobCtrl.getClientManagerList = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                var input = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL wm_get_clientManagerList( ' + input.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[1]) {
+                        response.status = true;
+                        response.message = "Clients loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            internalList: result[0] ? result[0] : [],
+                            clientList: result[1] ? result[1] : []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Clients  not found";
+                        response.error = 
+                        response.data = {
+                            internalList: [],
+                            clientList: []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting clients";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
 };
 
 module.exports = jobCtrl;
