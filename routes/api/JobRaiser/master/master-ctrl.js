@@ -488,7 +488,7 @@ masterCtrl.getbranchList = function (req, res, next) {
                             res2.longitude = results[3][i].longitude ? results[3][i].longitude : 0.0;
                             res2.nearestParking = results[3][i].nearestParking ? results[3][i].nearestParking : '';
                             res2.entryProcedure = results[3][i].entryProcedure ? results[3][i].entryProcedure : '';
-                            res2.contactList = JSON.parse(results[3][i].contactList) ? JSON.parse(results[3][i].contactList) : [];
+                            res2.contactList = results[3][i].contactList ? JSON.parse(results[3][i].contactList) : [];
                             output.push(res2);
                         };
 
