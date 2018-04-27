@@ -4,6 +4,7 @@
 
 var HEMasterCtrl = {};
 var error = {};
+var md5 = require('md5');
 
 HEMasterCtrl.getFormTypeList = function(req,res,next){
     var response = {
@@ -891,6 +892,65 @@ HEMasterCtrl.findHEUser = function(req,res,next){
             }
         });
     }
+};
+
+HEMasterCtrl.getWebKey = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+    var ip = req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress;
+
+    var uid = md5(ip + userAgent.device + userAgent.model);
+
+    var procParams = [
+        req.st.db.escape(req.query.token),
+        req.st.db.escape(uid)
+    ];
+
+    /**
+     * Calling procedure to get form template
+     * @type {string}
+     */
+    var procQuery = 'CALL HE_update_webKey( ' + procParams.join(',') + ')';
+    console.log(procQuery);
+    req.db.query(procQuery,function(err,keyResult){
+        if(!err && keyResult && keyResult[0] && keyResult[0][0]){
+            response.status = true;
+            response.message = "Key loaded successfully";
+            response.error = null;
+            response.data = {
+                key : keyResult[0][0].key
+            };
+            res.status(200).json(response);
+
+        }
+        else if(!err){
+            response.status = true;
+            response.message = "No key found";
+            response.error = null;
+            response.data = {
+                key : ""
+            };
+            res.status(200).json(response);
+        }
+        else{
+            response.status = false;
+            response.message = "Error while getting key";
+            response.error = null;
+            response.data = null;
+            res.status(500).json(response);
+        }
+    });
+
+
 };
 
 module.exports = HEMasterCtrl;

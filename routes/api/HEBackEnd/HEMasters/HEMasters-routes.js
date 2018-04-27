@@ -26,4 +26,6 @@ router.delete('/formTemplateGroup',formTypeCtrl.deleteFormGroup);
 
 router.get('/search/user',formTypeCtrl.findHEUser);
 
+router.get('/getWebKey',formTypeCtrl.getWebKey);
+
 module.exports = router;
