@@ -182,6 +182,7 @@ Notification_aws.prototype.publish_IOS = function(deviceId,messagePayload,issos)
 };
 
 //
+// For Development
 // Notification_aws.prototype.publish_IOS = function(deviceId,messagePayload,issos) {
 //     // Add the user to SNS
 //     var sound = "default";

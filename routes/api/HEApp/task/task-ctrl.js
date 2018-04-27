@@ -19,6 +19,8 @@ var error = {};
 
 var Client = require('node-poplib-gowhich').Client;
 var nodemailer = require('nodemailer');
+var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
+var notifyMessages = new notifyMessages();
 
 
 // taskCtrl.saveTask = function(req,res,next){
@@ -385,71 +387,72 @@ taskCtrl.saveTask = function(req,res,next){
                             console.log(results);
                             if(!err && results && results[0] ){
                                 senderGroupId = results[0][0].senderId;
-                                notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                                    senderName : results[0][0].senderName
-                                });
+                                // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
+                                //     senderName : results[0][0].senderName
+                                // });
+                                //
+                                // for (var i = 0; i < results[1].length; i++ ) {
+                                //     if (notificationTemplaterRes.parsedTpl) {
+                                //         console.log(results[1][0].senderId , "results[1][0].senderIdresults[1][0].senderIdresults[1][0].senderId");
+                                //         notification.publish(
+                                //             results[1][i].receiverId,
+                                //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                //             results[1][0].senderId,
+                                //             notificationTemplaterRes.parsedTpl,
+                                //             31,
+                                //             0,
+                                //             (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                //             (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                //             0,
+                                //             0,
+                                //             0,
+                                //             0,
+                                //             1,
+                                //             moment().format("YYYY-MM-DD HH:mm:ss"),
+                                //             '',
+                                //             0,
+                                //             0,
+                                //             null,
+                                //             '',
+                                //             /** Data object property to be sent with notification **/
+                                //             {
+                                //                 messageList: {
+                                //                     messageId: results[1][i].messageId,
+                                //                     message: results[1][i].message,
+                                //                     messageLink: results[1][i].messageLink,
+                                //                     createdDate: results[1][i].createdDate,
+                                //                     messageType: results[1][i].messageType,
+                                //                     messageStatus: results[1][i].messageStatus,
+                                //                     priority: results[1][i].priority,
+                                //                     senderName: results[1][i].senderName,
+                                //                     senderId: results[1][i].senderId,
+                                //                     receiverId: results[1][i].receiverId,
+                                //                     groupId: results[1][i].senderId,
+                                //                     groupType: 2,
+                                //                     transId : results[1][i].transId,
+                                //                     formId : results[1][i].formId,
+                                //                     currentStatus : results[1][i].currentStatus,
+                                //                     currentTransId : results[1][i].currentTransId,
+                                //                     parentId : results[1][i].parentId,
+                                //                     accessUserType : results[1][i].accessUserType,
+                                //                     heUserId : results[1][i].heUserId,
+                                //                     formData : JSON.parse(results[1][i].formDataJSON)
+                                //                 },
+                                //                 contactList : null
+                                //             },
+                                //             null,tokenResult[0].isWhatMate,
+                                //             results[1][i].secretKey);
+                                //         console.log('postNotification : notification for compose_message is sent successfully');
+                                //     }
+                                //     else {
+                                //         console.log('Error in parsing notification compose_message template - ',
+                                //             notificationTemplaterRes.error);
+                                //         console.log('postNotification : notification for compose_message is sent successfully');
+                                //     }
+                                // }
 
-                                for (var i = 0; i < results[1].length; i++ ) {
-                                    if (notificationTemplaterRes.parsedTpl) {
-                                        console.log(results[1][0].senderId , "results[1][0].senderIdresults[1][0].senderIdresults[1][0].senderId");
-                                        notification.publish(
-                                            results[1][i].receiverId,
-                                            (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                            (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                            results[1][0].senderId,
-                                            notificationTemplaterRes.parsedTpl,
-                                            31,
-                                            0,
-                                            (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                            (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                            0,
-                                            0,
-                                            0,
-                                            0,
-                                            1,
-                                            moment().format("YYYY-MM-DD HH:mm:ss"),
-                                            '',
-                                            0,
-                                            0,
-                                            null,
-                                            '',
-                                            /** Data object property to be sent with notification **/
-                                            {
-                                                messageList: {
-                                                    messageId: results[1][i].messageId,
-                                                    message: results[1][i].message,
-                                                    messageLink: results[1][i].messageLink,
-                                                    createdDate: results[1][i].createdDate,
-                                                    messageType: results[1][i].messageType,
-                                                    messageStatus: results[1][i].messageStatus,
-                                                    priority: results[1][i].priority,
-                                                    senderName: results[1][i].senderName,
-                                                    senderId: results[1][i].senderId,
-                                                    receiverId: results[1][i].receiverId,
-                                                    groupId: results[1][i].senderId,
-                                                    groupType: 2,
-                                                    transId : results[1][i].transId,
-                                                    formId : results[1][i].formId,
-                                                    currentStatus : results[1][i].currentStatus,
-                                                    currentTransId : results[1][i].currentTransId,
-                                                    parentId : results[1][i].parentId,
-                                                    accessUserType : results[1][i].accessUserType,
-                                                    heUserId : results[1][i].heUserId,
-                                                    formData : JSON.parse(results[1][i].formDataJSON)
-                                                },
-                                                contactList : null
-                                            },
-                                            null,tokenResult[0].isWhatMate,
-                                            results[1][i].secretKey);
-                                        console.log('postNotification : notification for compose_message is sent successfully');
-                                    }
-                                    else {
-                                        console.log('Error in parsing notification compose_message template - ',
-                                            notificationTemplaterRes.error);
-                                        console.log('postNotification : notification for compose_message is sent successfully');
-                                    }
-                                }
-
+                                notifyMessages.getMessagesNeedToNotify();
                                 response.status = true;
                                 response.message = "Task saved successfully";
                                 response.error = null;
@@ -804,56 +807,44 @@ taskCtrl.getMails = function(req,res,next){
         tls: true,
         mailparser: true,
         username: 'vedha@talentmicro.com',
-        password: 'vedha@123'
+        password: '88123'
+    });
+
+    var transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: 'vedha@talentmicro.com', // generated ethereal user
+            pass: '33123' // generated ethereal password
+        }
     });
 
     client.connect(function() {
-        client.retr(1,function(err, messages) {
-            console.log("messages",messages.attachments);
-            var fromDetails =(messages.from) ;
-            // console.log("messages.from",fromDetails[0].address);
-            // console.log("messages.subject",messages.subject);
-            // console.log("messages.html",messages.html);
+        client.retrieveAndDeleteAll(function(err, messages) {
 
             if(!err){
-                // messages.forEach(function(message) {
-                //     console.log(message);
-                //
-                //
-                // });
+                messages.forEach(function(message) {
+                    console.log(message);
+                    var fromDetails =(message.from) ;
+                    var mailOptions = {
+                        from: 'vedha14reddy@gmail.com', // sender address
+                        to: 'arun@jobraiser.com', // list of receivers
+                        subject: message.subject, // Subject line
+                        html: '<b>Received...</b>' + message.html, // html body
+                        attachments : message.attachments
+                    };
+                    transporter.sendMail(mailOptions, function(error, info) {
+                        if (error) {
+                            return console.log(error);
+                        }
+                        else {
+                            console.log('Message sent: %s', info.messageId);
+                        }
 
-                // sending mail starts
-                var transporter = nodemailer.createTransport({
-                    host: 'smtp.gmail.com',
-                    port: 587,
-                    secure: false, // true for 465, false for other ports
-                    auth: {
-                        user: 'vedha@talentmicro.com', // generated ethereal user
-                        pass: 'vedha@123' // generated ethereal password
-                    }
+                    });
+
                 });
-
-                // setup email data with unicode symbols
-                var mailOptions = {
-                    from: 'vedha14reddy@gmail.com', // sender address
-                    to: 'vedha@jobraiser.com', // list of receivers
-                    subject: messages.subject, // Subject line
-                    // text: 'Hello world?', // plain text body
-                    html: '<b>Received...</b>' + messages.html, // html body
-                    attachments : messages.attachments
-                };
-
-                transporter.sendMail(mailOptions, function(error, info) {
-                    if (error) {
-                        return console.log(error);
-                    }
-                    else {
-                        console.log('Message sent: %s', info.messageId);
-                    }
-
-            });
-
-
 
                 // sending mail ends
                 client.quit();
@@ -863,6 +854,7 @@ taskCtrl.getMails = function(req,res,next){
             }
         })
     });
+
 };
 
 module.exports = taskCtrl;

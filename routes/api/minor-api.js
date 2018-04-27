@@ -330,7 +330,7 @@ cron.schedule('*/15 * * * *', function(){
 });
 
 cron.schedule('*/15 * * * *', function(){
-    console.log('running a leave calculation every minute');
+    // console.log('running a leave calculation every minute');
     var procQuery = 'CALL he_leave_calculator()';
     console.log(procQuery);
     db.query(procQuery,function(err,results){
@@ -358,5 +358,6 @@ var cronJobMessage = new CronJob({
     timeZone: 'America/Los_Angeles'
 });
 cronJobMessage.start();
+
 
 module.exports = router;
