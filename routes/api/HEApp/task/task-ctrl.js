@@ -21,6 +21,7 @@ var Client = require('node-poplib-gowhich').Client;
 var nodemailer = require('nodemailer');
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var md5 = require('md5');
 
 
 // taskCtrl.saveTask = function(req,res,next){
@@ -856,5 +857,7 @@ taskCtrl.getMails = function(req,res,next){
     });
 
 };
+
+
 
 module.exports = taskCtrl;
