@@ -54,16 +54,18 @@ hospitalTokenManagementCtrl.getDoctorList = function (req, res, next) {
                         for (var i = 0; i < result[0].length; i++) {
                             var res2 = {};
                             res2.entityId = result[0][i].entityId;
-                            res2.entityName = result[0][i].entityName;                
+                            res2.entityName = result[0][i].entityName; 
+                            res2.bannerImages = result[0][i].bannerImages ? JSON.parse(result[0][i].bannerImages):[];                
+                            res2.bannerText = result[0][i].bannerText;                                                           
                             res2.shortName = result[0][i].shortName;
                             res2.unitLogo = result[0][i].unitLogo;
                             res2.bookingType = result[0][i].bookingType;
                             res2.displayType = result[0][i].displayType;
-                            res2.doctorsList = result[0][i].doctorsList ? JSON.parse(result[0][i].doctorsList) : [];
+                            res2.doctorList = result[0][i].doctorsList ? JSON.parse(result[0][i].doctorsList) : [];
                             output.push(res2);
                         }
                         response.data = {
-                            doctorsList:  output 
+                            hospitalEntityList: output
                         };
                         res.status(200).json(response);
                     }
@@ -71,9 +73,7 @@ hospitalTokenManagementCtrl.getDoctorList = function (req, res, next) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
-                        response.data = {
-                            doctorsList: []
-                        };
+                        response.data = [];
                         res.status(200).json(response);
                     }
                     else {
@@ -133,6 +133,7 @@ hospitalTokenManagementCtrl.getDoctorDetails = function (req, res, next) {
                         response.status = true;
                         response.message = "DoctorsDetails loaded successfully";
                         response.error = null;
+                        result[0][0].bannerImages = result[0][0].bannerImages ? JSON.parse(result[0][0].bannerImages):[];
                         response.data = {
                             doctorDetails:  result[0][0] 
                         };

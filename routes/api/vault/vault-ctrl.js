@@ -5,13 +5,13 @@
 var moment = require('moment');
 var vaultCtrl = {};
 
-vaultCtrl.getVaultList = function(req, res, next){
+vaultCtrl.getVaultList = function (req, res, next) {
 
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -22,7 +22,7 @@ vaultCtrl.getVaultList = function(req, res, next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
@@ -30,8 +30,8 @@ vaultCtrl.getVaultList = function(req, res, next){
     }
     else {
         try {
-            req.st.validateToken(req.query.token,function(err,tokenResult){
-                if((!err) && tokenResult){
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
 
                     var procParams = [
                         req.st.db.escape(req.query.token)
@@ -39,35 +39,36 @@ vaultCtrl.getVaultList = function(req, res, next){
                     ];
                     var procQuery = 'CALL  he_get_vaultList( ' + procParams.join(',') + ')';
                     console.log(procQuery);
-                    req.db.query(procQuery,function(err,vaultResult){
-                        if(!err && vaultResult && vaultResult[0]){
-                            var output =[];
-                            for( var i=0; i < vaultResult[0].length;i++){
+                    req.db.query(procQuery, function (err, vaultResult) {
+                        if (!err && vaultResult && vaultResult[0]) {
+                            var output = [];
+                            for (var i = 0; i < vaultResult[0].length; i++) {
                                 var result1 = {};
-                                result1.id =vaultResult[0][i].id ;
-                                result1.title = vaultResult[0][i].title ;
+                                result1.id = vaultResult[0][i].id;
+                                result1.title = vaultResult[0][i].title;
                                 result1.isFolder = vaultResult[0][i].isFolder;
                                 result1.dataType = vaultResult[0][i].dataType;
                                 output.push(result1);
                             }
 
-                            res.status(200).json({status: true,
+                            res.status(200).json({
+                                status: true,
                                 message: "Vault data loaded successfully",
-                                error : null,
+                                error: null,
                                 data: {
-                                    vaultList :output
+                                    vaultList: output
                                 }
                             });
 
                         }
-                        else if(!err ){
+                        else if (!err) {
                             response.status = true;
                             response.message = "Vault data not found";
                             response.error = null;
                             response.data = null;
                             res.status(500).json(response);
                         }
-                        else{
+                        else {
                             response.status = false;
                             response.message = "Error while getting vault data";
                             response.error = null;
@@ -76,7 +77,7 @@ vaultCtrl.getVaultList = function(req, res, next){
                         }
                     });
                 }
-                else{
+                else {
                     res.status(401).json(response);
                 }
             });
@@ -90,13 +91,13 @@ vaultCtrl.getVaultList = function(req, res, next){
     }
 };
 
-vaultCtrl.createNewFolder = function(req, res, next){
+vaultCtrl.createNewFolder = function (req, res, next) {
 
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -107,12 +108,7 @@ vaultCtrl.createNewFolder = function(req, res, next){
         validationFlag *= false;
     }
 
-    if (!req.body.title) {
-        error.title = 'Invalid title';
-        validationFlag *= false;
-    }
-
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
@@ -120,44 +116,60 @@ vaultCtrl.createNewFolder = function(req, res, next){
     }
     else {
         try {
-            req.st.validateToken(req.query.token,function(err,tokenResult){
-                if((!err) && tokenResult){
-
-                    var procParams = [
-                        req.st.db.escape(req.query.token),
-                        req.st.db.escape(req.body.title),
-                        req.st.db.escape(req.body.description)
-
-                    ];
-                    var procQuery = 'CALL he_save_vaultFolder( ' + procParams.join(',') + ')';
-                    console.log(procQuery);
-                    req.db.query(procQuery,function(err,vaultResult){
-                        if(!err && vaultResult && vaultResult[0] && vaultResult[0][0] && vaultResult[0][0].message){
-                            response.status = false;
-                            response.message = "Folder title is in use";
-                            response.error = null;
-                            res.status(200).json(response);
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                        if (!req.body.title) {
+                            error.title = 'Invalid title';
+                            validationFlag *= false;
                         }
-                        else if (!err && vaultResult && vaultResult[0] && vaultResult[0][0] && vaultResult[0][0].id){
-                            response.status = true;
-                            response.message = "Folder created successfully";
-                            response.data = {
-                              id : vaultResult[0][0].id,
-                              title : req.body.title
-                            };
-                            response.error = null;
-                            res.status(200).json(response);
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
                         }
-                        else{
-                            response.status = false;
-                            response.message = "Error while creating folder";
-                            response.error = null;
-                            response.data = null;
-                            res.status(500).json(response);
+                        else {
+                            var procParams = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.body.title),
+                                req.st.db.escape(req.body.description)
+
+                            ];
+                            var procQuery = 'CALL he_save_vaultFolder( ' + procParams.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, vaultResult) {
+                                if (!err && vaultResult && vaultResult[0] && vaultResult[0][0] && vaultResult[0][0].message) {
+                                    response.status = false;
+                                    response.message = "Folder title is in use";
+                                    response.error = null;
+                                    res.status(200).json(response);
+                                }
+                                else if (!err && vaultResult && vaultResult[0] && vaultResult[0][0] && vaultResult[0][0].id) {
+                                    response.status = true;
+                                    response.message = "Folder created successfully";
+                                    response.data = {
+                                        id: vaultResult[0][0].id,
+                                        title: req.body.title
+                                    };
+                                    response.error = null;
+                                    res.status(200).json(response);
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while creating folder";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            });
                         }
                     });
                 }
-                else{
+                else {
                     res.status(401).json(response);
                 }
             });
@@ -171,13 +183,13 @@ vaultCtrl.createNewFolder = function(req, res, next){
     }
 };
 
-vaultCtrl.getFolderData = function(req, res, next){
+vaultCtrl.getFolderData = function (req, res, next) {
 
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -192,7 +204,7 @@ vaultCtrl.getFolderData = function(req, res, next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
@@ -200,8 +212,8 @@ vaultCtrl.getFolderData = function(req, res, next){
     }
     else {
         try {
-            req.st.validateToken(req.query.token,function(err,tokenResult){
-                if((!err) && tokenResult){
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
 
                     var procParams = [
                         req.st.db.escape(req.query.token),
@@ -210,20 +222,20 @@ vaultCtrl.getFolderData = function(req, res, next){
                     ];
                     var procQuery = 'CALL  he_get_folderData( ' + procParams.join(',') + ')';
                     console.log(procQuery);
-                    req.db.query(procQuery,function(err,folderResult){
-                        if(!err && folderResult && folderResult[0] && folderResult[0][0]){
+                    req.db.query(procQuery, function (err, folderResult) {
+                        if (!err && folderResult && folderResult[0] && folderResult[0][0]) {
                             response.status = true;
                             response.message = "Folder data loaded successfully";
                             response.error = null;
                             response.data = {
-                                id : folderResult[0][0].id,
-                                title : folderResult[0][0].title,
-                                description : folderResult[0][0].description,
-                                itemList : folderResult[1] ? folderResult[1] : []
+                                id: folderResult[0][0].id,
+                                title: folderResult[0][0].title,
+                                description: folderResult[0][0].description,
+                                itemList: folderResult[1] ? folderResult[1] : []
                             };
                             res.status(200).json(response);
                         }
-                        else{
+                        else {
                             response.status = false;
                             response.message = "Error while getting folder data";
                             response.error = null;
@@ -232,7 +244,7 @@ vaultCtrl.getFolderData = function(req, res, next){
                         }
                     });
                 }
-                else{
+                else {
                     res.status(401).json(response);
                 }
             });
@@ -246,13 +258,13 @@ vaultCtrl.getFolderData = function(req, res, next){
     }
 };
 
-vaultCtrl.deleteVaultItem = function(req, res, next){
+vaultCtrl.deleteVaultItem = function (req, res, next) {
 
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -267,7 +279,7 @@ vaultCtrl.deleteVaultItem = function(req, res, next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
@@ -275,8 +287,8 @@ vaultCtrl.deleteVaultItem = function(req, res, next){
     }
     else {
         try {
-            req.st.validateToken(req.query.token,function(err,tokenResult){
-                if((!err) && tokenResult){
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
 
                     var procParams = [
                         req.st.db.escape(req.query.token),
@@ -285,15 +297,15 @@ vaultCtrl.deleteVaultItem = function(req, res, next){
                     ];
                     var procQuery = 'CALL he_delete_vaultItem( ' + procParams.join(',') + ')';
                     console.log(procQuery);
-                    req.db.query(procQuery,function(err,folderResult){
-                        if(!err){
+                    req.db.query(procQuery, function (err, folderResult) {
+                        if (!err) {
                             response.status = true;
                             response.message = "Item deleted successfully";
                             response.error = null;
                             response.data = null;
                             res.status(200).json(response);
                         }
-                        else{
+                        else {
                             response.status = false;
                             response.message = "Error while deleting item";
                             response.error = null;
@@ -302,7 +314,7 @@ vaultCtrl.deleteVaultItem = function(req, res, next){
                         }
                     });
                 }
-                else{
+                else {
                     res.status(401).json(response);
                 }
             });
@@ -316,13 +328,13 @@ vaultCtrl.deleteVaultItem = function(req, res, next){
     }
 };
 
-vaultCtrl.getMasterData = function(req, res, next){
+vaultCtrl.getMasterData = function (req, res, next) {
 
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -333,7 +345,7 @@ vaultCtrl.getMasterData = function(req, res, next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
@@ -341,8 +353,8 @@ vaultCtrl.getMasterData = function(req, res, next){
     }
     else {
         try {
-            req.st.validateToken(req.query.token,function(err,tokenResult){
-                if((!err) && tokenResult){
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
 
                     var procParams = [
                         req.st.db.escape(req.query.token)
@@ -350,18 +362,18 @@ vaultCtrl.getMasterData = function(req, res, next){
                     ];
                     var procQuery = 'CALL he_get_masterVaultData( ' + procParams.join(',') + ')';
                     console.log(procQuery);
-                    req.db.query(procQuery,function(err,masterResult){
-                        if(!err && masterResult && masterResult[0] && masterResult[0][0]){
+                    req.db.query(procQuery, function (err, masterResult) {
+                        if (!err && masterResult && masterResult[0] && masterResult[0][0]) {
                             response.status = true;
                             response.message = "Folder data loaded successfully";
                             response.error = null;
                             response.data = {
-                                tagList : masterResult[0],
-                                folderList : masterResult[1] ? masterResult[1] : []
+                                tagList: masterResult[0],
+                                folderList: masterResult[1] ? masterResult[1] : []
                             };
                             res.status(200).json(response);
                         }
-                        else{
+                        else {
                             response.status = false;
                             response.message = "Error while getting master data";
                             response.error = null;
@@ -370,7 +382,7 @@ vaultCtrl.getMasterData = function(req, res, next){
                         }
                     });
                 }
-                else{
+                else {
                     res.status(401).json(response);
                 }
             });
@@ -384,13 +396,13 @@ vaultCtrl.getMasterData = function(req, res, next){
     }
 };
 
-vaultCtrl.saveVaultItem = function(req, res, next){
+vaultCtrl.saveVaultItem = function (req, res, next) {
 
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -401,30 +413,7 @@ vaultCtrl.saveVaultItem = function(req, res, next){
         validationFlag *= false;
     }
 
-    if (!req.body.tagId) {
-        error.tagId = 'Invalid tagId';
-        validationFlag *= false;
-    }
-
-    var details =req.body.details;
-    if(typeof(details) == "string") {
-        details = JSON.parse(details);
-    }
-    if(!details){
-        error.details = 'Invalid details';
-        validationFlag *= false;
-    }
-
-    var attachments =req.body.attachments;
-    if(typeof(attachments) == "string") {
-        attachments = JSON.parse(attachments);
-    }
-    if(!attachments){
-        attachments = [];
-    }
-
-
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
@@ -432,41 +421,75 @@ vaultCtrl.saveVaultItem = function(req, res, next){
     }
     else {
         try {
-            req.st.validateToken(req.query.token,function(err,tokenResult){
-                if((!err) && tokenResult){
-
-                    req.body.itemId = req.body.itemId ? req.body.itemId : 0;
-                    req.body.folderId = req.body.folderId ? req.body.folderId : 0;
-
-                    var procParams = [
-                        req.st.db.escape(req.query.token),
-                        req.st.db.escape(req.body.itemId),
-                        req.st.db.escape(req.body.tagId),
-                        req.st.db.escape(JSON.stringify(details)),
-                        req.st.db.escape(JSON.stringify(attachments)),
-                        req.st.db.escape(req.body.folderId)
-                    ];
-
-                    var procQuery = 'CALL he_save_vaultItem( ' + procParams.join(',') + ')';
-                    console.log(procQuery);
-                    req.db.query(procQuery,function(err,vaultResult){
-                        if(!err && vaultResult){
-                            response.status = true;
-                            response.message = "Vault item saved successfully";
-                            response.error = null;
-                            response.data = null;
-                            res.status(200).json(response);
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                        if (!req.body.tagId) {
+                            error.tagId = 'Invalid tagId';
+                            validationFlag *= false;
                         }
-                        else{
-                            response.status = false;
-                            response.message = "Error while saving vault item";
-                            response.error = null;
-                            response.data = null;
-                            res.status(500).json(response);
+
+                        var details = req.body.details;
+                        if (typeof (details) == "string") {
+                            details = JSON.parse(details);
+                        }
+                        if (!details) {
+                            error.details = 'Invalid details';
+                            validationFlag *= false;
+                        }
+
+                        var attachments = req.body.attachments;
+                        if (typeof (attachments) == "string") {
+                            attachments = JSON.parse(attachments);
+                        }
+                        if (!attachments) {
+                            attachments = [];
+                        }
+
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            req.body.itemId = req.body.itemId ? req.body.itemId : 0;
+                            req.body.folderId = req.body.folderId ? req.body.folderId : 0;
+
+                            var procParams = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.body.itemId),
+                                req.st.db.escape(req.body.tagId),
+                                req.st.db.escape(JSON.stringify(details)),
+                                req.st.db.escape(JSON.stringify(attachments)),
+                                req.st.db.escape(req.body.folderId)
+                            ];
+
+                            var procQuery = 'CALL he_save_vaultItem( ' + procParams.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, vaultResult) {
+                                if (!err && vaultResult) {
+                                    response.status = true;
+                                    response.message = "Vault item saved successfully";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(200).json(response);
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while saving vault item";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            });
                         }
                     });
                 }
-                else{
+                else {
                     res.status(401).json(response);
                 }
             });
@@ -480,13 +503,13 @@ vaultCtrl.saveVaultItem = function(req, res, next){
     }
 };
 
-vaultCtrl.getVaultItem = function(req, res, next){
+vaultCtrl.getVaultItem = function (req, res, next) {
 
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -498,7 +521,7 @@ vaultCtrl.getVaultItem = function(req, res, next){
     }
 
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
@@ -506,8 +529,8 @@ vaultCtrl.getVaultItem = function(req, res, next){
     }
     else {
         try {
-            req.st.validateToken(req.query.token,function(err,tokenResult){
-                if((!err) && tokenResult){
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
                     req.query.itemId = (req.query.itemId) ? req.query.itemId : 0;
 
                     var procParams = [
@@ -517,32 +540,32 @@ vaultCtrl.getVaultItem = function(req, res, next){
 
                     var procQuery = 'CALL he_get_vaultItem( ' + procParams.join(',') + ')';
                     console.log(procQuery);
-                    req.db.query(procQuery,function(err,vaultResult){
-                        if(!err && vaultResult ){
+                    req.db.query(procQuery, function (err, vaultResult) {
+                        if (!err && vaultResult) {
                             response.status = true;
                             response.message = "Vault item saved successfully";
                             response.error = null;
                             response.data = {
-                                itemId : (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].itemId : 0,
-                                tagTitle : (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].tagTitle : "",
-                                tagId : (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].tagId : 0,
-                                folderId : (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].folderId : 0,
-                                attachments : (vaultResult[0] && vaultResult[0][0] && vaultResult[0][0].attachments) ? JSON.parse(vaultResult[0][0].attachments) : [],
-                                details : (vaultResult[0] && vaultResult[0][0] && vaultResult[0][0].details) ? JSON.parse(vaultResult[0][0].details) : null,
-                                tagList : vaultResult[1] ? vaultResult[1] : [],
-                                folderList : vaultResult[2] ? vaultResult[2] : [],
-                                currencyList : vaultResult[3] ? vaultResult[3] : []
+                                itemId: (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].itemId : 0,
+                                tagTitle: (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].tagTitle : "",
+                                tagId: (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].tagId : 0,
+                                folderId: (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].folderId : 0,
+                                attachments: (vaultResult[0] && vaultResult[0][0] && vaultResult[0][0].attachments) ? JSON.parse(vaultResult[0][0].attachments) : [],
+                                details: (vaultResult[0] && vaultResult[0][0] && vaultResult[0][0].details) ? JSON.parse(vaultResult[0][0].details) : null,
+                                tagList: vaultResult[1] ? vaultResult[1] : [],
+                                folderList: vaultResult[2] ? vaultResult[2] : [],
+                                currencyList: vaultResult[3] ? vaultResult[3] : []
                             };
                             res.status(200).json(response);
                         }
-                        else  if(!err){
+                        else if (!err) {
                             response.status = true;
                             response.message = "No data found";
                             response.error = null;
                             response.data = null;
                             res.status(200).json(response);
                         }
-                        else{
+                        else {
                             response.status = false;
                             response.message = "Error while getting vault item";
                             response.error = null;
@@ -551,7 +574,7 @@ vaultCtrl.getVaultItem = function(req, res, next){
                         }
                     });
                 }
-                else{
+                else {
                     res.status(401).json(response);
                 }
             });
