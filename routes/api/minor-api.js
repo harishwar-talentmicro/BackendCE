@@ -96,6 +96,8 @@ var zoom = require('./zoomMeeting/zoomMeeting-routes');
 var appGeneralRequest = require('./HEApp/generalRequest.js');
 var WGRM = require('./HEBackEnd/WGRMTemplates.js');
 
+// created by Arun
+var hospitalTokenManagement=require('./HEApp/hospitalTokenManagement.js');
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
 
@@ -188,6 +190,10 @@ router.use('/helloEZE/app',appGeneralRequest);
 router.use('/helloEZE/app',zoom);
 router.use('/helloEZE/',WGRM);
 router.use('/WhatMate/Windows',WMWindowsApp);
+
+
+//created by Arun
+router.use('/helloEZE/app',hospitalTokenManagement);
 
 //router.use('/test_info',testInfoV1);
 //router.use('/association-ap',associationAPV1);
