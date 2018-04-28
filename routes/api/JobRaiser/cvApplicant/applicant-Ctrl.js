@@ -279,7 +279,8 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(nationality)),
                             req.st.db.escape(cvKeywords),
                             req.st.db.escape(req.body.requirementId),
-                            req.st.db.escape(req.body.imageUrl)
+                            req.st.db.escape(req.body.imageUrl),
+                            req.st.db.escape(req.body.htmlText)
                         ];
 
                         var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data

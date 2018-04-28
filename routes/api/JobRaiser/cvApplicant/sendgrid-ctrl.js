@@ -43,6 +43,7 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
     var validationFlag = true;
     var updateFlag = 0;
     var overWrite = 0;
+    var clientContacts = req.body.clientContacts;
 
     if (req.body.overWrite) {
         overWrite = req.body.overWrite;
@@ -199,136 +200,237 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                     req.db.query(procQuery, function (err, result) {
                         console.log(err);
                         console.log(result);
-
                         if (!err && result) {
                             var temp = mailBody;
-                            for (var i = 0; i < idArray.length; i++) {
-
-                                for (var j = 0; j < tags.applicant.length; j++) {
-                                    mailBody = mailBody.replace('[applicant.' + tags.applicant[j].tagName + ']', result[0][i][tags.applicant[j].tagName]);
-                                }
-                                for (var j = 0; j < tags.requirement.length; j++) {
-
-                                    mailBody = mailBody.replace('[requirement.' + tags.requirement[j].tagName + ']', result[1][i][tags.requirement[j].tagName]);
-                                }
-
-                                for (var j = 0; j < tags.client.length; j++) {
-
-                                    mailBody = mailBody.replace('[client.' + tags.client[j].tagName + ']', result[2][i][tags.client[j].tagName]);
-                                }
-                                for (var j = 0; j < result[3].length; j++) {
-
-                                    emailId.push(result[3][j].emailId);
-                                }
-                                for (var j = 0; j < tags.clientContact.length; j++) {
-                                    mailBody = mailBody.replace('[clientContact.' + tags.clientContact[j].tagName + ']', result[8][i][tags.clientContact[j].tagName]);
-                                }
-
-                                //table creation for table tags
-                                console.log(tableTags, 'tabletags');
-                                if (tableTags.applicant.length > 0) {
-                                    mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
-                                    mailBody += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
-                                    console.log(mailBody, 'mailbody');
-                                    for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                        mailBody += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                            if (req.body.mailerType != 2) {
+                                for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+                                    console.log('applicantIndex=', applicantIndex);
+    
+                                    for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                        mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
                                     }
-                                    mailBody += "</tr>";
-                                    for (var candidateCount = 0; candidateCount < result[5].length; candidateCount++) {
-                                        mailBody += "<tr>";
-                                        for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                            mailBody += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[5][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                    for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+                                        mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[1][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                    }
+    
+                                    for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+                                        mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[2][applicantIndex][tags.client[tagIndex].tagName]);
+                                    }
+    
+
+                                    mailbody_array.push(mailBody);
+                                    var mailOptions = {
+                                        from: result[4][0].fromemailId,
+                                        to: result[8][i].emailId,
+                                        subject: req.body.subject,
+                                        html: mailBody
+                                    };
+    
+                                    mailOptions.cc = [];
+
+                                    for(var i = 0; i < cc.length; i++){
+                                        mailOptions.cc.push(cc[i].email);                                       
+                                    }
+    
+    
+                                    var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                    var email = new sendgrid.Email();
+                                    email.from = mailOptions.from;
+                                    email.to = mailOptions.to;
+                                    email.subject = mailOptions.subject;
+                                    email.mbody = mailOptions.html;
+                                    email.html = mailOptions.html;
+    
+                                    var saveMails = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.query.heMasterId),
+                                        req.st.db.escape(req.body.heDepartmentId),
+                                        req.st.db.escape(req.body.userId),
+                                        req.st.db.escape(req.body.mailerType),
+                                        req.st.db.escape(mailOptions.from),
+                                        req.st.db.escape(mailOptions.to),
+                                        req.st.db.escape(mailOptions.subject),
+                                        req.st.db.escape(mailOptions.html),    // contains mail body
+                                        req.st.db.escape(JSON.stringify(cc)),
+                                        req.st.db.escape(JSON.stringify(bcc)),
+                                        req.st.db.escape(JSON.stringify(attachment)),
+                                        req.st.db.escape(req.body.replyMailId),
+                                        req.st.db.escape(req.body.priority),
+                                        req.st.db.escape(req.body.stageId),
+                                        req.st.db.escape(req.body.statusId),
+                                        req.st.db.escape(req.body.smsMsg),
+                                        req.st.db.escape(req.body.whatmateMsg)
+    
+                                    ];
+    
+    
+                                    sendgrid.send(email, function (err, result) {
+                                        if (!err) {
+    
+                                            var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                            console.log(saveMailHistory);
+                                            req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                console.log(mailHistoryErr);
+                                                console.log(mailHistoryResult);
+                                                if (!mailHistoryErr && mailHistoryResult) {
+                                                    console.log('sent mails saved successfully');
+                                                }
+                                                else {
+                                                    console.log('mails could not be saved');
+                                                }
+                                            });
+                                            console.log('Mail sent now save sent history');
+                                            // response.status = true;
+                                            // response.message = "mail sent successfully";
+                                            // response.error = null;
+                                            // response.data = null;
+                                            // res.status(200).json(response);
+    
+    
                                         }
-                                        mailBody += "</tr>";
-                                    }
-
-                                    mailBody += "</table>";
-                                    mailBody += '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script><script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>';
-
-
+                                        else {
+                                            console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+                                        }
+                                    });
+                                   
+                                    mailBody = temp;
                                 }
-
-                                EZEIDEmail = result[4][0].fromemailId;
-
-                                mailbody_array.push(mailBody);
-
-                                var mailOptions = {
-                                    from: EZEIDEmail,
-                                    to: emailId[i],
-                                    subject: req.body.subject,
-                                    html: mailBody
-                                };
-
-
-                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                var email = new sendgrid.Email();
-                                email.from = mailOptions.from;
-                                email.to = mailOptions.to;
-                                email.subject = mailOptions.subject;
-                                email.mbody = mailOptions.html;
-                                email.html = mailOptions.html;
-
-                                var saveMails = [
-                                    req.st.db.escape(req.query.token),
-                                    req.st.db.escape(req.query.heMasterId),
-                                    req.st.db.escape(req.body.heDepartmentId),
-                                    req.st.db.escape(req.body.userId),
-                                    req.st.db.escape(req.body.mailerType),
-                                    req.st.db.escape(mailOptions.from),
-                                    req.st.db.escape(mailOptions.to),
-                                    req.st.db.escape(mailOptions.subject),
-                                    req.st.db.escape(mailOptions.html),    // contains mail body
-                                    req.st.db.escape(JSON.stringify(cc)),
-                                    req.st.db.escape(JSON.stringify(bcc)),
-                                    req.st.db.escape(JSON.stringify(attachment)),
-                                    req.st.db.escape(req.body.replyMailId),
-                                    req.st.db.escape(req.body.priority),
-                                    req.st.db.escape(req.body.stageId),
-                                    req.st.db.escape(req.body.statusId),
-                                    req.st.db.escape(req.body.smsMsg),
-                                    req.st.db.escape(req.body.whatmateMsg)
-
-                                ];
-
-
-                                sendgrid.send(email, function (err, result) {
-                                    if (!err) {
-
-                                        var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
-                                        console.log(saveMailHistory);
-                                        req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
-                                            console.log(mailHistoryErr);
-                                            console.log(mailHistoryResult);
-                                            if (!mailHistoryErr && mailHistoryResult) {
-                                                console.log('sent mails saved successfully');
-                                            }
-                                            else {
-                                                console.log('mails could not be saved');
-                                            }
-                                        });
-                                        console.log('Mail sent now save sent history');
-                                        // response.status = true;
-                                        // response.message = "mail sent successfully";
-                                        // response.error = null;
-                                        // response.data = null;
-                                        // res.status(200).json(response);
-
-
-                                    }
-                                    else {
-                                        console.log('FnForgetPassword: Mail not Saved Successfully' + err);
-                                    }
-                                });
-                                mailBody = temp;
                             }
+    
+                            else {
+                                for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
+                                    for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+    
+                                        for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                            mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                        }
+    
+                                        for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+                                            mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[1][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                        }
+    
+                                        for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+                                            mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[2][applicantIndex][tags.client[tagIndex].tagName]);
+                                        }
+                                    }
+                                    for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+                                        mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[8][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                        console.log('result=', result[8]);
+                                        console.log('result[8][k]=', result[8][clientIndex]);
+                                    }
+    
+                                    if (tableTags.applicant.length > 0) {
+                                        var position = mailBody.indexOf('@table');
+                                        var tableContent = '';
+                                        mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
+                                        tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
+                                        console.log(tableContent, 'mailbody');
+                                        for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                            tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                                        }
+                                        tableContent += "</tr>";
+                                        for (var candidateCount = 0; candidateCount < result[5].length; candidateCount++) {
+                                            tableContent += "<tr>";
+                                            for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                                tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[5][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                            }
+                                            tableContent += "</tr>";
+                                        }
+    
+                                        tableContent += "</table>";
+                                        mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
+    
+                                    }
+    
+                                    mailbody_array.push(mailBody);
+                                    var mailOptions = {
+                                        from: result[4][0].fromemailId,
+                                        to: result[8][clientIndex].emailId,
+                                        subject: req.body.subject,
+                                        html: mailBody
+                                        // cc:['sundar@talentmicro.com','gunasheel@jobraiser.com']
+                                    };
 
+                                    mailOptions.cc = [];
+
+                                    for(var i = 0; i < cc.length; i++){
+                                        mailOptions.cc.push(cc[i].email);                                       
+                                    }
+    
+    
+                                    var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                    var email = new sendgrid.Email();
+                                    email.from = mailOptions.from;
+                                    email.to = mailOptions.to;
+                                    email.cc = mailOptions.cc;
+                                    email.subject = mailOptions.subject;
+                                    email.mbody = mailOptions.html;
+                                    email.html = mailOptions.html;
+    
+                                    var saveMails = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.query.heMasterId),
+                                        req.st.db.escape(req.body.heDepartmentId),
+                                        req.st.db.escape(req.body.userId),
+                                        req.st.db.escape(req.body.mailerType),
+                                        req.st.db.escape(mailOptions.from),
+                                        req.st.db.escape(mailOptions.to),
+                                        req.st.db.escape(mailOptions.subject),
+                                        req.st.db.escape(mailOptions.html),    // contains mail body
+                                        req.st.db.escape(JSON.stringify(cc)),
+                                        req.st.db.escape(JSON.stringify(bcc)),
+                                        req.st.db.escape(JSON.stringify(attachment)),
+                                        req.st.db.escape(req.body.replyMailId),
+                                        req.st.db.escape(req.body.priority),
+                                        req.st.db.escape(req.body.stageId),
+                                        req.st.db.escape(req.body.statusId),
+                                        req.st.db.escape(req.body.smsMsg),
+                                        req.st.db.escape(req.body.whatmateMsg)
+    
+                                    ];
+    
+    
+                                    sendgrid.send(email, function (err, result) {
+                                        if (!err) {
+    
+                                            var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                            console.log(saveMailHistory);
+                                            req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                console.log(mailHistoryErr);
+                                                console.log(mailHistoryResult);
+                                                if (!mailHistoryErr && mailHistoryResult) {
+                                                    console.log('sent mails saved successfully');
+                                                }
+                                                else {
+                                                    console.log('mails could not be saved');
+                                                }
+                                            });
+                                            console.log('Mail sent now save sent history');
+                                            // response.status = true;
+                                            // response.message = "mail sent successfully";
+                                            // response.error = null;
+                                            // response.data = null;
+                                            // res.status(200).json(response);
+    
+    
+                                        }
+                                        else {
+                                            console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+                                        }
+                                    });
+                                    
+                                    mailBody = temp;
+                                }
+                            }
+    
+    
                             response.status = true;
                             response.message = "mail sent successfully";
                             response.error = null;
 
                             res.status(200).json(response);
                         }
-
+    
                         else {
                             response.status = false;
                             response.message = "Error while sending mail";
@@ -337,6 +439,7 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                             res.status(500).json(response);
                         }
                     });
+                    
                 }
 
                 req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
