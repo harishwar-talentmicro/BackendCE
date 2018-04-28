@@ -69,15 +69,15 @@ applicantCtrl.saveApplicant = function (req, res, next) {
         error.firstName = 'First Name is Mandatory';
         validationFlag *= false;
     }
-    if (!req.body.emailId) {
-        error.emailId = 'EmailId is Mandatory';
+    if (!req.body.emailId && !req.body.mobileNumber) {
+        error.emailId = 'EMail ID or Mobile Number is mandatory';
         validationFlag *= false;
     }
 
-    if (!req.body.mobileNumber) {
-        error.mobileNumber = 'Mobile Number is Mandatory';
-        validationFlag *= false;
-    }
+    // if (!req.body.mobileNumber) {
+    //     error.mobileNumber = 'Mobile Number is Mandatory';
+    //     validationFlag *= false;
+    // }
     var education = req.body.education;
     if (typeof (education) == "string") {
         education = JSON.parse(education);
@@ -307,13 +307,14 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                                 response.data = {
                                     applicantId: result[0][0]._applicantExists
                                 };
+                                response.duplicate = 1;
                                 res.status(200).json(response);
 
                             }
                             else {
                                 response.status = false;
                                 response.message = "Error While Saving Resume";
-                                response.error = null;
+                                response.error = 1;
                                 console.log(err);
                                 res.status(500).json(response);
                             }
@@ -1782,6 +1783,7 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                                 grossCTCCurrencySymbol: result[0][0].currencySymbol,
                                 grossCTCScale: result[0][0].grossCTCScale,
                                 grossCTCScaleName: result[0][0].scale,
+                                expectedjoining: result[0][0].expectedjoining,
                                 grossCTCDuration: result[0][0].grossCTCDuration,
                                 grossCTCDurationName: result[0][0].duration,
                                 offerAttachment: result[0][0].offerAttachment,
@@ -3204,6 +3206,104 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                     else {
                         response.status = false;
                         response.message = "Error while saving onBoarding data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+applicantCtrl.getOnBoarding = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.reqAppId),
+                    req.st.db.escape(req.query.stageId)
+                ];
+
+                var procQuery = 'CALL wm_get_onBoarding( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0]) {
+                        response.status = true;
+                        response.message = "onBoarding details loaded successfully";
+                        response.error = null;
+                        response.data =
+                            {
+                                heMasterId: result[0][0].heMasterId,
+                                heDepartmentId: result[0][0].heDepartmentId,
+                                applicantId: result[0][0].applicantId,
+                                jobTitleId: result[0][0].jobTitleId,
+                                jobtitle: result[0][0].jobtitle,
+                                expectedjoining: result[0][0].expectedjoining,
+                                companyContactId: result[0][0].companyContactId,
+                                companyContactName: result[0][0].companyContactName,
+                                accountManagerId: result[0][0].accountManagerId,
+                                accountManagerName: result[0][0].accountManagerName,
+                                offerJoiningDate: result[0][0].offerJoiningDate,
+                                plannedJoiningDate: result[0][0].plannedJoiningDate,
+                                actualJoiningDate: result[0][0].actualJoiningDate,
+                                offerCTCCurrId: result[0][0].offerCTCCurrId,
+                                offerCTCSalary: result[0][0].offerCTCSalary,
+                                offerCTCScaleId: result[0][0].offerCTCScaleId,
+                                offerCTCPeriodId: result[0][0].offerCTCPeriodId,
+                                salaryCurrId: result[0][0].salaryCurrId,
+                                salarySalary: result[0][0].salarySalary,
+                                salaryScaleId: result[0][0].salaryScaleId,
+                                salaryPeriodId: result[0][0].salaryPeriodId,
+                                notes: result[0][0].notes,
+                                workInMentionedShifts: result[0][0].workInMentionedShifts,
+                                attachmentList: JSON.parse(result[0][0].attachmentList) ? JSON.parse(result[0][0].attachmentList) : []
+                            };
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = {
+                            offerManager: []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting onBoarding details";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

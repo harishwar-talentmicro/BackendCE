@@ -1437,10 +1437,14 @@ masterCtrl.getClientView = function (req, res, next) {
                         for (var i = 0; i < results[0].length; i++) {
                             var res2 = {};
                             res2.stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
-                                res2.heDepartmentId = results[0][i].departmentId ? results[0][i].departmentId : 0,
-                                res2.clientName = results[0][i].clientName ? results[0][i].clientName : 0,
-                                res2.requirementCount = results[0][i].count ? results[0][i].count : 0,
-                                res2.notes = results[0][i].notes ? results[0][i].notes : 0
+                                res2.heDepartmentId = results[0][i].departmentId ? results[0][i].departmentId : 0;
+                                res2.clientName = results[0][i].clientName ? results[0][i].clientName : 0;
+                                res2.requirementCount = results[0][i].count ? results[0][i].count : 0;
+                                res2.notes = results[0][i].notes ? results[0][i].notes : 0;
+                                res2.createdDate = results[0][i].createdDate ? results[0][i].createdDate : null;
+                                res2.updateDate = results[0][i].updateDate ? results[0][i].updateDate : null;
+                                res2.createdUserName = results[0][i].createdUserName ? results[0][i].createdUserName : '';
+                                res2.updatedUserName = results[0][i].updatedUserName ? results[0][i].updatedUserName : '';
                             output.push(res2);
                         }
                         response.data = {

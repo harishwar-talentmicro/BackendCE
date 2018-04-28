@@ -53,5 +53,6 @@ router.get('/masterInterviewScheduler',applicantCtrl.getMasterInterviewScheduler
 router.post('/interviewScheduleForDirectApplicant',applicantCtrl.saveInterviewSchedulerForApplicant);
 
 router.post('/onBoarding',applicantCtrl.saveOnBoarding);
+router.get('/onBoarding',applicantCtrl.getOnBoarding);
 
 module.exports = router;
