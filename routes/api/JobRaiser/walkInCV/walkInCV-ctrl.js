@@ -445,7 +445,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     console.log(err);
 
                     var isWeb = req.query.isWeb;
-                    if (!err && results && results[0]) {
+                    
+                    if (!err && results && results[0][0]) {
                         senderGroupId = results[0][0].senderId;
                         notificationTemplaterRes = notificationTemplater.parse('compose_message', {
                             senderName: results[0][0].senderName
@@ -550,9 +551,17 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                         }
 
                     }
+                    else if(!err && results ){
+            
+                            response.status = true;
+                            response.message = "walkIn saved successfully";
+                            response.error = null;
+                            response.data=null;
+                            res.status(200).json(response);
+                        }
                     else {
                         response.status = false;
-                        response.message = "Error While Saving Candidate";
+                        response.message = "Error While Saving walkIn";
                         response.error = null;
                         console.log(err);
                         res.status(500).json(response);

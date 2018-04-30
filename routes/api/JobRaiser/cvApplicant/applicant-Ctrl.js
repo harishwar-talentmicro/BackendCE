@@ -3198,7 +3198,7 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
                     if (!err && result) {
-                        response.status = false;
+                        response.status = true;
                         response.message = "OnBoarding data saved successfully";
                         response.error = null;
                         response.data = null;
@@ -3266,30 +3266,31 @@ applicantCtrl.getOnBoarding = function (req, res, next) {
                         response.error = null;
                         response.data =
                             {
-                                heMasterId: result[0][0].heMasterId,
-                                heDepartmentId: result[0][0].heDepartmentId,
-                                applicantId: result[0][0].applicantId,
-                                jobTitleId: result[0][0].jobTitleId,
-                                jobtitle: result[0][0].jobtitle,
-                                expectedjoining: result[0][0].expectedjoining,
-                                companyContactId: result[0][0].companyContactId,
-                                companyContactName: result[0][0].companyContactName,
-                                accountManagerId: result[0][0].accountManagerId,
-                                accountManagerName: result[0][0].accountManagerName,
-                                offerJoiningDate: result[0][0].offerJoiningDate,
-                                plannedJoiningDate: result[0][0].plannedJoiningDate,
-                                actualJoiningDate: result[0][0].actualJoiningDate,
-                                offerCTCCurrId: result[0][0].offerCTCCurrId,
-                                offerCTCSalary: result[0][0].offerCTCSalary,
-                                offerCTCScaleId: result[0][0].offerCTCScaleId,
-                                offerCTCPeriodId: result[0][0].offerCTCPeriodId,
-                                salaryCurrId: result[0][0].salaryCurrId,
-                                salarySalary: result[0][0].salarySalary,
-                                salaryScaleId: result[0][0].salaryScaleId,
-                                salaryPeriodId: result[0][0].salaryPeriodId,
-                                notes: result[0][0].notes,
-                                workInMentionedShifts: result[0][0].workInMentionedShifts,
-                                attachmentList: JSON.parse(result[0][0].attachmentList) ? JSON.parse(result[0][0].attachmentList) : []
+                                result:result[0]
+                                // heMasterId: result[0][0].heMasterId,
+                                // heDepartmentId: result[0][0].heDepartmentId,
+                                // applicantId: result[0][0].applicantId,
+                                // jobTitleId: result[0][0].jobTitleId,
+                                // jobtitle: result[0][0].jobtitle,
+                                // expectedjoining: result[0][0].expectedjoining,
+                                // companyContactId: result[0][0].companyContactId,
+                                // companyContactName: result[0][0].companyContactName,
+                                // accountManagerId: result[0][0].accountManagerId,
+                                // accountManagerName: result[0][0].accountManagerName,
+                                // offerJoiningDate: result[0][0].offerJoiningDate,
+                                // plannedJoiningDate: result[0][0].plannedJoiningDate,
+                                // actualJoiningDate: result[0][0].actualJoiningDate,
+                                // offerCTCCurrId: result[0][0].offerCTCCurrId,
+                                // offerCTCSalary: result[0][0].offerCTCSalary,
+                                // offerCTCScaleId: result[0][0].offerCTCScaleId,
+                                // offerCTCPeriodId: result[0][0].offerCTCPeriodId,
+                                // salaryCurrId: result[0][0].salaryCurrId,
+                                // salarySalary: result[0][0].salarySalary,
+                                // salaryScaleId: result[0][0].salaryScaleId,
+                                // salaryPeriodId: result[0][0].salaryPeriodId,
+                                // notes: result[0][0].notes,
+                                // workInMentionedShifts: result[0][0].workInMentionedShifts,
+                                // attachmentList: JSON.parse(result[0][0].attachmentList) ? JSON.parse(result[0][0].attachmentList) : []
                             };
                         res.status(200).json(response);
                     }
@@ -3305,6 +3306,94 @@ applicantCtrl.getOnBoarding = function (req, res, next) {
                     else {
                         response.status = false;
                         response.message = "Error while getting onBoarding details";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+applicantCtrl.saveMedical = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.body.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.body.medicalId = req.body.medicalId ? req.body.medicalId : 0;
+                req.body.heDepartmentId = req.body.heDepartmentId ? req.body.heDepartmentId : 0;
+                req.body.currencyId = req.body.currencyId ? req.body.currencyId : 0;
+                req.body.scaleId = req.body.scaleId ? req.body.scaleId : 0;
+                req.body.medicalStatus = req.body.medicalStatus ? req.body.medicalStatus : 1;
+                req.body.reMedical = req.body.reMedical ? req.body.reMedical : 0;
+                req.body.medicalNotes = req.body.medicalNotes ? req.body.medicalNotes : '';
+                req.body.notes = req.body.notes ? req.body.notes : '';
+                
+                
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.medicalId),
+                    req.st.db.escape(req.body.heMasterId),
+                    req.st.db.escape(req.body.heDepartmentId),
+                    req.st.db.escape(req.body.applicantId),
+                    req.st.db.escape(req.body.billTo),
+                    req.st.db.escape(req.body.amount),
+                    req.st.db.escape(req.body.currencyId),
+                    req.st.db.escape(req.body.scaleId),
+                    req.st.db.escape(req.body.receivedDate),
+                    req.st.db.escape(req.body.sentDate),
+                    req.st.db.escape(req.body.date),
+                    req.st.db.escape(req.body.tokenNumber),
+                    req.st.db.escape(req.body.MOFANumber),
+                    req.st.db.escape(req.body.medicalStatus),
+                    req.st.db.escape(req.body.medicalNotes),
+                    req.st.db.escape(req.body.notes),
+                    req.st.db.escape(req.body.reMedical)
+                ];
+
+                var procQuery = 'CALL wm_save_1010_medical( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result) {
+                        response.status = true;
+                        response.message = "Medical data saved successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving Medical data";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
