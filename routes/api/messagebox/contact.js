@@ -22,6 +22,9 @@ var zlib = require('zlib');
 var AES_256_encryption = require('../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 
+var notifyMessages = require('../../../routes/api/messagebox/notifyMessages.js');
+var notifyMessages = new notifyMessages();
+
 /**
  * Method : GET
  * @param req
@@ -1133,143 +1136,147 @@ router.post('/addressBook',function(req, res, next){
                                                                             console.log(autoJoinResults[0][0].groupuserid, "groupuserid");
                                                                             console.log((results[1][i].iphoneId), "iphoneId");
                                                                             console.log((results[1][i].receiverGroupId), "receiverGroupId");
-                                                                            if (notificationTemplaterRes.parsedTpl) {
-                                                                                notification.publish(
-                                                                                    results[1][i].receiverGroupId,
-                                                                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                                                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                                                                    results[0][0].senderId,
-                                                                                    notificationTemplaterRes.parsedTpl,
-                                                                                    31,
-                                                                                    0,
-                                                                                    (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                                                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                                                                    0,
-                                                                                    0,
-                                                                                    0,
-                                                                                    0,
-                                                                                    1,
-                                                                                    moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                                                    '',
-                                                                                    0,
-                                                                                    0,
-                                                                                    null,
-                                                                                    '',
-                                                                                    /** Data object property to be sent with notification **/
-                                                                                    {
-                                                                                        isRelationExist: 0,
-                                                                                        messageList: {
-                                                                                            messageId: results[0][0].messageId,
-                                                                                            message: results[0][0].message,
-                                                                                            createdDate: results[0][0].createdDate,
-                                                                                            messageType: req.body.messageType,
-                                                                                            messageStatus: results[0][0].messageStatus,
-                                                                                            priority: results[0][0].priority,
-                                                                                            senderName: results[0][0].senderName,
-                                                                                            senderId: results[0][0].senderId,
-                                                                                            receiverId: results[1][i].receiverGroupId,
-                                                                                            groupType: results[0][0].groupType,
-                                                                                            groupId: senderGroupId
-                                                                                        },
-                                                                                        contactList: {
-                                                                                            groupId: senderGroupId,
-                                                                                            adminEzeId: results[3][0].adminEzeId,
-                                                                                            adminId: results[3][0].adminId,
-                                                                                            groupName: results[3][0].groupName,
-                                                                                            groupStatus: results[3][0].groupStatus,
-                                                                                            isAdmin: results[3][0].isAdminNew,
-                                                                                            areMembersVisible: results[3][0].areMembersVisible,
-                                                                                            isReplyRestricted: results[3][0].isReplyRestricted,
-                                                                                            groupRelationStatus: results[3][0].groupRelationStatus,
-                                                                                            luDate: results[3][0].luDate,
-                                                                                            isRequester: results[3][0].isRequester,
-                                                                                            unreadCount: results[3][0].unreadCount,
-                                                                                            luUser: results[3][0].luUser,
-                                                                                            aboutGroup: results[3][0].aboutGroup,
-                                                                                            memberCount: results[3][0].memberCount,
-                                                                                            autoJoin: results[3][0].autoJoin,
-                                                                                            groupType: results[0][0].groupType
-                                                                                        }
+                                                                            // if (notificationTemplaterRes.parsedTpl) {
+                                                                            //     notification.publish(
+                                                                            //         results[1][i].receiverGroupId,
+                                                                            //         (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                                            //         (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                                            //         results[0][0].senderId,
+                                                                            //         notificationTemplaterRes.parsedTpl,
+                                                                            //         31,
+                                                                            //         0,
+                                                                            //         (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                                                            //         (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                                                            //         0,
+                                                                            //         0,
+                                                                            //         0,
+                                                                            //         0,
+                                                                            //         1,
+                                                                            //         moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                                            //         '',
+                                                                            //         0,
+                                                                            //         0,
+                                                                            //         null,
+                                                                            //         '',
+                                                                            //         /** Data object property to be sent with notification **/
+                                                                            //         {
+                                                                            //             isRelationExist: 0,
+                                                                            //             messageList: {
+                                                                            //                 messageId: results[0][0].messageId,
+                                                                            //                 message: results[0][0].message,
+                                                                            //                 createdDate: results[0][0].createdDate,
+                                                                            //                 messageType: req.body.messageType,
+                                                                            //                 messageStatus: results[0][0].messageStatus,
+                                                                            //                 priority: results[0][0].priority,
+                                                                            //                 senderName: results[0][0].senderName,
+                                                                            //                 senderId: results[0][0].senderId,
+                                                                            //                 receiverId: results[1][i].receiverGroupId,
+                                                                            //                 groupType: results[0][0].groupType,
+                                                                            //                 groupId: senderGroupId
+                                                                            //             },
+                                                                            //             contactList: {
+                                                                            //                 groupId: senderGroupId,
+                                                                            //                 adminEzeId: results[3][0].adminEzeId,
+                                                                            //                 adminId: results[3][0].adminId,
+                                                                            //                 groupName: results[3][0].groupName,
+                                                                            //                 groupStatus: results[3][0].groupStatus,
+                                                                            //                 isAdmin: results[3][0].isAdminNew,
+                                                                            //                 areMembersVisible: results[3][0].areMembersVisible,
+                                                                            //                 isReplyRestricted: results[3][0].isReplyRestricted,
+                                                                            //                 groupRelationStatus: results[3][0].groupRelationStatus,
+                                                                            //                 luDate: results[3][0].luDate,
+                                                                            //                 isRequester: results[3][0].isRequester,
+                                                                            //                 unreadCount: results[3][0].unreadCount,
+                                                                            //                 luUser: results[3][0].luUser,
+                                                                            //                 aboutGroup: results[3][0].aboutGroup,
+                                                                            //                 memberCount: results[3][0].memberCount,
+                                                                            //                 autoJoin: results[3][0].autoJoin,
+                                                                            //                 groupType: results[0][0].groupType
+                                                                            //             }
+                                                                            //
+                                                                            //         },
+                                                                            //         null,tokenResult[0].isWhatMate,
+                                                                            //         results[1][i].secretKey);
+                                                                            //     console.log('postNotification : notification for compose_message is sent successfully');
+                                                                            // }
+                                                                            // else {
+                                                                            //     console.log('Error in parsing notification compose_message template - ',
+                                                                            //         notificationTemplaterRes.error);
+                                                                            //     console.log('postNotification : notification for compose_message is sent successfully');
+                                                                            // }
+                                                                            notifyMessages.getMessagesNeedToNotify();
 
-                                                                                    },
-                                                                                    null,tokenResult[0].isWhatMate,
-                                                                                    results[1][i].secretKey);
-                                                                                console.log('postNotification : notification for compose_message is sent successfully');
-                                                                            }
-                                                                            else {
-                                                                                console.log('Error in parsing notification compose_message template - ',
-                                                                                    notificationTemplaterRes.error);
-                                                                                console.log('postNotification : notification for compose_message is sent successfully');
-                                                                            }
                                                                         }
                                                                         else {
-                                                                            if (notificationTemplaterRes.parsedTpl) {
-                                                                                notification.publish(
-                                                                                    results[1][i].receiverGroupId,
-                                                                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                                                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                                                                    results[0][0].senderId,
-                                                                                    notificationTemplaterRes.parsedTpl,
-                                                                                    31,
-                                                                                    0,
-                                                                                    (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                                                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                                                                    0,
-                                                                                    0,
-                                                                                    0,
-                                                                                    0,
-                                                                                    1,
-                                                                                    moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                                                    '',
-                                                                                    0,
-                                                                                    0,
-                                                                                    null,
-                                                                                    '',
-                                                                                    /** Data object property to be sent with notification **/
-                                                                                    {
-                                                                                        isRelationExist: 1,
-                                                                                        messageList: {
-                                                                                            messageId: results[0][0].messageId,
-                                                                                            message: results[0][0].message,
-                                                                                            createdDate: results[0][0].createdDate,
-                                                                                            messageType: req.body.messageType,
-                                                                                            messageStatus: results[0][0].messageStatus,
-                                                                                            priority: req.body.priority,
-                                                                                            senderName: results[0][0].senderName,
-                                                                                            senderId: results[0][0].senderId,
-                                                                                            receiverId: results[1][i].receiverGroupId,
-                                                                                            groupId: senderGroupId,
-                                                                                            groupType: results[0][0].groupType
-                                                                                        },
-                                                                                        contactList: {
-                                                                                            groupId: senderGroupId,
-                                                                                            adminEzeId: results[3][0].adminEzeId,
-                                                                                            adminId: results[3][0].adminId,
-                                                                                            groupName: results[3][0].groupName,
-                                                                                            groupStatus: results[3][0].groupStatus,
-                                                                                            isAdmin: results[3][0].isAdminNew,
-                                                                                            areMembersVisible: results[3][0].areMembersVisible,
-                                                                                            isReplyRestricted: results[3][0].isReplyRestricted,
-                                                                                            groupRelationStatus: results[3][0].groupRelationStatus,
-                                                                                            luDate: results[3][0].luDate,
-                                                                                            isRequester: results[3][0].isRequester,
-                                                                                            unreadCount: results[3][0].unreadCount,
-                                                                                            luUser: results[3][0].luUser,
-                                                                                            aboutGroup: results[3][0].aboutGroup,
-                                                                                            memberCount: results[3][0].memberCount,
-                                                                                            autoJoin: results[3][0].autoJoin,
-                                                                                            groupType: results[0][0].groupType
-                                                                                        }
-                                                                                    },
-                                                                                    null,tokenResult[0].isWhatMate,
-                                                                                    results[1][i].secretKey);
-                                                                                console.log('postNotification : notification for compose_message is sent successfully');
-                                                                            }
-                                                                            else {
-                                                                                console.log('Error in parsing notification compose_message template - ',
-                                                                                    notificationTemplaterRes.error);
-                                                                                console.log('postNotification : notification for compose_message is sent successfully');
-                                                                            }
+                                                                            // if (notificationTemplaterRes.parsedTpl) {
+                                                                            //     notification.publish(
+                                                                            //         results[1][i].receiverGroupId,
+                                                                            //         (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                                            //         (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                                            //         results[0][0].senderId,
+                                                                            //         notificationTemplaterRes.parsedTpl,
+                                                                            //         31,
+                                                                            //         0,
+                                                                            //         (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                                                            //         (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                                                            //         0,
+                                                                            //         0,
+                                                                            //         0,
+                                                                            //         0,
+                                                                            //         1,
+                                                                            //         moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                                            //         '',
+                                                                            //         0,
+                                                                            //         0,
+                                                                            //         null,
+                                                                            //         '',
+                                                                            //         /** Data object property to be sent with notification **/
+                                                                            //         {
+                                                                            //             isRelationExist: 1,
+                                                                            //             messageList: {
+                                                                            //                 messageId: results[0][0].messageId,
+                                                                            //                 message: results[0][0].message,
+                                                                            //                 createdDate: results[0][0].createdDate,
+                                                                            //                 messageType: req.body.messageType,
+                                                                            //                 messageStatus: results[0][0].messageStatus,
+                                                                            //                 priority: req.body.priority,
+                                                                            //                 senderName: results[0][0].senderName,
+                                                                            //                 senderId: results[0][0].senderId,
+                                                                            //                 receiverId: results[1][i].receiverGroupId,
+                                                                            //                 groupId: senderGroupId,
+                                                                            //                 groupType: results[0][0].groupType
+                                                                            //             },
+                                                                            //             contactList: {
+                                                                            //                 groupId: senderGroupId,
+                                                                            //                 adminEzeId: results[3][0].adminEzeId,
+                                                                            //                 adminId: results[3][0].adminId,
+                                                                            //                 groupName: results[3][0].groupName,
+                                                                            //                 groupStatus: results[3][0].groupStatus,
+                                                                            //                 isAdmin: results[3][0].isAdminNew,
+                                                                            //                 areMembersVisible: results[3][0].areMembersVisible,
+                                                                            //                 isReplyRestricted: results[3][0].isReplyRestricted,
+                                                                            //                 groupRelationStatus: results[3][0].groupRelationStatus,
+                                                                            //                 luDate: results[3][0].luDate,
+                                                                            //                 isRequester: results[3][0].isRequester,
+                                                                            //                 unreadCount: results[3][0].unreadCount,
+                                                                            //                 luUser: results[3][0].luUser,
+                                                                            //                 aboutGroup: results[3][0].aboutGroup,
+                                                                            //                 memberCount: results[3][0].memberCount,
+                                                                            //                 autoJoin: results[3][0].autoJoin,
+                                                                            //                 groupType: results[0][0].groupType
+                                                                            //             }
+                                                                            //         },
+                                                                            //         null,tokenResult[0].isWhatMate,
+                                                                            //         results[1][i].secretKey);
+                                                                            //     console.log('postNotification : notification for compose_message is sent successfully');
+                                                                            // }
+                                                                            // else {
+                                                                            //     console.log('Error in parsing notification compose_message template - ',
+                                                                            //         notificationTemplaterRes.error);
+                                                                            //     console.log('postNotification : notification for compose_message is sent successfully');
+                                                                            // }
+                                                                            notifyMessages.getMessagesNeedToNotify();
+
                                                                         }
 
                                                                     }
