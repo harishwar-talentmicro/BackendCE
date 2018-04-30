@@ -30,6 +30,8 @@ function Association(db,stdLib){
 
 
 var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
+
 
 var gcs = gcloud.storage({
     projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
@@ -751,7 +753,7 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                     res.status(200).json(responseMessage);
                                                 }
                                                 var notiQueryParams = st.db.escape(req.body.service_mid) + ',' + st.db.escape(req.body.token)
-                                                    + ',' + st.db.escape(req.body.cid)+ ',' + st.db.escape(results[0][0]._i);
+                                                    + ',' + st.db.escape(req.body.cid)+ ',' + st.db.escape(results[0][0]._i)+ ',' + st.db.escape(DBSecretKey);
                                                 var notiQuery = 'CALL get_admin_notif_details(' + notiQueryParams + ')';
                                                 console.log("notiQuery",notiQuery);
                                                 st.db.query(notiQuery, function (err, notiResult) {
@@ -1380,7 +1382,7 @@ Association.prototype.associationGetEventInfo = function(req,res,next){
                         // req.query.type =(req.query.type) ? req.query.type : '2,5,6'
 
                         var procParams = st.db.escape(req.query.token) + ',' + st.db.escape(req.query.service_mid)
-                            + ',' + st.db.escape(req.query.ten_id) + ',' + st.db.escape(req.query.flag);
+                            + ',' + st.db.escape(req.query.ten_id) + ',' + st.db.escape(req.query.flag)+','+st.db.escape(DBSecretKey);
                         var procQuery = 'CALL get_event_details(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -1820,7 +1822,7 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                         };
                                                         res.status(200).json(responseMessage);
                                                     }
-                                                    var notiQueryParams = st.db.escape(req.body.code) + ',' + st.db.escape(req.body.token);
+                                                    var notiQueryParams = st.db.escape(req.body.code) + ',' + st.db.escape(req.body.token)+','+ st.db.escape(DBSecretKey);
                                                     var notiQuery = 'CALL get_admin_ten_notify(' + notiQueryParams + ')';
                                                     console.log("notiQuery",notiQuery);
                                                     st.db.query(notiQuery, function (err, notiResult) {
@@ -2191,7 +2193,7 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                         };
                                                         res.status(200).json(responseMessage);
                                                     }
-                                                    var notiQueryParams = st.db.escape(req.body.code) + ',' + st.db.escape(req.body.token);
+                                                    var notiQueryParams = st.db.escape(req.body.code) + ',' + st.db.escape(req.body.token)+','+ st.db.escape(DBSecretKey);
                                                     var notiQuery = 'CALL get_admin_ten_notify(' + notiQueryParams + ')';
                                                     console.log("notiQuery",notiQuery);
                                                     st.db.query(notiQuery, function (err, notiResult) {
@@ -3076,7 +3078,7 @@ Association.prototype.associationInvite = function(req, res, next){
 
                     var inviteMobile = function(mobileData){
 
-                        var queryParams = req.st.db.escape(req.query.token) + ',' + req.st.db.escape(mobileData.mobile) + ',' + req.st.db.escape(mobileData.isdMobile)+ ',' + req.st.db.escape(mobileData.firstName)+ ',' + req.st.db.escape(mobileData.lastName)+ ',' + req.st.db.escape(mobileData.ezeoneId)+ ',' + req.st.db.escape(req.body.serviceMasterId) ;
+                        var queryParams = req.st.db.escape(req.query.token) + ',' + req.st.db.escape(mobileData.mobile) + ',' + req.st.db.escape(mobileData.isdMobile)+ ',' + req.st.db.escape(mobileData.firstName)+ ',' + req.st.db.escape(mobileData.lastName)+ ',' + req.st.db.escape(mobileData.ezeoneId)+ ',' + req.st.db.escape(req.body.serviceMasterId)+ ',' + req.st.db.escape(DBSecretKey) ;
                         var addressBookQry = 'CALL addressBook_community(' + queryParams + ')';
                         console.log('addressBookQry_community',addressBookQry);
                         req.db.query(addressBookQry, function (err, results) {

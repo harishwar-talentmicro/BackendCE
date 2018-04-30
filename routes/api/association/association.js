@@ -9,6 +9,10 @@
 var express = require('express');
 var router = express.Router();
 var Sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+var CONFIG = require('../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
+
 /**
  * Method : GET
  * @param req
@@ -172,7 +176,7 @@ router.get('/approval_list', function(req,res,next){
     else {
         try {
             //req.query.code = req.st.alterEzeoneId(req.query.code);
-            var procParams = req.db.escape(req.query.token)+ ',' + req.db.escape(req.query.status)+ ',' + req.db.escape(req.query.smid);
+            var procParams = req.db.escape(req.query.token)+ ',' + req.db.escape(req.query.status)+ ',' + req.db.escape(req.query.smid)+','+req.db.escape(DBSecretKey);
             var procQuery = 'CALL get_community_member_approval_list(' + procParams + ')';
             console.log(procQuery);
             req.db.query(procQuery, function (err, results) {

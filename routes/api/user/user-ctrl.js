@@ -25,6 +25,9 @@ var Notification_aws = require('../../modules/notification/aws-sns-push');
 
 var _Notification_aws = new Notification_aws();
 
+var appConfig = require('../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
+
 var qs = require("querystring");
 var options = {
     "method": "POST",
@@ -1395,7 +1398,8 @@ UserCtrl.changePassword = function (req, res, next) {
                 var procParams = [
                     req.st.db.escape(encryptPwd),
                     req.st.db.escape(req.body.WhatMateId),
-                    req.st.db.escape(req.body.otp)
+                    req.st.db.escape(req.body.otp),
+                    req.st.db.escape(req.body.DBSecretKey)
                 ];
 
                 var procQuery = 'CALL change_password( ' + procParams.join(',') + ')';

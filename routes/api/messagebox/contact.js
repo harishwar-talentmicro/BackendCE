@@ -24,7 +24,8 @@ var encryption = new  AES_256_encryption();
 
 var notifyMessages = require('../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
-
+var config=require('../../../ezeone-config.json');
+var DBSecretKey=config.DB.secretKey;
 /**
  * Method : GET
  * @param req
@@ -1031,7 +1032,7 @@ router.post('/addressBook',function(req, res, next){
 
 
                         }
-                        var queryParams = req.st.db.escape(req.query.token) + ',' + req.st.db.escape(mobileData.mobile) + ',' + req.st.db.escape(mobileData.isdMobile)+ ',' + req.st.db.escape(mobileData.firstName)+ ',' + req.st.db.escape(mobileData.lastName)+ ',' + req.st.db.escape(mobileData.groupId);
+                        var queryParams = req.st.db.escape(req.query.token) + ',' + req.st.db.escape(mobileData.mobile) + ',' + req.st.db.escape(mobileData.isdMobile)+ ',' + req.st.db.escape(mobileData.firstName)+ ',' + req.st.db.escape(mobileData.lastName)+ ',' + req.st.db.escape(mobileData.groupId)+ ',' + req.st.db.escape(DBSecretKey);
                         var addressBookQry = 'CALL addressBook(' + queryParams + ')';
                         console.log('addressBookQry',addressBookQry);
                         req.db.query(addressBookQry, function (err, results) {
@@ -1054,7 +1055,8 @@ router.post('/addressBook',function(req, res, next){
                                                         req.db.escape(results[0][0].receiverGroupId),
                                                         req.db.escape(mobileData.groupType),
                                                         req.db.escape(message),
-                                                        req.db.escape(req.body.messageType)
+                                                        req.db.escape(req.body.messageType),
+                                                        req.db.escape(req.body.DBSecretKey)
                                                     ];
                                                     var contactParams = [
                                                         req.db.escape(req.st.alterEzeoneId(tokenResult[0].ezeoneId)),

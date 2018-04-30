@@ -1,6 +1,8 @@
 /**
  * Created by vedha on 11-03-2017.
  */
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 
 var userCtrl = {};
@@ -229,7 +231,8 @@ userCtrl.getUserDetails = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.HEUserId),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(DBSecretKey)                
                 ];
                 /**
                  * Calling procedure to get form template
@@ -360,7 +363,8 @@ userCtrl.getUserList = function(req,res,next){
                     req.st.db.escape(req.query.searchKeywords),
                     req.st.db.escape(startPage),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(DBSecretKey)                
                 ];
                 /**
                  * Calling procedure to get form template
@@ -410,7 +414,8 @@ userCtrl.getApproversList = function(req,res,next){
         if((!err) && tokenResult){
             var procParams = [
                 req.st.db.escape(req.query.HEFormId),
-                req.st.db.escape(req.query.HEUserId)
+                req.st.db.escape(req.query.HEUserId),
+                req.st.db.escape(DBSecretKey)
             ];
             /**
              * Calling procedure to get form template
@@ -458,7 +463,8 @@ userCtrl.getReceiversList = function(req,res,next){
 
             var procParams = [
                 req.st.db.escape(req.query.HEFormId),
-                req.st.db.escape(req.query.HEUserId)
+                req.st.db.escape(req.query.HEUserId),
+                req.st.db.escape(DBSecretKey)                
             ];
             /**
              * Calling procedure to get form template
@@ -506,7 +512,8 @@ userCtrl.getUserDataAccessRights = function(req,res,next){
 
             var procParams = [
                 req.st.db.escape(req.query.HEUserId),
-                req.st.db.escape(req.query.HEFormId)
+                req.st.db.escape(req.query.HEFormId),
+                req.st.db.escape(DBSecretKey)                
             ];
             /**
              * Calling procedure to get form template
@@ -645,7 +652,8 @@ userCtrl.validateEzeoneId = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.EZEOneId),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to get form template

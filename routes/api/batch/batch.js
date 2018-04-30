@@ -18,6 +18,7 @@ var fs = require('fs');
 var moment = require('moment');
 
 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 /**
  * Method : POST
@@ -734,7 +735,7 @@ router.post('/testinvoice', function(req,res,next){
     }
     else {
         try {
-            var procParams = req.db.escape(req.query.batch_id);
+            var procParams = req.db.escape(req.query.batch_id) +','+ req.db.escape(DBSecretKey);
             var procQuery = 'CALL get_billing_invoice_details(' + procParams + ')';
             console.log(procQuery);
             req.db.query(procQuery, function (err, results) {
@@ -855,7 +856,7 @@ router.post('/invoice', function(req,res,next){
                         for (var batchCount = 0; batchCount < memberArrayList.length; batchCount++) {
                             /**preparing query for getting all member results in a single shot */
                             var queryParams = req.db.escape(memberArrayList[batchCount]) + ',' + req.db.escape(req.body.batchId)
-                                + ',' + req.db.escape(req.body.serviceMasterId)+ ',' + req.db.escape(req.body.token);
+                                + ',' + req.db.escape(req.body.serviceMasterId)+ ',' + req.db.escape(req.body.token)+','+ req.db.escape(DBSecretKey);
                             var procQuery = 'CALL get_billing_invoice_details(' + queryParams + ');';
                             combinedInvoieQuery += procQuery;
                         }
