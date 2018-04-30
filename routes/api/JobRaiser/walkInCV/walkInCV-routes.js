@@ -12,5 +12,7 @@ router.post('/sendOtp',walkInCvCtrl.sendOtp);
 router.get('/verifyOtp',walkInCvCtrl.verifyOtp);
 router.get('/bannerList',walkInCvCtrl.bannerList);
 
+router.post('/InterviewScheduler',walkInCvCtrl.InterviewSchedulerForPublish);
+
 
 module.exports = router;
