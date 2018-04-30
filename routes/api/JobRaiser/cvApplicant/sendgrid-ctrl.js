@@ -221,15 +221,20 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                                     mailbody_array.push(mailBody);
                                     var mailOptions = {
                                         from: result[4][0].fromemailId,
-                                        to: result[8][i].emailId,
+                                        to: result[3][applicantIndex].emailId,
                                         subject: req.body.subject,
                                         html: mailBody
                                     };
     
                                     mailOptions.cc = [];
 
-                                    for(var i = 0; i < cc.length; i++){
-                                        mailOptions.cc.push(cc[i].email);                                       
+                                    for(var j = 0; j < cc.length; j++){
+                                        mailOptions.cc.push(cc[j].email);           
+                                    }
+                                    mailOptions.bcc = [];
+
+                                    for(var j = 0; j < bcc.length; j++){
+                                        mailOptions.bcc.push(bcc[j].email);           
                                     }
     
     

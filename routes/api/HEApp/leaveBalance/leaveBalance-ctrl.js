@@ -17,6 +17,8 @@ var leaveBalanceCtrl = {};
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
+var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
+var notifyMessages = new notifyMessages();
 
 leaveBalanceCtrl.getLeaveBalanceForm = function(req,res,next){
     var response = {
@@ -63,66 +65,67 @@ leaveBalanceCtrl.getLeaveBalanceForm = function(req,res,next){
                     console.log(results);
                     if(!err && results && results[0] ){
                         senderGroupId = results[0][0].senderId;
-                        notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                            senderName : results[0][0].message
-                        });
-
-                        for (var i = 0; i < results[1].length; i++ ) {
-                            if (notificationTemplaterRes.parsedTpl) {
-                                var leaveTypes1 = JSON.parse(results[0][0].formDataJSON);
-                                notification.publish(
-                                    results[1][i].receiverId,
-                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                    results[0][0].senderId,
-                                    notificationTemplaterRes.parsedTpl,
-                                    31,
-                                    0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    1,
-                                    moment().format("YYYY-MM-DD HH:mm:ss"),
-                                    '',
-                                    0,
-                                    0,
-                                    null,
-                                    '',
-                                    /** Data object property to be sent with notification **/
-                                    {
-                                        messageList: {
-                                            messageId: results[0][0].messageId,
-                                            message: results[0][0].message,
-                                            messageLink: results[0][0].messageLink,
-                                            createdDate: results[0][0].createdDate,
-                                            messageType: req.body.messageType,
-                                            messageStatus: results[0][0].messageStatus,
-                                            priority: results[0][0].priority,
-                                            senderName: results[0][0].senderName,
-                                            senderId: results[0][0].senderId,
-                                            receiverId: results[1][i].receiverId,
-                                            groupId: senderGroupId,
-                                            groupType: 2,
-                                            transId : results[0][0].transId,
-                                            formId : results[0][0].formId,
-                                            currentStatus : results[0][0].currentStatus,
-                                            formData : {
-                                                leaveTypes : JSON.parse(leaveTypes1["leaveTypes"]),
-                                                totalLeaves : leaveTypes1["totalLeaves"]
-                                            }
-                                        }
-                                    },
-                                    null,tokenResult[0].isWhatMate);
-                                console.log('postNotification : notification for compose_message is sent successfully');
-                            }
-                            else {
-                                console.log('Error in parsing notification compose_message template - ',
-                                    notificationTemplaterRes.error);
-                                console.log('postNotification : notification for compose_message is sent successfully');
-                            }
-                        }
+                        // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
+                        //     senderName : results[0][0].message
+                        // });
+                        //
+                        // for (var i = 0; i < results[1].length; i++ ) {
+                        //     if (notificationTemplaterRes.parsedTpl) {
+                        //         var leaveTypes1 = JSON.parse(results[0][0].formDataJSON);
+                        //         notification.publish(
+                        //             results[1][i].receiverId,
+                        //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                        //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                        //             results[0][0].senderId,
+                        //             notificationTemplaterRes.parsedTpl,
+                        //             31,
+                        //             0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                        //             (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                        //             0,
+                        //             0,
+                        //             0,
+                        //             0,
+                        //             1,
+                        //             moment().format("YYYY-MM-DD HH:mm:ss"),
+                        //             '',
+                        //             0,
+                        //             0,
+                        //             null,
+                        //             '',
+                        //             /** Data object property to be sent with notification **/
+                        //             {
+                        //                 messageList: {
+                        //                     messageId: results[0][0].messageId,
+                        //                     message: results[0][0].message,
+                        //                     messageLink: results[0][0].messageLink,
+                        //                     createdDate: results[0][0].createdDate,
+                        //                     messageType: req.body.messageType,
+                        //                     messageStatus: results[0][0].messageStatus,
+                        //                     priority: results[0][0].priority,
+                        //                     senderName: results[0][0].senderName,
+                        //                     senderId: results[0][0].senderId,
+                        //                     receiverId: results[1][i].receiverId,
+                        //                     groupId: senderGroupId,
+                        //                     groupType: 2,
+                        //                     transId : results[0][0].transId,
+                        //                     formId : results[0][0].formId,
+                        //                     currentStatus : results[0][0].currentStatus,
+                        //                     formData : {
+                        //                         leaveTypes : JSON.parse(leaveTypes1["leaveTypes"]),
+                        //                         totalLeaves : leaveTypes1["totalLeaves"]
+                        //                     }
+                        //                 }
+                        //             },
+                        //             null,tokenResult[0].isWhatMate);
+                        //         console.log('postNotification : notification for compose_message is sent successfully');
+                        //     }
+                        //     else {
+                        //         console.log('Error in parsing notification compose_message template - ',
+                        //             notificationTemplaterRes.error);
+                        //         console.log('postNotification : notification for compose_message is sent successfully');
+                        //     }
+                        // }
+                        notifyMessages.getMessagesNeedToNotify();
 
                         response.status = true;
                         response.message = "Leave balance loaded successfully";
