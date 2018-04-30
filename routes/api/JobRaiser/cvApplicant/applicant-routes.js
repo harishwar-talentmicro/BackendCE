@@ -55,4 +55,5 @@ router.post('/interviewScheduleForDirectApplicant',applicantCtrl.saveInterviewSc
 router.post('/onBoarding',applicantCtrl.saveOnBoarding);
 router.get('/onBoarding',applicantCtrl.getOnBoarding);
 
+router.post('/medical',applicantCtrl.saveMedical);
 module.exports = router;
