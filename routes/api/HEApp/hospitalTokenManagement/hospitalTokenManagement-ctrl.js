@@ -65,7 +65,7 @@ hospitalTokenManagementCtrl.getDoctorList = function (req, res, next) {
                             output.push(res2);
                         }
                         response.data = {
-                            hospitalEntityList: output
+                            hospitalEntityList: output[0]
                         };
                         res.status(200).json(response);
                     }
