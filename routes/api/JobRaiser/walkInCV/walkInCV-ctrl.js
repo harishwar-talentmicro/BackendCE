@@ -74,7 +74,7 @@ walkInCvCtrl.getmasterData = function (req, res, next) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    
+
                 ];
 
                 var procQuery = 'CALL wm_get_masterDataForWalkinForm( ' + inputs.join(',') + ')';
@@ -108,13 +108,13 @@ walkInCvCtrl.getmasterData = function (req, res, next) {
                         }
 
                         response.data = {
-                           
+
                             currency: (result && result[0]) ? result[0] : [],
                             scale: (result && result[1]) ? result[1] : [],
                             duration: (result && result[2]) ? result[2] : [],
                             ugEducationList: output ? output : [],
                             pgEducationList: output1 ? output1 : []
-                            
+
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -134,12 +134,12 @@ walkInCvCtrl.getmasterData = function (req, res, next) {
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-        
+
                             currency: [],
                             scale: [],
                             duration: [],
-                            ugEducationList:[],
-                            pgEducationList:[]
+                            ugEducationList: [],
+                            pgEducationList: []
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -197,7 +197,7 @@ walkInCvCtrl.getskillIndustry = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.keyword),
                     req.st.db.escape(req.query.type)
-                    
+
                 ];
 
                 var procQuery = 'CALL wm_get_skill_industry_forWalkinForm( ' + inputs.join(',') + ')';
@@ -212,7 +212,7 @@ walkInCvCtrl.getskillIndustry = function (req, res, next) {
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                           
+
                             searchResult: (result && result[0]) ? result[0] : []
 
                         };
@@ -234,9 +234,9 @@ walkInCvCtrl.getskillIndustry = function (req, res, next) {
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-        
+
                             searchResult: []
-                
+
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -312,7 +312,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
     if (!pgEducation) {
         pgEducation = [];
     }
-    
+
     var skills = req.body.skills;
     if (typeof (Skills) == "string") {
         skills = JSON.parse(skills);
@@ -320,7 +320,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
     if (!skills) {
         skills = [];
     }
-    
+
     var industry = req.body.industry;
     if (typeof (industry) == "string") {
         industry = JSON.parse(industry);
@@ -328,7 +328,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
     if (!industry) {
         industry = [];
     }
-    
+
     var currency = req.body.currency;
     if (typeof (currency) == "string") {
         currency = JSON.parse(currency);
@@ -360,7 +360,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-               
+
 
                 req.body.heParentId = (req.body.heParentId) ? req.body.heParentId : 0;
                 req.body.fresherExperience = (req.body.fresherExperience) ? req.body.fresherExperience : 0;
@@ -369,7 +369,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.presentEmployer = (req.body.presentEmployer) ? req.body.presentEmployer : "";
                 req.body.noticePeriod = (req.body.noticePeriod) ? req.body.noticePeriod : 0;
                 req.body.status = (req.body.status) ? req.body.status : 1;
-                
+
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -402,17 +402,18 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.approverCount),
                     req.st.db.escape(req.body.receiverCount),
                     req.st.db.escape(req.body.status)
-                    
+
                 ];
 
-                var procQuery = 'CALL wm_save_wlkinForm( ' + inputs.join(',') + ')';  
+                var procQuery = 'CALL wm_save_wlkinForm( ' + inputs.join(',') + ')';
                 console.log(procQuery);
 
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
                     var isWeb = req.query.isWeb;
-                    if (!err && results && results[0]) {
+                    
+                    if (!err && results && results[0][0]) {
                         senderGroupId = results[0][0].senderId;
                         notificationTemplaterRes = notificationTemplater.parse('compose_message', {
                             senderName: results[0][0].senderName
@@ -515,11 +516,19 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                         else {
                             res.status(200).json(response);
                         }
-                
+
                     }
+                    else if(!err && results ){
+            
+                            response.status = true;
+                            response.message = "walkIn saved successfully";
+                            response.error = null;
+                            response.data=null;
+                            res.status(200).json(response);
+                        }
                     else {
                         response.status = false;
-                        response.message = "Error While Saving Candidate";
+                        response.message = "Error While Saving walkIn";
                         response.error = null;
                         console.log(err);
                         res.status(500).json(response);
@@ -843,13 +852,13 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                     console.log(req.query.isWeb);
 
                     var isWeb = req.query.isWeb;
-                    if (!err && result && result[0] &&result[0][0]) {
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "Banner List loaded successfully";
                         response.error = null;
 
                         response.data = {
-                            bannerList : result[0]
+                            bannerList: result[0]
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -867,7 +876,7 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            bannerList :[]
+                            bannerList: []
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -897,5 +906,289 @@ walkInCvCtrl.bannerList = function (req, res, next) {
 
 };
 
+walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
+    var status = true, error = {};
+
+    var response = {
+        status: false,
+        message: "Invalid user",
+        data: null,
+        error: null
+    };
+
+    if (!req.body.password) {
+        error['password'] = 'password is mandatory';
+        status *= false;
+    }
+
+    if (!req.body.loginId) {
+        error['loginId'] = 'loginId is mandatory';
+        status *= false;
+    }
+
+    var assessment = req.body.assessment;
+    if (typeof (assessment) == "string") {
+        assessment = JSON.parse(assessment);
+    }
+    if (!assessment) {
+        assessment = {};
+    }
+
+    var jobTitle = req.body.jobTitle;
+    if (typeof (jobTitle) == "string") {
+        jobTitle = JSON.parse(jobTitle);
+    }
+    if (!jobTitle) {
+        jobTitle = {};
+    }
+
+    var assessmentTypeList = [];
+    assessmentTypeList = req.body.assessmentTypeList;
+    if (typeof (assessmentTypeList) == "string") {
+        assessmentTypeList = JSON.parse(assessmentTypeList);
+    }
+    if (!assessmentTypeList) {
+        assessmentTypeList = [];
+    }
+
+    var skillAssessment = [];
+    skillAssessment = req.body.skillAssessment;
+    if (typeof (skillAssessment) == "string") {
+        skillAssessment = JSON.parse(skillAssessment);
+    }
+    if (!skillAssessment) {
+        skillAssessment = [];
+    }
+    var heDepartment = [];
+    heDepartment = req.body.heDepartment;
+    if (typeof (heDepartment) == "string") {
+        heDepartment = JSON.parse(heDepartment);
+    }
+    if (!heDepartment) {
+        heDepartment = [];
+    }
+
+    var interviewRound = req.body.interviewRound;
+    if (typeof (interviewRound) == "string") {
+        interviewRound = JSON.parse(interviewRound);
+    }
+    if (!interviewRound) {
+        interviewRound = {};
+    }
+
+    var panelMembers = req.body.panelMembers;
+    if (typeof (panelMembers) == "string") {
+        panelMembers = JSON.parse(panelMembers);
+    }
+    if (!panelMembers) {
+        error.panelMembers = 'Invalid panels';
+        status *= false;
+    }
+
+    var attachmentList = req.body.attachmentList;
+    if (typeof (attachmentList) == "string") {
+        attachmentList = JSON.parse(attachmentList);
+    }
+    if (!attachmentList) {
+        attachmentList = [];
+    }
+
+    var senderGroupId;
+
+    if (status) {
+        var encryptPwd = req.st.hashPassword(req.body.password);
+        console.log(encryptPwd);
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        // if ((!err) && tokenResult) {
+        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+        req.body.parentId = req.body.parentId ? req.body.parentId : 0;
+        req.body.status = req.body.status ? req.body.status : 1;
+        req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : '';
+        req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
+        req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
+        req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
+        req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
+        req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
+        // req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
+        req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
+        req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+        req.body.notes = req.body.notes ? req.body.notes : "";
+        req.body.interviewDuration = req.body.interviewDuration ? req.body.interviewDuration : 0;
+        req.body.mobileISD = req.body.mobileISD ? req.body.mobileISD : '';
+        req.body.mobileNumber = req.body.mobileNumber ? req.body.mobileNumber : '';
+
+        var procParams = [
+            req.st.db.escape(req.body.loginId),
+            req.st.db.escape(encryptPwd),
+            req.st.db.escape(req.body.heMasterId),
+            req.st.db.escape(req.body.parentId),
+            req.st.db.escape(JSON.stringify(interviewRound)),
+            req.st.db.escape(req.body.reportingDateTime),
+            req.st.db.escape(req.body.interviewDuration),
+            req.st.db.escape(req.body.notes),
+            req.st.db.escape(JSON.stringify(panelMembers)),
+            req.st.db.escape(JSON.stringify(assessment)),
+            req.st.db.escape(req.body.senderNotes),
+            req.st.db.escape(req.body.approverNotes),
+            req.st.db.escape(req.body.receiverNotes),
+            req.st.db.escape(req.body.changeLog),
+            req.st.db.escape(req.body.groupId),
+            req.st.db.escape(req.body.learnMessageId),
+            req.st.db.escape(req.body.accessUserType),
+            req.st.db.escape(req.body.approverCount),
+            req.st.db.escape(req.body.receiverCount),
+            req.st.db.escape(req.body.status),
+            req.st.db.escape(req.body.applicantId),
+            req.st.db.escape(req.body.firstName),
+            req.st.db.escape(req.body.lastName),
+            req.st.db.escape(req.body.mobileISD),
+            req.st.db.escape(req.body.mobileNumber),
+            req.st.db.escape(req.body.emailId),
+            req.st.db.escape(JSON.stringify(jobTitle)),
+            req.st.db.escape(req.body.profilePicture),
+            req.st.db.escape(JSON.stringify(attachmentList[0])),
+            req.st.db.escape(JSON.stringify(assessmentTypeList)),
+            req.st.db.escape(JSON.stringify(skillAssessment)),
+            req.st.db.escape(JSON.stringify(heDepartment))
+        ];
+
+        var procQuery = 'CALL wm_save_interviewSchedulerForHirecraft( ' + procParams.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, results) {
+            console.log(err);
+
+            var isWeb = req.query.isWeb;
+            if(!err && results && results[0][0].error){
+                if(results[0][0].error='Invalid User'){
+                    response.status = true;
+                    response.message = "Invalid User";
+                    response.error = null;
+                    response.data=null;
+                    res.status(200).json(response);
+                }
+                else{
+                    response.status = true;
+                    response.message = "Invalid Company User";
+                    response.error = null;
+                    response.data=null;
+                    res.status(200).json(response);
+                }
+
+            }
+            else if (!err && results && results[0]) {
+                senderGroupId = results[0][0].senderId;
+                notificationTemplaterRes = notificationTemplater.parse('compose_message', {
+                    senderName: results[0][0].senderName
+                });
+
+                for (var i = 0; i < results[1].length; i++) {         // main line 
+                    if (notificationTemplaterRes.parsedTpl) {
+                        notification.publish(
+                            results[1][i].receiverId,
+                            (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                            (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                            results[0][0].senderId,
+                            notificationTemplaterRes.parsedTpl,
+                            31,
+                            0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                            (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                            0,
+                            0,
+                            0,
+                            0,
+                            1,
+                            moment().format("YYYY-MM-DD HH:mm:ss"),
+                            '',
+                            0,
+                            0,
+                            null,
+                            '',
+                            /** Data object property to be sent with notification **/
+                            {
+                                messageList: {
+                                    messageId: results[1][i].messageId,
+                                    message: results[1][i].message,
+                                    messageLink: results[1][i].messageLink,
+                                    createdDate: results[1][i].createdDate,
+                                    messageType: results[1][i].messageType,
+                                    messageStatus: results[1][i].messageStatus,
+                                    priority: results[1][i].priority,
+                                    senderName: results[1][i].senderName,
+                                    senderId: results[1][i].senderId,
+                                    receiverId: results[1][i].receiverId,
+                                    groupId: results[1][i].groupId,
+                                    groupType: 2,
+                                    transId: results[1][i].transId,
+                                    formId: results[1][i].formId,
+                                    currentStatus: results[1][i].currentStatus,
+                                    currentTransId: results[1][i].currentTransId,
+                                    parentId: results[1][i].parentId,
+                                    accessUserType: results[1][i].accessUserType,
+                                    heUserId: results[1][i].heUserId,
+                                    formData: JSON.parse(results[1][i].formDataJSON)
+                                }
+                            },
+                            null,
+                            // tokenResult[0].isWhatMate,
+                            results[1][i].secretKey);
+                        console.log('postNotification : notification for compose_message is sent successfully');
+                    }
+                    else {
+                        console.log('Error in parsing notification compose_message template - ',
+                            notificationTemplaterRes.error);
+                        console.log('postNotification : notification for compose_message is sent successfully');
+                    }
+                }
+
+                response.status = true;
+                response.message = "Interview scheduled successfully";
+                response.error = null;
+                response.data = {
+                    messageList:
+                        {
+                            messageId: results[0][0].messageId,
+                            message: results[0][0].message,
+                            messageLink: results[0][0].messageLink,
+                            createdDate: results[0][0].createdDate,
+                            messageType: results[0][0].messageType,
+                            messageStatus: results[0][0].messageStatus,
+                            priority: results[0][0].priority,
+                            senderName: results[0][0].senderName,
+                            senderId: results[0][0].senderId,
+                            receiverId: results[0][0].receiverId,
+                            transId: results[0][0].transId,
+                            formId: results[0][0].formId,
+                            groupId: req.body.groupId,
+                            currentStatus: results[0][0].currentStatus,
+                            currentTransId: results[0][0].currentTransId,
+                            localMessageId: req.body.localMessageId,
+                            parentId: results[0][0].parentId,
+                            accessUserType: results[0][0].accessUserType,
+                            heUserId: results[0][0].heUserId,
+                            formData: JSON.parse(results[0][0].formDataJSON)
+                        }
+                };
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while scheduling interview";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+        // }
+        // else {
+        //     res.status(401).json(response);
+        // }
+        // });
+    }
+    else {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+    }
+};
 
 module.exports = walkInCvCtrl;
