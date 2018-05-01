@@ -12,6 +12,8 @@ var bodyParser = require('body-parser');
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 var jobCtrl = {};
 var error = {};
@@ -1298,7 +1300,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                     req.st.db.escape(req.body.statusTitle),
                     req.st.db.escape(req.body.expectedJoining),
                     req.st.db.escape(req.body.jdTemplateFlag),
-                    req.st.db.escape(req.body.jdTemplateId)
+                    req.st.db.escape(req.body.jdTemplateId),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
@@ -1682,7 +1685,8 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                 var getStatus = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heParentId),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(DBSecretKey)
 
                 ];
 
@@ -1973,7 +1977,8 @@ jobCtrl.manpowerRequirementStatus = function (req, res, next) {
                 var input = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.status)
+                    req.st.db.escape(req.query.status),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL wm_get_manpowerRequirementOnStatus( ' + input.join(',') + ')';

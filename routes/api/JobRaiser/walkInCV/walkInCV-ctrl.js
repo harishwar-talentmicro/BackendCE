@@ -23,6 +23,9 @@ const authToken = '3abf04f536ede7f6964919936a35e614';
 const client = require('twilio')(accountSid, authToken);
 // const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 var qs = require("querystring");
 var options = {
     "method": "POST",
@@ -434,7 +437,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.accessUserType),
                     req.st.db.escape(req.body.approverCount),
                     req.st.db.escape(req.body.receiverCount),
-                    req.st.db.escape(req.body.status)
+                    req.st.db.escape(req.body.status),
+                    req.st.db.escape(DBSecretKey)
 
                 ];
 

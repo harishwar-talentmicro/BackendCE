@@ -11,6 +11,9 @@ var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 var paceUsersCtrl = {};
 var error = {};
 
@@ -43,7 +46,8 @@ paceUsersCtrl.checkUser = function (req, res, next) {
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.ezeoneId)
+                    req.st.db.escape(req.query.ezeoneId),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL wm_validate_paceUserId( ' + inputs.join(',') + ')';
@@ -180,7 +184,8 @@ paceUsersCtrl.getUsers = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.userMasterId)
+                    req.st.db.escape(req.query.userMasterId),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL wm_get_pace_users( ' + inputs.join(',') + ')';

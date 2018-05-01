@@ -11,6 +11,9 @@ var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 eventCtrl.getWhatMateBanners = function (req, res, next) {
     var response = {
         status: false,
@@ -326,7 +329,8 @@ eventCtrl.getWMEventSpeakers = function (req, res, next) {
     req.query.WMId = req.query.WMId ? req.query.WMId : 0;
 
     var procParams = [
-        req.st.db.escape(req.query.WMId)
+        req.st.db.escape(req.query.WMId),
+        req.st.db.escape(DBSecretKey)
     ];
     /**
      * Calling procedure to get form template
@@ -396,7 +400,8 @@ eventCtrl.getWMEventModerator = function (req, res, next) {
     req.st.validateToken(req.query.token, function (err, tokenResult) {
         if ((!err) && tokenResult) {
             var procParams = [
-                req.st.db.escape(req.query.WMId)
+                req.st.db.escape(req.query.WMId),
+                req.st.db.escape(DBSecretKey)
             ];
             /**
              * Calling procedure to get form template
@@ -1740,7 +1745,8 @@ eventCtrl.getStatusOfWMList = function (req, res, next) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.WMId)
+                    req.st.db.escape(req.query.WMId),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to get form template
@@ -2106,7 +2112,8 @@ eventCtrl.getWMEventSpeakerDetails = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 var procParams = [
-                    req.st.db.escape(req.query.userMasterId)
+                    req.st.db.escape(req.query.userMasterId),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to get form template
@@ -2191,7 +2198,8 @@ eventCtrl.getWMEventAgendaDetails = function (req, res, next) {
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.eventId),
-                    req.st.db.escape(req.query.sessionId)
+                    req.st.db.escape(req.query.sessionId),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to get form template

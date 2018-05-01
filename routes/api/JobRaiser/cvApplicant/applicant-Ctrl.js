@@ -14,6 +14,8 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 var applicantCtrl = {};
 var error = {};
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 
 var cv = '';
@@ -927,7 +929,8 @@ applicantCtrl.getreqAppStageStatus = function (req, res, next) {
                 var getStatus = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.reqApplicantId),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL wm_get_reqStageandStatus( ' + getStatus.join(',') + ')';
@@ -2045,7 +2048,8 @@ applicantCtrl.getReferralResumeMaster = function (req, res, next) {
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL wm_get_MasterForResumeReferal( ' + inputs.join(',') + ')';
@@ -2251,7 +2255,8 @@ applicantCtrl.saveInterviewSchedulerNew = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(assessmentTypeList)),
                     req.st.db.escape(JSON.stringify(skillAssessment)),
                     req.st.db.escape(JSON.stringify(interviewLocation)),
-                    req.st.db.escape(JSON.stringify(heDepartment))
+                    req.st.db.escape(JSON.stringify(heDepartment)),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL wm_save_interviewSchedular_new1( ' + procParams.join(',') + ')';
