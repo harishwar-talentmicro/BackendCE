@@ -1042,198 +1042,205 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                 if (loginResult && password) {
                     if(loginResult.length > 0){
                         var loginDetails = loginResult[0];
-                        if(loginResult[0][0].userError ='Invalid User'){
+
+                        if(loginResult[0][0].userError == 'Invalid User'){
+                            console.log("Enter1.............");
                             response.status=false;
                             response.error = error;
                             response.message = loginResult[0][0].userError;
                             res.status(401).json(response);
                         }
-                        else if(loginResult[0][0].companyError ='Invalid company user'){
+                        else if(loginResult[0][0].companyError == 'Invalid company user'){
+                            console.log("Enter2.............");
                             response.status=false;
                             response.error = error;
                             response.message = loginResult[0][0].companyError;
                             res.status(401).json(response);
                         }
-                        else if (comparePassword(password, loginResult[0][0].Password ? loginResult[0][0].Password :'')) {
-                            if ((!err) && loginResult[0]) {
-                                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                                req.body.parentId = req.body.parentId ? req.body.parentId : 0;
-                                req.body.status = req.body.status ? req.body.status : 1;
-                                req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : '';
-                                req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
-                                req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
-                                req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
-                                req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
-                                req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
-                                // req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
-                                req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
-                                req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
-                                req.body.notes = req.body.notes ? req.body.notes : "";
-                                req.body.interviewDuration = req.body.interviewDuration ? req.body.interviewDuration : 0;
-                                req.body.mobileISD = req.body.mobileISD ? req.body.mobileISD : '';
-                                req.body.mobileNumber = req.body.mobileNumber ? req.body.mobileNumber : '';
-    
-                                var procParams = [
-                                    // req.st.db.escape(req.body.loginId),
-                                    // req.st.db.escape(encryptPwd),
-                                    req.st.db.escape(req.body.heMasterId),
-                                    req.st.db.escape(req.body.parentId),
-                                    req.st.db.escape(JSON.stringify(interviewRound)),
-                                    req.st.db.escape(req.body.reportingDateTime),
-                                    req.st.db.escape(req.body.interviewDuration),
-                                    req.st.db.escape(req.body.notes),
-                                    req.st.db.escape(JSON.stringify(panelMembers)),
-                                    req.st.db.escape(JSON.stringify(assessment)),
-                                    req.st.db.escape(req.body.senderNotes),
-                                    req.st.db.escape(req.body.approverNotes),
-                                    req.st.db.escape(req.body.receiverNotes),
-                                    req.st.db.escape(req.body.changeLog),
-                                    req.st.db.escape(req.body.groupId),
-                                    req.st.db.escape(req.body.learnMessageId),
-                                    req.st.db.escape(req.body.accessUserType),
-                                    req.st.db.escape(req.body.approverCount),
-                                    req.st.db.escape(req.body.receiverCount),
-                                    req.st.db.escape(req.body.status),
-                                    req.st.db.escape(req.body.applicantId),
-                                    req.st.db.escape(req.body.firstName),
-                                    req.st.db.escape(req.body.lastName),
-                                    req.st.db.escape(req.body.mobileISD),
-                                    req.st.db.escape(req.body.mobileNumber),
-                                    req.st.db.escape(req.body.emailId),
-                                    req.st.db.escape(JSON.stringify(jobTitle)),
-                                    req.st.db.escape(req.body.profilePicture),
-                                    req.st.db.escape(JSON.stringify(attachmentList[0])),
-                                    req.st.db.escape(JSON.stringify(assessmentTypeList)),
-                                    req.st.db.escape(JSON.stringify(skillAssessment)),
-                                    req.st.db.escape(JSON.stringify(heDepartment))
-                                ];
-    
-                                var procQuery = 'CALL wm_save_interviewSchedulerForHirecraft( ' + procParams.join(',') + ')';
-                                console.log(procQuery);
-                                req.db.query(procQuery, function (err, results) {
-                                    console.log(err);
-    
-                                    var isWeb = req.query.isWeb;
-    
-                                    if (!err && results && results[0]) {
-                                        senderGroupId = results[0][0].senderId;
-                                        notificationTemplaterRes = notificationTemplater.parse('compose_message', {
-                                            senderName: results[0][0].senderName
-                                        });
-    
-                                        for (var i = 0; i < results[1].length; i++) {         // main line 
-                                            if (notificationTemplaterRes.parsedTpl) {
-                                                notification.publish(
-                                                    results[1][i].receiverId,
-                                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                                    results[0][0].senderId,
-                                                    notificationTemplaterRes.parsedTpl,
-                                                    31,
-                                                    0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                                    0,
-                                                    0,
-                                                    0,
-                                                    0,
-                                                    1,
-                                                    moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                    '',
-                                                    0,
-                                                    0,
-                                                    null,
-                                                    '',
-                                                    /** Data object property to be sent with notification **/
-                                                    {
-                                                        messageList: {
-                                                            messageId: results[1][i].messageId,
-                                                            message: results[1][i].message,
-                                                            messageLink: results[1][i].messageLink,
-                                                            createdDate: results[1][i].createdDate,
-                                                            messageType: results[1][i].messageType,
-                                                            messageStatus: results[1][i].messageStatus,
-                                                            priority: results[1][i].priority,
-                                                            senderName: results[1][i].senderName,
-                                                            senderId: results[1][i].senderId,
-                                                            receiverId: results[1][i].receiverId,
-                                                            groupId: results[1][i].groupId,
-                                                            groupType: 2,
-                                                            transId: results[1][i].transId,
-                                                            formId: results[1][i].formId,
-                                                            currentStatus: results[1][i].currentStatus,
-                                                            currentTransId: results[1][i].currentTransId,
-                                                            parentId: results[1][i].parentId,
-                                                            accessUserType: results[1][i].accessUserType,
-                                                            heUserId: results[1][i].heUserId,
-                                                            formData: JSON.parse(results[1][i].formDataJSON)
-                                                        }
-                                                    },
-                                                    null,
-                                                    // tokenResult[0].isWhatMate,
-                                                    results[1][i].secretKey);
-                                                console.log('postNotification : notification for compose_message is sent successfully');
-                                            }
-                                            else {
-                                                console.log('Error in parsing notification compose_message template - ',
-                                                    notificationTemplaterRes.error);
-                                                console.log('postNotification : notification for compose_message is sent successfully');
-                                            }
-                                        }
-    
-                                        response.status = true;
-                                        response.message = "Interview scheduled successfully";
-                                        response.error = null;
-                                        response.data = {
-                                            messageList:
-                                                {
-                                                    messageId: results[0][0].messageId,
-                                                    message: results[0][0].message,
-                                                    messageLink: results[0][0].messageLink,
-                                                    createdDate: results[0][0].createdDate,
-                                                    messageType: results[0][0].messageType,
-                                                    messageStatus: results[0][0].messageStatus,
-                                                    priority: results[0][0].priority,
-                                                    senderName: results[0][0].senderName,
-                                                    senderId: results[0][0].senderId,
-                                                    receiverId: results[0][0].receiverId,
-                                                    transId: results[0][0].transId,
-                                                    formId: results[0][0].formId,
-                                                    groupId: req.body.groupId,
-                                                    currentStatus: results[0][0].currentStatus,
-                                                    currentTransId: results[0][0].currentTransId,
-                                                    localMessageId: req.body.localMessageId,
-                                                    parentId: results[0][0].parentId,
-                                                    accessUserType: results[0][0].accessUserType,
-                                                    heUserId: results[0][0].heUserId,
-                                                    formData: JSON.parse(results[0][0].formDataJSON)
+                        else {
+                            console.log("Enter.............");
+                            if(comparePassword(password, loginResult[0][0].Password)){
+                                console.log("Sucess.............");
+                                if ((!err) && loginResult[0]) {
+                                    req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                                    req.body.parentId = req.body.parentId ? req.body.parentId : 0;
+                                    req.body.status = req.body.status ? req.body.status : 1;
+                                    req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : '';
+                                    req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
+                                    req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
+                                    req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
+                                    req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
+                                    req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
+                                    // req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
+                                    req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
+                                    req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                                    req.body.notes = req.body.notes ? req.body.notes : "";
+                                    req.body.interviewDuration = req.body.interviewDuration ? req.body.interviewDuration : 0;
+                                    req.body.mobileISD = req.body.mobileISD ? req.body.mobileISD : '';
+                                    req.body.mobileNumber = req.body.mobileNumber ? req.body.mobileNumber : '';
+
+                                    var procParams = [
+                                        // req.st.db.escape(req.body.loginId),
+                                        // req.st.db.escape(encryptPwd),
+                                        req.st.db.escape(req.body.heMasterId),
+                                        req.st.db.escape(req.body.parentId),
+                                        req.st.db.escape(JSON.stringify(interviewRound)),
+                                        req.st.db.escape(req.body.reportingDateTime),
+                                        req.st.db.escape(req.body.interviewDuration),
+                                        req.st.db.escape(req.body.notes),
+                                        req.st.db.escape(JSON.stringify(panelMembers)),
+                                        req.st.db.escape(JSON.stringify(assessment)),
+                                        req.st.db.escape(req.body.senderNotes),
+                                        req.st.db.escape(req.body.approverNotes),
+                                        req.st.db.escape(req.body.receiverNotes),
+                                        req.st.db.escape(req.body.changeLog),
+                                        req.st.db.escape(req.body.groupId),
+                                        req.st.db.escape(req.body.learnMessageId),
+                                        req.st.db.escape(req.body.accessUserType),
+                                        req.st.db.escape(req.body.approverCount),
+                                        req.st.db.escape(req.body.receiverCount),
+                                        req.st.db.escape(req.body.status),
+                                        req.st.db.escape(req.body.applicantId),
+                                        req.st.db.escape(req.body.firstName),
+                                        req.st.db.escape(req.body.lastName),
+                                        req.st.db.escape(req.body.mobileISD),
+                                        req.st.db.escape(req.body.mobileNumber),
+                                        req.st.db.escape(req.body.emailId),
+                                        req.st.db.escape(JSON.stringify(jobTitle)),
+                                        req.st.db.escape(req.body.profilePicture),
+                                        req.st.db.escape(JSON.stringify(attachmentList[0])),
+                                        req.st.db.escape(JSON.stringify(assessmentTypeList)),
+                                        req.st.db.escape(JSON.stringify(skillAssessment)),
+                                        req.st.db.escape(JSON.stringify(heDepartment))
+                                    ];
+
+                                    var procQuery = 'CALL wm_save_interviewSchedulerForHirecraft( ' + procParams.join(',') + ')';
+                                    console.log(procQuery);
+                                    req.db.query(procQuery, function (err, results) {
+                                        console.log(err);
+
+                                        var isWeb = req.query.isWeb;
+
+                                        if (!err && results && results[0]) {
+                                            senderGroupId = results[0][0].senderId;
+                                            notificationTemplaterRes = notificationTemplater.parse('compose_message', {
+                                                senderName: results[0][0].senderName
+                                            });
+
+                                            for (var i = 0; i < results[1].length; i++) {         // main line
+                                                if (notificationTemplaterRes.parsedTpl) {
+                                                    notification.publish(
+                                                        results[1][i].receiverId,
+                                                        (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                        (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                        results[0][0].senderId,
+                                                        notificationTemplaterRes.parsedTpl,
+                                                        31,
+                                                        0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                                        (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        1,
+                                                        moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                        '',
+                                                        0,
+                                                        0,
+                                                        null,
+                                                        '',
+                                                        /** Data object property to be sent with notification **/
+                                                        {
+                                                            messageList: {
+                                                                messageId: results[1][i].messageId,
+                                                                message: results[1][i].message,
+                                                                messageLink: results[1][i].messageLink,
+                                                                createdDate: results[1][i].createdDate,
+                                                                messageType: results[1][i].messageType,
+                                                                messageStatus: results[1][i].messageStatus,
+                                                                priority: results[1][i].priority,
+                                                                senderName: results[1][i].senderName,
+                                                                senderId: results[1][i].senderId,
+                                                                receiverId: results[1][i].receiverId,
+                                                                groupId: results[1][i].groupId,
+                                                                groupType: 2,
+                                                                transId: results[1][i].transId,
+                                                                formId: results[1][i].formId,
+                                                                currentStatus: results[1][i].currentStatus,
+                                                                currentTransId: results[1][i].currentTransId,
+                                                                parentId: results[1][i].parentId,
+                                                                accessUserType: results[1][i].accessUserType,
+                                                                heUserId: results[1][i].heUserId,
+                                                                formData: JSON.parse(results[1][i].formDataJSON)
+                                                            }
+                                                        },
+                                                        null,
+                                                        // tokenResult[0].isWhatMate,
+                                                        results[1][i].secretKey);
+                                                    console.log('postNotification : notification for compose_message is sent successfully');
                                                 }
-                                        };
-                                        res.status(200).json(response);
-                                    }
-                                    else {
-                                        response.status = false;
-                                        response.message = "Error while scheduling interview";
-                                        response.error = null;
-                                        response.data = null;
-                                        res.status(500).json(response);
-                                    }
-                                });
-                            }  // loginDetails[0] closes here
+                                                else {
+                                                    console.log('Error in parsing notification compose_message template - ',
+                                                        notificationTemplaterRes.error);
+                                                    console.log('postNotification : notification for compose_message is sent successfully');
+                                                }
+                                            }
+
+                                            response.status = true;
+                                            response.message = "Interview scheduled successfully";
+                                            response.error = null;
+                                            response.data = {
+                                                messageList:
+                                                    {
+                                                        messageId: results[0][0].messageId,
+                                                        message: results[0][0].message,
+                                                        messageLink: results[0][0].messageLink,
+                                                        createdDate: results[0][0].createdDate,
+                                                        messageType: results[0][0].messageType,
+                                                        messageStatus: results[0][0].messageStatus,
+                                                        priority: results[0][0].priority,
+                                                        senderName: results[0][0].senderName,
+                                                        senderId: results[0][0].senderId,
+                                                        receiverId: results[0][0].receiverId,
+                                                        transId: results[0][0].transId,
+                                                        formId: results[0][0].formId,
+                                                        groupId: req.body.groupId,
+                                                        currentStatus: results[0][0].currentStatus,
+                                                        currentTransId: results[0][0].currentTransId,
+                                                        localMessageId: req.body.localMessageId,
+                                                        parentId: results[0][0].parentId,
+                                                        accessUserType: results[0][0].accessUserType,
+                                                        heUserId: results[0][0].heUserId,
+                                                        formData: JSON.parse(results[0][0].formDataJSON)
+                                                    }
+                                            };
+                                            res.status(200).json(response);
+                                        }
+                                        else {
+                                            response.status = false;
+                                            response.message = "Error while scheduling interview";
+                                            response.error = null;
+                                            response.data = null;
+                                            res.status(500).json(response);
+                                        }
+                                    });
+                                }  // loginDetails[0] closes here
+                            }
                             else {
                                 response.status=false;
                                 response.error = error;
                                 response.message = 'Invalid  loginDatails';
                                 res.status(401).json(response);
-                                // console.log('FnLogin:loginDetails not found');
                             }
-                        } // if password comparison closed here
-                        else {
-                            response.status=false;
-                            response.error = error;
-                            response.message = 'password doesnt match';
-                            res.status(401).json(response);
-                            // console.log('FnLogin:password doesnt match found');
                         }
+                        // if password comparison closed here
+                        // else {
+                        //     response.status=false;
+                        //     response.error = error;
+                        //     response.message = 'password doesnt match';
+                        //     res.status(401).json(response);
+                        //     // console.log('FnLogin:password doesnt match found');
+                        // }
                     }
                 }
                 else {
