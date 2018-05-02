@@ -14,6 +14,7 @@ var chalk = require( "chalk" );
 var util = require( "util" );
 
 var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 var gcs = gcloud.storage({
     projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
@@ -333,7 +334,7 @@ Tag.prototype.saveStandardTags = function(req,res,next){
                                 remoteWriteStream.on('finish', function () {
                                     var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
                                         + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName)
-                                        + ',' + st.db.escape(folder_content);
+                                        + ',' + st.db.escape(folder_content)+','+st.db.escape(DBSecretKey);
 
                                     var query = 'CALL psavedocsandurls(' + queryParams + ')';
                                     console.log(query);
@@ -396,7 +397,7 @@ Tag.prototype.saveStandardTags = function(req,res,next){
 
                             var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
                                 + ',' + st.db.escape(tag.toString().toUpperCase()) + ',' + st.db.escape(pin)
-                                + ',' + st.db.escape(randomName)+ ',' + st.db.escape(folder_content);
+                                + ',' + st.db.escape(randomName)+ ',' + st.db.escape(folder_content)+','+st.db.escape(DBSecretKey);
 
 
                             var query = 'CALL psavedocsandurls(' + queryParams + ')';
@@ -775,7 +776,7 @@ Tag.prototype.saveTags = function(req,res,next){
                              */
                             var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' +
                                 st.db.escape('')+ ',' + st.db.escape(tag) + ',' + st.db.escape(pin) +
-                                ',' + st.db.escape(link) + ',' + st.db.escape(folder_content)  ;
+                                ',' + st.db.escape(link) + ',' + st.db.escape(folder_content) +','+st.db.escape(DBSecretKey) ;
                             var tagQuery = "CALL psavedocsandurls("+queryParams+")";
                             console.log(tagQuery);
                             st.db.query(tagQuery,function(err,tQResults){
@@ -831,7 +832,7 @@ Tag.prototype.saveTags = function(req,res,next){
                                 if(!err){
                                     var queryParams = st.db.escape(token) + ',' + st.db.escape('0') + ',' +
                                         st.db.escape(originalFileName)+ ',' + st.db.escape(tag) + ',' + st.db.escape(pin) +
-                                        ',' + st.db.escape(uniqueFileName)+ ',' + st.db.escape(folder_content);
+                                        ',' + st.db.escape(uniqueFileName)+ ',' + st.db.escape(folder_content)+','+st.db.escape(DBSecretKey);
                                     var tagQuery = "CALL psavedocsandurls("+queryParams+")";
                                     console.log(tagQuery);
                                     st.db.query(tagQuery,function(err,tQResults){
@@ -1403,7 +1404,7 @@ Tag.prototype.savePictures = function(req,res,next) {
                         if (token) {
                             var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
                                 + ',' + st.db.escape(tagType) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName)
-                                + ',' + st.db.escape(folder_content);
+                                + ',' + st.db.escape(folder_content)+','+st.db.escape(DBSecretKey);
                             spQuery = 'CALL psavedocsandurls(' + queryParams + ')';
                         }
                         else {
@@ -1474,7 +1475,7 @@ Tag.prototype.savePictures = function(req,res,next) {
 
                 var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
                     + ',' + st.db.escape(tagType) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName)
-                    + ',' + st.db.escape(folder_content);
+                    + ',' + st.db.escape(folder_content)+','+st.db.escape(DBSecretKey);
 
 
                 var query = 'CALL psavedocsandurls(' + queryParams + ')';

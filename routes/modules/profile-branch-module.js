@@ -101,7 +101,7 @@ ProfileBranch.prototype.saveBranch = function(req,res,next){
                             + ',' + st.db.escape(req.body.address) + ',' + st.db.escape(req.body.cn) + ',' + st.db.escape(req.body.lat)
                             + ',' + st.db.escape(req.body.long) + ',' + st.db.escape(req.body.hcalid) + ',' + st.db.escape(req.body.phone)
                             + ',' + st.db.escape(req.body.email) + ',' + st.db.escape(req.body.ws) + ',' + st.db.escape(req.body.ISDPhone)
-                            + ',' + st.db.escape(req.body.parking_status);
+                            + ',' + st.db.escape(req.body.parking_status)+','+st.db.escape(DBSecretKey);
                         var procQuery = 'CALL psaveBranches(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {

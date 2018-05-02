@@ -578,7 +578,9 @@ QuickResumeCtrl.saveResumeDetail = function(req,res,next){
                         req.st.db.escape(pictureFileName),
                         req.st.db.escape(jobType),
                         req.st.db.escape(data.availableForJobAfter),
-                        req.st.db.escape(resumeFileName)
+                        req.st.db.escape(resumeFileName),
+                        req.st.db.escape(DBSecretKey)
+                        
                     ];
                     var procAdvanceQuery = 'CALL pSave_Advanced_CV_Data (' + procAdvanceParam.join(',') + ')';
                     console.log(procAdvanceQuery);

@@ -508,7 +508,7 @@ jobCtrl.applyJob = function(req,res,next){
                                         console.log('FnApplyJob: Job apply successfully');
                                         if (insertResult[0][0].Status == 0){
                                             var dateTime = moment().format('MMMM Do YYYY, h:mm:ss a'); // April 21st 2016, 5:54:50 pm
-                                            var notificationQueryParams = req.st.db.escape(token) + ',' + req.st.db.escape(jobId);
+                                            var notificationQueryParams = req.st.db.escape(token) + ',' + req.st.db.escape(jobId)+','+req.st.db.escape(DBSecretKey);
                                             var notificationQuery = 'CALL pnotify_jobcreator_afterApply(' + notificationQueryParams + ')';
                                             console.log(notificationQuery);
                                             req.st.db.query(notificationQuery, function (err, notDetailsRes) {

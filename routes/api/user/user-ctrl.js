@@ -266,7 +266,9 @@ UserCtrl.saveAddress = function (req, res, next) {
                                 req.st.db.escape(req.body.aboutCompany),
                                 req.st.db.escape(req.body.keywords),
                                 req.st.db.escape(req.body.jobTitle),
-                                req.st.db.escape(req.body.companyName)
+                                req.st.db.escape(req.body.companyName),
+                                req.st.db.escape(DBSecretKey)
+                                
                             ];
                             /**
                              * Calling procedure to save deal
@@ -759,7 +761,7 @@ UserCtrl.login = function (req, res, next) {
     try {
         var passwordMatchStatus = false;
         var ezeoneId = '';
-        var queryParams = req.st.db.escape(req.body.userName) + ',' + req.st.db.escape(code);
+        var queryParams = req.st.db.escape(req.body.userName) + ',' + req.st.db.escape(code)+','+req.st.db.escape(DBSecretKey);
         var query = 'CALL plogin_v2(' + queryParams + ')';
         console.log(query);
         req.db.query(query, function (err, loginResult) {

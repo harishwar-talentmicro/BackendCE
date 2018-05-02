@@ -372,7 +372,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                         + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
                         + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)
                         + ',' + st.db.escape(companyDetails)+ ',' + st.db.escape(businesssize)+ ',' + st.db.escape(headcount)
-                        + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc)+ ',' + st.db.escape(rating);
+                        + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc)+ ',' + st.db.escape(rating)+','+req.st.db.escape(DBSecretKey);
 
                     var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                     //console.log(InsertQuery);
@@ -600,7 +600,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                         + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
                         + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)
                         + ',' + st.db.escape(companyDetails)+ ',' + st.db.escape(businesssize)+ ',' + st.db.escape(headcount)
-                        + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc)+ ',' + st.db.escape(rating);
+                        + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc)+ ',' + st.db.escape(rating)+','+req.st.db.escape(DBSecretKey);
 
                     var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                     console.log(query);
@@ -2106,7 +2106,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                             + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype)+ ',' + st.db.escape(fn)
                             + ',' + st.db.escape(ln)+ ',' + st.db.escape(email)+ ',' + st.db.escape(mn)
                             + ',' + st.db.escape(gender)+ ',' + st.db.escape(dob)+ ',' + st.db.escape(cn)+ ',' + st.db.escape(jt)
-                            + ',' + st.db.escape(bg)+ ',' + st.db.escape(ISDmobile);
+                            + ',' + st.db.escape(bg)+ ',' + st.db.escape(ISDmobile)+','+st.db.escape(DBSecretKey);
 
                         var query = 'CALL pSaveAlumniProfile(' + queryParams + ')';
                         console.log(query);

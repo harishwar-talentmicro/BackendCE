@@ -329,7 +329,7 @@ Job.prototype.create = function(req,res,next){
                             });
                         };
                         var postNotification = function(jobID){
-                            var queryParams = st.db.escape(jobID) + ',' + st.db.escape(token);
+                            var queryParams = st.db.escape(jobID) + ',' + st.db.escape(token)+','+st.db.escape(DBSecretKey);
                             /**
                              * send notification to eligible students
                              * @type {string}
@@ -1540,7 +1540,7 @@ Job.prototype.applyJob = function(req,res,next){
                                         console.log('FnApplyJob: Job apply successfully');
                                         if (insertResult[0][0].Status == 0){
                                             var dateTime = moment().format('MMMM Do YYYY, h:mm:ss a'); // April 21st 2016, 5:54:50 pm
-                                           var notificationQueryParams = st.db.escape(token) + ',' + st.db.escape(jobId);
+                                           var notificationQueryParams = st.db.escape(token) + ',' + st.db.escape(jobId)+','+st.db.escape(DBSecretKey);
                                            var notificationQuery = 'CALL pnotify_jobcreator_afterApply(' + notificationQueryParams + ')';
                                            console.log(notificationQuery);
                                            st.db.query(notificationQuery, function (err, notDetailsRes) {

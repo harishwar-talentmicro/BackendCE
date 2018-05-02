@@ -3,6 +3,8 @@
  */
 var request = require('request');
 var RegisterCtrl = {};
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 RegisterCtrl.register = function(req,res,next){
 
@@ -205,7 +207,7 @@ RegisterCtrl.register = function(req,res,next){
                         + ',' + req.st.db.escape(visiblePhone) + ',' + req.st.db.escape(locTitle) + ',' + req.st.db.escape(visibleAddress)
                         + ',' + req.st.db.escape(statusId) + ',' + req.st.db.escape(apUserid) + ',' + req.st.db.escape(businessKeywords)
                         + ',' + req.st.db.escape(companyDetails)+ ',' + req.st.db.escape(businesssize)+ ',' + req.st.db.escape(headcount)
-                        + ',' + req.st.db.escape(branch)+ ',' + req.st.db.escape(ismnc)+ ',' + req.st.db.escape(rating);
+                        + ',' + req.st.db.escape(branch)+ ',' + req.st.db.escape(ismnc)+ ',' + req.st.db.escape(rating)+','+req.st.db.escape(DBSecretKey);
 
                     var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                     console.log(query);

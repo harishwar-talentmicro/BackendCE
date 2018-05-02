@@ -281,7 +281,7 @@ Auth.prototype.register = function(req,res,next){
                 + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)
                 + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                 + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
+                + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)+','+req.st.db.escape(DBSecretKey);
 
 
             console.log('CALL pSaveEZEIDData(' + InsertQuery + ')');
@@ -569,7 +569,7 @@ Auth.prototype.register = function(req,res,next){
                 + ',' + st.db.escape(SelectionTypes)+ ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(TemplateID)
                 + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                 + ',' + st.db.escape(visiblePhone)+ ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ','+ st.db.escape(businessKeywords);
+                + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ','+ st.db.escape(businessKeywords)+','+req.st.db.escape(DBSecretKey);
 
             // console.log(InsertQuery);
             st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
@@ -886,7 +886,7 @@ Auth.prototype.registerNew = function(req,res,next){
                     + ',' + st.db.escape(selectionType) + ',' + st.db.escape(parkingStatus)+ ',' + st.db.escape(templateId)
                     + ',' + st.db.escape(categoryId)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                     + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
+                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)+','+req.st.db.escape(DBSecretKey);
 
                 var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                 console.log(query);
@@ -1133,7 +1133,7 @@ Auth.prototype.registerNew = function(req,res,next){
                     + ',' + st.db.escape(selectionType) + ',' + st.db.escape(parkingStatus)+ ',' + st.db.escape(templateId)
                     + ',' + st.db.escape(categoryId)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                     + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
+                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)+','+req.st.db.escape(DBSecretKey);
 
                 var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                 console.log(query);

@@ -2022,7 +2022,7 @@ User.prototype.saveResume = function(req,res,next){
                                 +',' + st.db.escape(expectedSalary)+ ','+ st.db.escape(firstName)+ ','+ st.db.escape(lastName)
                                 +',' + st.db.escape(email)+',' + st.db.escape(mobile)+',' + st.db.escape(tid)+',' + st.db.escape(salarytype)
                                 +',' + st.db.escape(expectedSalarytype) + ',' + st.db.escape(resumeFilePath)+',' + st.db.escape(gender)
-                                +',' + st.db.escape(KeySkills);
+                                +',' + st.db.escape(KeySkills)+','+st.db.escape(DBSecretKey);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
                             //console.log(query);
                             st.db.query(query, function (err, InsertResult) {
@@ -4034,7 +4034,7 @@ User.prototype.saveUserDetails = function(req,res,next){
                             + ',' + st.db.escape(mobile)+ ',' + st.db.escape(website)+ ',' + st.db.escape(isdPhone)
                             + ',' + st.db.escape(isdMobile)+ ',' + st.db.escape(parkingStatus)+ ',' + st.db.escape(templateId)
                             + ',' + st.db.escape(pin)+ ',' + st.db.escape(statusId)+ ',' + st.db.escape(functionId)
-                            + ',' + st.db.escape(categoryId) + ',' + st.db.escape(businessKeywords)+ ',' + st.db.escape(aboutCompany);
+                            + ',' + st.db.escape(categoryId) + ',' + st.db.escape(businessKeywords)+ ',' + st.db.escape(aboutCompany)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL psaveuserdetails(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertResult) {

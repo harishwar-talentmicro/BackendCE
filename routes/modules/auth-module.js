@@ -363,7 +363,7 @@ Auth.prototype.register = function(req,res,next){
                             + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
                             + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)
                             + ',' + st.db.escape(companyDetails)+ ',' + st.db.escape(businesssize)+ ',' + st.db.escape(headcount)
-                            + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc)+ ',' + st.db.escape(rating);
+                            + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc)+ ',' + st.db.escape(rating)+','+req.st.db.escape(DBSecretKey);
 
                         var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                         console.log(query);
