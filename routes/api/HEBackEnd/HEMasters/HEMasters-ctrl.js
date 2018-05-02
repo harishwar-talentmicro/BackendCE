@@ -5,6 +5,8 @@
 var HEMasterCtrl = {};
 var error = {};
 var md5 = require('md5');
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 HEMasterCtrl.getFormTypeList = function(req,res,next){
     var response = {
@@ -851,7 +853,8 @@ HEMasterCtrl.findHEUser = function(req,res,next){
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.keyword),
-                    req.st.db.escape(req.query.userType)
+                    req.st.db.escape(req.query.userType),
+                    req.st.db.escape(DBSecretKey)                                                
                 ];
 
                 /**

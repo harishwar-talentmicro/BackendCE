@@ -22,7 +22,8 @@ var nodemailer = require('nodemailer');
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
 var md5 = require('md5');
-
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 // taskCtrl.saveTask = function(req,res,next){
 //     var response = {
@@ -376,7 +377,8 @@ taskCtrl.saveTask = function(req,res,next){
                             req.st.db.escape(req.body.isEndDate),
                             req.st.db.escape(req.body.alertType),
                             req.st.db.escape(JSON.stringify(sharedMemberList)),
-                            req.st.db.escape(req.body.senderNotes)
+                            req.st.db.escape(req.body.senderNotes),
+                            req.st.db.escape(DBSecretKey)                                                                    
                         ];
                         /**
                          * Calling procedure to save form template
@@ -550,7 +552,8 @@ taskCtrl.getTask = function(req,res,next){
                     req.st.db.escape(req.query.groupId),
                     req.st.db.escape(req.query.status),
                     req.st.db.escape(startPage),
-                    req.st.db.escape(req.query.limit)
+                    req.st.db.escape(req.query.limit),
+                    req.st.db.escape(DBSecretKey)                                                                    
                 ];
                 /**
                  * Calling procedure to My self and my team leave apllications

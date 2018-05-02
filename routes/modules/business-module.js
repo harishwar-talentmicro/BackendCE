@@ -21,6 +21,9 @@ var mail = null;
 var Mailer = require('../../mail/mailer.js');
 var mailerApi = new Mailer();
 
+var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
+
 function BusinessManager(db,stdLib){
 
     if(stdLib){
@@ -64,7 +67,7 @@ var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folde
                              * user access, and then folder rights if all conditions will match then only notification
                              * will be sent
                              */
-                            var notificationQueryParams = st.db.escape(toEZEID) + ',' + st.db.escape(functionType);
+                            var notificationQueryParams = st.db.escape(toEZEID) + ',' + st.db.escape(functionType)+ ',' + st.db.escape(DBSecretKey);
                             var notificationQuery = 'CALL get_subuser_list(' + notificationQueryParams + ')';
                             console.log(notificationQuery);
                             st.db.query(notificationQuery, function (err, notDetailsRes) {
@@ -2592,7 +2595,7 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                     if (tokenResult) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(stageType)
                             + ',' + st.db.escape(transactionId) + ',' + st.db.escape(stage) + ',' + st.db.escape(reason)
-                            + ',' + st.db.escape(comments);
+                            + ',' + st.db.escape(comments)+ ',' + st.db.escape(DBSecretKey);
                         var query = 'CALL pcreatetranshistory(' + queryParams + ')';
                             console.log(query);
                         st.db.query(query, function (err, historyResult) {

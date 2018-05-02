@@ -11,6 +11,8 @@ var _Notification_aws = new  Notification_aws();
 var zlib = require('zlib');
 var AES_256_encryption = require('../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
+var appConfig = require('../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 const AccessToken = require('twilio').jwt.AccessToken;
 const VideoGrant = AccessToken.VideoGrant;
@@ -93,7 +95,8 @@ zoomCtrl.saveZoomMeeting = function(req,res,next){
                             req.st.db.escape(req.body.reminderDate),
                             req.st.db.escape(req.body.callType),
                             req.st.db.escape(req.body.callMethod),
-                            req.st.db.escape(req.body.callDateTime)
+                            req.st.db.escape(req.body.callDateTime),
+                            req.st.db.escape(DBSecretKey)                                                                                                                        
                         ];
         
                         var procQuery = 'CALL HE_save_zoomMeeting( ' + procParams.join(',') + ')';
@@ -187,7 +190,8 @@ zoomCtrl.stopMeeting = function(req,res,next){
                     else {
                         var procParams = [
                             req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.body.meetingId)
+                            req.st.db.escape(req.body.meetingId),
+                            req.st.db.escape(DBSecretKey)                                                                                                                        
                         ];
         
                         var procQuery = 'CALL HE_stop_zoomMeeting( ' + procParams.join(',') + ')';
@@ -268,7 +272,8 @@ zoomCtrl.getMeetingList = function(req,res,next){
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.status)
+                    req.st.db.escape(req.query.status),
+                    req.st.db.escape(DBSecretKey)                                                                                                                        
                 ];
 
                 var procQuery = 'CALL HE_get_zoomMeeting( ' + procParams.join(',') + ')';
@@ -564,7 +569,8 @@ zoomCtrl.stopMeetingForSingleUser = function(req,res,next){
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.meetingId),
-                            req.st.db.escape(req.body.ezeoneId)
+                            req.st.db.escape(req.body.ezeoneId),
+                            req.st.db.escape(DBSecretKey)                                                                                                                        
                         ];
         
                         var procQuery = 'CALL HE_stop_zoomMeeting_user( ' + procParams.join(',') + ')';
@@ -639,7 +645,8 @@ zoomCtrl.getLatestMeetingOfUser = function(req,res,next){
             if ((!err) && tokenResult) {
 
                 var procParams = [
-                    req.st.db.escape(req.query.token)
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(DBSecretKey)                                                                                                                        
                 ];
 
                 var procQuery = 'CALL he_get_latestMeeting( ' + procParams.join(',') + ')';

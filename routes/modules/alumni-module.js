@@ -105,6 +105,7 @@ var gcloud = require('gcloud');
 var fs = require('fs');
 
 var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 var gcs = gcloud.storage({
     projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
@@ -2867,7 +2868,7 @@ Alumni.prototype.getMyTENDetails = function(req,res,next){
         try {
 
             var queryParams = st.db.escape(type) + ',' + st.db.escape(code)+ ',' + st.db.escape(status)+ ',' + st.db.escape(pageSize)
-                + ',' + st.db.escape(pageCount) + ',' + st.db.escape(token);
+                + ',' + st.db.escape(pageCount) + ',' + st.db.escape(token)+ ',' + st.db.escape(DBSecretKey);
             var query = 'CALL get_ten_pending_details(' + queryParams + ')';
             console.log(query);
             st.db.query(query, function (err, getResult) {

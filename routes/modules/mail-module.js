@@ -17,6 +17,8 @@ var EZEIDEmail = 'noreply@ezeone.com';
 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 var util = require('util');
 
+var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 var Mailer = require('./mailer-ejs.js');
 var hussMailer = null;
@@ -882,7 +884,10 @@ Mail.prototype.businessMail = function(req,res,next) {
                 if (!err) {
                     if (tokenResult) {
                         if(recipients.length) {
-                            var queryParams = st.db.escape(token);
+                            var queryParams = [
+                                st.db.escape(token),
+                                st.db.escape(DBSecretKey)
+                            ];
                             var query = 'CALL pcheckverifiedstatus(' + queryParams + ')';
                             console.log(query);
                             st.db.query(query, function (err, userstatusResult) {

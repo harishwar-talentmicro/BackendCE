@@ -10,7 +10,8 @@
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-
+var CONFIG = require('../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 var st = null;
 
@@ -59,8 +60,8 @@ Audit.prototype.getAccessHistory = function(req,res,next){
                         //if (FromPage <= 1) {
                         //    FromPage = 0;
                         //}
-                        console.log('CALL pAccessHistory(' + st.db.escape(Token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ')');
-                        st.db.query('CALL pAccessHistory(' + st.db.escape(Token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ')', function (err, AccessHistoryResult) {
+                        console.log('CALL pAccessHistory(' + st.db.escape(Token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ',' + st.db.escape(DBSecretKey) + ')');
+                        st.db.query('CALL pAccessHistory(' + st.db.escape(Token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ',' + st.db.escape(DBSecretKey) + ')', function (err, AccessHistoryResult) {
                             if (!err) {
                                 //console.log(AccessHistoryResult);
                                 if (AccessHistoryResult) {

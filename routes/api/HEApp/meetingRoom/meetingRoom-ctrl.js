@@ -8,6 +8,8 @@ var error = {};
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 meetingRoomCtrl.getMeetingRooms = function(req,res,next){
     var response = {
@@ -52,7 +54,8 @@ meetingRoomCtrl.getMeetingRooms = function(req,res,next){
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.groupId),
                     req.st.db.escape(req.query.startTime),
-                    req.st.db.escape(req.query.endTime)
+                    req.st.db.escape(req.query.endTime),
+                    req.st.db.escape(DBSecretKey)                                                                    
                 ];
                 /**
                  * Calling procedure to save form template
@@ -267,7 +270,8 @@ meetingRoomCtrl.bookMeetingRoom = function(req,res,next){
                             req.st.db.escape(req.body.groupId),
                             req.st.db.escape(req.body.learnMessageId),
                             req.st.db.escape(req.body.accessUserType),
-                            req.st.db.escape(req.body.roomName)
+                            req.st.db.escape(req.body.roomName),
+                            req.st.db.escape(DBSecretKey)                                                                    
                         ];
                         /**
                          * Calling procedure to save form template

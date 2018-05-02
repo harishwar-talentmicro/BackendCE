@@ -5,6 +5,8 @@
 
 var salesCtrl = {};
 var error = {};
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 salesCtrl.saveItems = function(req,res,next){
     var response = {
@@ -147,7 +149,8 @@ salesCtrl.getSalesItems = function(req,res,next){
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(DBSecretKey)                                                                    
                 ];
                 /**
                  * Calling procedure to get form template
@@ -317,7 +320,8 @@ salesCtrl.getUOM = function(req,res,next){
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(DBSecretKey)                                                                    
                 ];
                 /**
                  * Calling procedure to get form template
@@ -592,7 +596,8 @@ salesCtrl.saveSalesMembers = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.body.id),
                     req.st.db.escape(req.body.memberId),
-                    req.st.db.escape(req.body.customerId)
+                    req.st.db.escape(req.body.customerId),
+                    req.st.db.escape(DBSecretKey)                                                                    
                 ];
 
                 var procQuery = 'CALL he_save_salesMembers( ' + procParams.join(',') + ')';
@@ -662,7 +667,8 @@ salesCtrl.getSalesMembers = function(req,res,next){
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(DBSecretKey)                                                                    
                 ];
                 /**
                  * Calling procedure to save units of measurements
@@ -744,7 +750,8 @@ salesCtrl.saveCategory = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.body.categoryId),
                     req.st.db.escape(req.body.title),
-                    req.st.db.escape(req.body.status)
+                    req.st.db.escape(req.body.status),
+                    req.st.db.escape(DBSecretKey)                                                                    
                 ];
                 /**
                  * Calling procedure to save units of measurements
@@ -817,7 +824,8 @@ salesCtrl.getCategory = function(req,res,next){
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(DBSecretKey)                                                                    
                 ];
                 /**
                  * Calling procedure to save units of measurements
@@ -899,7 +907,8 @@ salesCtrl.saveSupportMembers = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.body.id),
                     req.st.db.escape(req.body.memberId),
-                    req.st.db.escape(req.body.customerId)
+                    req.st.db.escape(req.body.customerId),
+                    req.st.db.escape(DBSecretKey)                                                                    
                 ];
 
                 var procQuery = 'CALL he_save_supportMembers( ' + procParams.join(',') + ')';
@@ -969,7 +978,8 @@ salesCtrl.getSupportMembers = function(req,res,next){
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(DBSecretKey)                                                                    
                 ];
                 /**
                  * Calling procedure to save units of measurements
@@ -1048,7 +1058,8 @@ salesCtrl.getSalesItemDetails = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(req.query.itemId)
+                    req.st.db.escape(req.query.itemId),
+                    req.st.db.escape(DBSecretKey)                                                                    
                 ];
                 /**
                  * Calling procedure to get form template

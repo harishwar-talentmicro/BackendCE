@@ -3,6 +3,8 @@
  */
 var moment = require('moment');
 var HEBackkendCtrl = {};
+var appConfig = require('../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 HEBackkendCtrl.saveAppSettings = function(req, res, next){
 
@@ -250,7 +252,8 @@ HEBackkendCtrl.getAppSettings = function(req, res, next){
                 if((!err) && tokenResult){
                     var procParams = [
                         req.st.db.escape(req.query.token),
-                        req.st.db.escape(req.query.APIKey)
+                        req.st.db.escape(req.query.APIKey),
+                        req.st.db.escape(DBSecretKey)                                                                                
                     ];
 
                     var procQuery = 'CALL  HE_Get_Appsettings( ' + procParams.join(',') + ')';

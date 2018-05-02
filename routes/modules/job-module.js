@@ -12,7 +12,8 @@ var NotificationTemplater = require('../lib/NotificationTemplater.js');
 
 var notificationTemplater = new NotificationTemplater();
 
-
+var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 
 var Notification = require('./notification/notification-master.js');
@@ -450,7 +451,7 @@ Job.prototype.create = function(req,res,next){
 
                                             var combinePOquery = "";
                                             for(counter = 0; counter < notificationResult[2].length; counter++){
-                                                var queryPOparamsList = [st.db.escape(notificationResult[2][counter].ezeoneId),  st.db.escape(4)];
+                                                var queryPOparamsList = [st.db.escape(notificationResult[2][counter].ezeoneId),  st.db.escape(4), st.db.escape(DBSecretKey)];
                                                 combinePOquery += 'CALL get_subuser_list(' + queryPOparamsList.join(',') + ');';
                                             }
 
@@ -1524,7 +1525,7 @@ Job.prototype.applyJob = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = st.db.escape(jobId) + ',' + st.db.escape(token)+ ',' + st.db.escape(status);
+                        var query = st.db.escape(jobId) + ',' + st.db.escape(token)+ ',' + st.db.escape(status)+ ',' + st.db.escape(DBSecretKey);
                         console.log('CALL pApplyjob(' + query + ')');
                         st.db.query('CALL pApplyjob(' + query + ')', function (err, insertResult) {
                             if (!err) {
@@ -4699,7 +4700,7 @@ Job.prototype.activateJobPO = function(req,res,next){
                                      * @type {number}
                                      */
                                     var functionType = 4;
-                                    var queryPOparams = st.db.escape(jobResult[1][0].ezeid) + ',' + st.db.escape(functionType);
+                                    var queryPOparams = st.db.escape(jobResult[1][0].ezeid) + ',' + st.db.escape(functionType) + ',' + st.db.escape(DBSecretKey);
                                     combinePOquery = 'CALL get_subuser_list(' + queryPOparams + ')';
                                     st.db.query(combinePOquery, function (err, notDetailsRes) {
                                         console.log(combinePOquery);

@@ -6,6 +6,9 @@ var request = require('request');
 var fs = require('fs');
 var path = require('path');
 
+var appConfig = require('../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
+
 var managerCtrl = {};
 
 managerCtrl.getUsers = function(req,res,next){
@@ -33,7 +36,8 @@ managerCtrl.getUsers = function(req,res,next){
             if((!err) && tokenResult){
 
                 var procParams = [
-                    req.st.db.escape(req.query.token)
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(DBSecretKey)                                                            
                 ];
                 /**
                  * Calling procedure to save deal
@@ -182,7 +186,8 @@ managerCtrl.getUserDetails = function(req,res,next){
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.managerId)
+                    req.st.db.escape(req.query.managerId),
+                    req.st.db.escape(DBSecretKey)                                        
                 ];
                 /**
                  * Calling procedure to save deal
@@ -384,7 +389,8 @@ managerCtrl.getWhatMateCompaniesList = function(req,res,next){
             if((!err) && tokenResult){
 
                 var procParams = [
-                    req.st.db.escape(req.query.token)
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(DBSecretKey)                    
                 ];
                 /**
                  * Calling procedure to save deal

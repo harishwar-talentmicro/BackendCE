@@ -17,6 +17,8 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 var generalRequestCtrl = {};
 var error = {};
@@ -100,7 +102,8 @@ generalRequestCtrl.saveGeneralRequest = function(req,res,next){
                             req.st.db.escape(req.body.budgetFrequency),
                             req.st.db.escape(req.body.isBudget),
                             req.st.db.escape(req.body.budgetLabel),
-                            req.st.db.escape(req.body.budgetFrequencyTitle)
+                            req.st.db.escape(req.body.budgetFrequencyTitle),
+                            req.st.db.escape(DBSecretKey)                                                                                                            
                         ];
                         /**
                          * Calling procedure to save form template
@@ -344,7 +347,8 @@ generalRequestCtrl.getGeneralRequest = function(req,res,next){
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.groupId),
                     req.st.db.escape(startPage),
-                    req.st.db.escape(req.query.limit)
+                    req.st.db.escape(req.query.limit),
+                    req.st.db.escape(DBSecretKey)                                                                                                            
                 ];
                 /**
                  * Calling procedure to My self and my team leave apllications

@@ -424,7 +424,7 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                          * @type {string}
                          */
                         var queryParams =   st.db.escape(masterId) + ',' + st.db.escape(token)+ ',' + st.db.escape(status)
-                            +',' + st.db.escape(req.query.pageNo)+ ',' + st.db.escape(req.query.limit);
+                            +',' + st.db.escape(req.query.pageNo)+ ',' + st.db.escape(req.query.limit)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL get_service_list(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, serviceResult) {
@@ -1048,7 +1048,7 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                         res.status(200).json(responseMessage);
                                                     }
                                                     var notiQueryParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.service_mid)
-                                                        + ',' + st.db.escape(req.body.service_id);
+                                                        + ',' + st.db.escape(req.body.service_id)+','+st.db.escape(DBSecretKey);
                                                     var notiQuery = 'CALL get_service_notify_details(' + notiQueryParams + ')';
                                                     console.log("notiQuery",notiQuery);
                                                     st.db.query(notiQuery, function (err, notiResult) {
@@ -2717,7 +2717,7 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                     responseMessage.data = null
                                     res.status(200).json(responseMessage);
                                     if (parseInt(req.body.status) == 3){
-                                        var notiQueryParams = st.db.escape(req.body.ten_id) + ',' + st.db.escape(req.body.token);
+                                        var notiQueryParams = st.db.escape(req.body.ten_id) + ',' + st.db.escape(req.body.token)+ ',' + req.st.db.escape(DBSecretKey);
                                         var notiQuery = 'CALL get_ten_notify_user_details(' + notiQueryParams + ')';
                                         console.log("notiQuery",notiQuery);
                                         st.db.query(notiQuery, function (err, notiResult) {

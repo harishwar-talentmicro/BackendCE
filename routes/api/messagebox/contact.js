@@ -88,7 +88,8 @@ router.get('/query', function(req,res,next){
                         req.db.escape(title),
                         req.db.escape(pin) ,
                         req.db.escape(req.query.token),
-                        req.db.escape(req.query.isWhatMate)
+                        req.db.escape(req.query.isWhatMate),
+                        req.st.db.escape(DBSecretKey)
                     ];
                     var procQuery = 'CALL get_v1_messagebox_contact(' + procParams.join(',') + ')';
                     console.log(procQuery);
@@ -1056,7 +1057,7 @@ router.post('/addressBook',function(req, res, next){
                                                         req.db.escape(mobileData.groupType),
                                                         req.db.escape(message),
                                                         req.db.escape(req.body.messageType),
-                                                        req.db.escape(req.body.DBSecretKey)
+                                                        req.db.escape(DBSecretKey)
                                                     ];
                                                     var contactParams = [
                                                         req.db.escape(req.st.alterEzeoneId(tokenResult[0].ezeoneId)),

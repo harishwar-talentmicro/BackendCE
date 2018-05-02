@@ -4,6 +4,8 @@
 var moment = require('moment');
 var inviteCtrl = {};
 var request = require('request');
+var CONFIG = require('../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 inviteCtrl.invite = function (req, res, next) {
 
@@ -194,7 +196,7 @@ inviteCtrl.invite = function (req, res, next) {
 
                             var inviteMobile = function (mobileData) {
 
-                                var queryParams = req.st.db.escape(mobileData.mobile) + ',' + req.st.db.escape(mobileData.isdMobile);
+                                var queryParams = req.st.db.escape(mobileData.mobile) + ',' + req.st.db.escape(mobileData.isdMobile) + ',' + req.st.db.escape(DBSecretKey);
                                 var locationInsertQuery = 'CALL invite(' + queryParams + ')';
                                 console.log('locationInsertQuery', locationInsertQuery);
                                 req.db.query(locationInsertQuery, function (err, results) {

@@ -5,6 +5,8 @@
 
 var interviewCtrl = {};
 var error = {};
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 interviewCtrl.saveStage = function(req,res,next){
     var response = {
@@ -122,7 +124,8 @@ interviewCtrl.getStages = function(req,res,next){
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(DBSecretKey)                                                                                
                 ];
 
                 var procQuery = 'CALL he_get_interviewStage( ' + procParams.join(',') + ')';
@@ -349,7 +352,8 @@ interviewCtrl.getAssessmentList = function(req,res,next){
 
             var procParams = [
                 req.st.db.escape(req.query.token),
-                req.st.db.escape(req.query.APIKey)
+                req.st.db.escape(req.query.APIKey),
+                req.st.db.escape(DBSecretKey)                                                                
             ];
             /**
              * Calling procedure to get form template

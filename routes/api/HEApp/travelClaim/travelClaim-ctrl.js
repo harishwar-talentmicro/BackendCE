@@ -24,6 +24,8 @@ var Mailer = require('../../../../mail/mailer.js');
 var mailerApi = new Mailer();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 travelClaimCtrl.saveTravelClaim = function(req,res,next){
     var response = {
@@ -117,7 +119,8 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                             req.st.db.escape(JSON.stringify(expenseList)),
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
-                            req.st.db.escape(req.body.travelRequestData)
+                            req.st.db.escape(req.body.travelRequestData),
+                            req.st.db.escape(DBSecretKey)                                                                    
                         ];
                         /**
                          * Calling procedure to save form template

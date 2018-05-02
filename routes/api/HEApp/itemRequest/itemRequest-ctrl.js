@@ -19,6 +19,8 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 itemRequestCtrl.saveStationaryRequest = function(req,res,next){
     var response = {
@@ -88,7 +90,8 @@ itemRequestCtrl.saveStationaryRequest = function(req,res,next){
                             req.st.db.escape(req.body.accessUserType),
                             req.st.db.escape(JSON.stringify(itemList)),
                             req.st.db.escape(req.body.approverCount),
-                            req.st.db.escape(req.body.receiverCount)
+                            req.st.db.escape(req.body.receiverCount),
+                            req.st.db.escape(DBSecretKey)
                         ];
                         /**
                          * Calling procedure to save form template
@@ -283,7 +286,8 @@ itemRequestCtrl.savePantryRequest = function(req,res,next){
                             req.st.db.escape(req.body.accessUserType),
                             req.st.db.escape(JSON.stringify(itemList)),
                             req.st.db.escape(req.body.approverCount),
-                            req.st.db.escape(req.body.receiverCount)
+                            req.st.db.escape(req.body.receiverCount),
+                            req.st.db.escape(DBSecretKey)
                         ];
                         /**
                          * Calling procedure to save form template
@@ -484,7 +488,8 @@ itemRequestCtrl.saveAssetRequest = function(req,res,next){
                             req.st.db.escape(req.body.accessUserType),
                             req.st.db.escape(JSON.stringify(itemList)),
                             req.st.db.escape(req.body.approverCount),
-                            req.st.db.escape(req.body.receiverCount)
+                            req.st.db.escape(req.body.receiverCount),
+                            req.st.db.escape(DBSecretKey)
                         ];
                         /**
                          * Calling procedure to save form template
@@ -685,7 +690,8 @@ itemRequestCtrl.saveDocRequestToHR = function(req,res,next){
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(JSON.stringify(attachmentList)),
                             req.st.db.escape(req.body.status),
-                            req.st.db.escape(req.body.approverNotes)
+                            req.st.db.escape(req.body.approverNotes),
+                            req.st.db.escape(DBSecretKey)
                         ];
                         /**
                          * Calling procedure to save form template

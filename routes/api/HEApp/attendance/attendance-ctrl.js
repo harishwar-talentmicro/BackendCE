@@ -18,6 +18,8 @@ var attendanceCtrl = {};
 var error = {};
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 attendanceCtrl.saveAttendance = function(req,res,next){
     var response = {
@@ -100,7 +102,8 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                             req.st.db.escape(JSON.stringify(attachmentList)),
                             req.st.db.escape(req.body.workedDate),
                             req.st.db.escape(req.body.availedDate),
-                            req.st.db.escape(req.body.isCompOffAvailed)
+                            req.st.db.escape(req.body.isCompOffAvailed),
+                            req.st.db.escape(DBSecretKey)
                         ];
                         /**
                          * Calling procedure to send attendance request

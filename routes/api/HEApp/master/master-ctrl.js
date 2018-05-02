@@ -7,6 +7,8 @@ var masterCtrl = {};
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 masterCtrl.searchUsers = function(req,res,next){
     var response = {
@@ -25,7 +27,8 @@ masterCtrl.searchUsers = function(req,res,next){
             var procParams = [
                 req.st.db.escape(req.query.token),
                 req.st.db.escape(req.query.name),
-                req.st.db.escape(req.query.groupId)
+                req.st.db.escape(req.query.groupId),
+                req.st.db.escape(DBSecretKey)
             ];
             /**
              * Calling procedure to get form template
@@ -689,7 +692,8 @@ masterCtrl.getWhatMateCompaniesList = function(req,res,next){
             if((!err) && tokenResult){
 
                 var procParams = [
-                    req.st.db.escape(req.query.token)
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save deal

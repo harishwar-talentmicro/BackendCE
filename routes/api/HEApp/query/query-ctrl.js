@@ -20,6 +20,8 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 queryCtrl.saveHRQuery = function(req,res,next){
     var response = {
@@ -92,7 +94,8 @@ queryCtrl.saveHRQuery = function(req,res,next){
                             req.st.db.escape(req.body.accessUserType),
                             req.st.db.escape(JSON.stringify(attachmentList)),
                             req.st.db.escape(req.body.approverCount),
-                            req.st.db.escape(req.body.receiverCount)
+                            req.st.db.escape(req.body.receiverCount),
+                            req.st.db.escape(DBSecretKey)                
                         ];
                         /**
                          * Calling procedure to save form template
@@ -288,7 +291,8 @@ queryCtrl.saveAccountsQuery = function(req,res,next){
                             req.st.db.escape(req.body.accessUserType),
                             req.st.db.escape(JSON.stringify(attachmentList)),
                             req.st.db.escape(req.body.approverCount),
-                            req.st.db.escape(req.body.receiverCount)
+                            req.st.db.escape(req.body.receiverCount),
+                            req.st.db.escape(DBSecretKey)                
                         ];
                         /**
                          * Calling procedure to save form template
@@ -485,7 +489,8 @@ queryCtrl.saveAdminQuery = function(req,res,next){
                             req.st.db.escape(req.body.accessUserType),
                             req.st.db.escape(JSON.stringify(attachmentList)),
                             req.st.db.escape(req.body.approverCount),
-                            req.st.db.escape(req.body.receiverCount)
+                            req.st.db.escape(req.body.receiverCount),
+                            req.st.db.escape(DBSecretKey)                
                         ];
                         /**
                          * Calling procedure to save form template
@@ -682,7 +687,8 @@ queryCtrl.saveFrontOfficeQuery = function(req,res,next){
                             req.st.db.escape(req.body.accessUserType),
                             req.st.db.escape(JSON.stringify(attachmentList)),
                             req.st.db.escape(req.body.approverCount),
-                            req.st.db.escape(req.body.receiverCount)
+                            req.st.db.escape(req.body.receiverCount),
+                            req.st.db.escape(DBSecretKey)                
                         ];
                         /**
                          * Calling procedure to save form template

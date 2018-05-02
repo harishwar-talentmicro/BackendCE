@@ -18,6 +18,8 @@ var chalk = require('chalk');
 var st = null;
 //var _ = require('underscore');
 var CONFIG = require('../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 function Procurement(db,stdLib){
 
     if(stdLib){
@@ -59,7 +61,7 @@ var sendNotiToSubuser = function(token,toEZEID,functionType,folderRuleID){
                              * user access, and then folder rights if all conditions will match then only notification
                              * will be sent
                              */
-                            var notificationQueryParams = st.db.escape(toEZEID) + ',' + st.db.escape(functionType);
+                            var notificationQueryParams = st.db.escape(toEZEID) + ',' + st.db.escape(functionType) + ',' + st.db.escape(DBSecretKey);
                             var notificationQuery = 'CALL get_subuser_list(' + notificationQueryParams + ')';
                             console.log(notificationQuery);
                             st.db.query(notificationQuery, function (err, notDetailsRes) {

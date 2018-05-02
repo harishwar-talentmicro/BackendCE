@@ -13,7 +13,8 @@ const accountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
 const authToken = '3abf04f536ede7f6964919936a35e614';
 const client = require('twilio')(accountSid, authToken);
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
-
+var appConfig = require('../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 var qs = require("querystring");
 var options = {
@@ -411,7 +412,8 @@ windowsCtrl.uploadUsers = function(req,res,next){
                     req.st.db.escape(Qndata[0].worklocation),
                     req.st.db.escape(Qndata[0].workgroup),
                     req.st.db.escape(Qndata[0].rm),
-                    req.st.db.escape(Qndata[0].email)
+                    req.st.db.escape(Qndata[0].email),
+                    req.st.db.escape(DBSecretKey)                                                                                                                        
                 ];
 
                 //CompanyName

@@ -18,7 +18,8 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
-
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 salesCtrl.getMasterData = function (req, res, next) {
     var response = {
         status: false,
@@ -50,7 +51,8 @@ salesCtrl.getMasterData = function (req, res, next) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.groupId)
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(DBSecretKey)                                                
                 ];
                 /**
                  * Calling procedure to save form sales items
@@ -263,7 +265,8 @@ salesCtrl.saveSalesRequest = function (req, res, next) {
                             req.st.db.escape(req.body.lastName),
                             req.st.db.escape(req.body.notes),
                             req.st.db.escape(req.body.contactId),
-                            req.st.db.escape(req.body.targetDate)
+                            req.st.db.escape(req.body.targetDate),
+                            req.st.db.escape(DBSecretKey)                            
                         ];
 
                         /**
@@ -496,7 +499,8 @@ salesCtrl.assignToUser = function (req, res, next) {
                             req.st.db.escape(req.body.memberId),
                             req.st.db.escape(req.body.groupId),
                             req.st.db.escape(req.body.parentId),
-                            req.st.db.escape(req.body.assignedReason)
+                            req.st.db.escape(req.body.assignedReason),
+                            req.st.db.escape(DBSecretKey)                            
                         ];
                         /**
                          * Calling procedure for sales request
@@ -644,7 +648,8 @@ salesCtrl.findHECustomer = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.groupId),
                     req.st.db.escape(req.query.keyword),
-                    req.st.db.escape(req.query.isSupport)
+                    req.st.db.escape(req.query.isSupport),
+                    req.st.db.escape(DBSecretKey)                                                
                 ];
 
                 /**

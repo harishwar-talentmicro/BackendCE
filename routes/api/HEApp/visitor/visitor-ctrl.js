@@ -21,6 +21,8 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 visitorCtrl.saveGatePassRequest = function(req,res,next){
     var response = {
@@ -102,7 +104,8 @@ visitorCtrl.saveGatePassRequest = function(req,res,next){
                             req.st.db.escape(req.body.companyName),
                             req.st.db.escape(req.body.status),
                             req.st.db.escape(req.body.approverNotes),
-                            req.st.db.escape(req.body.isd)
+                            req.st.db.escape(req.body.isd),
+                            req.st.db.escape(DBSecretKey)                                                                                                                    
                         ];
                         /**
                          * Calling procedure to save form template
@@ -382,7 +385,8 @@ visitorCtrl.saveGateAssetPassRequest = function(req,res,next){
                             req.st.db.escape(req.body.accessUserType),
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
-                            req.st.db.escape(req.body.isdPhone)
+                            req.st.db.escape(req.body.isdPhone),
+                            req.st.db.escape(DBSecretKey)                                                                                                                    
                         ];
                         /**
                          * Calling procedure to save form template
@@ -543,7 +547,8 @@ visitorCtrl.searchVisitors = function(req,res,next){
 
             var procParams = [
                 req.st.db.escape(req.query.searchWord),
-                req.st.db.escape(req.query.groupId)
+                req.st.db.escape(req.query.groupId),
+                req.st.db.escape(DBSecretKey)                                                                                        
             ];
             /**
              * Calling procedure to get form template
@@ -683,7 +688,8 @@ visitorCtrl.saveGuestHospitalityRequest = function(req,res,next){
                             req.st.db.escape(req.body.status),
                             req.st.db.escape(req.body.approverNotes),
                             req.st.db.escape(req.body.expenseCurrencyId),
-                            req.st.db.escape(req.body.expenseAmount)
+                            req.st.db.escape(req.body.expenseAmount),
+                            req.st.db.escape(DBSecretKey)                                                                                        
                         ];
                         /**
                          * Calling procedure to save form template
@@ -905,7 +911,8 @@ visitorCtrl.saveInternetRequest = function(req,res,next){
                             req.st.db.escape(req.body.accessUserType),
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
-                            req.st.db.escape(req.body.isdPhone)
+                            req.st.db.escape(req.body.isdPhone),
+                            req.st.db.escape(DBSecretKey)                                                                                        
                         ];
                         /**
                          * Calling procedure to save form template
@@ -1063,7 +1070,8 @@ visitorCtrl.getChangeLog = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.parentId),
-                    req.st.db.escape(req.query.formId)
+                    req.st.db.escape(req.query.formId),
+                    req.st.db.escape(DBSecretKey)                                                                                        
                 ];
                 /**
                  * Calling procedure to get form template

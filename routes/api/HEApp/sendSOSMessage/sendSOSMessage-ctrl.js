@@ -15,6 +15,8 @@ var sendSOSMessageCtrl = {};
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 sendSOSMessageCtrl.sendSOSMessage = function(req,res,next){
     var response = {
@@ -94,7 +96,8 @@ sendSOSMessageCtrl.sendSOSMessage = function(req,res,next){
                             req.st.db.escape(JSON.stringify(groupList)),
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.recordedVoiceUrl),
-                            req.st.db.escape(req.body.receiverCount)
+                            req.st.db.escape(req.body.receiverCount),
+                            req.st.db.escape(DBSecretKey)                                                
                         ];
                         /**
                          * Calling procedure to save form template

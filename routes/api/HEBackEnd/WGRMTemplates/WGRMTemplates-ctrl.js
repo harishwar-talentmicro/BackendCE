@@ -3,7 +3,8 @@
  */
 var WGRMTemplateCtrl = {};
 var error = {};
-
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 WGRMTemplateCtrl.saveWGTemplate = function(req,res,next){
     var response = {
@@ -431,8 +432,8 @@ WGRMTemplateCtrl.getRMTemplatedetailes = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.rmGroupId),
-                    req.st.db.escape(req.query.APIKey)
-
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(DBSecretKey)                                                                                        
                 ];
 
                 var procQuery = 'CALL he_get_rmGroupDetaile( ' + procParams.join(',') + ')';
@@ -655,8 +656,8 @@ WGRMTemplateCtrl.getRMTemplatemaster = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.keyword),
-                    req.st.db.escape(req.query.APIKey)
-
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(DBSecretKey)                                                                                        
                 ];
 
                 var procQuery = 'CALL he_get_rmMaster( ' + procParams.join(',') + ')';

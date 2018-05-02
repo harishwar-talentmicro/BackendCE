@@ -35,6 +35,9 @@ const thread = spawn('worker.js');
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
 
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
+
 sendMessageCtrl.sendMessage = function(req,res,next){
     var response = {
         status : false,
@@ -171,7 +174,8 @@ sendMessageCtrl.sendMessage = function(req,res,next){
                             req.st.db.escape(req.body.lockType),
                             req.st.db.escape(req.body.startDate),
                             req.st.db.escape(req.body.endDate),
-                            req.st.db.escape(req.body.isDraft)
+                            req.st.db.escape(req.body.isDraft),
+                            req.st.db.escape(DBSecretKey)                                                
                         ];
                         /**
                          * Calling procedure to save form template
@@ -1368,7 +1372,8 @@ sendMessageCtrl.saveAsDraft = function(req,res,next){
                             req.st.db.escape(req.body.lockType),
                             req.st.db.escape(req.body.startDate),
                             req.st.db.escape(req.body.endDate),
-                            req.st.db.escape(req.body.isDraft)
+                            req.st.db.escape(req.body.isDraft),
+                            req.st.db.escape(DBSecretKey)                                                                            
                         ];
                         /**
                          * Calling procedure to save form template
@@ -1807,7 +1812,8 @@ sendMessageCtrl.sendMessageTest = function(req,res,next){
                             req.st.db.escape(req.body.lockType),
                             req.st.db.escape(req.body.startDate),
                             req.st.db.escape(req.body.endDate),
-                            req.st.db.escape(req.body.isDraft)
+                            req.st.db.escape(req.body.isDraft),
+                            req.st.db.escape(DBSecretKey)                                                                            
                         ];
                         /**
                          * Calling procedure to save form template

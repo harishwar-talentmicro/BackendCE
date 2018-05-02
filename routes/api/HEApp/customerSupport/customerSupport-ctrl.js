@@ -17,6 +17,8 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 supportCtrl.saveSupportRequest = function(req,res,next){
     var response = {
@@ -123,7 +125,8 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                             req.st.db.escape(req.body.phoneNo),
                             req.st.db.escape(req.body.lastName),
                             req.st.db.escape(req.body.notes),
-                            req.st.db.escape(req.body.contactId)
+                            req.st.db.escape(req.body.contactId),
+                            req.st.db.escape(DBSecretKey)                                                        
                         ];
 
                         /**
@@ -342,7 +345,8 @@ supportCtrl.assignToUser = function(req,res,next){
                             req.st.db.escape(req.body.memberId),
                             req.st.db.escape(req.body.groupId),
                             req.st.db.escape(req.body.parentId),
-                            req.st.db.escape(req.body.assignedReason)
+                            req.st.db.escape(req.body.assignedReason),
+                            req.st.db.escape(DBSecretKey)                                                        
                         ];
                         /**
                          * Calling procedure for assign sales request to another sales user

@@ -18,6 +18,8 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 transportCtrl.saveTransportRequest = function(req,res,next){
     var response = {
@@ -103,7 +105,8 @@ transportCtrl.saveTransportRequest = function(req,res,next){
                             req.st.db.escape(req.body.approverNotes),
                             req.st.db.escape(req.body.expenseCurrencyId),
                             req.st.db.escape(req.body.expenseAmount),
-                            req.st.db.escape(JSON.stringify(attachmentList))
+                            req.st.db.escape(JSON.stringify(attachmentList)),
+                            req.st.db.escape(DBSecretKey)                                                                    
                         ];
                         /**
                          * Calling procedure to save form template

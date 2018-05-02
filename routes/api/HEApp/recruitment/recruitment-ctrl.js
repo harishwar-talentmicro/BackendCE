@@ -22,6 +22,8 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 recruitmentCtrl.manpowerRequest = function(req,res,next){
     var response = {
@@ -577,7 +579,8 @@ recruitmentCtrl.contactUs = function(req,res,next){
                             req.st.db.escape(req.body.learnMessageId),
                             req.st.db.escape(req.body.accessUserType),
                             req.st.db.escape(req.body.approverCount),
-                            req.st.db.escape(req.body.receiverCount)
+                            req.st.db.escape(req.body.receiverCount),
+                            req.st.db.escape(DBSecretKey)                                                                    
                         ];
         
                         var procQuery = 'CALL HE_save_contactUs_new( ' + procParams.join(',') + ')';

@@ -17,6 +17,8 @@ var error = {};
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 meetingCtrl.saveMetting = function(req,res,next){
     var response = {
@@ -108,7 +110,8 @@ meetingCtrl.saveMetting = function(req,res,next){
                             req.st.db.escape(req.body.groupId),
                             req.st.db.escape(req.body.learnMessageId),
                             req.st.db.escape(req.body.approverCount),
-                            req.st.db.escape(req.body.receiverCount)
+                            req.st.db.escape(req.body.receiverCount),
+                            req.st.db.escape(DBSecretKey)                
                         ];
                         /**
                          * Calling procedure to save form template

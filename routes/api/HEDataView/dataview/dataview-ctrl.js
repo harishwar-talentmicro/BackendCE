@@ -4,6 +4,8 @@
 
 var LoginCtrl = {};
 var error = {};
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 LoginCtrl.login = function(req,res,next){
     var response = {
@@ -110,7 +112,8 @@ LoginCtrl.getHelloEZEUsers = function(req,res,next){
         if((!err) && tokenResult){
 
             var procParams = [
-                req.st.db.escape(req.query.userFormMapId)
+                req.st.db.escape(req.query.userFormMapId),
+                req.st.db.escape(DBSecretKey)                                            
             ];
             /**
              * Calling procedure to save form template

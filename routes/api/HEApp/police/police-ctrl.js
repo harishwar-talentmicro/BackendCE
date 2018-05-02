@@ -11,6 +11,8 @@ var fs = require('fs');
 var Notification_aws = require('../../../modules/notification/aws-sns-push.js');
 
 var _Notification_aws = new  Notification_aws();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 policeCtrl.getPoliceStations = function(req,res,next){
     var response = {
@@ -143,7 +145,8 @@ policeCtrl.saveIncident = function(req,res,next){
                             req.st.db.escape(req.body.longitude),
                             req.st.db.escape(req.body.response),
                             req.st.db.escape(req.body.internalNotes),
-                            req.st.db.escape(req.body.status)
+                            req.st.db.escape(req.body.status),
+                            req.st.db.escape(DBSecretKey)                                                                                        
                         ];
         
                         var procQuery = 'CALL he_save_policeIncident( ' + procParams.join(',') + ')';
@@ -282,7 +285,8 @@ policeCtrl.getIncident = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.status),
-                    req.st.db.escape(req.query.keywords)
+                    req.st.db.escape(req.query.keywords),
+                    req.st.db.escape(DBSecretKey)                                                                                        
                 ];
 
                 var procQuery = 'CALL he_get_policeIncident( ' + procParams.join(',') + ')';

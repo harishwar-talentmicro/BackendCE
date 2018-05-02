@@ -9,6 +9,8 @@ var error = {};
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 companyCtrl.searchComapny = function(req,res,next){
     var response = {
@@ -39,7 +41,8 @@ companyCtrl.searchComapny = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.userType),
-                    req.st.db.escape(req.query.keywords)
+                    req.st.db.escape(req.query.keywords),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to get form template

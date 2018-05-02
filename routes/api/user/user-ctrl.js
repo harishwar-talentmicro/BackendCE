@@ -920,7 +920,8 @@ UserCtrl.getProfileData = function (req, res, next) {
             if ((!err) && tokenResult) {
 
                 var procParams = [
-                    req.st.db.escape(req.query.token)
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(DBSecretKey)                    
                 ];
                 /**
                  * Calling procedure to save deal
@@ -1399,7 +1400,7 @@ UserCtrl.changePassword = function (req, res, next) {
                     req.st.db.escape(encryptPwd),
                     req.st.db.escape(req.body.WhatMateId),
                     req.st.db.escape(req.body.otp),
-                    req.st.db.escape(req.body.DBSecretKey)
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL change_password( ' + procParams.join(',') + ')';
@@ -1674,7 +1675,8 @@ UserCtrl.invitePublicProfile = function (req, res, next) {
                         req.st.db.escape(req.body.name),
                         req.st.db.escape(req.body.email),
                         req.st.db.escape(req.body.meetingId),
-                        req.st.db.escape(encryptPwd)
+                        req.st.db.escape(encryptPwd),
+                        req.st.db.escape(DBSecretKey)                    
                     ];
 
                     //CompanyName

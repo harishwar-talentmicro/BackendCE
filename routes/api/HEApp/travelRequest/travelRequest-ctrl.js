@@ -18,6 +18,8 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 travelRequestCtrl.saveTravelRequest = function(req,res,next){
     var response = {
@@ -127,7 +129,8 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(req.body.isAdvanceAmountRequired),
                             req.st.db.escape(JSON.stringify(travelRequests)),
-                            req.st.db.escape(req.body.travelRequestType)
+                            req.st.db.escape(req.body.travelRequestType),
+                            req.st.db.escape(DBSecretKey)                                                                    
                         ];
                         /**
                          * Calling procedure to save form template

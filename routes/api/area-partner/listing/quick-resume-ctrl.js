@@ -8,6 +8,8 @@ var QuickResumeCtrl = {};
 
 var gcloud = require('gcloud');
 var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
+
 var fs = require('fs');
 var gm = require('gm').subClass({ imageMagick: true });
 var uuid = require('node-uuid');
@@ -259,7 +261,8 @@ QuickResumeCtrl.checkCandidate = function(req,res,next){
                 req.st.db.escape(req.body.isdMobile),
                 req.st.db.escape(req.body.mobile),
                 req.st.db.escape(req.body.isdPhone),
-                req.st.db.escape(req.body.phone)
+                req.st.db.escape(req.body.phone),
+                req.st.db.escape(DBSecretKey)
             ];
 
             /**
@@ -416,7 +419,8 @@ QuickResumeCtrl.saveResumeDetail = function(req,res,next){
                 req.st.db.escape(data.isdMobile),
                 req.st.db.escape(data.mobile),
                 req.st.db.escape(data.isdPhone),
-                req.st.db.escape(data.phone)
+                req.st.db.escape(data.phone),
+                req.st.db.escape(DBSecretKey)
             ];
 
             /**

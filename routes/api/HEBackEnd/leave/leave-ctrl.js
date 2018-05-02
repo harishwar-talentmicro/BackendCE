@@ -4,6 +4,8 @@
 
 var leaveCtrl = {};
 var error = {};
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 leaveCtrl.saveLeaveTypes = function(req,res,next){
     var response = {
@@ -494,7 +496,8 @@ leaveCtrl.getLeaveBalance = function(req,res,next){
                 req.st.db.escape(req.query.limit),
                 req.st.db.escape(req.query.dateFrom),
                 req.st.db.escape(req.query.dateTo),
-                req.st.db.escape(req.query.APIKey)
+                req.st.db.escape(req.query.APIKey),
+                req.st.db.escape(DBSecretKey)                                                                                                        
             ];
             /**
              * Calling procedure to get form template

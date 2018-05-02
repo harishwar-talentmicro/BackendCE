@@ -743,7 +743,8 @@ userCtrl.postToProfile = function(req,res,next){
                     req.st.db.escape(req.body.mobileISD),
                     req.st.db.escape(req.body.mobileNumber),
                     req.st.db.escape(req.body.emailId),
-                    req.st.db.escape(req.body.userMasterId)
+                    req.st.db.escape(req.body.userMasterId),
+                    req.st.db.escape(DBSecretKey)                
                 ];
 
                 var procQuery = 'CALL he_profileDataHistory( ' + procParams.join(',') + ')';
