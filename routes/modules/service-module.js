@@ -14,6 +14,8 @@ var NotificationQueryManager = require('./notification/notification-query.js');
 var notification = null;
 var notificationQmManager = null;
 var moment = require('moment');
+var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 function Service(db,stdLib){
 
@@ -189,7 +191,7 @@ Service.prototype.getServiceProviders = function(req,res,next){
                     if (result) {
                         var queryParams =   st.db.escape(token) + ',' + st.db.escape(lat)
                             + ',' + st.db.escape(lng)+ ',' + st.db.escape(serviceType) + ',' + st.db.escape(req.query.service_mid)
-                            + ',' + st.db.escape(req.query.dt);
+                            + ',' + st.db.escape(req.query.dt)+','+st.db.escape(DBSecretKey);
 
                         var query = 'CALL pgetserviceproviders(' + queryParams + ')';
                         console.log(query);

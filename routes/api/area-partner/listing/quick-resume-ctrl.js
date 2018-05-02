@@ -173,7 +173,8 @@ QuickResumeCtrl.getResumeDetail = function(req,res,next){
         if((!err) && tokenResult){
             var procParams = [
                 req.st.db.escape(req.query.token),
-                req.st.db.escape(req.params.userId)
+                req.st.db.escape(req.params.userId),
+                req.st.db.escape(DBSecretKey)
             ];
 
             var procQuery = 'CALL pGetCandidateDetailAP ( ' + procParams.join(',') + ')';

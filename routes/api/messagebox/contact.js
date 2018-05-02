@@ -222,7 +222,8 @@ router.get('/', function(req,res,next){
                 if ((!err) && tokenResult) {
                     var procParams = [
                         req.db.escape(req.query.token),
-                        req.db.escape(req.query.dateTime)
+                        req.db.escape(req.query.dateTime),
+                        req.db.escape(DBSecretKey)
                     ];
                     var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(' ,') + ')';
                     console.log(procQuery);

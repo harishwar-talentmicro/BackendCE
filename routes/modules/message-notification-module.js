@@ -12,6 +12,9 @@ var Notification = require('./notification/notification-master.js');
 var NotificationQueryManager = require('./notification/notification-query.js');
 var notification = null;
 var notificationQmManager = null;
+var CONFIG = require('../../ezeone-config.json');
+
+var DBSecretKey=CONFIG.DB.secretKey;
 
 function msgNotification(db,stdLib){
 
@@ -71,7 +74,7 @@ msgNotification.prototype.sendComposeMessage= function(msgContent, callBack) {
                                         if (groupDetails[0].length > 0) {
                                             if (groupDetails[1]) {
                                                 if (groupDetails[1].length > 0) {
-                                                    var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type) + ',' + st.db.escape(msgContent.token);
+                                                    var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type) + ',' + st.db.escape(msgContent.token)+','+st.db.escape(DBSecretKey);
                                                     var memberDetailsQuery1 = 'CALL pGetGroupInfn(' + queryParams1 + ')';
                                                     console.log(memberDetailsQuery1);
                                                     st.db.query(memberDetailsQuery1, function (err, groupInfo) {
@@ -953,7 +956,7 @@ msgNotification.prototype.sendForwardNotification = function(msgContent, callBac
                                             if (groupDetails[0].length > 0) {
                                                 if (groupDetails[1]) {
                                                     if (groupDetails[1].length > 0) {
-                                                        var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type) + ',' + st.db.escape(msgContent.token);
+                                                        var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type) + ',' + st.db.escape(msgContent.token)+','+st.db.escape(DBSecretKey);
                                                         var messageQuery1 = 'CALL pGetGroupInfn(' + queryParams1 + ')';
                                                         console.log(messageQuery1);
                                                         st.db.query(messageQuery1, function (err, groupDetails1) {

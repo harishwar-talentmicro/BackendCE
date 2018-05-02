@@ -2287,7 +2287,7 @@ Procurement.prototype.procurementGetVdEzeDetails = function(req,res,next){
             st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var procParams = st.db.escape(req.query.ezeone_id);
+                        var procParams = st.db.escape(req.query.ezeone_id)+','+st.db.escape(DBSecretKey);
                         var procQuery = 'CALL pGet_vendorezeone_details(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {

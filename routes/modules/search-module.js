@@ -15,6 +15,8 @@ var AES_256_encryption = require('../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 
 var st = null;
+var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 function Search(db,stdLib){
 
@@ -554,7 +556,7 @@ Search.prototype.searchInformation = function(req,res,next){
                 + ',' + st.db.escape(EZEID) + ',' + st.db.escape(Pin)+ ',' + st.db.escape(latitude) + ',' + st.db.escape(longitude);
 
             var feedbackParam = st.db.escape(EZEID) + ',' + st.db.escape(5) + ',' + st.db.escape(0)
-                + ',' + st.db.escape(0) + ',' + st.db.escape(1)+ ',' + st.db.escape(0);
+                + ',' + st.db.escape(0) + ',' + st.db.escape(1)+ ',' + st.db.escape(0)+','+st.db.escape(DBSecretKey);
             console.log('CALL pSearchInformationNew(' + SearchParameter + '); CALL pgetfeedbackDetails(' + feedbackParam + ');');
             /**
              * calling pgetfeedbackDetails to get one review/feedback for mobile users only

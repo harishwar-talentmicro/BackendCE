@@ -1821,7 +1821,7 @@ Job.prototype.getJobDetails = function(req,res,next){
             //    if (!err) {
             //        if (result) {
                         var queryParams = st.db.escape(jobId) + ',' + st.db.escape(token)+ ',' + st.db.escape(latitude)
-                            + ',' + st.db.escape(longitude);
+                            + ',' + st.db.escape(longitude)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL pgetjobDetails(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
@@ -2337,7 +2337,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                         var mailDetails = function(i) {
                             if(i < id.length) {
                                 tid = id[i];
-                                var queryParams = st.db.escape(token) + ',' + st.db.escape(tid);
+                                var queryParams = st.db.escape(token) + ',' + st.db.escape(tid)+','+st.db.escape(DBSecretKey);
                                 var query = 'CALL pGetjobseekersmailDetails(' + queryParams + ')';
                                 //console.log(query);
                                 st.db.query(query, function (err, getResult) {

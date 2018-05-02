@@ -3,7 +3,8 @@
  */
 var moment = require('moment');
 var jobCtrl = {};
-
+var appConfig = require('../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 jobCtrl.saveJob = function(req, res, next){
 
@@ -338,7 +339,8 @@ jobCtrl.getJobseekerList = function(req, res, next){
                         req.st.db.escape(req.query.jobId),
                         req.st.db.escape((req.query.stageId) ? (req.query.stageId) :0 ),
                         req.st.db.escape(startPage),
-                        req.st.db.escape(req.query.limit)
+                        req.st.db.escape(req.query.limit),
+                        req.st.db.escape(DBSecretKey)
 
                     ];
                     var procQuery = 'CALL  pget_jobs_jobseeker_list( ' + procParams.join(',') + ')';

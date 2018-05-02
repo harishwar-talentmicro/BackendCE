@@ -11,6 +11,8 @@ var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 var moment = require('moment');
 
+var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 
 var st = null;
@@ -40,7 +42,7 @@ User_AP.prototype.getUserDetailsAP = function(req,res,next){
         var EZEID = req.st.alterEzeoneId(req.query.EZEID);
         if (EZEID) {
             console.log("EZEID",EZEID);
-            var query = 'Call pgetUserProfileAP('+st.db.escape(EZEID)+')';
+            var query = 'Call pgetUserProfileAP('+st.db.escape(EZEID)+','+st.db.escape(DBSecretKey)+')';
             console.log("query",query);
             st.db.query(query, function (err, UserDetailsResult) {
                 if (!err) {

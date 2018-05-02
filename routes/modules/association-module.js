@@ -137,7 +137,7 @@ Association.prototype.associGetEventDtl = function(req,res,next){
                     if (tokenResult) {
                         var procParams = st.db.escape(req.query.token) + ',' + st.db.escape(req.query.service_mid)
                             + ',' + st.db.escape(req.query.pg_no)+ ',' + st.db.escape(req.query.limit)
-                            + ',' + st.db.escape(req.query.status) + ',' + st.db.escape(req.query.searchKeyword)+ ',' + st.db.escape(req.query.type);
+                            + ',' + st.db.escape(req.query.status) + ',' + st.db.escape(req.query.searchKeyword)+ ',' + st.db.escape(req.query.type)+','+st.db.escape(DBSecretKey);
                         var procQuery = 'CALL pGetAlumni_eventdetails(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {

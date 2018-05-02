@@ -24,7 +24,8 @@ var NotificationQueryManager = require('./notification/notification-query.js');
 var notificationQmManager = null;
 var mailModule = require('./mail-module.js');
 var mail = null;
-
+var appConfig = require('../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 var bcrypt = null;
 
@@ -1384,7 +1385,7 @@ Auth.prototype.login = function(req,res,next){
 
             //console.log('findarray: ' + FindArray.length);
 
-            var Query = st.db.escape(UserName) + ',' + st.db.escape(code)+ ',' + st.db.escape(token);
+            var Query = st.db.escape(UserName) + ',' + st.db.escape(code)+ ',' + st.db.escape(token)+','+st.db.escape(DBSecretKey);
             console.log(Query);
             st.db.query('CALL PLoginNew(' + Query + ')', function (err, loginResult) {
                 //console.log(loginResult);

@@ -1,5 +1,6 @@
 var st = null;
-
+var appConfig = require('../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 function NotificationQueryManager(db,stdLib){
     if(stdLib){
         st = stdLib;
@@ -216,7 +217,7 @@ NotificationQueryManager.prototype.getGroupInfo = function(groupId,groupType,get
     }
 
 
-    var queryParams = st.db.escape(groupId)+','+st.db.escape(groupType);
+    var queryParams = st.db.escape(groupId)+','+st.db.escape(groupType)+','+st.db.escape(DBSecretKey);
     var query = 'CALL pGetGroupInfn(' + queryParams + ')';
 
     st.db.query(query, function (err, getResult) {

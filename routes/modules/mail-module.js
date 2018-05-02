@@ -611,7 +611,7 @@ Mail.prototype.fnMessageMail= function(messageContent, callBack) {
                     if(getResult) {
                         if (getResult[0]) {
                             locId = getResult[0].TID;
-                            var query = st.db.escape(messageContent.token) + ',' + st.db.escape(locId) + ',' + st.db.escape(messageContent.messageType);
+                            var query = st.db.escape(messageContent.token) + ',' + st.db.escape(locId) + ',' + st.db.escape(messageContent.messageType)+','+st.db.escape(DBSecretKey);
                             console.log('CALL PgetMailSendingDetails(' + query + ')');
                             st.db.query('CALL PgetMailSendingDetails(' + query + ')', function (err, resumeDetails) {
                                 //console.log(resumeDetails);

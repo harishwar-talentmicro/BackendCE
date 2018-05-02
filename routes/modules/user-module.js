@@ -22,7 +22,7 @@ var EZEIDEmail = 'noreply@ezeone.com';
 var moment = require('moment');
 
 var appConfig = require('../../ezeone-config.json');
-
+var DBSecretKey=appConfig.DB.secretKey;
 
 
 function FnEncryptPassword(Password) {
@@ -503,7 +503,7 @@ User.prototype.getUserDetails = function(req,res,next){
                 //console.log(Result);
                 if (!err) {
                     if (tokenResult) {
-                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ')', function (err, UserDetailsResult) {
+                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) +','+st.db.escape(DBSecretKey)+  ')', function (err, UserDetailsResult) {
                             if (!err) {
                                 //console.log('UserDetailsResult',UserDetailsResult);
                                 if (UserDetailsResult[0]) {
@@ -1758,7 +1758,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
                                 }
                             }
                         }
-                        st.db.query('CALL pEZEIDPrimaryDetails(' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ')', function (err, GetResult) {
+                        st.db.query('CALL pEZEIDPrimaryDetails(' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ',' + st.db.escape(DBSecretKey)+ ')', function (err, GetResult) {
                             if (!err) {
                                 if(GetResult) {
                                     if (GetResult[0]) {
@@ -1855,7 +1855,7 @@ User.prototype.getResume = function(req,res,next){
 
         if (id) {
             var queryParams = st.db.escape(id);
-            var query = 'CALL pgetCVInfo(' + st.db.escape(id) + ')';
+            var query = 'CALL pgetCVInfo(' + st.db.escape(id) +','+ st.db.escape(DBSecretKey)+ ')';
             console.log(query);
             st.db.query(query, function (err, MessagesResult) {
                 if (!err) {

@@ -780,7 +780,7 @@ UserCtrl.login = function (req, res, next) {
                     req.st.generateToken(ip, userAgent, ezeoneId, isWhatMate, APNS_Id, GCM_Id, function (err, tokenResult) {
 
                         if ((!err) && tokenResult) {
-                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ')';
+                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) +','+req.st.db.escape(DBSecretKey)+ ')';
                             console.log(procQuery);
                             req.db.query(procQuery, function (err, UserDetailsResult) {
                                 console.log(UserDetailsResult);
@@ -2066,7 +2066,8 @@ UserCtrl.getUserDetails = function (req, res, next) {
                             var procParams = [
                                 req.st.db.escape(req.query.token),
                                 req.st.db.escape(req.body.dialerAPNS_Id),
-                                req.st.db.escape(req.body.dialerGCM_Id)
+                                req.st.db.escape(req.body.dialerGCM_Id),
+                                req.st.db.escape(DBSecretKey)                    
                             ];
 
                             req.db.query('CALL pGetDialerEZEIDDetails(' + procParams.join(',') + ')', function (err, UserDetailsResult) {

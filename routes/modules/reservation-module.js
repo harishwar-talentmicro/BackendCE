@@ -10,6 +10,8 @@ var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 var moment = require('moment');
 var st = null;
+var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 function Reservation(db,stdLib){
 
@@ -865,7 +867,7 @@ Reservation.prototype.getFeedback = function(req,res,next){
         else {
             try {
                 var queryParams = st.db.escape(ezeone_id) + ',' + st.db.escape(moduleType) + ',' + st.db.escape(transId)
-                    + ',' + st.db.escape(resourceId) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount);
+                    + ',' + st.db.escape(resourceId) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)+','+st.db.escape(DBSecretKey);
                 var query = 'CALL pgetfeedbackDetails(' + queryParams + ')';
                 console.log(query);
                 st.db.query(query, function (err, getResult) {

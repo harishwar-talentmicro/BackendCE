@@ -2345,7 +2345,7 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(code);
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(code)+ ',' + st.db.escape(DBSecretKey);
 
                         var query = 'CALL pGetAlumniProfile(' + queryParams + ')';
 
@@ -3546,7 +3546,7 @@ Alumni.prototype.getParticipantsList = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(tid);
+                        var queryParams = st.db.escape(tid)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL PgetListofParticipants(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
@@ -3668,7 +3668,7 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(code) + ',' + st.db.escape(alumniStatus);
+                        var queryParams = st.db.escape(code) + ',' + st.db.escape(alumniStatus)+',' + st.db.escape(DBSecretKey);
                         var query = 'CALL pGetAlumniMemberApprovalList(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
