@@ -2,6 +2,10 @@
  * Created by Jana1 on 01-10-2017.
  */
 
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
+
 var eventCtrl = {};
 var error = {};
 
@@ -409,7 +413,8 @@ eventCtrl.getEventUser = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.eventId),
                     req.st.db.escape(req.query.type),
-                    req.st.db.escape(req.query.sessionId)
+                    req.st.db.escape(req.query.sessionId),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -1431,7 +1436,8 @@ eventCtrl.getEventAgendaList = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(req.query.eventId)
+                    req.st.db.escape(req.query.eventId),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template

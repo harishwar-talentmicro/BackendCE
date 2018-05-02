@@ -466,7 +466,8 @@ jobCtrl.getJobDefaultMemberList = function (req, res, next) {
                     req.st.db.escape(req.query.defId),
                     req.st.db.escape(req.query.heDepartmentId),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.purpose)
+                    req.st.db.escape(req.query.purpose),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 var procQuery = 'CALL WM_get_defMemberList( ' + inputs.join(',') + ')';
                 console.log(procQuery);

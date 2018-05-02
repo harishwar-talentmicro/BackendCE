@@ -2,6 +2,10 @@
  * Created by vedha on 27-09-2017.
  */
 
+var CONFIG = require('../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
+
 var moment = require('moment');
 var wmAdminManagerCtrl = {};
 
@@ -252,7 +256,8 @@ wmAdminManagerCtrl.checkWhatMateCompany = function(req, res, next){
         try {
 
             var procParams = [
-                req.st.db.escape(req.query.whatmateId)
+                req.st.db.escape(req.query.whatmateId),
+                req.st.db.escape(DBSecretKey)
             ];
 
             var procQuery = 'CALL wm_check_whatmateId( ' + procParams.join(',') + ')';

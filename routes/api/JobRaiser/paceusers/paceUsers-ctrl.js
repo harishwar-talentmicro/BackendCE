@@ -48,6 +48,7 @@ paceUsersCtrl.checkUser = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.ezeoneId),
                     req.st.db.escape(DBSecretKey)
+
                 ];
 
                 var procQuery = 'CALL wm_validate_paceUserId( ' + inputs.join(',') + ')';

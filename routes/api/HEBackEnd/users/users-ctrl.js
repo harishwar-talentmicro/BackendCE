@@ -87,7 +87,8 @@ userCtrl.saveUser = function(req,res,next){
                     req.st.db.escape(req.body.mobileISD),
                     req.st.db.escape(req.body.mobileNumber),
                     req.st.db.escape(req.body.emailId),
-                    req.st.db.escape(req.body.DOJ)
+                    req.st.db.escape(req.body.DOJ),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -581,7 +582,8 @@ userCtrl.searchUser = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.name),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to get form template

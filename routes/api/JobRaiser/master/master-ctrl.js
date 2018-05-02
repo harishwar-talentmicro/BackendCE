@@ -14,6 +14,9 @@ var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 var masterCtrl = {};
 var error = {};
 
@@ -1422,7 +1425,8 @@ masterCtrl.getClientView = function (req, res, next) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 var procQuery = 'CALL wm_get_clientView( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -2097,7 +2101,8 @@ masterCtrl.saveUserManager = function (req, res, next) {
                     req.st.db.escape(req.body.workGroupId),
                     req.st.db.escape(req.body.RMId),
                     req.st.db.escape(req.body.exitDate),
-                    req.st.db.escape(req.body.joiningDate)
+                    req.st.db.escape(req.body.joiningDate),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 var procQuery = 'CALL save_Pace_User( ' + inputs.join(',') + ')';
                 console.log(procQuery);

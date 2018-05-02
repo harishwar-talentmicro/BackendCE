@@ -9,7 +9,8 @@
  */
 "use strict";
 
-
+var CONFIG = require('../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 
 var Notification = require('./notification/notification-master.js');
@@ -975,7 +976,7 @@ Location.prototype.validateEZEOne = function(req,res,next){
                 ezeid = name;
                 pin = null;
             }
-            var queryParams = st.db.escape(ezeid) + ',' + st.db.escape(pin);
+            var queryParams = st.db.escape(ezeid) + ',' + st.db.escape(pin) + ',' + st.db.escape(DBSecretKey);
             var query = 'CALL pvalidateEZEOne(' + queryParams + ')';
             //console.log(query);
             st.db.query(query, function (err, EZEOneResult) {

@@ -27,6 +27,9 @@ var mailModule = require('./mail-module.js');
 var mail = null;
 var CONFIG = require('../../ezeone-config.json');
 
+var CONFIG = require('../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 var bcrypt = null;
 
 try{
@@ -1225,7 +1228,7 @@ Auth.prototype.verifyResetCode = function(req,res,next){
 
     if(statusFlag){
         try{
-            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(resetCode);
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(resetCode) + ',' + st.db.escape(DBSecretKey);
             var query = 'CALL pverifyresetcode('+queryParams+')';
 
             //console.log(query);
