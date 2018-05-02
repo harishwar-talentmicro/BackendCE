@@ -15,6 +15,9 @@ var moment = require('moment');
 var appConfig = require('../../ezeone-config.json');
 var DBSecretKey = appConfig.DB.secretKey;
 
+var CONFIG = require('../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 var gcs = gcloud.storage({
     projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
     keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
@@ -366,7 +369,7 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
                 pin = null;
             }
             var queryParams = st.db.escape(ezeid) + ',' + st.db.escape(token) + ',' + st.db.escape(groupType)
-                + ',' + st.db.escape(pin);
+                + ',' + st.db.escape(pin) + ',' + st.db.escape(DBSecretKey);
             var query = 'CALL pValidateGroupName(' + queryParams + ')';
             //console.log(query);
             st.db.query(query, function (err, groupResult) {
@@ -477,7 +480,7 @@ MessageBox.prototype.validateGroupMember = function(req,res,next){
                             ezeid = ezeoneId;
                             pin = null;
                         }
-                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(ezeid)+ ',' + st.db.escape(pin);
+                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(ezeid)+ ',' + st.db.escape(pin) + ',' + st.db.escape(DBSecretKey);
                         var query = 'CALL pValidateGroupMember('+queryParams+')';
                         //console.log(query);
                         st.db.query(query,function(err,results){
@@ -2999,7 +3002,7 @@ MessageBox.prototype.viewMessage = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams =  st.db.escape(tid) + ',' + st.db.escape(token)+ ',' + st.db.escape(pageSize)
-                            + ',' + st.db.escape(pageCount);
+                            + ',' + st.db.escape(pageCount)+ ',' +st.db.escape(DBSecretKey);
                         var query = 'CALL pViewMessage(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
@@ -3478,8 +3481,11 @@ MessageBox.prototype.viewMessageNew = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =  st.db.escape(tid);
-                        var query = 'CALL pViewMessagenew(' + queryParams + ')';
+                        var queryParams =  [
+                            req.st.db.escape(tid),
+                            req.st.db.escape(DBSecretKey)
+                        ];
+                        var query = 'CALL pViewMessagenew(' + queryParams.join(',') + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {

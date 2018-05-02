@@ -461,7 +461,8 @@ eventCtrl.getWMEventQuestions = function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.sessionId),
-                    req.st.db.escape(req.query.eventId)
+                    req.st.db.escape(req.query.eventId),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL wm_get_event_questions( ' + procParams.join(',') + ')';
@@ -840,7 +841,8 @@ eventCtrl.getWMEventUsers = function(req,res,next){
                         req.st.db.escape(req.query.isUser),
                         req.st.db.escape(req.query.isModerator),
                         req.st.db.escape(req.query.isEventAdmin),
-                        req.st.db.escape(req.query.status)
+                        req.st.db.escape(req.query.status),
+                        req.st.db.escape(DBSecretKey)
                     ];
 
                     var procQuery = 'CALL wm_get_app_event_users( ' + procParams.join(',') + ')';
@@ -1259,7 +1261,8 @@ eventCtrl.getEventMessageLog = function(req,res,next){
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.eventId)
+                    req.st.db.escape(req.query.eventId),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL wm_get_event_messageLog( ' + procParams.join(',') + ')';
@@ -1596,6 +1599,7 @@ eventCtrl.getStatusOfWMList = function(req,res,next){
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
+
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.WMId),
@@ -1607,6 +1611,7 @@ eventCtrl.getStatusOfWMList = function(req,res,next){
                  */
                 var procQuery = 'CALL wm_get_statusOfWMList( ' + procParams.join(',') + ')';
                 console.log(procQuery);
+                console.log(DBSecretKey);
                 req.db.query(procQuery, function (err, homePageData) {
                     if (!err && homePageData && homePageData[0] && homePageData[0][0] ) {
                         response.status = true;

@@ -1029,7 +1029,7 @@ User.prototype.verifyResetPasswordLink = function(req,res,next){
             req.body.ezeone_id = req.st.alterEzeoneId(req.body.ezeone_id);
             var timestamp = moment(new Date()).format('YYYY-MM-DD HH:mm:ss').toString();
 
-            var verifyQueryParams = st.db.escape(req.body.ezeone_id) + ','+ st.db.escape(req.body.reset_code);
+            var verifyQueryParams = st.db.escape(req.body.ezeone_id) + ','+ st.db.escape(req.body.reset_code) + ','+ st.db.escape(DBSecretKey);
             var verifyQuery = 'CALL pverifyresetcode('+verifyQueryParams+')';
 
             st.db.query(verifyQuery,function(err,verifyRes){

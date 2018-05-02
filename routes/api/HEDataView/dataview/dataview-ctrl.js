@@ -257,7 +257,8 @@ LoginCtrl.getTasks = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -345,7 +346,8 @@ LoginCtrl.getMeeting = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -432,7 +434,8 @@ LoginCtrl.getExpenseList = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -648,7 +651,9 @@ LoginCtrl.getAttendanceRequestList = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
+
                 ];
                 /**
                  * Calling procedure to save form template
@@ -734,7 +739,8 @@ LoginCtrl.getLeaveRegister = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -820,7 +826,8 @@ LoginCtrl.getTravelRequest = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -906,7 +913,8 @@ LoginCtrl.getTravelClaim = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -1069,7 +1077,8 @@ LoginCtrl.getSalesList = function(req,res,next){
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
                     req.st.db.escape(tokenResult[0].masterid),
-                    req.st.db.escape(req.query.probabilities)
+                    req.st.db.escape(req.query.probabilities),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -1160,7 +1169,8 @@ LoginCtrl.getAttendanceRegister = function(req,res,next){
                     req.st.db.escape(req.query.limit),
                     req.st.db.escape(req.query.gradeIds),
                     req.st.db.escape(req.query.departmentIds),
-                    req.st.db.escape(req.query.workLocationIds)
+                    req.st.db.escape(req.query.workLocationIds),
+                    req.st.db.escape(DBSecretKey)
 
                 ];
 
@@ -1343,7 +1353,8 @@ LoginCtrl.getStationaryList = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -1431,7 +1442,8 @@ LoginCtrl.getPantryList = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -1519,7 +1531,8 @@ LoginCtrl.getAssetList = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -1607,7 +1620,8 @@ LoginCtrl.getManpowerList = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -1732,7 +1746,8 @@ LoginCtrl.getReferredCVs = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL whatmate_get_cvReferal( ' + procParams.join(',') + ')';
@@ -1815,7 +1830,8 @@ LoginCtrl.getInterviewScheduler = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL whatmate_get_InterviewSchedule( ' + procParams.join(',') + ')';
@@ -1927,7 +1943,8 @@ LoginCtrl.getDocumentRequestList = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL whatmate_get_DocumentsRequested( ' + procParams.join(',') + ')';

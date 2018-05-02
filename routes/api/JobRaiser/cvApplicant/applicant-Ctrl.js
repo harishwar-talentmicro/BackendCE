@@ -734,7 +734,8 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                     req.st.db.escape(req.query.statusId),
                     req.st.db.escape(req.query.startPage),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(req.query.requirementId)
+                    req.st.db.escape(req.query.requirementId),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL wm_get_applicants( ' + getStatus.join(',') + ')';
@@ -1346,7 +1347,8 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.applicantId)
+                    req.st.db.escape(req.query.applicantId),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL wm_get_applicantDetails( ' + inputs.join(',') + ')';

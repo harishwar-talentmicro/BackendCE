@@ -15,6 +15,8 @@ var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 var moment = require('moment');
 
+var CONFIG = require('../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 
 
@@ -1739,7 +1741,7 @@ Auth.prototype.verifyResetCode = function(req,res,next){
 
     if(statusFlag){
         try{
-            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(resetCode);
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(resetCode) + ',' + st.db.escape(DBSecretKey);
             var query = 'CALL pverifyresetcode('+queryParams+')';
 
             //console.log(query);

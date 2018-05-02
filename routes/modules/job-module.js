@@ -3218,8 +3218,11 @@ Job.prototype.viewApplicantList = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(cvId);
-                        var query = 'CALL pViewNotifiedCVDetails(' + queryParams + ')';
+                        var queryParams = [
+                            req.st.db.escape(cvId),
+                            req.st.db.escape(DBSecretKey)
+                        ];
+                        var query = 'CALL pViewNotifiedCVDetails(' + queryParams.join(',') + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
