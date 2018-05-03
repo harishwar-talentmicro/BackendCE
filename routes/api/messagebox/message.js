@@ -670,6 +670,8 @@ router.post('/sync', function (req, res, next) {
                 if (!err) {
                     var message;
                     if (tokenResult) {
+                        console.log("req.body.data",req.body.data);
+
                         var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                         zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                             req.body = JSON.parse(resultDecrypt.toString('utf-8'));
