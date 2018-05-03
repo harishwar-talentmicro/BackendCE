@@ -2213,7 +2213,7 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
                     req.socket.remoteAddress || req.connection.socket.remoteAddress);
 
                     var queryParams = st.db.escape(token) + ',' + st.db.escape(dateTime) + ',' + st.db.escape(ip) +
-                        ',' +st.db.escape(ezeoneId) + ',' + st.db.escape(locationSeq);
+                        ',' +st.db.escape(ezeoneId) + ',' + st.db.escape(locationSeq) + ',' + st.db.escape(DBSecretKey);
                     st.db.query('CALL pSearchinfnPinbased('+queryParams+')',function(err,result){
                         if(err){
                             console.log('Error FnGetEZEOneIDInfo :  '+err);

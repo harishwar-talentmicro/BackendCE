@@ -106,7 +106,8 @@ QuickResumeCtrl.searchCandidate = function(req,res,next){
         if((!err) && tokenResult){
             var procParams = [
                 req.st.db.escape(req.query.token),
-                req.st.db.escape(req.query.q)
+                req.st.db.escape(req.query.q),
+                req.st.db.escape(DBSecretKey)
             ];
             /**
              * Calling search procedure to get candidate list based on email, phone or mobile number
