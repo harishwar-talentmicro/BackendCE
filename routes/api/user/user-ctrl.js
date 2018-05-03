@@ -125,7 +125,8 @@ UserCtrl.signup = function (req, res, next) {
                         req.st.db.escape(req.body.lastName),
                         req.st.db.escape(req.body.email),
                         req.st.db.escape(req.body.mobile),
-                        req.st.db.escape(req.body.isdMobile)
+                        req.st.db.escape(req.body.isdMobile),
+                        req.st.db.escape(DBSecretKey)
                     ];
                     /**
                      * Calling procedure to save user details

@@ -2213,7 +2213,7 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
                     req.socket.remoteAddress || req.connection.socket.remoteAddress);
 
                     var queryParams = st.db.escape(token) + ',' + st.db.escape(dateTime) + ',' + st.db.escape(ip) +
-                        ',' +st.db.escape(ezeoneId) + ',' + st.db.escape(locationSeq);
+                        ',' +st.db.escape(ezeoneId) + ',' + st.db.escape(locationSeq) + ',' + st.db.escape(DBSecretKey);
                     st.db.query('CALL pSearchinfnPinbased('+queryParams+')',function(err,result){
                         if(err){
                             console.log('Error FnGetEZEOneIDInfo :  '+err);
@@ -2454,7 +2454,7 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
 
         if (stages && user && probabilities) {
             var query = st.db.escape(from_date) + ',' + st.db.escape(to_date) + ',' + st.db.escape(stages)
-                + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user);
+                + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user) + ',' + st.db.escape(DBSecretKey);
             st.db.query('CALL pTransactionfilter(' + query +')', function (err, transResult) {
                 var testQuery = 'CALL pTransactionfilter(' + query +')';
 console.log(testQuery,"query");

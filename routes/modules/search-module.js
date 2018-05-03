@@ -18,12 +18,7 @@ var st = null;
 var appConfig = require('../../ezeone-config.json');
 var DBSecretKey=appConfig.DB.secretKey;
 
-function Search(db,stdLib){
 
-    if(stdLib){
-        st = stdLib;
-    }
-};
 
 /**
  * Method : POST
@@ -155,7 +150,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                                 + ',' + st.db.escape(Longitude) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ',' + st.db.escape(Pin) + ',' + st.db.escape(SearchType) + ',' + st.db.escape(DocType)
                                 + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape(token)
                                 + ',' + st.db.escape(HomeDelivery) + ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                                st.db.escape(pagesize) + ',' + st.db.escape(pagecount) + ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag);
+                                st.db.escape(pagesize) + ',' + st.db.escape(pagecount) + ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag)  + ',' + st.db.escape(DBSecretKey);
 
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             st.db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
@@ -315,7 +310,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(1)
                     + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
                     + ',' + st.db.escape(token) + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ','+ st.db.escape(promotionFlag);
+                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ','+ st.db.escape(promotionFlag) + ',' + st.db.escape(DBSecretKey);
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
@@ -424,7 +419,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(3)
                     + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
                     + ',' + st.db.escape(token)  + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag);
+                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag)  + ',' + st.db.escape(DBSecretKey);
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
@@ -1104,7 +1099,7 @@ Search.prototype.searchTracker = function(req,res,next){
                     if (Result) {
                         var query = st.db.escape(Keyword) + ','  + st.db.escape(Latitude) + ',' +
                             st.db.escape(Longitude) + ',' + st.db.escape(Proximity)+
-                            ',' + st.db.escape(Token) + ',' +st.db.escape(currentDateTime) + ',' +st.db.escape(trackerFlag);
+                            ',' + st.db.escape(Token) + ',' +st.db.escape(currentDateTime) + ',' +st.db.escape(trackerFlag) + ',' + st.db.escape(DBSecretKey);
                         console.log('CALL pTrackerSearch(' + query + ')');
                         st.db.query('CALL pTrackerSearch(' + query + ')', function (err, GetResult) {
                            // console.log(GetResult);
@@ -1600,7 +1595,9 @@ Search.prototype.searchInformationNew = function(req,res,next){
             if((!err) && tokenResult){
 
                 var procParams = [
-                    req.st.db.escape(req.query.groupId)
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(DBSecretKey)
+
                 ];
 
                 var procQuery = 'CALL pSearchInformation( ' + procParams.join(',') + ')';

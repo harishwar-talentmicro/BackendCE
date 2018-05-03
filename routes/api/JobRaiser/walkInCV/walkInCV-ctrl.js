@@ -1117,7 +1117,8 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                         req.st.db.escape(JSON.stringify(attachmentList[0])),
                                         req.st.db.escape(JSON.stringify(assessmentTypeList)),
                                         req.st.db.escape(JSON.stringify(skillAssessment)),
-                                        req.st.db.escape(JSON.stringify(heDepartment))
+                                        req.st.db.escape(JSON.stringify(heDepartment)),
+                                        req.st.db.escape(DBSecretKey)
                                     ];
 
                                     var procQuery = 'CALL wm_save_interviewSchedulerForHirecraft( ' + procParams.join(',') + ')';

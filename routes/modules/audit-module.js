@@ -1035,7 +1035,7 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
                 st.validateToken(Token, function (err, tokenResult) {
                     if (!err) {
                         if (tokenResult) {
-                            var query = st.db.escape(Token);
+                            var query = st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) ;
                             console.log('CALL pSendMailerDetails(' + query + ')');
                             st.db.query('CALL pSendMailerDetails(' + query + ')', function (err, MailerDetails) {
                                 if (!err) {

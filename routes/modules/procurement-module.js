@@ -268,7 +268,8 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                             st.db.escape(req.body.message) + ',' +
                                                             st.db.escape(req.body.notes) + ',' +
                                                             st.db.escape(vendorList[vCount].procId) + ',' +
-                                                            st.db.escape(eId);
+                                                            st.db.escape(eId) + ',' +
+                                                                st.db.escape(DBSecretKey);
                                                             salesEnqComQuery += ("CALL psend_Procurement_enquiry("+
                                                             salesEnqParam +
                                                             ");");
@@ -360,7 +361,7 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
 
                                                         console.log(vendorEmailList,"vendorEmailList");
 
-                                                        var procParams = st.db.escape(req.body.token);
+                                                        var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(DBSecretKey);
                                                         var procQuery = 'CALL pSendMailerDetails(' + procParams + ')';
                                                         st.db.query(procQuery, function (err, MailerDetailsResult) {
                                                             if (!err) {
@@ -3503,7 +3504,7 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                         //var query = st.db.escape(Token) + ', ' +st.db.escape(TID);
                         //var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID in (' + TID + ')';
                         //console.log(GetResult[0]
-                        var procParams = st.db.escape(Token);
+                        var procParams = st.db.escape(Token) + ',' + st.db.escape(DBSecretKey);
                         var procQuery = 'CALL pSendMailerDetails(' + procParams + ')';
                         st.db.query(procQuery, function (err, MailerDetailsResult) {
                             if (!err) {

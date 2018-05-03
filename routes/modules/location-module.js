@@ -799,7 +799,7 @@ Location.prototype.shareLocation = function(req,res,next){
                 if (!err) {
                     if (tokenResult) {
                         var queryParams = st.db.escape(token) + ','  + st.db.escape(locationTitle)+ ','  + st.db.escape(latitude)
-                            + ','  + st.db.escape(longitude)+ ','  + st.db.escape(ezeone_id);
+                            + ','  + st.db.escape(longitude)+ ','  + st.db.escape(ezeone_id) + ','  + st.db.escape(DBSecretKey);
                         var query = 'CALL psharelocation(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, locationResult) {
