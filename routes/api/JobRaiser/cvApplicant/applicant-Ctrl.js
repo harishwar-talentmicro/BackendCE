@@ -1118,6 +1118,8 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                             res2.applicantId = result[0][i].applicantId;
                             res2.name = result[0][i].name;
                             res2.emailId = result[0][i].emailId;
+                            res2.mobileISD = result[0][i].mobileISD;
+                            res2.mobileNumber = result[0][i].mobileNumber;
                             res2.noticePeriod = result[0][i].noticePeriod;
                             res2.jobTitleId = result[0][i].jobTitleId;
                             res2.jobTitle = result[0][i].jobTitle;
@@ -2979,7 +2981,8 @@ applicantCtrl.saveInterviewSchedulerForApplicant = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(attachmentList[0])),
                     req.st.db.escape(JSON.stringify(assessmentTypeList)),
                     req.st.db.escape(JSON.stringify(skillAssessment)),
-                    req.st.db.escape(JSON.stringify(heDepartment))
+                    req.st.db.escape(JSON.stringify(heDepartment)),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL wm_save_interviewSchedulerOfOneApplicant( ' + procParams.join(',') + ')';

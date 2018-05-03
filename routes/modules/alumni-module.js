@@ -6,6 +6,8 @@
  */
 
 "use strict";
+var CONFIG = require('../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 var uuid = require('node-uuid');
 var stream = require( "stream" );
@@ -5515,7 +5517,7 @@ Alumni.prototype.searchAlumniTEN = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(title)+ ',' + st.db.escape(pageCount) + ',' + st.db.escape(pageSize)
-                            + ',' + st.db.escape(code);
+                            + ',' + st.db.escape(code) + ',' + st.db.escape(DBSecretKey);
                         var query = 'CALL pSearchAlumniTEN(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
