@@ -1,5 +1,8 @@
 "use strict";
 
+var CONFIG = require('../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 var appConfig = require('../../ezeone-config.json');
 function error(err, req, res, next) {
     // log it
@@ -197,8 +200,8 @@ StdLib.prototype.validateToken = function(token, CallBack){
             /**
              * @info : Token is now queried from session table i.e. tloginout
              */
-
-            var validateTokenQuery = 'CALL pvalidate_token(' + _this.db.escape(token)+')';
+            var queryParams = _this.db.escape(token)  + ',' + st.db.escape(DBSecretKey);
+            var validateTokenQuery = 'CALL pvalidate_token(' + queryParams + ')';
            _this.db.query(validateTokenQuery, function (err, sessionResult) {
                 if (!err) {
 
@@ -546,7 +549,8 @@ StdLib.prototype.validateHEToken = function(APIKey , EZEOneId , password,token, 
             });
         }
         else if (token != ""){
-            var validateTokenQuery = 'CALL pvalidate_token(' + _this.db.escape(token)+')';
+            var queryParams = _this.db.escape(token)  + ',' + st.db.escape(DBSecretKey);
+            var validateTokenQuery = 'CALL pvalidate_token(' + queryParams + ')';
             _this.db.query(validateTokenQuery, function (err, sessionResult) {
                 if (!err) {
 

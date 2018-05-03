@@ -248,7 +248,7 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
                             + ',' + st.db.escape(clientSort) + ',' + st.db.escape(clientQuery)
                             + ',' + st.db.escape(contactSort) + ',' + st.db.escape(contactQuery) + ',' + st.db.escape(jobCodeSort)
                             + ',' + st.db.escape(jobCodeQuery)+ ',' + st.db.escape(jobTitleSort)+ ',' + st.db.escape(jobTitleQuery)
-                            + ',' + st.db.escape(applicantSearch)+ ',' + st.db.escape(status)+ ',' + st.db.escape(folderSort);
+                            + ',' + st.db.escape(applicantSearch)+ ',' + st.db.escape(status)+ ',' + st.db.escape(folderSort)+','+st.db.escape(DBSecretKey);
                         console.log('CALL pGetMessagesNew(' + parameters + ')');
                         st.db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, transResult) {
                             if (!err) {
@@ -3183,7 +3183,7 @@ BusinessManager.prototype.getContactDetails = function(req,res,next){
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var queryParams = st.db.escape(ezeid);
+                        var queryParams = st.db.escape(ezeid)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL pgetcontactdetails(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, result) {

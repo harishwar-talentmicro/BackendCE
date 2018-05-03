@@ -173,7 +173,8 @@ QuickResumeCtrl.getResumeDetail = function(req,res,next){
         if((!err) && tokenResult){
             var procParams = [
                 req.st.db.escape(req.query.token),
-                req.st.db.escape(req.params.userId)
+                req.st.db.escape(req.params.userId),
+                req.st.db.escape(DBSecretKey)
             ];
 
             var procQuery = 'CALL pGetCandidateDetailAP ( ' + procParams.join(',') + ')';
@@ -577,7 +578,9 @@ QuickResumeCtrl.saveResumeDetail = function(req,res,next){
                         req.st.db.escape(pictureFileName),
                         req.st.db.escape(jobType),
                         req.st.db.escape(data.availableForJobAfter),
-                        req.st.db.escape(resumeFileName)
+                        req.st.db.escape(resumeFileName),
+                        req.st.db.escape(DBSecretKey)
+                        
                     ];
                     var procAdvanceQuery = 'CALL pSave_Advanced_CV_Data (' + procAdvanceParam.join(',') + ')';
                     console.log(procAdvanceQuery);

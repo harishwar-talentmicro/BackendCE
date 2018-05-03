@@ -405,6 +405,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.presentEmployer = (req.body.presentEmployer) ? req.body.presentEmployer : "";
                 req.body.noticePeriod = (req.body.noticePeriod) ? req.body.noticePeriod : 0;
                 req.body.status = (req.body.status) ? req.body.status : 1;
+                req.body.experience = (req.body.experience) ? req.body.experience : '0.0';
+                req.body.presentSalary = (req.body.presentSalary) ? req.body.presentSalary : '0.0';
 
 
                 var inputs = [

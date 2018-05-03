@@ -27,6 +27,9 @@ var mailModule = require('./mail-module.js');
 var mail = null;
 var CONFIG = require('../../ezeone-config.json');
 
+var CONFIG = require('../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 var bcrypt = null;
 
 try{
@@ -360,7 +363,7 @@ Auth.prototype.register = function(req,res,next){
                             + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
                             + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)
                             + ',' + st.db.escape(companyDetails)+ ',' + st.db.escape(businesssize)+ ',' + st.db.escape(headcount)
-                            + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc)+ ',' + st.db.escape(rating);
+                            + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc)+ ',' + st.db.escape(rating)+','+req.st.db.escape(DBSecretKey);
 
                         var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                         console.log(query);
@@ -852,7 +855,7 @@ Auth.prototype.login = function(req,res,next){
 
         if (ezeoneId && password) {
 
-            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code)+ ',' + st.db.escape(token);
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code)+ ',' + st.db.escape(token)+','+st.db.escape(DBSecretKey);
             var query = 'CALL PLoginNew(' + queryParams + ')';
             console.log('query',query);
             st.db.query(query, function (err, loginResult) {
@@ -867,11 +870,13 @@ Auth.prototype.login = function(req,res,next){
                                     if (comparePassword(password, loginDetails[0].Password)) {
                                         st.generateToken(ip, userAgent, loginDetails[0].EZEID,isWhatMate,APNS_Id,GCM_Id,secretKey, function (err, tokenResult) {
                                             if ((!err) && tokenResult && loginDetails[0]) {
-                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ')', function (err, UserDetailsResult) {
+                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) +','+st.db.escape(DBSecretKey)+ ')', function (err, UserDetailsResult) {
                                                     if (!err) {
                                                         var procParams = [
                                                             req.db.escape(tokenResult),
-                                                            req.db.escape(null)
+                                                            req.db.escape(null),
+                                                            req.db.escape(DBSecretKey)
+                                                            
                                                         ];
                                                         var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(' ,') + ')';
                                                         console.log(procQuery);
@@ -1225,7 +1230,7 @@ Auth.prototype.verifyResetCode = function(req,res,next){
 
     if(statusFlag){
         try{
-            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(resetCode);
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(resetCode) + ',' + st.db.escape(DBSecretKey);
             var query = 'CALL pverifyresetcode('+queryParams+')';
 
             //console.log(query);
@@ -1733,7 +1738,7 @@ Auth.prototype.loginNew = function(req,res,next){
 
         if (ezeoneId && password) {
 
-            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code)+ ',' + st.db.escape(token);
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code)+ ',' + st.db.escape(token)+','+st.db.escape(DBSecretKey);
             var query = 'CALL PLoginNew(' + queryParams + ')';
             console.log('query',query);
             st.db.query(query, function (err, loginResult) {
@@ -1748,11 +1753,13 @@ Auth.prototype.loginNew = function(req,res,next){
                                     if (comparePassword(password, loginDetails[0].Password)) {
                                         st.generateToken(ip, userAgent, loginDetails[0].EZEID,isWhatMate,APNS_Id,GCM_Id,secretKey, function (err, tokenResult) {
                                             if ((!err) && tokenResult && loginDetails[0]) {
-                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ')', function (err, UserDetailsResult) {
+                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) +','+st.db.escape(DBSecretKey)+ ')', function (err, UserDetailsResult) {
                                                     if (!err) {
                                                         var procParams = [
                                                             req.db.escape(tokenResult),
-                                                            req.db.escape(null)
+                                                            req.db.escape(null),
+                                                            req.db.escape(DBSecretKey)
+                                                            
                                                         ];
                                                         var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(' ,') + ')';
                                                         console.log(procQuery);

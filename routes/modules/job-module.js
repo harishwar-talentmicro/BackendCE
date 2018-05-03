@@ -329,7 +329,7 @@ Job.prototype.create = function(req,res,next){
                             });
                         };
                         var postNotification = function(jobID){
-                            var queryParams = st.db.escape(jobID) + ',' + st.db.escape(token);
+                            var queryParams = st.db.escape(jobID) + ',' + st.db.escape(token)+','+st.db.escape(DBSecretKey);
                             /**
                              * send notification to eligible students
                              * @type {string}
@@ -1540,7 +1540,7 @@ Job.prototype.applyJob = function(req,res,next){
                                         console.log('FnApplyJob: Job apply successfully');
                                         if (insertResult[0][0].Status == 0){
                                             var dateTime = moment().format('MMMM Do YYYY, h:mm:ss a'); // April 21st 2016, 5:54:50 pm
-                                           var notificationQueryParams = st.db.escape(token) + ',' + st.db.escape(jobId);
+                                           var notificationQueryParams = st.db.escape(token) + ',' + st.db.escape(jobId)+','+st.db.escape(DBSecretKey);
                                            var notificationQuery = 'CALL pnotify_jobcreator_afterApply(' + notificationQueryParams + ')';
                                            console.log(notificationQuery);
                                            st.db.query(notificationQuery, function (err, notDetailsRes) {
@@ -1821,7 +1821,7 @@ Job.prototype.getJobDetails = function(req,res,next){
             //    if (!err) {
             //        if (result) {
                         var queryParams = st.db.escape(jobId) + ',' + st.db.escape(token)+ ',' + st.db.escape(latitude)
-                            + ',' + st.db.escape(longitude);
+                            + ',' + st.db.escape(longitude)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL pgetjobDetails(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
@@ -2337,7 +2337,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                         var mailDetails = function(i) {
                             if(i < id.length) {
                                 tid = id[i];
-                                var queryParams = st.db.escape(token) + ',' + st.db.escape(tid);
+                                var queryParams = st.db.escape(token) + ',' + st.db.escape(tid)+','+st.db.escape(DBSecretKey);
                                 var query = 'CALL pGetjobseekersmailDetails(' + queryParams + ')';
                                 //console.log(query);
                                 st.db.query(query, function (err, getResult) {
@@ -3218,8 +3218,11 @@ Job.prototype.viewApplicantList = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(cvId);
-                        var query = 'CALL pViewNotifiedCVDetails(' + queryParams + ')';
+                        var queryParams = [
+                            req.st.db.escape(cvId),
+                            req.st.db.escape(DBSecretKey)
+                        ];
+                        var query = 'CALL pViewNotifiedCVDetails(' + queryParams.join(',') + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {

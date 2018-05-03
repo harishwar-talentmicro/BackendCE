@@ -13,6 +13,10 @@ var path = require('path');
 var moment = require('moment');
 
 var appConfig = require('../../ezeone-config.json');
+var DBSecretKey = appConfig.DB.secretKey;
+
+var CONFIG = require('../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 var gcs = gcloud.storage({
     projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
@@ -365,7 +369,7 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
                 pin = null;
             }
             var queryParams = st.db.escape(ezeid) + ',' + st.db.escape(token) + ',' + st.db.escape(groupType)
-                + ',' + st.db.escape(pin);
+                + ',' + st.db.escape(pin) + ',' + st.db.escape(DBSecretKey);
             var query = 'CALL pValidateGroupName(' + queryParams + ')';
             //console.log(query);
             st.db.query(query, function (err, groupResult) {
@@ -476,7 +480,7 @@ MessageBox.prototype.validateGroupMember = function(req,res,next){
                             ezeid = ezeoneId;
                             pin = null;
                         }
-                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(ezeid)+ ',' + st.db.escape(pin);
+                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(ezeid)+ ',' + st.db.escape(pin) + ',' + st.db.escape(DBSecretKey);
                         var query = 'CALL pValidateGroupMember('+queryParams+')';
                         //console.log(query);
                         st.db.query(query,function(err,results){
@@ -860,7 +864,7 @@ MessageBox.prototype.deleteGroup = function(req,res,next){
                 if (!err) {
                     if (result) {
 
-                        var queryParams = st.db.escape(groupId);
+                        var queryParams = st.db.escape(groupId) +','+ st.db.escape(DBSecretKey);
                         var query = 'CALL pDeleteGroup(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
@@ -2476,7 +2480,7 @@ MessageBox.prototype.getPendingRequest = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(token);
+                        var queryParams = st.db.escape(token)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL pGetPendingRequest(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
@@ -2649,7 +2653,7 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                                                                         }
                                                                     }
                                                                 }
-                                                                var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                                                var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) +','+ st.db.escape(DBSecretKey)+ ')';
                                                                 st.db.query(queryCount, function (err, invitationResult) {
                                                                     responseMessage.status = true;
                                                                     responseMessage.error = null;
@@ -2661,7 +2665,7 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                                                                 });
                                                             }
                                                             else {
-                                                                var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                                                var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) +','+ st.db.escape(DBSecretKey)+ ')';
                                                                 st.db.query(queryCount, function (err, invitationResult) {
                                                                     responseMessage.status = true;
                                                                     responseMessage.error = null;
@@ -2674,7 +2678,7 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                                                             }
                                                         }
                                                         else {
-                                                            var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                                            var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) +','+ st.db.escape(DBSecretKey)+ ')';
                                                             st.db.query(queryCount, function (err, invitationResult) {
                                                                 responseMessage.status = true;
                                                                 responseMessage.error = null;
@@ -2687,7 +2691,7 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                                                         }
                                                     }
                                                     else {
-                                                        var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                                        var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) +','+ st.db.escape(DBSecretKey)+ ')';
                                                         st.db.query(queryCount, function (err, invitationResult) {
                                                             responseMessage.status = true;
                                                             responseMessage.error = null;
@@ -2710,7 +2714,7 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                                             });
                                         }
                                         else {
-                                            var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                            var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) +','+ st.db.escape(DBSecretKey)+ ')';
                                             st.db.query(queryCount, function (err, invitationResult) {
                                                 responseMessage.status = true;
                                                 responseMessage.error = null;
@@ -2723,7 +2727,7 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                                         }
                                     }
                                     else {
-                                        var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                        var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) +','+ st.db.escape(DBSecretKey)+ ')';
                                         st.db.query(queryCount, function (err, invitationResult) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
@@ -2736,7 +2740,7 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                                     }
                                 }
                                 else {
-                                    var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                    var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) +','+ st.db.escape(DBSecretKey)+ ')';
                                     st.db.query(queryCount, function (err, invitationResult) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
@@ -2998,7 +3002,7 @@ MessageBox.prototype.viewMessage = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams =  st.db.escape(tid) + ',' + st.db.escape(token)+ ',' + st.db.escape(pageSize)
-                            + ',' + st.db.escape(pageCount);
+                            + ',' + st.db.escape(pageCount)+ ',' +st.db.escape(DBSecretKey);
                         var query = 'CALL pViewMessage(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
@@ -3246,7 +3250,7 @@ MessageBox.prototype.getGroupInfo = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(groupId)+','+st.db.escape(type)+','+st.db.escape(token);
+                        var queryParams = st.db.escape(groupId)+','+st.db.escape(type)+','+st.db.escape(token)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL pGetGroupInfn(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
@@ -3477,8 +3481,11 @@ MessageBox.prototype.viewMessageNew = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =  st.db.escape(tid);
-                        var query = 'CALL pViewMessagenew(' + queryParams + ')';
+                        var queryParams =  [
+                            req.st.db.escape(tid),
+                            req.st.db.escape(DBSecretKey)
+                        ];
+                        var query = 'CALL pViewMessagenew(' + queryParams.join(',') + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
@@ -3831,7 +3838,7 @@ MessageBox.prototype.getLastMsgOfGroup = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams =  st.db.escape(msgId) + ',' + st.db.escape(groupId)+ ',' + st.db.escape(groupType)
-                            + ',' + st.db.escape(token);
+                            + ',' + st.db.escape(token)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL pGetlatestmessagesofGroup(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
@@ -4088,8 +4095,8 @@ MessageBox.prototype.getMessageList = function(req,res,next){
                 st.validateToken(req.query.token, function (err, tokenResult) {
                     if (!err) {
                         if (tokenResult) {
-                            var queryParams = st.db.escape(req.query.token) + ',' + st.db.escape(req.query.datetime);
-                            var queryParams1 = st.db.escape(req.query.token);
+                            var queryParams = st.db.escape(req.query.token) + ',' + st.db.escape(req.query.datetime)+','+st.db.escape(DBSecretKey);
+                            var queryParams1 = st.db.escape(req.query.token)+','+ st.db.escape(DBSecretKey);
                             var query = 'CALL pGetlatestGroupAndIndividuals(' + queryParams + '); ' +
                                 'CALL PGetUnreadMessageCountofGroup(' + queryParams1 + '); CALL pGetPendingRequest(' + queryParams1 + ')';
                             console.log(query);

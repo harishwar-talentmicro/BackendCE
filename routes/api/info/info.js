@@ -7,6 +7,9 @@ var request = require('request');
 var Docxtemplater = require('docxtemplater');
 var Mailer = require('../../../mail/mailer.js');
 var mailerApi = new Mailer();
+
+var appConfig = require('../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 /**
  * Method : GET
  * @param req
@@ -303,7 +306,7 @@ router.get('/testbhavya',function(req,res,next){
 
         if (id) {
             console.log(id);
-            var queryParams = req.db.escape(id);
+            var queryParams = req.db.escape(id)+','+req.db.escape(DBSecretKey);
             var query = 'CALL pgetCVInfo(' + queryParams + ')';
             console.log(query);
             req.db.query(query, function (err, MessagesResult) {

@@ -9,7 +9,8 @@
 var util = require('util');
 var validator = require('validator');
 
-
+var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 
 var st = null;
@@ -100,7 +101,7 @@ ProfileBranch.prototype.saveBranch = function(req,res,next){
                             + ',' + st.db.escape(req.body.address) + ',' + st.db.escape(req.body.cn) + ',' + st.db.escape(req.body.lat)
                             + ',' + st.db.escape(req.body.long) + ',' + st.db.escape(req.body.hcalid) + ',' + st.db.escape(req.body.phone)
                             + ',' + st.db.escape(req.body.email) + ',' + st.db.escape(req.body.ws) + ',' + st.db.escape(req.body.ISDPhone)
-                            + ',' + st.db.escape(req.body.parking_status);
+                            + ',' + st.db.escape(req.body.parking_status)+','+st.db.escape(DBSecretKey);
                         var procQuery = 'CALL psaveBranches(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -351,7 +352,7 @@ ProfileBranch.prototype.getBranch = function(req,res,next){
                 st.validateToken(req.query.token, function (err, tokenResult) {
                     if (!err) {
                         if (tokenResult) {
-                            var procParams = st.db.escape(req.query.token);
+                            var procParams = st.db.escape(req.query.token)+','+st.db.escape(DBSecretKey);
                             var procQuery = 'CALL pgetbranches(' + procParams + ')';
                             console.log(procQuery);
                             st.db.query(procQuery, function (err, results) {
@@ -464,7 +465,7 @@ ProfileBranch.prototype.getBranch = function(req,res,next){
         else {
             try {
 
-                var procParams = st.db.escape(req.query.ezeid);
+                var procParams = st.db.escape(req.query.ezeid)+','+st.db.escape(DBSecretKey);
                 var procQuery = 'CALL pgetbranchesByEzeid(' + procParams + ')';
                 console.log(procQuery);
                 st.db.query(procQuery, function (err, results) {

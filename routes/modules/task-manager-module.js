@@ -15,6 +15,8 @@ function error(err, req, res, next) {
 
 
 var st = null;
+var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 function TaskManager(db,stdLib){
 
@@ -232,7 +234,7 @@ TaskManager.prototype.getTasks = function(req,res,next){
                 if (!err) {
                     if (tokenResult) {
                         var queryParams = st.db.escape(startDate)+ ',' + st.db.escape(endDate) + ',' +
-                            st.db.escape(token)+ ',' + st.db.escape(functionType)+ ',' + st.db.escape(tid);
+                            st.db.escape(token)+ ',' + st.db.escape(functionType)+ ',' + st.db.escape(tid)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL pGetTasks(' + queryParams + ')';
                         console.log(query);
 

@@ -15,6 +15,8 @@ var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 var moment = require('moment');
 
+var CONFIG = require('../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 
 
@@ -24,7 +26,8 @@ var NotificationQueryManager = require('./notification/notification-query.js');
 var notificationQmManager = null;
 var mailModule = require('./mail-module.js');
 var mail = null;
-
+var appConfig = require('../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 var bcrypt = null;
 
@@ -278,7 +281,7 @@ Auth.prototype.register = function(req,res,next){
                 + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)
                 + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                 + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
+                + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)+','+req.st.db.escape(DBSecretKey);
 
 
             console.log('CALL pSaveEZEIDData(' + InsertQuery + ')');
@@ -566,7 +569,7 @@ Auth.prototype.register = function(req,res,next){
                 + ',' + st.db.escape(SelectionTypes)+ ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(TemplateID)
                 + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                 + ',' + st.db.escape(visiblePhone)+ ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ','+ st.db.escape(businessKeywords);
+                + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ','+ st.db.escape(businessKeywords)+','+req.st.db.escape(DBSecretKey);
 
             // console.log(InsertQuery);
             st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
@@ -883,7 +886,7 @@ Auth.prototype.registerNew = function(req,res,next){
                     + ',' + st.db.escape(selectionType) + ',' + st.db.escape(parkingStatus)+ ',' + st.db.escape(templateId)
                     + ',' + st.db.escape(categoryId)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                     + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
+                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)+','+req.st.db.escape(DBSecretKey);
 
                 var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                 console.log(query);
@@ -1130,7 +1133,7 @@ Auth.prototype.registerNew = function(req,res,next){
                     + ',' + st.db.escape(selectionType) + ',' + st.db.escape(parkingStatus)+ ',' + st.db.escape(templateId)
                     + ',' + st.db.escape(categoryId)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                     + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
+                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)+','+req.st.db.escape(DBSecretKey);
 
                 var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                 console.log(query);
@@ -1384,7 +1387,7 @@ Auth.prototype.login = function(req,res,next){
 
             //console.log('findarray: ' + FindArray.length);
 
-            var Query = st.db.escape(UserName) + ',' + st.db.escape(code)+ ',' + st.db.escape(token);
+            var Query = st.db.escape(UserName) + ',' + st.db.escape(code)+ ',' + st.db.escape(token)+','+st.db.escape(DBSecretKey);
             console.log(Query);
             st.db.query('CALL PLoginNew(' + Query + ')', function (err, loginResult) {
                 //console.log(loginResult);
@@ -1738,7 +1741,7 @@ Auth.prototype.verifyResetCode = function(req,res,next){
 
     if(statusFlag){
         try{
-            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(resetCode);
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(resetCode) + ',' + st.db.escape(DBSecretKey);
             var query = 'CALL pverifyresetcode('+queryParams+')';
 
             //console.log(query);

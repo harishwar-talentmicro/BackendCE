@@ -8,6 +8,9 @@ var st = null;
 var Notification = require('./notification/notification-master.js');
 var notification = null;
 
+var CONFIG = require('../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 
 function Sos(db,stdLib){
 
@@ -346,7 +349,7 @@ Sos.prototype.updateSosRequest = function(req,res,next) {
         data: null
     };
     try {
-        var queryParams = st.db.escape(id) + ',' + st.db.escape(token)+ ',' + st.db.escape(req.body.service_mid);
+        var queryParams = st.db.escape(id) + ',' + st.db.escape(token)+ ',' + st.db.escape(req.body.service_mid) + ',' + st.db.escape(DBSecretKey);
         var query = 'CALL pUpdateSOSstatus(' + queryParams + ')';
         console.log(query);
         st.db.query(query, function (err, updateResult) {

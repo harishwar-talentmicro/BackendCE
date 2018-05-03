@@ -495,7 +495,8 @@ eventCtrl.getWMEventQuestions = function (req, res, next) {
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.sessionId),
-                    req.st.db.escape(req.query.eventId)
+                    req.st.db.escape(req.query.eventId),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL wm_get_event_questions( ' + procParams.join(',') + ')';
@@ -920,7 +921,8 @@ eventCtrl.getWMEventUsers = function (req, res, next) {
                         req.st.db.escape(req.query.isUser),
                         req.st.db.escape(req.query.isModerator),
                         req.st.db.escape(req.query.isEventAdmin),
-                        req.st.db.escape(req.query.status)
+                        req.st.db.escape(req.query.status),
+                        req.st.db.escape(DBSecretKey)
                     ];
 
                     var procQuery = 'CALL wm_get_app_event_users( ' + procParams.join(',') + ')';
@@ -1382,7 +1384,8 @@ eventCtrl.getEventMessageLog = function (req, res, next) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.eventId)
+                    req.st.db.escape(req.query.eventId),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL wm_get_event_messageLog( ' + procParams.join(',') + ')';

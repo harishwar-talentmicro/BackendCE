@@ -8,6 +8,9 @@
 
 
 var st = null;
+var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
+
 function Planner(db,stdLib){
 
     if(stdLib){
@@ -179,7 +182,7 @@ Planner.prototype.getTrans = function(req,res,next){
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var queryParams = st.db.escape(tid);
+                        var queryParams = st.db.escape(tid)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL pGetMessagesDetails(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {

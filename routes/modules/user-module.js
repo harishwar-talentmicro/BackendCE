@@ -22,7 +22,7 @@ var EZEIDEmail = 'noreply@ezeone.com';
 var moment = require('moment');
 
 var appConfig = require('../../ezeone-config.json');
-
+var DBSecretKey=appConfig.DB.secretKey;
 
 
 function FnEncryptPassword(Password) {
@@ -503,7 +503,7 @@ User.prototype.getUserDetails = function(req,res,next){
                 //console.log(Result);
                 if (!err) {
                     if (tokenResult) {
-                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ')', function (err, UserDetailsResult) {
+                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) +','+st.db.escape(DBSecretKey)+  ')', function (err, UserDetailsResult) {
                             if (!err) {
                                 //console.log('UserDetailsResult',UserDetailsResult);
                                 if (UserDetailsResult[0]) {
@@ -1029,7 +1029,7 @@ User.prototype.verifyResetPasswordLink = function(req,res,next){
             req.body.ezeone_id = req.st.alterEzeoneId(req.body.ezeone_id);
             var timestamp = moment(new Date()).format('YYYY-MM-DD HH:mm:ss').toString();
 
-            var verifyQueryParams = st.db.escape(req.body.ezeone_id) + ','+ st.db.escape(req.body.reset_code);
+            var verifyQueryParams = st.db.escape(req.body.ezeone_id) + ','+ st.db.escape(req.body.reset_code) + ','+ st.db.escape(DBSecretKey);
             var verifyQuery = 'CALL pverifyresetcode('+verifyQueryParams+')';
 
             st.db.query(verifyQuery,function(err,verifyRes){
@@ -1758,7 +1758,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
                                 }
                             }
                         }
-                        st.db.query('CALL pEZEIDPrimaryDetails(' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ')', function (err, GetResult) {
+                        st.db.query('CALL pEZEIDPrimaryDetails(' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ',' + st.db.escape(DBSecretKey)+ ')', function (err, GetResult) {
                             if (!err) {
                                 if(GetResult) {
                                     if (GetResult[0]) {
@@ -1855,7 +1855,7 @@ User.prototype.getResume = function(req,res,next){
 
         if (id) {
             var queryParams = st.db.escape(id);
-            var query = 'CALL pgetCVInfo(' + st.db.escape(id) + ')';
+            var query = 'CALL pgetCVInfo(' + st.db.escape(id) +','+ st.db.escape(DBSecretKey)+ ')';
             console.log(query);
             st.db.query(query, function (err, MessagesResult) {
                 if (!err) {
@@ -2022,7 +2022,7 @@ User.prototype.saveResume = function(req,res,next){
                                 +',' + st.db.escape(expectedSalary)+ ','+ st.db.escape(firstName)+ ','+ st.db.escape(lastName)
                                 +',' + st.db.escape(email)+',' + st.db.escape(mobile)+',' + st.db.escape(tid)+',' + st.db.escape(salarytype)
                                 +',' + st.db.escape(expectedSalarytype) + ',' + st.db.escape(resumeFilePath)+',' + st.db.escape(gender)
-                                +',' + st.db.escape(KeySkills);
+                                +',' + st.db.escape(KeySkills)+','+st.db.escape(DBSecretKey);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
                             //console.log(query);
                             st.db.query(query, function (err, InsertResult) {
@@ -4034,7 +4034,7 @@ User.prototype.saveUserDetails = function(req,res,next){
                             + ',' + st.db.escape(mobile)+ ',' + st.db.escape(website)+ ',' + st.db.escape(isdPhone)
                             + ',' + st.db.escape(isdMobile)+ ',' + st.db.escape(parkingStatus)+ ',' + st.db.escape(templateId)
                             + ',' + st.db.escape(pin)+ ',' + st.db.escape(statusId)+ ',' + st.db.escape(functionId)
-                            + ',' + st.db.escape(categoryId) + ',' + st.db.escape(businessKeywords)+ ',' + st.db.escape(aboutCompany);
+                            + ',' + st.db.escape(categoryId) + ',' + st.db.escape(businessKeywords)+ ',' + st.db.escape(aboutCompany)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL psaveuserdetails(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertResult) {

@@ -1,6 +1,9 @@
 /**
  * Created by Jana1 on 01-09-2017.
  */
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 var customerSupportCtrl = {};
 var error = {};
 
@@ -47,7 +50,8 @@ customerSupportCtrl.getCustomerSupport = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL WhatMate_get_customerSupport( ' + procParams.join(',') + ')';

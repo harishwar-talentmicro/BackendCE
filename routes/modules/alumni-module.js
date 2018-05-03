@@ -372,7 +372,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                         + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
                         + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)
                         + ',' + st.db.escape(companyDetails)+ ',' + st.db.escape(businesssize)+ ',' + st.db.escape(headcount)
-                        + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc)+ ',' + st.db.escape(rating);
+                        + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc)+ ',' + st.db.escape(rating)+','+req.st.db.escape(DBSecretKey);
 
                     var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                     //console.log(InsertQuery);
@@ -600,7 +600,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                         + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
                         + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)
                         + ',' + st.db.escape(companyDetails)+ ',' + st.db.escape(businesssize)+ ',' + st.db.escape(headcount)
-                        + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc)+ ',' + st.db.escape(rating);
+                        + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc)+ ',' + st.db.escape(rating)+','+req.st.db.escape(DBSecretKey);
 
                     var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                     console.log(query);
@@ -2106,7 +2106,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                             + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype)+ ',' + st.db.escape(fn)
                             + ',' + st.db.escape(ln)+ ',' + st.db.escape(email)+ ',' + st.db.escape(mn)
                             + ',' + st.db.escape(gender)+ ',' + st.db.escape(dob)+ ',' + st.db.escape(cn)+ ',' + st.db.escape(jt)
-                            + ',' + st.db.escape(bg)+ ',' + st.db.escape(ISDmobile);
+                            + ',' + st.db.escape(bg)+ ',' + st.db.escape(ISDmobile)+','+st.db.escape(DBSecretKey);
 
                         var query = 'CALL pSaveAlumniProfile(' + queryParams + ')';
                         console.log(query);
@@ -2345,7 +2345,7 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(code);
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(code)+ ',' + st.db.escape(DBSecretKey);
 
                         var query = 'CALL pGetAlumniProfile(' + queryParams + ')';
 
@@ -3546,7 +3546,7 @@ Alumni.prototype.getParticipantsList = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(tid);
+                        var queryParams = st.db.escape(tid)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL PgetListofParticipants(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
@@ -3668,7 +3668,7 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(code) + ',' + st.db.escape(alumniStatus);
+                        var queryParams = st.db.escape(code) + ',' + st.db.escape(alumniStatus)+',' + st.db.escape(DBSecretKey);
                         var query = 'CALL pGetAlumniMemberApprovalList(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {

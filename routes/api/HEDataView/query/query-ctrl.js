@@ -1,8 +1,12 @@
 /**
  * Created by Jana1 on 30-08-2017.
+ *
  */
 var queryCtrl = {};
 var error = {};
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 
 queryCtrl.getHRQueryList = function(req,res,next){
     var response = {
@@ -47,7 +51,8 @@ queryCtrl.getHRQueryList = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL whatmate_get_HRQueryList( ' + procParams.join(',') + ')';
@@ -146,7 +151,8 @@ queryCtrl.getFinanceQueryList = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL whatmate_get_FinanceQueryList( ' + procParams.join(',') + ')';
@@ -245,7 +251,8 @@ queryCtrl.getAdminQueryList = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL whatmate_get_AdminQueryList( ' + procParams.join(',') + ')';
@@ -344,7 +351,8 @@ queryCtrl.getFrontOfficeQueryList = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL whatmate_get_FrontOfficeQueryList( ' + procParams.join(',') + ')';
@@ -443,7 +451,8 @@ queryCtrl.getITHelpDeskList = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL whatmate_get_ITHelpdeskList( ' + procParams.join(',') + ')';
@@ -544,7 +553,8 @@ queryCtrl.getMessagesList = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL whatmate_get_messageList( ' + procParams.join(',') + ')';
@@ -628,7 +638,8 @@ queryCtrl.getContactUs = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL WhatMate_get_contactUsList( ' + procParams.join(',') + ')';
@@ -711,7 +722,8 @@ queryCtrl.getTransportRequest = function(req,res,next){
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(tokenResult[0].masterid)
+                    req.st.db.escape(tokenResult[0].masterid),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL WhatMate_get_TransportRequest( ' + procParams.join(',') + ')';

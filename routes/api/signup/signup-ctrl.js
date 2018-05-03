@@ -17,6 +17,10 @@ const authToken = '3abf04f536ede7f6964919936a35e614';
 const client = require('twilio')(accountSid, authToken);
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
+
+var CONFIG = require('../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 var qs = require("querystring");
 var options = {
     "method": "POST",
@@ -634,7 +638,8 @@ signupCtrl.verifyOTP = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.isOTPRequired),
                     req.st.db.escape(emailId),
-                    req.st.db.escape(encryptPwd)
+                    req.st.db.escape(encryptPwd),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL verify_otp( ' + procParams.join(',') + ')';
@@ -953,7 +958,8 @@ signupCtrl.verifyEmailId = function (req, res, next) {
     }
     else {
         var procParams = [
-            req.st.db.escape(req.query.emailId)
+            req.st.db.escape(req.query.emailId),
+            req.st.db.escape(DBSecretKey)
         ];
         /**
          * Calling procedure to save deal

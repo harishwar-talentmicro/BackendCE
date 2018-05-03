@@ -15,7 +15,8 @@ var NotificationTemplater = require('../../lib/NotificationTemplater.js');
 var notificationTemplater = new NotificationTemplater();
 var Notification = require('../../modules/notification/notification-master.js');
 var notification = new Notification();
-
+var appConfig = require('../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 /**
  * Method : POST
  * @param req
@@ -1400,7 +1401,8 @@ router.delete('/:groupId', function (req, res, next) {
                 if ((!err) && tokenResult) {
                     var procParams = [
                         req.db.escape(req.params.groupId),
-                        req.db.escape(req.query.token)
+                        req.db.escape(req.query.token),
+                        req.st.db.escape(DBSecretKey)
                     ];
                     /**
                      * calling procedure to delete group by admin

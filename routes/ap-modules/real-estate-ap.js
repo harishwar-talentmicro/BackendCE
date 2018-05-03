@@ -9,7 +9,8 @@
 
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
-
+var appConfig = require('../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 var st = null;
 function RealEstate_AP(db,stdLib){
@@ -41,7 +42,7 @@ RealEstate_AP.prototype.getRealStateDataAP = function(req,res,next){
             st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        st.db.query('CALL pGetRealEstateData(' + st.db.escape(TID)  + ')', function (err, RealStateResult) {
+                        st.db.query('CALL pGetRealEstateData(' + st.db.escape(TID)  +','+st.db.escape(DBSecretKey)+ ')', function (err, RealStateResult) {
                             if (!err) {
                                 // console.log(PictuerResult);
                                 if (RealStateResult != null) {

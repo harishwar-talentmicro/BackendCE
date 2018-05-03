@@ -316,7 +316,8 @@ managerCtrl.validateEzeoneId = function(req,res,next){
 
             var procParams = [
                 req.st.db.escape(req.query.token),
-                req.st.db.escape(req.query.EZEOneId)
+                req.st.db.escape(req.query.EZEOneId),
+                req.st.db.escape(DBSecretKey)
             ];
             /**
              * Calling procedure to get form template

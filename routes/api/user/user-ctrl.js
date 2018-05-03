@@ -266,7 +266,9 @@ UserCtrl.saveAddress = function (req, res, next) {
                                 req.st.db.escape(req.body.aboutCompany),
                                 req.st.db.escape(req.body.keywords),
                                 req.st.db.escape(req.body.jobTitle),
-                                req.st.db.escape(req.body.companyName)
+                                req.st.db.escape(req.body.companyName),
+                                req.st.db.escape(DBSecretKey)
+                                
                             ];
                             /**
                              * Calling procedure to save deal
@@ -606,7 +608,8 @@ UserCtrl.verifyEzeoneId = function (req, res, next) {
             if ((!err) && tokenResult) {
 
                 var procParams = [
-                    req.st.db.escape(req.query.token), req.st.db.escape(req.params.ezeoneId)
+                    req.st.db.escape(req.query.token), req.st.db.escape(req.params.ezeoneId),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save deal
@@ -758,7 +761,7 @@ UserCtrl.login = function (req, res, next) {
     try {
         var passwordMatchStatus = false;
         var ezeoneId = '';
-        var queryParams = req.st.db.escape(req.body.userName) + ',' + req.st.db.escape(code);
+        var queryParams = req.st.db.escape(req.body.userName) + ',' + req.st.db.escape(code)+','+req.st.db.escape(DBSecretKey);
         var query = 'CALL plogin_v2(' + queryParams + ')';
         console.log(query);
         req.db.query(query, function (err, loginResult) {
@@ -780,7 +783,7 @@ UserCtrl.login = function (req, res, next) {
                     req.st.generateToken(ip, userAgent, ezeoneId, isWhatMate, APNS_Id, GCM_Id, function (err, tokenResult) {
 
                         if ((!err) && tokenResult) {
-                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ')';
+                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) +','+req.st.db.escape(DBSecretKey)+ ')';
                             console.log(procQuery);
                             req.db.query(procQuery, function (err, UserDetailsResult) {
                                 console.log(UserDetailsResult);
@@ -1035,7 +1038,8 @@ UserCtrl.saveProfileData = function (req, res, next) {
                             req.st.db.escape(req.body.keywords),
                             req.st.db.escape(req.body.about),
                             req.st.db.escape(req.body.jobTitle),
-                            req.st.db.escape(req.body.companyName)
+                            req.st.db.escape(req.body.companyName),
+                            req.st.db.escape(DBSecretKey)
                         ];
 
                         var procQuery = 'CALL update_profile_data( ' + procParams.join(',') + ')';
@@ -1121,7 +1125,8 @@ UserCtrl.sendPasswordResetOTP = function (req, res, next) {
 
                 var query = [
                     req.st.db.escape(req.body.WhatMateId),
-                    req.st.db.escape(code)
+                    req.st.db.escape(code),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 req.st.db.query('CALL pvalidateEZEOne(' + query + ')', function (err, otpResult) {
@@ -1332,7 +1337,8 @@ UserCtrl.verifyPasswordResetOTP = function (req, res, next) {
     else {
         var procParams = [
             req.st.db.escape(req.query.WhatMateId),
-            req.st.db.escape(req.query.otp)
+            req.st.db.escape(req.query.otp),
+            req.st.db.escape(DBSecretKey)
         ];
 
         var procQuery = 'CALL pverifyresetcode( ' + procParams.join(',') + ')';
@@ -1483,7 +1489,8 @@ UserCtrl.verifyUpdateOTP = function (req, res, next) {
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.mobile),
                             req.st.db.escape(req.body.isdMobile),
-                            req.st.db.escape(req.body.otp)
+                            req.st.db.escape(req.body.otp),
+                            req.st.db.escape(DBSecretKey)
                         ];
         
                         var procQuery = 'CALL verify_mobile( ' + procParams.join(',') + ')';
@@ -1542,7 +1549,8 @@ UserCtrl.sendPasswordResetOtpPhone = function (req, res, next) {
 
             var query = [
                 req.st.db.escape(req.body.WhatMateId),
-                req.st.db.escape(code)
+                req.st.db.escape(code),
+                req.st.db.escape(DBSecretKey)
             ];
 
             req.st.db.query('CALL pvalidateEZEOne(' + query + ')', function (err, insertResult) {
@@ -2066,7 +2074,8 @@ UserCtrl.getUserDetails = function (req, res, next) {
                             var procParams = [
                                 req.st.db.escape(req.query.token),
                                 req.st.db.escape(req.body.dialerAPNS_Id),
-                                req.st.db.escape(req.body.dialerGCM_Id)
+                                req.st.db.escape(req.body.dialerGCM_Id),
+                                req.st.db.escape(DBSecretKey)                    
                             ];
 
                             req.db.query('CALL pGetDialerEZEIDDetails(' + procParams.join(',') + ')', function (err, UserDetailsResult) {

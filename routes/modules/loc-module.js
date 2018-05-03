@@ -7,6 +7,9 @@
 "use strict";
 
 var st = null;
+var CONFIG = require('../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
+
 function Loc(db,stdLib){
 
     if(stdLib){
@@ -993,7 +996,7 @@ Loc.prototype.getLocBasket = function(req,res,next){
                             + ',' + st.db.escape(phoneQuery)+ ',' + st.db.escape(citySort)+ ',' + st.db.escape(cityQuery)
                             + ',' + st.db.escape(stateSort)+ ',' + st.db.escape(stateQuery)+ ',' + st.db.escape(countrySort)
                             + ',' + st.db.escape(countryQuery)+ ',' + st.db.escape(statusSort)+ ',' + st.db.escape(statusQuery)
-                            + ',' + st.db.escape(mobileSort)+ ',' + st.db.escape(mobileQuery);
+                            + ',' + st.db.escape(mobileSort)+ ',' + st.db.escape(mobileQuery)+','+st.db.escape(DBSecretKey);
                         var query = 'CALL ploadLOCbasket(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, locBasket) {
