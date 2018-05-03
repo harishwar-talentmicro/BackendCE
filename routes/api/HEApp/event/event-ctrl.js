@@ -14,6 +14,7 @@ var encryption = new AES_256_encryption();
 var CONFIG = require('../../../../ezeone-config.json');
 var DBSecretKey=CONFIG.DB.secretKey;
 
+
 eventCtrl.getWhatMateBanners = function (req, res, next) {
     var response = {
         status: false,
@@ -1742,7 +1743,7 @@ eventCtrl.getStatusOfWMList = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-
+                console.log("DBSecretKey",CONFIG.DB.secretKey);
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.WMId),
