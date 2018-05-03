@@ -19,6 +19,8 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey=CONFIG.DB.secretKey;
 
 leaveBalanceCtrl.getLeaveBalanceForm = function(req,res,next){
     var response = {
@@ -291,7 +293,8 @@ leaveBalanceCtrl.getLeaveApplications = function(req,res,next){
                     req.st.db.escape(req.query.isMySelf),
                     req.st.db.escape(startPage),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(req.query.keywords)
+                    req.st.db.escape(req.query.keywords),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to My self and my team leave apllications
