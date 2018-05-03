@@ -2454,7 +2454,7 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
 
         if (stages && user && probabilities) {
             var query = st.db.escape(from_date) + ',' + st.db.escape(to_date) + ',' + st.db.escape(stages)
-                + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user);
+                + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user) + ',' + st.db.escape(DBSecretKey);
             st.db.query('CALL pTransactionfilter(' + query +')', function (err, transResult) {
                 var testQuery = 'CALL pTransactionfilter(' + query +')';
 console.log(testQuery,"query");

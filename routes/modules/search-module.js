@@ -1104,7 +1104,7 @@ Search.prototype.searchTracker = function(req,res,next){
                     if (Result) {
                         var query = st.db.escape(Keyword) + ','  + st.db.escape(Latitude) + ',' +
                             st.db.escape(Longitude) + ',' + st.db.escape(Proximity)+
-                            ',' + st.db.escape(Token) + ',' +st.db.escape(currentDateTime) + ',' +st.db.escape(trackerFlag);
+                            ',' + st.db.escape(Token) + ',' +st.db.escape(currentDateTime) + ',' +st.db.escape(trackerFlag) + ',' + st.db.escape(DBSecretKey);
                         console.log('CALL pTrackerSearch(' + query + ')');
                         st.db.query('CALL pTrackerSearch(' + query + ')', function (err, GetResult) {
                            // console.log(GetResult);
