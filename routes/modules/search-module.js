@@ -17,7 +17,12 @@ var encryption = new  AES_256_encryption();
 var st = null;
 var appConfig = require('../../ezeone-config.json');
 var DBSecretKey=appConfig.DB.secretKey;
+function Search(db,stdLib){
 
+    if(stdLib){
+        st = stdLib;
+    }
+};
 
 
 /**
