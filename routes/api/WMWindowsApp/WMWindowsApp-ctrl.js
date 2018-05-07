@@ -423,7 +423,6 @@ windowsCtrl.uploadUsers = function(req,res,next){
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,userResult){
                     if (!err && userResult && userResult[0] ){
-
                         if (userResult[0][0].status == "New" ){
                             if(Qndata[0].email != ""){
                                 // mailerApi.sendMailNew('NewUserUpload', {
@@ -431,22 +430,24 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                 //     UserName : userResult[0][0].whatmateId,
                                 //     Password : password
                                 // }, '',Qndata[0].email,[]);
-                                if (Qndata[0].emailtext != "") {
-                                    Qndata[0].emailtext = Qndata[0].emailtext.replace("[name]", Qndata[0].name);
-                                    Qndata[0].emailtext = Qndata[0].emailtext.replace("[UserName]",userResult[0][0].whatmateId);
-                                    Qndata[0].emailtext = Qndata[0].emailtext.replace("[Password]",password);
+                                
+                                if (userResult[0][0].emailtext != "") {
+                                    userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[name]", Qndata[0].name);
+                                    userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[UserName]",userResult[0][0].whatmateId);
+                                    userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[Password]",password);
 
                                     var mail = {
                                         from: 'noreply@talentmicro.com',
                                         to: Qndata[0].email,
                                         subject: 'Your user Credentials for WhatMate App',
-                                        html: Qndata[0].emailtext // html body
+                                        html: userResult[0][0].emailtext // html body
                                     };
 
                                     var email = new sendgrid.Email();
                                     email.from = mail.from;
                                     email.to = mail.to;
-                                    email.addCc(cc);
+
+                                    // email.addCc(cc);
                                     email.subject = mail.subject;
                                     email.html = mail.html;
                                     sendgrid.send(email, function (err, result) {
@@ -590,10 +591,10 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                 //     UserName : userResult[0][0].whatmateId,
                                 //     CompanyName : req.query.CompanyName
                                 // }, '',Qndata[0].email,[]);
-                                if (Qndata[0].ExistingUserEmailText != "") {
-                                    Qndata[0].ExistingUserEmailText = Qndata[0].ExistingUserEmailText.replace("[name]", Qndata[0].name);
-                                    Qndata[0].ExistingUserEmailText = Qndata[0].ExistingUserEmailText.replace("[UserName]",userResult[0][0].whatmateId);
-                                    Qndata[0].ExistingUserEmailText = Qndata[0].ExistingUserEmailText.replace("[CompanyName]",req.query.CompanyName);
+                                if (userResult[0][0].ExistingUserEmailText != "") {
+                                    userResult[0][0].ExistingUserEmailText = userResult[0][0].ExistingUserEmailText.replace("[name]", Qndata[0].name);
+                                    userResult[0][0].ExistingUserEmailText = userResult[0][0].ExistingUserEmailText.replace("[UserName]",userResult[0][0].whatmateId);
+                                    userResult[0][0].ExistingUserEmailText = userResult[0][0].ExistingUserEmailText.replace("[CompanyName]",req.query.CompanyName);
 
                                     mail = {
                                         from: 'noreply@talentmicro.com',
@@ -605,7 +606,7 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                     email = new sendgrid.Email();
                                     email.from = mail.from;
                                     email.to = mail.to;
-                                    email.addCc(cc);
+                                    // email.addCc(cc);
                                     email.subject = mail.subject;
                                     email.html = mail.html;
                                     sendgrid.send(email, function (err, result) {
