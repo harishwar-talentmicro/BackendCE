@@ -317,7 +317,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
         validationFlag *= false;
     }
     if (!req.body.heMasterId) {
-        error.heMasterId = 'Invalid Company';
+        error.heMasterId = 'Invalid Com123pany';
         validationFlag *= false;
     }
     if (!req.body.firstName) {
@@ -544,7 +544,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     heUserId: results[0][0].heUserId,
                                     formData: JSON.parse(results[0][0].formDataJSON)
                                 },
-                                walkinMessage:results[2]
+                                walkinMessage:results[2][0]
                         };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -564,7 +564,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             response.message = "Walkin Form saved successfully";
                             response.error = null;
                             response.data={
-                                walkinMessage:results[2]
+                                walkinMessage:results[2][0]
                             };
                             res.status(200).json(response);
                         }
