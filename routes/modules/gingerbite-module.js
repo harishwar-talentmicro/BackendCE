@@ -132,11 +132,7 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
                                         sendgrid.send(email, function (err, result) {
                                             console.log(result);
                                             if (!err) {
-                                                //console.log('Message sent');
-                                                //var nodemailer = require('nodemailer');
-                                                //var transporter = nodemailer.createTransport();
-                                                //transporter.sendMail(mail, function (error, info) {
-                                                //  if (!error) {
+
                                                 responseMessage.status = true;
                                                 responseMessage.error = null;
                                                 responseMessage.message = 'Mail send successfully';

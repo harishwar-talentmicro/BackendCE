@@ -28,6 +28,8 @@ var options = {
     }
 };
 
+var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+
 windowsCtrl.uploadPaySlip = function(req,res,next){
     var response = {
         status : false,
@@ -424,11 +426,39 @@ windowsCtrl.uploadUsers = function(req,res,next){
 
                         if (userResult[0][0].status == "New" ){
                             if(Qndata[0].email != ""){
-                                mailerApi.sendMailNew('NewUserUpload', {
-                                    name : Qndata[0].name,
-                                    UserName : userResult[0][0].whatmateId,
-                                    Password : password
-                                }, '',Qndata[0].email,[]);
+                                // mailerApi.sendMailNew('NewUserUpload', {
+                                //     name : Qndata[0].name,
+                                //     UserName : userResult[0][0].whatmateId,
+                                //     Password : password
+                                // }, '',Qndata[0].email,[]);
+                                if (Qndata[0].emailtext != "") {
+                                    Qndata[0].emailtext = Qndata[0].emailtext.replace("[name]", Qndata[0].name);
+                                    Qndata[0].emailtext = Qndata[0].emailtext.replace("[UserName]",userResult[0][0].whatmateId);
+                                    Qndata[0].emailtext = Qndata[0].emailtext.replace("[Password]",password);
+
+                                    var mail = {
+                                        from: 'noreply@talentmicro.com',
+                                        to: Qndata[0].email,
+                                        subject: 'Your user Credentials for WhatMate App',
+                                        html: Qndata[0].emailtext // html body
+                                    };
+
+                                    var email = new sendgrid.Email();
+                                    email.from = mail.from;
+                                    email.to = mail.to;
+                                    email.addCc(cc);
+                                    email.subject = mail.subject;
+                                    email.html = mail.html;
+                                    sendgrid.send(email, function (err, result) {
+                                        if (!err) {
+                                            console.log("Mail sent success") ;
+                                        }
+                                        else{
+                                            console.log("Mail Error",err);
+                                        }
+                                    });
+
+                                }
                             }
 
                             message = 'Dear ' + Qndata[0].name  + ', Your WhatMate credentials, Login ID: ' + userResult[0][0].whatmateId + ',Password: ' + password ;
@@ -555,11 +585,41 @@ windowsCtrl.uploadUsers = function(req,res,next){
                         }
                         else if(userResult[0][0].status == "Existing") {
                             if(Qndata[0].email != ""){
-                                mailerApi.sendMailNew('existingUsers', {
-                                    name : Qndata[0].name,
-                                    UserName : userResult[0][0].whatmateId,
-                                    CompanyName : req.query.CompanyName
-                                }, '',Qndata[0].email,[]);
+                                // mailerApi.sendMailNew('existingUsers', {
+                                //     name : Qndata[0].name,
+                                //     UserName : userResult[0][0].whatmateId,
+                                //     CompanyName : req.query.CompanyName
+                                // }, '',Qndata[0].email,[]);
+                                if (Qndata[0].ExistingUserEmailText != "") {
+                                    Qndata[0].ExistingUserEmailText = Qndata[0].ExistingUserEmailText.replace("[name]", Qndata[0].name);
+                                    Qndata[0].ExistingUserEmailText = Qndata[0].ExistingUserEmailText.replace("[UserName]",userResult[0][0].whatmateId);
+                                    Qndata[0].ExistingUserEmailText = Qndata[0].ExistingUserEmailText.replace("[CompanyName]",req.query.CompanyName);
+
+                                    mail = {
+                                        from: 'noreply@talentmicro.com',
+                                        to: Qndata[0].email,
+                                        subject: 'Your user Credentials for WhatMate App',
+                                        html: Qndata[0].ExistingUserEmailText // html body
+                                    };
+
+                                    email = new sendgrid.Email();
+                                    email.from = mail.from;
+                                    email.to = mail.to;
+                                    email.addCc(cc);
+                                    email.subject = mail.subject;
+                                    email.html = mail.html;
+                                    sendgrid.send(email, function (err, result) {
+                                        if (!err) {
+                                            console.log("Mail sent success") ;
+                                        }
+                                        else{
+                                            console.log("Mail Error",err);
+                                        }
+                                    });
+
+                                }
+
+
                             }
 
                             message = 'Dear ' + Qndata[0].name  + ', Your existing profile on WhatMate is successfully linked to ' + req.query.CompanyName + ' now.';
