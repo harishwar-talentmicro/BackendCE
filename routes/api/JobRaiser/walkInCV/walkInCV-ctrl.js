@@ -518,7 +518,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                         }
 
                         response.status = true;
-                        response.message = "Candidate Saved Successfully";
+                        response.message = "Walkin Form saved successfully";
                         response.error = null;
                         response.data = {
                             messageList:
@@ -543,7 +543,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     accessUserType: results[0][0].accessUserType,
                                     heUserId: results[0][0].heUserId,
                                     formData: JSON.parse(results[0][0].formDataJSON)
-                                }
+                                },
+                                walkinMessage:results[2]
                         };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -560,9 +561,11 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     else if(!err && results ){
             
                             response.status = true;
-                            response.message = "walkIn saved successfully";
+                            response.message = "Walkin Form saved successfully";
                             response.error = null;
-                            response.data=null;
+                            response.data={
+                                walkinMessage:results[2]
+                            };
                             res.status(200).json(response);
                         }
                     else {
@@ -830,8 +833,18 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
         req.db.query(procQuery, function (err, result) {
             console.log(err);
             console.log(result);
-            if (!err && result && result[0]) {
+            if (!err && result && result[0][0].message == "OTP verified successfully") {
                 response.status = true;
+                response.message = result[0][0].message;
+                response.error = false;
+                response.data = {
+                    message: result[0][0].message
+                };
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0][0].message == "INVALID OTP") {
+                response.status = false;
                 response.message = result[0][0].message;
                 response.error = false;
                 response.data = {
@@ -897,7 +910,8 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                         response.error = null;
 
                         response.data = {
-                            bannerList: result[0]
+                            bannerList: result[0],
+                            companyLogo:result[1][0].companyLogo
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -973,39 +987,25 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
         assessment = {};
     }
 
-    var jobTitle = req.body.jobTitle;
-    if (typeof (jobTitle) == "string") {
-        jobTitle = JSON.parse(jobTitle);
+
+    var assessmentDetail = {};
+    assessmentDetail = req.body.assessmentTypeList;
+    if (typeof (assessmentDetail) == "string") {
+        assessmentDetail = JSON.parse(assessmentDetail);
     }
-    if (!jobTitle) {
-        jobTitle = {};
+    if (!assessmentDetail) {
+        assessmentDetail = {};
     }
 
-    var assessmentTypeList = [];
-    assessmentTypeList = req.body.assessmentTypeList;
-    if (typeof (assessmentTypeList) == "string") {
-        assessmentTypeList = JSON.parse(assessmentTypeList);
-    }
-    if (!assessmentTypeList) {
-        assessmentTypeList = [];
-    }
-
-    var skillAssessment = [];
+    var skillAssessment = {};
     skillAssessment = req.body.skillAssessment;
     if (typeof (skillAssessment) == "string") {
         skillAssessment = JSON.parse(skillAssessment);
     }
     if (!skillAssessment) {
-        skillAssessment = [];
+        skillAssessment = {};
     }
-    var heDepartment = [];
-    heDepartment = req.body.heDepartment;
-    if (typeof (heDepartment) == "string") {
-        heDepartment = JSON.parse(heDepartment);
-    }
-    if (!heDepartment) {
-        heDepartment = [];
-    }
+
 
     var interviewRound = req.body.interviewRound;
     if (typeof (interviewRound) == "string") {
@@ -1014,22 +1014,28 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
     if (!interviewRound) {
         interviewRound = {};
     }
-
-    var panelMembers = req.body.panelMembers;
-    if (typeof (panelMembers) == "string") {
-        panelMembers = JSON.parse(panelMembers);
+    var requirementDetails = req.body.requirementDetails;
+    if (typeof (requirementDetails) == "string") {
+        requirementDetails = JSON.parse(requirementDetails);
     }
-    if (!panelMembers) {
-        error.panelMembers = 'Invalid panels';
-        status *= false;
+    if (!requirementDetails) {
+        requirementDetails={};
     }
 
-    var attachmentList = req.body.attachmentList;
-    if (typeof (attachmentList) == "string") {
-        attachmentList = JSON.parse(attachmentList);
+    var candidateDetails = req.body.candidateDetails;
+    if (typeof (candidateDetails) == "string") {
+        candidateDetails = JSON.parse(candidateDetails);
     }
-    if (!attachmentList) {
-        attachmentList = [];
+    if (!candidateDetails) {
+        candidateDetails={};
+    }
+
+    var clientDetails = req.body.clientDetails;
+    if (typeof (clientDetails) == "string") {
+        clientDetails = JSON.parse(clientDetails);
+    }
+    if (!clientDetails) {
+        clientDetails={};
     }
 
     var senderGroupId;
@@ -1048,25 +1054,24 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                 if (loginResult && password) {
                     if(loginResult.length > 0){
                         var loginDetails = loginResult[0];
-
                         if(loginResult[0][0].userError == 'Invalid User'){
-                            console.log("Enter1.............");
+
                             response.status=false;
                             response.error = error;
                             response.message = loginResult[0][0].userError;
                             res.status(401).json(response);
                         }
                         else if(loginResult[0][0].companyError == 'Invalid company user'){
-                            console.log("Enter2.............");
+
                             response.status=false;
                             response.error = error;
                             response.message = loginResult[0][0].companyError;
                             res.status(401).json(response);
                         }
                         else {
-                            console.log("Enter.............");
+
                             if(comparePassword(password, loginResult[0][0].Password)){
-                                console.log("Sucess.............");
+
                                 if ((!err) && loginResult[0]) {
                                     req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                                     req.body.parentId = req.body.parentId ? req.body.parentId : 0;
@@ -1082,19 +1087,17 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                     req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
                                     req.body.notes = req.body.notes ? req.body.notes : "";
                                     req.body.interviewDuration = req.body.interviewDuration ? req.body.interviewDuration : 0;
-                                    req.body.mobileISD = req.body.mobileISD ? req.body.mobileISD : '';
-                                    req.body.mobileNumber = req.body.mobileNumber ? req.body.mobileNumber : '';
 
                                     var procParams = [
-                                        // req.st.db.escape(req.body.loginId),
+                                        req.st.db.escape(req.body.loginId),
                                         // req.st.db.escape(encryptPwd),
+
                                         req.st.db.escape(req.body.heMasterId),
                                         req.st.db.escape(req.body.parentId),
                                         req.st.db.escape(JSON.stringify(interviewRound)),
                                         req.st.db.escape(req.body.reportingDateTime),
                                         req.st.db.escape(req.body.interviewDuration),
                                         req.st.db.escape(req.body.notes),
-                                        req.st.db.escape(JSON.stringify(panelMembers)),
                                         req.st.db.escape(JSON.stringify(assessment)),
                                         req.st.db.escape(req.body.senderNotes),
                                         req.st.db.escape(req.body.approverNotes),
@@ -1106,18 +1109,10 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                         req.st.db.escape(req.body.approverCount),
                                         req.st.db.escape(req.body.receiverCount),
                                         req.st.db.escape(req.body.status),
-                                        req.st.db.escape(req.body.applicantId),
-                                        req.st.db.escape(req.body.firstName),
-                                        req.st.db.escape(req.body.lastName),
-                                        req.st.db.escape(req.body.mobileISD),
-                                        req.st.db.escape(req.body.mobileNumber),
-                                        req.st.db.escape(req.body.emailId),
-                                        req.st.db.escape(JSON.stringify(jobTitle)),
-                                        req.st.db.escape(req.body.profilePicture),
-                                        req.st.db.escape(JSON.stringify(attachmentList[0])),
-                                        req.st.db.escape(JSON.stringify(assessmentTypeList)),
-                                        req.st.db.escape(JSON.stringify(skillAssessment)),
-                                        req.st.db.escape(JSON.stringify(heDepartment)),
+                                            req.st.db.escape(JSON.stringify(requirementDetails)),
+                                            req.st.db.escape(JSON.stringify(candidateDetails)),
+                                            req.st.db.escape(JSON.stringify(clientDetails)),
+
                                         req.st.db.escape(DBSecretKey)
                                     ];
 
