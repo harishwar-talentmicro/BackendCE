@@ -911,7 +911,9 @@ walkInCvCtrl.bannerList = function (req, res, next) {
 
                         response.data = {
                             bannerList: result[0],
-                            companyLogo:result[1][0].companyLogo
+                            companyLogo:result[1][0].companyLogo,
+                            registrationType :0,  // need to come from backend, will be done later.
+                            tokenGeneration : 0   // need to come from backend, will be done later.
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -929,7 +931,10 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            bannerList: []
+                            bannerList: [],
+                            companyLogo:"",
+                            registrationType :0,  // need to come from backend, will be done later.
+                            tokenGeneration : 0  
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
