@@ -22,7 +22,7 @@ var EZEIDEmail = 'noreply@ezeone.com';
 var moment = require('moment');
 
 var appConfig = require('../../ezeone-config.json');
-var DBSecretKey=appConfig.DB.secretKey;
+var DBSecretKey = appConfig.DB.secretKey;
 
 
 function FnEncryptPassword(Password) {
@@ -48,10 +48,10 @@ function FnEncryptPassword(Password) {
 }
 var bcrypt = null;
 
-try{
+try {
     bcrypt = require('bcrypt');
 }
-catch(ex){
+catch (ex) {
     console.log('Bcrypt not found, falling back to bcrypt-nodejs');
     bcrypt = require('bcrypt-nodejs');
 }
@@ -61,15 +61,15 @@ catch(ex){
  * @param password
  * @returns {*}
  */
-function hashPassword(password){
-    if(!password){
+function hashPassword(password) {
+    if (!password) {
         return null;
     }
-    try{
+    try {
         var hash = bcrypt.hashSync(password, 12);
         return hash;
     }
-    catch(ex){
+    catch (ex) {
         console.log(ex);
     }
 }
@@ -80,29 +80,29 @@ function hashPassword(password){
  * @param hash
  * @returns {*}
  */
-function comparePassword(password,hash){
-    if(!password){
+function comparePassword(password, hash) {
+    if (!password) {
         return false;
     }
-    if(!hash){
+    if (!hash) {
         return false;
     }
-    return bcrypt.compareSync(password,hash);
+    return bcrypt.compareSync(password, hash);
 }
 
 
 /** Now password cannot be decrypted, So this function is useless******/
-function FnDecrypt(EncryptPassword){
+function FnDecrypt(EncryptPassword) {
     try {
         var crypto = require('crypto'),
             algorithm = 'aes-256-ctr',
             password = 'ezeid@123';
-        var decipher = crypto.createDecipher(algorithm,password);
-        var dec = decipher.update(EncryptPassword,'hex','utf8');
+        var decipher = crypto.createDecipher(algorithm, password);
+        var dec = decipher.update(EncryptPassword, 'hex', 'utf8');
         dec += decipher.final('utf8');
         return dec;
     }
-    catch(ex){
+    catch (ex) {
         console.log('FnDecrypterror:' + ex);
 
         return 'error'
@@ -111,9 +111,9 @@ function FnDecrypt(EncryptPassword){
 
 var st = null;
 
-function User(db,stdLib){
+function User(db, stdLib) {
 
-    if(stdLib){
+    if (stdLib) {
         st = stdLib;
     }
 };
@@ -125,7 +125,7 @@ function User(db,stdLib){
  * @param res
  * @param next
  */
-User.prototype.getLoginDetails = function(req,res,next){
+User.prototype.getLoginDetails = function (req, res, next) {
     /**
      * @todo FnGetLoginDetails
      */
@@ -189,7 +189,7 @@ User.prototype.getLoginDetails = function(req,res,next){
             if (!Token) {
                 console.log('FnGetLoginDetails: Token is empty');
             }
-            res.statusCode=400;
+            res.statusCode = 400;
             res.json(null);
         }
     }
@@ -208,7 +208,7 @@ User.prototype.getLoginDetails = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getCountry = function(req,res,next){
+User.prototype.getCountry = function (req, res, next) {
 
     /**
      * @todo FnGetCountry
@@ -265,7 +265,7 @@ User.prototype.getCountry = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getState = function(req,res,next){
+User.prototype.getState = function (req, res, next) {
     /**
      * @todo FnGetState
      */
@@ -281,13 +281,13 @@ User.prototype.getState = function(req,res,next){
             // console.log(Query);
             st.db.query(Query, function (err, StateResult) {
                 if (!err) {
-                    if(StateResult) {
+                    if (StateResult) {
                         if (StateResult.length > 0) {
                             var Query = 'Select ifnull(ISDCode,"") as ISDCode from  mcountry where CountryID=' + st.db.escape(CountryID);
                             st.db.query(Query, function (err, CountryResult) {
                                 if (!err) {
-                                    if(CountryResult) {
-                                        if (CountryResult.length  > 0) {
+                                    if (CountryResult) {
+                                        if (CountryResult.length > 0) {
                                             res.setHeader('ISDCode', CountryResult[0].ISDCode);
                                             res.send(StateResult);
                                             console.log('FnGetState: mcountry: State sent successfully');
@@ -351,7 +351,7 @@ User.prototype.getState = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getCity = function(req,res,next){
+User.prototype.getCity = function (req, res, next) {
     /**
      * @todo FnGetCity
      */
@@ -366,7 +366,7 @@ User.prototype.getCity = function(req,res,next){
             var Query = 'Select  CityID, CityName from mcity where LangID=' + st.db.escape(LangID) + ' and StateID= ' + st.db.escape(StateID);
             st.db.query(Query, function (err, CityResult) {
                 if (!err) {
-                    if(CityResult) {
+                    if (CityResult) {
                         if (CityResult.length > 0) {
                             res.send(CityResult);
                             console.log('FnGetCity: mcity: City sent successfully');
@@ -413,13 +413,13 @@ User.prototype.getCity = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getUserDetails = function(req,res,next){
+User.prototype.getUserDetails = function (req, res, next) {
     /**
      * @todo FnGetUserDetails
      */
     var rtnMessage = {
-        versionStatus : 0,
-        versionMessage : "Your application is up to date"
+        versionStatus: 0,
+        versionMessage: "Your application is up to date"
     };
 
     // switch(req.platform){
@@ -503,7 +503,7 @@ User.prototype.getUserDetails = function(req,res,next){
                 //console.log(Result);
                 if (!err) {
                     if (tokenResult) {
-                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) +','+st.db.escape(DBSecretKey)+  ')', function (err, UserDetailsResult) {
+                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ')', function (err, UserDetailsResult) {
                             if (!err) {
                                 //console.log('UserDetailsResult',UserDetailsResult);
                                 if (UserDetailsResult[0]) {
@@ -566,7 +566,7 @@ User.prototype.getUserDetails = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.checkEzeid = function(req,res,next){
+User.prototype.checkEzeid = function (req, res, next) {
     /**
      * @todo FnCheckEzeid
      */
@@ -582,26 +582,26 @@ User.prototype.checkEzeid = function(req,res,next){
         if (EZEID) {
 
             var list = req.CONFIG.RESERVED_EZEONE_LIST;
-            console.log(list,"list is there");
-            var testCase = EZEID.replace('@','');
+            console.log(list, "list is there");
+            var testCase = EZEID.replace('@', '');
             var allowedFlag = true;
 
-            for(var i = 0; i < list.length; i++){
-                var reg = new RegExp(list[i],'g');
-                if(reg.test(testCase)){
+            for (var i = 0; i < list.length; i++) {
+                var reg = new RegExp(list[i], 'g');
+                if (reg.test(testCase)) {
                     //console.log('Test pass : Should not be allowed',testCase);
                     allowedFlag = false;
                     break;
                 }
             }
             console.log(allowedFlag);
-            if(allowedFlag){
+            if (allowedFlag) {
                 var Query = 'Select EZEID from tmaster where EZEID=' + st.db.escape(EZEID);
                 //var Query = 'CALL pcheckEzeid(' + st.db.escape(EZEID) + ')';
                 st.db.query(Query, function (err, EzeidExitsResult) {
                     //console.log(EzeidExitsResult);
                     if (!err) {
-                        if(EzeidExitsResult) {
+                        if (EzeidExitsResult) {
                             if (EzeidExitsResult.length > 0) {
                                 RtnMessage.IsIdAvailable = false;
                                 res.send(RtnMessage);
@@ -626,8 +626,8 @@ User.prototype.checkEzeid = function(req,res,next){
                         console.log('FnCheckEzeid: tmaster: ' + err);
                     }
                 });
-        }
-        else{
+            }
+            else {
                 res.statusCode = 400;
                 RtnMessage.IsIdAvailable = false;
                 res.send(RtnMessage);
@@ -655,7 +655,7 @@ User.prototype.checkEzeid = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.changePassword = function(req,res,next){
+User.prototype.changePassword = function (req, res, next) {
     /**
      * @todo FnChangePassword
      */
@@ -664,38 +664,57 @@ User.prototype.changePassword = function(req,res,next){
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var TokenNo = req.body.Token;
-        var OldPassword = req.body.OldPassword;
-        var NewPassword = req.body.NewPassword;
+        var TokenNo = req.query.Token;   // token is now query
+
         var RtnMessage = {
-            status : true,
-            message : "Invalid token",
+            status: true,
+            message: "Invalid token",
             IsChanged: false
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (OldPassword && NewPassword && TokenNo ) {
-            st.validateToken(TokenNo, function (err, tokenResult) {
-                if (!err) {
-                    if (tokenResult) {
+
+        var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        RtnMessage.message = 'Please check the errors';
+        res.status(400).json(RtnMessage);
+        console.log(RtnMessage);
+    }
+    else{
+        // if (OldPassword && NewPassword && TokenNo ) {
+        st.validateToken(TokenNo, function (err, tokenResult) {
+            if (!err) {
+                if (tokenResult) {
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                        var OldPassword = req.body.OldPassword;
+                        var NewPassword = req.body.NewPassword;
+
                         var oldPassQueryParams = st.db.escape(TokenNo);
-                        var oldPassQuery = 'CALL pgetoldpassword('+oldPassQueryParams+')';
+                        var oldPassQuery = 'CALL pgetoldpassword(' + oldPassQueryParams + ')';
                         console.log(oldPassQuery);
-                        st.db.query(oldPassQuery,function(err,oldPassResult){
-                            if(err){
+                        st.db.query(oldPassQuery, function (err, oldPassResult) {
+                            if (err) {
                                 console.log('Error : FnChangePassword - During old password retrieval; Procedure: pgetoldpassword');
                                 console.log(err);
                                 RtnMessage.status = false;
                                 RtnMessage.message = "Something went wrong";
                                 res.status(400).json(RtnMessage);
                             }
-                            else{
+                            else {
                                 console.log(oldPassResult);
-                                if(oldPassResult){
-                                    if(oldPassResult[0]){
-                                        if(oldPassResult[0][0]){
-                                            if(oldPassResult[0][0].Password){
+                                if (oldPassResult) {
+                                    if (oldPassResult[0]) {
+                                        if (oldPassResult[0][0]) {
+                                            if (oldPassResult[0][0].Password) {
 
-                                                if(comparePassword(OldPassword,oldPassResult[0][0].Password)){
+                                                if (comparePassword(OldPassword, oldPassResult[0][0].Password)) {
                                                     var ip = req.headers['x-forwarded-for'] ||
                                                         req.connection.remoteAddress ||
                                                         req.socket.remoteAddress ||
@@ -704,28 +723,28 @@ User.prototype.changePassword = function(req,res,next){
 
                                                     var newPassword = hashPassword(NewPassword);
                                                     var passChangeQueryParams = st.db.escape(TokenNo) + ',' +
-                                                        st.db.escape(newPassword) + ',' + st.db.escape(ip) +',' + st.db.escape(userAgent);
+                                                        st.db.escape(newPassword) + ',' + st.db.escape(ip) + ',' + st.db.escape(userAgent);
 
-                                                    var passChangeQuery = 'CALL pChangePassword('+passChangeQueryParams + ')';
+                                                    var passChangeQuery = 'CALL pChangePassword(' + passChangeQueryParams + ')';
                                                     console.log(passChangeQuery);
 
 
-                                                    st.db.query(passChangeQuery,function(err,passChangeResult){
-                                                        if(err){
+                                                    st.db.query(passChangeQuery, function (err, passChangeResult) {
+                                                        if (err) {
                                                             console.log('Error FnChangePassword :  procedure pChangePassword');
                                                             console.log(err);
                                                             RtnMessage.status = false;
                                                             RtnMessage.message = "Something went wrong";
                                                             res.status(500).json(RtnMessage);
                                                         }
-                                                        else{
-                                                            if(passChangeResult){
+                                                        else {
+                                                            if (passChangeResult) {
                                                                 RtnMessage.IsChanged = true;
                                                                 RtnMessage.status = true;
                                                                 RtnMessage.message = "Password changed ..";
                                                                 res.status(200).json(RtnMessage);
                                                             }
-                                                            else{
+                                                            else {
                                                                 RtnMessage.status = true;
                                                                 RtnMessage.message = "Password changed ..";
                                                                 res.status(200).status(RtnMessage);
@@ -733,67 +752,70 @@ User.prototype.changePassword = function(req,res,next){
                                                         }
                                                     });
                                                 }
-                                                else{
+                                                else {
                                                     RtnMessage.status = false;
                                                     RtnMessage.message = "Password do not match. Please re-enter password..";
                                                     res.status(200).json(RtnMessage);
                                                 }
                                             }
-                                            else{
+                                            else {
                                                 RtnMessage.status = false;
                                                 RtnMessage.message = "Unable to fetch old password ..";
                                                 res.status(401).json(RtnMessage);
                                             }
                                         }
-                                        else{
+                                        else {
                                             RtnMessage.status = false;
                                             RtnMessage.message = "Unable to fetch old password ..";
                                             res.status(401).json(RtnMessage);
                                         }
                                     }
-                                    else{
+                                    else {
                                         RtnMessage.status = false;
                                         RtnMessage.message = "Unable to fetch old password ..";
                                         res.status(401).json(RtnMessage);
                                     }
                                 }
-                                else{
+                                else {
                                     RtnMessage.status = false;
                                     RtnMessage.message = "Unable to fetch old password ..";
                                     res.status(401).json(RtnMessage);
                                 }
                             }
                         });
+                    });
 
-                    } else {
-                        RtnMessage.status = false;
-                        RtnMessage.message = "Invalid token..";
-                        res.status(401).json(RtnMessage);
-                        console.log('FnChangePassword:pChangePassword: Invalid Token');
-                    }
+
                 } else {
                     RtnMessage.status = false;
-                    RtnMessage.message = "Something went wrong..";
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-                    console.log('FnChangePassword:pChangePassword: Error in validating token:  ' + err);
+                    RtnMessage.message = "Invalid token..";
+                    res.status(401).json(RtnMessage);
+                    console.log('FnChangePassword:pChangePassword: Invalid Token');
                 }
-            });
-        }
-        else {
-            if (!OldPassword) {
-                console.log('FnChangePassword: OldPassword is empty');
+            } else {
+                RtnMessage.status = false;
+                RtnMessage.message = "Something went wrong..";
+                res.statusCode = 500;
+                res.send(RtnMessage);
+                console.log('FnChangePassword:pChangePassword: Error in validating token:  ' + err);
             }
-            else if (!NewPassword) {
-                console.log('FnChangePassword: NewPassword is empty');
-            }
-            else if (!TokenNo) {
-                console.log('FnChangePassword: TokenNo is empty');
-            }
-            RtnMessage.status = false;
-            RtnMessage.message = "Fill all required fields..";
-            res.statusCode = 400;
-            res.send(RtnMessage);
+        });
+        // }
+        // else {
+        //     if (!OldPassword) {
+        //         console.log('FnChangePassword: OldPassword is empty');
+        //     }
+        //     else if (!NewPassword) {
+        //         console.log('FnChangePassword: NewPassword is empty');
+        //     }
+        //     else if (!TokenNo) {
+        //         console.log('FnChangePassword: TokenNo is empty');
+        //     }
+        //     RtnMessage.status = false;
+        //     RtnMessage.message = "Fill all required fields..";
+        //     res.statusCode = 400;
+        //     res.send(RtnMessage);
+        // }
         }
     }
     catch (ex) {
@@ -807,7 +829,7 @@ User.prototype.changePassword = function(req,res,next){
     }
 };
 
-User.prototype.forgetPassword = function(req,res,next){
+User.prototype.forgetPassword = function (req, res, next) {
     /**
      * @todo FnForgetPassword
      */
@@ -822,21 +844,21 @@ User.prototype.forgetPassword = function(req,res,next){
         var resetCode = st.generateRandomHash(Date.now().toString());
 
         var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
-        var ip =  req.headers['x-forwarded-for'] ||
+        var ip = req.headers['x-forwarded-for'] ||
             req.connection.remoteAddress ||
             req.socket.remoteAddress ||
             req.connection.socket.remoteAddress;
 
         var RtnMessage = {
             IsChanged: false,
-            mailSend : false
+            mailSend: false
         };
         RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (EZEID != null) {
             var resetQueryParams = st.db.escape(EZEID) + ',' + st.db.escape(resetCode) +
                 ',' + st.db.escape(userAgent) + ',' + st.db.escape(ip);
-            var resetQuery = 'CALL pResetpassword('+resetQueryParams+')';
+            var resetQuery = 'CALL pResetpassword(' + resetQueryParams + ')';
 
             st.db.query(resetQuery, function (err, ForgetPasswordResult) {
                 if (!err) {
@@ -849,8 +871,8 @@ User.prototype.forgetPassword = function(req,res,next){
                             //console.log(UserQuery);
                             st.db.query(UserQuery, function (err, UserResult) {
                                 if (!err) {
-                                    if(UserResult){
-                                        if(UserResult[0]) {
+                                    if (UserResult) {
+                                        if (UserResult[0]) {
                                             if (UserResult[0].EMailID) {
                                                 UserResult[0].FirstName = (UserResult[0].FirstName) ? UserResult[0].FirstName : 'Anonymous';
                                                 UserResult[0].LastName = (UserResult[0].LastName) ? UserResult[0].LastName : ' ';
@@ -925,8 +947,8 @@ User.prototype.forgetPassword = function(req,res,next){
                                                             }
                                                         });
                                                     }
-                                                    else{
-                                                        console.log('FnForgetPassword: readfile '+err);
+                                                    else {
+                                                        console.log('FnForgetPassword: readfile ' + err);
                                                     }
                                                 });
 
@@ -937,12 +959,12 @@ User.prototype.forgetPassword = function(req,res,next){
                                             }
                                             console.log('FnForgetPassword: Password reset successfully');
                                         }
-                                        else{
+                                        else {
                                             RtnMessage.IsChanged = false;
                                             res.send(RtnMessage);
                                         }
                                     }
-                                    else{
+                                    else {
                                         RtnMessage.IsChanged = false;
                                         res.send(RtnMessage);
                                     }
@@ -1003,89 +1025,89 @@ User.prototype.forgetPassword = function(req,res,next){
  *
  * @url : /pass_reset_code
  */
-User.prototype.verifyResetPasswordLink = function(req,res,next){
+User.prototype.verifyResetPasswordLink = function (req, res, next) {
 
     var status = true;
     var error = {};
     var respMsg = {
-        status : false,
-        message : 'Link is invalid or expired',
-        data : null,
-        error : null
+        status: false,
+        message: 'Link is invalid or expired',
+        data: null,
+        error: null
     };
 
-    if(!req.body.reset_code){
+    if (!req.body.reset_code) {
         error['reset_code'] = 'Reset code is invalid';
         status *= false;
     }
 
-    if(!req.body.ezeone_id){
+    if (!req.body.ezeone_id) {
         error['ezeone_id'] = 'EZEOne ID is invalid';
         status *= false;
     }
 
-    if(status){
-        try{
+    if (status) {
+        try {
             req.body.ezeone_id = req.st.alterEzeoneId(req.body.ezeone_id);
             var timestamp = moment(new Date()).format('YYYY-MM-DD HH:mm:ss').toString();
 
-            var verifyQueryParams = st.db.escape(req.body.ezeone_id) + ','+ st.db.escape(req.body.reset_code) + ','+ st.db.escape(DBSecretKey);
-            var verifyQuery = 'CALL pverifyresetcode('+verifyQueryParams+')';
+            var verifyQueryParams = st.db.escape(req.body.ezeone_id) + ',' + st.db.escape(req.body.reset_code) + ',' + st.db.escape(DBSecretKey);
+            var verifyQuery = 'CALL pverifyresetcode(' + verifyQueryParams + ')';
 
-            st.db.query(verifyQuery,function(err,verifyRes){
-                if(err){
+            st.db.query(verifyQuery, function (err, verifyRes) {
+                if (err) {
                     console.log('Error in verifyQuery : FnVerifyResetPasswordLink ');
                     console.log(err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
-                    respMsg.error = {server : 'Internal Server Error'};
+                    respMsg.error = { server: 'Internal Server Error' };
                     respMsg.message = 'An error occurred ! Please try again';
                     res.status(400).json(respMsg);
                 }
-                else{
-                    if(verifyRes){
-                        if(verifyRes[0]){
-                            if(verifyRes[0][0]){
-                                if(verifyRes[0][0].tid){
+                else {
+                    if (verifyRes) {
+                        if (verifyRes[0]) {
+                            if (verifyRes[0][0]) {
+                                if (verifyRes[0][0].tid) {
                                     respMsg.status = true;
                                     respMsg.data = {
-                                        tid : verifyRes[0][0].tid,
-                                        reset_otp : ''
+                                        tid: verifyRes[0][0].tid,
+                                        reset_otp: ''
                                     };
                                     respMsg.message = 'Reset code is valid ! Proceed to reset password';
                                     respMsg.error = null;
                                     res.status(200).json(respMsg);
                                 }
-                                else{
+                                else {
                                     res.status(200).json(respMsg);
                                 }
                             }
-                            else{
+                            else {
                                 res.status(200).json(respMsg);
                             }
                         }
-                        else{
+                        else {
                             res.status(200).json(respMsg);
                         }
                     }
-                    else{
+                    else {
                         res.status(200).json(respMsg);
                     }
                 }
 
             });
         }
-        catch(ex){
+        catch (ex) {
             console.log('Error : FnVerifyResetPasswordLink ' + ex);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
-            respMsg.error = {server : 'Internal Server Error'};
+            respMsg.error = { server: 'Internal Server Error' };
             respMsg.message = 'An error occurred ! Please try again';
             res.status(400).json(respMsg);
         }
     }
-    else{
+    else {
         respMsg.error = error;
         respMsg.message = 'Please check all the errors';
         res.status(400).json(respMsg);
@@ -1109,7 +1131,7 @@ User.prototype.verifyResetPasswordLink = function(req,res,next){
  *
  * @url : /verify_secret_code
  */
-User.prototype.verifySecretCode = function(req,res,next) {
+User.prototype.verifySecretCode = function (req, res, next) {
 
     var status = true;
     var error = {};
@@ -1146,7 +1168,7 @@ User.prototype.verifySecretCode = function(req,res,next) {
                     console.log(err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
-                    respMsg.error = {server: 'Internal Server Error'};
+                    respMsg.error = { server: 'Internal Server Error' };
                     respMsg.message = 'An error occurred ! Please try again';
                     res.status(400).json(respMsg);
                 }
@@ -1187,7 +1209,7 @@ User.prototype.verifySecretCode = function(req,res,next) {
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
-            respMsg.error = {server: 'Internal Server Error'};
+            respMsg.error = { server: 'Internal Server Error' };
             respMsg.message = 'An error occurred ! Please try again';
             res.status(400).json(respMsg);
         }
@@ -1206,14 +1228,14 @@ User.prototype.verifySecretCode = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.decryptPassword = function(req,res,next){
+User.prototype.decryptPassword = function (req, res, next) {
     /**
      * @todo FnDecryptPassword
      */
 
     try {
-//res.setHeader("Access-Control-Allow-Origin", "*");
-//res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        //res.setHeader("Access-Control-Allow-Origin", "*");
+        //res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         res.header('Access-Control-Allow-Credentials', true);
         res.header('Access-Control-Allow-Origin', "*");
         res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
@@ -1222,7 +1244,7 @@ User.prototype.decryptPassword = function(req,res,next){
         var password = req.query.Password;
 
         var RtnMessage = {
-            Password : ''
+            Password: ''
         };
         RtnMessage.Password = FnDecrypt(password);
         //console.log(RtnMessage.Password);
@@ -1230,7 +1252,7 @@ User.prototype.decryptPassword = function(req,res,next){
 
 
     }
-    catch(ex){
+    catch (ex) {
         console.log('FnDecrypterror:' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1264,12 +1286,12 @@ function FnRandomPassword() {
  * @param res
  * @param next
  */
-User.prototype.getCompanyProfile = function(req,res,next){
+User.prototype.getCompanyProfile = function (req, res, next) {
     /**
      * @todo FnGetCompanyProfile
      */
 
-    try{
+    try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
@@ -1280,18 +1302,18 @@ User.prototype.getCompanyProfile = function(req,res,next){
             Result: [],
             Message: ''
         };
-        if ( Token != null){
+        if (Token != null) {
             TID = 0;
         }
-        else{
+        else {
             TID = TID;
             Token = 0;
         }
-        if(Token != null && TID != null ){
+        if (Token != null && TID != null) {
             //console.log('CALL pGetTagLine(' + st.db.escape(TID)+ ',' + st.db.escape(Token) + ')');
-            st.db.query('CALL pGetTagLine(' + st.db.escape(TID)+ ',' + st.db.escape(Token) + ')', function (err, taglineResult) {
+            st.db.query('CALL pGetTagLine(' + st.db.escape(TID) + ',' + st.db.escape(Token) + ')', function (err, taglineResult) {
                 if (!err) {
-                    if(taglineResult) {
+                    if (taglineResult) {
                         if (taglineResult[0]) {
                             if (taglineResult[0].length > 0) {
                                 RtnMessage.Result = taglineResult[0];
@@ -1331,11 +1353,11 @@ User.prototype.getCompanyProfile = function(req,res,next){
                 console.log('FnGetCompanyProfile: TID is empty');
                 RtnMessage.Message = 'TID is empty';
             }
-            else if(Token == null){
+            else if (Token == null) {
                 console.log('FnGetCompanyProfile: Token is empty');
                 RtnMessage.Message = 'Token is empty';
             }
-            res.statusCode=400;
+            res.statusCode = 400;
             res.send(RtnMessage);
         }
     }
@@ -1353,12 +1375,12 @@ User.prototype.getCompanyProfile = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.saveCompanyProfile = function(req,res,next){
+User.prototype.saveCompanyProfile = function (req, res, next) {
     /**
      * @todo FnSaveCompanyProfile
      */
 
-    try{
+    try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1367,18 +1389,18 @@ User.prototype.saveCompanyProfile = function(req,res,next){
         var CompanyProfile = req.body.CompanyProfile;
 
         var RtnMessage = {
-            IsSuccessfull : false,
+            IsSuccessfull: false,
             Message: ''
         };
 
-        if(Token && CompanyProfile){
+        if (Token && CompanyProfile) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        var query = st.db.escape(Token)+ ',' + st.db.escape(CompanyProfile);
+                        var query = st.db.escape(Token) + ',' + st.db.escape(CompanyProfile);
                         st.db.query('CALL pSaveTagLine(' + query + ')', function (err, companyResult) {
                             if (!err) {
-                                if(companyResult) {
+                                if (companyResult) {
                                     if (companyResult.affectedRows > 0) {
                                         RtnMessage.IsSuccessfull = true;
                                         RtnMessage.Message = 'Inserted successfully';
@@ -1391,16 +1413,15 @@ User.prototype.saveCompanyProfile = function(req,res,next){
                                         res.send(RtnMessage);
                                     }
                                 }
-                                else{
+                                else {
                                     RtnMessage.Message = 'Not inserted';
                                     console.log('FnSaveCompanyProfile:No Inserted sucessfully..');
                                     res.send(RtnMessage);
                                 }
                             }
-                            else
-                            {
+                            else {
                                 RtnMessage.Message = 'Error in saving...';
-                                console.log('FnSaveCompanyProfile:Error in getting insert group members..'+ err);
+                                console.log('FnSaveCompanyProfile:Error in getting insert group members..' + err);
                                 res.send(RtnMessage);
                             }
                         });
@@ -1418,12 +1439,12 @@ User.prototype.saveCompanyProfile = function(req,res,next){
                 }
             });
         }
-        else{
-            if(!Token){
+        else {
+            if (!Token) {
                 console.log('FnSaveAboutCompany:Token is empty');
                 RtnMessage.Message = 'Token is empty';
             }
-            else if(!CompanyProfile){
+            else if (!CompanyProfile) {
                 console.log('FnSaveCompanyProfile:Company Profile is empty');
                 RtnMessage.Message = 'Company Profile is emtpy';
             }
@@ -1446,7 +1467,7 @@ User.prototype.saveCompanyProfile = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getWebLink = function(req,res,next){
+User.prototype.getWebLink = function (req, res, next) {
     /**
      * @todo FnGetWebLink
      */
@@ -1468,7 +1489,7 @@ User.prototype.getWebLink = function(req,res,next){
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0]) {
-                                        if(GetResult[0].length >0){
+                                        if (GetResult[0].length > 0) {
                                             console.log('FnGetWebLink: Web Links Send successfully');
                                             res.send(GetResult[0]);
                                         }
@@ -1515,7 +1536,7 @@ User.prototype.getWebLink = function(req,res,next){
         }
         else {
             console.log('FnGetWebLink: Token is empty');
-            res.statusCode=400;
+            res.statusCode = 400;
             res.json(null);
         }
     }
@@ -1533,12 +1554,12 @@ User.prototype.getWebLink = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.saveWebLink = function(req,res,next){
+User.prototype.saveWebLink = function (req, res, next) {
     /**
      * @todo FnSaveWebLink
      */
 
-    try{
+    try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
@@ -1548,10 +1569,10 @@ User.prototype.saveWebLink = function(req,res,next){
 
         var RtnMessage = {
             IsSuccessfull: false,
-            Message:''
+            Message: ''
         };
         var URLNumber = '';
-        if(URLNo > 0 && URLNo < 100)
+        if (URLNo > 0 && URLNo < 100)
             URLNumber = URLNo;
         else
             RtnMessage.Message = 'Please Enter a URLNumber 1 t0 99';
@@ -1561,10 +1582,10 @@ User.prototype.saveWebLink = function(req,res,next){
                 if (!err) {
                     if (tokenResult) {
                         //console.log(Token,URL,URLNumber);
-                        var query = st.db.escape(Token) + ',' + st.db.escape(URL) + ',' + st.db.escape(URLNumber) ;
+                        var query = st.db.escape(Token) + ',' + st.db.escape(URL) + ',' + st.db.escape(URLNumber);
                         st.db.query('CALL pSaveWebLinks(' + query + ')', function (err, InsertResult) {
-                            if (!err){
-                                if(InsertResult) {
+                            if (!err) {
+                                if (InsertResult) {
                                     if (InsertResult.affectedRows > 0) {
                                         RtnMessage.IsSuccessfull = true;
                                         RtnMessage.Message = 'Save Successfully';
@@ -1586,7 +1607,7 @@ User.prototype.saveWebLink = function(req,res,next){
 
                             else {
                                 console.log('FnSaveWebLink: error in saving Web links' + err);
-                                RtnMessage.Message ='Error in saving' ;
+                                RtnMessage.Message = 'Error in saving';
                                 res.statusCode = 500;
                                 res.send(RtnMessage);
                             }
@@ -1609,17 +1630,17 @@ User.prototype.saveWebLink = function(req,res,next){
         }
 
         else {
-            if(!Token) {
+            if (!Token) {
                 console.log('FnSaveWebLink: Token is empty');
             }
-            else if(!URL) {
+            else if (!URL) {
                 console.log('FnSaveWebLink: URL is empty');
             }
             else if (!URLNumber) {
                 console.log('FnSaveWebLink: URLNumber is empty');
             }
 
-            res.statusCode=400;
+            res.statusCode = 400;
             res.send(RtnMessage);
         }
 
@@ -1638,12 +1659,12 @@ User.prototype.saveWebLink = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.deleteWebLink = function(req,res,next){
+User.prototype.deleteWebLink = function (req, res, next) {
     /**
      * @todo FnDeleteWebLink
      */
 
-    try{
+    try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
@@ -1651,18 +1672,18 @@ User.prototype.deleteWebLink = function(req,res,next){
         var TID = req.query.TID;
         var RtnMessage = {
             IsSuccessfull: false,
-            Message:''
+            Message: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-        if (Token !=null && TID != null) {
+        if (Token != null && TID != null) {
             st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
                         //console.log('CALL pDeleteWorkinghours(' + st.db.escape(TID) + ')');
                         st.db.query('CALL pDeleteWebLink(' + st.db.escape(TID) + ')', function (err, deleteResult) {
-                            if (!err){
-                                if(deleteResult) {
+                            if (!err) {
+                                if (deleteResult) {
                                     if (deleteResult.affectedRows > 0) {
                                         RtnMessage.IsSuccessfull = true;
                                         RtnMessage.Message = 'Delete Successfully';
@@ -1708,7 +1729,7 @@ User.prototype.deleteWebLink = function(req,res,next){
             else if (TID == null) {
                 console.log('FnDeleteWebLink: TID is empty');
             }
-            res.statusCode=400;
+            res.statusCode = 400;
             res.send(RtnMessage);
         }
     }
@@ -1726,7 +1747,7 @@ User.prototype.deleteWebLink = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getEzeidDetails = function(req,res,next){
+User.prototype.getEzeidDetails = function (req, res, next) {
     /**
      * @todo FnEZEIDPrimaryDetails
      */
@@ -1738,12 +1759,12 @@ User.prototype.getEzeidDetails = function(req,res,next){
         var Token = req.query.Token;
         var EZEID = req.st.alterEzeoneId(req.query.EZEID);
         //console.log(req.query);
-        if (Token && EZEID != null ) {
+        if (Token && EZEID != null) {
             st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
                         var LocSeqNo = 0;
-                        var FindArray =EZEID.split('.');
+                        var FindArray = EZEID.split('.');
                         if (FindArray.length > 0) {
                             EZEID = FindArray[0];
                             //console.log(EZEID);
@@ -1758,9 +1779,9 @@ User.prototype.getEzeidDetails = function(req,res,next){
                                 }
                             }
                         }
-                        st.db.query('CALL pEZEIDPrimaryDetails(' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ',' + st.db.escape(DBSecretKey)+ ')', function (err, GetResult) {
+                        st.db.query('CALL pEZEIDPrimaryDetails(' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ',' + st.db.escape(DBSecretKey) + ')', function (err, GetResult) {
                             if (!err) {
-                                if(GetResult) {
+                                if (GetResult) {
                                     if (GetResult[0]) {
                                         if (GetResult[0].length > 0) {
                                             console.log('FnEZEIDPrimaryDetails: EZEID Primary deatils Send successfully');
@@ -1794,8 +1815,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
                         console.log('FnEZEIDPrimaryDetails: Invalid Token');
                     }
                 }
-                else
-                {
+                else {
                     res.statusCode = 500;
                     res.json(null);
                     console.log('FnEZEIDPrimaryDetails: Error in validating token:  ' + err);
@@ -1803,16 +1823,14 @@ User.prototype.getEzeidDetails = function(req,res,next){
             });
         }
         else {
-            if (!Token)
-            {
+            if (!Token) {
                 console.log('FnEZEIDPrimaryDetails: Token is empty');
             }
-            else if (EZEID == null)
-            {
+            else if (EZEID == null) {
                 console.log('FnEZEIDPrimaryDetails: EZEID is empty');
             }
 
-            res.statusCode=400;
+            res.statusCode = 400;
             res.json(null);
         }
     }
@@ -1830,7 +1848,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getResume = function(req,res,next){
+User.prototype.getResume = function (req, res, next) {
     /**
      * @todo FnGetCVInfo
      */
@@ -1845,21 +1863,21 @@ User.prototype.getResume = function(req,res,next){
         var responseMessage = {
             status: false,
             data: null,
-            skillMatrix : [],
-            job_location : [],
-            line_of_career : [],
-            education : [],
-            error:{},
-            message:''
+            skillMatrix: [],
+            job_location: [],
+            line_of_career: [],
+            education: [],
+            error: {},
+            message: ''
         };
 
         if (id) {
             var queryParams = st.db.escape(id);
-            var query = 'CALL pgetCVInfo(' + st.db.escape(id) +','+ st.db.escape(DBSecretKey)+ ')';
+            var query = 'CALL pgetCVInfo(' + st.db.escape(id) + ',' + st.db.escape(DBSecretKey) + ')';
             console.log(query);
             st.db.query(query, function (err, MessagesResult) {
                 if (!err) {
-                    if(MessagesResult) {
+                    if (MessagesResult) {
                         if (MessagesResult[0]) {
                             if (MessagesResult[0][0]) {
                                 MessagesResult[0][0].CVDocpath = (MessagesResult[0][0].CVDocpath) ?
@@ -1917,7 +1935,7 @@ User.prototype.getResume = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.saveResume = function(req,res,next){
+User.prototype.saveResume = function (req, res, next) {
     /**
      * @todo FnSaveCVInfo
      */
@@ -1929,12 +1947,12 @@ User.prototype.saveResume = function(req,res,next){
         var gender = (!isNaN(parseInt(req.body.gender))) ? parseInt(req.body.gender) : 3;
         var ids = req.body.skillsTid;
         var FunctionID = req.body.FunctionID;
-        var KeySkills = (req.body.KeySkills) ? req.body.KeySkills : '' ;
+        var KeySkills = (req.body.KeySkills) ? req.body.KeySkills : '';
         var Status = parseInt(req.body.Status);
         var Pin = req.body.Pin;
         var Token = req.body.TokenNo;
         var skillMatrix1 = req.body.skillMatrix;
-        skillMatrix1= JSON.parse(JSON.stringify(skillMatrix1));
+        skillMatrix1 = JSON.parse(JSON.stringify(skillMatrix1));
         var skillMatrix = [];
         var allowedParam = [
             'tid',
@@ -1969,20 +1987,20 @@ User.prototype.saveResume = function(req,res,next){
         var expectedSalarytype = (req.body.exp_salary_type) ? req.body.exp_salary_type : 0;
 
         var locMatrix = req.body.locMatrix;
-        locMatrix= JSON.parse(JSON.stringify(locMatrix));
+        locMatrix = JSON.parse(JSON.stringify(locMatrix));
         var educations = req.body.educations;
-        educations= JSON.parse(JSON.stringify(educations));
+        educations = JSON.parse(JSON.stringify(educations));
 
         var resumeFilePath = (req.body.resume_path) ? req.body.resume_path : '';
 
-        resumeFilePath = resumeFilePath.replace(req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/','');
+        resumeFilePath = resumeFilePath.replace(req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/', '');
 
-        if(typeof(locationsList) == "string"){
+        if (typeof (locationsList) == "string") {
             locationsList = JSON.parse(locationsList);
         }
 
 
-        if(!locationsList){
+        if (!locationsList) {
             locationsList = [];
         }
 
@@ -1993,7 +2011,7 @@ User.prototype.saveResume = function(req,res,next){
 
         var RtnMessage = {
             IsSuccessfull: false,
-            id : ''
+            id: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
@@ -2013,16 +2031,16 @@ User.prototype.saveResume = function(req,res,next){
 
                         var locCount = 0;
                         var locationDetails = locationsList[locCount];
-                        var saveResumeDetails = function(){
-                            location_id = location_id.substr(0,location_id.length - 1);
+                        var saveResumeDetails = function () {
+                            location_id = location_id.substr(0, location_id.length - 1);
                             var queryParams = st.db.escape(FunctionID) + ',' + st.db.escape(Status) + ',' + st.db.escape(Pin)
-                                + ',' + st.db.escape(Token) + ',' + st.db.escape(ids)+ ','+ st.db.escape(salary) + ',' + st.db.escape(noticePeriod)
-                                + ',' + st.db.escape(experience) + ','+ st.db.escape(currentEmployeer) + ',' + st.db.escape(currentJobTitle)
-                                + ',' + st.db.escape(jobType) + ','+ st.db.escape(location_id) + ',' + st.db.escape(categoryID)
-                                +',' + st.db.escape(expectedSalary)+ ','+ st.db.escape(firstName)+ ','+ st.db.escape(lastName)
-                                +',' + st.db.escape(email)+',' + st.db.escape(mobile)+',' + st.db.escape(tid)+',' + st.db.escape(salarytype)
-                                +',' + st.db.escape(expectedSalarytype) + ',' + st.db.escape(resumeFilePath)+',' + st.db.escape(gender)
-                                +',' + st.db.escape(KeySkills)+','+st.db.escape(DBSecretKey);
+                                + ',' + st.db.escape(Token) + ',' + st.db.escape(ids) + ',' + st.db.escape(salary) + ',' + st.db.escape(noticePeriod)
+                                + ',' + st.db.escape(experience) + ',' + st.db.escape(currentEmployeer) + ',' + st.db.escape(currentJobTitle)
+                                + ',' + st.db.escape(jobType) + ',' + st.db.escape(location_id) + ',' + st.db.escape(categoryID)
+                                + ',' + st.db.escape(expectedSalary) + ',' + st.db.escape(firstName) + ',' + st.db.escape(lastName)
+                                + ',' + st.db.escape(email) + ',' + st.db.escape(mobile) + ',' + st.db.escape(tid) + ',' + st.db.escape(salarytype)
+                                + ',' + st.db.escape(expectedSalarytype) + ',' + st.db.escape(resumeFilePath) + ',' + st.db.escape(gender)
+                                + ',' + st.db.escape(KeySkills) + ',' + st.db.escape(DBSecretKey);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
                             //console.log(query);
                             st.db.query(query, function (err, InsertResult) {
@@ -2128,7 +2146,7 @@ User.prototype.saveResume = function(req,res,next){
 
                                         //line of career skill matrix
                                         if (locMatrix.length) {
-                                            for(var k=0; k < locMatrix.length; k++){
+                                            for (var k = 0; k < locMatrix.length; k++) {
                                                 //async.each(locMatrix, function iterator(locDetails, callback) {
 
                                                 console.log('----LOC Matrix----');
@@ -2144,9 +2162,9 @@ User.prototype.saveResume = function(req,res,next){
                                                 };
 
 
-                                                var queryParams = st.db.escape(locSkills.fid)+ ',' + st.db.escape(locSkills.careerId)
-                                                    + ',' + st.db.escape(locSkills.expertiseLevel)+ ',' + st.db.escape(locSkills.exp)
-                                                    + ',' + st.db.escape(locSkills.cvid)+ ',' + st.db.escape(locSkills.locUid);
+                                                var queryParams = st.db.escape(locSkills.fid) + ',' + st.db.escape(locSkills.careerId)
+                                                    + ',' + st.db.escape(locSkills.expertiseLevel) + ',' + st.db.escape(locSkills.exp)
+                                                    + ',' + st.db.escape(locSkills.cvid) + ',' + st.db.escape(locSkills.locUid);
 
 
                                                 var query = 'CALL psavecvLOC(' + queryParams + ')';
@@ -2175,7 +2193,7 @@ User.prototype.saveResume = function(req,res,next){
                                         //educations
                                         if (educations.length) {
                                             console.log(educations);
-                                            for(var j=0; j < educations.length; j++){
+                                            for (var j = 0; j < educations.length; j++) {
                                                 //async.each(educations, function iterator(eduDetails, callback) {
 
                                                 var educationData = {
@@ -2186,14 +2204,14 @@ User.prototype.saveResume = function(req,res,next){
                                                     score: educations[j].score,
                                                     yearofpassing: educations[j].yp,
                                                     level: educations[j].expertiseLevel, // 0-ug, 1-pg
-                                                    instituteId : educations[j].institute_id,
-                                                    instituteEnrollmentNumber : (educations[j].enrollment_no) ? educations[j].enrollment_no : null
+                                                    instituteId: educations[j].institute_id,
+                                                    instituteEnrollmentNumber: (educations[j].enrollment_no) ? educations[j].enrollment_no : null
                                                 };
 
                                                 var queryParams = st.db.escape(educationData.cvid) + ',' + st.db.escape(educationData.eduId)
                                                     + ',' + st.db.escape(educationData.spcId) + ',' + st.db.escape(educationData.score)
                                                     + ',' + st.db.escape(educationData.yearofpassing) + ',' + st.db.escape(educationData.level)
-                                                    + ',' + st.db.escape(educationData.instituteId)+ ',' + st.db.escape(educationData.instituteEnrollmentNumber);
+                                                    + ',' + st.db.escape(educationData.instituteId) + ',' + st.db.escape(educationData.instituteEnrollmentNumber);
 
                                                 var query = 'CALL psavecveducation(' + queryParams + ')';
                                                 console.log(query);
@@ -2233,38 +2251,38 @@ User.prototype.saveResume = function(req,res,next){
                             });
                         };
 
-                        var insertLocations = function(locationDetails){
+                        var insertLocations = function (locationDetails) {
                             var list = {
                                 locationTitle: locationDetails.location_title,
                                 lat: locationDetails.latitude,
                                 lng: locationDetails.longitude,
                                 country: locationDetails.country,
-                                mapType : locationDetails.maptype
+                                mapType: locationDetails.maptype
                             };
                             var queryParams = st.db.escape(list.locationTitle) + ',' + st.db.escape(list.lat)
-                                + ',' + st.db.escape(list.lng) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.mapType);
+                                + ',' + st.db.escape(list.lng) + ',' + st.db.escape(list.country) + ',' + st.db.escape(list.mapType);
 
                             var query = 'CALL psavejoblocation(' + queryParams + ')';
                             console.log(query);
 
                             st.db.query(query, function (err, results) {
 
-                                if(err){
+                                if (err) {
                                     console.log('Error in saving psavejoblocation');
                                     console.log(err);
                                 }
-                                else{
+                                else {
                                     if (results) {
                                         if (results[0]) {
                                             if (results[0][0]) {
 
                                                 //console.log(results[0][0].id);
                                                 location_id += results[0][0].id + ',';
-                                                locCount +=1;
-                                                if(locCount < locationsList.length){
+                                                locCount += 1;
+                                                if (locCount < locationsList.length) {
                                                     insertLocations(locationsList[locCount]);
                                                 }
-                                                else{
+                                                else {
                                                     saveResumeDetails();
                                                 }
                                             }
@@ -2287,18 +2305,18 @@ User.prototype.saveResume = function(req,res,next){
                             });
                         };
 
-                        if(locationsList){
-                            if(locationsList.length > 0){
+                        if (locationsList) {
+                            if (locationsList.length > 0) {
                                 insertLocations(locationDetails);
                             }
-                            else{
+                            else {
                                 location_id = '';
                                 saveResumeDetails();
 
                             }
                         }
 
-                        else{
+                        else {
                             location_id = '';
                             saveResumeDetails();
                         }
@@ -2346,7 +2364,7 @@ function FnSaveSkills(skill, CallBack) {
             };
             RtnResponse = JSON.parse(JSON.stringify((RtnResponse)));
 
-            st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname) + ' and type='+st.db.escape(skill.type)+ ' and functionid='+st.db.escape(skill.fid), function (err, SkillResult) {
+            st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname) + ' and type=' + st.db.escape(skill.type) + ' and functionid=' + st.db.escape(skill.fid), function (err, SkillResult) {
                 if ((!err)) {
                     if (SkillResult[0]) {
 
@@ -2357,11 +2375,11 @@ function FnSaveSkills(skill, CallBack) {
                     else {
                         st.db.query('insert into mskill (SkillTitle,type,functionid) values (' + st.db.escape(skill.skillname) + ',' + st.db.escape(skill.type) + ',' + st.db.escape(skill.fid) + ')', function (err, skillInsertResult) {
                             if (!err) {
-                                if(skillInsertResult) {
+                                if (skillInsertResult) {
                                     if (skillInsertResult.affectedRows > 0) {
                                         st.db.query('select SkillID from mskill where SkillTitle like ' + st.db.escape(skill.skillname) + ' and type=' + st.db.escape(skill.type), function (err, SkillMaxResult) {
                                             if (!err) {
-                                                if(SkillMaxResult) {
+                                                if (SkillMaxResult) {
                                                     if (SkillMaxResult[0]) {
                                                         //console.log('New Skill');
                                                         RtnResponse.SkillID = SkillMaxResult[0].SkillID;
@@ -2415,7 +2433,7 @@ function FnSaveSkills(skill, CallBack) {
  * @param res
  * @param next
  */
-User.prototype.getSkills = function(req,res,next){
+User.prototype.getSkills = function (req, res, next) {
     /**
      * @todo FnPGetSkills
      */
@@ -2423,23 +2441,23 @@ User.prototype.getSkills = function(req,res,next){
     var functionId = (req.query.fid) ? req.query.fid : 0;
     var type = req.query.type;  //0-core,1-soft
     var responseMsg = {
-        status : false,
-        data : [],
-        message : 'Unable to load skills ! Please try again',
-        error : {
-            server : 'An internal server error'
+        status: false,
+        data: [],
+        message: 'Unable to load skills ! Please try again',
+        error: {
+            server: 'An internal server error'
         }
     };
 
-    try{
+    try {
         var query = 'CALL PGetSkills(' + st.db.escape(functionId) + ',' + st.db.escape(type) + ')';
-        st.db.query(query,function(err,result){
+        st.db.query(query, function (err, result) {
             // console.log(result);
-            if(err){
+            if (err) {
                 console.log('Error : FnPGetSkills ');
                 res.status(400).json(responseMsg);
             }
-            else{
+            else {
                 responseMsg.status = true;
                 responseMsg.message = 'Skills loaded successfully';
                 responseMsg.error = null;
@@ -2450,9 +2468,9 @@ User.prototype.getSkills = function(req,res,next){
         });
     }
 
-    catch(ex){
+    catch (ex) {
         res.status(500).json(responseMsg);
-        console.log('Error : FnPGetSkills '+ ex);
+        console.log('Error : FnPGetSkills ' + ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -2464,7 +2482,7 @@ User.prototype.getSkills = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getDocPin = function(req,res,next) {
+User.prototype.getDocPin = function (req, res, next) {
     /**
      * @todo FnGetDocPin
      */
@@ -2480,7 +2498,7 @@ User.prototype.getDocPin = function(req,res,next) {
                         st.db.query('CALL pGetDocPIN(' + st.db.escape(token) + ')', function (err, BussinessListingResult) {
                             if (!err) {
                                 // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
-                                if(BussinessListingResult) {
+                                if (BussinessListingResult) {
                                     if (BussinessListingResult[0]) {
                                         if (BussinessListingResult[0].length > 0) {
                                             res.send(BussinessListingResult[0]);
@@ -2541,7 +2559,7 @@ User.prototype.getDocPin = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.getDoc = function(req,res,next) {
+User.prototype.getDoc = function (req, res, next) {
     /**
      * @todo FnGetDoc
      */
@@ -2560,7 +2578,7 @@ User.prototype.getDoc = function(req,res,next) {
                         st.db.query('CALL pGetDocs(' + st.db.escape(Token) + ',' + st.db.escape(Type) + ')', function (err, DocumentResult) {
                             if (!err) {
                                 //console.log(DocumentResult);
-                                if(DocumentResult) {
+                                if (DocumentResult) {
                                     if (DocumentResult[0]) {
                                         if (DocumentResult[0].length > 0) {
                                             res.send(DocumentResult[0]);
@@ -2627,7 +2645,7 @@ User.prototype.getDoc = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.getDocument = function(req,res,next) {
+User.prototype.getDocument = function (req, res, next) {
     /**
      * @todo FnGetDocument
      */
@@ -2642,11 +2660,11 @@ User.prototype.getDocument = function(req,res,next) {
             st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var query = st.db.escape(Token) + ',' + st.db.escape(Type)+ ',' + st.db.escape(cvid);
+                        var query = st.db.escape(Token) + ',' + st.db.escape(Type) + ',' + st.db.escape(cvid);
                         //console.log(query);
                         st.db.query('CALL  pGetDocsFile(' + query + ')', function (err, DocumentResult) {
                             if (!err) {
-                                if(DocumentResult) {
+                                if (DocumentResult) {
                                     if (DocumentResult[0]) {
                                         if (DocumentResult[0].length > 0) {
                                             DocumentResult = DocumentResult[0];
@@ -2655,7 +2673,7 @@ User.prototype.getDocument = function(req,res,next) {
                                             res.setHeader('Content-Type', docs.ContentType);
                                             res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
                                             res.setHeader('Cache-Control', 'public, max-age=0');
-                                            res.writeHead('200', {'Content-Type': docs.ContentType});
+                                            res.writeHead('200', { 'Content-Type': docs.ContentType });
                                             //console.log(docs.Docs);
                                             res.end(docs.Docs, 'base64');
                                             console.log('FnGetDocument: Document sent successfully-1');
@@ -2725,7 +2743,7 @@ User.prototype.getDocument = function(req,res,next) {
  * @service-param pin
  * @service-param id
  */
-User.prototype.updateDocPin = function(req,res,next) {
+User.prototype.updateDocPin = function (req, res, next) {
     /**
      * @todo FnUpdateDocPin
      */
@@ -2746,12 +2764,12 @@ User.prototype.updateDocPin = function(req,res,next) {
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var query = st.db.escape(token) + ',' + st.db.escape(tPin)  + ',' + st.db.escape(req.body.id);
+                        var query = st.db.escape(token) + ',' + st.db.escape(tPin) + ',' + st.db.escape(req.body.id);
                         st.db.query('CALL pUpdateDocPIN(' + query + ')', function (err, UpdateResult) {
                             if (!err) {
                                 //  console.log(UpdateResult);
                                 // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
-                                if(UpdateResult) {
+                                if (UpdateResult) {
                                     if (UpdateResult.affectedRows > 0) {
                                         RtnMessage.IsUpdated = true;
                                         res.send(RtnMessage);
@@ -2811,7 +2829,7 @@ User.prototype.updateDocPin = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.saveDoc = function(req,res,next) {
+User.prototype.saveDoc = function (req, res, next) {
     /**
      * @todo FnSaveDoc
      */
@@ -2842,7 +2860,7 @@ User.prototype.saveDoc = function(req,res,next) {
                         st.db.query('CALL pSaveDocs(' + query + ')', function (err, InsertResult) {
                             if (!err) {
                                 //console.log(InsertResult);
-                                if(InsertResult) {
+                                if (InsertResult) {
                                     if (InsertResult.affectedRows > 0) {
                                         RtnMessage.IsSuccessfull = true;
                                         console.log('Document Saved successfully');
@@ -2903,12 +2921,12 @@ User.prototype.saveDoc = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.getFunctions = function(req,res,next) {
+User.prototype.getFunctions = function (req, res, next) {
     /**
      * @todo FnGetFunctions
      */
 
-    var type = (!isNaN(parseInt(req.query.type))) ?  parseInt(req.query.type) : 0;
+    var type = (!isNaN(parseInt(req.query.type))) ? parseInt(req.query.type) : 0;
 
     try {
 
@@ -2920,7 +2938,7 @@ User.prototype.getFunctions = function(req,res,next) {
 
         st.db.query(query, function (err, FunctionRoleMapResult) {
             if (!err) {
-                if(FunctionRoleMapResult) {
+                if (FunctionRoleMapResult) {
                     if (FunctionRoleMapResult.length > 0) {
                         res.send(FunctionRoleMapResult[0]);
                         console.log('FnGetFunctions: mfunctiontype: Functions sent successfully');
@@ -2958,20 +2976,20 @@ var fs = require("fs");
  * @param res
  * @param next
  */
-User.prototype.uploadDoc = function(req,res,next) {
+User.prototype.uploadDoc = function (req, res, next) {
     /**
      * @todo FnUploadDocument
      */
 
     try {
 
-        var deleteTempFile = function(){
-            fs.unlink('../bin/'+req.files.file.path);
+        var deleteTempFile = function () {
+            fs.unlink('../bin/' + req.files.file.path);
         };
 
         var RtnMessage = {
             IsSuccessfull: false,
-            id : ''
+            id: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
@@ -2996,7 +3014,7 @@ User.prototype.uploadDoc = function(req,res,next) {
                             }
                             //console.log(Token);
                             fs.readFile(RefFileName, function (err, original_data) {
-                                var query = st.db.escape(Token) + ',' + st.db.escape( new Buffer(original_data).toString('base64'))
+                                var query = st.db.escape(Token) + ',' + st.db.escape(new Buffer(original_data).toString('base64'))
                                     + ',' + st.db.escape(fileName) + ',' + st.db.escape(tRefType) + ',' + st.db.escape(CntType)
                                     + ',' + st.db.escape(cvid) + ',' + st.db.escape(isinternal);
                                 //console.log(query);
@@ -3004,8 +3022,8 @@ User.prototype.uploadDoc = function(req,res,next) {
                                     if (!err) {
                                         //    console.log(InsertResult);
                                         if (InsertResult) {
-                                            if(InsertResult[0]) {
-                                                if(InsertResult[0][0]) {
+                                            if (InsertResult[0]) {
+                                                if (InsertResult[0][0]) {
                                                     if (tRefType == 7) {
                                                         RtnMessage.IsSuccessfull = true;
                                                         RtnMessage.id = InsertResult[0][0].id;
@@ -3080,7 +3098,7 @@ User.prototype.uploadDoc = function(req,res,next) {
     }
 };
 
-var FnGetRedirectLink = function(ezeid,tag,redirectCallback) {
+var FnGetRedirectLink = function (ezeid, tag, redirectCallback) {
 
     console.log('--------------------');
     console.log('Call Get Weblink Url....');
@@ -3089,13 +3107,13 @@ var FnGetRedirectLink = function(ezeid,tag,redirectCallback) {
     st.db.query(query, function (err, result) {
         if (!err) {
             //console.log(result);
-            if(result) {
+            if (result) {
 
                 var query1 = 'SELECT tid,imageurl,pin,imagefilename as URL,tag FROM t_docsandurls WHERE masterid=' + st.db.escape(result[0].tid) + ' AND tag=' + st.db.escape(tag) + ' AND imageurl=1';
                 console.log(query1);
                 st.db.query(query1, function (err, results) {
                     if (!err) {
-                        if(results) {
+                        if (results) {
                             if (results.length > 0) {
                                 //console.log(results);
                                 redirectCallback(results[0].URL);
@@ -3131,7 +3149,7 @@ var FnGetRedirectLink = function(ezeid,tag,redirectCallback) {
  * @param res
  * @param next
  */
-User.prototype.webLinkRedirect = function(req,res,next) {
+User.prototype.webLinkRedirect = function (req, res, next) {
     console.log('\nComing to redirection block\n');
     /**
      * @todo FnWebLinkRedirect
@@ -3140,7 +3158,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
     var ezeid;
     var tag;
     var pin;
-    var output=[];
+    var output = [];
 
     var respMsg = {
         status: false,
@@ -3148,7 +3166,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
         data: null,
         error: null
     };
-    if(req.params.id) {
+    if (req.params.id) {
         var link = req.params.id;
         var arr = link.split('.');
 
@@ -3159,33 +3177,32 @@ User.prototype.webLinkRedirect = function(req,res,next) {
 
             tag = arr[1].toUpperCase();
         }
-        if(arr[2]) {
+        if (arr[2]) {
             pin = arr[2];
         }
-        else
-        { pin = '' ; }
+        else { pin = ''; }
 
-        if(arr.length > 1){
-            if(arr[1].toUpperCase() == 'MAP'){
+        if (arr.length > 1) {
+            if (arr[1].toUpperCase() == 'MAP') {
                 //res.redirect('/'+alterEzeoneId(arr[0]) + req.CONFIG.CONSTANT.MAP_REDIRECT_LINK);
 
                 var geolocationQuery = "SELECT Latitude, Longitude FROM tmaster WHERE ezeid = " + st.db.escape(req.st.alterEzeoneId(arr[0]));
 
-                st.db.query(geolocationQuery,function(err,geoResult){
-                   if(err){
-                        console.log('Error','Weblink redirect function error');
+                st.db.query(geolocationQuery, function (err, geoResult) {
+                    if (err) {
+                        console.log('Error', 'Weblink redirect function error');
                         res.redirect("https://www.ezeone.com");
-                   }
-                   else {
-                       var GOOGLE_MAP_URL = " https://www.google.com/maps/place/";
-                       if (geoResult && geoResult[0]) {
-                           res.redirect(GOOGLE_MAP_URL + geoResult[0].Latitude +
-                               "+" + geoResult[0].Longitude + "/@" + geoResult[0].Latitude + "," + geoResult[0].Longitude + "," + "16z")
-                       }
-                       else {
-                           res.redirect("https://www.ezeone.com");
-                       }
-                   }
+                    }
+                    else {
+                        var GOOGLE_MAP_URL = " https://www.google.com/maps/place/";
+                        if (geoResult && geoResult[0]) {
+                            res.redirect(GOOGLE_MAP_URL + geoResult[0].Latitude +
+                                "+" + geoResult[0].Longitude + "/@" + geoResult[0].Latitude + "," + geoResult[0].Longitude + "," + "16z")
+                        }
+                        else {
+                            res.redirect("https://www.ezeone.com");
+                        }
+                    }
                 });
                 //var GOOGLE_MAP_URL = " https://www.google.com/maps/place/";
                 //res.redirect(GOOGLE_MAP_URL + latitute +  "+" + longitude + "/@"+latitude+","+longitude+","+"16z")
@@ -3202,14 +3219,14 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                 var query = st.db.escape(ezeid) + ',' + st.db.escape(tag);
                 console.log('CALL  PGetSearchDocuments(' + query + ')');
                 st.db.query('CALL  PGetSearchDocuments(' + query + ')', function (err, results) {
-                    console.log('err',err);
-                    console.log('results',results);
-                    if((!err) && results && results[0] && results[0][0]){
-                        switch(results[0][0].type){
+                    console.log('err', err);
+                    console.log('results', results);
+                    if ((!err) && results && results[0] && results[0][0]) {
+                        switch (results[0][0].type) {
                             /**
                              * Type 0 : It is a document uploaded to cloud and needs to be served from cloud storage
                              */
-                            case 0 :
+                            case 0:
                                 /**
                                  * This is a document saved on google cloud ! Creating dynamic google storage bucket link
                                  * and redirecting the user to there
@@ -3218,17 +3235,17 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                                 var documentUrl = (results[0][0].path) ?
                                     (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][0].path) : 'https://www.ezeone.com';
                                 console.log('redirecting url..');
-                                console.log('documentUrl',documentUrl);
+                                console.log('documentUrl', documentUrl);
 
-                                if(results[0][0].pin) {
+                                if (results[0][0].pin) {
                                     if (pin && pin == results[0][0].pin) {
                                         res.redirect(documentUrl);
                                     }
-                                    else{
+                                    else {
                                         next();
                                     }
                                 }
-                                else{
+                                else {
                                     res.redirect(documentUrl);
                                 }
 
@@ -3236,16 +3253,16 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                             /**
                              * Type 1 : It is a url and it needs to be redirected from here to open that website to whom the url belongs
                              */
-                            case 1 :
-                                if(results[0][0].pin){
-                                    if(pin && pin == results[0][0].pin){
+                            case 1:
+                                if (results[0][0].pin) {
+                                    if (pin && pin == results[0][0].pin) {
                                         res.redirect(results[0][0].path);
                                     }
-                                    else{
+                                    else {
                                         next();
                                     }
                                 }
-                                else{
+                                else {
                                     res.redirect(results[0][0].path);
                                 }
 
@@ -3254,7 +3271,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                              * Type 2 : It is a folder which contains type 0 documents therefore
                              * all the files needs to be archived which are in folder and served (downloaded) to the end user who requested it
                              */
-                            case 2 :
+                            case 2:
 
                                 console.log('Coming to case 2');
                                 //request
@@ -3264,35 +3281,35 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                                 //    })
                                 //    .pipe(fs.createWriteStream('doodle.png'))
 
-                                if(results[0][0].pin) {
+                                if (results[0][0].pin) {
                                     if (pin && pin == results[0][0].pin) {
-                                        var tagFolderContentQuery = "CALL get_folder_content_list("+st.db.escape(results[0][0].folder_content) + ")";
+                                        var tagFolderContentQuery = "CALL get_folder_content_list(" + st.db.escape(results[0][0].folder_content) + ")";
                                         console.log(tagFolderContentQuery);
-                                        st.db.query(tagFolderContentQuery,function(err,tagFolderContentRes){
-                                            if(err){
+                                        st.db.query(tagFolderContentQuery, function (err, tagFolderContentRes) {
+                                            if (err) {
                                                 next();
                                             }
-                                            else{
+                                            else {
                                                 var archive = archiver('zip');
 
-                                                archive.on('error', function(err) {
+                                                archive.on('error', function (err) {
                                                     next();
                                                 });
 
-                                                res.attachment(tag+ '.zip');
+                                                res.attachment(tag + '.zip');
 
                                                 archive.pipe(res);
-                                                if(tagFolderContentRes && tagFolderContentRes[0] && tagFolderContentRes[0].length){
-                                                    for(var counter = 0; counter < tagFolderContentRes[0].length; counter++){
-                                                        if(tagFolderContentRes[0][counter].type == 0){
+                                                if (tagFolderContentRes && tagFolderContentRes[0] && tagFolderContentRes[0].length) {
+                                                    for (var counter = 0; counter < tagFolderContentRes[0].length; counter++) {
+                                                        if (tagFolderContentRes[0][counter].type == 0) {
                                                             var pathComponents = tagFolderContentRes[0][counter].path.split('.');
 
                                                             /**
                                                              * Appending files to the archive
                                                              * Downloading by using request module from google cloud
                                                              */
-                                                            archive.append(request.get(req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + tagFolderContentRes[0][counter].path),{
-                                                                name : tagFolderContentRes[0][counter].tag + ((pathComponents.length > 1) ? '.' + pathComponents[pathComponents.length - 1] : '')
+                                                            archive.append(request.get(req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + tagFolderContentRes[0][counter].path), {
+                                                                name: tagFolderContentRes[0][counter].tag + ((pathComponents.length > 1) ? '.' + pathComponents[pathComponents.length - 1] : '')
                                                             });
                                                         }
 
@@ -3300,19 +3317,19 @@ User.prototype.webLinkRedirect = function(req,res,next) {
 
                                                     archive.finalize();
                                                 }
-                                                else{
+                                                else {
                                                     archive.finalize();
                                                 }
                                             }
 
                                         });
                                     }
-                                    else{
+                                    else {
                                         next();
                                     }
                                 }
 
-                                else{
+                                else {
                                     next();
                                 }
 
@@ -3326,23 +3343,23 @@ User.prototype.webLinkRedirect = function(req,res,next) {
 
                                 break;
 
-                            default :
+                            default:
                                 next();
                                 break;
                         }
                     }
-                    else{
+                    else {
                         next();
                     }
                 });
             }
 
         }
-        else{
+        else {
             next();
         }
     }
-    else{
+    else {
         next();
     }
 };
@@ -3353,7 +3370,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.getMTitle = function(req,res,next) {
+User.prototype.getMTitle = function (req, res, next) {
 
 };
 
@@ -3363,7 +3380,7 @@ User.prototype.getMTitle = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.updateProfilePicture = function(req,res,next) {
+User.prototype.updateProfilePicture = function (req, res, next) {
     /**
      * @todo FnUpdateProfilePicture
      */
@@ -3393,14 +3410,14 @@ User.prototype.updateProfilePicture = function(req,res,next) {
                             if (!err) {
                                 //console.log(UserResult);
                                 if (UserResult) {
-                                    if(UserResult[0]) {
+                                    if (UserResult[0]) {
                                         if (UserResult[0].length > 0) {
                                             var query = 'Update tlocations set Picture = ' + st.db.escape(Picture) + ',' + 'PictureFileName= ' + st.db.escape(PictureFileName) + ' where SeqNo=0 and MasterID=' + st.db.escape(UserResult[0].TID);
                                             // console.log(query);
                                             st.db.query(query, function (err, PicResult) {
                                                 if (!err) {
                                                     //console.log(PicResult);
-                                                    if(PicResult) {
+                                                    if (PicResult) {
                                                         if (PicResult.affectedRows > 0) {
                                                             RtnMessage.IsSuccessfull = true;
                                                             res.send(RtnMessage);
@@ -3481,7 +3498,7 @@ User.prototype.updateProfilePicture = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.getLoginCheck = function(req,res,next) {
+User.prototype.getLoginCheck = function (req, res, next) {
     /**
      * @todo FnGetLoginCheck
      */
@@ -3540,7 +3557,7 @@ User.prototype.getLoginCheck = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.getProxmity = function(req,res,next) {
+User.prototype.getProxmity = function (req, res, next) {
     /**
      * @todo FnGetProxmity
      */
@@ -3589,7 +3606,7 @@ User.prototype.getProxmity = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.getInstitutes = function(req,res,next) {
+User.prototype.getInstitutes = function (req, res, next) {
 
     var token = req.query.token;
     var responseMsg = {
@@ -3622,20 +3639,20 @@ User.prototype.getInstitutes = function(req,res,next) {
                                 res.status(400).json(responseMsg);
                             }
                             else {
-                                if(instituteResult) {
-                                    if(instituteResult[0]) {
+                                if (instituteResult) {
+                                    if (instituteResult[0]) {
                                         responseMsg.status = true;
                                         responseMsg.message = 'Institutes loaded successfully';
                                         responseMsg.error = null;
                                         responseMsg.data = instituteResult[0];
                                         res.status(200).json(responseMsg);
                                     }
-                                    else{
+                                    else {
                                         console.log('FnGetInstitutes:Unable to load Institutes');
                                         res.status(200).json(responseMsg);
                                     }
                                 }
-                                else{
+                                else {
                                     console.log('FnGetInstitutes:Unable to load Institutes');
                                     res.status(200).json(responseMsg);
                                 }
@@ -3676,7 +3693,7 @@ User.prototype.getInstitutes = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.getEducations = function(req,res,next) {
+User.prototype.getEducations = function (req, res, next) {
 
     var token = req.query.token;
     var responseMsg = {
@@ -3704,26 +3721,26 @@ User.prototype.getEducations = function(req,res,next) {
                 if (!err) {
                     if (tokenResult) {
                         var parameters = st.db.escape(filter);
-                        st.db.query('CALL pGetEducations('+ parameters +')', function (err, geteducationResult) {
+                        st.db.query('CALL pGetEducations(' + parameters + ')', function (err, geteducationResult) {
                             if (err) {
                                 console.log('Error : FnGetEducations :' + err);
                                 res.status(400).json(responseMsg);
                             }
                             else {
-                                if(geteducationResult) {
-                                    if(geteducationResult[0]) {
+                                if (geteducationResult) {
+                                    if (geteducationResult[0]) {
                                         responseMsg.status = true;
                                         responseMsg.message = 'Educations loaded successfully';
                                         responseMsg.error = null;
                                         responseMsg.data = geteducationResult[0];
                                         res.status(200).json(responseMsg);
                                     }
-                                    else{
+                                    else {
                                         console.log('getEducations:Unable to load Institutes');
                                         res.status(200).json(responseMsg);
                                     }
                                 }
-                                else{
+                                else {
                                     console.log('getEducations:Unable to load Institutes');
                                     res.status(200).json(responseMsg);
                                 }
@@ -3764,7 +3781,7 @@ User.prototype.getEducations = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.getSpecialization = function(req,res,next) {
+User.prototype.getSpecialization = function (req, res, next) {
 
     var token = req.query.token;
     var educationId = (req.query.education_id) ? req.query.education_id : '';
@@ -3798,20 +3815,20 @@ User.prototype.getSpecialization = function(req,res,next) {
                                 res.status(400).json(responseMsg);
                             }
                             else {
-                                if(specializationResult) {
-                                    if(specializationResult[0]) {
+                                if (specializationResult) {
+                                    if (specializationResult[0]) {
                                         responseMsg.status = true;
                                         responseMsg.message = 'Specialization loaded successfully';
                                         responseMsg.error = null;
                                         responseMsg.data = specializationResult[0];
                                         res.status(200).json(responseMsg);
                                     }
-                                    else{
+                                    else {
                                         console.log('getSpecialization:Unable to load Institutes');
                                         res.status(200).json(responseMsg);
                                     }
                                 }
-                                else{
+                                else {
                                     console.log('getSpecialization:Unable to load Institutes');
                                     res.status(200).json(responseMsg);
                                 }
@@ -3852,7 +3869,7 @@ User.prototype.getSpecialization = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.getVerifiedInstitutes = function(req,res,next) {
+User.prototype.getVerifiedInstitutes = function (req, res, next) {
 
     var token = req.query.token;
     var responseMsg = {
@@ -3886,20 +3903,20 @@ User.prototype.getVerifiedInstitutes = function(req,res,next) {
                             }
                             else {
                                 //console.log(verifiedinstituteResult);
-                                if(verifiedinstituteResult) {
-                                    if(verifiedinstituteResult[0]) {
+                                if (verifiedinstituteResult) {
+                                    if (verifiedinstituteResult[0]) {
                                         responseMsg.status = true;
                                         responseMsg.message = 'Institutes is valid';
                                         responseMsg.error = null;
                                         responseMsg.data = verifiedinstituteResult[0];
                                         res.status(200).json(responseMsg);
                                     }
-                                    else{
+                                    else {
                                         console.log('FnGetVerifiedInstitutes:Unable to load Institutes');
                                         res.status(200).json(responseMsg);
                                     }
                                 }
-                                else{
+                                else {
                                     console.log('FnGetVerifiedInstitutes:Unable to load Institutes');
                                     res.status(200).json(responseMsg);
                                 }
@@ -3950,28 +3967,28 @@ User.prototype.getVerifiedInstitutes = function(req,res,next) {
  * @service-param email_id <varchar(50)>
  * @description api code for save user details
  */
-User.prototype.saveUserDetails = function(req,res,next){
+User.prototype.saveUserDetails = function (req, res, next) {
 
-    var token  = req.body.token;
-    var firstName  = (req.body.first_name) ? req.body.first_name : '';
+    var token = req.body.token;
+    var firstName = (req.body.first_name) ? req.body.first_name : '';
     var lastName = (req.body.last_name) ? req.body.last_name : '';
     var companyName = (req.body.company_name) ? req.body.company_name : '';
-    var jobTitle  = (req.body.job_title) ? req.body.job_title : '';
-    var gender  = (req.body.gender) ? req.body.gender : '';
-    var dob  = req.body.dob;
-    var companyTagline  = req.body.company_tagline;
-    var email  = (req.body.email) ? req.body.email : '';
-    var visibleEmail = (!isNaN(parseInt(req.body.ve))) ?  parseInt(req.body.ve) : 1; // 0-invisible, 1- visible
-    var visibleMobile = (!isNaN(parseInt(req.body.vm))) ?  parseInt(req.body.vm) : 1;     // 0-invisible, 1- visible
-    var visiblePhone = (!isNaN(parseInt(req.body.vp))) ?  parseInt(req.body.vp) : 1;// 0-invisible, 1- visible
-    var visibleAddress = (!isNaN(parseInt(req.body.va))) ?  parseInt(req.body.va) : 1;// 0-invisible, 1- visible
+    var jobTitle = (req.body.job_title) ? req.body.job_title : '';
+    var gender = (req.body.gender) ? req.body.gender : '';
+    var dob = req.body.dob;
+    var companyTagline = req.body.company_tagline;
+    var email = (req.body.email) ? req.body.email : '';
+    var visibleEmail = (!isNaN(parseInt(req.body.ve))) ? parseInt(req.body.ve) : 1; // 0-invisible, 1- visible
+    var visibleMobile = (!isNaN(parseInt(req.body.vm))) ? parseInt(req.body.vm) : 1;     // 0-invisible, 1- visible
+    var visiblePhone = (!isNaN(parseInt(req.body.vp))) ? parseInt(req.body.vp) : 1;// 0-invisible, 1- visible
+    var visibleAddress = (!isNaN(parseInt(req.body.va))) ? parseInt(req.body.va) : 1;// 0-invisible, 1- visible
     var locTitle = (req.body.loc_title) ? req.body.loc_title : '';
-   // var latitude = (req.body.lat) ? req.body.lat : '';
-   // var longitude = (req.body.lng) ? req.body.lng : '';
+    // var latitude = (req.body.lat) ? req.body.lat : '';
+    // var longitude = (req.body.lng) ? req.body.lng : '';
     var address1 = (req.body.address_line1) ? req.body.address_line1 : '';
     var address2 = (req.body.address_line2) ? req.body.address_line2 : '';
     var city = (req.body.city) ? req.body.city : '';
-    var stateId = (req.body.state_id) ?  req.body.state_id : '';
+    var stateId = (req.body.state_id) ? req.body.state_id : '';
     var countryId = (req.body.country_id) ? req.body.country_id : '';
     var postalCode = (req.body.postal_code) ? req.body.postal_code : '';
     var phone = (req.body.ph) ? req.body.ph : '';
@@ -3982,7 +3999,7 @@ User.prototype.saveUserDetails = function(req,res,next){
     var parkingStatus = (req.body.parking_status) ? req.body.parking_status : '';
     var templateId = (!isNaN(parseInt(req.body.template_id))) ? parseInt(req.body.template_id) : '';
     var pin = req.body.pin ? req.body.pin : null;
-    var statusId = (!isNaN(parseInt(req.body.status_id))) ?  parseInt(req.body.status_id) : 1;  // 1-active, 2-inactive
+    var statusId = (!isNaN(parseInt(req.body.status_id))) ? parseInt(req.body.status_id) : 1;  // 1-active, 2-inactive
     var functionId = (!isNaN(parseInt(req.body.fid))) ? parseInt(req.body.fid) : 0;
     var categoryId = (!isNaN(parseInt(req.body.cid))) ? parseInt(req.body.cid) : 0;
     var businessKeywords = (req.body.keywords) ? req.body.keywords : '';
@@ -4000,19 +4017,19 @@ User.prototype.saveUserDetails = function(req,res,next){
     var validateStatus = true;
     var error = {};
 
-    if(!token){
+    if (!token) {
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-    if(!req.body.lat){
+    if (!req.body.lat) {
         error['lat'] = 'Invalid latitude';
         validateStatus *= false;
     }
-    if(!req.body.lng){
+    if (!req.body.lng) {
         error['lng'] = 'Invalid longitude';
         validateStatus *= false;
     }
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
         res.status(400).json(responseMessage);
@@ -4023,24 +4040,24 @@ User.prototype.saveUserDetails = function(req,res,next){
                 if (!err) {
                     //console.log(tokenResult);
                     if (tokenResult) {
-                        var queryParams =  st.db.escape(firstName) + ',' + st.db.escape(lastName)
-                            + ',' + st.db.escape(companyName)+ ','+ st.db.escape(jobTitle) + ',' + st.db.escape(gender)
-                            + ',' + st.db.escape(dob + ' 00:00') + ',' + st.db.escape(companyTagline)+ ',' + st.db.escape(email)
-                            + ',' + st.db.escape(token)+ ',' + st.db.escape(visibleEmail)+ ',' + st.db.escape(visibleMobile)
-                            + ',' + st.db.escape(visiblePhone)+ ',' + st.db.escape(visibleAddress)+ ',' + st.db.escape(locTitle)
-                            + ',' + st.db.escape(req.body.lat)+ ',' + st.db.escape(req.body.lng)+ ',' + st.db.escape(address1)
-                            + ',' + st.db.escape(address2)+ ',' + st.db.escape(city)+ ',' + st.db.escape(stateId)
-                            + ',' + st.db.escape(countryId)+ ',' + st.db.escape(postalCode)+ ',' + st.db.escape(phone)
-                            + ',' + st.db.escape(mobile)+ ',' + st.db.escape(website)+ ',' + st.db.escape(isdPhone)
-                            + ',' + st.db.escape(isdMobile)+ ',' + st.db.escape(parkingStatus)+ ',' + st.db.escape(templateId)
-                            + ',' + st.db.escape(pin)+ ',' + st.db.escape(statusId)+ ',' + st.db.escape(functionId)
-                            + ',' + st.db.escape(categoryId) + ',' + st.db.escape(businessKeywords)+ ',' + st.db.escape(aboutCompany)+','+st.db.escape(DBSecretKey);
+                        var queryParams = st.db.escape(firstName) + ',' + st.db.escape(lastName)
+                            + ',' + st.db.escape(companyName) + ',' + st.db.escape(jobTitle) + ',' + st.db.escape(gender)
+                            + ',' + st.db.escape(dob + ' 00:00') + ',' + st.db.escape(companyTagline) + ',' + st.db.escape(email)
+                            + ',' + st.db.escape(token) + ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
+                            + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(visibleAddress) + ',' + st.db.escape(locTitle)
+                            + ',' + st.db.escape(req.body.lat) + ',' + st.db.escape(req.body.lng) + ',' + st.db.escape(address1)
+                            + ',' + st.db.escape(address2) + ',' + st.db.escape(city) + ',' + st.db.escape(stateId)
+                            + ',' + st.db.escape(countryId) + ',' + st.db.escape(postalCode) + ',' + st.db.escape(phone)
+                            + ',' + st.db.escape(mobile) + ',' + st.db.escape(website) + ',' + st.db.escape(isdPhone)
+                            + ',' + st.db.escape(isdMobile) + ',' + st.db.escape(parkingStatus) + ',' + st.db.escape(templateId)
+                            + ',' + st.db.escape(pin) + ',' + st.db.escape(statusId) + ',' + st.db.escape(functionId)
+                            + ',' + st.db.escape(categoryId) + ',' + st.db.escape(businessKeywords) + ',' + st.db.escape(aboutCompany) + ',' + st.db.escape(DBSecretKey);
                         var query = 'CALL psaveuserdetails(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertResult) {
                             if (!err) {
                                 //console.log(insertResult);
-                                if(insertResult) {
+                                if (insertResult) {
                                     if (insertResult.affectedRows > 0) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
@@ -4160,34 +4177,36 @@ User.prototype.saveUserDetails = function(req,res,next){
  *
  * @request-param token* <string>
  */
-User.prototype.getUserDetailsNew = function(req,res,next){
+User.prototype.getUserDetailsNew = function (req, res, next) {
     var token = req.query.token;
 
     var respMsg = {
-        status : false,
-        message : 'An error occurred ! Please try again',
-        data : null,
-        error : {
-            token : 'Invalid token'
+        status: false,
+        message: 'An error occurred ! Please try again',
+        data: null,
+        error: {
+            token: 'Invalid token'
         }
     };
 
-    if(!token){
-        res.status(401).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
-            token : 'Invalid token'
-        }});
+    if (!token) {
+        res.status(401).json({
+            status: false, data: null, message: 'Unauthorized ! Please login to continue', error: {
+                token: 'Invalid token'
+            }
+        });
     }
-    else{
-        try{
-            st.validateToken(token,function(err,tokenRes){
-                if(!err){
-                    if(tokenRes){
-                        var queryString = 'CALL pgetuserdetails('+st.db.escape(token) + ')';
-                        st.db.query(queryString,function(err,results){
-                            if(!err){
-                                if(results){
-                                    if(results[0]){
-                                        if(results[0][0]){
+    else {
+        try {
+            st.validateToken(token, function (err, tokenRes) {
+                if (!err) {
+                    if (tokenRes) {
+                        var queryString = 'CALL pgetuserdetails(' + st.db.escape(token) + ')';
+                        st.db.query(queryString, function (err, results) {
+                            if (!err) {
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0][0]) {
                                             respMsg.status = true;
                                             respMsg.error = null;
                                             respMsg.message = 'User details loaded successfully';
@@ -4195,7 +4214,7 @@ User.prototype.getUserDetailsNew = function(req,res,next){
                                             respMsg.data = results[0][0];
                                             res.status(200).json(respMsg);
                                         }
-                                        else{
+                                        else {
                                             respMsg.status = false;
                                             respMsg.error = null;
                                             respMsg.message = 'No such user is available';
@@ -4203,7 +4222,7 @@ User.prototype.getUserDetailsNew = function(req,res,next){
                                             res.status(200).json(respMsg);
                                         }
                                     }
-                                    else{
+                                    else {
                                         respMsg.status = false;
                                         respMsg.error = null;
                                         respMsg.message = 'No such user is available';
@@ -4212,7 +4231,7 @@ User.prototype.getUserDetailsNew = function(req,res,next){
                                     }
 
                                 }
-                                else{
+                                else {
                                     respMsg.status = false;
                                     respMsg.error = null;
                                     respMsg.message = 'No such user is available';
@@ -4220,34 +4239,40 @@ User.prototype.getUserDetailsNew = function(req,res,next){
                                     res.status(200).json(respMsg);
                                 }
                             }
-                            else{
+                            else {
                                 console.log('getUserDetailsNew : error');
                                 console.log(err);
                                 res.status(200).json(respMsg);
                             }
                         });
                     }
-                    else{
-                        res.status(401).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
-                            token : 'Invalid token'
-                        }});
+                    else {
+                        res.status(401).json({
+                            status: false, data: null, message: 'Unauthorized ! Please login to continue', error: {
+                                token: 'Invalid token'
+                            }
+                        });
                     }
                 }
-                else{
+                else {
                     console.log('getUserDetailsNew : error');
                     console.log(err);
-                    res.status(500).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
-                        token : 'Invalid token'
-                    }});
+                    res.status(500).json({
+                        status: false, data: null, message: 'Unauthorized ! Please login to continue', error: {
+                            token: 'Invalid token'
+                        }
+                    });
                 }
             });
         }
-        catch(ex){
+        catch (ex) {
             console.log('Exception - getUserDetailsNew ');
             console.log(ex);
-            res.status(500).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
-                token : 'Invalid token'
-            }});
+            res.status(500).json({
+                status: false, data: null, message: 'Unauthorized ! Please login to continue', error: {
+                    token: 'Invalid token'
+                }
+            });
         }
 
     }
@@ -4261,11 +4286,11 @@ User.prototype.getUserDetailsNew = function(req,res,next){
  * @param next
  * @description api code for send resume
  */
-User.prototype.sendResume = function(req,res,next){
+User.prototype.sendResume = function (req, res, next) {
 
     var token = req.body.token;
-    var cvid = (!isNaN(parseInt(req.body.cvid))) ? parseInt(req.body.cvid):0;
-    var ezeid =  req.st.alterEzeoneId(req.body.ezeid);
+    var cvid = (!isNaN(parseInt(req.body.cvid))) ? parseInt(req.body.cvid) : 0;
+    var ezeid = req.st.alterEzeoneId(req.body.ezeid);
     var responseMessage = {
         status: false,
         error: {},
@@ -4276,16 +4301,16 @@ User.prototype.sendResume = function(req,res,next){
     var validateStatus = true;
     var error = {};
 
-    if(!token){
+    if (!token) {
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-    if(!cvid){
+    if (!cvid) {
         error['cvid'] = 'Invalid cvid';
         validateStatus *= false;
     }
 
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors below';
         res.status(400).json(responseMessage);
@@ -4295,18 +4320,18 @@ User.prototype.sendResume = function(req,res,next){
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var queryParams = st.db.escape(token)+ ',' + st.db.escape(cvid)+','+st.db.escape(ezeid);
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(cvid) + ',' + st.db.escape(ezeid);
                         var query = 'CALL pSendResume(' + queryParams + ')';
                         st.db.query(query, function (err, insertResult) {
                             if (!err) {
-                                if(insertResult) {
+                                if (insertResult) {
                                     if (insertResult.affectedRows > 0) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Resume Send successfully';
                                         responseMessage.data = {
                                             cvid: cvid,
-                                            ezeid:ezeid
+                                            ezeid: ezeid
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnSendResume: Resume send successfully');
@@ -4376,7 +4401,7 @@ User.prototype.sendResume = function(req,res,next){
  * @param next
  * @description api code for download resume
  */
-User.prototype.downloadResume = function(req,res,next){
+User.prototype.downloadResume = function (req, res, next) {
 
     var token = req.query.token;
     var id = parseInt(req.query.id);
@@ -4391,16 +4416,16 @@ User.prototype.downloadResume = function(req,res,next){
     var validateStatus = true;
     var error = {};
 
-    if(!token){
+    if (!token) {
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-    if(!id){
+    if (!id) {
         error['id'] = 'Invalid id';
         validateStatus *= false;
     }
 
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors below';
         res.status(400).json(responseMessage);
@@ -4414,7 +4439,7 @@ User.prototype.downloadResume = function(req,res,next){
                         var query = 'CALL pdownloadresume(' + queryParams + ')';
                         st.db.query(query, function (err, getResume) {
                             if (!err) {
-                                if(getResume) {
+                                if (getResume) {
                                     if (getResume[0]) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
@@ -4488,23 +4513,23 @@ User.prototype.downloadResume = function(req,res,next){
  * @param next
  * @description api code for get conveyance report
  */
-User.prototype.getConveyanceReport = function(req,res,next){
+User.prototype.getConveyanceReport = function (req, res, next) {
 
     var token = req.query.token;
     var startDate = req.query.s_date;
     var endDate = req.query.e_date;
-    var pdfcontent='';
+    var pdfcontent = '';
     var data1;
-    var total=0;
+    var total = 0;
 
 
     var path = require('path');
 
 
     var sDate = startDate.split('-');
-    sDate = sDate[2] + '-' + sDate[1]+ '-' + sDate[0];
+    sDate = sDate[2] + '-' + sDate[1] + '-' + sDate[0];
     var eDate = endDate.split('-');
-    eDate = eDate[2] + '-' + eDate[1]+ '-' + eDate[0];
+    eDate = eDate[2] + '-' + eDate[1] + '-' + eDate[0];
 
 
     var responseMessage = {
@@ -4517,12 +4542,12 @@ User.prototype.getConveyanceReport = function(req,res,next){
     var validateStatus = true;
     var error = {};
 
-    if(!token){
+    if (!token) {
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
 
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors below';
         res.status(400).json(responseMessage);
@@ -4532,12 +4557,12 @@ User.prototype.getConveyanceReport = function(req,res,next){
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(startDate)+ ',' + st.db.escape(endDate);
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate);
                         var query = 'CALL pgetConveyanceReport(' + queryParams + ')';
                         st.db.query(query, function (err, getresult) {
                             //console.log(getresult[0]);
                             if (!err) {
-                                if(getresult) {
+                                if (getresult) {
                                     if (getresult[0]) {
 
                                         responseMessage.status = true;
@@ -4768,7 +4793,7 @@ User.prototype.getConveyanceReport = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getindustryType = function(req,res,next) {
+User.prototype.getindustryType = function (req, res, next) {
     /**
      * @todo FnGetindustryType
      */
@@ -4785,8 +4810,8 @@ User.prototype.getindustryType = function(req,res,next) {
 
         st.db.query('CALL pGetindustryType()', function (err, industrytypeResult) {
             if (!err) {
-                if(industrytypeResult) {
-                    if(industrytypeResult[0]) {
+                if (industrytypeResult) {
+                    if (industrytypeResult[0]) {
                         responseMsg.status = true;
                         responseMsg.message = 'industryType loaded successfully';
                         responseMsg.error = null;
@@ -4804,7 +4829,7 @@ User.prototype.getindustryType = function(req,res,next) {
                 }
             }
             else {
-                console.log('Error : FnGetindustryType: '+err);
+                console.log('Error : FnGetindustryType: ' + err);
                 res.status(500).json(responseMsg);
             }
         });
@@ -4826,7 +4851,7 @@ User.prototype.getindustryType = function(req,res,next) {
  * @param next
  * @description api code for get industry category
  */
-User.prototype.getindustrycategory = function(req,res,next){
+User.prototype.getindustrycategory = function (req, res, next) {
 
     var industryId = req.query.iid;
 
@@ -4839,7 +4864,7 @@ User.prototype.getindustrycategory = function(req,res,next){
 
     try {
 
-        var queryParams = st.db.escape(industryId) ;
+        var queryParams = st.db.escape(industryId);
         var query = 'CALL Pgetindustrycategory(' + queryParams + ')';
         //console.log(query);
         st.db.query(query, function (err, getResult) {
@@ -4897,7 +4922,7 @@ User.prototype.getindustrycategory = function(req,res,next){
  * @param next
  * @description api code for get Profile Pic For Ezeid
  */
-User.prototype.profilePicForEzeid = function(req,res,next){
+User.prototype.profilePicForEzeid = function (req, res, next) {
 
     var ezeid = req.st.alterEzeoneId(req.query.ezeid);
 
@@ -4905,19 +4930,19 @@ User.prototype.profilePicForEzeid = function(req,res,next){
         status: false,
         error: {},
         message: '',
-        data: {s_url:''}
+        data: { s_url: '' }
     };
 
     var validateStatus = true;
     var error = {};
 
 
-    if(!ezeid){
+    if (!ezeid) {
         error['ezeid'] = 'Invalid ezeid';
         validateStatus *= false;
     }
 
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors below';
         res.status(400).json(responseMessage);
@@ -4929,26 +4954,20 @@ User.prototype.profilePicForEzeid = function(req,res,next){
             st.db.query(query, function (err, EzediExitsResult) {
                 if (!err) {
                     if (EzediExitsResult) {
-                        if(EzediExitsResult[0]) {
-                                var query1 = "select ifnull((SELECT image FROM t_docsandurls where masterid=" + EzediExitsResult[0].TID + " AND tag='PIC' LIMIT 0,1),'') as picture from tmaster where tid=" + EzediExitsResult[0].TID;
-                                st.db.query(query1, function (err, imageResult) {
-                                    if (!err) {
-                                        if(imageResult) {
-                                            if (imageResult[0]) {
-                                                responseMessage.status = true;
-                                                responseMessage.error = null;
-                                                responseMessage.message = 'Profile Picture loaded successfully';
-                                                imageResult[0].picture = (imageResult[0].picture) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + imageResult[0].picture) : '';
-                                                responseMessage.data = {s_url: imageResult[0].picture};
+                        if (EzediExitsResult[0]) {
+                            var query1 = "select ifnull((SELECT image FROM t_docsandurls where masterid=" + EzediExitsResult[0].TID + " AND tag='PIC' LIMIT 0,1),'') as picture from tmaster where tid=" + EzediExitsResult[0].TID;
+                            st.db.query(query1, function (err, imageResult) {
+                                if (!err) {
+                                    if (imageResult) {
+                                        if (imageResult[0]) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Profile Picture loaded successfully';
+                                            imageResult[0].picture = (imageResult[0].picture) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + imageResult[0].picture) : '';
+                                            responseMessage.data = { s_url: imageResult[0].picture };
 
-                                                res.status(200).json(responseMessage);
-                                                console.log('FnProfilePicForEzeid: Profile Picture loaded successfully');
-                                            }
-                                            else {
-                                                responseMessage.message = 'Profile Picture not loaded';
-                                                res.status(200).json(responseMessage);
-                                                console.log('FnProfilePicForEzeid: Profile Picture not loaded');
-                                            }
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnProfilePicForEzeid: Profile Picture loaded successfully');
                                         }
                                         else {
                                             responseMessage.message = 'Profile Picture not loaded';
@@ -4957,14 +4976,20 @@ User.prototype.profilePicForEzeid = function(req,res,next){
                                         }
                                     }
                                     else {
-                                        responseMessage.message = 'An error occured in query ! Please try again';
-                                        responseMessage.error = {
-                                            server: 'Internal Server Error'
-                                        };
-                                        res.status(500).json(responseMessage);
-                                        console.log('FnProfilePicForEzeid: error in getting Profile Picture :' + err);
+                                        responseMessage.message = 'Profile Picture not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnProfilePicForEzeid: Profile Picture not loaded');
                                     }
-                                });
+                                }
+                                else {
+                                    responseMessage.message = 'An error occured in query ! Please try again';
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    res.status(500).json(responseMessage);
+                                    console.log('FnProfilePicForEzeid: error in getting Profile Picture :' + err);
+                                }
+                            });
 
                         }
                         else {
@@ -5010,7 +5035,7 @@ User.prototype.profilePicForEzeid = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getAlumniEducations = function(req,res,next) {
+User.prototype.getAlumniEducations = function (req, res, next) {
 
     var token = req.query.token;
     var responseMsg = {
@@ -5019,7 +5044,7 @@ User.prototype.getAlumniEducations = function(req,res,next) {
         message: 'Unable to load educations',
         error: {}
     };
-    if(!req.query.alumni_code){
+    if (!req.query.alumni_code) {
         error['alumni_code'] = 'Invalid Alumni code';
         validateStatus *= false;
     }
@@ -5044,26 +5069,26 @@ User.prototype.getAlumniEducations = function(req,res,next) {
                 if (!err) {
                     if (tokenResult) {
                         var parameters = st.db.escape(alumniCode);
-                        st.db.query('CALL pGetAlumni_Educations('+ parameters +')', function (err, educationResult) {
+                        st.db.query('CALL pGetAlumni_Educations(' + parameters + ')', function (err, educationResult) {
                             if (err) {
                                 console.log('Error : pGetAlumni_Educations :' + err);
                                 res.status(400).json(responseMsg);
                             }
                             else {
-                                if(educationResult) {
-                                    if(educationResult[0]) {
+                                if (educationResult) {
+                                    if (educationResult[0]) {
                                         responseMsg.status = true;
                                         responseMsg.message = 'Educations loaded successfully';
                                         responseMsg.error = null;
                                         responseMsg.data = geteducationResult[0];
                                         res.status(200).json(responseMsg);
                                     }
-                                    else{
+                                    else {
                                         console.log('getAlumniEducations:Unable to load educations');
                                         res.status(200).json(responseMsg);
                                     }
                                 }
-                                else{
+                                else {
                                     console.log('getAlumniEducations:Unable to load educations');
                                     res.status(200).json(responseMsg);
                                 }
