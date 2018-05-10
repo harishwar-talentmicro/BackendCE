@@ -2089,7 +2089,7 @@ UserCtrl.getUserDetails = function (req, res, next) {
                                             console.log('FnGetUserDetails : tmaster: User details sent successfully');
                                             UserDetailsResult[0][0].versionStatus = rtnMessage.versionStatus;
                                             UserDetailsResult[0][0].versionMessage = rtnMessage.versionMessage;
-                                            res.send(UserDetailsResult[0]);
+                                            res.send(UserDetailsResult[0][0]);  // response is json object now from array
                                         }
                                         else {
                                             res.json(null);
