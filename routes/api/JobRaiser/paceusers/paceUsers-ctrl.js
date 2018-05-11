@@ -396,11 +396,13 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-
+                req.query.type = req.query.type ? req.query.type : 1;
+            
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.userMasterId)
+                    req.st.db.escape(req.query.userMasterId),
+                    req.st.db.escape(req.query.type)
                 ];
 
                 var procQuery = 'CALL wm_get_DashBoard( ' + inputs.join(',') + ')';
@@ -411,9 +413,16 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         response.status = true;
                         response.message = "data loaded successfully";
                         response.error = null;
+                        var output =[];
+                        for (var i = 0; i < result[1].length; i++) {
+                            var res2 = {};
+                            res2.stage = result[1][i].stage ? JSON.parse(result[1][i].stage):{};
+                            output.push(res2);
+                        }
                         response.data =
                             {
-                                requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {}
+                                requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
+                                stages :output
                             };
                         res.status(200).json(response);
                     }
@@ -423,7 +432,8 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            requirementStatus: {}
+                            requirementStatus: {},
+                            stages: []
                         };
                         res.status(200).json(response);
                     }

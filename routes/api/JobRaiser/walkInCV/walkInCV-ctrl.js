@@ -913,7 +913,9 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             bannerList: result[0],
                             companyLogo:result[1][0].companyLogo,
                             registrationType :0,  // need to come from backend, will be done later.
-                            tokenGeneration : 0   // need to come from backend, will be done later.
+                            tokenGeneration : 0,
+                            industryList: result[2] ? result[2]:[],
+                            skillList: result[3] ? result[3]:[]   // need to come from backend, will be done later.
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -934,7 +936,9 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             bannerList: [],
                             companyLogo:"",
                             registrationType :0,  // need to come from backend, will be done later.
-                            tokenGeneration : 0  
+                            tokenGeneration : 0,
+                            industryList: [],
+                            skillList: []  
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -1044,21 +1048,26 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
     }
 
     var senderGroupId;
+
+
     var loginId = req.body.loginId;
     var password = req.body.password;
-    var heMasterId = req.body.heMasterId;
+    var apiKey = req.body.APIKey;
+    // var heMasterId = req.body.heMasterId;
 
     if (status) {
 
-        var queryParams = req.st.db.escape(loginId) + ',' + req.st.db.escape(heMasterId);
+        var queryParams = req.st.db.escape(loginId) + ',' + req.st.db.escape(apiKey);
         var query = 'CALL checkLogin(' + queryParams + ')';
         console.log('query', query);
         req.db.query(query, function (err, loginResult) {
             console.log(loginResult);
             if (!err) {
-                if (loginResult && password) {
-                    if(loginResult.length > 0){
-                        var loginDetails = loginResult[0];
+
+                if (loginResult && loginResult[0][0]) {
+
+                        var loginDetails = loginResult;
+
                         if(loginResult[0][0].userError == 'Invalid User'){
 
                             response.status=false;
@@ -1066,7 +1075,8 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                             response.message = loginResult[0][0].userError;
                             res.status(401).json(response);
                         }
-                        else if(loginResult[0][0].companyError == 'Invalid company user'){
+
+                        else if(loginResult[0][0].companyError == 'Invalid Company User'){
 
                             response.status=false;
                             response.error = error;
@@ -1076,6 +1086,7 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                         else {
 
                             if(comparePassword(password, loginResult[0][0].Password)){
+                                var heMasterId=loginResult[1][0].heMasterId;
 
                                 if ((!err) && loginResult[0]) {
                                     req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
@@ -1094,10 +1105,9 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                     req.body.interviewDuration = req.body.interviewDuration ? req.body.interviewDuration : 0;
 
                                     var procParams = [
-                                        req.st.db.escape(req.body.loginId),
-                                        // req.st.db.escape(encryptPwd),
 
-                                        req.st.db.escape(req.body.heMasterId),
+                                        req.st.db.escape(req.body.loginId),
+                                        req.st.db.escape(heMasterId),
                                         req.st.db.escape(req.body.parentId),
                                         req.st.db.escape(JSON.stringify(interviewRound)),
                                         req.st.db.escape(req.body.reportingDateTime),
@@ -1108,7 +1118,7 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                         req.st.db.escape(req.body.approverNotes),
                                         req.st.db.escape(req.body.receiverNotes),
                                         req.st.db.escape(req.body.changeLog),
-                                        req.st.db.escape(req.body.groupId),
+                                        
                                         req.st.db.escape(req.body.learnMessageId),
                                         req.st.db.escape(req.body.accessUserType),
                                         req.st.db.escape(req.body.approverCount),
@@ -1248,7 +1258,7 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                         //     res.status(401).json(response);
                         //     // console.log('FnLogin:password doesnt match found');
                         // }
-                    }
+
                 }
                 else {
                     response.status=false;

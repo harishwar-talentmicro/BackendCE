@@ -10,6 +10,10 @@ var Notification = require('../../../modules/notification/notification-master.js
 var notification = new Notification();
 var fs = require('fs');
 
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+var zlib = require('zlib');
+
 var composeCtrl = {};
 
 composeCtrl.sendMessage = function(req,res,next){

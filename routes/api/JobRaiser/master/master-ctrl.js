@@ -15,7 +15,7 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 
 var CONFIG = require('../../../../ezeone-config.json');
-var DBSecretKey=CONFIG.DB.secretKey;
+var DBSecretKey = CONFIG.DB.secretKey;
 
 var masterCtrl = {};
 var error = {};
@@ -1442,14 +1442,14 @@ masterCtrl.getClientView = function (req, res, next) {
                             var res2 = {};
                             res2.stageDetail = results[0][i].stageDetail ? JSON.parse(results[0][i].stageDetail) : [],
                                 res2.heDepartmentId = results[0][i].departmentId ? results[0][i].departmentId : 0;
-                                res2.clientName = results[0][i].clientName ? results[0][i].clientName : 0;
-                                res2.requirementCount = results[0][i].count ? results[0][i].count : 0;
-                                res2.notes = results[0][i].notes ? results[0][i].notes : 0;
-                                res2.createdDate = results[0][i].createdDate ? results[0][i].createdDate : null;
-                                res2.updateDate = results[0][i].updateDate ? results[0][i].updateDate : null;
-                                res2.createdUserName = results[0][i].createdUserName ? results[0][i].createdUserName : '';
-                                res2.updatedUserName = results[0][i].updatedUserName ? results[0][i].updatedUserName : '';
-                                res2.clientContacts = results[0][i].contacts ? JSON.parse(results[0][i].contacts) : [];
+                            res2.clientName = results[0][i].clientName ? results[0][i].clientName : 0;
+                            res2.requirementCount = results[0][i].count ? results[0][i].count : 0;
+                            res2.notes = results[0][i].notes ? results[0][i].notes : 0;
+                            res2.createdDate = results[0][i].createdDate ? results[0][i].createdDate : null;
+                            res2.updateDate = results[0][i].updateDate ? results[0][i].updateDate : null;
+                            res2.createdUserName = results[0][i].createdUserName ? results[0][i].createdUserName : '';
+                            res2.updatedUserName = results[0][i].updatedUserName ? results[0][i].updatedUserName : '';
+                            res2.clientContacts = results[0][i].contacts ? JSON.parse(results[0][i].contacts) : [];
                             output.push(res2);
                         }
                         response.data = {
@@ -1585,14 +1585,59 @@ masterCtrl.mailTags = function (req, res, next) {
                 else {                     //Client mailer
                     idArray = client;
                 }
-
-                var procQuery = 'CALL wm_get_detailsByTags1( ' + inputs.join(',') + ')';
+                var procQuery;
+                if (req.body.mailerType == 4)
+                    procQuery = 'CALL wm_get_clientDetailsByTags( ' + inputs.join(',') + ')';
+                else
+                    procQuery = 'CALL wm_get_detailsByTags1( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
                     console.log(result);
                     if (!err && result) {
                         var temp = mailBody;
+                        if (req.body.mailerType == 4) {
+                            for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
+                                // for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+
+
+                                //     for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+                                //         mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[2][applicantIndex][tags.client[tagIndex].tagName]);
+                                //     }
+                                // }
+                                for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+                                    mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                    console.log('result=', result[0]);
+                                    console.log('result[8][k]=', result[0][clientIndex]);
+                                }
+
+                                // if (tableTags.applicant.length > 0) {
+                                //     var position = mailBody.indexOf('@table');
+                                //     var tableContent = '';
+                                //     mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
+                                //     tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
+                                //     console.log(tableContent, 'mailbody');
+                                //     for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                //         tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                                //     }
+                                //     tableContent += "</tr>";
+                                //     for (var candidateCount = 0; candidateCount < result[5].length; candidateCount++) {
+                                //         tableContent += "<tr>";
+                                //         for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                //             tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[5][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                //         }
+                                //         tableContent += "</tr>";
+                                //     }
+
+                                //     tableContent += "</table>";
+                                //     mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
+
+                                // }
+
+                                mailbody_array.push(mailBody);
+                                mailBody = temp;
+                            }
+                        }
                         if (req.body.mailerType != 2) {
                             for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
                                 console.log('applicantIndex=', applicantIndex);
