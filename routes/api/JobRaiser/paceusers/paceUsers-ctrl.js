@@ -304,7 +304,7 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
     var validationFlag = true;
 
     if (!req.query.heMasterId) {
-        validationFlag = false;
+        validationFlag *= false;
         error.heMasterId = "Invalid Company";
     }
     if (!req.query.token) {
@@ -453,5 +453,77 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
     }
 };
 
+paceUsersCtrl.saveTrackerTemplate = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.body.heMasterId) {
+        error.heMasterId = "Invalid Company";
+        validationFlag *= false;
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    var tagsJson = req.body.tagsJson;
+    if (typeof (tagsJson) == "string") {
+        tagsJson = JSON.parse(tagsJson);
+    }
+    if (!tagsJson) {
+        tagsJson = [];
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.heMasterId),
+                    req.st.db.escape(req.body.trackerId),
+                    req.st.db.escape(req.body.userMasterId),
+                    req.st.db.escape(req.body.templateName),
+                    req.st.db.escape(req.body.generatedFileName),
+                    req.st.db.escape(JSON.stringify(tagsJson))
+                ];
+
+                var procQuery = 'CALL paceusers_tracker( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(result);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "tracker saved successfully";
+                        response.error = null;
+                        response.data = result[0][0];
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving tracker template";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
 
 module.exports = paceUsersCtrl;

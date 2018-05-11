@@ -449,7 +449,8 @@ router.put('/status', function(req,res,next){
                             req.db.escape(req.query.token) ,
                             req.db.escape(req.body.groupId) ,
                             req.db.escape(req.body.status) ,
-                            req.db.escape(req.body.userGroupId)
+                            req.db.escape(req.body.userGroupId),
+                            req.db.escape(DBSecretKey)
                         ];
                         var notifyParams = [
                             req.db.escape(req.query.token) ,

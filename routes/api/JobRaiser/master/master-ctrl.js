@@ -602,7 +602,8 @@ masterCtrl.getmailTemplate = function (req, res, next) {
                             submissionMailer: result[1] ? result[1] : [],
                             jobseekerMailer: result[2] ? result[2] : [],
                             clientMailer: result[3] ? result[3] : [],
-                            interviewMailer: result[4] ? result[4] : []
+                            interviewMailer: result[4] ? result[4] : [],
+                            trackerTemplates: result[5] ? result[5]: []
                         };
                         res.status(200).json(response);
                     }

@@ -25,7 +25,7 @@ var NotificationQueryManager = require('./notification/notification-query.js');
 var notificationQmManager = null;
 var mailModule = require('./mail-module.js');
 var mail = null;
-var CONFIG = require('../../ezeone-config.json');
+// var CONFIG = require('../../ezeone-config.json');
 
 var CONFIG = require('../../ezeone-config.json');
 var DBSecretKey = CONFIG.DB.secretKey;

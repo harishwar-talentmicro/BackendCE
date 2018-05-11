@@ -26,6 +26,8 @@ var encryption = new AES_256_encryption();
 var notifyMessages = require('../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
 
+var appConfig = require('../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 /**
  * Method : POST
@@ -270,7 +272,8 @@ router.post('/', function (req, res, next) {
                                         var contactParams = [
                                             req.db.escape(req.st.alterEzeoneId(tokenResult[0].ezeoneId)),
                                             req.db.escape(tokenResult[0].pin),
-                                            req.db.escape(req.body.receiverGroupId)
+                                            req.db.escape(req.body.receiverGroupId),
+                                            req.db.escape(DBSecretKey)
                                         ];
 
                                         var procQuery = 'CALL p_v1_ComposeMessage(' + procParams.join(', ') + ');CALL get_v1_contact(' + contactParams.join(', ') + ');';
@@ -697,7 +700,8 @@ router.post('/sync', function (req, res, next) {
                                     req.db.escape(req.query.limit),
                                     req.db.escape(req.query.lastSyncTimeStamp),
                                     req.db.escape(req.query.currentTimeStamp),
-                                    req.db.escape(JSON.stringify(messageList))
+                                    req.db.escape(JSON.stringify(messageList)),
+                                    req.db.escape(DBSecretKey)
                                 ];
                                 var procQuery = 'CALL p_v1_LoadMessagesofGroup(' + procParams.join(',') + ')';
                                 console.log(procQuery);
@@ -1216,7 +1220,8 @@ router.get('', function (req, res, next) {
                             req.db.escape(req.query.pageNo),
                             req.db.escape(req.query.limit),
                             req.db.escape(req.query.lastSyncTimeStamp),
-                            req.db.escape(req.query.currentTimeStamp)
+                            req.db.escape(req.query.currentTimeStamp),
+                            req.db.escape(DBSecretKey)
                         ];
                         var procQuery = 'CALL p_v1_LoadMessagesofGroup(' + procParams.join(',') + ')';
                         console.log(procQuery);

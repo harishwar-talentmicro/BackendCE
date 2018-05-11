@@ -387,6 +387,15 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
         period = {};
     }
 
+    var location = req.body.location;
+    if (typeof (location) == "string") {
+        location = JSON.parse(location);
+    }
+    if (!location) {
+        location = {};
+    }
+
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please Check the Errors';
@@ -407,6 +416,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.status = (req.body.status) ? req.body.status : 1;
                 req.body.experience = (req.body.experience) ? req.body.experience : '0.0';
                 req.body.presentSalary = (req.body.presentSalary) ? req.body.presentSalary : '0.0';
+                req.body.walkinType = (req.body.walkinType) ? req.body.walkinType : 0;
+                req.body.referedByUserId = (req.body.referedByUserId) ? req.body.referedByUserId : 0;
 
 
                 var inputs = [
@@ -440,6 +451,10 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.approverCount),
                     req.st.db.escape(req.body.receiverCount),
                     req.st.db.escape(req.body.status),
+                    req.st.db.escape(req.body.walkinType),
+                    req.st.db.escape(req.body.referedByUserId),
+                    req.st.db.escape(req.body.location),
+
                     req.st.db.escape(DBSecretKey)
 
                 ];
@@ -558,16 +573,29 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                         }
 
                     }
-                    else if(!err && results ){
+                    else if(!err && results [1] && results [2] && results [3] ){
             
                             response.status = true;
                             response.message = "Walkin Form saved successfully";
                             response.error = null;
                             response.data={
-                                walkinMessage:results[2][0]
+                                walkinMessage:results[2][0],
+                                token:results[3][0]
                             };
                             res.status(200).json(response);
                         }
+
+                    else if(!err && results [1] && results [2] ){
+
+                        response.status = true;
+                        response.message = "Walkin Form saved successfully";
+                        response.error = null;
+                        response.data={
+                            walkinMessage:results[2][0]
+                        };
+                        res.status(200).json(response);
+                    }
+
                     else {
                         response.status = false;
                         response.message = "Error While Saving walkIn";
@@ -915,7 +943,9 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             registrationType :0,  // need to come from backend, will be done later.
                             tokenGeneration : 0,
                             industryList: result[2] ? result[2]:[],
-                            skillList: result[3] ? result[3]:[]   // need to come from backend, will be done later.
+                            skillList: result[3] ? result[3]:[],// need to come from backend, will be done later.
+                            locationList:result[4] ? result[4]:[],
+                            referedNameList:result[5] ? result[5]:[]
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -1048,8 +1078,6 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
     }
 
     var senderGroupId;
-
-
     var loginId = req.body.loginId;
     var password = req.body.password;
     var apiKey = req.body.APIKey;
@@ -1057,7 +1085,7 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
 
     if (status) {
 
-        var queryParams = req.st.db.escape(loginId) + ',' + req.st.db.escape(apiKey);
+        var queryParams = req.st.db.escape(loginId) + ',' + req.st.db.escape(apiKey)+ ',' + req.st.db.escape(DBSecretKey);
         var query = 'CALL checkLogin(' + queryParams + ')';
         console.log('query', query);
         req.db.query(query, function (err, loginResult) {
@@ -1087,6 +1115,15 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
 
                             if(comparePassword(password, loginResult[0][0].Password)){
                                 var heMasterId=loginResult[1][0].heMasterId;
+
+                                var CVFile=candidateDetails.cvFile;
+                                function base64_decode(base64str, CVFile) {
+                                    // create buffer object from base64 encoded string, it is important to tell the constructor that the string is base64 encoded
+                                    var bitmap = new Buffer(base64str, 'base64');
+                                    // write buffer to file
+                                    fs.writeFileSync(CVFile, bitmap);
+                                    console.log();
+                                }
 
                                 if ((!err) && loginResult[0]) {
                                     req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
@@ -1207,7 +1244,7 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                             response.message = "Interview scheduled successfully";
                                             response.error = null;
                                             response.data = {
-                                                messageList:
+                                               /* messageList:
                                                     {
                                                         messageId: results[0][0].messageId,
                                                         message: results[0][0].message,
@@ -1229,7 +1266,8 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                                         accessUserType: results[0][0].accessUserType,
                                                         heUserId: results[0][0].heUserId,
                                                         formData: JSON.parse(results[0][0].formDataJSON)
-                                                    }
+                                                    }*/
+                                               transactionId:results[2][0].transId
                                             };
                                             res.status(200).json(response);
                                         }

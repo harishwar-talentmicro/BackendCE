@@ -414,7 +414,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                 requirement: result[12] ? result[12] : [],
                                 client: result[13] ? result[13] : [],
                                 general: result[27] ? result[27] : [],
-                                clientContact: result[30] ? result[30] : []
+                                clientContact: result[30] ? result[30] : [],
+                                interview: result[33] ? result[33] : []
                             },
                             educationList: output1,
                             Stage: result[15] ? result[15] : [],
@@ -468,7 +469,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                 requirementTags: [],
                                 client: [],
                                 general: [],
-                                clientContact: []
+                                clientContact: [],
+                                interview: []
                             },
                             educationList: [],
                             stage: [],
@@ -1158,6 +1160,7 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                             res2.noticePeriod = result[0][i].noticePeriod;
                             res2.jobTitleId = result[0][i].jobTitleId;
                             res2.jobTitle = result[0][i].jobTitle;
+                            res2.cvPath = result[0][i].cvPath;
                             res2.experience = result[0][i].experience;
                             res2.employer = result[0][i].employer;
                             res2.CTCcurrencyId = result[0][i].CTCcurrencyId;
@@ -2825,7 +2828,8 @@ applicantCtrl.getMasterInterviewScheduler = function (req, res, next) {
                                 assessmentList: result[1] ? result[1] : [],
                                 interviewRound: result[2] ? result[2] : [],
                                 skillLevelList: result[3] ? result[3] : [],
-                                heDepartment: result[4] ? result[4] : []
+                                heDepartment: result[4] ? result[4] : [],
+                                skillList : result[5] ? result[5] : []
                             };
 
                         if (req.query.isWeb == 0) {
@@ -2848,7 +2852,8 @@ applicantCtrl.getMasterInterviewScheduler = function (req, res, next) {
                             assessmentList: [],
                             interviewRound: [],
                             skillLevelList: [],
-                            heDepartment: []
+                            heDepartment: [],
+                            skillList: []
                         };
 
                         if (req.query.isWeb == 0) {
@@ -2969,6 +2974,13 @@ applicantCtrl.saveInterviewSchedulerForApplicant = function (req, res, next) {
                     if (!attachmentList) {
                         attachmentList = [];
                     }
+                    var skills = req.body.skills;
+                    if (typeof (skills) == "string") {
+                        skills = JSON.parse(skills);
+                    }
+                    if (!skills) {
+                        skills = [];
+                    }
 
                     var senderGroupId;
                     if (!validationFlag) {
@@ -3026,7 +3038,8 @@ applicantCtrl.saveInterviewSchedulerForApplicant = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(assessmentTypeList)),
                             req.st.db.escape(JSON.stringify(skillAssessment)),
                             req.st.db.escape(JSON.stringify(heDepartment)),
-                            req.st.db.escape(DBSecretKey)
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(JSON.stringify(skills))
                         ];
 
                         var procQuery = 'CALL wm_save_interviewSchedulerOfOneApplicant( ' + procParams.join(',') + ')';

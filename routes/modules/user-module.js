@@ -4201,7 +4201,7 @@ User.prototype.getUserDetailsNew = function (req, res, next) {
             st.validateToken(token, function (err, tokenRes) {
                 if (!err) {
                     if (tokenRes) {
-                        var queryString = 'CALL pgetuserdetails(' + st.db.escape(token) + ')';
+                        var queryString = 'CALL pgetuserdetails(' + st.db.escape(token) + st.db.escape(DBSecretKey) + ')';
                         st.db.query(queryString, function (err, results) {
                             if (!err) {
                                 if (results) {
