@@ -1542,6 +1542,18 @@ masterCtrl.mailTags = function (req, res, next) {
         tableTags = [];
     }
 
+    var trackerTemplate = req.body.trackerTemplate;
+    if (typeof (trackerTemplate) == "string") {
+        trackerTemplate = JSON.parse(trackerTemplate);
+    }
+    if (!trackerTemplate) {
+        trackerTemplate = {};
+        trackerTags = [];
+    }
+    else{
+        trackerTags = JSON.parse(trackerTemplate.trackerTags);
+    }
+
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -1572,7 +1584,8 @@ masterCtrl.mailTags = function (req, res, next) {
                     req.st.db.escape(req.query.userId),
                     req.st.db.escape(req.body.mailerType),
                     req.st.db.escape(JSON.stringify(tableTags)),
-                    req.st.db.escape(JSON.stringify(clientContacts))
+                    req.st.db.escape(JSON.stringify(clientContacts)),
+                    req.st.db.escape((trackerTemplate.trackerTags))
 
                 ];
                 var idArray;

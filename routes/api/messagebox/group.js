@@ -17,6 +17,10 @@ var Notification = require('../../modules/notification/notification-master.js');
 var notification = new Notification();
 var appConfig = require('../../../ezeone-config.json');
 var DBSecretKey=appConfig.DB.secretKey;
+
+var zlib = require('zlib');
+var AES_256_encryption = require('../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 /**
  * Method : POST
  * @param req

@@ -5,6 +5,10 @@
 var taxCtrl = {};
 var error = {};
 
+var zlib = require('zlib');
+var AES_256_encryption = require('../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
 taxCtrl.getTaxDeclarations = function (req, res, next) {
     var response = {
         status: false,

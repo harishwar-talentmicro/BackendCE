@@ -23,7 +23,9 @@ var moment = require('moment');
 
 var appConfig = require('../../ezeone-config.json');
 var DBSecretKey = appConfig.DB.secretKey;
-
+var zlib = require('zlib');
+var AES_256_encryption = require('../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 
 function FnEncryptPassword(Password) {
     try {

@@ -17,6 +17,7 @@ var encryption = new AES_256_encryption();
 var path = require('path');
 var archiver = require('archiver');
 var request = require('request');
+var xlsx = require('node-xlsx');  // for xls file generation
 
 var sendgridCtrl = {};
 var error = {};
@@ -78,6 +79,13 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
     if (typeof (trackerTemplate) == "string") {
         trackerTemplate = JSON.parse(trackerTemplate);
     }
+    if (!trackerTemplate) {
+        trackerTemplate = {};
+        trackerTags = [];
+    }
+    else {
+        trackerTags = JSON.parse(trackerTemplate.trackerTags);
+    }
 
     if (typeof (tags) == "string") {
         tags = JSON.parse(tags);
@@ -123,6 +131,7 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
         tableTags = JSON.parse(tableTags);
     }
 
+
     //check for mail type and assign the recipients
     if (mailerType == 1 || mailerType == 2) {
         emailReceivers = reqApplicants;
@@ -155,7 +164,8 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                         req.st.db.escape(userId),
                         req.st.db.escape(mailerType),
                         req.st.db.escape(JSON.stringify(tableTags)),
-                        req.st.db.escape(JSON.stringify(clientContacts))
+                        req.st.db.escape(JSON.stringify(clientContacts)),
+                        req.st.db.escape((trackerTemplate.trackerTags))
                     ];
 
                     var procQuery = 'CALL wm_get_detailsByTags1( ' + inputs.join(',') + ')';
@@ -187,8 +197,9 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                             //end of if
                             //if mailer type is submission mailer, recipients are client contacts
                             else {
+                                console.log('tags', tags);
                                 for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
-                                    for (var applicantIndex = 0; applicantIndex < emailReceivers.length; applicantIndex++) {
+                                    for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
                                         //replacing all tags present in the mail body
                                         for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
                                             mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
@@ -236,7 +247,33 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                                 }
                             }
                             //end of else (mailertype if)                           
+                            var buffer;
+                            if (trackerTemplate) {
+                                var ws_data = '[[';
+                                // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
+                                for (var i = 0; i < trackerTags.length; i++) {
+                                    if (i != trackerTags.length - 1)
+                                        ws_data += '"' + trackerTags[i].displayTagAs + '",';
+                                    else
+                                        ws_data += '"' + trackerTags[i].displayTagAs + '"';
+                                }
+                                ws_data += "]";
 
+                                // console.log(new Buffer(buffer).toString("base64"));
+                                for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
+                                    ws_data += ',[';
+                                    for (var tagIndex = 0; tagIndex < trackerTags.length; tagIndex++) {
+                                        if (tagIndex < trackerTags.length - 1)
+                                            ws_data += '"' + result[9][applicantIndex][trackerTags[tagIndex].tagName] + '",';
+                                        else
+                                            ws_data += '"' + result[9][applicantIndex][trackerTags[tagIndex].tagName] + '"';
+                                    }
+                                    ws_data += ']';
+                                }
+                                ws_data += ']';
+                                console.log(ws_data);
+                                buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]); // Returns a buffer
+                            }
                             //for sending mails
                             for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
                                 var mailOptions = {
@@ -271,7 +308,14 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                                     email.addFile({
                                         filename: attachment[file].fileName,
                                         content: new Buffer(attachment[file].binaryFile, 'base64'),
-                                        contentType: attachment[file].fileType,
+                                        contentType: attachment[file].fileType
+                                    });
+                                }
+                                if (trackerTemplate) {
+                                    email.addFile({
+                                        filename: trackerTemplate.templateName + '.xlsx',
+                                        content: new Buffer(new Buffer(buffer).toString("base64"), 'base64'),
+                                        contentType: 'application/*'
                                     });
                                 }
 
