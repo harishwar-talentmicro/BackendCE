@@ -394,6 +394,13 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
     if (!location) {
         location = {};
     }
+    var referedNameList = req.body.referedNameList;
+    if (typeof (referedNameList) == "string") {
+        referedNameList = JSON.parse(referedNameList);
+    }
+    if (!referedNameList) {
+        referedNameList = {};
+    }
 
 
     if (!validationFlag) {
@@ -417,7 +424,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.experience = (req.body.experience) ? req.body.experience : '0.0';
                 req.body.presentSalary = (req.body.presentSalary) ? req.body.presentSalary : '0.0';
                 req.body.walkinType = (req.body.walkinType) ? req.body.walkinType : 0;
-                req.body.referedByUserId = (req.body.referedByUserId) ? req.body.referedByUserId : 0;
+                // req.body.referedByUserId = (req.body.referedByUserId) ? req.body.referedByUserId : 0;
 
 
                 var inputs = [
@@ -452,11 +459,9 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.receiverCount),
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(req.body.walkinType),
-                    req.st.db.escape(req.body.referedByUserId),
-                    req.st.db.escape(req.body.location),
-
+                    req.st.db.escape(JSON.stringify(referedNameList)),
+                    req.st.db.escape(JSON.stringify(location)),
                     req.st.db.escape(DBSecretKey)
-
                 ];
 
                 var procQuery = 'CALL wm_save_wlkinForm( ' + inputs.join(',') + ')';
@@ -573,7 +578,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                         }
 
                     }
-                    else if(!err && results [1] && results [2] && results [3] ){
+                    else if(!err && (results [1] || results [2] && results [3]) ){
             
                             response.status = true;
                             response.message = "Walkin Form saved successfully";
@@ -585,7 +590,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             res.status(200).json(response);
                         }
 
-                    else if(!err && results [1] && results [2] ){
+                    else if(!err && (results [1] || results [2]) ){
 
                         response.status = true;
                         response.message = "Walkin Form saved successfully";

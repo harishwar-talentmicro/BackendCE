@@ -11,4 +11,6 @@ var composeCtrl = require('./compose-ctrl');
 router.post('/send',composeCtrl.sendMessage);
 router.post('/learnMessage',composeCtrl.learnMessage);
 
+router.post('/learnKeywords',composeCtrl.learnKeywords);
+
 module.exports = router;

@@ -776,6 +776,15 @@ router.post('/sync', function (req, res, next) {
                                                     formData: results[0][i].formDataJSON ? JSON.parse(results[0][i].formDataJSON) : null
                                                 });
                                             }
+                                            var keywords_list = [];
+                                            if(results[5]){
+                                                for(var keywordIndex = 0; keywordIndex < results[5].length; keywordIndex++){
+                                                    keywords_list[keywordIndex] = {};
+                                                    keywords_list[keywordIndex].formID = results[5][keywordIndex].formID;
+                                                    if(results[5][keywordIndex].keywords)
+                                                        keywords_list[keywordIndex].keywords = results[5][keywordIndex].keywords.split(' ');
+                                                }
+                                            }
 
                                             // console.log("results[5][0].GCM_Id",results[5][0].GCM_Id);
                                             responseMessage.data = {
@@ -783,8 +792,9 @@ router.post('/sync', function (req, res, next) {
                                                 deleteMessageIdList: [],
                                                 feedback: (results[2]) ? results[2] : [],
                                                 APNSId: (results[3] && results[3][0]) ? JSON.parse(results[3][0].APNS_Id) : [],
-                                                GCMId: (results[4] && results[4][0]) ? JSON.parse(results[4][0].GCM_Id) : []
-                                                // supportFeedback : (results[4]) ? results[4] : []
+                                                GCMId: (results[4] && results[4][0]) ? JSON.parse(results[4][0].GCM_Id) : [],
+                                                // supportFeedback : (results[4]) ? results[4] : [],
+                                                learnMessageList : (keywords_list) ? keywords_list : []
                                             };
 
                                             var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
