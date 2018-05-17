@@ -211,24 +211,22 @@ composeCtrl.learnKeywords = function(req,res,next){
                 // var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
                 // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                 //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                //     // if (!req.body.message) {
-                    //     error.token = 'Invalid message';
-                    //     validationFlag *= false;
-                    // }
+                //     
                     // if (!req.body.groupId) {
                     //     error.groupId = 'Invalid groupId';
                     //     validationFlag *= false;
                     // }
+
                     if (!req.body.formId) {
                         error.formId = 'Invalid formId';
                         validationFlag *= false;
                     }
-                    var keywords=req.body.keywords;
-                    if(typeof(keywords) == "string"){
-                        keywords=JSON.stringify(keywords);
+                    var keywordList=req.body.keywordList;
+                    if(!keywordList){
+                        keywordList ={};
                     }
-                    if(!keywords){
-                        keywords ={};
+                    else if(typeof(keywordList) == "string"){
+                        keywordList=JSON.stringify(keywordList);
                     }
 
                     if (!validationFlag){
@@ -241,7 +239,9 @@ composeCtrl.learnKeywords = function(req,res,next){
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.formId),
-                            req.st.db.escape(JSON.stringify(keywords))                      ];
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)
+                        ];
                         /**
                          * Calling procedure to save learned words for form
                          * @type {string}
@@ -250,9 +250,9 @@ composeCtrl.learnKeywords = function(req,res,next){
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             console.log(results);
-                            if(!err){
+                            if(!err && results[0] && results[0][0]){
                                 response.status = true;
-                                response.message = "Message saved successfully";
+                                response.message = results[0][0].message;
                                 response.error = null;
                                 response.data = null ;
                                 res.status(200).json(response);

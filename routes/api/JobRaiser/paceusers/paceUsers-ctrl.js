@@ -419,6 +419,8 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             res2.stage = result[1][i].stage ? JSON.parse(result[1][i].stage):{};
                             output.push(res2);
                         }
+
+                        
                         response.data =
                             {
                                 requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},

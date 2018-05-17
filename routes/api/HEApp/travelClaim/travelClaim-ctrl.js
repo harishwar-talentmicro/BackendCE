@@ -65,6 +65,13 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                         error.expenseList = 'Invalid expenseList';
                         validationFlag *= false;
                     }
+                    var keywordList =req.body.keywordList;
+                    if(typeof(keywordList) == "string") {
+                        keywordList = JSON.parse(keywordList);
+                    }
+                    if(!keywordList){
+                        keywordList = [];
+                    }
                 
                     var senderGroupId;
                     console.log(validationFlag, "validationFlag");
@@ -147,12 +154,19 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(DBSecretKey)                                                                    
                         ];
+                        var travelClaimFormId=1007;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(travelClaimFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
                         if (req.body.travelRequestId !=0) {
-                            var procQuery = 'CALL HE_save_travelClaim_new( ' + procParams.join(',') + ')';
+                            var procQuery = 'CALL HE_save_travelClaim_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                             console.log(procQuery);
                             req.db.query(procQuery,function(err,results){
                                 console.log(results);
@@ -307,9 +321,15 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                             });
                         }
                         else{
-                            var procQuery = 'CALL HE_save_expenseClaim_new( ' + expenseParams.join(',') + ')';
-                        
-                            var procQuery = 'CALL HE_save_expenseClaim_new( ' + procParams.join(',') + ')';
+                            var expenseClaimFormId=1005;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(expenseClaimFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
+                            var procQuery = 'CALL HE_save_expenseClaim_new( ' + expenseParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                            
                             console.log(procQuery);
                             req.db.query(procQuery,function(err,results){
                                 console.log(results);

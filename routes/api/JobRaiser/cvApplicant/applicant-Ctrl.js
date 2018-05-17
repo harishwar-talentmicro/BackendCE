@@ -15,7 +15,7 @@ var encryption = new AES_256_encryption();
 var applicantCtrl = {};
 var error = {};
 var CONFIG = require('../../../../ezeone-config.json');
-var DBSecretKey=CONFIG.DB.secretKey;
+var DBSecretKey = CONFIG.DB.secretKey;
 
 
 var cv = '';
@@ -708,35 +708,39 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
         validationFlag = false;
     }
     var heDepartmentId = req.body.heDepartmentId;
-    if (typeof (heDepartmentId) == "string") {
-        heDepartmentId = JSON.parse(heDepartmentId);
-    }
     if (!heDepartmentId) {
         heDepartmentId = [];
     }
+    else if (typeof (heDepartmentId) == "string") {
+        heDepartmentId = JSON.parse(heDepartmentId);
+    }
+
 
     var jobTitleId = req.body.jobTitleId;
-    if (typeof (jobTitleId) == "string") {
-        jobTitleId = JSON.parse(jobTitleId);
-    }
     if (!jobTitleId) {
         jobTitleId = [];
     }
+    else if (typeof (jobTitleId) == "string") {
+        jobTitleId = JSON.parse(jobTitleId);
+    }
 
-    var stageId=req.body.stageId;
-    if (typeof (stageId)== "string"){
-        stageId=JSON.parse(stageId);
+
+    var stageId = req.body.stageId;
+    if (!stageId) {
+        stageId = [];
     }
-    if(!stageId){
-        stageId=[];
+    else if (typeof (stageId) == "string") {
+        stageId = JSON.parse(stageId);
     }
-    var statusId=req.body.statusId;
-    if (typeof  (statusId)== "string"){
-        statusId=JSON.parse(statusId);
+    
+    var statusId = req.body.statusId;
+    if (!statusId) {
+        statusId = [];
     }
-    if(!statusId){
-        statusId=[];
+    else if (typeof (statusId) == "string") {
+        statusId = JSON.parse(statusId);
     }
+    
 
     if (!validationFlag) {
         response.error = error;
@@ -748,13 +752,13 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 // req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
-                req.query.jobTitleId = (req.query.jobTitleId) ? req.query.jobTitleId : 0;
-                req.query.stageId = (req.query.stageId) ? req.query.stageId : 0;
-                req.query.statusId = (req.query.statusId) ? req.query.statusId : 0;
-                req.query.startPage = (req.query.startPage) ? req.query.startPage : 0;
-                req.query.limit = (req.query.limit) ? req.query.limit : 100;
-                req.query.applicantId = (req.query.applicantId) ? req.query.applicantId : 0;
-                req.query.requirementId = (req.query.requirementId) ? req.query.requirementId : 0;
+                // req.body.jobTitleId = (req.body.jobTitleId) ? req.body.jobTitleId : [];
+                // req.body.stageId = (req.body.stageId) ? req.body.stageId : [];
+                // req.body.statusId = (req.body.statusId) ? req.body.statusId : 0;
+                req.body.startPage = (req.body.startPage) ? req.body.startPage : 0;
+                req.body.limit = (req.body.limit) ? req.body.limit : 12;
+                req.body.applicantId = (req.body.applicantId) || (req.body.applicantId == "") ? req.body.applicantId : 0;
+                req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
 
 
                 var getStatus = [
@@ -762,16 +766,16 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(JSON.stringify(heDepartmentId)),
                     req.st.db.escape(JSON.stringify(jobTitleId)),
-                    req.st.db.escape(JSON.stringify(stageId)),
-                    req.st.db.escape(JSON.stringify(statusId)),
                     // req.st.db.escape(req.query.heDepartmentId),
                     // req.st.db.escape(req.query.jobTitleId),
-                    // req.st.db.escape(req.query.applicantId),
+                    req.st.db.escape(req.body.applicantId),
                     // req.st.db.escape(req.query.stageId),
-                    req.st.db.escape(req.query.statusId),
-                    req.st.db.escape(req.query.startPage),
-                    req.st.db.escape(req.query.limit),
-                    req.st.db.escape(req.query.requirementId),
+                    // req.st.db.escape(req.body.statusId),
+                    req.st.db.escape(JSON.stringify(stageId)),
+                    req.st.db.escape(JSON.stringify(statusId)),
+                    req.st.db.escape(req.body.startPage),
+                    req.st.db.escape(req.body.limit),
+                    req.st.db.escape(req.body.requirementId),
                     req.st.db.escape(DBSecretKey)
                 ];
 
@@ -2829,7 +2833,7 @@ applicantCtrl.getMasterInterviewScheduler = function (req, res, next) {
                                 interviewRound: result[2] ? result[2] : [],
                                 skillLevelList: result[3] ? result[3] : [],
                                 heDepartment: result[4] ? result[4] : [],
-                                skillList : result[5] ? result[5] : []
+                                skillList: result[5] ? result[5] : []
                             };
 
                         if (req.query.isWeb == 0) {
@@ -2905,7 +2909,7 @@ applicantCtrl.saveInterviewSchedulerForApplicant = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
                     var assessment = req.body.assessment;
@@ -3337,7 +3341,7 @@ applicantCtrl.getOnBoarding = function (req, res, next) {
                         response.error = null;
                         response.data =
                             {
-                                result:result[0]
+                                result: result[0]
                                 // heMasterId: result[0][0].heMasterId,
                                 // heDepartmentId: result[0][0].heDepartmentId,
                                 // applicantId: result[0][0].applicantId,
@@ -3417,7 +3421,7 @@ applicantCtrl.saveMedical = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                
+
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 req.body.medicalId = req.body.medicalId ? req.body.medicalId : 0;
                 req.body.heDepartmentId = req.body.heDepartmentId ? req.body.heDepartmentId : 0;
@@ -3427,8 +3431,8 @@ applicantCtrl.saveMedical = function (req, res, next) {
                 req.body.reMedical = req.body.reMedical ? req.body.reMedical : 0;
                 req.body.medicalNotes = req.body.medicalNotes ? req.body.medicalNotes : '';
                 req.body.notes = req.body.notes ? req.body.notes : '';
-                
-                
+
+
 
                 var inputs = [
                     req.st.db.escape(req.query.token),

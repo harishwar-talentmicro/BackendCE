@@ -57,6 +57,13 @@ transportCtrl.saveTransportRequest = function(req,res,next){
                     if(!attachmentList){
                         attachmentList = [];
                     }
+                    var keywordList =req.body.keywordList;
+                    if(typeof(keywordList) == "string") {
+                        keywordList = JSON.parse(keywordList);
+                    }
+                    if(!keywordList){
+                        keywordList = [];
+                    }
                 
                     var senderGroupId;
                 
@@ -108,11 +115,19 @@ transportCtrl.saveTransportRequest = function(req,res,next){
                             req.st.db.escape(JSON.stringify(attachmentList)),
                             req.st.db.escape(DBSecretKey)                                                                    
                         ];
+
+                        var transportFormId=1036;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(transportFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_Save_TransportRequest_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_Save_TransportRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             if(!err && results && results[0] ){

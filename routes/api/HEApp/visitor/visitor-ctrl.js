@@ -57,6 +57,13 @@ visitorCtrl.saveGatePassRequest = function(req,res,next){
                         error.phone = 'Invalid phone';
                         validationFlag *= false;
                     }
+                    var keywordList =req.body.keywordList;
+                    if(typeof(keywordList) == "string") {
+                        keywordList = JSON.parse(keywordList);
+                    }
+                    if(!keywordList){
+                        keywordList = [];
+                    }
                 
                     var senderGroupId;
                 
@@ -107,11 +114,18 @@ visitorCtrl.saveGatePassRequest = function(req,res,next){
                             req.st.db.escape(req.body.isd),
                             req.st.db.escape(DBSecretKey)                                                                                                                    
                         ];
+                        var visitorFormId=1028;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(visitorFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_visitorGatePassRequest_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_save_visitorGatePassRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             if(!err && results && results[0] ){
@@ -332,6 +346,13 @@ visitorCtrl.saveGateAssetPassRequest = function(req,res,next){
                         error.visitorId = 'Invalid visitorId';
                         validationFlag *= false;
                     }
+                    var keywordList =req.body.keywordList;
+                    if(typeof(keywordList) == "string") {
+                        keywordList = JSON.parse(keywordList);
+                    }
+                    if(!keywordList){
+                        keywordList = [];
+                    }
                 
                     var senderGroupId;
                 
@@ -388,11 +409,19 @@ visitorCtrl.saveGateAssetPassRequest = function(req,res,next){
                             req.st.db.escape(req.body.isdPhone),
                             req.st.db.escape(DBSecretKey)                                                                                                                    
                         ];
+                        var assetFormId=1029;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(assetFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
+                        
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_visitorAssetPassRequest_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_save_visitorAssetPassRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             if(!err && results && results[0] ){
@@ -642,6 +671,13 @@ visitorCtrl.saveGuestHospitalityRequest = function(req,res,next){
                         error.guestList = 'Invalid guestList';
                         validationFlag *= false;
                     }
+                    var keywordList =req.body.keywordList;
+                    if(typeof(keywordList) == "string") {
+                        keywordList = JSON.parse(keywordList);
+                    }
+                    if(!keywordList){
+                        keywordList = [];
+                    }
                 
                     var senderGroupId;
                 
@@ -691,11 +727,18 @@ visitorCtrl.saveGuestHospitalityRequest = function(req,res,next){
                             req.st.db.escape(req.body.expenseAmount),
                             req.st.db.escape(DBSecretKey)                                                                                        
                         ];
+                         var guestFormId=1032;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(guestFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_GuestHospitalityRequest_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_save_GuestHospitalityRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             if(!err && results && results[0] ){
@@ -858,6 +901,13 @@ visitorCtrl.saveInternetRequest = function(req,res,next){
                         error.visitorId = 'Invalid visitorId';
                         validationFlag *= false;
                     }
+                    var keywordList =req.body.keywordList;
+                    if(typeof(keywordList) == "string") {
+                        keywordList = JSON.parse(keywordList);
+                    }
+                    if(!keywordList){
+                        keywordList = [];
+                    }
                 
                     var senderGroupId;
                 
@@ -914,11 +964,18 @@ visitorCtrl.saveInternetRequest = function(req,res,next){
                             req.st.db.escape(req.body.isdPhone),
                             req.st.db.escape(DBSecretKey)                                                                                        
                         ];
+                        var visitorInternetFormId=1030;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(visitorInternetFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_visitorInternetRequest_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_save_visitorInternetRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             if(!err && results && results[0] ){

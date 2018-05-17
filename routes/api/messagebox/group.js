@@ -409,7 +409,7 @@ router.post('/members', function (req, res, next) {
      *
      * */
     if(!req.query.token){
-        error.token='';
+        error.token='No token found';
         validationFlag *=false;
     }
 

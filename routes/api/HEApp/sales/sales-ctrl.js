@@ -174,6 +174,13 @@ salesCtrl.saveSalesRequest = function (req, res, next) {
                     if (!items) {
                         items = [];
                     }
+                    var keywordList =req.body.keywordList;
+                    if(typeof(keywordList) == "string") {
+                        keywordList = JSON.parse(keywordList);
+                    }
+                    if(!keywordList){
+                        keywordList = [];
+                    }
 
                     var senderGroupId;
 
@@ -268,13 +275,20 @@ salesCtrl.saveSalesRequest = function (req, res, next) {
                             req.st.db.escape(req.body.targetDate),
                             req.st.db.escape(DBSecretKey)                            
                         ];
+                        var salesFormId=2000;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(salesFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
 
                         /**
                          * Calling procedure for sales request
                          * @type {string}
                          */
 
-                        var procQuery = 'CALL he_save_salesRequest_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL he_save_salesRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, results) {
                             console.log(results);
@@ -482,6 +496,13 @@ salesCtrl.assignToUser = function (req, res, next) {
                         error.parentId = 'Invalid parentId';
                         validationFlag *= false;
                     }
+                    var keywordList =req.body.keywordList;
+                    if(typeof(keywordList) == "string") {
+                        keywordList = JSON.parse(keywordList);
+                    }
+                    if(!keywordList){
+                        keywordList = [];
+                    }
                 
                     var senderGroupId;
                 
@@ -502,12 +523,20 @@ salesCtrl.assignToUser = function (req, res, next) {
                             req.st.db.escape(req.body.assignedReason),
                             req.st.db.escape(DBSecretKey)                            
                         ];
+                        
+                        var salesFormId=2000;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(salesFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure for sales request
                          * @type {string}
                          */
         
-                        var procQuery = 'CALL he_assign_sales( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL he_assign_sales( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, results) {
                             console.log(results);
@@ -786,7 +815,7 @@ salesCtrl.saveSalesFeedback = function (req, res, next) {
                                 response.status = true;
                                 response.message = "Feedback saved successfully";
                                 response.error = null;
-                                response.data = results[0];
+                                response.data = results[0][0];
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
                                     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');

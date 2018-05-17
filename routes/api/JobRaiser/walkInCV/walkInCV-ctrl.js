@@ -394,14 +394,6 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
     if (!location) {
         location = {};
     }
-    var referedNameList = req.body.referedNameList;
-    if (typeof (referedNameList) == "string") {
-        referedNameList = JSON.parse(referedNameList);
-    }
-    if (!referedNameList) {
-        referedNameList = {};
-    }
-
 
     if (!validationFlag) {
         response.error = error;
@@ -459,8 +451,9 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.receiverCount),
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(req.body.walkinType),
-                    req.st.db.escape(JSON.stringify(referedNameList)),
+                    req.st.db.escape(req.body.userId),
                     req.st.db.escape(JSON.stringify(location)),
+                    req.st.db.escape(req.body.profilePicture),
                     req.st.db.escape(DBSecretKey)
                 ];
 
@@ -564,7 +557,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     heUserId: results[0][0].heUserId,
                                     formData: JSON.parse(results[0][0].formDataJSON)
                                 },
-                                walkinMessage:results[2][0]
+                                walkinMessage:results[2][0],
+                                token: results[3][0].token
                         };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -585,7 +579,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             response.error = null;
                             response.data={
                                 walkinMessage:results[2][0],
-                                token:results[3][0]
+                                token:results[3][0].token
                             };
                             res.status(200).json(response);
                         }
@@ -945,8 +939,8 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                         response.data = {
                             bannerList: result[0],
                             companyLogo:result[1][0].companyLogo,
-                            registrationType :0,  // need to come from backend, will be done later.
-                            tokenGeneration : 0,
+                            registrationType :result[6][0].walkinRegistrationType,  // need to come from backend, will be done later.
+                            tokenGeneration : result[6][0].walkinTokenGeneration,
                             industryList: result[2] ? result[2]:[],
                             skillList: result[3] ? result[3]:[],// need to come from backend, will be done later.
                             locationList:result[4] ? result[4]:[],

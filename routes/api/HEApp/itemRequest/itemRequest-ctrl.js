@@ -54,6 +54,14 @@ itemRequestCtrl.saveStationaryRequest = function(req,res,next){
                         error.itemList = 'Invalid itemList';
                         validationFlag *= false;
                     }
+                    var keywordList =req.body.keywordList;
+                        if(typeof(keywordList) == "string") {
+                            keywordList = JSON.parse(keywordList);
+                        }
+                        if(!keywordList){
+                            keywordList = [];
+                        }
+
                     var senderGroupId;
                 
                     if (!validationFlag){
@@ -93,11 +101,19 @@ itemRequestCtrl.saveStationaryRequest = function(req,res,next){
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(DBSecretKey)
                         ];
+                        
+                        var stationaryFormId=1008;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(stationaryFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_stationaryRequest_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_save_stationaryRequest_new( ' + procParams.join(',') + '); CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             console.log(results);
@@ -250,6 +266,14 @@ itemRequestCtrl.savePantryRequest = function(req,res,next){
                         error.itemList = 'Invalid itemList';
                         validationFlag *= false;
                     }
+                    var keywordList =req.body.keywordList;
+                        if(typeof(keywordList) == "string") {
+                            keywordList = JSON.parse(keywordList);
+                        }
+                        if(!keywordList){
+                            keywordList = [];
+                        }
+
                     var senderGroupId;
                 
                     if (!validationFlag){
@@ -289,11 +313,20 @@ itemRequestCtrl.savePantryRequest = function(req,res,next){
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(DBSecretKey)
                         ];
+
+                        var pantryFormId=1009;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(pantryFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
+
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_pantryRequest_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_save_pantryRequest_new( ' + procParams.join(',') + '); CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             console.log(results);
@@ -446,6 +479,14 @@ itemRequestCtrl.saveAssetRequest = function(req,res,next){
                         error.itemList = 'Invalid itemList';
                         validationFlag *= false;
                     }
+                    var keywordList =req.body.keywordList;
+                        if(typeof(keywordList) == "string") {
+                            keywordList = JSON.parse(keywordList);
+                        }
+                        if(!keywordList){
+                            keywordList = [];
+                        }
+
                     var senderGroupId;
                 
                     if (!validationFlag){
@@ -491,11 +532,19 @@ itemRequestCtrl.saveAssetRequest = function(req,res,next){
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(DBSecretKey)
                         ];
+
+                        var assestFormId=1018;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(assestFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_assetRequest_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_save_assetRequest_new( ' + procParams.join(',') + '); CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             console.log(results);
@@ -650,6 +699,14 @@ itemRequestCtrl.saveDocRequestToHR = function(req,res,next){
                     if(!attachmentList){
                         attachmentList = [];
                     }
+                    var keywordList =req.body.keywordList;
+                        if(typeof(keywordList) == "string") {
+                            keywordList = JSON.parse(keywordList);
+                        }
+                        if(!keywordList){
+                            keywordList = [];
+                        }
+                        
                     var senderGroupId;
                 
                     if (!validationFlag){
@@ -693,11 +750,19 @@ itemRequestCtrl.saveDocRequestToHR = function(req,res,next){
                             req.st.db.escape(req.body.approverNotes),
                             req.st.db.escape(DBSecretKey)
                         ];
+
+                        var docrequestFormId=1022;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(docrequestFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_docRequestToHR_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_save_docRequestToHR_new( ' + procParams.join(',') + '); CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             if(!err && results && results[0] ){

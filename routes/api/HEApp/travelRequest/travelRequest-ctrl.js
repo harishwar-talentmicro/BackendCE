@@ -71,6 +71,13 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
                     if(!travelRequests){
                         travelRequests = [] ;
                     }
+                    var keywordList =req.body.keywordList;
+                    if(typeof(keywordList) == "string") {
+                        keywordList = JSON.parse(keywordList);
+                    }
+                    if(!keywordList){
+                        keywordList = [];
+                    }
                 
                     var senderGroupId;
                 
@@ -132,11 +139,18 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
                             req.st.db.escape(req.body.travelRequestType),
                             req.st.db.escape(DBSecretKey)                                                                    
                         ];
+                        var travelFormId=1006;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(travelFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_travelRequest_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_save_travelRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             console.log(results);

@@ -13,4 +13,8 @@ router.get('/support/summary',supportCtrl.getSupportSummary);
 router.get('/support/priorityData',supportCtrl.getSupportUsersByPriority);
 router.get('/support/user',supportCtrl.getUser);
 
+router.get('/master',supportCtrl.getMasterData);
+
+
+
 module.exports = router;

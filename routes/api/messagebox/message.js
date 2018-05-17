@@ -267,13 +267,13 @@ router.post('/', function (req, res, next) {
                                             req.db.escape(req.body.receiverGroupId),
                                             req.db.escape(explicitMemberGroupIdList),
                                             req.db.escape(autoJoinResults[0][0].groupRelationStatus),
-                                            req.db.escape(autoJoinResults[0][0].luUser)
+                                            req.db.escape(autoJoinResults[0][0].luUser),
+                                            req.db.escape(DBSecretKey)
                                         ];
                                         var contactParams = [
                                             req.db.escape(req.st.alterEzeoneId(tokenResult[0].ezeoneId)),
                                             req.db.escape(tokenResult[0].pin),
-                                            req.db.escape(req.body.receiverGroupId),
-                                            req.db.escape(DBSecretKey)
+                                            req.db.escape(req.body.receiverGroupId)
                                         ];
 
                                         var procQuery = 'CALL p_v1_ComposeMessage(' + procParams.join(', ') + ');CALL get_v1_contact(' + contactParams.join(', ') + ');';
@@ -780,9 +780,9 @@ router.post('/sync', function (req, res, next) {
                                             if(results[5]){
                                                 for(var keywordIndex = 0; keywordIndex < results[5].length; keywordIndex++){
                                                     keywords_list[keywordIndex] = {};
-                                                    keywords_list[keywordIndex].formID = results[5][keywordIndex].formID;
+                                                    keywords_list[keywordIndex].formId = results[5][keywordIndex].formID;
                                                     if(results[5][keywordIndex].keywords)
-                                                        keywords_list[keywordIndex].keywords = results[5][keywordIndex].keywords.split(' ');
+                                                        keywords_list[keywordIndex].keywordList = results[5][keywordIndex].keywords.split(' ');
                                                 }
                                             }
 
@@ -814,7 +814,8 @@ router.post('/sync', function (req, res, next) {
                                                 messageList: [],
                                                 deleteMessageIdList: [],
                                                 APNSId: (results[3] && results[3][0]) ? JSON.parse(results[3][0].APNS_Id) : [],
-                                                GCMId: (results[4] && results[4][0]) ? JSON.parse(results[4][0].GCM_Id) : []
+                                                GCMId: (results[4] && results[4][0]) ? JSON.parse(results[4][0].GCM_Id) : [],
+                                                learnMessageList: keywords_list ? keywords_list : []
                                             };
                                             var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
                                             zlib.gzip(buf, function (_, result) {
@@ -935,7 +936,7 @@ router.post('/delete', function (req, res, next) {
                                 var comDeleteMessageQuery = "";
                                 for (var i = 0; i < messageIdList.length; i++) {
                                     var procParams = [
-                                        req.db.escape(req.body.token),
+                                        req.db.escape(req.query.token),
                                         req.db.escape(messageIdList[i].messageId)
                                     ];
                                     var procQuery = 'CALL p_v1_deletemessage(' + procParams.join(',') + ');';
