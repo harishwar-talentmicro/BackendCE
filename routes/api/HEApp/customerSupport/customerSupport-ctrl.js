@@ -874,5 +874,111 @@ supportCtrl.getUser = function(req,res,next){
 
 };
 
+supportCtrl.getMasterData = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(DBSecretKey)
+                ];
+                /**
+                 * Calling procedure to save form sales items
+                 */
+                var procQuery = 'CALL HE_get_app_suppourtmaster( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, masterData) {
+                    if (!err && masterData[0] && masterData[0][0]) {
+                        var output = [];
+                        for (var i = 0; i < masterData[0].length; i++) {
+                            var res1 = {};
+                            res1.stageId = masterData[0][i].stageId;
+                            res1.stageTitle = masterData[0][i].stageTitle;
+                            res1.stageProgress = masterData[0][i].stageProgress;
+                            res1.statusList = (masterData[0][i].statusList) ? JSON.parse(masterData[0][i].statusList):[];
+                            output.push(res1);
+                        }
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.data = {
+                            stageStatusList: output,
+                            categoryList: masterData[1] ? masterData[1] : [],
+                            currencyList: masterData[2] ? masterData[2] : [],
+                            memberList: masterData[3] ? masterData[3] : [],
+                            currency: {
+                                currencySymbol: (masterData[4] && masterData[4][0] && masterData[4][0].currencySymbol) ? masterData[4][0].currencySymbol : '',
+                                currencyId: (masterData[4] && masterData[4][0] && masterData[4][0].currencyId) ? masterData[4][0].currencyId : 0
+                            },
+                            probability: masterData[5] ? masterData[5] : []
+                        };
+                        response.error = null;
+                         // res.status(200).json(response);
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No data found";
+                        response.data = {
+                            stageStatusList: [],
+                            categoryList: [],
+                            currencyList: [],
+                            memberList: []/mbox/message
+                        };
+                        response.error = null;
+                        // res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 
 module.exports = supportCtrl;
