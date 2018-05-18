@@ -4,6 +4,9 @@
 
 var moment = require('moment');
 var vaultCtrl = {};
+var zlib = require('zlib');
+var AES_256_encryption = require('../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 
 vaultCtrl.getVaultList = function (req, res, next) {
 

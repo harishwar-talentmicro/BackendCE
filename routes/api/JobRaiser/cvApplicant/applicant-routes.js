@@ -12,7 +12,7 @@ router.get('/applicant',applicantCtrl.getApplicantMasterData);
 router.post('/reqapplicant',applicantCtrl.saveReqApplicant);
 router.get('/reqapplicant',applicantCtrl.getReqApplicantMasterData);
 
-router.get('/applicantList',applicantCtrl.getreqApplicants);
+router.post('/applicantList',applicantCtrl.getreqApplicants);
 router.get('/applicantDetails',applicantCtrl.getApplicantDetails);
 
 router.get('/stagestatus',applicantCtrl.getreqAppStageStatus);

@@ -74,6 +74,7 @@ greetingCtrl.sendGreeting = function (req, res, next) {
                             req.st.db.escape(req.body.messageId),
                             req.st.db.escape(req.body.comments)
                         ];
+                        
                         /**
                          * Calling procedure to save form template
                          * @type {string}

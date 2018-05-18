@@ -60,6 +60,14 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                         if(!attachmentList){
                             attachmentList = [] ;
                         }
+                    
+                        var keywordList =req.body.keywordList;
+                        if(typeof(keywordList) == "string") {
+                            keywordList = JSON.parse(keywordList);
+                        }
+                        if(!keywordList){
+                            keywordList = [];
+                        }
                     if (!validationFlag){
                         response.error = error;
                         response.message = 'Please check the errors';
@@ -129,11 +137,18 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                             req.st.db.escape(DBSecretKey)                                                        
                         ];
 
+                        var supportFormId=2001;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(supportFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure for sales request
                          * @type {string}
                          */
-                        var procQuery = 'CALL he_save_supportRequest_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL he_save_supportRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             console.log(results);
@@ -953,7 +968,7 @@ supportCtrl.getMasterData = function (req, res, next) {
                             stageStatusList: [],
                             categoryList: [],
                             currencyList: [],
-                            memberList: []/mbox/message
+                            memberList: []
                         };
                         response.error = null;
                         // res.status(200).json(response);

@@ -387,6 +387,14 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
         period = {};
     }
 
+    var location = req.body.location;
+    if (typeof (location) == "string") {
+        location = JSON.parse(location);
+    }
+    if (!location) {
+        location = {};
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please Check the Errors';
@@ -407,6 +415,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.status = (req.body.status) ? req.body.status : 1;
                 req.body.experience = (req.body.experience) ? req.body.experience : '0.0';
                 req.body.presentSalary = (req.body.presentSalary) ? req.body.presentSalary : '0.0';
+                req.body.walkinType = (req.body.walkinType) ? req.body.walkinType : 0;
+                // req.body.referedByUserId = (req.body.referedByUserId) ? req.body.referedByUserId : 0;
 
 
                 var inputs = [
@@ -440,8 +450,11 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.approverCount),
                     req.st.db.escape(req.body.receiverCount),
                     req.st.db.escape(req.body.status),
+                    req.st.db.escape(req.body.walkinType),
+                    req.st.db.escape(req.body.userId),
+                    req.st.db.escape(JSON.stringify(location)),
+                    req.st.db.escape(req.body.profilePicture),
                     req.st.db.escape(DBSecretKey)
-
                 ];
 
                 var procQuery = 'CALL wm_save_wlkinForm( ' + inputs.join(',') + ')';
@@ -544,7 +557,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     heUserId: results[0][0].heUserId,
                                     formData: JSON.parse(results[0][0].formDataJSON)
                                 },
-                                walkinMessage:results[2][0]
+                                walkinMessage:results[2][0],
+                                token: results[3][0].token
                         };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -558,16 +572,29 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                         }
 
                     }
-                    else if(!err && results ){
+                    else if(!err && (results [1] || results [2] && results [3]) ){
             
                             response.status = true;
                             response.message = "Walkin Form saved successfully";
                             response.error = null;
                             response.data={
-                                walkinMessage:results[2][0]
+                                walkinMessage:results[2][0],
+                                token:results[3][0].token
                             };
                             res.status(200).json(response);
                         }
+
+                    else if(!err && (results [1] || results [2]) ){
+
+                        response.status = true;
+                        response.message = "Walkin Form saved successfully";
+                        response.error = null;
+                        response.data={
+                            walkinMessage:results[2][0]
+                        };
+                        res.status(200).json(response);
+                    }
+
                     else {
                         response.status = false;
                         response.message = "Error While Saving walkIn";
@@ -912,8 +939,12 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                         response.data = {
                             bannerList: result[0],
                             companyLogo:result[1][0].companyLogo,
-                            registrationType :0,  // need to come from backend, will be done later.
-                            tokenGeneration : 0   // need to come from backend, will be done later.
+                            registrationType :result[6][0].walkinRegistrationType,  // need to come from backend, will be done later.
+                            tokenGeneration : result[6][0].walkinTokenGeneration,
+                            industryList: result[2] ? result[2]:[],
+                            skillList: result[3] ? result[3]:[],// need to come from backend, will be done later.
+                            locationList:result[4] ? result[4]:[],
+                            referedNameList:result[5] ? result[5]:[]
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -934,7 +965,9 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             bannerList: [],
                             companyLogo:"",
                             registrationType :0,  // need to come from backend, will be done later.
-                            tokenGeneration : 0  
+                            tokenGeneration : 0,
+                            industryList: [],
+                            skillList: []  
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -1046,19 +1079,22 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
     var senderGroupId;
     var loginId = req.body.loginId;
     var password = req.body.password;
-    var heMasterId = req.body.heMasterId;
+    var apiKey = req.body.APIKey;
+    // var heMasterId = req.body.heMasterId;
 
     if (status) {
 
-        var queryParams = req.st.db.escape(loginId) + ',' + req.st.db.escape(heMasterId);
+        var queryParams = req.st.db.escape(loginId) + ',' + req.st.db.escape(apiKey)+ ',' + req.st.db.escape(DBSecretKey);
         var query = 'CALL checkLogin(' + queryParams + ')';
         console.log('query', query);
         req.db.query(query, function (err, loginResult) {
             console.log(loginResult);
             if (!err) {
-                if (loginResult && password) {
-                    if(loginResult.length > 0){
-                        var loginDetails = loginResult[0];
+
+                if (loginResult && loginResult[0][0]) {
+
+                        var loginDetails = loginResult;
+
                         if(loginResult[0][0].userError == 'Invalid User'){
 
                             response.status=false;
@@ -1066,7 +1102,8 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                             response.message = loginResult[0][0].userError;
                             res.status(401).json(response);
                         }
-                        else if(loginResult[0][0].companyError == 'Invalid company user'){
+
+                        else if(loginResult[0][0].companyError == 'Invalid Company User'){
 
                             response.status=false;
                             response.error = error;
@@ -1076,6 +1113,16 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                         else {
 
                             if(comparePassword(password, loginResult[0][0].Password)){
+                                var heMasterId=loginResult[1][0].heMasterId;
+
+                                var CVFile=candidateDetails.cvFile;
+                                function base64_decode(base64str, CVFile) {
+                                    // create buffer object from base64 encoded string, it is important to tell the constructor that the string is base64 encoded
+                                    var bitmap = new Buffer(base64str, 'base64');
+                                    // write buffer to file
+                                    fs.writeFileSync(CVFile, bitmap);
+                                    console.log();
+                                }
 
                                 if ((!err) && loginResult[0]) {
                                     req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
@@ -1094,10 +1141,9 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                     req.body.interviewDuration = req.body.interviewDuration ? req.body.interviewDuration : 0;
 
                                     var procParams = [
-                                        req.st.db.escape(req.body.loginId),
-                                        // req.st.db.escape(encryptPwd),
 
-                                        req.st.db.escape(req.body.heMasterId),
+                                        req.st.db.escape(req.body.loginId),
+                                        req.st.db.escape(heMasterId),
                                         req.st.db.escape(req.body.parentId),
                                         req.st.db.escape(JSON.stringify(interviewRound)),
                                         req.st.db.escape(req.body.reportingDateTime),
@@ -1108,7 +1154,7 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                         req.st.db.escape(req.body.approverNotes),
                                         req.st.db.escape(req.body.receiverNotes),
                                         req.st.db.escape(req.body.changeLog),
-                                        req.st.db.escape(req.body.groupId),
+                                        
                                         req.st.db.escape(req.body.learnMessageId),
                                         req.st.db.escape(req.body.accessUserType),
                                         req.st.db.escape(req.body.approverCount),
@@ -1197,7 +1243,7 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                             response.message = "Interview scheduled successfully";
                                             response.error = null;
                                             response.data = {
-                                                messageList:
+                                               /* messageList:
                                                     {
                                                         messageId: results[0][0].messageId,
                                                         message: results[0][0].message,
@@ -1219,7 +1265,8 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                                         accessUserType: results[0][0].accessUserType,
                                                         heUserId: results[0][0].heUserId,
                                                         formData: JSON.parse(results[0][0].formDataJSON)
-                                                    }
+                                                    }*/
+                                               transactionId:results[2][0].transId
                                             };
                                             res.status(200).json(response);
                                         }
@@ -1248,7 +1295,7 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                         //     res.status(401).json(response);
                         //     // console.log('FnLogin:password doesnt match found');
                         // }
-                    }
+
                 }
                 else {
                     response.status=false;

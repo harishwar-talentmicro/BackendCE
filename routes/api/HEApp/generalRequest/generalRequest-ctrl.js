@@ -52,6 +52,14 @@ generalRequestCtrl.saveGeneralRequest = function(req,res,next){
                         error.generalRequestType = 'Invalid generalRequestType';
                         validationFlag *= false;
                     }
+                    var keywordList =req.body.keywordList;
+                        if(typeof(keywordList) == "string") {
+                            keywordList = JSON.parse(keywordList);
+                        }
+                        if(!keywordList){
+                            keywordList = [];
+                        }
+                        
                     var senderGroupId;
                     if (!validationFlag){
                         response.error = error;
@@ -105,11 +113,19 @@ generalRequestCtrl.saveGeneralRequest = function(req,res,next){
                             req.st.db.escape(req.body.budgetFrequencyTitle),
                             req.st.db.escape(DBSecretKey)                                                                                                            
                         ];
+
+                        var generalFormId=1037;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(generalFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_generalRequest_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_save_generalRequest_new( ' + procParams.join(',') + '); CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             console.log(results);

@@ -34,7 +34,6 @@ attendanceCtrl.saveAttendance = function(req,res,next){
         validationFlag *= false;
     }
 
-
     var senderGroupId;
 
     if (!validationFlag){
@@ -55,6 +54,13 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                     }
                     if(!attachmentList){
                         attachmentList = [];
+                    }
+                    var keywordList =req.body.keywordList;
+                    if(typeof(keywordList) == "string") {
+                        keywordList = JSON.parse(keywordList);
+                    }
+                    if(!keywordList){
+                        keywordList = [];
                     }
 
                     if (!validationFlag){
@@ -105,11 +111,19 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                             req.st.db.escape(req.body.isCompOffAvailed),
                             req.st.db.escape(DBSecretKey)
                         ];
+                        // changes
+                        var attendenceFormId=1002;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(attendenceFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure to send attendance request
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_attendenceForm_new( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_save_attendenceForm_new( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             console.log(results);
@@ -181,7 +195,7 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                                 // }
                                 notifyMessages.getMessagesNeedToNotify();
                                 response.status = true;
-                                response.message = "Attendence saved successfully";
+                                response.message = "Attendence saved successfully"+" and "+((results[2] && results[2][0]) ? results[2][0].message:"");
                                 response.error = null;
                                 response.data = {
                                     messageList: {

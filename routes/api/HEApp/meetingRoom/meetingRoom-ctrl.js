@@ -230,6 +230,13 @@ meetingRoomCtrl.bookMeetingRoom = function(req,res,next){
                         error.roomId = 'Invalid roomId';
                         validationFlag *= false;
                     }
+                    var keywordList =req.body.keywordList;
+                        if(typeof(keywordList) == "string") {
+                            keywordList = JSON.parse(keywordList);
+                        }
+                        if(!keywordList){
+                            keywordList = [];
+                        }
                     var senderGroupId;
                 
                     if (!validationFlag){
@@ -273,11 +280,19 @@ meetingRoomCtrl.bookMeetingRoom = function(req,res,next){
                             req.st.db.escape(req.body.roomName),
                             req.st.db.escape(DBSecretKey)                                                                    
                         ];
+
+                        var meetingFormId=2004;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(meetingFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL he_save_app_meetingRoom( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL he_save_app_meetingRoom( ' + procParams.join(',') + '); CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             console.log(results);

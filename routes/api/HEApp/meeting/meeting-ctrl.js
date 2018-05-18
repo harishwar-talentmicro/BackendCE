@@ -67,6 +67,13 @@ meetingCtrl.saveMetting = function(req,res,next){
                     if(!memberList){
                         memberList = [];
                     }
+                    var keywordList =req.body.keywordList;
+                        if(typeof(keywordList) == "string") {
+                            keywordList = JSON.parse(keywordList);
+                        }
+                        if(!keywordList){
+                            keywordList = [];
+                        }
                 
                     var senderGroupId;
                 
@@ -113,11 +120,19 @@ meetingCtrl.saveMetting = function(req,res,next){
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(DBSecretKey)                
                         ];
+
+                        var meetingFormId=1001;
+                        var keywordsParams=[
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(meetingFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)  
+                        ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_meetingForm( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_save_meetingForm( ' + procParams.join(',')+ '); CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             console.log(results);
