@@ -450,7 +450,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.approverCount),
                     req.st.db.escape(req.body.receiverCount),
                     req.st.db.escape(req.body.status),
-                    req.st.db.escape(req.body.walkinType),
+                    req.st.db.escape(req.body.walkInType),
                     req.st.db.escape(req.body.userId),
                     req.st.db.escape(JSON.stringify(location)),
                     req.st.db.escape(req.body.profilePicture),

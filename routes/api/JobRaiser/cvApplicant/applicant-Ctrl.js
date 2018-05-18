@@ -8,6 +8,8 @@ var textract = require('textract');
 var http = require('https');
 var defer = require('q');  // for handling promise
 var bodyParser = require('body-parser');
+var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
+var notifyMessages = new notifyMessages();
 
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
@@ -234,6 +236,8 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         req.body.transactions = (req.body.transactions) ? req.body.transactions : '';
                         req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
                         req.body.imageUrl = req.body.imageUrl ? req.body.imageUrl : '';
+                        req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0; 
+                        req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
 
                         var inputs = [
                             req.st.db.escape(req.query.token),
@@ -282,7 +286,9 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(cvKeywords),
                             req.st.db.escape(req.body.requirementId),
                             req.st.db.escape(req.body.imageUrl),
-                            req.st.db.escape(req.body.htmlText)
+                            req.st.db.escape(req.body.htmlText),
+                            req.st.db.escape(req.body.reqAppId),
+                            req.st.db.escape(req.body.clientCvPath)
                         ];
 
                         var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -3038,7 +3044,7 @@ applicantCtrl.saveInterviewSchedulerForApplicant = function (req, res, next) {
                             req.st.db.escape(req.body.emailId),
                             req.st.db.escape(JSON.stringify(jobTitle)),
                             req.st.db.escape(req.body.profilePicture),
-                            req.st.db.escape(JSON.stringify(attachmentList[0])),
+                            req.st.db.escape(JSON.stringify(attachmentList)),
                             req.st.db.escape(JSON.stringify(assessmentTypeList)),
                             req.st.db.escape(JSON.stringify(skillAssessment)),
                             req.st.db.escape(JSON.stringify(heDepartment)),
@@ -3052,76 +3058,79 @@ applicantCtrl.saveInterviewSchedulerForApplicant = function (req, res, next) {
                             console.log(err);
 
                             var isWeb = req.query.isWeb;
-                            if (!err && results && results[0]) {
+                            console.log(results);
+                            if(!err && results && results[0] ){
                                 senderGroupId = results[0][0].senderId;
-                                notificationTemplaterRes = notificationTemplater.parse('compose_message', {
-                                    senderName: results[0][0].senderName
-                                });
-
-                                for (var i = 0; i < results[1].length; i++) {         // main line
-                                    console.log(results[1]);
-                                    if (notificationTemplaterRes.parsedTpl) {
-                                        notification.publish(
-                                            results[1][i].receiverId,
-                                            (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                            (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                            results[0][0].senderId,
-                                            notificationTemplaterRes.parsedTpl,
-                                            31,
-                                            0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                            (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                            0,
-                                            0,
-                                            0,
-                                            0,
-                                            1,
-                                            moment().format("YYYY-MM-DD HH:mm:ss"),
-                                            '',
-                                            0,
-                                            0,
-                                            null,
-                                            '',
-                                            /** Data object property to be sent with notification **/
-                                            {
-                                                messageList: {
-                                                    messageId: results[1][i].messageId,
-                                                    message: results[1][i].message,
-                                                    messageLink: results[1][i].messageLink,
-                                                    createdDate: results[1][i].createdDate,
-                                                    messageType: results[1][i].messageType,
-                                                    messageStatus: results[1][i].messageStatus,
-                                                    priority: results[1][i].priority,
-                                                    senderName: results[1][i].senderName,
-                                                    senderId: results[1][i].senderId,
-                                                    receiverId: results[1][i].receiverId,
-                                                    groupId: results[1][i].groupId,
-                                                    groupType: 2,
-                                                    transId: results[1][i].transId,
-                                                    formId: results[1][i].formId,
-                                                    currentStatus: results[1][i].currentStatus,
-                                                    currentTransId: results[1][i].currentTransId,
-                                                    parentId: results[1][i].parentId,
-                                                    accessUserType: results[1][i].accessUserType,
-                                                    heUserId: results[1][i].heUserId,
-                                                    formData: JSON.parse(results[1][i].formDataJSON)
-                                                }
-                                            },
-                                            null,
-                                            tokenResult[0].isWhatMate,
-                                            results[1][i].secretKey);
-                                        console.log('postNotification : notification for compose_message is sent successfully');
-                                    }
-                                    else {
-                                        console.log('Error in parsing notification compose_message template - ',
-                                            notificationTemplaterRes.error);
-                                        console.log('postNotification : notification for compose_message is sent successfully');
-                                    }
-                                }
-
+                                // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
+                                //     senderName : results[0][0].message
+                                // });
+                                // console.log("notificationTemplaterRes.parsedTpl",notificationTemplaterRes.parsedTpl) ;
+                                //
+                                // for (var i = 0; i < results[1].length; i++ ) {
+                                //     if (notificationTemplaterRes.parsedTpl) {
+                                //         notification.publish(
+                                //             results[1][i].receiverId,
+                                //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                //             results[0][0].senderId,
+                                //             notificationTemplaterRes.parsedTpl,
+                                //             31,
+                                //             0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                //             (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                //             0,
+                                //             0,
+                                //             0,
+                                //             0,
+                                //             1,
+                                //             moment().format("YYYY-MM-DD HH:mm:ss"),
+                                //             '',
+                                //             0,
+                                //             0,
+                                //             null,
+                                //             '',
+                                //             /** Data object property to be sent with notification **/
+                                //             {
+                                //                 messageList: {
+                                //                     messageId: results[1][i].messageId,
+                                //                     message: results[1][i].message,
+                                //                     messageLink: results[1][i].messageLink,
+                                //                     createdDate: results[1][i].createdDate,
+                                //                     messageType: results[1][i].messageType,
+                                //                     messageStatus: results[1][i].messageStatus,
+                                //                     priority: results[1][i].priority,
+                                //                     senderName: results[1][i].senderName,
+                                //                     senderId: results[1][i].senderId,
+                                //                     receiverId: results[1][i].receiverId,
+                                //                     groupId: results[1][i].senderId,
+                                //                     groupType: 2,
+                                //                     transId : results[1][i].transId,
+                                //                     formId : results[1][i].formId,
+                                //                     currentStatus : results[1][i].currentStatus,
+                                //                     currentTransId : results[1][i].currentTransId,
+                                //                     parentId : results[1][i].parentId,
+                                //                     accessUserType : results[1][i].accessUserType,
+                                //                     heUserId : results[1][i].heUserId,
+                                //                     formData : JSON.parse(results[1][i].formDataJSON)
+                                //
+                                //                 }
+                                //             },
+                                //             null,
+                                //             tokenResult[0].isWhatMate,
+                                //             results[1][i].secretKey);
+                                //         console.log('postNotification : notification for compose_message is sent successfully');
+                                //     }
+                                //     else {
+                                //         console.log('Error in parsing notification compose_message template - ',
+                                //             notificationTemplaterRes.error);
+                                //         console.log('postNotification : notification for compose_message is sent successfully');
+                                //     }
+                                // }
+                                notifyMessages.getMessagesNeedToNotify();
                                 response.status = true;
                                 response.message = "Interview scheduled successfully";
                                 response.error = null;
                                 response.data = {
+
                                     messageList:
                                         {
                                             messageId: results[0][0].messageId,

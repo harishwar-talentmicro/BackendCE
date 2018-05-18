@@ -96,8 +96,11 @@ var zoom = require('./zoomMeeting/zoomMeeting-routes');
 var appGeneralRequest = require('./HEApp/generalRequest.js');
 var WGRM = require('./HEBackEnd/WGRMTemplates.js');
 
-// created by Arun
+
 var hospitalTokenManagement=require('./HEApp/hospitalTokenManagement.js');
+
+var generalOtp = require('./HEApp/otp/otp-routes.js');
+
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
 
@@ -126,6 +129,8 @@ router.use('/invite',invite);
 router.use('/jobInfo',jobInfo);
 
 router.use('/signup',signup);
+router.use('/otp',generalOtp);  // for general otp sending
+
 
 // for Hello EZE Project
 router.use('/helloEZE/appSettings',helloEZE);

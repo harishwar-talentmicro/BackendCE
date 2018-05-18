@@ -2,8 +2,11 @@
  * Created by veddha on 23-04-2018.
  */
 
-var st = null;
-// thread
+
+ var st = null;
+ var dbConfig=require('../../../ezeone-config.json');
+ var DBSecretKey=dbConfig.DB.secretKey;
+ // thread
 const threads  = require('threads');
 const config  = threads.config;
 const spawn   = threads.spawn;
@@ -23,7 +26,8 @@ function Messages(){
 }
 
 Messages.prototype.getMessagesNeedToNotify = function() {
-    var procQuery = 'CALL he_get_messageList()';
+    console.log()
+    var procQuery = 'CALL he_get_messageList("'+DBSecretKey+'")';
     console.log(procQuery);
 
     db.query(procQuery,function(err,messageList){

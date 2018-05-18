@@ -266,6 +266,14 @@ masterCtrl.saveClients = function (req, res, next) {
     if (!businessLocation) {
         businessLocation = [];
     }
+
+    var contracts = req.body.contracts;
+    if (typeof (contracts) == "string") {
+        contracts = JSON.parse(contracts);
+    }
+    if (!contracts) {
+        contracts = [];
+    }
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
@@ -280,7 +288,8 @@ masterCtrl.saveClients = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(JSON.stringify(heDepartment)),
-                    req.st.db.escape(JSON.stringify(businessLocation))
+                    req.st.db.escape(JSON.stringify(businessLocation)),
+                    req.st.db.escape(JSON.stringify(contracts))                    
 
                 ];
                 var procQuery = 'CALL wm_saveClientBusinessLocationContacts( ' + inputs.join(',') + ')';
@@ -1830,7 +1839,8 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
 
                         response.data = {
                             heDepartment: result[0][0],
-                            businessLocation: output
+                            businessLocation: output,
+                            contracts : (result[2] && result[2][0]) ? (result[2]): []
                         };
 
 
@@ -1852,7 +1862,9 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            clientData: []
+                            heDepartment: {},
+                            businessLocation: [],
+                            managers : []
                         };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
