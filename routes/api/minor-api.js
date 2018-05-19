@@ -312,6 +312,9 @@ var applicantModule = require('./JobRaiser/cv.js');  // on feb 5th
 var jobPortalModule = require('./JobRaiser/jobPortal.js');  // on feb 5th
 var paceUsersModule = require('./JobRaiser/paceusers.js');
 var walkInCvModule = require('./JobRaiser/walkInCV.js');
+var gulfModule = require('./JobRaiser/gulf.js');
+
+
 
 router.use('/WM',jobModule);
 router.use('/WM',masterModule);
@@ -319,6 +322,7 @@ router.use('/WM',applicantModule);
 router.use('/WM',jobPortalModule);
 router.use('/WM',paceUsersModule);
 router.use('/WM',walkInCvModule);
+router.use('/WM',gulfModule);
 // cron
 // var taskScheduler = require('../api/HEApp/task/task-ctrl');
 cron.schedule('*/15 * * * *', function(){
