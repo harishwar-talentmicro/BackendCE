@@ -39,8 +39,11 @@ gulfCtrl.saveMedical = function (req, res, next) {
         error.heMasterId = 'Invalid company';
         validationFlag = false;
     }
+    if (!req.body.reqApplicantId) {
+        error.reqApplicantId = 'Invalid reqApplicantId';
+        validationFlag = false;
+    }
     
-
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -60,6 +63,7 @@ gulfCtrl.saveMedical = function (req, res, next) {
                 
                 var getStatus = [
                     req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.medicalId),                    
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.body.reqApplicantId),
                     req.st.db.escape(req.body.heDepartmentId),
@@ -130,8 +134,11 @@ gulfCtrl.getMedical = function (req, res, next) {
         error.heMasterId = 'Invalid company';
         validationFlag = false;
     }
+    if (!req.query.reqApplicantId) {
+        error.reqApplicantId = 'Invalid reqApplicantId';
+        validationFlag = false;
+    }
     
-
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -146,10 +153,10 @@ gulfCtrl.getMedical = function (req, res, next) {
                 var getStatus = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.reqAppId)                    
+                    req.st.db.escape(req.query.reqApplicantId)                    
                 ];
 
-                var procQuery = 'CALL wm_save_1010_medical( ' + getStatus.join(',') + ')';
+                var procQuery = 'CALL wm_get_medical( ' + getStatus.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, Result) {
                     console.log(err);
@@ -658,14 +665,26 @@ gulfCtrl.saveAttestation = function (req, res, next) {
                 ];
                 var procQuery = 'CALL wm_save_paceAttestation( ' + inputs.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery, function (err, results) {
+                req.db.query(procQuery, function (err, result) {
                     console.log(err);
 
-                    if (!err && results && results[0][0]) {
+                    if (!err && result && result[0][0]) {
                         response.status = true;
                         response.message = "Visa data saved sucessfully";
                         response.error = null;
-                        response.data = (results && results[0] && results[0][0]) ? results[0][0]:{};
+
+                        result[0][0].attestation=(result[0][0].attestation) ? JSON.parse(result[0][0].attestation):[];
+                        if(result[0][0].attestation){
+                            var temp=[];
+                            for(var i = 0; i<result[0][0].attestation.length ; i++){
+                               
+                                result[0][0].attestation[i].attestationDoc=result[0][0].attestation[i].attestationDoc ? JSON.parse(result[0][0].attestation[i].attestationDoc):[];
+                                
+                                temp.push(result[0][0].attestation[i]);
+                            }
+                            result[0][0].attestation=temp;
+                        }
+                        response.data = (result && result[0] && result[0][0]) ? result[0][0]:{};
                         res.status(200).json(response);
                     }
                    
@@ -739,9 +758,7 @@ gulfCtrl.getAttestation = function (req, res, next) {
                         if(result[0][0].attestation){
                             var temp=[];
                             for(var i = 0; i<result[0][0].attestation.length ; i++){
-                                result[0][0].attestation[i].attestationCurrency=result[0][0].attestation[i].attestationCurrency ? JSON.parse(result[0][0].attestation[i].attestationCurrency):{};
-                                result[0][0].attestation[i].attestationCurrencyScale=result[0][0].attestation[i].attestationCurrencyScale ? JSON.parse(result[0][0].attestation[i].attestationCurrencyScale):{};
-
+                               
                                 result[0][0].attestation[i].attestationDoc=result[0][0].attestation[i].attestationDoc ? JSON.parse(result[0][0].attestation[i].attestationDoc):[];
                                 
                                 temp.push(result[0][0].attestation[i]);
