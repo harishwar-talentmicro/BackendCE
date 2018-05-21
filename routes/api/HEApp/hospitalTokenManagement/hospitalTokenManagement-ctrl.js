@@ -13,6 +13,8 @@ var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 
+var appConfig = require('../../../../ezeone-config.json');
+var DBSecretKey=appConfig.DB.secretKey;
 
 hospitalTokenManagementCtrl.getDoctorList = function (req, res, next) {
     var response = {
@@ -494,7 +496,8 @@ hospitalTokenManagementCtrl.bookAppointment = function (req, res, next) {
                             req.st.db.escape(req.body.HEMasterId),
                             req.st.db.escape(req.body.name),
                             req.st.db.escape(req.body.mobileISD),
-                            req.st.db.escape(req.body.mobileNumber)
+                            req.st.db.escape(req.body.mobileNumber),
+                            req.st.db.escape(DBSecretKey)
                         ];
 
                         var procQuery = 'CALL he_create_appointment( ' + procParams.join(',') + ')';
@@ -526,7 +529,6 @@ hospitalTokenManagementCtrl.bookAppointment = function (req, res, next) {
     }
 
 };
-
 
 hospitalTokenManagementCtrl.printSpecialToken = function (req, res, next) {
     var response = {
@@ -626,7 +628,6 @@ hospitalTokenManagementCtrl.printSpecialToken = function (req, res, next) {
     }
 
 };
-
 
 hospitalTokenManagementCtrl.updateAppointmentStatus = function (req, res, next) {
     var response = {

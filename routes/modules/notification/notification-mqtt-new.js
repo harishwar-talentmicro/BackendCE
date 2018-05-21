@@ -35,26 +35,26 @@ var messageDeliverProcessFlag = false;
 var amqpConn;
 function createConnection(){
 
-    amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
-
-    amqpConn.on('ready',function(){
-        console.log('Connection established successfully to rabbitmq broker');
-        if(!messageDeliverProcessFlag){
-            messageDeliverProcessFlag = true;
-        }
-    });
-
-    amqpConn.on('error',function(err){
-        amqpConn = null;
-        console.log('Connection error', err);
-        messageDeliverProcessFlag = false;
-        setImmediate(function(){
-                createConnection();
-        });
-    });
+    // amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
+    //
+    // amqpConn.on('ready',function(){
+    //     console.log('Connection established successfully to rabbitmq broker');
+    //     if(!messageDeliverProcessFlag){
+    //         messageDeliverProcessFlag = true;
+    //     }
+    // });
+    //
+    // amqpConn.on('error',function(err){
+    //     amqpConn = null;
+    //     console.log('Connection error', err);
+    //     messageDeliverProcessFlag = false;
+    //     setImmediate(function(){
+    //             createConnection();
+    //     });
+    // });
 }
 
-createConnection();
+// createConnection();
 
 
 console.log('.....................................................................');

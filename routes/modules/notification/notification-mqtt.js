@@ -18,43 +18,43 @@ var CONFIG = require('../../../ezeone-config.json');
 var messageList = [];
 
 function createConnection(){
-    var open = require('amqplib').connect('amqp://'+CONFIG.MQTT.USERNAME+':'+CONFIG.MQTT.PASSWORD+'@'+CONFIG.MQTT.HOST+
-        ':'+CONFIG.MQTT.AMQP_PORT+'/'+CONFIG.MQTT.VHOST+'?heartbeat=500');
-    var openConn = open;
-console.log("openConn",openConn);
-
-    openConn.then(function(conn) {
-
-        conn.on('error',function(){
-            setTimeout(function(){
-                createConnection();
-            },1000);
-        });
-
-        conn.on('close',function(){
-            setTimeout(function(){
-                createConnection();
-            },1000);
-        });
-
-        var ok = conn.createChannel();
-
-        ok = ok.then(function(channel){
-            publishMessage(channel);
-        });
-        return ok;
-
-    }).then(function(){
-        console.log('ok');
-        // publishMessage();
-    },function(){
-        setTimeout(function(){
-            createConnection();
-        },1000);
-    });
+//     var open = require('amqplib').connect('amqp://'+CONFIG.MQTT.USERNAME+':'+CONFIG.MQTT.PASSWORD+'@'+CONFIG.MQTT.HOST+
+//         ':'+CONFIG.MQTT.AMQP_PORT+'/'+CONFIG.MQTT.VHOST+'?heartbeat=500');
+//     var openConn = open;
+// console.log("openConn",openConn);
+//
+//     openConn.then(function(conn) {
+//
+//         conn.on('error',function(){
+//             setTimeout(function(){
+//                 createConnection();
+//             },1000);
+//         });
+//
+//         conn.on('close',function(){
+//             setTimeout(function(){
+//                 createConnection();
+//             },1000);
+//         });
+//
+//         var ok = conn.createChannel();
+//
+//         ok = ok.then(function(channel){
+//             publishMessage(channel);
+//         });
+//         return ok;
+//
+//     }).then(function(){
+//         console.log('ok');
+//         // publishMessage();
+//     },function(){
+//         setTimeout(function(){
+//             createConnection();
+//         },1000);
+//     });
 }
 
-createConnection();
+// createConnection();
 
 var counter  = 0;
 function publishMessage(channel){
