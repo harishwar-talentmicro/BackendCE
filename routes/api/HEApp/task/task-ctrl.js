@@ -14,7 +14,7 @@ var taskCtrl = {};
 
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
-var encryption = new  AES_256_encryption();
+var encryption = new AES_256_encryption();
 var error = {};
 
 var Client = require('node-poplib-gowhich').Client;
@@ -23,7 +23,7 @@ var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.j
 var notifyMessages = new notifyMessages();
 var md5 = require('md5');
 var appConfig = require('../../../../ezeone-config.json');
-var DBSecretKey=appConfig.DB.secretKey;
+var DBSecretKey = appConfig.DB.secretKey;
 
 // taskCtrl.saveTask = function(req,res,next){
 //     var response = {
@@ -259,12 +259,12 @@ var DBSecretKey=appConfig.DB.secretKey;
 //
 // };
 
-taskCtrl.saveTask = function(req,res,next){
+taskCtrl.saveTask = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     var senderGroupId;
@@ -274,17 +274,17 @@ taskCtrl.saveTask = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
@@ -298,7 +298,7 @@ taskCtrl.saveTask = function(req,res,next){
                         validationFlag *= false;
                     }
 
-                    if (!validationFlag){
+                    if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
                         res.status(400).json(response);
@@ -324,32 +324,39 @@ taskCtrl.saveTask = function(req,res,next){
                         req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : "";
                         req.body.ends = req.body.ends != undefined ? req.body.ends : null;
 
-                        var memberList =req.body.memberList;
-                        if(typeof(memberList) == "string") {
+                        var memberList = req.body.memberList;
+                        if (typeof (memberList) == "string") {
                             memberList = JSON.parse(memberList);
                         }
-                        if(!memberList){
+                        if (!memberList) {
                             memberList = [];
                         }
 
-                        var sharedMemberList =req.body.sharedMemberList;
-                        if(typeof(sharedMemberList) == "string") {
+                        var sharedMemberList = req.body.sharedMemberList;
+                        if (typeof (sharedMemberList) == "string") {
                             sharedMemberList = JSON.parse(sharedMemberList);
                         }
-                        if(!sharedMemberList){
+                        if (!sharedMemberList) {
                             sharedMemberList = [];
                         }
 
-                        var attachmentList =req.body.attachmentList;
-                        if(typeof(attachmentList) == "string") {
+                        var attachmentList = req.body.attachmentList;
+                        if (typeof (attachmentList) == "string") {
                             attachmentList = JSON.parse(attachmentList);
                         }
-                        if(!attachmentList){
+                        if (!attachmentList) {
                             attachmentList = [];
+                        }
+                        var keywordList = req.body.keywordList;
+                        if (typeof (keywordList) == "string") {
+                            keywordList = JSON.parse(keywordList);
+                        }
+                        if (!keywordList) {
+                            keywordList = [];
                         }
 
 
-                        if(req.body.ends == ""){
+                        if (req.body.ends == "") {
                             req.body.ends = null
                         }
 
@@ -378,17 +385,25 @@ taskCtrl.saveTask = function(req,res,next){
                             req.st.db.escape(req.body.alertType),
                             req.st.db.escape(JSON.stringify(sharedMemberList)),
                             req.st.db.escape(req.body.senderNotes),
-                            req.st.db.escape(DBSecretKey)                                                                    
+                            req.st.db.escape(DBSecretKey)
+                        ];
+
+                        var taskFormId = 1000;
+                        var keywordsParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(taskFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)
                         ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_taskForm( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_save_taskForm( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
-                        req.db.query(procQuery,function(err,results){
+                        req.db.query(procQuery, function (err, results) {
                             console.log(results);
-                            if(!err && results && results[0] ){
+                            if (!err && results && results[0]) {
                                 senderGroupId = results[0][0].senderId;
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                 //     senderName : results[0][0].senderName
@@ -472,25 +487,25 @@ taskCtrl.saveTask = function(req,res,next){
                                         senderId: results[0][0].senderId,
                                         groupId: req.body.groupId,
                                         receiverId: results[0][0].receiverId,
-                                        transId : results[0][0].transId,
-                                        formId : results[0][0].formId,
-                                        currentStatus : results[0][0].currentStatus,
-                                        currentTransId : results[0][0].currentTransId,
-                                        localMessageId : req.body.localMessageId,
-                                        parentId : results[0][0].parentId,
-                                        accessUserType : results[0][0].accessUserType,
-                                        heUserId : results[0][0].heUserId,
-                                        formData : JSON.parse(results[0][0].formDataJSON)
+                                        transId: results[0][0].transId,
+                                        formId: results[0][0].formId,
+                                        currentStatus: results[0][0].currentStatus,
+                                        currentTransId: results[0][0].currentTransId,
+                                        localMessageId: req.body.localMessageId,
+                                        parentId: results[0][0].parentId,
+                                        accessUserType: results[0][0].accessUserType,
+                                        heUserId: results[0][0].heUserId,
+                                        formData: JSON.parse(results[0][0].formDataJSON)
                                     }
                                 };
                                 // res.status(200).json(response);
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(response);
                                 });
                             }
-                            else{
+                            else {
                                 response.status = false;
                                 response.message = "Error while saving task";
                                 response.error = null;
@@ -503,7 +518,7 @@ taskCtrl.saveTask = function(req,res,next){
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -511,12 +526,12 @@ taskCtrl.saveTask = function(req,res,next){
 
 };
 
-taskCtrl.getTask = function(req,res,next){
+taskCtrl.getTask = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -530,15 +545,15 @@ taskCtrl.getTask = function(req,res,next){
     }
 
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 req.query.limit = (req.query.limit) ? (req.query.limit) : 10;
                 req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
                 req.query.status = (req.query.status) ? (req.query.status) : 1;
@@ -553,7 +568,7 @@ taskCtrl.getTask = function(req,res,next){
                     req.st.db.escape(req.query.status),
                     req.st.db.escape(startPage),
                     req.st.db.escape(req.query.limit),
-                    req.st.db.escape(DBSecretKey)                                                                    
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to My self and my team leave apllications
@@ -561,38 +576,38 @@ taskCtrl.getTask = function(req,res,next){
                  */
                 var procQuery = 'CALL HE_get_scheduledTaskList( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
+                req.db.query(procQuery, function (err, results) {
                     console.log(results);
-                    if(!err && results && results[0] ){
+                    if (!err && results && results[0]) {
                         response.status = true;
                         response.message = "Task requests loaded successfully";
                         response.error = null;
                         response.data = {
-                            taskList : results[0],
-                            count : results[1][0].count
+                            taskList: results[0],
+                            count: results[1][0].count
                         };
                         // res.status(200).json(response);
                         buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No task requests found";
                         response.error = null;
                         response.data = {
-                            taskList : [],
-                            count : 0
+                            taskList: [],
+                            count: 0
                         };
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting task requests";
                         response.error = null;
@@ -601,7 +616,7 @@ taskCtrl.getTask = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -609,12 +624,12 @@ taskCtrl.getTask = function(req,res,next){
 
 };
 
-taskCtrl.updateTaskStatus = function(req,res,next){
+taskCtrl.updateTaskStatus = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -624,17 +639,17 @@ taskCtrl.updateTaskStatus = function(req,res,next){
 
 
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
@@ -642,7 +657,7 @@ taskCtrl.updateTaskStatus = function(req,res,next){
                         error.scheduledId = 'Invalid scheduledId';
                         validationFlag *= false;
                     }
-                    if (!validationFlag){
+                    if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
                         res.status(400).json(response);
@@ -660,16 +675,16 @@ taskCtrl.updateTaskStatus = function(req,res,next){
                          */
                         var procQuery = 'CALL HE_save_taskStatus( ' + procParams.join(',') + ')';
                         console.log(procQuery);
-                        req.db.query(procQuery,function(err,results){
+                        req.db.query(procQuery, function (err, results) {
                             console.log(results);
-                            if(!err){
+                            if (!err) {
                                 response.status = true;
                                 response.message = "Task status updated successfully";
                                 response.error = null;
-                                response.data = null ;
+                                response.data = null;
                                 res.status(200).json(response);
                             }
-                            else{
+                            else {
                                 response.status = false;
                                 response.message = "Error while updating task status";
                                 response.error = null;
@@ -680,7 +695,7 @@ taskCtrl.updateTaskStatus = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -688,42 +703,42 @@ taskCtrl.updateTaskStatus = function(req,res,next){
 
 };
 
-taskCtrl.scheduleTask = function(req,res,next){
+taskCtrl.scheduleTask = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-                var procQuery = 'CALL he_schedule_tasks()';
-                console.log(procQuery);
+        var procQuery = 'CALL he_schedule_tasks()';
+        console.log(procQuery);
 
-                req.db.query(procQuery,function(err,results){
-                    console.log(results);
-                    if(!err){
-                        response.status = true;
-                        response.message = "Task Scheduled successfully";
-                        response.error = null;
-                        response.data = null ;
-                        res.status(200).json(response);
-                    }
-                    else{
-                        response.status = false;
-                        response.message = "Error while scheduling task";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
+        req.db.query(procQuery, function (err, results) {
+            console.log(results);
+            if (!err) {
+                response.status = true;
+                response.message = "Task Scheduled successfully";
+                response.error = null;
+                response.data = null;
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while scheduling task";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
 
 
 
@@ -731,16 +746,16 @@ taskCtrl.scheduleTask = function(req,res,next){
 
 };
 
-taskCtrl.getStationary = function(req,res,next){
+taskCtrl.getStationary = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    req.st.validateToken(req.query.token, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
 
             var procParams = [
                 req.st.db.escape(req.query.token),
@@ -752,8 +767,8 @@ taskCtrl.getStationary = function(req,res,next){
              */
             var procQuery = 'CALL HE_get_app_stationary( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,stationaryResult){
-                if(!err && stationaryResult && stationaryResult[0] && stationaryResult[0][0]){
+            req.db.query(procQuery, function (err, stationaryResult) {
+                if (!err && stationaryResult && stationaryResult[0] && stationaryResult[0][0]) {
                     response.status = true;
                     response.message = "Stationeries loaded successfully";
                     response.error = null;
@@ -762,13 +777,13 @@ taskCtrl.getStationary = function(req,res,next){
                     /*
                      * dcrypt and again unzip and extract data */
 
-                    var bufA = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                    var bufA = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                     // console.log("bufA",bufA.toString('utf-8'));
                     zlib.unzip(bufA, function (_, resultDecrypt) {
-                        console.log("resultDecrypt",resultDecrypt.toString('utf-8'));
+                        console.log("resultDecrypt", resultDecrypt.toString('utf-8'));
                         req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                        console.log("req.body",req.body);
-                        console.log("req.body.stationaryId",req.body.stationaryId);
+                        console.log("req.body", req.body);
+                        console.log("req.body.stationaryId", req.body.stationaryId);
                     });
 
 
@@ -777,19 +792,19 @@ taskCtrl.getStationary = function(req,res,next){
                     // res.status(200).json(response);
 
                     zlib.gzip(buf, function (_, result) {
-                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                         res.status(200).json(response);
                     });
 
                 }
-                else if(!err){
+                else if (!err) {
                     response.status = true;
                     response.message = "Stationeries loaded successfully";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting stationeries";
                     response.error = null;
@@ -798,16 +813,16 @@ taskCtrl.getStationary = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-taskCtrl.getMails = function(req,res,next){
+taskCtrl.getMails = function (req, res, next) {
     var client = new Client({
         hostname: 'pop.gmail.com',
-        port:  995,
+        port: 995,
         tls: true,
         mailparser: true,
         username: 'vedha@talentmicro.com',
@@ -824,21 +839,21 @@ taskCtrl.getMails = function(req,res,next){
         }
     });
 
-    client.connect(function() {
-        client.retrieveAndDeleteAll(function(err, messages) {
+    client.connect(function () {
+        client.retrieveAndDeleteAll(function (err, messages) {
 
-            if(!err){
-                messages.forEach(function(message) {
+            if (!err) {
+                messages.forEach(function (message) {
                     console.log(message);
-                    var fromDetails =(message.from) ;
+                    var fromDetails = (message.from);
                     var mailOptions = {
                         from: 'vedha14reddy@gmail.com', // sender address
                         to: 'arun@jobraiser.com', // list of receivers
                         subject: message.subject, // Subject line
                         html: '<b>Received...</b>' + message.html, // html body
-                        attachments : message.attachments
+                        attachments: message.attachments
                     };
-                    transporter.sendMail(mailOptions, function(error, info) {
+                    transporter.sendMail(mailOptions, function (error, info) {
                         if (error) {
                             return console.log(error);
                         }

@@ -96,8 +96,11 @@ var zoom = require('./zoomMeeting/zoomMeeting-routes');
 var appGeneralRequest = require('./HEApp/generalRequest.js');
 var WGRM = require('./HEBackEnd/WGRMTemplates.js');
 
-// created by Arun
+
 var hospitalTokenManagement=require('./HEApp/hospitalTokenManagement.js');
+
+var generalOtp = require('./HEApp/otp/otp-routes.js');
+
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
 
@@ -126,6 +129,8 @@ router.use('/invite',invite);
 router.use('/jobInfo',jobInfo);
 
 router.use('/signup',signup);
+router.use('/otp',generalOtp);  // for general otp sending
+
 
 // for Hello EZE Project
 router.use('/helloEZE/appSettings',helloEZE);
@@ -307,6 +312,9 @@ var applicantModule = require('./JobRaiser/cv.js');  // on feb 5th
 var jobPortalModule = require('./JobRaiser/jobPortal.js');  // on feb 5th
 var paceUsersModule = require('./JobRaiser/paceusers.js');
 var walkInCvModule = require('./JobRaiser/walkInCV.js');
+var gulfModule = require('./JobRaiser/gulf.js');
+
+
 
 router.use('/WM',jobModule);
 router.use('/WM',masterModule);
@@ -314,6 +322,7 @@ router.use('/WM',applicantModule);
 router.use('/WM',jobPortalModule);
 router.use('/WM',paceUsersModule);
 router.use('/WM',walkInCvModule);
+router.use('/WM',gulfModule);
 // cron
 // var taskScheduler = require('../api/HEApp/task/task-ctrl');
 cron.schedule('*/15 * * * *', function(){

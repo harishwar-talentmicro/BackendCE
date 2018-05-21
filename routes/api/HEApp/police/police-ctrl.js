@@ -8,6 +8,10 @@ var path = require('path');
 
 var fs = require('fs');
 
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
 var Notification_aws = require('../../../modules/notification/aws-sns-push.js');
 
 var _Notification_aws = new  Notification_aws();

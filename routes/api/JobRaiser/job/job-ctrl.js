@@ -399,14 +399,14 @@ jobCtrl.getJobStatus = function (req, res, next) {
                     console.log(err);
                     if (!err && statusResult && statusResult[0] && statusResult[0][0]) {
                         response.status = true;
-                        response.message = "status loaded successfully";
+                        response.message = "Status loaded successfully";
                         response.error = null;
                         response.data = statusResult[0];
                         res.status(200).json(response);
                     }
                     else if (!err) {
                         response.status = true;
-                        response.message = "status not found";
+                        response.message = "Status not found";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
@@ -869,7 +869,7 @@ jobCtrl.saveEducation = function (req, res, next) {
                     var isWeb = req.query.isWeb;
                     if (!err && results && results[0]) {
                         response.status = true;
-                        response.message = "education and Specialization saved sucessfully";
+                        response.message = "Education and Specialization saved sucessfully";
                         response.error = null;
                         response.data = {
                             educationSpecialization: results[0]
@@ -1379,7 +1379,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                         }
 
                         response.status = true;
-                        response.message = "requirement saved successfully";
+                        response.message = "Requirement saved successfully";
                         response.error = null;
                         response.data = {
                             messageList: {
@@ -1893,7 +1893,7 @@ jobCtrl.getJdTemplateDetails = function (req, res, next) {
                     var isWeb = req.query.isWeb;
                     if (!err && result && result[0]) {
                         response.status = true;
-                        response.message = "JdTemplateDetails  loaded successfully";
+                        response.message = "Jd Template Details  loaded successfully";
                         response.error = null;
                         response.data = {
                             jdTemplateDetails: JSON.parse(result[0][0].reqjsondata) ? JSON.parse(result[0][0].reqjsondata) : []
@@ -1913,7 +1913,7 @@ jobCtrl.getJdTemplateDetails = function (req, res, next) {
                     }
                     else if (!err) {
                         response.status = true;
-                        response.message = "JdTemplateDetails not found";
+                        response.message = "Jd Template Details not found";
                         response.error = null;
                         response.data = {
                             jdTemplateDetails: []

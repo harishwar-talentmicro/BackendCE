@@ -17,6 +17,10 @@ var Notification = require('../../modules/notification/notification-master.js');
 var notification = new Notification();
 var appConfig = require('../../../ezeone-config.json');
 var DBSecretKey=appConfig.DB.secretKey;
+
+var zlib = require('zlib');
+var AES_256_encryption = require('../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 /**
  * Method : POST
  * @param req
@@ -405,7 +409,7 @@ router.post('/members', function (req, res, next) {
      *
      * */
     if(!req.query.token){
-        error.token='';
+        error.token='No token found';
         validationFlag *=false;
     }
 
@@ -448,7 +452,8 @@ router.post('/members', function (req, res, next) {
                             var queryParams = [
                                 req.db.escape(req.body.groupId),
                                 req.db.escape(JSON.stringify(memberList)),
-                                req.db.escape(req.query.token)
+                                req.db.escape(req.query.token),
+                                req.db.escape(DBSecretKey)
                             ];
                             /**
                              * call p_v1_addmembersbygroup to add members to the group
@@ -950,7 +955,8 @@ router.get('/members', function (req, res, next) {
                     var procParams = [
                         req.db.escape(req.query.token),
                         req.db.escape(req.query.groupId),
-                        req.db.escape(req.query.timeStamp)
+                        req.db.escape(req.query.timeStamp),
+                        req.db.escape(DBSecretKey)
                     ];
                     var procQuery = 'CALL p_v1_getGroupMembers(' + procParams.join(',') + ')';
                     console.log(procQuery);
@@ -958,7 +964,7 @@ router.get('/members', function (req, res, next) {
                         /**
                          *if getting group member list with group id then give list of group members in response
                          * */
-                        console.log(groupMemberResults[0], "groupMemberResults[0]");
+                        // console.log(groupMemberResults[0], "groupMemberResults[0]");
                         if (!err) {
                             if (groupMemberResults && groupMemberResults[0] && groupMemberResults[0][0]) {
                                 if (groupMemberResults[0][0].groupId) {
@@ -1231,7 +1237,8 @@ router.post('/change_admin', function (req, res, next) {
                             var procParams = [
                                 req.db.escape(req.body.ezeoneId),
                                 req.db.escape(req.body.groupId),
-                                req.db.escape(req.query.token)
+                                req.db.escape(req.query.token),
+                                req.db.escape(DBSecretKey)
                             ];
 
                             /**
@@ -1579,7 +1586,8 @@ router.put('/leave', function (req, res, next) {
                         else {
                             var queryParams = [
                                 req.db.escape(req.query.token),
-                                req.db.escape(req.body.groupId)
+                                req.db.escape(req.body.groupId),
+                                req.db.escape(DBSecretKey)
                             ];
                             /**
                              * call p_v1_UpdateUserStatus to change the status like accept/reject/block
@@ -1743,7 +1751,8 @@ router.get('/pending_request', function (req, res, next) {
                      * */
                     var procParams = [
                         req.db.escape(req.query.groupId),
-                        req.db.escape(req.query.token)
+                        req.db.escape(req.query.token),
+                        req.db.escape(DBSecretKey)
                     ];
                     var procQuery = 'CALL p_v1_pending_requests(' + procParams.join(',') + ')';
                     console.log(procQuery);

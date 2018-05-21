@@ -17,6 +17,9 @@ const authToken = '3abf04f536ede7f6964919936a35e614';
 const client = require('twilio')(accountSid, authToken);
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
+var zlib = require('zlib');
+var AES_256_encryption = require('../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 
 var CONFIG = require('../../../ezeone-config.json');
 var DBSecretKey = CONFIG.DB.secretKey;

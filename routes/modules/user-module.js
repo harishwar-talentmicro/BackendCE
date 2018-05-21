@@ -23,7 +23,9 @@ var moment = require('moment');
 
 var appConfig = require('../../ezeone-config.json');
 var DBSecretKey = appConfig.DB.secretKey;
-
+var zlib = require('zlib');
+var AES_256_encryption = require('../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
 
 function FnEncryptPassword(Password) {
     try {
@@ -4201,7 +4203,7 @@ User.prototype.getUserDetailsNew = function (req, res, next) {
             st.validateToken(token, function (err, tokenRes) {
                 if (!err) {
                     if (tokenRes) {
-                        var queryString = 'CALL pgetuserdetails(' + st.db.escape(token) + ')';
+                        var queryString = 'CALL pgetuserdetails(' + st.db.escape(token) + st.db.escape(DBSecretKey) + ')';
                         st.db.query(queryString, function (err, results) {
                             if (!err) {
                                 if (results) {
