@@ -17,6 +17,7 @@ var DBSecretKey=appConfig.DB.secretKey;
 const AccessToken = require('twilio').jwt.AccessToken;
 const VideoGrant = AccessToken.VideoGrant;
 const VoiceGrant = AccessToken.VoiceGrant;
+
 // Used when generating any kind of tokens
 const twilioAccountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
 const twilioApiKey = 'SK325bcee2fd8a349792f9772907f0bfe8';

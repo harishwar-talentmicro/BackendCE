@@ -22,12 +22,17 @@ const thread = spawn('worker.js');
 var DbHelper = require('./../../../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
 
+var whatmateconfig=require('../../../ezeone-config.json');
+var DBSecretKey=whatmateconfig.DB.secretKey;
+
 function Messages(){
 }
 
 Messages.prototype.getMessagesNeedToNotify = function() {
-    console.log()
-    var procQuery = 'CALL he_get_messageList("'+DBSecretKey+'")';
+
+
+    var procQuery = 'CALL he_get_messageList("' + DBSecretKey + '")';
+
     console.log(procQuery);
 
     db.query(procQuery,function(err,messageList){
@@ -38,7 +43,8 @@ Messages.prototype.getMessagesNeedToNotify = function() {
                 thread
                     .send({messageList:messageList[0],increment:i,limitValues:100})
                     .on('message', function(response) {
-                        //thread.kill();
+                        console.log("response",response);
+                        thread.kill();
                     })
                     .on('error', function(error) {
                         console.log('Worker errored:', error);
