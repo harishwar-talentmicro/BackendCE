@@ -54,16 +54,16 @@ gulfCtrl.saveMedical = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
-                req.query.medicalId = (req.query.medicalId) ? req.query.medicalId : 0;
-                req.query.currencyId = (req.query.currencyId) ? req.query.currencyId : 1;
-                req.query.scaleId = (req.query.scaleId) ? req.query.scaleId : 1;
-                req.query.tokenNumber = (req.query.tokenNumber) ? req.query.tokenNumber : 0;
-                req.query.medicalNotes = (req.query.medicalNotes) ? req.query.medicalNotes : "";
-                req.query.notes = (req.query.notes) ? req.query.notes : "";
+                req.body.medicalId = (req.body.medicalId) ? req.body.medicalId : 0;
+                req.body.currencyId = (req.body.currencyId) ? req.body.currencyId : 1;
+                req.body.scaleId = (req.body.scaleId) ? req.body.scaleId : 1;
+                req.body.tokenNumber = (req.body.tokenNumber) ? req.body.tokenNumber : 0;
+                req.body.medicalNotes = (req.body.medicalNotes) ? req.body.medicalNotes : "";
+                req.body.notes = (req.body.notes) ? req.body.notes : "";
                 
                 var getStatus = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.medicalId),                    
+                    req.st.db.escape(req.body.medicalId),                    
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.body.reqApplicantId),
                     req.st.db.escape(req.body.heDepartmentId),
@@ -248,7 +248,7 @@ gulfCtrl.saveDeparture = function (req, res, next) {
                 req.body.tickets = req.body.tickets ? req.body.tickets : '';
                 req.body.pnrNumber = req.body.pnrNumber ? req.body.pnrNumber : '';
                 req.body.airlineStatus = req.body.airlineStatus ? req.body.airlineStatus : 0;
-                req.body.departureAmmount = req.body.departureAmmount ? req.body.departureAmmount : 0.0;
+                req.body.departureAmount = req.body.departureAmount ? req.body.departureAmount : 0.0;
                 req.body.billTo = req.body.billTo ? req.body.billTo : 0;
                 req.body.creditNoteNumber = req.body.creditNoteNumber ? req.body.creditNoteNumber : '';
                 req.body.notes = req.body.notes ? req.body.notes : '';
@@ -272,7 +272,7 @@ gulfCtrl.saveDeparture = function (req, res, next) {
                     req.st.db.escape(req.body.pnrNumber),
                     req.st.db.escape(req.body.airlineStatus),
                     req.st.db.escape(JSON.stringify(departureCurrency)),
-                    req.st.db.escape(req.body.departureAmmount),
+                    req.st.db.escape(req.body.departureAmount),
                     req.st.db.escape(JSON.stringify(departureCurrencyScale)),
                     req.st.db.escape(req.body.creditNoteNumber),
                     req.st.db.escape(req.body.billTo),
@@ -290,6 +290,8 @@ gulfCtrl.saveDeparture = function (req, res, next) {
                         response.status = true;
                         response.message = "Departure data saved sucessfully";
                         response.error = null;
+                        results[0][0].departureCurrency= results[0][0].departureCurrency ? JSON.parse(results[0][0].departureCurrency):{};
+                        results[0][0].departureCurrencyScale= results[0][0].departureCurrencyScale ? JSON.parse(results[0][0].departureCurrencyScale):{};                        
                         response.data = (results && results[0] && results[0][0]) ? results[0][0]:{};
                         res.status(200).json(response);
                     }
@@ -363,6 +365,9 @@ gulfCtrl.getDeparture = function (req, res, next) {
                         response.status = true;
                         response.message = "Departure data loaded successfully";
                         response.error = null;
+                        result[0][0].departureCurrency= result[0][0].departureCurrency ? JSON.parse(result[0][0].departureCurrency):{};
+                        result[0][0].departureCurrencyScale= result[0][0].departureCurrencyScale ? JSON.parse(result[0][0].departureCurrencyScale):{};
+
                         response.data = (result && result[0] && result[0][0]) ? result[0][0] : {};
                         res.status(200).json(response);
                     }
@@ -467,7 +472,8 @@ gulfCtrl.saveVisa = function (req, res, next) {
                 req.body.validityTo = req.body.validityTo ? req.body.validityTo : null;
                 req.body.coverageDetails = req.body.coverageDetails ? req.body.coverageDetails : '';
                 req.body.billTo = req.body.billTo ? req.body.billTo : 0;
-                req.body.visaAmmount = req.body.visaAmmount ? req.body.visaAmmount : 0.0;
+                req.body.visaAmount = req.body.visaAmount ? req.body.visaAmount : 0.0;
+                req.body.passportNumber = req.body.passportNumber ? req.body.passportNumber : '';
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -476,6 +482,7 @@ gulfCtrl.saveVisa = function (req, res, next) {
                     req.st.db.escape(req.body.applicantId),
                     req.st.db.escape(req.body.requirementId),
                     req.st.db.escape(req.body.applicantName),
+                    req.st.db.escape(req.body.passportNumber),
                     req.st.db.escape(req.body.visaNumber),
                     req.st.db.escape(req.body.visaStatus),
                     req.st.db.escape(req.body.dateOfIssue),
@@ -500,18 +507,21 @@ gulfCtrl.saveVisa = function (req, res, next) {
                     req.st.db.escape(req.body.billTo),
                     req.st.db.escape(JSON.stringify(visaCurrency)),
                     req.st.db.escape(JSON.stringify(visaScale)),
-                    req.st.db.escape(req.body.visaAmmount)
+                    req.st.db.escape(req.body.visaAmount)
                 ];
                 var procQuery = 'CALL wm_save_paceVisa( ' + inputs.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery, function (err, results) {
+                req.db.query(procQuery, function (err, result) {
                     console.log(err);
 
-                    if (!err && results && results[0][0]) {
+                    if (!err && result && result[0][0]) {
                         response.status = true;
                         response.message = "Visa data saved sucessfully";
                         response.error = null;
-                        response.data = (results && results[0] && results[0][0]) ? results[0][0]:{};
+                        result[0][0].visaCurrency=result[0][0].visaCurrency ? JSON.parse(result[0][0].visaCurrency):{};
+                        result[0][0].country=result[0][0].country ? JSON.parse(result[0][0].country):{};
+                        result[0][0].visaScale=result[0][0].visaScale ? JSON.parse(result[0][0].visaScale):{};
+                        response.data = (result && result[0] && result[0][0]) ? result[0][0]:{};
                         res.status(200).json(response);
                     }
                    
@@ -580,6 +590,9 @@ gulfCtrl.getVisa = function (req, res, next) {
                         response.status = true;
                         response.message = "Visa data loaded successfully";
                         response.error = null;
+                        result[0][0].visaCurrency=result[0][0].visaCurrency ? JSON.parse(result[0][0].visaCurrency):{};
+                        result[0][0].country=result[0][0].country ? JSON.parse(result[0][0].country):{};
+                        result[0][0].visaScale=result[0][0].visaScale ? JSON.parse(result[0][0].visaScale):{};                                                                        
                         response.data = (result && result[0] && result[0][0]) ? result[0][0] : {};
                         res.status(200).json(response);
                     }

@@ -707,6 +707,16 @@ router.post('/sync', function (req, res, next) {
                                 console.log(procQuery);
                                 req.db.query(procQuery, function (err, results) {
                                     if (!err) {
+
+                                        var keywords_list = [];
+                                            if(results[5]){
+                                                for(var keywordIndex = 0; keywordIndex < results[5].length; keywordIndex++){
+                                                    keywords_list[keywordIndex] = {};
+                                                    keywords_list[keywordIndex].formId = results[5][keywordIndex].formID;
+                                                    if(results[5][keywordIndex].keywords)
+                                                        keywords_list[keywordIndex].keywordList = results[5][keywordIndex].keywords.split(' ');
+                                                }
+                                            }
                                         //console.log(results,"results");
                                         if (results && results[0] && results[0].length > 0) {
                                             var messageObj;
@@ -776,15 +786,7 @@ router.post('/sync', function (req, res, next) {
                                                     formData: results[0][i].formDataJSON ? JSON.parse(results[0][i].formDataJSON) : null
                                                 });
                                             }
-                                            var keywords_list = [];
-                                            if(results[5]){
-                                                for(var keywordIndex = 0; keywordIndex < results[5].length; keywordIndex++){
-                                                    keywords_list[keywordIndex] = {};
-                                                    keywords_list[keywordIndex].formId = results[5][keywordIndex].formID;
-                                                    if(results[5][keywordIndex].keywords)
-                                                        keywords_list[keywordIndex].keywordList = results[5][keywordIndex].keywords.split(' ');
-                                                }
-                                            }
+                                            
 
                                             // console.log("results[5][0].GCM_Id",results[5][0].GCM_Id);
                                             responseMessage.data = {
