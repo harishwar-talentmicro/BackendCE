@@ -18,7 +18,7 @@ config.set({
     }
 });
 
-const thread = spawn('worker.js');
+
 var DbHelper = require('./../../../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
 
@@ -40,6 +40,7 @@ Messages.prototype.getMessagesNeedToNotify = function() {
             var numberOfThreads = Math.ceil(messageList[0].length /100);
             console.log("numberOfThreads",numberOfThreads);
             for (var i = 0; i < numberOfThreads ; i++) {
+                const thread = spawn('worker.js');
                 thread
                     .send({messageList:messageList[0],increment:i,limitValues:100})
                     .on('message', function(response) {
