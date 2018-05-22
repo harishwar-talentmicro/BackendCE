@@ -4,9 +4,7 @@ var notificationTemplater = new NotificationTemplater();
 var Notification = require('../../../modules/notification/notification-master.js');
 var notification = new Notification();
 var fs = require('fs');
-var textract = require('textract');
 var http = require('https');
-var defer = require('q');  // for handling promise
 var bodyParser = require('body-parser');
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
@@ -43,6 +41,20 @@ gulfCtrl.saveMedical = function (req, res, next) {
         error.reqApplicantId = 'Invalid reqApplicantId';
         validationFlag = false;
     }
+    var currency = req.body.currency;
+    if (typeof (currency) == "string") {
+        currency = JSON.parse(currency);
+    }
+    if (!currency) {
+        currency = {};
+    }
+    var scale = req.body.scale;
+    if (typeof (scale) == "string") {
+        scale = JSON.parse(scale);
+    }
+    if (!scale) {
+        scale = {};
+    }
     
     if (!validationFlag) {
         response.error = error;
@@ -70,8 +82,8 @@ gulfCtrl.saveMedical = function (req, res, next) {
                     req.st.db.escape(req.body.applicantId),
                     req.st.db.escape(req.body.billTo),
                     req.st.db.escape(req.body.amount),
-                    req.st.db.escape(req.body.currencyId),
-                    req.st.db.escape(req.body.scaleId),
+                    req.st.db.escape(JSON.stringify(currency)),
+                    req.st.db.escape(JSON.stringify(scale)),
                     req.st.db.escape(req.body.receivedDate),
                     req.st.db.escape(req.body.sentDate),
                     req.st.db.escape(req.body.date),
@@ -82,7 +94,7 @@ gulfCtrl.saveMedical = function (req, res, next) {
                     req.st.db.escape(req.body.notes),
                     req.st.db.escape(req.body.reMedical)
                 ];
-
+            
                 var procQuery = 'CALL wm_save_1010_medical( ' + getStatus.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, Result) {
@@ -100,7 +112,7 @@ gulfCtrl.saveMedical = function (req, res, next) {
                     
                     else {
                         response.status = false;
-                        response.message = "Error while saving Medicaldata";
+                        response.message = "Error while saving medical data";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
@@ -173,7 +185,7 @@ gulfCtrl.getMedical = function (req, res, next) {
                     
                     else {
                         response.status = false;
-                        response.message = "Error while loading Medicaldata";
+                        response.message = "Error while loading medical data";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
@@ -683,7 +695,7 @@ gulfCtrl.saveAttestation = function (req, res, next) {
 
                     if (!err && result && result[0][0]) {
                         response.status = true;
-                        response.message = "Visa data saved sucessfully";
+                        response.message = "Attestation data saved sucessfully";
                         response.error = null;
 
                         result[0][0].attestation=(result[0][0].attestation) ? JSON.parse(result[0][0].attestation):[];
@@ -703,7 +715,7 @@ gulfCtrl.saveAttestation = function (req, res, next) {
                    
                     else {
                         response.status = false;
-                        response.message = "Error while saving visa data";
+                        response.message = "Error while saving Attestation data";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

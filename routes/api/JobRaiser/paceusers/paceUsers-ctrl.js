@@ -242,6 +242,23 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+
+    var venue=req.body.venue;
+    if(typeof(venue) == "string"){
+        venue=JSON.parse(venue);
+    }
+    if(!venue){
+        venue={};
+    }
+
+    var anchor=req.body.anchor;
+    if(typeof(anchor) == "string"){
+        anchor=JSON.parse(anchor);
+    }
+    if(!anchor){
+        anchor={};
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -254,6 +271,8 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 req.body.taskId = req.body.taskId ? req.body.taskId : 0;
                 req.body.priority = req.body.priority ? req.body.priority : 1;
+                req.body.taskDateTime = req.body.taskDateTime ? req.body.taskDateTime : null;
+                req.body.taskEndDate = req.body.taskEndDate ? req.body.taskEndDate : null;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -263,7 +282,10 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                     req.st.db.escape(req.body.taskTitle),
                     req.st.db.escape(req.body.taskDescription),
                     req.st.db.escape(req.body.taskDateTime),
-                    req.st.db.escape(req.body.priority)
+                    req.st.db.escape(req.body.priority),
+                    req.st.db.escape(req.body.taskEndDate),
+                    req.st.db.escape(JSON.parse(venue)),
+                    req.st.db.escape(JSON.parse(anchor))                                        
                 ];
 
                 var procQuery = 'CALL wm_save_pacePlanner( ' + inputs.join(',') + ')';
@@ -274,7 +296,7 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                         response.status = true;
                         response.message = "Task saved successfully";
                         response.error = null;
-                        response.data = result[0][0];
+                        response.data = result[0];
                         res.status(200).json(response);
                     }
                     else {

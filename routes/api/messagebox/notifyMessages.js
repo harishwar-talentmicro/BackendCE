@@ -4,8 +4,8 @@
 
 
  var st = null;
- var dbConfig=require('../../../ezeone-config.json');
- var DBSecretKey=dbConfig.DB.secretKey;
+//  var dbConfig=require('../../../ezeone-config.json');
+//  var DBSecretKey=dbConfig.DB.secretKey;
  // thread
 const threads  = require('threads');
 const config  = threads.config;

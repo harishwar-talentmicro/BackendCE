@@ -940,7 +940,8 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             bannerList: result[0],
                             companyLogo:result[1][0].companyLogo,
                             registrationType :result[6][0].walkinRegistrationType,  // need to come from backend, will be done later.
-                            tokenGeneration : result[6][0].walkinTokenGeneration,
+                            // tokenGeneration : result[6][0].walkinTokenGeneration,
+                            tokenGeneration :0,
                             industryList: result[2] ? result[2]:[],
                             skillList: result[3] ? result[3]:[],// need to come from backend, will be done later.
                             locationList:result[4] ? result[4]:[],
