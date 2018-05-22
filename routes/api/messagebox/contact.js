@@ -83,13 +83,16 @@ router.get('/query', function(req,res,next){
                         }
                     }
                     req.query.isWhatMate = req.query.isWhatMate ? req.query.isWhatMate : 0;
+                    req.query.searchType = req.query.searchType ? req.query.searchType : 1;
 
+                    // searchType = 1 then internal user 2=Public user
                     var procParams = [
                         req.db.escape(title),
                         req.db.escape(pin) ,
                         req.db.escape(req.query.token),
                         req.db.escape(req.query.isWhatMate),
-                        req.st.db.escape(DBSecretKey)
+                        req.st.db.escape(DBSecretKey),
+                        req.db.escape(req.query.searchType)
                     ];
                     var procQuery = 'CALL get_v1_messagebox_contact(' + procParams.join(',') + ')';
                     console.log(procQuery);
