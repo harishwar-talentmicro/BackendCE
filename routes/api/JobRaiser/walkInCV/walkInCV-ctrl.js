@@ -940,7 +940,8 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             bannerList: result[0],
                             companyLogo:result[1][0].companyLogo,
                             registrationType :result[6][0].walkinRegistrationType,  // need to come from backend, will be done later.
-                            tokenGeneration : result[6][0].walkinTokenGeneration,
+                            // tokenGeneration : result[6][0].walkinTokenGeneration,
+                            tokenGeneration :0,
                             industryList: result[2] ? result[2]:[],
                             skillList: result[3] ? result[3]:[],// need to come from backend, will be done later.
                             locationList:result[4] ? result[4]:[],
@@ -1125,6 +1126,8 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                     console.log();
                                 }
 
+                                var source=2;
+
                                 if ((!err) && loginResult[0]) {
                                     req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                                     req.body.parentId = req.body.parentId ? req.body.parentId : 0;
@@ -1165,7 +1168,8 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                             req.st.db.escape(JSON.stringify(candidateDetails)),
                                             req.st.db.escape(JSON.stringify(clientDetails)),
 
-                                        req.st.db.escape(DBSecretKey)
+                                        req.st.db.escape(DBSecretKey),
+                                        req.st.db.escape(source)
                                     ];
 
                                     var procQuery = 'CALL wm_save_interviewSchedulerForHirecraft( ' + procParams.join(',') + ')';

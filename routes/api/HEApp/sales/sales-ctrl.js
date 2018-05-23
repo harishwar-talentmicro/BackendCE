@@ -962,6 +962,30 @@ salesCtrl.getSalesTracker = function (req, res, next) {
         validationFlag *= false;
     }
 
+    var stageStatusList = req.body.stageStatusList;
+    if (typeof (stageStatusList) == "string") {
+        stageStatusList = JSON.parse(stageStatusList);
+    }
+    if (!stageStatusList) {
+        stageStatusList = {};
+    }
+
+    var probability = req.body.probability;
+    if (typeof (probability) == "string") {
+        probability = JSON.parse(probability);
+    }
+    if (!probability) {
+        probability = {};
+    }
+
+    var timeline = req.body.timeline;
+    if (typeof (timeline) == "string") {
+        timeline = JSON.parse(timeline);
+    }
+    if (!timeline) {
+        timeline = {};
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -981,25 +1005,32 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                         console.log(response);
                     }
                     else {
-                        req.query.type = req.query.type ? req.query.type : 1;
+                        req.body.type = req.body.type ? req.body.type : 1;
                         req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
                         req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
                         var startPage = 0;
         
                         startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
+
+                        req.body.userId = req.body.userId ? req.body.userId : 0;
         
         
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.query.groupId),
-                            req.st.db.escape(req.query.type),
+                            req.st.db.escape(req.body.type),
                             req.st.db.escape(startPage),
-                            req.st.db.escape(req.query.limit)
+                            req.st.db.escape(req.query.limit),
+                            req.st.db.escape(JSON.stringify(stageStatusList)),
+                            req.st.db.escape(JSON.stringify(probability)),
+                            req.st.db.escape(JSON.stringify(timeline)),
+                            req.st.db.escape(req.body.userId)
+
                         ];
                         /**
                          * Calling procedure to save form sales items
                          */
-                        var procQuery = 'CALL HE_get_salesTracker( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL HE_get_salesTracker1( ' + procParams.join(',') + ')';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, salesItems) {
                             if (!err && salesItems && salesItems[0]) {
@@ -1202,6 +1233,7 @@ salesCtrl.getSalesUserPerformanceByProbability = function (req, res, next) {
                         for (var i = 0; i < salesItems[0].length; i++) {
                             var res1 = {};
                             res1.name = salesItems[0][i].name;
+                            res1.HEUserId=salesItems[0][i].HEUserId;
                             res1.probabilityData = salesItems[0][i].probabilityData ? JSON.parse(salesItems[0][i].probabilityData) : [];
                             output.push(res1);
                         }
@@ -1302,7 +1334,7 @@ salesCtrl.getSalesUserPerformanceByTimeLine = function (req, res, next) {
                 var procQuery = 'CALL he_get_salesUserByTimeLine( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, salesItems) {
-                    if (!err && salesItems && salesItems[0] && salesItems[0][0].message != "no_data_found") {
+                    if (!err && salesItems && salesItems[0] ) {
 
                         response.status = true;
                         response.message = "Sales tracker data loaded successfully";
@@ -1310,6 +1342,7 @@ salesCtrl.getSalesUserPerformanceByTimeLine = function (req, res, next) {
                         for (var i = 0; i < salesItems[0].length; i++) {
                             var res1 = {};
                             res1.name = salesItems[0][i].name;
+                            res1.HEUserId=salesItems[0][i].HEUserId;
                             res1.timeLineData = salesItems[0][i].timeLineData ? JSON.parse(salesItems[0][i].timeLineData) : [];
                             output.push(res1);
                         }
