@@ -498,7 +498,21 @@ supportCtrl.getSupportTracker = function(req,res,next){
         error.groupId = 'Invalid groupId';
         validationFlag *= false;
     }
+    var status = req.body.status;
+    if (typeof (status) == "string") {
+        status = JSON.parse(status);
+    }
+    if (!status) {
+        status = [];
+    }
 
+    var priority = req.body.priority;
+    if (typeof (priority) == "string") {
+        priority = JSON.parse(priority);
+    }
+    if (!priority) {
+        priority = [];
+    }
 
     if (!validationFlag){
         response.error = error;
@@ -509,26 +523,30 @@ supportCtrl.getSupportTracker = function(req,res,next){
     else{
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
-                req.query.type = (req.query.type) ? (req.query.type) : 0;
+                req.body.type = (req.body.type) ? (req.body.type) : 0;
                 req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
                 req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
                 var startPage = 0;
 
                 startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
+                req.body.userId = (req.body.userId) ? (req.body.userId) : 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.groupId),
-                    req.st.db.escape(req.query.type),
+                    req.st.db.escape(req.body.type),
                     req.st.db.escape(startPage),
-                    req.st.db.escape(req.query.limit)
+                    req.st.db.escape(req.query.limit),
+                    req.st.db.escape(JSON.stringify(req.body.status)),
+                    req.st.db.escape(JSON.stringify(req.body.priority)),
+                    req.st.db.escape(req.body.userId)
                 ];
                 /**
                  * Calling procedure for sales request
                  * @type {string}
                  */
 
-                var procQuery = 'CALL HE_get_supportTracker( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL HE_get_supportTracker1( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     console.log(results);
@@ -729,6 +747,7 @@ supportCtrl.getSupportUsersByPriority = function(req,res,next){
                         for(var i = 0; i < supportPriorityData[0].length; i++) {
                             var res1 = {};
                             res1.name = supportPriorityData[0][i].name;
+                            res1.HEUserId= supportPriorityData[0][i].HEUserId;
                             res1.priorityData = supportPriorityData[0][i].probabilityData ? JSON.parse(supportPriorityData[0][i].probabilityData) : [];
                             output.push(res1);
                         }

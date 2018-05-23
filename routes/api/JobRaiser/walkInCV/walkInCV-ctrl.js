@@ -1534,7 +1534,7 @@ walkInCvCtrl.getUsersOnSearch= function (req, res, next) {
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            userList: []
+                            List: []
                         };
                         res.status(200).json(response);
 
