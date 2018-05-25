@@ -6,13 +6,14 @@ var Notification = require('../../../modules/notification/notification-master.js
 var notification = new Notification();
 var fs = require('fs');
 var bodyParser = require('body-parser');
-
+var http = require('https');
+var request = require('request');
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 
 var CONFIG = require('../../../../ezeone-config.json');
-var DBSecretKey=CONFIG.DB.secretKey;
+var DBSecretKey = CONFIG.DB.secretKey;
 
 var paceUsersCtrl = {};
 var error = {};
@@ -242,6 +243,23 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+
+    var venue = req.body.venue;
+    if (typeof (venue) == "string") {
+        venue = JSON.parse(venue);
+    }
+    if (!venue) {
+        venue = {};
+    }
+
+    var anchor = req.body.anchor;
+    if (typeof (anchor) == "string") {
+        anchor = JSON.parse(anchor);
+    }
+    if (!anchor) {
+        anchor = {};
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -254,6 +272,8 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 req.body.taskId = req.body.taskId ? req.body.taskId : 0;
                 req.body.priority = req.body.priority ? req.body.priority : 1;
+                req.body.taskDateTime = req.body.taskDateTime ? req.body.taskDateTime : null;
+                req.body.taskEndDate = req.body.taskEndDate ? req.body.taskEndDate : null;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -263,7 +283,10 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                     req.st.db.escape(req.body.taskTitle),
                     req.st.db.escape(req.body.taskDescription),
                     req.st.db.escape(req.body.taskDateTime),
-                    req.st.db.escape(req.body.priority)
+                    req.st.db.escape(req.body.priority),
+                    req.st.db.escape(req.body.taskEndDate),
+                    req.st.db.escape(JSON.stringify(venue)),
+                    req.st.db.escape(JSON.stringify(anchor))
                 ];
 
                 var procQuery = 'CALL wm_save_pacePlanner( ' + inputs.join(',') + ')';
@@ -274,7 +297,7 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                         response.status = true;
                         response.message = "Task saved successfully";
                         response.error = null;
-                        response.data = result[0][0];
+                        response.data = result[0];
                         res.status(200).json(response);
                     }
                     else {
@@ -334,6 +357,12 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
                         response.status = true;
                         response.message = "Tasks loaded successfully";
                         response.error = null;
+                        var output = [];
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
+                            result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
+
+                        }
                         response.data =
                             {
                                 tasks: result[0]
@@ -397,7 +426,7 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.type = req.query.type ? req.query.type : 1;
-            
+
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -413,18 +442,18 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         response.status = true;
                         response.message = "data loaded successfully";
                         response.error = null;
-                        var output =[];
+                        var output = [];
                         for (var i = 0; i < result[1].length; i++) {
                             var res2 = {};
-                            res2.stage = result[1][i].stage ? JSON.parse(result[1][i].stage):{};
+                            res2.stage = result[1][i].stage ? JSON.parse(result[1][i].stage) : {};
                             output.push(res2);
                         }
 
-                        
+
                         response.data =
                             {
                                 requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
-                                stages :output
+                                stages: output
                             };
                         res.status(200).json(response);
                     }
@@ -520,6 +549,69 @@ paceUsersCtrl.saveTrackerTemplate = function (req, res, next) {
                         res.status(500).json(response);
                     }
                 });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+paceUsersCtrl.getBaseFile = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "bas64 File",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = "Invalid Company";
+        validationFlag *= false;
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.query.cdnPath = req.query.cdnPath ? req.query.cdnPath : "";
+
+                var url = "https://storage.googleapis.com/ezeone/" + req.query.cdnPath;
+                http.get(url, function (fileResponse) {
+                    var bufs = [];
+        
+                    fileResponse.on('data', function (d) { bufs.push(d); });
+                    fileResponse.on('end', function () {
+                        var buf = Buffer.concat(bufs);
+                        buf=new Buffer(buf).toString("base64");
+                        response.data=buf;
+                        res.status(200).json(response);
+                        });
+                    });
+               
+
+                    
+                // request.get(url, function (error, response, body) { 
+                //     if (!error && response.statusCode == 200) 
+                //     { 
+                        
+                //         data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64'); 
+                //         // console.log(data);
+                //         res.status(200).json(data);
+                //         // console.log(body,'----body');
+                //         // console.log(response,'----response');
+                //     }});
             }
             else {
                 res.status(401).json(response);

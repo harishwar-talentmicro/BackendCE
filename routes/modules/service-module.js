@@ -705,9 +705,35 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
             if(req.files.attachment) {
                 var uniqueId = uuid.v4();
                 var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
+                var mimeType = req.files.attachment.mimetype;
+                if(mimeType){
+                    if(mimeType.indexOf('png') > 0|| mimeType.indexOf('jpg') > 0 ){
+                        filetype = "png";
+                    }
+                    else if(mimeType.indexOf('jpeg') > 0 ){
+                        filetype = "jpeg";
+                    }
+                    else if(mimeType.indexOf('jpg') > 0 ){
+                        filetype = "jpg"
+                    }
+                    else if(mimeType.indexOf('doc') > 0 ){
+                        filetype = "doc"
+                    }
+                    else if(mimeType.indexOf('docx') > 0 ){
+                        filetype = "docx"
+                    }
+                    else if(mimeType.indexOf('rtf') > 0 ){
+                        filetype = "rtf"
+                    }
+                    else if(mimeType.indexOf('pdf') > 0 ){
+                        filetype = "pdf"
+                    }
+                }
                 aUrl = uniqueId + '.' + filetype;
                 aFilename = req.files.attachment.originalname;
                 console.log("aFilenameaFilename",aFilename);
+                console.log("aFilenameaFilename",req.files.attachment);
+                
                 console.log("req.files.attachment.path",req.files.attachment.path);
 
                 var readStream = fs.createReadStream(req.files.attachment.path);

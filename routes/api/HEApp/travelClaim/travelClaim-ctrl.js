@@ -134,26 +134,6 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                             req.st.db.escape(DBSecretKey)
                    ];
 
-                        var expenseParams = [ // for expense claim
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.body.parentId),
-                            req.st.db.escape(req.body.title),
-                            req.st.db.escape(req.body.totalCurrencyId), // before currencyId=totalCurrencyId 
-                            req.st.db.escape(req.body.totalAmount), //before ammount = totalAmount
-                            req.st.db.escape(req.body.senderNotes),
-                            req.st.db.escape(req.body.status),
-                            req.st.db.escape(req.body.approverNotes),
-                            req.st.db.escape(req.body.settlementPaid),  //before amountSettled=settlementPaid
-                            req.st.db.escape(req.body.receiverNotes),
-                            req.st.db.escape(req.body.changeLog),
-                            req.st.db.escape(req.body.groupId),
-                            req.st.db.escape(req.body.learnMessageId),
-                            req.st.db.escape(req.body.accessUserType),
-                            req.st.db.escape(JSON.stringify(expenseList)),
-                            req.st.db.escape(req.body.approverCount),
-                            req.st.db.escape(req.body.receiverCount),
-                            req.st.db.escape(DBSecretKey)                                                                    
-                        ];
                         var travelClaimFormId=1007;
                         var keywordsParams=[
                             req.st.db.escape(req.query.token),
@@ -165,7 +145,6 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        if (req.body.travelRequestId !=0) {
                             var procQuery = 'CALL HE_save_travelClaim_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                             console.log(procQuery);
                             req.db.query(procQuery,function(err,results){
@@ -319,165 +298,6 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                                     res.status(500).json(response);
                                 }
                             });
-                        }
-                        else{
-                            var expenseClaimFormId=1005;
-                        var keywordsParams=[
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(expenseClaimFormId),
-                            req.st.db.escape(JSON.stringify(keywordList)),
-                            req.st.db.escape(req.body.groupId)  
-                        ];
-                            var procQuery = 'CALL HE_save_expenseClaim_new( ' + expenseParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
-                            
-                            console.log(procQuery);
-                            req.db.query(procQuery,function(err,results){
-                                console.log(results);
-                                if(!err && results && results[0] ){
-                                    senderGroupId = results[0][0].senderId;
-                                    // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                                    //     senderName : results[0][0].message
-                                    // });
-                                    //
-                                    // for (var i = 0; i < results[1].length; i++ ) {
-                                    //     if (notificationTemplaterRes.parsedTpl) {
-                                    //         notification.publish(
-                                    //             results[1][i].receiverId,
-                                    //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                    //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                    //             results[0][0].senderId,
-                                    //             notificationTemplaterRes.parsedTpl,
-                                    //             31,
-                                    //             0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                    //             (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                    //             0,
-                                    //             0,
-                                    //             0,
-                                    //             0,
-                                    //             1,
-                                    //             moment().format("YYYY-MM-DD HH:mm:ss"),
-                                    //             '',
-                                    //             0,
-                                    //             0,
-                                    //             null,
-                                    //             '',
-                                    //             /** Data object property to be sent with notification **/
-                                    //             {
-                                    //                 messageList: {
-                                    //                     messageId: results[1][i].messageId,
-                                    //                     message: results[1][i].message,
-                                    //                     messageLink: results[1][i].messageLink,
-                                    //                     createdDate: results[1][i].createdDate,
-                                    //                     messageType: results[1][i].messageType,
-                                    //                     messageStatus: results[1][i].messageStatus,
-                                    //                     priority: results[1][i].priority,
-                                    //                     senderName: results[1][i].senderName,
-                                    //                     senderId: results[1][i].senderId,
-                                    //                     receiverId: results[1][i].receiverId,
-                                    //                     groupId: results[1][i].senderId,
-                                    //                     groupType: 2,
-                                    //                     transId : results[1][i].transId,
-                                    //                     formId : results[1][i].formId,
-                                    //                     currentStatus : results[1][i].currentStatus,
-                                    //                     currentTransId : results[1][i].currentTransId,
-                                    //                     parentId : results[1][i].parentId,
-                                    //                     accessUserType : results[1][i].accessUserType,
-                                    //                     heUserId : results[1][i].heUserId,
-                                    //                     formData : JSON.parse(results[1][i].formDataJSON)
-                                    //
-                                    //                 }
-                                    //             },
-                                    //             null,
-                                    //             tokenResult[0].isWhatMate,
-                                    //             results[1][i].secretKey);
-                                    //         console.log('postNotification : notification for compose_message is sent successfully');
-                                    //     }
-                                    //     else {
-                                    //         console.log('Error in parsing notification compose_message template - ',
-                                    //             notificationTemplaterRes.error);
-                                    //         console.log('postNotification : notification for compose_message is sent successfully');
-                                    //     }
-                                    // }
-            
-                                    // pdf generation starts
-                                    if(results[2] && results[2][0] && results[3] && results[4] ){
-                                        console.log("results[2]",results[2]);
-                                        var reportData = {
-                                            expense : results[2] ,
-                                            name : results[3][0].name,
-                                            employeeCode : results[3][0].employeeCode,
-                                            total : results[3][0].total,
-                                            amount : results[3][0].amount
-                                        };
-            
-                                        req.data = JSON.parse(JSON.stringify(reportData));
-                                        (0,expenseClaimReport.expenseReport)(req, res);
-                                        var options = { format: 'A4', width: '8in', height: '10.5in', border: '0', timeout: 30000, "zoomFactor": "1" };
-            
-                                        htmlpdf.create(res.data,options).toBuffer(function (err, buffer) {
-                                            console.log('This is a buffer:', Buffer.isBuffer(buffer));
-                                            var attachmentObjectsList = [{
-                                                filename: results[3][0].name + '.pdf',
-                                                content: buffer
-                                            }];
-            
-                                            for (var z = 0; z < results[4].length; z++ ) {
-                                                mailerApi.sendMailNew('expenseClaim', {
-                                                    name : results[4][z].name,
-                                                    senderName : results[3][0].name
-                                                }, '', results[4][z].emailId, attachmentObjectsList);
-                                            }
-            
-                                        });
-            
-            
-                                    }
-                                    // pdf generation ends
-    
-                                    notifyMessages.getMessagesNeedToNotify();
-    
-                                    response.status = true;
-                                    response.message = "Expense claim saved successfully";
-                                    response.error = null;
-                                    response.data = {
-                                        messageList: {
-                                            messageId: results[0][0].messageId,
-                                            message: results[0][0].message,
-                                            messageLink: results[0][0].messageLink,
-                                            createdDate: results[0][0].createdDate,
-                                            messageType: results[0][0].messageType,
-                                            messageStatus: results[0][0].messageStatus,
-                                            priority: results[0][0].priority,
-                                            senderName: results[0][0].senderName,
-                                            senderId: results[0][0].senderId,
-                                            receiverId: results[0][0].receiverId,
-                                            transId : results[0][0].transId,
-                                            formId : results[0][0].formId,
-                                            groupId: req.body.groupId,
-                                            currentStatus : results[0][0].currentStatus,
-                                            currentTransId : results[0][0].currentTransId,
-                                            localMessageId : req.body.localMessageId,
-                                            parentId : results[0][0].parentId,
-                                            accessUserType : results[0][0].accessUserType,
-                                            heUserId : results[0][0].heUserId,
-                                            formData : JSON.parse(results[0][0].formDataJSON)
-                                        }
-                                    };
-                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                    zlib.gzip(buf, function (_, result) {
-                                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                                        res.status(200).json(response);
-                                    });
-                                }
-                                else{
-                                    response.status = false;
-                                    response.message = "Error while saving expense claim";
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(500).json(response);
-                                }
-                            });
-                        }
                     }
                 });
             }

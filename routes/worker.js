@@ -9,25 +9,57 @@ var NotificationTemplater = require('../routes/lib/NotificationTemplater.js');
 var notificationTemplater = new NotificationTemplater();
 var DbHelper = require('./../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
+var results = "";
+var limitValue = 100;
+var messageIds = "" ;
 
+
+var zlib = require('zlib');
+var AES_256_encryption = require('../routes/encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+var Notification_aws = require('../routes/modules/notification/aws-sns-push.js');
+var _Notification_aws = new  Notification_aws();
+
+var SNS = require('sns-mobile');
+var CONFIG = require('../ezeone-config.json');
+
+var SNS_KEY_ID = CONFIG.AWS_SNS.SNS_KEY_ID;
+var SNS_ACCESS_KEY = CONFIG.AWS_SNS.SNS_SECRET_KEY_ID ;
+var ANDROID_ARN = CONFIG.AWS_SNS.SNS_ANDROID_ARN;
+var IOS_ARN = CONFIG.AWS_SNS.SNS_IOS_ARN ;
+
+var ANDROID_SNS = new SNS({
+    platform: SNS.SUPPORTED_PLATFORMS.ANDROID,
+    region: 'us-east-1',
+    apiVersion: '2010-03-31',
+    accessKeyId: SNS_KEY_ID,
+    secretAccessKey: SNS_ACCESS_KEY,
+    platformApplicationArn: ANDROID_ARN
+});
+
+var IOS_SNS = new SNS({
+    platform: SNS.SUPPORTED_PLATFORMS.IOS,
+    // If using iOS change uncomment the line below
+    // and comment out the 'android' one above
+    // platform: 'ios',
+    region: 'us-east-1',
+    apiVersion: '2010-03-31',
+    accessKeyId: SNS_KEY_ID,
+    secretAccessKey: SNS_ACCESS_KEY,
+    platformApplicationArn: IOS_ARN
+});
 
 module.exports = function(favoriteBook,done) {
     // console.log("startPage",favoriteBook.increment);
     // console.log("results",favoriteBook.results[0]);
     // console.log("limitValues",favoriteBook.limitValues);
-    var messageIds = "" ;
+
     var startPage = favoriteBook.increment ;
     var limit = favoriteBook.limitValues ;
-    var results = favoriteBook.messageList ;
+    results = favoriteBook.messageList ;
 
-
-    // start page =0 limit=100 loop from 0 =99  (<100)
-    // start page =1 limit=100 loop from 100 = 199  (<200)
-    // start page =2 limit=100 loop from 200 = 299  (<300)
-    // start page =3 limit=100 loop from 300 = 399   (<400)
-    // start page =4 limit=100 loop from 400 = 499   (<500) in for loop
     var initialValue = (startPage * limit) ;
-    var limitValue = 100;
+
 
     if (initialValue == 0){
         limitValue = limit  ;
@@ -40,92 +72,226 @@ module.exports = function(favoriteBook,done) {
         limitValue = results.length ;
     }
 
-console.log("initialValue",initialValue);
-console.log("limitValue",limitValue);
+    console.log("initialValue",initialValue);
+    console.log("limitValue",limitValue);
+    var msgBytes = 1024;
+    var messagePayload = {} ;
 
-    for (var i = initialValue; i < limitValue ; i++) {
-        // console.log("i",i);
-        notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-            senderName : results[i].message ? results[i].message : ""
-        });
-        if (notificationTemplaterRes.parsedTpl) {
-            notification.publish(
-                results[i].receiverId,
-                (results[i].groupName) ? (results[i].groupName) : '',
-                (results[i].groupName) ? (results[i].groupName) : '',
-                results[i].senderId,
-                notificationTemplaterRes.parsedTpl,
-                31,
-                0,
-                (results[i].iphoneId) ? (results[i].iphoneId) : '',
-                (results[i].GCM_Id) ? (results[i].GCM_Id) : '',
-                0,
-                0,
-                0,
-                0,
-                1,
-                moment().format("YYYY-MM-DD HH:mm:ss"),
-                '',
-                0,
-                0,
-                null,
-                '',
-                /** Data object property to be sent with notification **/
-                {
-                    messageList: {
-                        messageId: results[i].messageId,
-                        message: results[i].message,
-                        messageLink: results[i].messageLink,
-                        createdDate: results[i].createdDate,
-                        messageType: results[i].messageType,
-                        messageStatus: results[i].messageStatus,
-                        priority: results[i].priority,
-                        senderName: results[i].senderName,
-                        senderId: results[i].senderId,
-                        receiverId: results[i].receiverId,
-                        groupId: results[i].senderId,
-                        groupType: 2,
-                        transId: results[i].transId,
-                        formId: results[i].formId,
-                        currentStatus: results[i].currentStatus,
-                        currentTransId: results[i].currentTransId,
-                        parentId: results[i].parentId,
-                        accessUserType: results[i].accessUserType,
-                        heUserId: results[i].heUserId,
-                        formData: JSON.parse(results[i].formDataJSON)
-                    },
-                    contactList: null
+    var uploader = function (i)
+    {
+        if( i < limitValue ) {
+
+
+            notificationTemplaterRes = notificationTemplater.parse('compose_message',{
+                senderName : results[i].message ? results[i].message : ""
+            });
+            var data ={
+                messageList: {
+                    messageId: results[i].messageId,
+                    message: results[i].message,
+                    messageLink: results[i].messageLink,
+                    createdDate: results[i].createdDate,
+                    messageType: results[i].messageType,
+                    messageStatus: results[i].messageStatus,
+                    priority: results[i].priority,
+                    senderName: results[i].senderName,
+                    senderId: results[i].senderId,
+                    receiverId: results[i].receiverId,
+                    groupId: results[i].senderId,
+                    groupType: 2,
+                    transId: results[i].transId,
+                    formId: results[i].formId,
+                    currentStatus: results[i].currentStatus,
+                    currentTransId: results[i].currentTransId,
+                    parentId: results[i].parentId,
+                    accessUserType: results[i].accessUserType,
+                    heUserId: results[i].heUserId,
+                    formData: JSON.parse(results[i].formDataJSON)
                 },
-                null, 1,
-                results[i].secretKey);
-            if(messageIds == ""){
-                messageIds = results[i].messageUserId ;
-            }
-            else {
-                messageIds = messageIds + "," + results[i].messageUserId ;
-            }
+                contactList: null
+            } ;
 
-            }
-        else {
-            console.log('Error in parsing notification compose_message template - ',
-                notificationTemplaterRes.error);
+            var buf = new Buffer(JSON.stringify(data), 'utf-8');
+
+
+            zlib.gzip(buf, function (_, result) {
+                messagePayload = {
+                    gid : results[i].senderId,
+                    message :notificationTemplaterRes.parsedTpl,
+                    s_title : (results[i].groupName) ? (results[i].groupName) : '',
+                    g_title : (results[i].groupName) ? (results[i].groupName) : '',
+                    type : 31,
+                    ts : moment().format("YYYY-MM-DD HH:mm:ss"),
+                    op: 0,
+                    mid : 0,
+                    masterid : 0,
+                    lat : 0,
+                    long : 0,
+                    priority : 0,
+                    date_time : moment().format("YYYY-MM-DD HH:mm:ss"),
+                    a_filename : "",
+                    msgUserid : 0,
+                    job_id : 0,
+                    a_url : null,
+                    tx_id : '',
+                    data : encryption.encrypt(result,results[i].secretKey).toString('base64')
+                };
+
+                var iphoneId =(results[i].iphoneId) ? (results[i].iphoneId) : '' ;
+                var GCM_Id = (results[i].GCM_Id) ? (results[i].GCM_Id) : '';
+                console.log("GCM_Id1",GCM_Id);
+                console.log("iphoneId1",iphoneId);
+
+                if(iphoneId != ""){
+                    var sound = "default";
+                    var alert ="" ;
+                    var alarmType = (messagePayload.alarmType != 'undefined' || messagePayload.alarmType != 'Nan' || messagePayload.alarmType != null ) ? messagePayload.alarmType : 1 ;
+                    if(alarmType == 0){
+                        sound = null;
+                    }
+                    else if(alarmType == 1){
+                        sound = "default";
+                    }
+                    else if(alarmType == 2){
+                        sound = "bell.wav";
+                    }
+                    else if(alarmType == 3){
+                        sound = "emergency_alert.mp3";
+                    }
+                    else if(alarmType == 4){
+                        sound = "short.wav";
+                    }
+
+                    if(messagePayload.type == 72 || messagePayload.type == 74 ){
+                        alert = {
+                            title : messagePayload.eventTitle,
+                            body : messagePayload.message
+                        }
+                    }
+                    else if(messagePayload.type == 73){
+                        alert = {
+                            title : messagePayload.title,
+                            body : messagePayload.message
+                        }
+                    }
+                    else {
+                        alert = messagePayload.message ;
+                    }
+
+                    var params = {
+                        default : "This is the default",
+                        APNS_SANDBOX : {
+                            aps : {
+                                alert : alert,
+                                sound : sound
+                            },
+                            payload : messagePayload
+                        }
+                    };
+                    params.APNS_SANDBOX = JSON.stringify(params.APNS_SANDBOX);
+
+                    IOS_SNS.addUser(iphoneId, null, function(err, endpointArn) {
+                        if (err) {
+                            console.log(err);
+                            uploader(i+1);
+                        }
+                        else {
+                            // Send notifications
+                            IOS_SNS.sendMessage(endpointArn, params, function(err, data) {
+                                if (err) {
+                                    console.log(err.stack);
+                                }
+                                else {
+                                    if(messageIds == ""){
+                                        messageIds = results[i].messageUserId ;
+                                    }
+                                    else {
+                                        messageIds = messageIds + "," + results[i].messageUserId ;
+                                    }
+                                    uploader(i+1);
+                                }
+
+                            });
+                        }
+                    });
+
+
+                }
+                else if(GCM_Id != ""){
+                        console.log("GCM_Id",GCM_Id);
+                        //  _Notification_aws.publish_Android(GCM_Id,messagePayload);
+                        params = {
+                            default : "This is the default message which must be present when publishing a message to a topic. The default message will only be used if a message is not present one of the notification platforms.",
+                            GCM : {
+                                data : {
+                                    message : messagePayload.message,
+                                    body : messagePayload
+                                }
+                            }
+                        };
+                        params.GCM = JSON.stringify(params.GCM);
+
+                        ANDROID_SNS.addUser(GCM_Id, null, function(err, endpointArn) {
+                            if (err) {
+                                console.log(err);
+                                uploader(i+1);
+                            }
+                            else {
+                                ANDROID_SNS.sendMessage(endpointArn, params, function(err, messageId) {
+                                    console.log("messageId",messageId,"======",endpointArn);
+                                    if(err) {
+                                        console.log('An error occured sending message to device %s', endpointArn);
+                                        console.log(err);
+                                    } else {
+                                        if(messageIds == ""){
+                                            messageIds = results[i].messageUserId ;
+                                        }
+                                        else {
+                                            messageIds = messageIds + "," + results[i].messageUserId ;
+                                        }
+
+                                        console.log('Successfully sent a message to device %s. MessageID was %s', messageId);
+                                        uploader(i+1);
+                                    }
+                                });
+                            }
+                        });
+                }
+                else {
+                    if(messageIds == ""){
+                        messageIds = results[i].messageUserId ;
+                    }
+                    else {
+                        messageIds = messageIds + "," + results[i].messageUserId ;
+                    }
+
+                    uploader(i+1);
+                }
+
+            });
+
+
+            // vedha
+
         }
-
-        if(i == (limitValue-1) ){
+        else {
             messageIds = '"' + messageIds + '"' ;
             var procQuery = 'CALL he_update_isNotifiedMessages( ' + messageIds + ')';
             console.log(procQuery);
             db.query(procQuery,function(err,results) {
                 if(!err){
-                    done('Awesome thread script may run in browser and node.js!');
+                     done('Awesome thread script may run in browser and node.js!');
                 }
                 else {
                     done(err);
                 }
 
             });
+
         }
 
-    }
+    };
+
+    uploader(initialValue);
 
 };

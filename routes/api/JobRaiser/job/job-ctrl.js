@@ -120,7 +120,8 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                         response.error = null;
                         response.message = "Requirement default saved successfully";
                         response.data = {
-                            defaultId: results[0]
+                            defaultId: results[0],
+                            defaultData:(results[1] && results[1][0] &&results[1][0].defaultFormData) ? JSON.parse(results[1][0].defaultFormData): {}
                         };
                         res.status(200).json(response);
                     }
@@ -1255,6 +1256,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                 req.body.statusTitle = req.body.statusTitle ? req.body.statusTitle : 'Pending';
                 req.body.expectedJoining = (req.body.expectedJoining) ? req.body.expectedJoining : 0;
                 req.body.jdTemplateId = (req.body.jdTemplateId) ? req.body.jdTemplateId : 0;
+                req.body.jdAttachment = (req.body.jdAttachment) ? req.body.jdAttachment : '';
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -1302,7 +1304,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                     req.st.db.escape(req.body.expectedJoining),
                     req.st.db.escape(req.body.jdTemplateFlag),
                     req.st.db.escape(req.body.jdTemplateId),
-                    req.st.db.escape(DBSecretKey)
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.body.jdAttachment)
                 ];
 
                 var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
