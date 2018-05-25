@@ -13,5 +13,6 @@ router.get('/getTasks',paceUsersCtrl.getTaskPlanner);
 router.get('/dashBoard',paceUsersCtrl.getdashBoard);
 
 router.post('/saveTrackerTemplate',paceUsersCtrl.saveTrackerTemplate);
+router.get('/baseFile',paceUsersCtrl.getBaseFile);
 
 module.exports = router;
