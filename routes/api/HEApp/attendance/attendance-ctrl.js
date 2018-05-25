@@ -195,7 +195,7 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                                 // }
                                 notifyMessages.getMessagesNeedToNotify();
                                 response.status = true;
-                                response.message = "Attendence saved successfully"+" and "+((results[2] && results[2][0]) ? results[2][0].message:"");
+                                response.message = "Attendence saved successfully";
                                 response.error = null;
                                 response.data = {
                                     messageList: {

@@ -297,12 +297,14 @@ masterCtrl.saveClients = function (req, res, next) {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if (!err && results) {
+                    if (!err && results && results[0] && results[0][0]) {
                         response.status = true;
                         response.message = "Client saved sucessfully";
                         response.error = null;
                         response.data = {
-                            heDepartmentId: results[0][0].heDepartmentId
+                            heDepartmentId: results[0][0].heDepartmentId,
+                            department: (results[1] && results[1][0]) ? results[1] : [],
+                            client: (results[2] && results[2][0]) ? results[2] : [],
                         };
                         res.status(200).json(response);
                     }

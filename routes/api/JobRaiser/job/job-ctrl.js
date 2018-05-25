@@ -120,7 +120,8 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                         response.error = null;
                         response.message = "Requirement default saved successfully";
                         response.data = {
-                            defaultId: results[0]
+                            defaultId: results[0],
+                            defaultData:(results[1] && results[1][0] &&results[1][0].defaultFormData) ? JSON.parse(results[1][0].defaultFormData): {}
                         };
                         res.status(200).json(response);
                     }

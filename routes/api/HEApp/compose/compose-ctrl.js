@@ -208,14 +208,14 @@ composeCtrl.learnKeywords = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
-                // var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
-                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                //     
-                    // if (!req.body.groupId) {
-                    //     error.groupId = 'Invalid groupId';
-                    //     validationFlag *= false;
-                    // }
+                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    
+                    if (!req.body.groupId) {
+                        error.groupId = 'Invalid groupId';
+                        validationFlag *= false;
+                    }
 
                     if (!req.body.formId) {
                         error.formId = 'Invalid formId';
@@ -266,7 +266,7 @@ composeCtrl.learnKeywords = function(req,res,next){
                             }
                         });
                     }
-                // });
+                });
 
             }
             else{
