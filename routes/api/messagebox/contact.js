@@ -83,9 +83,9 @@ router.get('/query', function(req,res,next){
                         }
                     }
                     req.query.isWhatMate = req.query.isWhatMate ? req.query.isWhatMate : 0;
-                    req.query.searchType = req.query.searchType ? req.query.searchType : 1;
+                    req.query.searchType = req.query.searchType ? req.query.searchType : 0;
 
-                    // searchType = 1 then internal user 2=Public user
+                    // searchType = 0 then internal user 1=Public user
                     var procParams = [
                         req.db.escape(title),
                         req.db.escape(pin) ,

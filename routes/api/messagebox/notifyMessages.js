@@ -44,8 +44,11 @@ Messages.prototype.getMessagesNeedToNotify = function() {
                 thread
                     .send({messageList:messageList[0],increment:i,limitValues:100})
                     .on('message', function(response) {
-                        console.log("response",response);
+                        console.log("thread_response",response);
                         thread.kill();
+                        // if(response){
+                        //
+                        // }
                     })
                     .on('error', function(error) {
                         console.log('Worker errored:', error);

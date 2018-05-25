@@ -140,6 +140,7 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
                 }
 
                 if (GCM_Id){
+                    console.log("GCM_Id",GCM_Id);
                     _Notification_aws.publish_Android(GCM_Id,messagePayload);
                 }
             });
@@ -172,6 +173,7 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             }
 
             if (GCM_Id){
+                console.log("GCM_Id",GCM_Id);
                 _Notification_aws.publish_Android(GCM_Id,messagePayload);
             }
         }
