@@ -217,20 +217,24 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                                     // pdf generation starts
                                     if(results[2] && results[2][0] && results[3] && results[4] ){
                                         var reportData = {
-                                            expense : results[2] ,
-                                            name : results[3][0].name,
-                                            employeeCode : results[3][0].employeeCode,
-                                            starts : results[5][0].starts,
-                                            ends : results[5][0].ends,
-                                            justification : results[5][0].justification,
-                                            total : results[3][0].total,
-                                            totalAmount : results[3][0].totalAmount,
-                                            advance : results[3][0].advance,
-                                            advanceAmount : results[3][0].advanceAmount,
-                                            totalPayable : results[3][0].totalPayable,
-                                            totalPayableAmount : results[3][0].totalPayableAmount
+                                            expense : (results[2] && results[2][0]) ? results[2]:[],
+                                            name : (results[3] && results[3][0]) ? results[3][0].name:"",
+                                            employeeCode : (results[3] && results[3][0]) ? results[3][0].employeeCode: "",
+                                            // starts : ( results[5] &&  results[5][0]) ? results[5][0].starts:"",
+                                            // ends : ( results[5] &&  results[5][0]) ? results[5][0].ends:"",
+                                            justification : (results[5] && results[5][0]) ? results[5][0].justification:"",
+                                            total : (results[3] && results[3][0]) ? results[3][0].total:"INR",
+                                            totalAmount : (results[3] && results[3][0]) ? results[3][0].totalAmount:0.0,
+                                            advance : (results[3] && results[3][0]) ? results[3][0].advance:"INR",
+                                            advanceAmount : (results[3] && results[3][0]) ? results[3][0].advanceAmount:0.0,
+                                            totalPayable : (results[3] && results[3][0]) ? results[3][0].totalPayable:"INR",
+                                            totalPayableAmount : (results[3] && results[3][0]) ? results[3][0].totalPayableAmount:0.0
                                         };
-            
+                                        
+                                        if(req.body.travelRequestId!=0){
+                                            reportData.starts=results[5][0].starts,
+                                            reportData.ends=results[5][0].ends
+                                        };
             
                                         req.data = JSON.parse(JSON.stringify(reportData));
             

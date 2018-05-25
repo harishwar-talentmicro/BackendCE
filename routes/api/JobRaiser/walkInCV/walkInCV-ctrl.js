@@ -398,6 +398,15 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
         location = {};
     }
 
+    var walkInJobs = req.body.walkInJobs;
+    if (typeof (walkInJobs) == "string") {
+        walkInJobs = JSON.parse(walkInJobs);
+    }
+    if (!walkInJobs) {
+        walkInJobs = {};
+    }
+
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please Check the Errors';
@@ -457,7 +466,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.userId),
                     req.st.db.escape(JSON.stringify(location)),
                     req.st.db.escape(req.body.profilePicture),
-                    req.st.db.escape(DBSecretKey)
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(JSON.stringify(walkInJobs))
                 ];
 
                 var procQuery = 'CALL wm_save_wlkinForm( ' + inputs.join(',') + ')';
@@ -1140,8 +1150,8 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                 req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
                                 req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
                                 // req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
-                                req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
-                                req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                                req.body.approverCount = req.body.approverCount ? req.body.approverCount : 1;
+                                req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 1;
                                 req.body.notes = req.body.notes ? req.body.notes : "";
                                 req.body.interviewDuration = req.body.interviewDuration ? req.body.interviewDuration : 0;
 
