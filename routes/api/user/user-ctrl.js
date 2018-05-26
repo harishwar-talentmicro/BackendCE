@@ -26,7 +26,7 @@ var Notification_aws = require('../../modules/notification/aws-sns-push');
 var _Notification_aws = new Notification_aws();
 
 var appConfig = require('../../../ezeone-config.json');
-var DBSecretKey=appConfig.DB.secretKey;
+var DBSecretKey = appConfig.DB.secretKey;
 
 var qs = require("querystring");
 var options = {
@@ -115,70 +115,70 @@ UserCtrl.signup = function (req, res, next) {
 
     else {
         try {
-                    req.body.lastName = (req.body.lastName) ? req.body.lastName : '';
-                    req.body.isdMobile = (req.body.isdMobile) ? req.body.isdMobile : '';
-                    req.body.password = (req.body.password) ? req.body.password : '';
-                    req.body.isWhatMate = (req.body.isWhatMate) ? req.body.isWhatMate : 0;
+            req.body.lastName = (req.body.lastName) ? req.body.lastName : '';
+            req.body.isdMobile = (req.body.isdMobile) ? req.body.isdMobile : '';
+            req.body.password = (req.body.password) ? req.body.password : '';
+            req.body.isWhatMate = (req.body.isWhatMate) ? req.body.isWhatMate : 0;
 
-                    var procParams = [
-                        req.st.db.escape(req.body.firstName),
-                        req.st.db.escape(req.body.lastName),
-                        req.st.db.escape(req.body.email),
-                        req.st.db.escape(req.body.mobile),
-                        req.st.db.escape(req.body.isdMobile),
-                        req.st.db.escape(DBSecretKey)
-                    ];
-                    /**
-                     * Calling procedure to save user details
-                     * @type {string}
-                     */
-                    var procQuery = 'CALL psignup( ' + procParams.join(',') + ')';
-                    console.log(procQuery);
-                    req.db.query(procQuery, function (err, userResult) {
-                        /**
-                         * fetching ip address and user agent from header
-                         * @type {*|string}
-                         */
-                        var ip = req.headers['x-forwarded-for'] ||
-                            req.connection.remoteAddress ||
-                            req.socket.remoteAddress;
-                        var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
-                        if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].masterId) {
-                            req.st.generateToken(ip, userAgent, userResult[0][0].ezeoneId, req.body.isWhatMate, function (err, token) {
-                                if (err) {
-                                    console.log('Error while generating token' + err);
-                                    response.status = false;
-                                    response.message = "Error while generating token";
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(500).json(response);
-                                }
-                                else {
-                                    response.status = true;
-                                    response.message = "You are successfully register";
-                                    response.error = null;
-                                    response.data = {
-                                        firstName: (req.body.firstName) ? req.body.firstName : '',
-                                        lastName: (req.body.lastName) ? req.body.lastName : '',
-                                        email: (req.body.email) ? req.body.email : '',
-                                        mobile: (req.body.mobile) ? req.body.mobile : '',
-                                        isdMobile: (req.body.isdMobile) ? req.body.isdMobile : '',
-                                        token: token,
-                                        masterId: (userResult[0][0].masterId) ? userResult[0][0].masterId : 0,
-                                        ezeoneId: (userResult[0][0].ezeoneId) ? userResult[0][0].ezeoneId : 0
-                                    };
-                                    res.status(200).json(response);
-                                }
-                            });
-                        }
-                        else {
+            var procParams = [
+                req.st.db.escape(req.body.firstName),
+                req.st.db.escape(req.body.lastName),
+                req.st.db.escape(req.body.email),
+                req.st.db.escape(req.body.mobile),
+                req.st.db.escape(req.body.isdMobile),
+                req.st.db.escape(DBSecretKey)
+            ];
+            /**
+             * Calling procedure to save user details
+             * @type {string}
+             */
+            var procQuery = 'CALL psignup( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery, function (err, userResult) {
+                /**
+                 * fetching ip address and user agent from header
+                 * @type {*|string}
+                 */
+                var ip = req.headers['x-forwarded-for'] ||
+                    req.connection.remoteAddress ||
+                    req.socket.remoteAddress;
+                var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+                if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].masterId) {
+                    req.st.generateToken(ip, userAgent, userResult[0][0].ezeoneId, req.body.isWhatMate, function (err, token) {
+                        if (err) {
+                            console.log('Error while generating token' + err);
                             response.status = false;
-                            response.message = "Error while user registration";
+                            response.message = "Error while generating token";
                             response.error = null;
                             response.data = null;
                             res.status(500).json(response);
                         }
+                        else {
+                            response.status = true;
+                            response.message = "You are successfully register";
+                            response.error = null;
+                            response.data = {
+                                firstName: (req.body.firstName) ? req.body.firstName : '',
+                                lastName: (req.body.lastName) ? req.body.lastName : '',
+                                email: (req.body.email) ? req.body.email : '',
+                                mobile: (req.body.mobile) ? req.body.mobile : '',
+                                isdMobile: (req.body.isdMobile) ? req.body.isdMobile : '',
+                                token: token,
+                                masterId: (userResult[0][0].masterId) ? userResult[0][0].masterId : 0,
+                                ezeoneId: (userResult[0][0].ezeoneId) ? userResult[0][0].ezeoneId : 0
+                            };
+                            res.status(200).json(response);
+                        }
                     });
+                }
+                else {
+                    response.status = false;
+                    response.message = "Error while user registration";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
         }
         catch (ex) {
             var errorDate = new Date();
@@ -269,7 +269,7 @@ UserCtrl.saveAddress = function (req, res, next) {
                                 req.st.db.escape(req.body.jobTitle),
                                 req.st.db.escape(req.body.companyName),
                                 req.st.db.escape(DBSecretKey)
-                                
+
                             ];
                             /**
                              * Calling procedure to save deal
@@ -762,7 +762,7 @@ UserCtrl.login = function (req, res, next) {
     try {
         var passwordMatchStatus = false;
         var ezeoneId = '';
-        var queryParams = req.st.db.escape(req.body.userName) + ',' + req.st.db.escape(code)+','+req.st.db.escape(DBSecretKey);
+        var queryParams = req.st.db.escape(req.body.userName) + ',' + req.st.db.escape(code) + ',' + req.st.db.escape(DBSecretKey);
         var query = 'CALL plogin_v2(' + queryParams + ')';
         console.log(query);
         req.db.query(query, function (err, loginResult) {
@@ -784,7 +784,7 @@ UserCtrl.login = function (req, res, next) {
                     req.st.generateToken(ip, userAgent, ezeoneId, isWhatMate, APNS_Id, GCM_Id, function (err, tokenResult) {
 
                         if ((!err) && tokenResult) {
-                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) +','+req.st.db.escape(DBSecretKey)+ ')';
+                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ',' + req.st.db.escape(DBSecretKey) + ')';
                             console.log(procQuery);
                             req.db.query(procQuery, function (err, UserDetailsResult) {
                                 console.log(UserDetailsResult);
@@ -925,7 +925,7 @@ UserCtrl.getProfileData = function (req, res, next) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(DBSecretKey)                    
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save deal
@@ -1087,227 +1087,227 @@ UserCtrl.saveProfileData = function (req, res, next) {
 };
 
 UserCtrl.sendPasswordResetOTP = function (req, res, next) {
-    
-        var status = true, error = {};
-        var respMsg = {
-            status: false,
-            message: '',
-            data: null,
-            error: null
-        };
 
-        if (!req.body.WhatMateId) {
-            error['WhatMateId'] = 'WhatMateId is mandatory';
-            status *= false;
-        }
+    var status = true, error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
 
-        if (status) {
-            try {
-                var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
-                var message = "";
+    if (!req.body.WhatMateId) {
+        error['WhatMateId'] = 'WhatMateId is mandatory';
+        status *= false;
+    }
 
-                //generate otp 6 digit random number
-                var code = "";
-                var possible = "1234567890";
+    if (status) {
+        try {
+            var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+            var message = "";
 
-                for (var i = 0; i <= 3; i++) {
+            //generate otp 6 digit random number
+            var code = "";
+            var possible = "1234567890";
 
-                    code += possible.charAt(Math.floor(Math.random() * possible.length));
-                }
+            for (var i = 0; i <= 3; i++) {
+
+                code += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
 
 
-                // if(isWhatMate ==0 )
-                // {
-                //     message='Your EZEOne password reset OTP is ' + code + ' .';
-                // }
-                // else{
-                //     message='Your WhatMate password reset OTP is ' + code + ' .';
-                // }
+            // if(isWhatMate ==0 )
+            // {
+            //     message='Your EZEOne password reset OTP is ' + code + ' .';
+            // }
+            // else{
+            //     message='Your WhatMate password reset OTP is ' + code + ' .';
+            // }
 
-                var query = [
-                    req.st.db.escape(req.body.WhatMateId),
-                    req.st.db.escape(code),
-                    req.st.db.escape(DBSecretKey)
-                ];
+            var query = [
+                req.st.db.escape(req.body.WhatMateId),
+                req.st.db.escape(code),
+                req.st.db.escape(DBSecretKey)
+            ];
 
-                req.st.db.query('CALL pvalidateEZEOne(' + query + ')', function (err, otpResult) {
+            req.st.db.query('CALL pvalidateEZEOne(' + query + ')', function (err, otpResult) {
 
-                    if (!err && otpResult && otpResult[0] && otpResult[0][0].otp) {
-                        console.log("otpResult[0][0].name", otpResult[0][0].name);
-                        code = otpResult[0][0].otp;
-                        message = 'Your WhatMate password reset OTP is ' + code + ' .';
+                if (!err && otpResult && otpResult[0] && otpResult[0][0].otp) {
+                    console.log("otpResult[0][0].name", otpResult[0][0].name);
+                    code = otpResult[0][0].otp;
+                    message = 'Your WhatMate password reset OTP is ' + code + ' .';
 
-                        if (otpResult[0][0].email) {
-                            var file = path.join(__dirname, '../../../mail/templates/passwordResetOTP.html');
+                    if (otpResult[0][0].email) {
+                        var file = path.join(__dirname, '../../../mail/templates/passwordResetOTP.html');
 
-                            fs.readFile(file, "utf8", function (err, data) {
+                        fs.readFile(file, "utf8", function (err, data) {
 
-                                if (!err) {
-                                    data = data.replace("[name]", otpResult[0][0].name);
-                                    data = data.replace("[OTP]", code);
+                            if (!err) {
+                                data = data.replace("[name]", otpResult[0][0].name);
+                                data = data.replace("[OTP]", code);
 
-                                    var mailOptions = {
-                                        from: EZEIDEmail,
-                                        to: otpResult[0][0].email,
-                                        subject: 'Password Reset Request',
-                                        html: data // html body
-                                    };
+                                var mailOptions = {
+                                    from: EZEIDEmail,
+                                    to: otpResult[0][0].email,
+                                    subject: 'Password Reset Request',
+                                    html: data // html body
+                                };
 
-                                    var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                    var email = new sendgrid.Email();
-                                    email.from = mailOptions.from;
-                                    email.to = mailOptions.to;
-                                    email.subject = mailOptions.subject;
-                                    email.html = mailOptions.html;
+                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                var email = new sendgrid.Email();
+                                email.from = mailOptions.from;
+                                email.to = mailOptions.to;
+                                email.subject = mailOptions.subject;
+                                email.html = mailOptions.html;
 
-                                    sendgrid.send(email, function (err, result) {
-                                    });
+                                sendgrid.send(email, function (err, result) {
+                                });
+                            }
+                        });
+                    }
+
+                    if (otpResult[0][0].isd && otpResult[0][0].mobile) {
+                        if (otpResult[0][0].isd == "+977") {
+                            request({
+                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                qs: {
+                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                    to: otpResult[0][0].mobile,
+                                    message: message,
+                                    sender: 'Techingen'
+                                },
+                                method: 'GET'
+
+                            }, function (error, response, body) {
+                                if (error) {
+                                    console.log(error, "SMS");
                                 }
+                                else {
+                                    console.log("SUCCESS", "SMS response");
+                                }
+
                             });
                         }
+                        else if (otpResult[0][0].isd == "+91") {
+                            request({
+                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                qs: {
+                                    user_name: 'janardana@hirecraft.com',
+                                    password: 'Ezeid2015',
+                                    sender_id: 'WtMate',
+                                    service: 'TRANS',
+                                    mobile_no: otpResult[0][0].mobile,
+                                    message: message,
+                                    method: 'send_sms'
+                                },
+                                method: 'GET'
 
-                        if (otpResult[0][0].isd && otpResult[0][0].mobile) {
-                            if (otpResult[0][0].isd == "+977") {
-                                request({
-                                    url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                    qs: {
-                                        token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                        to: otpResult[0][0].mobile,
-                                        message: message,
-                                        sender: 'Techingen'
-                                    },
-                                    method: 'GET'
+                            }, function (error, response, body) {
+                                if (error) {
+                                    console.log(error, "SMS");
+                                }
+                                else {
+                                    console.log("SUCCESS", "SMS response");
+                                }
+                            });
 
-                                }, function (error, response, body) {
-                                    if (error) {
-                                        console.log(error, "SMS");
-                                    }
-                                    else {
-                                        console.log("SUCCESS", "SMS response");
-                                    }
+                            var req = http.request(options, function (res) {
+                                var chunks = [];
 
-                                });
-                            }
-                            else if (otpResult[0][0].isd == "+91") {
-                                request({
-                                    url: 'https://aikonsms.co.in/control/smsapi.php',
-                                    qs: {
-                                        user_name: 'janardana@hirecraft.com',
-                                        password: 'Ezeid2015',
-                                        sender_id: 'WtMate',
-                                        service: 'TRANS',
-                                        mobile_no: otpResult[0][0].mobile,
-                                        message: message,
-                                        method: 'send_sms'
-                                    },
-                                    method: 'GET'
-
-                                }, function (error, response, body) {
-                                    if (error) {
-                                        console.log(error, "SMS");
-                                    }
-                                    else {
-                                        console.log("SUCCESS", "SMS response");
-                                    }
+                                res.on("data", function (chunk) {
+                                    chunks.push(chunk);
                                 });
 
-                                var req = http.request(options, function (res) {
-                                    var chunks = [];
-
-                                    res.on("data", function (chunk) {
-                                        chunks.push(chunk);
-                                    });
-
-                                    res.on("end", function () {
-                                        var body = Buffer.concat(chunks);
-                                        console.log(body.toString());
-                                    });
+                                res.on("end", function () {
+                                    var body = Buffer.concat(chunks);
+                                    console.log(body.toString());
                                 });
+                            });
 
-                                req.write(qs.stringify({
-                                    userId: 'talentmicro',
-                                    password: 'TalentMicro@123',
-                                    senderId: 'WTMATE',
-                                    sendMethod: 'simpleMsg',
-                                    msgType: 'text',
-                                    mobile: otpResult[0][0].isd.replace("+", "") + otpResult[0][0].mobile,
-                                    msg: message,
-                                    duplicateCheck: 'true',
-                                    format: 'json'
-                                }));
-                                req.end();
+                            req.write(qs.stringify({
+                                userId: 'talentmicro',
+                                password: 'TalentMicro@123',
+                                senderId: 'WTMATE',
+                                sendMethod: 'simpleMsg',
+                                msgType: 'text',
+                                mobile: otpResult[0][0].isd.replace("+", "") + otpResult[0][0].mobile,
+                                msg: message,
+                                duplicateCheck: 'true',
+                                format: 'json'
+                            }));
+                            req.end();
 
 
-                            }
-                            else if (otpResult[0][0].isd != "") {
-                                client.messages.create(
-                                    {
-                                        body: message,
-                                        to: otpResult[0][0].isd + otpResult[0][0].mobile,
-                                        from: '+14434322305'
-                                    },
-                                    function (error, response) {
-                                        if (error) {
-                                            console.log(error, "SMS");
-                                        }
-                                        else {
-                                            console.log("SUCCESS", "SMS response");
-                                        }
-                                    }
-                                );
-
-                                // request({
-                                //     url: 'https://rest.nexmo.com/sms/json',
-                                //     qs: {
-                                //         api_key : '4405b7b5 ',
-                                //         api_secret : '77dfad076c27e4c8',
-                                //         to: otpResult[0][0].isd.replace("+","") + otpResult[0][0].mobile,
-                                //         from : 'WtMate',
-                                //         text: message
-                                //     },
-                                //     method: 'POST'
-                                //
-                                // }, function (error, response, body) {
-                                //     if(error)
-                                //     {
-                                //         console.log(error,"SMS");
-                                //     }
-                                //     else{
-                                //         console.log("SUCCESS","SMS response");
-                                //     }
-                                // });
-
-                            }
                         }
-                        respMsg.status = true;
-                        respMsg.message = 'OTP Sent Successfully';
-                        respMsg.data = null;
-                        res.status(200).json(respMsg);
+                        else if (otpResult[0][0].isd != "") {
+                            client.messages.create(
+                                {
+                                    body: message,
+                                    to: otpResult[0][0].isd + otpResult[0][0].mobile,
+                                    from: '+14434322305'
+                                },
+                                function (error, response) {
+                                    if (error) {
+                                        console.log(error, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+                                }
+                            );
 
-                    }
-                    else {
-                        respMsg.status = false;
-                        respMsg.message = 'Something went wrong';
-                        res.status(500).json(respMsg);
-                    }
-                });
+                            // request({
+                            //     url: 'https://rest.nexmo.com/sms/json',
+                            //     qs: {
+                            //         api_key : '4405b7b5 ',
+                            //         api_secret : '77dfad076c27e4c8',
+                            //         to: otpResult[0][0].isd.replace("+","") + otpResult[0][0].mobile,
+                            //         from : 'WtMate',
+                            //         text: message
+                            //     },
+                            //     method: 'POST'
+                            //
+                            // }, function (error, response, body) {
+                            //     if(error)
+                            //     {
+                            //         console.log(error,"SMS");
+                            //     }
+                            //     else{
+                            //         console.log("SUCCESS","SMS response");
+                            //     }
+                            // });
 
-            }
-            catch (ex) {
-                console.log('Error : FnSendOtp ' + ex);
-                console.log(ex);
-                var errorDate = new Date();
-                console.log(errorDate.toTimeString() + ' ......... error ...........');
-                respMsg.error = { server: 'Internal Server Error' };
-                respMsg.message = 'An error occurred ! Please try again';
-                res.status(400).json(respMsg);
-            }
+                        }
+                    }
+                    respMsg.status = true;
+                    respMsg.message = 'OTP Sent Successfully';
+                    respMsg.data = null;
+                    res.status(200).json(respMsg);
+
+                }
+                else {
+                    respMsg.status = false;
+                    respMsg.message = 'Something went wrong';
+                    res.status(500).json(respMsg);
+                }
+            });
+
         }
-        else {
-            respMsg.error = error;
-            respMsg.message = 'Please check all the errors';
+        catch (ex) {
+            console.log('Error : FnSendOtp ' + ex);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = { server: 'Internal Server Error' };
+            respMsg.message = 'An error occurred ! Please try again';
             res.status(400).json(respMsg);
         }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
+    }
 };
 
 UserCtrl.verifyPasswordResetOTP = function (req, res, next) {
@@ -1380,67 +1380,67 @@ UserCtrl.verifyPasswordResetOTP = function (req, res, next) {
 };
 
 UserCtrl.changePassword = function (req, res, next) {
-    
-        var status = true, error = {};
-        var respMsg = {
-            status: false,
-            message: '',
-            data: null,
-            error: null
-        };
 
-        if (!req.body.password) {
-            error['password'] = 'password is mandatory';
-            status *= false;
-        }
-        if (!req.body.WhatMateId) {
-            error['WhatMateId'] = 'WhatMateId is mandatory';
-            status *= false;
-        }
+    var status = true, error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
 
-        if (status) {
-            try {
-                var encryptPwd = req.st.hashPassword(req.body.password);
-                req.body.isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+    if (!req.body.password) {
+        error['password'] = 'password is mandatory';
+        status *= false;
+    }
+    if (!req.body.WhatMateId) {
+        error['WhatMateId'] = 'WhatMateId is mandatory';
+        status *= false;
+    }
 
-                var procParams = [
-                    req.st.db.escape(encryptPwd),
-                    req.st.db.escape(req.body.WhatMateId),
-                    req.st.db.escape(req.body.otp),
-                    req.st.db.escape(DBSecretKey)
-                ];
+    if (status) {
+        try {
+            var encryptPwd = req.st.hashPassword(req.body.password);
+            req.body.isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
 
-                var procQuery = 'CALL change_password( ' + procParams.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    if (!err && result && result[0] && result[0][0] && result[0][0].message) {
-                        respMsg.status = false;
-                        respMsg.message = "Invalid OTP";
-                        res.status(200).json(respMsg);
-                    }
-                    else if (!err) {
-                        respMsg.status = true;
-                        respMsg.message = "Password changed successfully";
-                        res.status(200).json(respMsg);
-                    }
-                    else {
-                        respMsg.status = false;
-                        respMsg.message = "Internal Server Error";
-                        res.status(500).json(respMsg);
-                    }
-                });
-            }
-            catch (ex) {
-                respMsg.error = 'Internal Server Error';
-                respMsg.message = 'An error occurred ! Please try again';
-                res.status(500).json(respMsg);
-            }
+            var procParams = [
+                req.st.db.escape(encryptPwd),
+                req.st.db.escape(req.body.WhatMateId),
+                req.st.db.escape(req.body.otp),
+                req.st.db.escape(DBSecretKey)
+            ];
+
+            var procQuery = 'CALL change_password( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery, function (err, result) {
+                if (!err && result && result[0] && result[0][0] && result[0][0].message) {
+                    respMsg.status = false;
+                    respMsg.message = "Invalid OTP";
+                    res.status(200).json(respMsg);
+                }
+                else if (!err) {
+                    respMsg.status = true;
+                    respMsg.message = "Password changed successfully";
+                    res.status(200).json(respMsg);
+                }
+                else {
+                    respMsg.status = false;
+                    respMsg.message = "Internal Server Error";
+                    res.status(500).json(respMsg);
+                }
+            });
         }
-        else {
-            respMsg.error = error;
-            respMsg.message = 'Please check all the errors';
-            res.status(400).json(respMsg);
+        catch (ex) {
+            respMsg.error = 'Internal Server Error';
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(500).json(respMsg);
         }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
+    }
 };
 
 UserCtrl.verifyUpdateOTP = function (req, res, next) {
@@ -1478,7 +1478,7 @@ UserCtrl.verifyUpdateOTP = function (req, res, next) {
                         error.mobile = 'Invalid mobile';
                         validationFlag *= false;
                     }
-        
+
                     if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
@@ -1493,7 +1493,7 @@ UserCtrl.verifyUpdateOTP = function (req, res, next) {
                             req.st.db.escape(req.body.otp),
                             req.st.db.escape(DBSecretKey)
                         ];
-        
+
                         var procQuery = 'CALL verify_mobile( ' + procParams.join(',') + ')';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, result) {
@@ -1505,7 +1505,7 @@ UserCtrl.verifyUpdateOTP = function (req, res, next) {
                                     response.data = null;
                                     res.status(200).json(response);
                                 }
-        
+
                             }
                             else {
                                 response.status = true;
@@ -1685,7 +1685,7 @@ UserCtrl.invitePublicProfile = function (req, res, next) {
                         req.st.db.escape(req.body.email),
                         req.st.db.escape(req.body.meetingId),
                         req.st.db.escape(encryptPwd),
-                        req.st.db.escape(DBSecretKey)                    
+                        req.st.db.escape(DBSecretKey)
                     ];
 
                     //CompanyName
@@ -2042,6 +2042,13 @@ UserCtrl.getWelcomeAttachments = function (req, res, next) {
 };
 
 UserCtrl.getUserDetails = function (req, res, next) {
+
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
     /**
      * @todo FnGetUserDetails
      */
@@ -2076,7 +2083,7 @@ UserCtrl.getUserDetails = function (req, res, next) {
                                 req.st.db.escape(req.query.token),
                                 req.st.db.escape(req.body.dialerAPNS_Id),
                                 req.st.db.escape(req.body.dialerGCM_Id),
-                                req.st.db.escape(DBSecretKey)                    
+                                req.st.db.escape(DBSecretKey)
                             ];
 
                             req.db.query('CALL pGetDialerEZEIDDetails(' + procParams.join(',') + ')', function (err, UserDetailsResult) {
@@ -2089,22 +2096,55 @@ UserCtrl.getUserDetails = function (req, res, next) {
                                             console.log('FnGetUserDetails : tmaster: User details sent successfully');
                                             UserDetailsResult[0][0].versionStatus = rtnMessage.versionStatus;
                                             UserDetailsResult[0][0].versionMessage = rtnMessage.versionMessage;
-                                            res.send(UserDetailsResult[0][0]);  // response is json object now from array
+                                            response.status = true;
+                                            response.message = "Attachments loaded successfully";
+                                            response.error = null;
+                                            response.data = UserDetailsResult[0][0];
+
+                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(response);
+                                            });
+                                            // res.send(UserDetailsResult[0][0]);  // response is json object now from array
                                         }
                                         else {
-                                            res.json(null);
+                                            response.status = true;
+                                            response.message = "FnGetUserDetails : tmaster: No User details found";
+                                            response.error = null;
+                                            response.data =null;
+                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(response);
+                                            });
+                                            // res.json(null);
                                             console.log('FnGetUserDetails : tmaster: No User details found');
                                         }
                                     }
                                     else {
-                                        res.json(null);
+                                        response.status = true;
+                                        response.message = "FnGetUserDetails : tmaster: No User details found";
+                                        response.error = null;
+                                        response.data =null;
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        });
+                                        // res.json(null);
                                         console.log('FnGetUserDetails : tmaster: No User details found');
                                     }
 
                                 }
                                 else {
-                                    res.json(null);
-                                    res.statusCode = 500;
+                                    response.status = false;
+                                    response.message = "FnGetUserDetails : tmaster:"+ err;
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                    // res.json(null);
+                                    // res.statusCode = 500;
                                     console.log('FnGetUserDetails : tmaster:' + err);
                                 }
                             });
@@ -2113,20 +2153,20 @@ UserCtrl.getUserDetails = function (req, res, next) {
                     }
                     else {
                         console.log('FnGetUserDetails: Invalid token');
-                        res.statusCode = 401;
-                        res.json(null);
+                        res.status(401).json(response);
+                        // res.json(null);
                     }
                 }
                 else {
                     console.log('FnGetUserDetails: ' + err);
-                    res.statusCode = 500;
-                    res.json(null);
+                    res.status(500).json(response);
+                    // res.json(null);
                 }
             });
         }
         else {
-            res.json(null);
-            res.statusCode = 400;
+            // res.json(null);
+            res.status(400).json(response);
             console.log('FnGetUserDetails :  token is empty');
         }
     }

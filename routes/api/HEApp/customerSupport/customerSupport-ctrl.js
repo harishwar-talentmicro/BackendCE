@@ -498,21 +498,6 @@ supportCtrl.getSupportTracker = function(req,res,next){
         error.groupId = 'Invalid groupId';
         validationFlag *= false;
     }
-    var status = req.body.status;
-    if (typeof (status) == "string") {
-        status = JSON.parse(status);
-    }
-    if (!status) {
-        status = [];
-    }
-
-    var priority = req.body.priority;
-    if (typeof (priority) == "string") {
-        priority = JSON.parse(priority);
-    }
-    if (!priority) {
-        priority = [];
-    }
 
     if (!validationFlag){
         response.error = error;
@@ -523,73 +508,98 @@ supportCtrl.getSupportTracker = function(req,res,next){
     else{
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
-                req.body.type = (req.body.type) ? (req.body.type) : 0;
-                req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
-                req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
-                var startPage = 0;
+                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
-                req.body.userId = (req.body.userId) ? (req.body.userId) : 0;
+                    var priority = req.body.priority;
+                    if (typeof (priority) == "string") {
+                        priority = JSON.parse(priority);
+                    }
+                    if (!priority) {
+                        priority = [];
+                    }
 
-                var procParams = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.groupId),
-                    req.st.db.escape(req.body.type),
-                    req.st.db.escape(startPage),
-                    req.st.db.escape(req.query.limit),
-                    req.st.db.escape(JSON.stringify(req.body.status)),
-                    req.st.db.escape(JSON.stringify(req.body.priority)),
-                    req.st.db.escape(req.body.userId)
-                ];
-                /**
-                 * Calling procedure for sales request
-                 * @type {string}
-                 */
+                    if (!validationFlag){
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+                        req.body.type = (req.body.type) ? (req.body.type) : 1;
+                        req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                        req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
+                        var startPage = 0;
 
-                var procQuery = 'CALL HE_get_supportTracker1( ' + procParams.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
-                    console.log(results);
-                    if(!err && results && results[0] ){
-                        response.status = true;
-                        response.message = "support Tracker loaded successfully";
-                        response.error = null;
-                        response.data = {
-                            chartData:results[0],
-                            TransactionData:results[1],
-                            count:results[2][0].count
-                        } ;
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
+                        startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
+                        req.body.userId = (req.body.userId) ? (req.body.userId) : 0;
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.groupId),
+                            req.st.db.escape(req.body.type),
+                            req.st.db.escape(startPage),
+                            req.st.db.escape(req.query.limit),
+                            req.st.db.escape(req.body.status),
+                            req.st.db.escape(JSON.stringify(priority)),
+                            req.st.db.escape(req.body.userId)
+                        ];
+                        /**
+                         * Calling procedure for sales request
+                         * @type {string}
+                         */
+
+                        var procQuery = 'CALL HE_get_supportTracker1( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery,function(err,results){
+                            console.log(results);
+                            if(!err && results && results[0] ){
+                                response.status = true;
+                                response.message = "support Tracker loaded successfully";
+                                response.error = null;
+                                response.data = {
+                                    chartData:results[0],
+                                    TransactionData:results[1],
+                                    count:results[2][0].count,
+                                    isSupportMember:results[3][0].isSupportMember
+                                } ;
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else if(!err)
+                            {
+                                response.status = true;
+                                response.message = "support Tracker loaded successfully";
+                                response.error = null;
+                                response.data = {
+                                    chartData : [],
+                                    transactionData : [],
+                                    count : 0,
+                                    isSupportMember:0
+                                };
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else{
+                                response.status = false;
+                                response.message = "Error while loading support Tracker";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
                         });
                     }
-                    else if(!err)
-                    {
-                        response.status = true;
-                        response.message = "support Tracker loaded successfully";
-                        response.error = null;
-                        response.data = {
-                            chartData : [],
-                            transactionData : [],
-                            count : 0
-                        };
 
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
-                    }
-                    else{
-                        response.status = false;
-                        response.message = "Error while loading support Tracker";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
                 });
+
             }
             else{
                 res.status(401).json(response);
@@ -719,7 +729,7 @@ supportCtrl.getSupportUsersByPriority = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
-                req.query.type = req.query.type ? req.query.type : 1;
+                req.query.type = req.query.type ? req.query.type : 0;
                 req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
                 req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
                 var startPage = 0;
@@ -858,7 +868,9 @@ supportCtrl.getUser = function(req,res,next){
                         for(var i = 0; i < result[0].length; i++) {
                             var res1 = {};
                             res1.name = result[0][i].name;
+                            res1.HEUserId = result [0][i].HEUserId;
                             res1.supportData = result[0][i].supportData ? JSON.parse(result[0][i].supportData) : [];
+
                             output.push(res1);
                         }
 

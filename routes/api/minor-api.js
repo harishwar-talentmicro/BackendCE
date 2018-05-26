@@ -9,18 +9,22 @@ var CronJob = require('cron').CronJob;
 var notifyMessages = require('../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
 
-var configurationV1 =  require('./configuration.js');
-var recruitmentV1 =  require('./recruitment/recruitment-master.js');
-var infoV1 =  require('./info/info.js');
-var expenseV1 =  require('./expense.js');
-var utilities =  require('./utilities/utilities.js');
+var request = require('request');
+// var Client = require('node-rest-client').Client;   // for interview scheduler hirecraft
+// var client = new Client();
+
+var configurationV1 = require('./configuration.js');
+var recruitmentV1 = require('./recruitment/recruitment-master.js');
+var infoV1 = require('./info/info.js');
+var expenseV1 = require('./expense.js');
+var utilities = require('./utilities/utilities.js');
 //var cvTempGenrate =  require('./cv_temp_genrate.js');
-var itemGroupV1 =  require('./item-group/item-group-master.js');
-var associationV1 =  require('./association/association-master.js');
-var batchV1 =  require('./batch/batch-master.js');
-var messaageBoxV1 =  require('./messagebox/messagebox-master.js');
-var locForecastV1 =  require('./line-of-career/loc-master.js');
-var apVersionV1 =  require('./ap-module/version.js');
+var itemGroupV1 = require('./item-group/item-group-master.js');
+var associationV1 = require('./association/association-master.js');
+var batchV1 = require('./batch/batch-master.js');
+var messaageBoxV1 = require('./messagebox/messagebox-master.js');
+var locForecastV1 = require('./line-of-career/loc-master.js');
+var apVersionV1 = require('./ap-module/version.js');
 var areaPartner = require('./area-partner/area-partner-master.js');
 var configuration = require('./configuration/deal.js');
 var jobRaiser = require('./job-raiser/job-raiser-routes');
@@ -97,176 +101,176 @@ var appGeneralRequest = require('./HEApp/generalRequest.js');
 var WGRM = require('./HEBackEnd/WGRMTemplates.js');
 
 
-var hospitalTokenManagement=require('./HEApp/hospitalTokenManagement.js');
+var hospitalTokenManagement = require('./HEApp/hospitalTokenManagement.js');
 
 var generalOtp = require('./HEApp/otp/otp-routes.js');
 
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
 
-router.use('/configuration',configurationV1);
-router.use('/recruitment',recruitmentV1);
-router.use('/info',infoV1);
-router.use('/expense',expenseV1);
-router.use('/utilities',utilities);
+router.use('/configuration', configurationV1);
+router.use('/recruitment', recruitmentV1);
+router.use('/info', infoV1);
+router.use('/expense', expenseV1);
+router.use('/utilities', utilities);
 //router.use('/cv_temp_genrate',cvTempGenrate);
-router.use('/item',itemGroupV1);
-router.use('/association',associationV1);
-router.use('/batch',batchV1);
-router.use('/mbox',messaageBoxV1);
-router.use('/loc',locForecastV1);
-router.use('/versionCode',apVersionV1);
+router.use('/item', itemGroupV1);
+router.use('/association', associationV1);
+router.use('/batch', batchV1);
+router.use('/mbox', messaageBoxV1);
+router.use('/loc', locForecastV1);
+router.use('/versionCode', apVersionV1);
 
-router.use('/area_partner',areaPartner);
-router.use('/job_raiser',jobRaiser);
-router.use('/configuration',configuration);
-router.use('/user',user);
-router.use('/community',community);
-router.use('/job',job);
-router.use('/whatMate',whatmatemanager);
+router.use('/area_partner', areaPartner);
+router.use('/job_raiser', jobRaiser);
+router.use('/configuration', configuration);
+router.use('/user', user);
+router.use('/community', community);
+router.use('/job', job);
+router.use('/whatMate', whatmatemanager);
 
-router.use('/invite',invite);
-router.use('/jobInfo',jobInfo);
+router.use('/invite', invite);
+router.use('/jobInfo', jobInfo);
 
-router.use('/signup',signup);
-router.use('/otp',generalOtp);  // for general otp sending
+router.use('/signup', signup);
+router.use('/otp', generalOtp);  // for general otp sending
 
 
 // for Hello EZE Project
-router.use('/helloEZE/appSettings',helloEZE);
-router.use('/helloEZE',HEformTemplate);
-router.use('/helloEZE',HETrackTemplate);
-router.use('/helloEZE',HEholidayTemplate);
-router.use('/helloEZE',HEWorkLocation);
-router.use('/helloEZE',HECurrency);
-router.use('/helloEZE',HEMaster);
-router.use('/helloEZE',HEUser);
-router.use('/helloEZE',HEHRDocs);
-router.use('/helloEZE/app',HEFormType);
-router.use('/helloEZE/app',HECompose);
-router.use('/helloEZE/app',HETask);
-router.use('/helloEZE/app',HEAppMaster);
-router.use('/helloEZE/app',HEMeeting);
-router.use('/helloEZE/app',HEAttendance);
-router.use('/helloEZE/app',HELeaveBalance);
-router.use('/helloEZE/dataview',HEDataViewLogin);
-router.use('/helloEZE/dataview',HEDataViewQueryLogin);
-router.use('/helloEZE/dataview',HEDataViewCustomerSupport);
-router.use('/helloEZE/dataview',HERouteMap);
-router.use('/helloEZE/app',HELeaveLetter);
-router.use('/helloEZE/app',HEExpenseClaim);
-router.use('/helloEZE/app',HETravelRequest);
-router.use('/helloEZE',HEExpenseType);
-router.use('/helloEZE',HERequestMaster);
-router.use('/helloEZE/app',HETravelClaim);
-router.use('/helloEZE/app',HEItemRequest);
-router.use('/helloEZE',HELeave);
-router.use('/helloEZE/app',HEITHelpDesk);
-router.use('/helloEZE/app',HEVisitor);
-router.use('/helloEZE/app',HELogInOut);
-router.use('/helloEZE/app',HEsendMessage);
-router.use('/helloEZE/app',HEsendSOSMessage);
-router.use('/helloEZE/app',HEgreeting);
-router.use('/helloEZE/app',HETransport);
-router.use('/helloEZE/app',HEQuery);
-router.use('/helloEZE',HEsales);
-router.use('/helloEZE/app',HEAppsales);
-router.use('/helloEZE/app',HEAppSupport);
-router.use('/helloEZE',HEMeetingRoom);
-router.use('/helloEZE/app',HEAppMeetingRoom);
-router.use('/helloEZE/app',HEAppRecruitment);
-router.use('/helloEZE',HEContentManager);
-router.use('/helloEZE',HEInterview);
-router.use('/helloEZE',HEPaySlip);
-router.use('/helloEZE/app',HEAppCompany);
-router.use('/helloEZE/dataview',HEDataViewVisitor);
-router.use('/helloEZE',HEdepartment);
-router.use('/helloEZE',HEgrade);
-router.use('/vault',vault);
-router.use('/WhatMate/admin',WMAdminManager);
-router.use('/helloEZE',eventBackEnd);
-router.use('/helloEZE/app',eventApp);
-router.use('/helloEZE/app',taxDeclarations);
-router.use('/helloEZE',taxWebSavings);
-router.use('/helloEZE/app',policeStations);
-router.use('/helloEZE',travelMode);
-router.use('/helloEZE',generalRequest);
-router.use('/helloEZE/app',appGeneralRequest);
-router.use('/helloEZE/app',zoom);
-router.use('/helloEZE/',WGRM);
-router.use('/WhatMate/Windows',WMWindowsApp);
+router.use('/helloEZE/appSettings', helloEZE);
+router.use('/helloEZE', HEformTemplate);
+router.use('/helloEZE', HETrackTemplate);
+router.use('/helloEZE', HEholidayTemplate);
+router.use('/helloEZE', HEWorkLocation);
+router.use('/helloEZE', HECurrency);
+router.use('/helloEZE', HEMaster);
+router.use('/helloEZE', HEUser);
+router.use('/helloEZE', HEHRDocs);
+router.use('/helloEZE/app', HEFormType);
+router.use('/helloEZE/app', HECompose);
+router.use('/helloEZE/app', HETask);
+router.use('/helloEZE/app', HEAppMaster);
+router.use('/helloEZE/app', HEMeeting);
+router.use('/helloEZE/app', HEAttendance);
+router.use('/helloEZE/app', HELeaveBalance);
+router.use('/helloEZE/dataview', HEDataViewLogin);
+router.use('/helloEZE/dataview', HEDataViewQueryLogin);
+router.use('/helloEZE/dataview', HEDataViewCustomerSupport);
+router.use('/helloEZE/dataview', HERouteMap);
+router.use('/helloEZE/app', HELeaveLetter);
+router.use('/helloEZE/app', HEExpenseClaim);
+router.use('/helloEZE/app', HETravelRequest);
+router.use('/helloEZE', HEExpenseType);
+router.use('/helloEZE', HERequestMaster);
+router.use('/helloEZE/app', HETravelClaim);
+router.use('/helloEZE/app', HEItemRequest);
+router.use('/helloEZE', HELeave);
+router.use('/helloEZE/app', HEITHelpDesk);
+router.use('/helloEZE/app', HEVisitor);
+router.use('/helloEZE/app', HELogInOut);
+router.use('/helloEZE/app', HEsendMessage);
+router.use('/helloEZE/app', HEsendSOSMessage);
+router.use('/helloEZE/app', HEgreeting);
+router.use('/helloEZE/app', HETransport);
+router.use('/helloEZE/app', HEQuery);
+router.use('/helloEZE', HEsales);
+router.use('/helloEZE/app', HEAppsales);
+router.use('/helloEZE/app', HEAppSupport);
+router.use('/helloEZE', HEMeetingRoom);
+router.use('/helloEZE/app', HEAppMeetingRoom);
+router.use('/helloEZE/app', HEAppRecruitment);
+router.use('/helloEZE', HEContentManager);
+router.use('/helloEZE', HEInterview);
+router.use('/helloEZE', HEPaySlip);
+router.use('/helloEZE/app', HEAppCompany);
+router.use('/helloEZE/dataview', HEDataViewVisitor);
+router.use('/helloEZE', HEdepartment);
+router.use('/helloEZE', HEgrade);
+router.use('/vault', vault);
+router.use('/WhatMate/admin', WMAdminManager);
+router.use('/helloEZE', eventBackEnd);
+router.use('/helloEZE/app', eventApp);
+router.use('/helloEZE/app', taxDeclarations);
+router.use('/helloEZE', taxWebSavings);
+router.use('/helloEZE/app', policeStations);
+router.use('/helloEZE', travelMode);
+router.use('/helloEZE', generalRequest);
+router.use('/helloEZE/app', appGeneralRequest);
+router.use('/helloEZE/app', zoom);
+router.use('/helloEZE/', WGRM);
+router.use('/WhatMate/Windows', WMWindowsApp);
 
 
 //created by Arun
-router.use('/helloEZE/app',hospitalTokenManagement);
+router.use('/helloEZE/app', hospitalTokenManagement);
 
 //router.use('/test_info',testInfoV1);
 //router.use('/association-ap',associationAPV1);
 
-router.get('/test',function(req,res,next){
+router.get('/test', function (req, res, next) {
     /**
      * Keep coerceTypes true for inputData to cast one datatype into another
      * for eg. '1'[string] to 1[integer]
      */
-    var inAjv = new Ajv({coerceTypes : true});
+    var inAjv = new Ajv({ coerceTypes: true });
     var validInputSchema = {
-        "properties" : {
-            "ezeoneId" : {
-                "type" : "string",
-                "maxLength" : 15
+        "properties": {
+            "ezeoneId": {
+                "type": "string",
+                "maxLength": 15
             },
-            "idType" : {
-                "type" : "number",
-                "minimum" : 1,
-                "maximum" : 4
+            "idType": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 4
             }
         },
-        "required" : ["ezeoneId","idType"]
+        "required": ["ezeoneId", "idType"]
     };
     //////////////////////////////////////////////////
 
-    var inSchema = schemaLoader.load('/api/v1.1/test','GET','input',0);
-    var outSchema1 = schemaLoader.load('/api/v1.1/test','GET','output',0);
-    var outSchema2 = schemaLoader.load('/api/v1.1/test','GET','output',1);
+    var inSchema = schemaLoader.load('/api/v1.1/test', 'GET', 'input', 0);
+    var outSchema1 = schemaLoader.load('/api/v1.1/test', 'GET', 'output', 0);
+    var outSchema2 = schemaLoader.load('/api/v1.1/test', 'GET', 'output', 1);
 
 
-    ajv.validate(inSchema,req.body);
+    ajv.validate(inSchema, req.body);
 
 
 
     /////////////////////////////////////////////////
 
 
-    if(!inAjv.validate(validInputSchema,req.query)){
+    if (!inAjv.validate(validInputSchema, req.query)) {
         console.log('In Schema validation failed');
         res.json({
-            status : false,
-            error : inAjv.errors,
-            message : 'Please check errors',
-            data : null
+            status: false,
+            error: inAjv.errors,
+            message: 'Please check errors',
+            data: null
         });
         return;
     }
 
     var validOutputSchema = {
-        "properties" : {
-            "id" : {
-                "type" : "integer",
-                "min" : 1
+        "properties": {
+            "id": {
+                "type": "integer",
+                "min": 1
             },
-            "companyName" : {
-                "type" : "string",
-                "maxLength" : 100
+            "companyName": {
+                "type": "string",
+                "maxLength": 100
             }
         },
-        "required" : ["id","companyName"]
+        "required": ["id", "companyName"]
     };
 
     var query = 'select TID AS id, CompanyName AS companyName from tmaster WHERE EZEID = ' + req.db.escape("@SGOWRI2");
-    req.db.query(query, function(err,results){
-        if(!err){
+    req.db.query(query, function (err, results) {
+        if (!err) {
             console.log(results);
-            if (results && results[0]){
+            if (results && results[0]) {
                 /**
                  * Compares only first object as we assume that one query will produce same kind of objects if
                  * multiple results are there
@@ -274,30 +278,30 @@ router.get('/test',function(req,res,next){
                  */
 
                 var outAjv = new Ajv();
-                if(!outAjv.validate(validOutputSchema,results[0])){
+                if (!outAjv.validate(validOutputSchema, results[0])) {
                     console.log('Out Schema validation failed');
                     res.status(500).json({
-                        status : false,
-                        message : "Invalid schema",
-                        data : null,
-                        error : outAjv.errors
+                        status: false,
+                        message: "Invalid schema",
+                        data: null,
+                        error: outAjv.errors
                     });
                     return;
                 }
 
                 res.json({
-                    status : true,
-                    message : "Test working",
-                    result : results,
-                    error : null
+                    status: true,
+                    message: "Test working",
+                    result: results,
+                    error: null
                 });
             }
-            else{
+            else {
                 res.json({
-                    status : true,
-                    message : "Test working",
-                    result : [],
-                    error : null
+                    status: true,
+                    message: "Test working",
+                    result: [],
+                    error: null
                 });
             }
         }
@@ -316,44 +320,44 @@ var gulfModule = require('./JobRaiser/gulf.js');
 
 
 
-router.use('/WM',jobModule);
-router.use('/WM',masterModule);
-router.use('/WM',applicantModule);
-router.use('/WM',jobPortalModule);
-router.use('/WM',paceUsersModule);
-router.use('/WM',walkInCvModule);
-router.use('/WM',gulfModule);
+router.use('/WM', jobModule);
+router.use('/WM', masterModule);
+router.use('/WM', applicantModule);
+router.use('/WM', jobPortalModule);
+router.use('/WM', paceUsersModule);
+router.use('/WM', walkInCvModule);
+router.use('/WM', gulfModule);
 // cron
 // var taskScheduler = require('../api/HEApp/task/task-ctrl');
-cron.schedule('*/15 * * * *', function(){
+cron.schedule('*/15 * * * *', function () {
     console.log('running a task every minute');
     var datetime = new Date();
     console.log(datetime);
     var procQuery = 'CALL he_schedule_tasks()';
     console.log(procQuery);
 
-    db.query(procQuery,function(err,results){
+    db.query(procQuery, function (err, results) {
         console.log(results);
-        if(!err){
+        if (!err) {
             console.log(err);
         }
-        else{
+        else {
             console.log("success");
         }
     });
 
 });
 
-cron.schedule('*/15 * * * *', function(){
+cron.schedule('*/15 * * * *', function () {
     // console.log('running a leave calculation every minute');
     var procQuery = 'CALL he_leave_calculator()';
     console.log(procQuery);
-    db.query(procQuery,function(err,results){
+    db.query(procQuery, function (err, results) {
         console.log(results);
-        if(!err){
+        if (!err) {
             console.log(err);
         }
-        else{
+        else {
             console.log("success");
         }
     });
@@ -361,7 +365,7 @@ cron.schedule('*/15 * * * *', function(){
 
 var cronJobMessage = new CronJob({
     cronTime: '20 * * * * *',
-    onTick: function() {
+    onTick: function () {
         notifyMessages.getMessagesNeedToNotify();
         /*
          * Runs every weekday (Monday through Friday)
@@ -374,5 +378,125 @@ var cronJobMessage = new CronJob({
 });
 cronJobMessage.start();
 
+
+
+
+//Example POST method invocation
+
+
+
+cron.schedule('*/5 * * * *', function () {
+    var query = "call wm_integrationUrlForHircraft()";
+    db.query(query, function (err, result) {
+        if (err) {
+            console.log('error: integrationUrlForHircraft');
+        }
+        else {
+            var heMasterId;
+            var transId;
+            var integrationFormData = {};
+            var DBUrl;
+            // console.log(result);
+            if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
+                heMasterId = result[0][0].heMasterId;
+                DBUrl = result[0][0].url;
+                transId = result[1][0].transId;
+                var response_server = (result[1][0].integrationFormdata);
+                // console.log(response_server);
+                if (typeof (response_server) == "string") {
+                    response_server = JSON.parse(response_server);
+                }
+
+                if (typeof (response_server.assessment) == 'string') {
+                    response_server.assessment = JSON.parse(response_server.assessment);
+                }
+
+                if (typeof (response_server.assessment.integrationAssessmentDetails) == 'string') {
+                    response_server.assessment.integrationAssessmentDetails = JSON.parse(response_server.assessment.integrationAssessmentDetails);
+                }
+
+                for (var r = 0; r < response_server.assessment.integrationAssessmentDetails.length; r++) {
+
+                    if (typeof (response_server.assessment.integrationAssessmentDetails[r].integrationQuestions) == 'string') {
+                        response_server.assessment.integrationAssessmentDetails[r].integrationQuestions = JSON.parse(response_server.assessment.integrationAssessmentDetails[r].integrationQuestions);
+                    }
+                    for (var s = 0; s < response_server.assessment.integrationAssessmentDetails[r].integrationQuestions.length; s++) {
+                        if (typeof (response_server.assessment.integrationAssessmentDetails[r].integrationQuestions[s].integrationselectedOption) == 'string') {
+                            response_server.assessment.integrationAssessmentDetails[r].integrationQuestions[s].integrationselectedOption = JSON.parse(response_server.assessment.integrationAssessmentDetails[r].integrationQuestions[s].integrationselectedOption);
+                        }
+                    }
+                }
+                // console.log(response_server);
+                request({
+                    url: DBUrl,
+                    method: "POST",
+                    json: true,   // <--Very important!!!
+                    body: response_server
+                }, function (error, response, body) {
+
+                    console.log(error);
+                    console.log(body);
+                    if (body.Code == "SUCCESS0001") {
+                        var updateQuery = "update 1014_trans set sync=1 where heParentId=" + transId;
+                        db.query(updateQuery, function (err, results) {
+                            if (err) {
+                                console.log("update sync query throws error");
+                            }
+                            else {
+                                console.log("sync is updated to 1 successfully", transId);
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    });
+    console.log('Interview cron job running');
+});
+
+
+cron.schedule('*/5 * * * *', function () {
+    var query = "call wm_integrationUrlwalkIn()";
+    db.query(query, function (err, result) {
+        console.log('Running walkin cron job');
+        if (err) {
+            console.log('error: integrationUrlForHircraft');
+        }
+        else {
+            var heMasterId;
+            var transId;
+            var formData = {};
+            var DBUrl;
+            if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
+            heMasterId = result[0][0].heMasterId;
+            DBUrl = result[0][0].url;
+            transId = result[1][0].transId;
+            formData = result[1][0].formData;
+
+            // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
+            request({
+                url: DBUrl,
+                method: "POST",
+                json: true,   // <--Very important!!!
+                body: JSON.parse(formData)
+            }, function (error, response, body) {
+                console.log(error);
+                console.log(body);
+                if (body.Code == "SAVED") {
+                    var updateQuery = "update 1039_trans set sync=1 where heParentId=" + transId;
+                    db.query(updateQuery, function (err, results) {
+                        if (err) {
+                            console.log("update sync query throws error");
+                        }
+                        else {
+                            console.log("sync is updated to 1 successfully of transId", transId);
+                        }
+                    });
+                }
+            });
+        }
+    }
+    });
+});
 
 module.exports = router;

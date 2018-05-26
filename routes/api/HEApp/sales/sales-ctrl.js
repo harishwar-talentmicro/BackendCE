@@ -962,29 +962,7 @@ salesCtrl.getSalesTracker = function (req, res, next) {
         validationFlag *= false;
     }
 
-    var stageStatusList = req.body.stageStatusList;
-    if (typeof (stageStatusList) == "string") {
-        stageStatusList = JSON.parse(stageStatusList);
-    }
-    if (!stageStatusList) {
-        stageStatusList = {};
-    }
 
-    var probability = req.body.probability;
-    if (typeof (probability) == "string") {
-        probability = JSON.parse(probability);
-    }
-    if (!probability) {
-        probability = {};
-    }
-
-    var timeline = req.body.timeline;
-    if (typeof (timeline) == "string") {
-        timeline = JSON.parse(timeline);
-    }
-    if (!timeline) {
-        timeline = {};
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -998,6 +976,24 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                 var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                    var stageStatusList = req.body.stageStatusList;
+                    if (typeof (stageStatusList) == "string") {
+                        stageStatusList = JSON.parse(stageStatusList);
+                    }
+                    if (!stageStatusList) {
+                        stageStatusList = {};
+                    }
+
+                    var probability = req.body.probability;
+                    if (typeof (probability) == "string") {
+                        probability = JSON.parse(probability);
+                    }
+                    if (!probability) {
+                        probability = {};
+                    }
+
+
                     if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
@@ -1013,7 +1009,7 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                         startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
 
                         req.body.userId = req.body.userId ? req.body.userId : 0;
-        
+                        req.body.timeline = req.body.timeline ? req.body.timeline : "" ;
         
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -1023,7 +1019,7 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                             req.st.db.escape(req.query.limit),
                             req.st.db.escape(JSON.stringify(stageStatusList)),
                             req.st.db.escape(JSON.stringify(probability)),
-                            req.st.db.escape(JSON.stringify(timeline)),
+                            req.st.db.escape(req.body.timeline),
                             req.st.db.escape(req.body.userId)
 
                         ];
@@ -1040,7 +1036,8 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                                 response.data = {
                                     chartData: salesItems[0],
                                     transactionData: salesItems[1],
-                                    count: salesItems[2][0].count
+                                    count: salesItems[2][0].count,
+                                    isSalesMember: salesItems[3][0].isSalesMember
                                 };
         
                                 response.error = null;
@@ -1058,7 +1055,8 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                                 response.data = {
                                     chartData: [],
                                     transactionData: [],
-                                    count: 0
+                                    count: 0,
+                                    isSalesMember:0
                                 };
                                 response.error = null;
         

@@ -188,6 +188,13 @@ applicantCtrl.saveApplicant = function (req, res, next) {
     if (!attachmentList) {
         attachmentList = [];
     }
+    var functionalAreas = req.body.functionalAreas;
+    if (typeof (functionalAreas) == "string") {
+        functionalAreas = JSON.parse(functionalAreas);
+    }
+    if (!functionalAreas) {
+        functionalAreas = [];
+    }
 
     if (!validationFlag) {
         response.error = error;
@@ -288,7 +295,8 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(req.body.imageUrl),
                             req.st.db.escape(req.body.htmlText),
                             req.st.db.escape(req.body.reqAppId),
-                            req.st.db.escape(req.body.clientCvPath)
+                            req.st.db.escape(req.body.clientCvPath),
+                            req.st.db.escape(JSON.stringify(functionalAreas))                            
                         ];
 
                         var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -439,7 +447,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             grade: result[28] ? result[28] : [],
                             paceUsers: result[29] ? result[29] : [],
                             reasons: result[31] ? result[31] : [],
-                            reportingTo: result[32] ? result[32] : []
+                            reportingTo: result[32] ? result[32] : [],
+                            functionalAreas: result[34] ? result[34] :[]
                         };
 
                         if (req.query.isWeb == 0) {
@@ -494,7 +503,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             grade: [],
                             paceUsers: [],
                             reasons: [],
-                            reportingTo: []
+                            reportingTo: [],
+                            functionalAreas :[]
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1393,12 +1403,14 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.query.reqAppId = req.query.reqAppId ? req.query.reqAppId : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.query.applicantId),
-                    req.st.db.escape(DBSecretKey)
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.query.reqAppId)
                 ];
 
                 var procQuery = 'CALL wm_get_applicantDetails( ' + inputs.join(',') + ')';
@@ -1415,7 +1427,7 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         temp_result.expectedSalaryScale = JSON.parse(temp_result.expectedSalaryScale);
                         temp_result.industry = JSON.parse(temp_result.industry);
                         temp_result.jobTitle = JSON.parse(temp_result.jobTitle);
-                        temp_result.jobTitle = temp_result.jobTitle.titleId != null ? temp_result.jobTitle : undefined;
+                        //  temp_result.jobTitle = temp_result.jobTitle.titleId != null ? temp_result.jobTitle : undefined;
                         temp_result.nationality = JSON.parse(temp_result.nationality);
                         temp_result.prefLocations = JSON.parse(temp_result.prefLocations);
                         temp_result.presentSalaryCurr = JSON.parse(temp_result.presentSalaryCurr);
@@ -1423,14 +1435,16 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         temp_result.presentSalaryScale = JSON.parse(temp_result.presentSalaryScale);
                         temp_result.primarySkills = JSON.parse(temp_result.primarySkills);
                         temp_result.secondarySkills = JSON.parse(temp_result.secondarySkills);
-
+                        temp_result.functionalAreas = JSON.parse(temp_result.functionalAreas);
+                        
                         response.status = true;
                         response.message = "Applicant data loaded successfully";
                         response.error = null;
                         response.data =
                             {
                                 applicantDetails: temp_result ? temp_result : [],
-                                applicantTransaction: result[1] ? result[1] : []
+                                applicantTransaction: result[1] ? result[1] : [],
+                                clientCvPath: (result[2] && result[2][0]) ? result[2][0].clientCvPath:""
                             };
                         res.status(200).json(response);
                     }

@@ -289,7 +289,7 @@ masterCtrl.saveClients = function (req, res, next) {
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(JSON.stringify(heDepartment)),
                     req.st.db.escape(JSON.stringify(businessLocation)),
-                    req.st.db.escape(JSON.stringify(contracts))                    
+                    req.st.db.escape(JSON.stringify(contracts))
 
                 ];
                 var procQuery = 'CALL wm_saveClientBusinessLocationContacts( ' + inputs.join(',') + ')';
@@ -614,7 +614,7 @@ masterCtrl.getmailTemplate = function (req, res, next) {
                             jobseekerMailer: result[2] ? result[2] : [],
                             clientMailer: result[3] ? result[3] : [],
                             interviewMailer: result[4] ? result[4] : [],
-                            trackerTemplates: result[5] ? result[5]: []
+                            trackerTemplates: result[5] ? result[5] : []
                         };
                         res.status(200).json(response);
                     }
@@ -1561,7 +1561,7 @@ masterCtrl.mailTags = function (req, res, next) {
         trackerTemplate = {};
         trackerTags = [];
     }
-    else{
+    else {
         trackerTags = JSON.parse(trackerTemplate.trackerTags);
     }
 
@@ -1839,10 +1839,19 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                         }
                         result[0][0].managers = JSON.parse(result[0][0].managers);
 
+                        if (result[2] && result[2][0]) {
+                            var contracts = (result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : [];
+                            if(contracts){
+                                for (var j = 0; j < contracts.length; j++) {
+                                    contracts[j].managers = JSON.parse(contracts[j].managers);
+                                }
+                            }
+                        }
+
                         response.data = {
                             heDepartment: result[0][0],
                             businessLocation: output,
-                            contracts : (result[2] && result[2][0]) ? (result[2]): []
+                            contracts: contracts//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
                         };
 
 
@@ -1866,7 +1875,7 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                         response.data = {
                             heDepartment: {},
                             businessLocation: [],
-                            managers : []
+                            contracts: []
                         };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
