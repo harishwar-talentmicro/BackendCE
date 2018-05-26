@@ -202,6 +202,7 @@ module.exports = function(favoriteBook,done) {
                                     console.log(err.stack);
                                 }
                                 else {
+                                    console.log("data",data);
                                     if(messageIds == ""){
                                         messageIds = results[i].messageUserId ;
                                     }
