@@ -1735,11 +1735,6 @@ Auth.prototype.loginNew = function (req, res, next) {
     // }
 
     try {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
                     var ezeoneId = req.st.alterEzeoneId(req.body.UserName);
 
@@ -2038,10 +2033,9 @@ Auth.prototype.loginNew = function (req, res, next) {
                         });
 
                     }
-                });
 
-            }
-        });
+
+
         //close here
     }
     catch (ex) {
