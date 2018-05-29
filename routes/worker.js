@@ -180,7 +180,7 @@ module.exports = function(favoriteBook,done) {
 
                     var params = {
                         default : "This is the default",
-                        APNS_SANDBOX : {
+                        APNS : {
                             aps : {
                                 alert : alert,
                                 sound : sound
@@ -188,7 +188,7 @@ module.exports = function(favoriteBook,done) {
                             payload : messagePayload
                         }
                     };
-                    params.APNS_SANDBOX = JSON.stringify(params.APNS_SANDBOX);
+                    params.APNS = JSON.stringify(params.APNS);
 
                     IOS_SNS.addUser(iphoneId, null, function(err, endpointArn) {
                         if (err) {
