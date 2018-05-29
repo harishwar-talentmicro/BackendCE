@@ -1157,7 +1157,8 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                     req.st.db.escape(req.body.noticePeriodFrom),
                     req.st.db.escape(req.body.noticePeriodTo),
                     //req.st.db.escape(req.body.workLocation),
-                    req.st.db.escape(JSON.stringify(requiredNationalities))
+                    req.st.db.escape(JSON.stringify(requiredNationalities)),
+                    req.st.db.escape(JSON.stringify(req.body.DOB))
                 ];
 
                 var procQuery = 'CALL wd_resume_search_new2( ' + inputs.join(',') + ')';  // call procedure to save requirement data
