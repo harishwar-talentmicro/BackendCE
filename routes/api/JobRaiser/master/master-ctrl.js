@@ -1822,26 +1822,18 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                         response.status = true;
                         response.message = "client data loaded successfully";
                         response.error = null;
-                        var output = [];
-                        for (var i = 0; i < result[1].length; i++) {
-                            var res2 = {};
-                            res2.businessLocationId = result[1][i].businessLocationId;
-                            res2.businessLocationTitle = result[1][i].businessLocationTitle;
-                            res2.location = result[1][i].location;
-                            res2.address = result[1][i].type;
-                            res2.latitude = result[1][i].latitude;
-                            res2.longitude = result[1][i].longitude;
-                            res2.nearestParking = result[1][i].nearestParking;
-                            res2.entryProcedure = result[1][i].entryProcedure;
-                            res2.landmark = result[1][i].landmark;
-                            res2.contactList = JSON.parse(result[1][i].contactList) ? JSON.parse(result[1][i].contactList) : [];
-                            output.push(res2);
+                        if (result[1] && result[1][0]) {
+                            for (var i = 0; i < result[1].length; i++) {
+                                var res2 = {};
+                                result[1][i].contactList = result[1][i].contactList ? JSON.parse(result[1][i].contactList) : [];
+                            }
                         }
+
                         result[0][0].managers = JSON.parse(result[0][0].managers);
 
                         if (result[2] && result[2][0]) {
                             var contracts = (result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : [];
-                            if(contracts){
+                            if (contracts) {
                                 for (var j = 0; j < contracts.length; j++) {
                                     contracts[j].managers = JSON.parse(contracts[j].managers);
                                 }
@@ -1850,7 +1842,7 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
 
                         response.data = {
                             heDepartment: result[0][0],
-                            businessLocation: output,
+                            businessLocation: result[1],
                             contracts: contracts//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
                         };
 
