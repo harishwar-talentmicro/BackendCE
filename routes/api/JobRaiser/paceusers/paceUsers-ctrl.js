@@ -408,7 +408,7 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
     }
 
     if (!req.query.userMasterId) {
-        error.userMasterId = "Invalid Company";
+        error.userMasterId = "Invalid user";
         validationFlag = false;
     }
 
@@ -431,7 +431,9 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.query.userMasterId),
-                    req.st.db.escape(req.query.type)
+                    req.st.db.escape(req.query.type),
+                    req.st.db.escape(req.body.from),
+                    req.st.db.escape(req.body.to)
                 ];
 
                 var procQuery = 'CALL wm_get_DashBoard( ' + inputs.join(',') + ')';
@@ -449,11 +451,31 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             output.push(res2);
                         }
 
+                        var output1 = [];
+                        
+                        for (var i = 0; i < result[2].length; i++) {
+                            var res3 = {};
+                            res3.name=result[2][i].name;
+                            res3.stage = result[2][i].stage ? JSON.parse(result[2][i].stage) : [];
+                            output1.push(res3);
+                        }
+
+                        var output2 = [];
+                        for (var i = 0; i < result[4].length; i++) {
+                            var res4 = {};
+                            res4.clientName = result[4][i].clientName;
+                            res4.stage = result[4][i].stage ? JSON.parse(result[4][i].stage) : {};
+                            output2.push(res4);
+                        }
 
                         response.data =
                             {
                                 requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
-                                stages: output
+                                stages: output,
+                                requirementReport:output1,
+                                requirementReportTotalCount:result[3],
+                                fullfilmentReport:output2,
+                                fullfilmentReportTotalCount:result[5]
                             };
                         res.status(200).json(response);
                     }
@@ -464,7 +486,12 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             requirementStatus: {},
-                            stages: []
+                            stages: [],
+                            requirementReport:[],
+                                requirementReportTotalCount:[],
+                                fullfilmentReport:[],
+                                fullfilmentReportTotalCount:[]
+
                         };
                         res.status(200).json(response);
                     }
@@ -619,5 +646,6 @@ paceUsersCtrl.getBaseFile = function (req, res, next) {
         });
     }
 };
+
 
 module.exports = paceUsersCtrl;
