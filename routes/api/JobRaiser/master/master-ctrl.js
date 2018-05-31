@@ -1311,6 +1311,8 @@ masterCtrl.getRequirementView = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+                req.query.status = (req.query.status) ? req.query.status : 0;
+
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.status),
@@ -1321,7 +1323,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if (!err && results && results[0]) {
+                    if (!err && results && (results[0] || results[1])) {
                         response.status = true;
                         response.message = " Requirement View loaded sucessfully";
                         response.error = null;
@@ -1350,8 +1352,10 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                 res2.stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : []
                             output.push(res2);
                         }
+                        
                         response.data = {
-                            requirementView: output
+                            requirementView: output,
+                            stageList : (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList):[]
                         };
 
                         if (req.query.isWeb == 0) {
@@ -1371,7 +1375,8 @@ masterCtrl.getRequirementView = function (req, res, next) {
                         response.message = " Requirement View is empty";
                         response.error = null;
                         response.data = {
-                            requirementView: []
+                            requirementView: [],
+                            stageList: (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList):[]
 
                         };
                         if (req.query.isWeb == 0) {

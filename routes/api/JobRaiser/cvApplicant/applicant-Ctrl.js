@@ -245,6 +245,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         req.body.imageUrl = req.body.imageUrl ? req.body.imageUrl : '';
                         req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0; 
                         req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
+                        req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 0;
 
                         var inputs = [
                             req.st.db.escape(req.query.token),
@@ -296,7 +297,8 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(req.body.htmlText),
                             req.st.db.escape(req.body.reqAppId),
                             req.st.db.escape(req.body.clientCvPath),
-                            req.st.db.escape(JSON.stringify(functionalAreas))                            
+                            req.st.db.escape(JSON.stringify(functionalAreas)),                            
+                            req.st.db.escape(req.body.importerFlag)
                         ];
 
                         var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -1737,6 +1739,60 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
         reqApp = [];
     }
 
+    var billableCurrency = {};
+    billableCurrency = req.body.billableCurrency;
+    if (typeof (billableCurrency) == "string") {
+        billableCurrency = JSON.parse(billableCurrency);
+    }
+    if (!billableCurrency) {
+        billableCurrency = {};
+    }
+
+    var billableScale = {};
+    billableScale = req.body.billableScale;
+    if (typeof (billableScale) == "string") {
+        billableScale = JSON.parse(billableScale);
+    }
+    if (!billableScale) {
+        billableScale = {};
+    }
+
+    var billableDuration = {};
+    billableDuration = req.body.billableDuration;
+    if (typeof (billableDuration) == "string") {
+        billableDuration = JSON.parse(billableDuration);
+    }
+    if (!billableDuration) {
+        billableDuration = {};
+    }
+
+    var billingCurrency = {};
+    billingCurrency = req.body.billingCurrency;
+    if (typeof (billingCurrency) == "string") {
+        billingCurrency = JSON.parse(billingCurrency);
+    }
+    if (!billingCurrency) {
+        billingCurrency = {};
+    }
+
+    var billingScale = {};
+    billingScale = req.body.billingScale;
+    if (typeof (billingScale) == "string") {
+        billingScale = JSON.parse(billingScale);
+    }
+    if (!billingScale) {
+        billingScale = {};
+    }
+
+    var billingDuration = {};
+    billingDuration = req.body.billingDuration;
+    if (typeof (billingDuration) == "string") {
+        billingDuration = JSON.parse(billingDuration);
+    }
+    if (!billingDuration) {
+        billingDuration = {};
+    }
+
     var offerAttachment = [];
     offerAttachment = req.body.offerAttachment;
     if (typeof (offerAttachment) == "string") {
@@ -1762,7 +1818,6 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
                     req.st.db.escape(req.body.offerManagerId),
                     req.st.db.escape(req.body.heMasterId),
                     req.st.db.escape(req.body.heDepartmentId),
-                    // req.st.db.escape(req.body.reqAppTransId),
                     req.st.db.escape(req.body.grossCTCAmount),
                     req.st.db.escape(req.body.grossCTCCurrency),
                     req.st.db.escape(req.body.grossCTCScale),
@@ -1770,8 +1825,15 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(offerAttachment)),
                     req.st.db.escape(JSON.stringify(reqApp)),
                     req.st.db.escape(req.body.expectedJoining),
-                    req.st.db.escape(JSON.stringify(documentAttachment))
-                ];
+                    req.st.db.escape(JSON.stringify(documentAttachment)),
+                    req.st.db.escape(JSON.stringify(billableCurrency)),
+                    req.st.db.escape(JSON.stringify(billableScale)),
+                    req.st.db.escape(JSON.stringify(billableDuration)),
+                    req.st.db.escape(req.body.billableCTCAmount),
+                    req.st.db.escape(JSON.stringify(billingCurrency)),
+                    req.st.db.escape(JSON.stringify(billingScale)),
+                    req.st.db.escape(JSON.stringify(billingDuration)),
+                    req.st.db.escape(req.body.billingCTCAmount)                ];
 
                 var procQuery = 'CALL wm_save_offerManager( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -1842,32 +1904,26 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0]) {
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "Offer manager list loaded successfully";
                         response.error = null;
-                        response.data =
-                            {
-                                grossCTCAmount: result[0][0].grossCTCAmount,
-                                grossCTCCurrency: result[0][0].grossCTCCurrency,
-                                grossCTCCurrencySymbol: result[0][0].currencySymbol,
-                                grossCTCScale: result[0][0].grossCTCScale,
-                                grossCTCScaleName: result[0][0].scale,
-                                expectedjoining: result[0][0].expectedjoining,
-                                grossCTCDuration: result[0][0].grossCTCDuration,
-                                grossCTCDurationName: result[0][0].duration,
-                                offerAttachment: result[0][0].offerAttachment,
-                                reqAppList: JSON.parse(result[0][0].reqAppList) ? JSON.parse(result[0][0].reqAppList) : []
-                            };
+                        result[0][0].reqAppList=result[0][0].reqAppList ? JSON.parse(result[0][0].reqAppList) : [];
+                        result[0][0].documentAttachment=result[0][0].documentAttachment ? JSON.parse(result[0][0].documentAttachment) : [];
+                        result[0][0].billableCurrency=result[0][0].billableCurrency ? JSON.parse(result[0][0].billableCurrency) : {};
+                        result[0][0].billableScale=result[0][0].billableScale ? JSON.parse(result[0][0].billableScale) : {};
+                        result[0][0].billableDuration=result[0][0].billableDuration ? JSON.parse(result[0][0].billableDuration) : {};
+                        result[0][0].billingCurrency=result[0][0].billingCurrency ? JSON.parse(result[0][0].billingCurrency) : {};
+                        result[0][0].billingScale=result[0][0].billingScale ? JSON.parse(result[0][0].billingScale) : [];
+                        result[0][0].billingDuration=result[0][0].billingDuration ? JSON.parse(result[0][0].billingDuration) : {};
+                        response.data =result[0][0];
                         res.status(200).json(response);
                     }
                     else if (!err) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
-                        response.data = {
-                            offerManager: []
-                        };
+                        response.data =[];
                         res.status(200).json(response);
                     }
                     else {

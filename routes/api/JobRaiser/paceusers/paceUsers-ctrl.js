@@ -274,6 +274,7 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                 req.body.priority = req.body.priority ? req.body.priority : 1;
                 req.body.taskDateTime = req.body.taskDateTime ? req.body.taskDateTime : null;
                 req.body.taskEndDate = req.body.taskEndDate ? req.body.taskEndDate : null;
+                req.body.status = req.body.status ? req.body.status : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -286,7 +287,9 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                     req.st.db.escape(req.body.priority),
                     req.st.db.escape(req.body.taskEndDate),
                     req.st.db.escape(JSON.stringify(venue)),
-                    req.st.db.escape(JSON.stringify(anchor))
+                    req.st.db.escape(JSON.stringify(anchor)),
+                    req.st.db.escape(req.body.status)
+
                 ];
 
                 var procQuery = 'CALL wm_save_pacePlanner( ' + inputs.join(',') + ')';
@@ -297,6 +300,10 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                         response.status = true;
                         response.message = "Task saved successfully";
                         response.error = null;
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
+                            result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
+                        }
                         response.data = result[0];
                         res.status(200).json(response);
                     }
@@ -357,11 +364,9 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
                         response.status = true;
                         response.message = "Tasks loaded successfully";
                         response.error = null;
-                        var output = [];
                         for (var i = 0; i < result[0].length; i++) {
                             result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
                             result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
-
                         }
                         response.data =
                             {
