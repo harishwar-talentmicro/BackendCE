@@ -1311,6 +1311,8 @@ masterCtrl.getRequirementView = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+                req.query.status = (req.query.status) ? req.query.status : 0;
+
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.status),
@@ -1321,7 +1323,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if (!err && results && results[0]) {
+                    if (!err && results && (results[0] || results[1])) {
                         response.status = true;
                         response.message = " Requirement View loaded sucessfully";
                         response.error = null;
@@ -1350,8 +1352,10 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                 res2.stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : []
                             output.push(res2);
                         }
+                        
                         response.data = {
-                            requirementView: output
+                            requirementView: output,
+                            stageList : (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList):[]
                         };
 
                         if (req.query.isWeb == 0) {
@@ -1371,7 +1375,8 @@ masterCtrl.getRequirementView = function (req, res, next) {
                         response.message = " Requirement View is empty";
                         response.error = null;
                         response.data = {
-                            requirementView: []
+                            requirementView: [],
+                            stageList: (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList):[]
 
                         };
                         if (req.query.isWeb == 0) {
@@ -1822,26 +1827,18 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                         response.status = true;
                         response.message = "client data loaded successfully";
                         response.error = null;
-                        var output = [];
-                        for (var i = 0; i < result[1].length; i++) {
-                            var res2 = {};
-                            res2.businessLocationId = result[1][i].businessLocationId;
-                            res2.businessLocationTitle = result[1][i].businessLocationTitle;
-                            res2.location = result[1][i].location;
-                            res2.address = result[1][i].type;
-                            res2.latitude = result[1][i].latitude;
-                            res2.longitude = result[1][i].longitude;
-                            res2.nearestParking = result[1][i].nearestParking;
-                            res2.entryProcedure = result[1][i].entryProcedure;
-                            res2.landmark = result[1][i].landmark;
-                            res2.contactList = JSON.parse(result[1][i].contactList) ? JSON.parse(result[1][i].contactList) : [];
-                            output.push(res2);
+                        if (result[1] && result[1][0]) {
+                            for (var i = 0; i < result[1].length; i++) {
+                                var res2 = {};
+                                result[1][i].contactList = result[1][i].contactList ? JSON.parse(result[1][i].contactList) : [];
+                            }
                         }
+
                         result[0][0].managers = JSON.parse(result[0][0].managers);
 
                         if (result[2] && result[2][0]) {
                             var contracts = (result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : [];
-                            if(contracts){
+                            if (contracts) {
                                 for (var j = 0; j < contracts.length; j++) {
                                     contracts[j].managers = JSON.parse(contracts[j].managers);
                                 }
@@ -1850,7 +1847,7 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
 
                         response.data = {
                             heDepartment: result[0][0],
-                            businessLocation: output,
+                            businessLocation: result[1],
                             contracts: contracts//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
                         };
 

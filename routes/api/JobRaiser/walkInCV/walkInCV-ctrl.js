@@ -942,13 +942,30 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
                     console.log(req.query.isWeb);
+                    var output = [];
+                    for (var i = 0; i < result[11].length; i++) {
+                        var res2 = {};
+                        res2.educationId = result[11][i].educationId;
+                        res2.educationTitle = result[11][i].EducationTitle;
+                        res2.specialization = result[11][i].specialization ? JSON.parse(result[11][i].specialization) : [];
+                        output.push(res2);
+                    }
+
+                    var output1 = [];
+                    for (var j = 0; j < result[12].length; j++) {
+                        var res3 = {};
+                        res3.educationId = result[12][j].educationId;
+                        res3.educationTitle = result[12][j].EducationTitle;
+                        res3.specialization = result[12][j].specialization ? JSON.parse(result[12][j].specialization) : [];
+                        output1.push(res3);
+                    }
+
 
                     var isWeb = req.query.isWeb;
                     if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "Banner List loaded successfully";
                         response.error = null;
-
                         response.data = {
                             bannerList: result[0],
                             companyLogo: result[1][0].companyLogo,
@@ -959,7 +976,12 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             skillList: result[3] ? result[3] : [],// need to come from backend, will be done later.
                             locationList: result[4] ? result[4] : [],
                             referedNameList: result[5] ? result[5] : [],
-                            walkInJobs: (result[7] && result[7][0]) ? result[7] : []
+                            walkInJobs: (result[7] && result[7][0]) ? result[7] : [],
+                            currency: (result && result[8]) ? result[8] : [],
+                            scale: (result && result[9]) ? result[9] : [],
+                            duration: (result && result[10]) ? result[10] : [],
+                            ugEducationList: output ? output : [],
+                            pgEducationList: output1 ? output1 : []
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -982,7 +1004,12 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             registrationType: 0,  // need to come from backend, will be done later.
                             tokenGeneration: 0,
                             industryList: [],
-                            skillList: []
+                            skillList: [],
+                            currency: [],
+                            scale: [],
+                            duration: [],
+                            ugEducationList: [],
+                            pgEducationList: []
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
