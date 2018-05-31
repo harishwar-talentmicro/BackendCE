@@ -385,7 +385,7 @@ cronJobMessage.start();
 
 
 
-cron.schedule('*/5 * * * *', function () {
+cron.schedule('*/15 * * * *', function () {
     var query = "call wm_integrationUrlForHircraft()";
     db.query(query, function (err, result) {
         if (err) {
@@ -455,7 +455,7 @@ cron.schedule('*/5 * * * *', function () {
 });
 
 
-cron.schedule('*/5 * * * *', function () {
+cron.schedule('*/15 * * * *', function () {
     var query = "call wm_integrationUrlwalkIn()";
     db.query(query, function (err, result) {
         console.log('Running walkin cron job');
@@ -481,8 +481,8 @@ cron.schedule('*/5 * * * *', function () {
                 body: JSON.parse(formData)
             }, function (error, response, body) {
                 console.log(error);
-                console.log(body);
-                if (body.Code == "SAVED") {
+                console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
+                if ((body.Code == "SAVED") || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "INFO_03") || (body.Code == "ERR_07") || (body.Code == "ERR_08")) {
                     var updateQuery = "update 1039_trans set sync=1 where heParentId=" + transId;
                     db.query(updateQuery, function (err, results) {
                         if (err) {

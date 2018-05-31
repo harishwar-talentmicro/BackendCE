@@ -676,8 +676,8 @@ User.prototype.changePassword = function (req, res, next) {
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
+    if (!req.query.Token) {
+        error.Token = 'Invalid token';
         validationFlag *= false;
     }
 
