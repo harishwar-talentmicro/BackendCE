@@ -413,6 +413,10 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             output.push(res2);
                         }
 
+                        for(var p =0; p<result[35].length; p++){
+                            result[35][p].templateData = (result[35] && result[35][p]) ? JSON.parse(result[35] && result[35][p].templateData):[];
+                        }
+
                         response.data = {
                             jobType: result[0] ? result[0] : [],
                             currency: result[1] ? result[1] : [],
@@ -450,7 +454,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             paceUsers: result[29] ? result[29] : [],
                             reasons: result[31] ? result[31] : [],
                             reportingTo: result[32] ? result[32] : [],
-                            functionalAreas: result[34] ? result[34] :[]
+                            functionalAreas: result[34] ? result[34] :[],
+                            accessRightsTemplateDetails: result[35] ? result[35]:[]
                         };
 
                         if (req.query.isWeb == 0) {
@@ -506,7 +511,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             paceUsers: [],
                             reasons: [],
                             reportingTo: [],
-                            functionalAreas :[]
+                            functionalAreas :[],
+                            accessRightsTemplateDetails:[]
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
