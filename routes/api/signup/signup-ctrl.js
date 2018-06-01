@@ -587,8 +587,21 @@ signupCtrl.verifyOTP = function (req, res, next) {
     };
 
     var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
+   
+    var mobileNo = req.body.mobileNo;
+    var isdMobile = req.body.isdMobile;
+    var emailId = req.body.emailId;
+
+    if (!mobileNo) {
+        error['mobile'] = 'mobile no is mandatory';
+        validationFlag *= false;
+    }
+    if (!isdMobile) {
+        error['isdMobile'] = 'isd mobile is mandatory';
+        validationFlag *= false;
+    }
+    if (!emailId) {
+        error['emailId'] = 'Email id is mandatory';
         validationFlag *= false;
     }
 
@@ -600,36 +613,6 @@ signupCtrl.verifyOTP = function (req, res, next) {
     }
     else {
         try {
-            req.st.validateToken(req.query.token, function (err, tokenResult) {
-                if ((!err) && tokenResult) {
-                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-
-                        var mobileNo = req.body.mobileNo;
-                        var isdMobile = req.body.isdMobile;
-                        var emailId = req.body.emailId;
-
-                        if (!mobileNo) {
-                            error['mobile'] = 'mobile no is mandatory';
-                            validationFlag *= false;
-                        }
-                        if (!isdMobile) {
-                            error['isdMobile'] = 'isd mobile is mandatory';
-                            validationFlag *= false;
-                        }
-                        if (!emailId) {
-                            error['emailId'] = 'Email id is mandatory';
-                            validationFlag *= false;
-                        }
-
-                        if (!validationFlag) {
-                            response.error = error;
-                            response.message = 'Please check the errors';
-                            res.status(400).json(response);
-                            console.log(response);
-                        }
-                        else {
                             var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
                             req.query.token = req.query.token ? req.query.token : "";
                             var pictureURL = req.body.pictureURL ? req.body.pictureURL : "";
@@ -865,14 +848,7 @@ signupCtrl.verifyOTP = function (req, res, next) {
                                     res.status(500).json(respMsg);
                                 }
                             });
-                        }
-                    });
-                }
-                else {
-                    res.status(401).json(response);
-                }
-            });
-
+                      
         }
         catch (ex) {
             respMsg.error = 'Internal Server Error';

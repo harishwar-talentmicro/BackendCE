@@ -801,7 +801,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, Result) {
                     console.log(err);
-                    if (!err && Result && Result[0]) {
+                    if (!err && Result && Result[0] && Result[0][0]) {
                         response.status = true;
                         response.message = "Applicants loaded successfully";
                         response.error = null;
@@ -838,25 +838,26 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                             res2.statusId = Result[0][i].statusId;
                             res2.status = Result[0][i].statusTitle;
                             res2.statusTypeId = Result[0][i].statusTypeId;
-                            res2.clientContacts = JSON.parse(Result[0][i].clientContacts) ? JSON.parse(Result[0][i].clientContacts) : [];
+                            res2.clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
                             output.push(res2);
                         }
                         response.data = {
                             applicantlist: output,
                             count: Result[1][0].count
                         };
+                        // console.log(response.data);
                         res.status(200).json(response);
                     }
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "Applicants not found";
-                        response.error = null;
-                        response.data = {
-                            applicantlist: [],
-                            count: []
-                        };
-                        res.status(200).json(response);
-                    }
+                    // else if (!err) {
+                    //     response.status = true;
+                    //     response.message = "Applicants not found";
+                    //     response.error = null;
+                    //     response.data = {
+                    //         applicantlist: [],
+                    //         count: []
+                    //     };
+                    //     res.status(200).json(response);
+                    // }
                     else {
                         response.status = false;
                         response.message = "Error while loading applicants";
