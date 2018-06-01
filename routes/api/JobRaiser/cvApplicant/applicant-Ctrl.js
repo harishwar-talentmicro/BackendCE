@@ -843,21 +843,31 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                         }
                         response.data = {
                             applicantlist: output,
-                            count: Result[1][0].count
+                            count: Result[1][0].count,
+                            offerMasterData:{
+                                 currency: Result[2] ? Result[2] : [],
+                                 scale: Result[3] ? Result[3] : [],
+                                 duration: Result[4] ? Result[4] : [],
+                                 attachment: Result[5] ? Result[5] : []                                 
+                            }
                         };
                         // console.log(response.data);
                         res.status(200).json(response);
                     }
-                    // else if (!err) {
-                    //     response.status = true;
-                    //     response.message = "Applicants not found";
-                    //     response.error = null;
-                    //     response.data = {
-                    //         applicantlist: [],
-                    //         count: []
-                    //     };
-                    //     res.status(200).json(response);
-                    // }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Applicants not found";
+                        response.error = null;
+                        response.data = {
+                            applicantlist: [],
+                            count: [],
+                            currency: [],
+                            scale: [],
+                            duration: [],
+                            attachment:[]
+                        };
+                        res.status(200).json(response);
+                    }
                     else {
                         response.status = false;
                         response.message = "Error while loading applicants";
