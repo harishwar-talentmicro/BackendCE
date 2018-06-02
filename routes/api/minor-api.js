@@ -437,7 +437,7 @@ cron.schedule('*/15 * * * *', function () {
 
                     console.log(error);
                     console.log(body);
-                    if (body.Code == "SUCCESS0001") {
+                    if (body && body.Code && body.Code == "SUCCESS0001") {
                         var updateQuery = "update 1014_trans set sync=1 where heParentId=" + transId;
                         db.query(updateQuery, function (err, results) {
                             if (err) {
@@ -483,7 +483,7 @@ cron.schedule('*/15 * * * *', function () {
             }, function (error, response, body) {
                 console.log(error);
                 console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
-                if ((body.Code == "SAVED") || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "INFO_03") || (body.Code == "ERR_07") || (body.Code == "ERR_08")) {
+                if (body && body.Code && ((body.Code == "SAVED") || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "INFO_03") || (body.Code == "ERR_07") || (body.Code == "ERR_08"))) {
                     var updateQuery = "update 1039_trans set sync=1 where heParentId=" + transId;
                     db.query(updateQuery, function (err, results) {
                         if (err) {
