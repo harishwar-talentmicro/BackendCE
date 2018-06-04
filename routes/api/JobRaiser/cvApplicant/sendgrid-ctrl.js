@@ -430,7 +430,7 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(cc)),
                         req.st.db.escape(JSON.stringify(bcc)),
                         req.st.db.escape(req.body.subject),
-                        req.st.db.escape(req.body.templateContent),
+                        req.st.db.escape(req.body.mailBody),
                         req.st.db.escape(req.body.replymailId),
                         req.st.db.escape(req.body.priority),
                         req.st.db.escape(req.body.updateFlag),
@@ -807,12 +807,12 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                                     }
                                 });
                             }
-
-                            response.status = true;
-                            response.message = "mail sent successfully";
-                            response.error = null;
-                            if (!(templateId == 0 || overWrite))
+                            if (!(templateId == 0 || overWrite)){
+                                response.status = true;
+                                response.message = "mail sent successfully";
+                                response.error = null;
                                 res.status(200).json(response);
+                            }
                         }
                        
                         else {
@@ -847,7 +847,7 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(cc)),
                         req.st.db.escape(JSON.stringify(bcc)),
                         req.st.db.escape(req.body.subject),
-                        req.st.db.escape(req.body.templateContent),
+                        req.st.db.escape(req.body.mailBody),
                         req.st.db.escape(req.body.replymailId),
                         req.st.db.escape(req.body.priority),
                         req.st.db.escape(req.body.updateFlag),
@@ -1514,14 +1514,13 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                     }
                                 });
                             }
-
-                            response.status = true;
-                            response.message = "mail sent successfully";
-                            response.error = null;
-                            if (!(templateId == 0 || overWrite))
+                            if (!(templateId == 0 || overWrite)){
+                                response.status = true;
+                                response.message = "mail sent successfully";
+                                response.error = null;
                                 res.status(200).json(response);
+                            }
                         }
-                       
                         else {
                             response.status = false;
                             response.message = "Error while sending mail";
@@ -1554,7 +1553,7 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(cc)),
                         req.st.db.escape(JSON.stringify(bcc)),
                         req.st.db.escape(req.body.subject),
-                        req.st.db.escape(req.body.templateContent),
+                        req.st.db.escape(req.body.mailBody),
                         req.st.db.escape(req.body.replymailId),
                         req.st.db.escape(req.body.priority),
                         req.st.db.escape(req.body.updateFlag),
@@ -1574,13 +1573,15 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                             console.log(tempSaveResult);
                             response.status = true;
                             //check if there are any receivers, if yes sent and saved
-                            if (emailReceivers.length != 0)
+                            if (emailReceivers.length != 0){
                                 response.message = "Mail is Sent and Template Saved successfully";
+                            }
                             //else saved
-                            else
+                            else{
                                 response.message = "Template saved successfully";
+                            }
                             response.error = null;
-                            response.data = null;
+                            response.data = tempSaveResult[0][0];
                             res.status(200).json(response);
                         }
                     });
@@ -2231,11 +2232,12 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                 });
                             }
 
-                            response.status = true;
-                            response.message = "mail sent successfully";
-                            response.error = null;
-                            if (!(templateId == 0 || overWrite))
+                            if (!(templateId == 0 || overWrite)){
+                                response.status = true;
+                                response.message = "mail sent successfully";
+                                response.error = null;
                                 res.status(200).json(response);
+                            }
                         }
                        
                         else {
@@ -2270,7 +2272,7 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(cc)),
                         req.st.db.escape(JSON.stringify(bcc)),
                         req.st.db.escape(req.body.subject),
-                        req.st.db.escape(req.body.templateContent),
+                        req.st.db.escape(req.body.mailBody),
                         req.st.db.escape(req.body.replymailId),
                         req.st.db.escape(req.body.priority),
                         req.st.db.escape(req.body.updateFlag),
@@ -2780,11 +2782,12 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                                 });
                             }
 
-                            response.status = true;
-                            response.message = "mail sent successfully";
-                            response.error = null;
-                            if (!(templateId == 0 || overWrite))
+                            if (!(templateId == 0 || overWrite)){
+                                response.status = true;
+                                response.message = "mail sent successfully";
+                                response.error = null;
                                 res.status(200).json(response);
+                            }
                         }
                        
                         else {
@@ -2819,7 +2822,7 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(cc)),
                         req.st.db.escape(JSON.stringify(bcc)),
                         req.st.db.escape(req.body.subject),
-                        req.st.db.escape(req.body.templateContent),
+                        req.st.db.escape(req.body.mailBody),
                         req.st.db.escape(req.body.replymailId),
                         req.st.db.escape(req.body.priority),
                         req.st.db.escape(req.body.updateFlag),
@@ -3577,12 +3580,12 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                     }
                                 });
                             }
-
-                            response.status = true;
-                            response.message = "mail sent successfully";
-                            response.error = null;
-                            if (!(templateId == 0 || overWrite))
+                            if (!(templateId == 0 || overWrite)){
+                                response.status = true;
+                                response.message = "mail sent successfully";
+                                response.error = null;
                                 res.status(200).json(response);
+                            }
                         }
                        
                         else {
@@ -3617,7 +3620,7 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(cc)),
                         req.st.db.escape(JSON.stringify(bcc)),
                         req.st.db.escape(req.body.subject),
-                        req.st.db.escape(req.body.templateContent),
+                        req.st.db.escape(req.body.mailBody),
                         req.st.db.escape(req.body.replymailId),
                         req.st.db.escape(req.body.priority),
                         req.st.db.escape(req.body.updateFlag),

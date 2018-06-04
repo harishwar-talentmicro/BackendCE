@@ -392,7 +392,7 @@ cron.schedule('*/15 * * * *', function () {
         if (err) {
             console.log('error: integrationUrlForHircraft');
         }
-        else {
+        else if((result[0].length != 0) && (result[1].length != 0)){
             var heMasterId;
             var transId;
             var integrationFormData = {};
@@ -428,13 +428,13 @@ cron.schedule('*/15 * * * *', function () {
                     }
                 }
                 // console.log(response_server);
+                var count=0;
                 request({
                     url: DBUrl,
                     method: "POST",
                     json: true,   // <--Very important!!!
                     body: response_server
                 }, function (error, response, body) {
-
                     console.log(error);
                     console.log(body);
                     if (body && body.Code && body.Code == "SUCCESS0001") {
@@ -448,7 +448,9 @@ cron.schedule('*/15 * * * *', function () {
                             }
                         });
                     }
+                    count++;
                 });
+                console.log('tallint interview hit for ',count,' times');
             }
         }
     });
@@ -463,7 +465,7 @@ cron.schedule('*/15 * * * *', function () {
         if (err) {
             console.log('error: integrationUrlForHircraft');
         }
-        else {
+        else if((result[0].length != 0) && (result[1].length != 0)) {
             var heMasterId;
             var transId;
             var formData = {};
@@ -475,6 +477,7 @@ cron.schedule('*/15 * * * *', function () {
             formData = result[1][0].formData;
 
             // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
+            var count=0;
             request({
                 url: DBUrl,
                 method: "POST",
@@ -494,7 +497,9 @@ cron.schedule('*/15 * * * *', function () {
                         }
                     });
                 }
+                count++;
             });
+            console.log('tallint walkIn hit for ',count,' times');            
         }
     }
     });
