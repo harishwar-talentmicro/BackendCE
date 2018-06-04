@@ -207,13 +207,13 @@ settingsCtrl.saveAccessrightsTemplate = function (req, res, next) {
                     console.log(err);
                     if (!err && result[0][0].error) {
                         response.status = true;
-                        response.message = "TemplateName already exixt";
+                        response.message = "TemplateName already exist";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
 
-                    else if (!err && result) {
+                    else if (!err) {
                         response.status = true;
                         response.message = "Template saved successfully";
                         response.error = null;
