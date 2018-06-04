@@ -386,8 +386,12 @@ cronJobMessage.start();
 
 
 
-cron.schedule('*/15 * * * *', function () {
-    var query = "call wm_integrationUrlForHircraft()";
+// cron.schedule('*/15 * * * *', function () {
+   
+    var cronJobInterview = new CronJob({
+        cronTime: '25 * * * * *',
+        onTick: function () {
+var query = "call wm_integrationUrlForHircraft()";
     db.query(query, function (err, result) {
         if (err) {
             console.log('error: integrationUrlForHircraft');
@@ -455,10 +459,21 @@ cron.schedule('*/15 * * * *', function () {
         }
     });
     console.log('Interview cron job running');
+},
+start: false,
+timeZone: 'America/Los_Angeles'
 });
+cronJobInterview.start();
+
+// });
 
 
-cron.schedule('*/15 * * * *', function () {
+// cron.schedule('*/15 * * * *', function () {
+
+
+    var cronJobWalkIn = new CronJob({
+        cronTime: '45 * * * * *',
+        onTick: function () {
     var query = "call wm_integrationUrlwalkIn()";
     db.query(query, function (err, result) {
         console.log('Running walkin cron job');
@@ -503,6 +518,13 @@ cron.schedule('*/15 * * * *', function () {
         }
     }
     });
+},
+start: false,
+timeZone: 'America/Los_Angeles'
 });
+cronJobWalkIn.start();
+
+
+// });
 
 module.exports = router;
