@@ -428,6 +428,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.experience = (req.body.experience) ? req.body.experience : '0.0';
                 req.body.presentSalary = (req.body.presentSalary) ? req.body.presentSalary : '0.0';
                 req.body.walkinType = (req.body.walkinType) ? req.body.walkinType : 0;
+                req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
+                req.body.IDNumber = (req.body.IDNumber) ? req.body.IDNumber : '';
                 // req.body.referedByUserId = (req.body.referedByUserId) ? req.body.referedByUserId : 0;
 
 
@@ -467,8 +469,11 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(location)),
                     req.st.db.escape(req.body.profilePicture),
                     req.st.db.escape(DBSecretKey),
-                    req.st.db.escape(JSON.stringify(walkInJobs))
+                    req.st.db.escape(JSON.stringify(walkInJobs)),
+                    req.st.db.escape(DOB),
+                    req.st.db.escape(IDNumber)
                 ];
+
 
                 var procQuery = 'CALL wm_save_wlkinForm( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -970,8 +975,8 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             bannerList: result[0],
                             companyLogo: result[1][0].companyLogo,
                             registrationType: result[6][0].walkinRegistrationType,  // need to come from backend, will be done later.
-                            tokenGeneration : result[6][0].walkinTokenGeneration,
-                            // tokenGeneration: 0,
+                            tokenGeneration: result[6][0].walkinTokenGeneration,
+
                             industryList: result[2] ? result[2] : [],
                             skillList: result[3] ? result[3] : [],// need to come from backend, will be done later.
                             locationList: result[4] ? result[4] : [],
@@ -981,7 +986,10 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             scale: (result && result[9]) ? result[9] : [],
                             duration: (result && result[10]) ? result[10] : [],
                             ugEducationList: output ? output : [],
-                            pgEducationList: output1 ? output1 : []
+                            pgEducationList: output1 ? output1 : [],
+                            isDOBRequired: result[13][0].isDOBRequired ,
+                            isIDRequired: result[13][0].isIDRequired ,
+                            IDType: result[13][0].IDType
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -1486,8 +1494,8 @@ walkInCvCtrl.getWalkinJoblist = function (req, res, next) {
                         response.status = true;
                         response.message = "Walkin Joblist loaded successfully";
                         response.error = null;
-                        for(var i=0 ; i<result[0].length; i++){
-                            result[0][i].users = result[0][i].users ? JSON.parse( result[0][i].users):[];
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].users = result[0][i].users ? JSON.parse(result[0][i].users) : [];
                         }
                         response.data = {
                             jobList: (result[0] && result[0][0]) ? result[0] : []
@@ -1524,7 +1532,7 @@ walkInCvCtrl.getWalkinJoblist = function (req, res, next) {
 };
 
 
-walkInCvCtrl.getUsersOnSearch= function (req, res, next) {
+walkInCvCtrl.getUsersOnSearch = function (req, res, next) {
     var response = {
         status: false,
         message: "Invalid token",
@@ -1553,7 +1561,7 @@ walkInCvCtrl.getUsersOnSearch= function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.keywords)                    
+                    req.st.db.escape(req.query.keywords)
                 ];
 
                 var procQuery = 'CALL wm_get_walkinUsers( ' + inputs.join(',') + ')';

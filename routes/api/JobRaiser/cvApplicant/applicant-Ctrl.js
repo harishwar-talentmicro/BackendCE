@@ -243,7 +243,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         req.body.transactions = (req.body.transactions) ? req.body.transactions : '';
                         req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
                         req.body.imageUrl = req.body.imageUrl ? req.body.imageUrl : '';
-                        req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0; 
+                        req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0;
                         req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
                         req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 0;
 
@@ -297,7 +297,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(req.body.htmlText),
                             req.st.db.escape(req.body.reqAppId),
                             req.st.db.escape(req.body.clientCvPath),
-                            req.st.db.escape(JSON.stringify(functionalAreas)),                            
+                            req.st.db.escape(JSON.stringify(functionalAreas)),
                             req.st.db.escape(req.body.importerFlag)
                         ];
 
@@ -413,9 +413,14 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             output.push(res2);
                         }
 
-                        for(var p =0; p<result[35].length; p++){
-                            result[35][p].templateData = (result[35] && result[35][p]) ? JSON.parse(result[35] && result[35][p].templateData):[];
+                        for (var p = 0; p < result[35].length; p++) {
+                            result[35][p].templateData = (result[35] && result[35][p]) ? JSON.parse(result[35] && result[35][p].templateData) : {};
                         }
+                        var templateData = {};
+                        for (var i = 0; i < result[35][0].templateData.length; i++) {
+                            templateData[result[35][0].templateData[i].formId] = result[35][0].templateData[i];
+                        }
+                        result[35][0].templateData = templateData;
 
                         response.data = {
                             jobType: result[0] ? result[0] : [],
@@ -454,8 +459,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             paceUsers: result[29] ? result[29] : [],
                             reasons: result[31] ? result[31] : [],
                             reportingTo: result[32] ? result[32] : [],
-                            functionalAreas: result[34] ? result[34] :[],
-                            accessRightsTemplateDetails: result[35] ? result[35]:[]
+                            functionalAreas: result[34] ? result[34] : [],
+                            accessRightsTemplateDetails: result[35] ? result[35] : []
                         };
 
                         if (req.query.isWeb == 0) {
@@ -511,8 +516,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             paceUsers: [],
                             reasons: [],
                             reportingTo: [],
-                            functionalAreas :[],
-                            accessRightsTemplateDetails:[]
+                            functionalAreas: [],
+                            accessRightsTemplateDetails: []
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -756,7 +761,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
     else if (typeof (stageId) == "string") {
         stageId = JSON.parse(stageId);
     }
-    
+
     var statusId = req.body.statusId;
     if (!statusId) {
         statusId = [];
@@ -764,7 +769,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
     else if (typeof (statusId) == "string") {
         statusId = JSON.parse(statusId);
     }
-    
+
 
     if (!validationFlag) {
         response.error = error;
@@ -850,11 +855,11 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                         response.data = {
                             applicantlist: output,
                             count: Result[1][0].count,
-                            offerMasterData:{
-                                 currency: Result[2] ? Result[2] : [],
-                                 scale: Result[3] ? Result[3] : [],
-                                 duration: Result[4] ? Result[4] : [],
-                                 attachment: Result[5] ? Result[5] : []                                 
+                            offerMasterData: {
+                                currency: Result[2] ? Result[2] : [],
+                                scale: Result[3] ? Result[3] : [],
+                                duration: Result[4] ? Result[4] : [],
+                                attachment: Result[5] ? Result[5] : []
                             }
                         };
                         // console.log(response.data);
@@ -870,7 +875,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                             currency: [],
                             scale: [],
                             duration: [],
-                            attachment:[]
+                            attachment: []
                         };
                         res.status(200).json(response);
                     }
@@ -1464,7 +1469,7 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         temp_result.primarySkills = JSON.parse(temp_result.primarySkills);
                         temp_result.secondarySkills = JSON.parse(temp_result.secondarySkills);
                         temp_result.functionalAreas = JSON.parse(temp_result.functionalAreas);
-                        
+
                         response.status = true;
                         response.message = "Applicant data loaded successfully";
                         response.error = null;
@@ -1472,7 +1477,7 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                             {
                                 applicantDetails: temp_result ? temp_result : [],
                                 applicantTransaction: result[1] ? result[1] : [],
-                                clientCvPath: (result[2] && result[2][0]) ? result[2][0].clientCvPath:""
+                                clientCvPath: (result[2] && result[2][0]) ? result[2][0].clientCvPath : ""
                             };
                         res.status(200).json(response);
                     }
@@ -1859,7 +1864,7 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(billingCurrency)),
                     req.st.db.escape(JSON.stringify(billingScale)),
                     req.st.db.escape(JSON.stringify(billingDuration)),
-                    req.st.db.escape(req.body.billingCTCAmount)                ];
+                    req.st.db.escape(req.body.billingCTCAmount)];
 
                 var procQuery = 'CALL wm_save_offerManager( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -1934,22 +1939,22 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                         response.status = true;
                         response.message = "Offer manager list loaded successfully";
                         response.error = null;
-                        result[0][0].reqAppList=result[0][0].reqAppList ? JSON.parse(result[0][0].reqAppList) : [];
-                        result[0][0].documentAttachment=result[0][0].documentAttachment ? JSON.parse(result[0][0].documentAttachment) : [];
-                        result[0][0].billableCurrency=result[0][0].billableCurrency ? JSON.parse(result[0][0].billableCurrency) : {};
-                        result[0][0].billableScale=result[0][0].billableScale ? JSON.parse(result[0][0].billableScale) : {};
-                        result[0][0].billableDuration=result[0][0].billableDuration ? JSON.parse(result[0][0].billableDuration) : {};
-                        result[0][0].billingCurrency=result[0][0].billingCurrency ? JSON.parse(result[0][0].billingCurrency) : {};
-                        result[0][0].billingScale=result[0][0].billingScale ? JSON.parse(result[0][0].billingScale) : [];
-                        result[0][0].billingDuration=result[0][0].billingDuration ? JSON.parse(result[0][0].billingDuration) : {};
-                        response.data =result[0][0];
+                        result[0][0].reqAppList = result[0][0].reqAppList ? JSON.parse(result[0][0].reqAppList) : [];
+                        result[0][0].documentAttachment = result[0][0].documentAttachment ? JSON.parse(result[0][0].documentAttachment) : [];
+                        result[0][0].billableCurrency = result[0][0].billableCurrency ? JSON.parse(result[0][0].billableCurrency) : {};
+                        result[0][0].billableScale = result[0][0].billableScale ? JSON.parse(result[0][0].billableScale) : {};
+                        result[0][0].billableDuration = result[0][0].billableDuration ? JSON.parse(result[0][0].billableDuration) : {};
+                        result[0][0].billingCurrency = result[0][0].billingCurrency ? JSON.parse(result[0][0].billingCurrency) : {};
+                        result[0][0].billingScale = result[0][0].billingScale ? JSON.parse(result[0][0].billingScale) : [];
+                        result[0][0].billingDuration = result[0][0].billingDuration ? JSON.parse(result[0][0].billingDuration) : {};
+                        response.data = result[0][0];
                         res.status(200).json(response);
                     }
                     else if (!err) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
-                        response.data =[];
+                        response.data = [];
                         res.status(200).json(response);
                     }
                     else {
@@ -3155,7 +3160,7 @@ applicantCtrl.saveInterviewSchedulerForApplicant = function (req, res, next) {
 
                             var isWeb = req.query.isWeb;
                             console.log(results);
-                            if(!err && results && results[0] ){
+                            if (!err && results && results[0]) {
                                 senderGroupId = results[0][0].senderId;
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                 //     senderName : results[0][0].message
