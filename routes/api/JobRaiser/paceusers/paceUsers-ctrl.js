@@ -666,5 +666,102 @@ paceUsersCtrl.getBaseFile = function (req, res, next) {
     }
 };
 
+paceUsersCtrl.toVerifyOtp = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid otp",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.body.mobileNo) {
+        error.mobileNo = "Mobile number is mandatory";
+        validationFlag = false;
+    }
+    if (!req.body.isdMobile) {
+        error.isdMobile = "isdMobile number is mandatory";
+        validationFlag = false;
+    }
+
+    if (!req.body.otp) {
+        error.otp = "Please enter OTP";
+        validationFlag = false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        var inputs = [
+            req.st.db.escape(req.body.isdMobile),
+            req.st.db.escape(req.body.mobileNo),
+            req.st.db.escape(req.body.otp),
+            req.st.db.escape(DBSecretKey)
+        ];
+
+        var procQuery = 'CALL wm_paceUserManager_verifyOtpInuse( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            console.log(err);
+            console.log(result);
+            if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].error=="user already exist") {
+                response.status = false;
+                response.message = result[0][0].message;
+                response.error = false;
+                response.data = {
+                    message: result[1][0].error
+                };
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].success== "user does not exist") {
+                response.status = true;
+                response.message = result[1][0].success;
+                response.error = false;
+                response.data = {
+                    userDetails: result[2][0]
+                };
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].success== "user does not exist in whatmate") {
+                response.status = true;
+                response.message = result[1][0].success;
+                response.error = false;
+                response.data = null;
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0][0].message == "INVALID OTP") {
+                response.status = false;
+                response.message = result[0][0].message;
+                response.error = false;
+                response.data = {
+                    message: result[0][0].message
+                };
+                res.status(200).json(response);
+            }
+            else if (!err) {
+                response.status = true;
+                response.message = "No result found";
+                response.error = false;
+                response.data = null;
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while verifying OTP";
+                response.error = true;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+    }
+};
+
 
 module.exports = paceUsersCtrl;
