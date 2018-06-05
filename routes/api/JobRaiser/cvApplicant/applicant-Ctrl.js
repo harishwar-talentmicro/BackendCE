@@ -413,17 +413,19 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             output.push(res2);
                         }
 
-                        for (var p = 0; p < result[35].length; p++) {
-                            result[35][p].templateData = (result[35] && result[35][p]) ? JSON.parse(result[35] && result[35][p].templateData) : {};
-                        }
-                        var templateData = {};
-                        for (var i = 0; i < result[35][0].templateData.length; i++) {
-                            templateData[result[35][0].templateData[i].formId] = result[35][0].templateData[i];
-                            if(i==100){
-                                break;
+                        if (result[35].length){
+                            for (var p = 0; p < result[35].length; p++) {
+                                result[35][p].templateData = (result[35] && result[35][p]) ? JSON.parse(result[35] && result[35][p].templateData) : {};
                             }
+                            var templateData = {};
+                            for (var i = 0; i < result[35][0].templateData.length; i++) {
+                                templateData[result[35][0].templateData[i].formId] = result[35][0].templateData[i];
+                                if(i==100){
+                                    break;
+                                }
+                            }
+                            result[35][0].templateData = templateData;
                         }
-                        result[35][0].templateData = templateData;
 
                         response.data = {
                             jobType: result[0] ? result[0] : [],
