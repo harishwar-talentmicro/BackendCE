@@ -990,7 +990,8 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             pgEducationList: output1 ? output1 : [],
                             isDOBRequired: result[13][0].isDOBRequired ,
                             isIDRequired: result[13][0].isIDRequired ,
-                            IDType: result[13][0].IDType
+                            IDType: result[13][0].IDType,
+                            DOBType: result[13][0].DOBType
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
