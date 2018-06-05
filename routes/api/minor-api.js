@@ -386,13 +386,17 @@ cronJobMessage.start();
 
 
 
-cron.schedule('*/15 * * * *', function () {
-    var query = "call wm_integrationUrlForHircraft()";
+// cron.schedule('*/15 * * * *', function () {
+   
+    var cronJobInterview = new CronJob({
+        cronTime: '25 * * * * *',
+        onTick: function () {
+var query = "call wm_integrationUrlForHircraft()";
     db.query(query, function (err, result) {
         if (err) {
             console.log('error: integrationUrlForHircraft');
         }
-        else {
+        else if((result[0].length != 0) && (result[1].length != 0)){
             var heMasterId;
             var transId;
             var integrationFormData = {};
@@ -428,13 +432,13 @@ cron.schedule('*/15 * * * *', function () {
                     }
                 }
                 // console.log(response_server);
+                var count=0;
                 request({
                     url: DBUrl,
                     method: "POST",
                     json: true,   // <--Very important!!!
                     body: response_server
                 }, function (error, response, body) {
-
                     console.log(error);
                     console.log(body);
                     if (body && body.Code && body.Code == "SUCCESS0001") {
@@ -448,22 +452,35 @@ cron.schedule('*/15 * * * *', function () {
                             }
                         });
                     }
+                    count++;
                 });
+                console.log('tallint interview hit for ',count,' times');
             }
         }
     });
     console.log('Interview cron job running');
+},
+start: false,
+timeZone: 'America/Los_Angeles'
 });
+cronJobInterview.start();
+
+// });
 
 
-cron.schedule('*/15 * * * *', function () {
+// cron.schedule('*/15 * * * *', function () {
+
+
+    var cronJobWalkIn = new CronJob({
+        cronTime: '45 * * * * *',
+        onTick: function () {
     var query = "call wm_integrationUrlwalkIn()";
     db.query(query, function (err, result) {
         console.log('Running walkin cron job');
         if (err) {
             console.log('error: integrationUrlForHircraft');
         }
-        else {
+        else if((result[0].length != 0) && (result[1].length != 0)) {
             var heMasterId;
             var transId;
             var formData = {};
@@ -475,6 +492,7 @@ cron.schedule('*/15 * * * *', function () {
             formData = result[1][0].formData;
 
             // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
+            var count=0;
             request({
                 url: DBUrl,
                 method: "POST",
@@ -494,10 +512,19 @@ cron.schedule('*/15 * * * *', function () {
                         }
                     });
                 }
+                count++;
             });
+            console.log('tallint walkIn hit for ',count,' times');            
         }
     }
     });
+},
+start: false,
+timeZone: 'America/Los_Angeles'
 });
+cronJobWalkIn.start();
+
+
+// });
 
 module.exports = router;

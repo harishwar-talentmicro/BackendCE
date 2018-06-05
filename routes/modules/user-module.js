@@ -222,7 +222,7 @@ User.prototype.getCountry = function (req, res, next) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var langId = (!isNaN(parseInt(req.query.LangID))) ? (parseInt(req.query.LangID)) : 0;
         if (langId) {
-            var query = 'Select CountryID, CountryName, ISDCode from  mcountry where LangID=' + st.db.escape(langId);
+            var query = 'Select CountryID, CountryName, ISDCode,length from  mcountry where LangID=' + st.db.escape(langId);
             st.db.query(query, function (err, countryResult) {
                 if (!err) {
                     if (countryResult) {

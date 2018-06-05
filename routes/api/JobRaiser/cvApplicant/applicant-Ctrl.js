@@ -419,6 +419,9 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                         var templateData = {};
                         for (var i = 0; i < result[35][0].templateData.length; i++) {
                             templateData[result[35][0].templateData[i].formId] = result[35][0].templateData[i];
+                            if(i==100){
+                                break;
+                            }
                         }
                         result[35][0].templateData = templateData;
 
