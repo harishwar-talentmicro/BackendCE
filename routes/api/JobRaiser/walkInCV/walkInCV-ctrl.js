@@ -431,7 +431,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
                 req.body.IDNumber = (req.body.IDNumber) ? req.body.IDNumber : '';
                 // req.body.referedByUserId = (req.body.referedByUserId) ? req.body.referedByUserId : 0;
-
+                req.body.middleName = (req.body.middleName) ? req.body.middleName : '';
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -470,8 +470,9 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.profilePicture),
                     req.st.db.escape(DBSecretKey),
                     req.st.db.escape(JSON.stringify(walkInJobs)),
-                    req.st.db.escape(DOB),
-                    req.st.db.escape(IDNumber)
+                    req.st.db.escape(req.body.DOB),
+                    req.st.db.escape(req.body.IDNumber),
+                    req.st.db.escape(req.body.middleName)                    
                 ];
 
 
@@ -989,7 +990,8 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             pgEducationList: output1 ? output1 : [],
                             isDOBRequired: result[13][0].isDOBRequired ,
                             isIDRequired: result[13][0].isIDRequired ,
-                            IDType: result[13][0].IDType
+                            IDType: result[13][0].IDType,
+                            DOBType: result[13][0].DOBType
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -1410,6 +1412,10 @@ walkInCvCtrl.saveWalkInJobs = function (req, res, next) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 req.body.walkInJobId = req.body.walkInJobId ? req.body.walkInJobId : 0;
                 req.body.status = req.body.status ? req.body.status : 1;
+                req.body.DOBRequired = req.body.DOBRequired ? req.body.DOBRequired : 0;
+                req.body.IDRequired = req.body.IDRequired ? req.body.IDRequired : 0;
+                req.body.IDType = req.body.IDType ? req.body.IDType : "";
+                req.body.DOBType = req.body.DOBType ? req.body.DOBType : "";
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -1420,7 +1426,11 @@ walkInCvCtrl.saveWalkInJobs = function (req, res, next) {
                     req.st.db.escape(req.body.jobSummary),
                     req.st.db.escape(req.body.jobDescription),
                     req.st.db.escape(JSON.stringify(users)),
-                    req.st.db.escape(req.body.status)
+                    req.st.db.escape(req.body.status),
+                    req.st.db.escape(req.body.DOBRequired),
+                    req.st.db.escape(req.body.IDRequired),
+                    req.st.db.escape(req.body.IDType),
+                    req.st.db.escape(req.body.DOBType)                    
                 ];
 
                 var procQuery = 'CALL wm_save_walkinJobs( ' + inputs.join(',') + ')';
