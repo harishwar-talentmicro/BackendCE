@@ -15,4 +15,6 @@ router.post('/dashBoard',paceUsersCtrl.getdashBoard);
 router.post('/saveTrackerTemplate',paceUsersCtrl.saveTrackerTemplate);
 router.get('/baseFile',paceUsersCtrl.getBaseFile);
 
+router.post('/verifyotp',paceUsersCtrl.toVerifyOtp);
+
 module.exports = router;
