@@ -195,6 +195,13 @@ applicantCtrl.saveApplicant = function (req, res, next) {
     if (!functionalAreas) {
         functionalAreas = [];
     }
+    var requirementArray = req.body.requirementArray;
+    if (typeof (requirementArray) == "string") {
+        requirementArray = JSON.parse(requirementArray);
+    }
+    if (!requirementArray) {
+        requirementArray = [];
+    }
 
     if (!validationFlag) {
         response.error = error;
@@ -298,7 +305,8 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(req.body.reqAppId),
                             req.st.db.escape(req.body.clientCvPath),
                             req.st.db.escape(JSON.stringify(functionalAreas)),
-                            req.st.db.escape(req.body.importerFlag)
+                            req.st.db.escape(req.body.importerFlag),
+                            req.st.db.escape(JSON.stringify(requirementArray)),
                         ];
 
                         var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data

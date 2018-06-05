@@ -274,7 +274,7 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                 req.body.priority = req.body.priority ? req.body.priority : 1;
                 req.body.taskDateTime = req.body.taskDateTime ? req.body.taskDateTime : null;
                 req.body.taskEndDate = req.body.taskEndDate ? req.body.taskEndDate : null;
-                req.body.status = req.body.status ? req.body.status : 0;
+                req.body.status = req.body.status ? req.body.status : 0;  // 0 pending ,1- completed
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -304,7 +304,15 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                             result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
                             result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
                         }
-                        response.data = result[0];
+
+                        for (var i = 0; i < result[1].length; i++) {
+                            result[1][i].anchor = result[1][i].anchor ? JSON.parse(result[1][i].anchor) : {};
+                            result[1][i].venue = result[1][i].venue ? JSON.parse(result[1][i].venue) : {};
+                        }
+                        response.data = {
+                            pendingTasks:result[0],
+                            tasks: result[1]
+                        }
                         res.status(200).json(response);
                     }
                     else {
@@ -368,9 +376,15 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
                             result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
                             result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
                         }
+
+                        for (var i = 0; i < result[1].length; i++) {
+                            result[1][i].anchor = result[1][i].anchor ? JSON.parse(result[1][i].anchor) : {};
+                            result[1][i].venue = result[1][i].venue ? JSON.parse(result[1][i].venue) : {};
+                        }
                         response.data =
                             {
-                                tasks: result[0]
+                                pendingTasks:result[0],
+                                tasks: result[1]
                             };
                         res.status(200).json(response);
                     }

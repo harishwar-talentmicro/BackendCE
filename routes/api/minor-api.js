@@ -387,81 +387,81 @@ cronJobMessage.start();
 
 
 // cron.schedule('*/15 * * * *', function () {
-   
-    var cronJobInterview = new CronJob({
-        cronTime: '25 * * * * *',
-        onTick: function () {
-var query = "call wm_integrationUrlForHircraft()";
-    db.query(query, function (err, result) {
-        if (err) {
-            console.log('error: integrationUrlForHircraft');
-        }
-        else if((result[0].length != 0) && (result[1].length != 0)){
-            var heMasterId;
-            var transId;
-            var integrationFormData = {};
-            var DBUrl;
-            // console.log(result);
-            if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
-                heMasterId = result[0][0].heMasterId;
-                DBUrl = result[0][0].url;
-                transId = result[1][0].transId;
-                var response_server = (result[1][0].integrationFormdata);
-                // console.log(response_server);
-                if (typeof (response_server) == "string") {
-                    response_server = JSON.parse(response_server);
-                }
 
-                if (typeof (response_server.assessment) == 'string') {
-                    response_server.assessment = JSON.parse(response_server.assessment);
-                }
-
-                if (typeof (response_server.assessment.integrationAssessmentDetails) == 'string') {
-                    response_server.assessment.integrationAssessmentDetails = JSON.parse(response_server.assessment.integrationAssessmentDetails);
-                }
-
-                for (var r = 0; r < response_server.assessment.integrationAssessmentDetails.length; r++) {
-
-                    if (typeof (response_server.assessment.integrationAssessmentDetails[r].integrationQuestions) == 'string') {
-                        response_server.assessment.integrationAssessmentDetails[r].integrationQuestions = JSON.parse(response_server.assessment.integrationAssessmentDetails[r].integrationQuestions);
+var cronJobInterview = new CronJob({
+    cronTime: '25 * * * * *',
+    onTick: function () {
+        var query = "call wm_integrationUrlForHircraft()";
+        db.query(query, function (err, result) {
+            if (err) {
+                console.log('error: integrationUrlForHircraft');
+            }
+            else if ((result[0].length != 0) && (result[1].length != 0)) {
+                var heMasterId;
+                var transId;
+                var integrationFormData = {};
+                var DBUrl;
+                // console.log(result);
+                if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
+                    heMasterId = result[0][0].heMasterId;
+                    DBUrl = result[0][0].url;
+                    transId = result[1][0].transId;
+                    var response_server = (result[1][0].integrationFormdata);
+                    // console.log(response_server);
+                    if (typeof (response_server) == "string") {
+                        response_server = JSON.parse(response_server);
                     }
-                    for (var s = 0; s < response_server.assessment.integrationAssessmentDetails[r].integrationQuestions.length; s++) {
-                        if (typeof (response_server.assessment.integrationAssessmentDetails[r].integrationQuestions[s].integrationselectedOption) == 'string') {
-                            response_server.assessment.integrationAssessmentDetails[r].integrationQuestions[s].integrationselectedOption = JSON.parse(response_server.assessment.integrationAssessmentDetails[r].integrationQuestions[s].integrationselectedOption);
+
+                    if (typeof (response_server.assessment) == 'string') {
+                        response_server.assessment = JSON.parse(response_server.assessment);
+                    }
+
+                    if (typeof (response_server.assessment.integrationAssessmentDetails) == 'string') {
+                        response_server.assessment.integrationAssessmentDetails = JSON.parse(response_server.assessment.integrationAssessmentDetails);
+                    }
+
+                    for (var r = 0; r < response_server.assessment.integrationAssessmentDetails.length; r++) {
+
+                        if (typeof (response_server.assessment.integrationAssessmentDetails[r].integrationQuestions) == 'string') {
+                            response_server.assessment.integrationAssessmentDetails[r].integrationQuestions = JSON.parse(response_server.assessment.integrationAssessmentDetails[r].integrationQuestions);
+                        }
+                        for (var s = 0; s < response_server.assessment.integrationAssessmentDetails[r].integrationQuestions.length; s++) {
+                            if (typeof (response_server.assessment.integrationAssessmentDetails[r].integrationQuestions[s].integrationselectedOption) == 'string') {
+                                response_server.assessment.integrationAssessmentDetails[r].integrationQuestions[s].integrationselectedOption = JSON.parse(response_server.assessment.integrationAssessmentDetails[r].integrationQuestions[s].integrationselectedOption);
+                            }
                         }
                     }
+                    // console.log(response_server);
+                    var count = 0;
+                    request({
+                        url: DBUrl,
+                        method: "POST",
+                        json: true,   // <--Very important!!!
+                        body: response_server
+                    }, function (error, response, body) {
+                        console.log(error);
+                        console.log(body);
+                        if (body && body.Code && body.Code == "SUCCESS0001") {
+                            var updateQuery = "update 1014_trans set sync=1 where heParentId=" + transId;
+                            db.query(updateQuery, function (err, results) {
+                                if (err) {
+                                    console.log("update sync query throws error");
+                                }
+                                else {
+                                    console.log("sync is updated to 1 successfully", transId);
+                                }
+                            });
+                        }
+                        count++;
+                    });
+                    console.log('tallint interview hit for ', count, ' times');
                 }
-                // console.log(response_server);
-                var count=0;
-                request({
-                    url: DBUrl,
-                    method: "POST",
-                    json: true,   // <--Very important!!!
-                    body: response_server
-                }, function (error, response, body) {
-                    console.log(error);
-                    console.log(body);
-                    if (body && body.Code && body.Code == "SUCCESS0001") {
-                        var updateQuery = "update 1014_trans set sync=1 where heParentId=" + transId;
-                        db.query(updateQuery, function (err, results) {
-                            if (err) {
-                                console.log("update sync query throws error");
-                            }
-                            else {
-                                console.log("sync is updated to 1 successfully", transId);
-                            }
-                        });
-                    }
-                    count++;
-                });
-                console.log('tallint interview hit for ',count,' times');
             }
-        }
-    });
-    console.log('Interview cron job running');
-},
-start: false,
-timeZone: 'America/Los_Angeles'
+        });
+        console.log('Interview cron job running');
+    },
+    start: false,
+    timeZone: 'America/Los_Angeles'
 });
 cronJobInterview.start();
 
@@ -471,56 +471,56 @@ cronJobInterview.start();
 // cron.schedule('*/15 * * * *', function () {
 
 
-    var cronJobWalkIn = new CronJob({
-        cronTime: '45 * * * * *',
-        onTick: function () {
-    var query = "call wm_integrationUrlwalkIn()";
-    db.query(query, function (err, result) {
-        console.log('Running walkin cron job');
-        if (err) {
-            console.log('error: integrationUrlForHircraft');
-        }
-        else if((result[0].length != 0) && (result[1].length != 0)) {
-            var heMasterId;
-            var transId;
-            var formData = {};
-            var DBUrl;
-            if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
-            heMasterId = result[0][0].heMasterId;
-            DBUrl = result[0][0].url;
-            transId = result[1][0].transId;
-            formData = result[1][0].formData;
+var cronJobWalkIn = new CronJob({
+    cronTime: '45 * * * * *',
+    onTick: function () {
+        var query = "call wm_integrationUrlwalkIn()";
+        db.query(query, function (err, result) {
+            console.log('Running walkin cron job');
+            if (err) {
+                console.log('error: integrationUrlForHircraft');
+            }
+            else if ((result[0].length != 0) && (result[1].length != 0)) {
+                var heMasterId;
+                var transId;
+                var formData = {};
+                var DBUrl;
+                if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
+                    heMasterId = result[0][0].heMasterId;
+                    DBUrl = result[0][0].url;
+                    transId = result[1][0].transId;
+                    formData = result[1][0].formData;
 
-            // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
-            var count=0;
-            request({
-                url: DBUrl,
-                method: "POST",
-                json: true,   // <--Very important!!!
-                body: JSON.parse(formData)
-            }, function (error, response, body) {
-                console.log(error);
-                console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
-                if (body && body.Code && ((body.Code == "SAVED") || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "INFO_03") || (body.Code == "ERR_07") || (body.Code == "ERR_08"))) {
-                    var updateQuery = "update 1039_trans set sync=1 where heParentId=" + transId;
-                    db.query(updateQuery, function (err, results) {
-                        if (err) {
-                            console.log("update sync query throws error");
+                    // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
+                    var count = 0;
+                    request({
+                        url: DBUrl,
+                        method: "POST",
+                        json: true,   // <--Very important!!!
+                        body: JSON.parse(formData)
+                    }, function (error, response, body) {
+                        console.log(error);
+                        console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
+                        if (body && body.Code && ((body.Code == "SAVED") || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "INFO_03") || (body.Code == "ERR_07") || (body.Code == "ERR_08"))) {
+                            var updateQuery = "update 1039_trans set sync=1 where heParentId=" + transId;
+                            db.query(updateQuery, function (err, results) {
+                                if (err) {
+                                    console.log("update sync query throws error");
+                                }
+                                else {
+                                    console.log("sync is updated to 1 successfully of transId", transId);
+                                }
+                            });
                         }
-                        else {
-                            console.log("sync is updated to 1 successfully of transId", transId);
-                        }
+                        count++;
                     });
+                    console.log('tallint walkIn hit for ', count, ' times');
                 }
-                count++;
-            });
-            console.log('tallint walkIn hit for ',count,' times');            
-        }
-    }
-    });
-},
-start: false,
-timeZone: 'America/Los_Angeles'
+            }
+        });
+    },
+    start: false,
+    timeZone: 'America/Los_Angeles'
 });
 cronJobWalkIn.start();
 
