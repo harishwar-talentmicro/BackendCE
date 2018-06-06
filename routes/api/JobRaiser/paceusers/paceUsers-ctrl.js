@@ -271,7 +271,7 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 req.body.taskId = req.body.taskId ? req.body.taskId : 0;
-                req.body.priority = req.body.priority ? req.body.priority : 1;
+                req.body.priority = req.body.priority ? req.body.priority : 0;
                 req.body.taskDateTime = req.body.taskDateTime ? req.body.taskDateTime : null;
                 req.body.taskEndDate = req.body.taskEndDate ? req.body.taskEndDate : null;
                 req.body.status = req.body.status ? req.body.status : 0;  // 0 pending ,1- completed
@@ -606,6 +606,7 @@ paceUsersCtrl.saveTrackerTemplate = function (req, res, next) {
 paceUsersCtrl.getBaseFile = function (req, res, next) {
     var response = {
         status: false,
+        code:null,
         message: "bas64 File",
         data: null,
         error: null
@@ -711,6 +712,7 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
             if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].error=="user already exist") {
                 response.status = false;
                 response.message = result[0][0].message;
+                response.code =100;
                 response.error = false;
                 response.data = {
                     message: result[1][0].error
@@ -718,9 +720,10 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
                 res.status(200).json(response);
             }
 
-            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].success== "user does not exist") {
+            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].success== "paceuser does not exist") {
                 response.status = true;
                 response.message = result[1][0].success;
+                response.code =200;
                 response.error = false;
                 response.data = {
                     userDetails: result[2][0]
@@ -731,6 +734,7 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
             else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].success== "user does not exist in whatmate") {
                 response.status = true;
                 response.message = result[1][0].success;
+                response.code =300;
                 response.error = false;
                 response.data = null;
                 res.status(200).json(response);
@@ -740,6 +744,7 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
                 response.status = false;
                 response.message = result[0][0].message;
                 response.error = false;
+                response.code =400;
                 response.data = {
                     message: result[0][0].message
                 };
@@ -748,6 +753,7 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
             else if (!err) {
                 response.status = true;
                 response.message = "No result found";
+                response.code =600;
                 response.error = false;
                 response.data = null;
                 res.status(200).json(response);
@@ -756,6 +762,7 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
                 response.status = false;
                 response.message = "Error while verifying OTP";
                 response.error = true;
+                response.code =500;
                 response.data = null;
                 res.status(500).json(response);
             }

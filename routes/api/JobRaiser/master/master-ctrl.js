@@ -2137,6 +2137,8 @@ masterCtrl.saveUserManager = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
+
+                
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 req.query.apiKey = req.query.apiKey ? req.query.apiKey : 0;
                 req.body.userMasterId = req.body.userMasterId ? req.body.userMasterId : 0;
@@ -2154,7 +2156,9 @@ masterCtrl.saveUserManager = function (req, res, next) {
                 req.body.gradeId = req.body.gradeId ? req.body.gradeId : 0;
                 req.body.workGroupId = req.body.workGroupId ? req.body.workGroupId : 0;
                 req.body.RMId = req.body.RMId ? req.body.RMId : 0;
-                req.body.RMId = req.body.RMId ? req.body.exitDate : 0;
+                req.body.exitDate = req.body.exitDate ? req.body.exitDate : 0;
+                req.body.password = req.body.password ? req.body.password : '';
+                var encryptPwd = req.st.hashPassword(req.body.password);
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -2182,7 +2186,8 @@ masterCtrl.saveUserManager = function (req, res, next) {
                     req.st.db.escape(req.body.RMId),
                     req.st.db.escape(req.body.exitDate),
                     req.st.db.escape(req.body.joiningDate),
-                    req.st.db.escape(DBSecretKey)
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(encryptPwd)
                 ];
                 var procQuery = 'CALL save_Pace_User( ' + inputs.join(',') + ')';
                 console.log(procQuery);

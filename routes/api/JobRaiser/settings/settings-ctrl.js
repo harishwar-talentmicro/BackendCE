@@ -205,7 +205,7 @@ settingsCtrl.saveAccessrightsTemplate = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result) {
+                    if (!err && result[0]) {
                         response.status = false;
                         response.message = "TemplateName already exist";
                         response.error = null;
