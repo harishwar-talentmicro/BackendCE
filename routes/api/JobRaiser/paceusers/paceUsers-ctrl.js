@@ -707,7 +707,7 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
         console.log(procQuery);
         req.db.query(procQuery, function (err, result) {
             console.log(err);
-            console.log(result);
+            // console.log(result);
             if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].error=="user already exist") {
                 response.status = false;
                 response.message = result[0][0].message;
@@ -718,7 +718,7 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
                 res.status(200).json(response);
             }
 
-            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].success== "user does not exist") {
+            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].success == "user does not exist") {
                 response.status = true;
                 response.message = result[1][0].success;
                 response.error = false;

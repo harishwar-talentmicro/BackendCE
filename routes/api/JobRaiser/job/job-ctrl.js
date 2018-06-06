@@ -1390,7 +1390,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                         heUserId: results[0][0].heUserId,
                                         formData: JSON.parse(results[0][0].formDataJSON)
                                     },
-                                    requirementList: results[2]
+                                    requirementList: (results && results[2] && results[2][0]) ? results[2]:[],
+                                    jdTemplateList:(results && results[3] && results[3][0]) ? results[3] :[]
                                 };
                                 if (isWeb == 0) {
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

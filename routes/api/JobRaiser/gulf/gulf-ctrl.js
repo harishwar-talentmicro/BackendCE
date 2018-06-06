@@ -176,8 +176,11 @@ gulfCtrl.getMedical = function (req, res, next) {
                         response.status = true;
                         response.message = "Medical data loaded successfully";
                         response.error = null;
-                        response.data = {
-                           
+
+                        Result[0][0].currency=(Result[0] && Result[0][0]) ? JSON.parse(Result[0][0].currency):{};
+                        Result[0][0].scale=(Result[0] && Result[0][0]) ? JSON.parse(Result[0][0].scale):{};
+
+                        response.data = {   
                             medicalDetails: Result[0][0]
                         };
                         res.status(200).json(response);

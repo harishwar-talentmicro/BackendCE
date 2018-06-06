@@ -18,5 +18,7 @@ router.post('/saveWalkInJob',walkInCvCtrl.saveWalkInJobs);
 router.get('/getwalkInJobList',walkInCvCtrl.getWalkinJoblist);
 router.get('/getUserList',walkInCvCtrl.getUsersOnSearch);
 
+router.post('/visitorCheckIn',walkInCvCtrl.saveVisitorCheckIn);
+
 
 module.exports = router;
