@@ -670,6 +670,7 @@ User.prototype.changePassword = function (req, res, next) {
 
         var RtnMessage = {
             status: true,
+            error:null,
             message: "Invalid token",
             IsChanged: false
         };

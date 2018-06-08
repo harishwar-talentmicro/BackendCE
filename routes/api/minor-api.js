@@ -387,7 +387,7 @@ cronJobMessage.start();
 
 
 // cron.schedule('*/15 * * * *', function () {
-/*
+
 var cronJobInterview = new CronJob({
     cronTime: '25 * * * * *',
     onTick: function () {
@@ -464,13 +464,13 @@ var cronJobInterview = new CronJob({
     timeZone: 'America/Los_Angeles'
 });
 cronJobInterview.start();
-*/
+
 // });
 
 
 // cron.schedule('*/15 * * * *', function () {
 
-/*
+
 var cronJobWalkIn = new CronJob({
     cronTime: '45 * * * * *',
     onTick: function () {
@@ -523,7 +523,7 @@ var cronJobWalkIn = new CronJob({
     timeZone: 'America/Los_Angeles'
 });
 cronJobWalkIn.start();
-*/
+
 
 // });
 

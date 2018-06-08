@@ -146,7 +146,8 @@ var error = {};
 
 var candidateDetailsHirecraft;
 var cloudUrl;
-var attachFile = new Promise(function (resolve, reject) {
+
+/*var attachFile = new Promise(function (resolve, reject) {
 
     var CVFile=candidateDetailsHirecraft.cvFile;
     var CVFileType=candidateDetailsHirecraft.cvFileType;
@@ -182,7 +183,7 @@ var attachFile = new Promise(function (resolve, reject) {
         }
         fs.unlinkSync('Resume.'+ CVFileType);
     });
-});
+});*/
 
 walkInCvCtrl.getmasterData = function (req, res, next) {
     var response = {
@@ -1267,11 +1268,11 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                     candidateDetailsHirecraft=candidateDetails;
                                     console.log(candidateDetailsHirecraft)
 
-                                    attachFile.then(function (resp) {
+                                    // attachFile.then(function (resp) {
 
-                                        candidateDetails.cvFile=cloudUrl;
+                                    //     candidateDetails.cvFile=cloudUrl;
 
-                                        console.log(candidateDetails);
+                                    //     console.log(candidateDetails);
                                         
 
                                         req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
@@ -1427,7 +1428,7 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                                 res.status(500).json(response);
                                             }
                                         });
-                                     });
+                                    //  });
 
 
                                 }  // loginDetails[0] closes here
@@ -1835,7 +1836,7 @@ walkInCvCtrl.saveVisitorCheckIn = function(req,res,next){
                         req.db.query(procQuery,function(err,results){
                             console.log(err);
                             if(!err && results && results[0] ){
-                                senderGroupId = results[0][0].senderId;
+                                // senderGroupId = results[0][0].senderId;
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                 //     senderName : results[0][0].message
                                 // });
@@ -1898,39 +1899,40 @@ walkInCvCtrl.saveVisitorCheckIn = function(req,res,next){
                                 //         console.log('postNotification : notification for compose_message is sent successfully');
                                 //     }
                                 // }
-                                notifyMessages.getMessagesNeedToNotify();
+                                // notifyMessages.getMessagesNeedToNotify();
                                 response.status = true;
                                 response.message = "Visitor data saved successfully";
                                 response.error = null;
-                                response.data = {
-                                    messageList: {
-                                        messageId: results[0][0].messageId,
-                                        message: results[0][0].message,
-                                        messageLink: results[0][0].messageLink,
-                                        createdDate: results[0][0].createdDate,
-                                        messageType: results[0][0].messageType,
-                                        messageStatus: results[0][0].messageStatus,
-                                        priority: results[0][0].priority,
-                                        senderName: results[0][0].senderName,
-                                        senderId: results[0][0].senderId,
-                                        receiverId: results[0][0].receiverId,
-                                        transId : results[0][0].transId,
-                                        formId : results[0][0].formId,
-                                        groupId: req.body.groupId,
-                                        currentStatus : results[0][0].currentStatus,
-                                        currentTransId : results[0][0].currentTransId,
-                                        localMessageId : req.body.localMessageId,
-                                        parentId : results[0][0].parentId,
-                                        accessUserType : results[0][0].accessUserType,
-                                        heUserId : results[0][0].heUserId,
-                                        formData : JSON.parse(results[0][0].formDataJSON)
-                                    }
-                                };
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                response.data = null;
+                                // {
+                                //     messageList: {
+                                //         messageId: results[0][0].messageId,
+                                //         message: results[0][0].message,
+                                //         messageLink: results[0][0].messageLink,
+                                //         createdDate: results[0][0].createdDate,
+                                //         messageType: results[0][0].messageType,
+                                //         messageStatus: results[0][0].messageStatus,
+                                //         priority: results[0][0].priority,
+                                //         senderName: results[0][0].senderName,
+                                //         senderId: results[0][0].senderId,
+                                //         receiverId: results[0][0].receiverId,
+                                //         transId : results[0][0].transId,
+                                //         formId : results[0][0].formId,
+                                //         groupId: req.body.groupId,
+                                //         currentStatus : results[0][0].currentStatus,
+                                //         currentTransId : results[0][0].currentTransId,
+                                //         localMessageId : req.body.localMessageId,
+                                //         parentId : results[0][0].parentId,
+                                //         accessUserType : results[0][0].accessUserType,
+                                //         heUserId : results[0][0].heUserId,
+                                //         formData : JSON.parse(results[0][0].formDataJSON)
+                                //     }
+                                // };
+                                // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                // zlib.gzip(buf, function (_, result) {
+                                //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(response);
-                                });
+                                // });
                             }
                             else{
                                 response.status = false;
@@ -2139,6 +2141,76 @@ walkInCvCtrl.getMaster = function (req, res, next) {
                     else {
                         response.status = false;
                         response.message = "Error while loading Master data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+walkInCvCtrl.getvisitorTrackerPdf = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.startDate),
+                    req.st.db.escape(req.query.endDate)
+                ];
+
+                var procQuery = 'CALL wm_get_visitorTrackerpdf( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Visitor list loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            companyDetails: (result && result[0]) ? result[0][0]: {},
+                            visitorList: (result && result[1]) ?  result[1]:[]  
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Visitor list loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            companyDetails: {},
+                            visitorList: []  
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading visitor list";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

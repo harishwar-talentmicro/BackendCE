@@ -2347,12 +2347,12 @@ sendgridCtrl.clientMailerPreview = function (req, res, next) {
         tags = [];
     }
 
-    var client = req.body.clientId;
-    if (typeof (client) == "string") {
-        client = JSON.parse(client);
+    var clientContacts = req.body.clientContacts;
+    if (typeof (clientContacts) == "string") {
+        clientContacts = JSON.parse(clientContacts);
     }
-    if (!client) {
-        client = [];
+    if (!clientContacts) {
+        clientContacts = [];
     }
 
     var validationFlag = true;
@@ -2369,10 +2369,10 @@ sendgridCtrl.clientMailerPreview = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(client))
+                    req.st.db.escape(JSON.stringify(clientContacts))
                 ];
                 var idArray;
-                idArray = client;
+                idArray = clientContacts;
                 // idArray.sort(function(a,b){return a-b});
                 var mailbody_array = [];
                 var subject_array = [];
@@ -2391,12 +2391,12 @@ sendgridCtrl.clientMailerPreview = function (req, res, next) {
 
                         for (var clientIndex = 0; clientIndex < idArray.length; clientIndex++) {
 
-                            for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-                                mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+                            for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+                                mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
 
-                                subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+                                subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
 
-                                smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+                                smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
                             }
                             mailbody_array.push(mailBody);
                             subject_array.push(subject);
@@ -2484,7 +2484,7 @@ sendgridCtrl.clientMailer = function (req, res, next) {
     var attachment = req.body.attachment || [];
     var reqApplicants = req.body.reqApplicants || [];
     var applicants = req.body.applicantId || [];
-    var client = req.body.clientId || [];
+    var clientContacts = req.body.clientContacts || [];
     var tableTags = req.body.tableTags || {};
     var clientContacts = req.body.clientContacts || [];
     var subject = req.body.subject || '';
@@ -2535,20 +2535,20 @@ sendgridCtrl.clientMailer = function (req, res, next) {
         attachment = JSON.parse(attachment);
     }
 
-    if (typeof (client) == "string") {
-        client = JSON.parse(client);
-    }
-
     if (typeof (clientContacts) == "string") {
         clientContacts = JSON.parse(clientContacts);
     }
+
+    // if (typeof (clientContacts) == "string") {
+    //     clientContacts = JSON.parse(clientContacts);
+    // }
 
     if (typeof (tableTags) == "string") {
         tableTags = JSON.parse(tableTags);
     }
 
     //check for mail type and assign the recipients
-    emailReceivers = clientId;
+    emailReceivers = clientContacts;
     // emailReceivers.sort(function(a,b){return a-b});
 
     if (!validationFlag) {
@@ -2565,7 +2565,7 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                     var inputs = [
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.query.heMasterId),
-                        req.st.db.escape(JSON.stringify(clientId))
+                        req.st.db.escape(JSON.stringify(clientContacts))
 
                     ];
 
@@ -2580,12 +2580,12 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                             console.log('result of pacemailer procedure', result[0]);
                             for (var clientIndex = 0; clientIndex < emailReceivers.length; clientIndex++) {
 
-                                for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-                                    mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+                                for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+                                    mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
     
-                                    subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+                                    subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
     
-                                    smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+                                    smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
                                 }
 
                                 mailbody_array.push(mailBody);
