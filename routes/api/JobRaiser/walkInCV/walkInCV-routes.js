@@ -26,7 +26,7 @@ router.get('/visitorMaster',walkInCvCtrl.getMaster);
 
 router.post('/visitorListPdf',walkInCvCtrl.getvisitorTrackerPdf);
 router.post('/visitorCheckOut',walkInCvCtrl.checkOUT);
-
+router.get('/visitorForceCheckOut',walkInCvCtrl.forceCheckOUT);
 
 
 module.exports = router;
