@@ -23,4 +23,7 @@ router.post('/visitorCheckIn',walkInCvCtrl.saveVisitorCheckIn);
 router.get('/visitor',walkInCvCtrl.getvisitorTracker);
 router.post('/userData',walkInCvCtrl.getUser);
 router.get('/visitorMaster',walkInCvCtrl.getMaster);
+
+router.post('/visitorListPdf',walkInCvCtrl.getvisitorTrackerPdf);
+
 module.exports = router;
