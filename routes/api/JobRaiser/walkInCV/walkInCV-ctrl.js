@@ -2219,4 +2219,68 @@ walkInCvCtrl.getvisitorTrackerPdf = function (req, res, next) {
 
 };
 
+
+walkInCvCtrl.checkOUT = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.body.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.heMasterId),
+                    req.st.db.escape(req.body.mobileISD),
+                    req.st.db.escape(req.body.mobileNumber),
+                    req.st.db.escape(DBSecretKey)
+                ];
+
+                var procQuery = 'CALL wm_get_checkOut( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result ) {
+                        response.status = true;
+                        response.message = "Visitor Checked OUT successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while  Visitor Checked OUT";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 module.exports = walkInCvCtrl;

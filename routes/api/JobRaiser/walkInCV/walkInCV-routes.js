@@ -25,5 +25,8 @@ router.post('/userData',walkInCvCtrl.getUser);
 router.get('/visitorMaster',walkInCvCtrl.getMaster);
 
 router.post('/visitorListPdf',walkInCvCtrl.getvisitorTrackerPdf);
+router.post('/visitorCheckOut',walkInCvCtrl.checkOUT);
+
+
 
 module.exports = router;
