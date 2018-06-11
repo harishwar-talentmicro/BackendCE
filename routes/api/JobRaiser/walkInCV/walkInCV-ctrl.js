@@ -1101,7 +1101,9 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             isDOBRequired: result[13][0].isDOBRequired,
                             isIDRequired: result[13][0].isIDRequired,
                             IDType: result[13][0].IDType,
-                            DOBType: result[13][0].DOBType
+                            DOBType: result[13][0].DOBType,
+                            visitorwalkinRegistrationtype:result[14][0].registrationType,
+                            vendorDetails:(result && result[15]) ? result[15] : [],
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -2397,7 +2399,7 @@ walkInCvCtrl.forceCheckOUT = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.body.heMasterId) {
+    if (!req.query.heMasterId) {
         error.heMasterId = 'Invalid heMasterId';
         validationFlag *= false;
     }
