@@ -638,12 +638,12 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                                 mailOptions.cc = [];
 
                                 for (var j = 0; j < cc.length; j++) {
-                                    mailOptions.cc.push(cc[j].email);
+                                    mailOptions.cc.push(cc[j].emailId);
                                 }
                                 mailOptions.bcc = [];
 
                                 for (var j = 0; j < bcc.length; j++) {
-                                    mailOptions.bcc.push(bcc[j].email);
+                                    mailOptions.bcc.push(bcc[j].emailId);
                                 }
 
                                 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
@@ -1345,12 +1345,12 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                 mailOptions.cc = [];
 
                                 for (var j = 0; j < cc.length; j++) {
-                                    mailOptions.cc.push(cc[j].email);
+                                    mailOptions.cc.push(cc[j].emailId);
                                 }
                                 mailOptions.bcc = [];
 
                                 for (var j = 0; j < bcc.length; j++) {
-                                    mailOptions.bcc.push(bcc[j].email);
+                                    mailOptions.bcc.push(bcc[j].emailId);
                                 }
 
                                 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
@@ -1826,7 +1826,7 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
     var overWrite = req.body.overWrite || 0;
     var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
     var templateId = req.body.template ? req.body.template.templateId : undefined;
-    var trackerTemplate = req.body.trackerTemplate || {};
+    var trackerTemplate = req.body.trackerTemplate;
     var tags = req.body.tags || {};
     var cc = req.body.cc || [];
     var toMail = req.body.toMail || [];
@@ -2054,12 +2054,12 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                 mailOptions.cc = [];
 
                                 for (var j = 0; j < cc.length; j++) {
-                                    mailOptions.cc.push(cc[j].email);
+                                    mailOptions.cc.push(cc[j].emailId);
                                 }
                                 mailOptions.bcc = [];
 
                                 for (var j = 0; j < bcc.length; j++) {
-                                    mailOptions.bcc.push(bcc[j].email);
+                                    mailOptions.bcc.push(bcc[j].emailId);
                                 }
 
                                 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
@@ -2612,12 +2612,12 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                                 mailOptions.cc = [];
 
                                 for (var j = 0; j < cc.length; j++) {
-                                    mailOptions.cc.push(cc[j].email);
+                                    mailOptions.cc.push(cc[j].emailId);
                                 }
                                 mailOptions.bcc = [];
 
                                 for (var j = 0; j < bcc.length; j++) {
-                                    mailOptions.bcc.push(bcc[j].email);
+                                    mailOptions.bcc.push(bcc[j].emailId);
                                 }
 
                                 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
@@ -3403,12 +3403,12 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                 mailOptions.cc = [];
 
                                 for (var j = 0; j < cc.length; j++) {
-                                    mailOptions.cc.push(cc[j].email);
+                                    mailOptions.cc.push(cc[j].emailId);
                                 }
                                 mailOptions.bcc = [];
 
                                 for (var j = 0; j < bcc.length; j++) {
-                                    mailOptions.bcc.push(bcc[j].email);
+                                    mailOptions.bcc.push(bcc[j].emailId);
                                 }
 
                                 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
