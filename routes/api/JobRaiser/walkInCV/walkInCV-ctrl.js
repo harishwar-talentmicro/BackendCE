@@ -471,6 +471,15 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
     if (!currency) {
         currency = {};
     }
+
+    var userDetails = req.body.userDetails;
+    if (typeof (userDetails) == "string") {
+        userDetails = JSON.parse(currency);
+    }
+    if (!userDetails) {
+        userDetails = {};
+    }
+
     var scale = req.body.scale;
     if (typeof (scale) == "string") {
         scale = JSON.parse(scale);
@@ -561,7 +570,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.receiverCount),
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(req.body.walkInType),
-                    req.st.db.escape(req.body.userId),
+                    req.st.db.escape(JSON.stringify(userDetails)),
                     req.st.db.escape(JSON.stringify(location)),
                     req.st.db.escape(req.body.profilePicture),
                     req.st.db.escape(DBSecretKey),
@@ -1979,7 +1988,8 @@ walkInCvCtrl.getvisitorTracker = function (req, res, next) {
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.date)
                 ];
 
                 var procQuery = 'CALL wm_get_visitorTracker( ' + inputs.join(',') + ')';
