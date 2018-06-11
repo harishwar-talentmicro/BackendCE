@@ -473,7 +473,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             reasons: result[31] ? result[31] : [],
                             reportingTo: result[32] ? result[32] : [],
                             functionalAreas: result[34] ? result[34] : [],
-                            accessRightsTemplateDetails: result[35] ? result[35] : []
+                            accessRightsTemplateDetails: result[35] ? result[35] : [],
+                            layout : (result && result[36] && result[36][0]) ? JSON.parse(result[36][0].layout):{}
                         };
 
                         if (req.query.isWeb == 0) {
@@ -530,7 +531,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             reasons: [],
                             reportingTo: [],
                             functionalAreas: [],
-                            accessRightsTemplateDetails: []
+                            accessRightsTemplateDetails: [],
+                            layout:{}
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

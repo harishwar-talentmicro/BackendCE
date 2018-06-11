@@ -16,5 +16,6 @@ router.post('/saveTrackerTemplate',paceUsersCtrl.saveTrackerTemplate);
 router.get('/baseFile',paceUsersCtrl.getBaseFile);
 
 router.post('/verifyotp',paceUsersCtrl.toVerifyOtp);
+router.post('/saveLayout',paceUsersCtrl.saveLayout);
 
 module.exports = router;
