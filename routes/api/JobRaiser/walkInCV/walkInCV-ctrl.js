@@ -17,6 +17,8 @@ var htmlpdf = require('html-pdf');
 var Mailer = require('../../../../mail/mailer.js');
 var mailerApi = new Mailer();
 
+var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+
 
 var request = require('request');
 var path = require('path');
@@ -47,6 +49,7 @@ var options = {
 var Mailer = require('../../../../mail/mailer.js');
 var mailerApi = new Mailer();
 var randomstring = require("randomstring");
+
 
 try {
     bcrypt = require('bcrypt');
@@ -693,6 +696,25 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
 
                     }
                     else if (!err && (results[1] || results[2] && results[3])) {
+                        
+                        var mailContent = "Dear [FirstName] <br>Thank you for registering your profile.  We will revert to you once we find your Resume match one of the requirements we have.In the mean time, please [ClickHere] to upload your latest CV that will help us with more detailed information about your profile.<br><br>Wishing you all the best<br><br>[WalkINSignature]<br>[Disclaimer]";
+                        mailContent = mailContent.replace("[FirstName]", req.body.firstName);
+                        mailContent = mailContent.replace("[FullName]", (req.body.firstName + ' ' + req.body.middleName + ' ' + req.body.lastName));
+
+                        var email = new sendgrid.Email();
+                        email.from = results[4][0].fromEmailId;
+                        email.to = req.body.emailId;
+                        email.subject = "Congratulations for the successful Registration of your profile";
+                        email.html = mailContent;
+
+                        sendgrid.send(email, function (err, result) {
+                            if (err) {
+                                console.log("mail not sent", err);
+                            }
+                            else {
+                                console.log("mail sent successfully", result);
+                            }
+                        });
 
                         response.status = true;
                         response.message = "Walkin Form saved successfully";
@@ -705,6 +727,26 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     }
 
                     else if (!err && (results[1] || results[2])) {
+
+                        var mailContent = "Dear [FirstName] <br>Thank you for registering your profile.  We will revert to you once we find your Resume match one of the requirements we have.In the mean time, please <a title='Link' href='https://www.whatmate.com'>Click Here</a> to upload your latest CV that will help us with more detailed information about your profile.<br><br>Wishing you all the best<br><br>[WalkINSignature]<br>[Disclaimer]";
+
+                        mailContent = mailContent.replace("[FirstName]", req.body.firstName);
+                        mailContent = mailContent.replace("[FullName]", (req.body.firstName + ' ' + req.body.middleName + ' ' + req.body.lastName));
+
+                        var email = new sendgrid.Email();
+                        email.from = results[4][0].fromEmailId;
+                        email.to = req.body.emailId;
+                        email.subject = "Congratulations for the successful Registration of your profile";
+                        email.html = mailContent;
+
+                        sendgrid.send(email, function (err, result) {
+                            if (err) {
+                                console.log("mail not sent", err);
+                            }
+                            else {
+                                console.log("mail sent successfully", result);
+                            }
+                        });
 
                         response.status = true;
                         response.message = "Walkin Form saved successfully";
@@ -2228,48 +2270,48 @@ walkInCvCtrl.getvisitorTrackerPdf = function (req, res, next) {
 
                     // for (var k = 0; k < toMailId.length; k++) {
 
-                        var options = { format: 'A4', width: '8in', height: '10.5in', border: '0', timeout: 30000, "zoomFactor": "1" };
+                    var options = { format: 'A4', width: '8in', height: '10.5in', border: '0', timeout: 30000, "zoomFactor": "1" };
 
-                        var myBuffer = [];
-                        var buffer = new Buffer(htmlContent, 'utf16le');
-                        for (var i = 0; i < buffer.length; i++) {
-                            myBuffer.push(buffer[i]);
-                        }
+                    var myBuffer = [];
+                    var buffer = new Buffer(htmlContent, 'utf16le');
+                    for (var i = 0; i < buffer.length; i++) {
+                        myBuffer.push(buffer[i]);
+                    }
 
-                        var attachmentObjectsList = [];
-                        htmlpdf.create(htmlContent, options).toBuffer(function (err, buffer) {
-                            attachmentObjectsList = [{
-                                filename: "VisitorList" + '.pdf',
-                                content: buffer
+                    var attachmentObjectsList = [];
+                    htmlpdf.create(htmlContent, options).toBuffer(function (err, buffer) {
+                        attachmentObjectsList = [{
+                            filename: "VisitorList" + '.pdf',
+                            content: buffer
 
-                            }];
+                        }];
 
-                            var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                            var email = new sendgrid.Email();
-                            email.from = "noreply@talentMicro.com";
-                            email.to = toMailId;
-                            email.subject = "Visitor Register from " +result[2][0].startDate + " to " + result[2][0].endDate;
-                            email.html = "Please find the Visitor Register for the period from " + result[2][0].startDate + " to " + result[2][0].endDate + " attached herewith. <br><br><br><br>Whatmate Team.<br><br> This email is intended only for the person to whom it is addressed and/or otherwise authorized personnel. The information contained herein and attached is confidential TalentMicro Innovations and the property of TalentMicro Innovations Pvt. Ltd. If you are not the intended recipient, please be advised that viewing this message and any attachments, as well as copying, forwarding, printing, and disseminating any information related to this email is prohibited, and that you should not take any action based on the content of this email and/or its attachments. If you received this message in error, please contact the sender and destroy all copies of this email and any attachment. Please note that the views and opinions expressed herein are solely those of the author and do not necessarily reflect those of the company. While antivirus protection tools have been employed, you should check this email and attachments for the presence of viruses. No warranties or assurances are made in relation to the safety and content of this email and ttachments. TalentMicro Innovations Pvt. Ltd. accepts no liability for any damage caused by any virus transmitted by or contained in this email and attachments. No liability is accepted for any consequences arising from this email";
-                            // email.cc = mailOptions.cc;
-                            // email.bcc = mailOptions.bcc;
-                            // email.html = mailOptions.html;
-                            //if 1 or more attachments are present
+                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                        var email = new sendgrid.Email();
+                        email.from = "noreply@talentMicro.com";
+                        email.to = toMailId;
+                        email.subject = "Visitor Register from " + result[2][0].startDate + " to " + result[2][0].endDate;
+                        email.html = "Please find the Visitor Register for the period from " + result[2][0].startDate + " to " + result[2][0].endDate + " attached herewith. <br><br><br><br>Whatmate Team.<br><br> This email is intended only for the person to whom it is addressed and/or otherwise authorized personnel. The information contained herein and attached is confidential TalentMicro Innovations and the property of TalentMicro Innovations Pvt. Ltd. If you are not the intended recipient, please be advised that viewing this message and any attachments, as well as copying, forwarding, printing, and disseminating any information related to this email is prohibited, and that you should not take any action based on the content of this email and/or its attachments. If you received this message in error, please contact the sender and destroy all copies of this email and any attachment. Please note that the views and opinions expressed herein are solely those of the author and do not necessarily reflect those of the company. While antivirus protection tools have been employed, you should check this email and attachments for the presence of viruses. No warranties or assurances are made in relation to the safety and content of this email and ttachments. TalentMicro Innovations Pvt. Ltd. accepts no liability for any damage caused by any virus transmitted by or contained in this email and attachments. No liability is accepted for any consequences arising from this email";
+                        // email.cc = mailOptions.cc;
+                        // email.bcc = mailOptions.bcc;
+                        // email.html = mailOptions.html;
+                        //if 1 or more attachments are present
 
-                            email.addFile({
-                                filename: attachmentObjectsList[0].filename,
-                                content: attachmentObjectsList[0].content,
-                                contentType: "application/pdf"
-                            });
-
-                            sendgrid.send(email, function (err, result) {
-                                if (err) {
-                                    console.log("mail not sent", err);
-                                }
-                                else {
-                                    console.log("mail sent successfully", result);
-                                }
-                            });
+                        email.addFile({
+                            filename: attachmentObjectsList[0].filename,
+                            content: attachmentObjectsList[0].content,
+                            contentType: "application/pdf"
                         });
+
+                        sendgrid.send(email, function (err, result) {
+                            if (err) {
+                                console.log("mail not sent", err);
+                            }
+                            else {
+                                console.log("mail sent successfully", result);
+                            }
+                        });
+                    });
                     // }
 
 
@@ -2413,7 +2455,7 @@ walkInCvCtrl.forceCheckOUT = function (req, res, next) {
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
 
-                    if (!err && result ) {
+                    if (!err && result) {
                         response.status = true;
                         response.message = "Visitor Checked OUT successfully";
                         response.error = null;
