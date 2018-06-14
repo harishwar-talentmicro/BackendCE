@@ -274,6 +274,15 @@ masterCtrl.saveClients = function (req, res, next) {
     if (!contracts) {
         contracts = [];
     }
+
+    var contacts = req.body.contacts;
+    if (typeof (contacts) == "string") {
+        contacts = JSON.parse(contacts);
+    }
+    if (!contacts) {
+        contacts = [];
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
@@ -289,8 +298,8 @@ masterCtrl.saveClients = function (req, res, next) {
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(JSON.stringify(heDepartment)),
                     req.st.db.escape(JSON.stringify(businessLocation)),
-                    req.st.db.escape(JSON.stringify(contracts))
-
+                    req.st.db.escape(JSON.stringify(contracts)),
+                    req.st.db.escape(JSON.stringify(contacts))
                 ];
                 var procQuery = 'CALL wm_saveClientBusinessLocationContacts( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -1459,9 +1468,9 @@ masterCtrl.getClientView = function (req, res, next) {
                             var res2 = {};
                             res2.stageDetail = results[0][i].stageDetail ? JSON.parse(results[0][i].stageDetail) : [],
                                 res2.heDepartmentId = results[0][i].departmentId ? results[0][i].departmentId : 0;
-                            res2.clientName = results[0][i].clientName ? results[0][i].clientName : 0;
+                            res2.clientName = results[0][i].clientName ? results[0][i].clientName : '';
                             res2.requirementCount = results[0][i].count ? results[0][i].count : 0;
-                            res2.notes = results[0][i].notes ? results[0][i].notes : 0;
+                            res2.notes = results[0][i].notes ? results[0][i].notes : '';
                             res2.createdDate = results[0][i].createdDate ? results[0][i].createdDate : null;
                             res2.updateDate = results[0][i].updateDate ? results[0][i].updateDate : null;
                             res2.createdUserName = results[0][i].createdUserName ? results[0][i].createdUserName : '';
@@ -1829,13 +1838,16 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                         response.error = null;
                         if (result[1] && result[1][0]) {
                             for (var i = 0; i < result[1].length; i++) {
-                                var res2 = {};
-                                result[1][i].contactList = result[1][i].contactList ? JSON.parse(result[1][i].contactList) : [];
+                                // var res2 = {};
+                                // result[1][i].contactList = result[1][i].contactList ? JSON.parse(result[1][i].contactList) : [];
+
+                                result[1][i].location = result[1][i].location ? JSON.parse(result[1][i].location) : [];
                             }
                         }
 
                         result[0][0].managers = JSON.parse(result[0][0].managers);
 
+                        // contracts parsing
                         if (result[2] && result[2][0]) {
                             var contracts = (result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : [];
                             if (contracts) {
@@ -1845,10 +1857,14 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                             }
                         }
 
+                        // client contact parsing
+                        result[3][0].contactList = (result && result[3] && result[3][0]) ? JSON.parse(result[3][0].contactList) :[];
+
                         response.data = {
                             heDepartment: result[0][0],
                             businessLocation: result[1],
-                            contracts: contracts//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
+                            contracts: contracts,//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
+                            contactList : result[3][0].contactList
                         };
 
 
@@ -1872,7 +1888,8 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                         response.data = {
                             heDepartment: {},
                             businessLocation: [],
-                            contracts: []
+                            contracts: [],
+                            contactList : []
                         };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

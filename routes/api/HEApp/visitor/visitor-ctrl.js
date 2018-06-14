@@ -18,18 +18,18 @@ var error = {};
 
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
-var encryption = new  AES_256_encryption();
+var encryption = new AES_256_encryption();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
 var appConfig = require('../../../../ezeone-config.json');
-var DBSecretKey=appConfig.DB.secretKey;
+var DBSecretKey = appConfig.DB.secretKey;
 
-visitorCtrl.saveGatePassRequest = function(req,res,next){
+visitorCtrl.saveGatePassRequest = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -37,37 +37,47 @@ visitorCtrl.saveGatePassRequest = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                    if (!req.body.name) {
+                    console.log(req.body);
+                    if (!req.body.firstName) {
                         error.name = 'Invalid name';
                         validationFlag *= false;
                     }
-                
+
                     if (!req.body.phone) {
                         error.phone = 'Invalid phone';
                         validationFlag *= false;
                     }
-                    var keywordList =req.body.keywordList;
-                    if(typeof(keywordList) == "string") {
+
+                    var toMeetWhom = req.body.toMeetWhom;
+                    if (typeof (toMeetWhom) == "string") {
+                        toMeetWhom = JSON.stringify(toMeetWhom);
+                    }
+                    if (!toMeetWhom) {
+                        toMeetWhom = {};
+                    }
+                    
+                    var keywordList = req.body.keywordList;
+                    if (typeof (keywordList) == "string") {
                         keywordList = JSON.parse(keywordList);
                     }
-                    if(!keywordList){
+                    if (!keywordList) {
                         keywordList = [];
                     }
-                
+
                     var senderGroupId;
-                
-                    if (!validationFlag){
+
+                    if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
                         res.status(400).json(response);
@@ -81,7 +91,7 @@ visitorCtrl.saveGatePassRequest = function(req,res,next){
                         req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
                         req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
                         req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
-                        req.body.accessUserType  = req.body.accessUserType  ? req.body.accessUserType  : 0;
+                        req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
@@ -89,7 +99,14 @@ visitorCtrl.saveGatePassRequest = function(req,res,next){
                         req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
                         req.body.isd = req.body.isd ? req.body.isd : '';
                         req.body.status = req.body.status ? req.body.status : 1;
-        
+                        req.body.middleName = req.body.middleName ? req.body.middleName : '';
+                        req.body.lastName = req.body.lastName ? req.body.lastName : '';
+                        req.body.IDNumber = req.body.IDNumber ? req.body.IDNumber : '';
+                        req.body.visitorBadgeNumber = req.body.visitorBadgeNumber ? req.body.visitorBadgeNumber : '';
+                        req.body.signInHere = req.body.signInHere ? req.body.signInHere : '';
+                        req.query.heMasterId = req.query.heMasterId ? req.query.heMasterId : 0; 
+
+
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.parentId),
@@ -112,23 +129,31 @@ visitorCtrl.saveGatePassRequest = function(req,res,next){
                             req.st.db.escape(req.body.status),
                             req.st.db.escape(req.body.approverNotes),
                             req.st.db.escape(req.body.isd),
-                            req.st.db.escape(DBSecretKey)                                                                                                                    
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.firstName),
+                            req.st.db.escape(req.body.middleName),
+                            req.st.db.escape(req.body.lastName),
+                            req.st.db.escape(req.body.IDNumber),
+                            req.st.db.escape(req.body.visitorBadgeNumber),
+                            req.st.db.escape(JSON.stringify(toMeetWhom)),
+                            req.st.db.escape(req.body.signInHere),
+                            req.st.db.escape(req.query.heMasterId)   // not used yet keep
                         ];
-                        var visitorFormId=1028;
-                        var keywordsParams=[
+                        var visitorFormId = 1028;
+                        var keywordsParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(visitorFormId),
                             req.st.db.escape(JSON.stringify(keywordList)),
-                            req.st.db.escape(req.body.groupId)  
+                            req.st.db.escape(req.body.groupId)
                         ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_visitorGatePassRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                        var procQuery = 'CALL HE_save_visitorGatePassRequest_new( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
-                        req.db.query(procQuery,function(err,results){
-                            if(!err && results && results[0] ){
+                        req.db.query(procQuery, function (err, results) {
+                            if (!err && results && results[0]) {
                                 senderGroupId = results[0][0].senderId;
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                 //     senderName : results[0][0].message
@@ -208,25 +233,25 @@ visitorCtrl.saveGatePassRequest = function(req,res,next){
                                         senderName: results[0][0].senderName,
                                         senderId: results[0][0].senderId,
                                         receiverId: results[0][0].receiverId,
-                                        transId : results[0][0].transId,
-                                        formId : results[0][0].formId,
+                                        transId: results[0][0].transId,
+                                        formId: results[0][0].formId,
                                         groupId: req.body.groupId,
-                                        currentStatus : results[0][0].currentStatus,
-                                        currentTransId : results[0][0].currentTransId,
-                                        localMessageId : req.body.localMessageId,
-                                        parentId : results[0][0].parentId,
-                                        accessUserType : results[0][0].accessUserType,
-                                        heUserId : results[0][0].heUserId,
-                                        formData : JSON.parse(results[0][0].formDataJSON)
+                                        currentStatus: results[0][0].currentStatus,
+                                        currentTransId: results[0][0].currentTransId,
+                                        localMessageId: req.body.localMessageId,
+                                        parentId: results[0][0].parentId,
+                                        accessUserType: results[0][0].accessUserType,
+                                        heUserId: results[0][0].heUserId,
+                                        formData: JSON.parse(results[0][0].formDataJSON)
                                     }
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(response);
                                 });
                             }
-                            else{
+                            else {
                                 response.status = false;
                                 response.message = "Error while saving Visitor gate pass request";
                                 response.error = null;
@@ -237,23 +262,23 @@ visitorCtrl.saveGatePassRequest = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 };
 
-visitorCtrl.getVisitorList = function(req,res,next){
+visitorCtrl.getVisitorList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    req.st.validateToken(req.query.token, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
 
             var procParams = [
                 req.st.db.escape(req.query.token),
@@ -265,29 +290,29 @@ visitorCtrl.getVisitorList = function(req,res,next){
              */
             var procQuery = 'CALL HE_get_visitorList( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,visitorsResult){
-                if(!err && visitorsResult && visitorsResult[0] && visitorsResult[0][0]){
+            req.db.query(procQuery, function (err, visitorsResult) {
+                if (!err && visitorsResult && visitorsResult[0] && visitorsResult[0][0]) {
                     response.status = true;
                     response.message = "Visitors loaded successfully";
                     response.error = null;
                     response.data = {
-                        visitorList : visitorsResult[0]
+                        visitorList: visitorsResult[0]
                     };
                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                     zlib.gzip(buf, function (_, result) {
-                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                         res.status(200).json(response);
                     });
 
                 }
-                else if(!err){
+                else if (!err) {
                     response.status = true;
                     response.message = "Visitors loaded successfully";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting visitors";
                     response.error = null;
@@ -296,18 +321,18 @@ visitorCtrl.getVisitorList = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-visitorCtrl.saveGateAssetPassRequest = function(req,res,next){
+visitorCtrl.saveGateAssetPassRequest = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -315,57 +340,57 @@ visitorCtrl.saveGateAssetPassRequest = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         console.log(response);
         res.status(400).json(response);
     }
-    else{
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
                     if (!req.body.name) {
                         error.name = 'Invalid name';
                         validationFlag *= false;
                     }
-                
+
                     if (!req.body.phone) {
                         error.phone = 'Invalid phone';
                         validationFlag *= false;
                     }
-                
+
                     if (!req.body.assetDetails) {
                         error.assetDetails = 'Invalid assetDetails';
                         validationFlag *= false;
                     }
-                
+
                     if (!req.body.visitorId) {
                         error.visitorId = 'Invalid visitorId';
                         validationFlag *= false;
                     }
-                    var keywordList =req.body.keywordList;
-                    if(typeof(keywordList) == "string") {
+                    var keywordList = req.body.keywordList;
+                    if (typeof (keywordList) == "string") {
                         keywordList = JSON.parse(keywordList);
                     }
-                    if(!keywordList){
+                    if (!keywordList) {
                         keywordList = [];
                     }
-                
+
                     var senderGroupId;
-                
-                    if (!validationFlag){
+
+                    if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
                         console.log(response);
                         res.status(400).json(response);
                     }
-                    else{
+                    else {
                         req.body.parentId = req.body.parentId ? req.body.parentId : 0;
                         req.body.status = req.body.status ? req.body.status : 1;
-                        req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '' ;
+                        req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
                         req.body.expectedTime = req.body.expectedTime ? req.body.expectedTime : null;
                         req.body.assetDetails = req.body.assetDetails ? req.body.assetDetails : '';
                         req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : '';
@@ -376,13 +401,13 @@ visitorCtrl.saveGateAssetPassRequest = function(req,res,next){
                         req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
                         req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
                         req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
-                        req.body.accessUserType  = req.body.accessUserType  ? req.body.accessUserType  : 0;
+                        req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
                         req.body.isdPhone = req.body.isdPhone ? req.body.isdPhone : "";
-        
-        
+
+
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.parentId),
@@ -407,24 +432,24 @@ visitorCtrl.saveGateAssetPassRequest = function(req,res,next){
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(req.body.isdPhone),
-                            req.st.db.escape(DBSecretKey)                                                                                                                    
+                            req.st.db.escape(DBSecretKey)
                         ];
-                        var assetFormId=1029;
-                        var keywordsParams=[
+                        var assetFormId = 1029;
+                        var keywordsParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(assetFormId),
                             req.st.db.escape(JSON.stringify(keywordList)),
-                            req.st.db.escape(req.body.groupId)  
+                            req.st.db.escape(req.body.groupId)
                         ];
-                        
+
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_visitorAssetPassRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                        var procQuery = 'CALL HE_save_visitorAssetPassRequest_new( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
-                        req.db.query(procQuery,function(err,results){
-                            if(!err && results && results[0] ){
+                        req.db.query(procQuery, function (err, results) {
+                            if (!err && results && results[0]) {
                                 senderGroupId = results[0][0].senderId;
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                 //     senderName : results[0][0].message
@@ -504,25 +529,25 @@ visitorCtrl.saveGateAssetPassRequest = function(req,res,next){
                                         senderName: results[0][0].senderName,
                                         senderId: results[0][0].senderId,
                                         receiverId: results[0][0].receiverId,
-                                        transId : results[0][0].transId,
-                                        formId : results[0][0].formId,
+                                        transId: results[0][0].transId,
+                                        formId: results[0][0].formId,
                                         groupId: req.body.groupId,
-                                        currentStatus : results[0][0].currentStatus,
-                                        currentTransId : results[0][0].currentTransId,
-                                        localMessageId : req.body.localMessageId,
-                                        parentId : results[0][0].parentId,
-                                        accessUserType : results[0][0].accessUserType,
-                                        heUserId : results[0][0].heUserId,
-                                        formData : JSON.parse(results[0][0].formDataJSON)
+                                        currentStatus: results[0][0].currentStatus,
+                                        currentTransId: results[0][0].currentTransId,
+                                        localMessageId: req.body.localMessageId,
+                                        parentId: results[0][0].parentId,
+                                        accessUserType: results[0][0].accessUserType,
+                                        heUserId: results[0][0].heUserId,
+                                        formData: JSON.parse(results[0][0].formDataJSON)
                                     }
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(response);
                                 });
                             }
-                            else{
+                            else {
                                 response.status = false;
                                 response.message = "Error while saving visitor asset pass request";
                                 response.error = null;
@@ -533,19 +558,19 @@ visitorCtrl.saveGateAssetPassRequest = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 };
 
-visitorCtrl.searchVisitors = function(req,res,next){
+visitorCtrl.searchVisitors = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -558,26 +583,26 @@ visitorCtrl.searchVisitors = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.searchWord ) {
+    if (!req.query.searchWord) {
         error.searchWord = 'Invalid searchWord';
         validationFlag *= false;
     }
 
     var senderGroupId;
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
     }
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    req.st.validateToken(req.query.token, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
 
             var procParams = [
                 req.st.db.escape(req.query.searchWord),
                 req.st.db.escape(req.query.groupId),
-                req.st.db.escape(DBSecretKey)                                                                                        
+                req.st.db.escape(DBSecretKey)
             ];
             /**
              * Calling procedure to get form template
@@ -585,10 +610,10 @@ visitorCtrl.searchVisitors = function(req,res,next){
              */
             var procQuery = 'CALL HE_search_visitors( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,visitorsResult){
-                if(!err && visitorsResult && visitorsResult[0] && visitorsResult[0][0]){
+            req.db.query(procQuery, function (err, visitorsResult) {
+                if (!err && visitorsResult && visitorsResult[0] && visitorsResult[0][0]) {
                     var output = [];
-                    for(var i = 0; i < visitorsResult[0].length; i++) {
+                    for (var i = 0; i < visitorsResult[0].length; i++) {
                         var res1 = {};
                         res1.name = visitorsResult[0][i].name;
                         res1.phone = visitorsResult[0][i].phone;
@@ -598,7 +623,7 @@ visitorCtrl.searchVisitors = function(req,res,next){
                         res1.isd = visitorsResult[0][i].isd;
                         res1.source = visitorsResult[0][i].source;
                         res1.pictureUrl = (visitorsResult[0][i].pictureUrl);
-                            // ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + visitorsResult[0][i].pictureUrl) : "" ;
+                        // ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + visitorsResult[0][i].pictureUrl) : "" ;
 
                         output.push(res1);
                     }
@@ -607,23 +632,23 @@ visitorCtrl.searchVisitors = function(req,res,next){
                     response.message = "Data loaded successfully";
                     response.error = null;
                     response.data = {
-                        visitorList : output
+                        visitorList: output
                     };
                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                     zlib.gzip(buf, function (_, result) {
-                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                         res.status(200).json(response);
                     });
 
                 }
-                else if(!err){
+                else if (!err) {
                     response.status = true;
                     response.message = "Data loaded successfully";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting data";
                     response.error = null;
@@ -632,18 +657,18 @@ visitorCtrl.searchVisitors = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-visitorCtrl.saveGuestHospitalityRequest = function(req,res,next){
+visitorCtrl.saveGuestHospitalityRequest = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -651,37 +676,37 @@ visitorCtrl.saveGuestHospitalityRequest = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
                     if (!req.body.arrivalTime) {
                         error.arrivalTime = 'Invalid arrivalTime';
                         validationFlag *= false;
                     }
-                
+
                     if (!req.body.guestList) {
                         error.guestList = 'Invalid guestList';
                         validationFlag *= false;
                     }
-                    var keywordList =req.body.keywordList;
-                    if(typeof(keywordList) == "string") {
+                    var keywordList = req.body.keywordList;
+                    if (typeof (keywordList) == "string") {
                         keywordList = JSON.parse(keywordList);
                     }
-                    if(!keywordList){
+                    if (!keywordList) {
                         keywordList = [];
                     }
-                
+
                     var senderGroupId;
-                
-                    if (!validationFlag){
+
+                    if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
                         res.status(400).json(response);
@@ -690,13 +715,13 @@ visitorCtrl.saveGuestHospitalityRequest = function(req,res,next){
                         req.body.parentId = req.body.parentId ? req.body.parentId : 0;
                         req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : '';
                         req.body.typeOfGuest = req.body.typeOfGuest ? req.body.typeOfGuest : 0;
-        
+
                         req.body.companyName = req.body.companyName ? req.body.companyName : '';
                         req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
                         req.body.purpose = req.body.purpose ? req.body.purpose : '';
                         req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
                         req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
-                        req.body.accessUserType  = req.body.accessUserType  ? req.body.accessUserType  : 0;
+                        req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
@@ -704,7 +729,7 @@ visitorCtrl.saveGuestHospitalityRequest = function(req,res,next){
                         req.body.status = req.body.status ? req.body.status : 1;
                         req.body.expenseAmount = req.body.expenseAmount ? req.body.expenseAmount : 0;
                         req.body.expenseCurrencyId = req.body.expenseCurrencyId ? req.body.expenseCurrencyId : 0;
-        
+
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.parentId),
@@ -725,23 +750,23 @@ visitorCtrl.saveGuestHospitalityRequest = function(req,res,next){
                             req.st.db.escape(req.body.approverNotes),
                             req.st.db.escape(req.body.expenseCurrencyId),
                             req.st.db.escape(req.body.expenseAmount),
-                            req.st.db.escape(DBSecretKey)                                                                                        
+                            req.st.db.escape(DBSecretKey)
                         ];
-                         var guestFormId=1032;
-                        var keywordsParams=[
+                        var guestFormId = 1032;
+                        var keywordsParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(guestFormId),
                             req.st.db.escape(JSON.stringify(keywordList)),
-                            req.st.db.escape(req.body.groupId)  
+                            req.st.db.escape(req.body.groupId)
                         ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_GuestHospitalityRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                        var procQuery = 'CALL HE_save_GuestHospitalityRequest_new( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
-                        req.db.query(procQuery,function(err,results){
-                            if(!err && results && results[0] ){
+                        req.db.query(procQuery, function (err, results) {
+                            if (!err && results && results[0]) {
                                 senderGroupId = results[0][0].senderId;
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                 //     senderName : results[0][0].message
@@ -821,25 +846,25 @@ visitorCtrl.saveGuestHospitalityRequest = function(req,res,next){
                                         senderName: results[0][0].senderName,
                                         senderId: results[0][0].senderId,
                                         receiverId: results[0][0].receiverId,
-                                        transId : results[0][0].transId,
-                                        formId : results[0][0].formId,
+                                        transId: results[0][0].transId,
+                                        formId: results[0][0].formId,
                                         groupId: req.body.groupId,
-                                        currentStatus : results[0][0].currentStatus,
-                                        currentTransId : results[0][0].currentTransId,
-                                        localMessageId : req.body.localMessageId,
-                                        parentId : results[0][0].parentId,
-                                        accessUserType : results[0][0].accessUserType,
-                                        heUserId : results[0][0].heUserId,
-                                        formData : JSON.parse(results[0][0].formDataJSON)
+                                        currentStatus: results[0][0].currentStatus,
+                                        currentTransId: results[0][0].currentTransId,
+                                        localMessageId: req.body.localMessageId,
+                                        parentId: results[0][0].parentId,
+                                        accessUserType: results[0][0].accessUserType,
+                                        heUserId: results[0][0].heUserId,
+                                        formData: JSON.parse(results[0][0].formDataJSON)
                                     }
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(response);
                                 });
                             }
-                            else{
+                            else {
                                 response.status = false;
                                 response.message = "Error while saving guest hospitality request";
                                 response.error = null;
@@ -850,19 +875,19 @@ visitorCtrl.saveGuestHospitalityRequest = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 };
 
-visitorCtrl.saveInternetRequest = function(req,res,next){
+visitorCtrl.saveInternetRequest = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -870,57 +895,57 @@ visitorCtrl.saveInternetRequest = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         console.log(response);
         res.status(400).json(response);
     }
-    else{
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
                     if (!req.body.name) {
                         error.name = 'Invalid name';
                         validationFlag *= false;
                     }
-                
+
                     if (!req.body.phone) {
                         error.phone = 'Invalid phone';
                         validationFlag *= false;
                     }
-                
+
                     if (!req.body.assetDetails) {
                         error.assetDetails = 'Invalid assetDetails';
                         validationFlag *= false;
                     }
-                
+
                     if (!req.body.visitorId) {
                         error.visitorId = 'Invalid visitorId';
                         validationFlag *= false;
                     }
-                    var keywordList =req.body.keywordList;
-                    if(typeof(keywordList) == "string") {
+                    var keywordList = req.body.keywordList;
+                    if (typeof (keywordList) == "string") {
                         keywordList = JSON.parse(keywordList);
                     }
-                    if(!keywordList){
+                    if (!keywordList) {
                         keywordList = [];
                     }
-                
+
                     var senderGroupId;
-                
-                    if (!validationFlag){
+
+                    if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
                         console.log(response);
                         res.status(400).json(response);
                     }
-                    else{
+                    else {
                         req.body.parentId = req.body.parentId ? req.body.parentId : 0;
                         req.body.status = req.body.status ? req.body.status : 1;
-                        req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '' ;
+                        req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
                         req.body.expectedTime = req.body.expectedTime ? req.body.expectedTime : null;
                         req.body.assetDetails = req.body.assetDetails ? req.body.assetDetails : '';
                         req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : '';
@@ -931,13 +956,13 @@ visitorCtrl.saveInternetRequest = function(req,res,next){
                         req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
                         req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
                         req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
-                        req.body.accessUserType  = req.body.accessUserType  ? req.body.accessUserType  : 0;
+                        req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
                         req.body.isdPhone = req.body.isdPhone ? req.body.isdPhone : "";
-        
-        
+
+
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.parentId),
@@ -962,23 +987,23 @@ visitorCtrl.saveInternetRequest = function(req,res,next){
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(req.body.isdPhone),
-                            req.st.db.escape(DBSecretKey)                                                                                        
+                            req.st.db.escape(DBSecretKey)
                         ];
-                        var visitorInternetFormId=1030;
-                        var keywordsParams=[
+                        var visitorInternetFormId = 1030;
+                        var keywordsParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(visitorInternetFormId),
                             req.st.db.escape(JSON.stringify(keywordList)),
-                            req.st.db.escape(req.body.groupId)  
+                            req.st.db.escape(req.body.groupId)
                         ];
                         /**
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                        var procQuery = 'CALL HE_save_visitorInternetRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                        var procQuery = 'CALL HE_save_visitorInternetRequest_new( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
-                        req.db.query(procQuery,function(err,results){
-                            if(!err && results && results[0] ){
+                        req.db.query(procQuery, function (err, results) {
+                            if (!err && results && results[0]) {
                                 senderGroupId = results[0][0].senderId;
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                 //     senderName : results[0][0].message
@@ -1058,25 +1083,25 @@ visitorCtrl.saveInternetRequest = function(req,res,next){
                                         senderName: results[0][0].senderName,
                                         senderId: results[0][0].senderId,
                                         receiverId: results[0][0].receiverId,
-                                        transId : results[0][0].transId,
-                                        formId : results[0][0].formId,
+                                        transId: results[0][0].transId,
+                                        formId: results[0][0].formId,
                                         groupId: req.body.groupId,
-                                        currentStatus : results[0][0].currentStatus,
-                                        currentTransId : results[0][0].currentTransId,
-                                        localMessageId : req.body.localMessageId,
-                                        parentId : results[0][0].parentId,
-                                        accessUserType : results[0][0].accessUserType,
-                                        heUserId : results[0][0].heUserId,
-                                        formData : JSON.parse(results[0][0].formDataJSON)
+                                        currentStatus: results[0][0].currentStatus,
+                                        currentTransId: results[0][0].currentTransId,
+                                        localMessageId: req.body.localMessageId,
+                                        parentId: results[0][0].parentId,
+                                        accessUserType: results[0][0].accessUserType,
+                                        heUserId: results[0][0].heUserId,
+                                        formData: JSON.parse(results[0][0].formDataJSON)
                                     }
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(response);
                                 });
                             }
-                            else{
+                            else {
                                 response.status = false;
                                 response.message = "Error while saving visitor asset pass request";
                                 response.error = null;
@@ -1087,19 +1112,19 @@ visitorCtrl.saveInternetRequest = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 };
 
-visitorCtrl.getChangeLog = function(req,res,next){
+visitorCtrl.getChangeLog = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -1114,21 +1139,21 @@ visitorCtrl.getChangeLog = function(req,res,next){
 
     var senderGroupId;
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         console.log(response);
         res.status(400).json(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.parentId),
                     req.st.db.escape(req.query.formId),
-                    req.st.db.escape(DBSecretKey)                                                                                        
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to get form template
@@ -1136,35 +1161,35 @@ visitorCtrl.getChangeLog = function(req,res,next){
                  */
                 var procQuery = 'CALL he_get_changeLog( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,changeLogResult){
-                    if(!err && changeLogResult && changeLogResult[0] && changeLogResult[0][0]){
+                req.db.query(procQuery, function (err, changeLogResult) {
+                    if (!err && changeLogResult && changeLogResult[0] && changeLogResult[0][0]) {
                         response.status = true;
                         response.message = "Change log loaded successfully";
                         response.error = null;
                         response.data = {
-                            changeLog : changeLogResult[0]
+                            changeLog: changeLogResult[0]
                         };
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
 
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
                         response.data = {
-                            changeLog : []
+                            changeLog: []
                         };
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting change log";
                         response.error = null;
@@ -1173,7 +1198,7 @@ visitorCtrl.getChangeLog = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });

@@ -444,7 +444,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
         ugEducation = JSON.parse(ugEducation);
     }
     if (!ugEducation) {
-        ugEducation = [];
+        ugEducation = {};
     }
 
     var pgEducation = req.body.pgEducation;
@@ -452,7 +452,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
         pgEducation = JSON.parse(pgEducation);
     }
     if (!pgEducation) {
-        pgEducation = [];
+        pgEducation = {};
     }
 
     var skills = req.body.skills;
@@ -1173,8 +1173,14 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             isIDRequired: result[13][0].isIDRequired,
                             IDType: result[13][0].IDType,
                             DOBType: result[13][0].DOBType,
-                            visitorwalkinRegistrationtype:result[14][0].registrationType,
-                            vendorDetails:(result && result[15]) ? result[15] : [],
+                            isVisitorCheckIn: result[14][0].isVisitorCheckIn,
+                            isWalkIn: result[14][0].isWalkIn,
+                            isVisitorCheckOut: result[14][0].isVisitorCheckOut,
+                            vendorDetails: (result && result[15]) ? result[15] : [],
+                            directWalkIn: result[14][0].directWalkIn,
+                            referredByEmployeeList: result[14][0].referredByEmployeeList,
+                            referredByName: result[14][0].referredByName,
+                            vendors: result[14][0].vendors
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -1698,19 +1704,25 @@ walkInCvCtrl.getWalkinJoblist = function (req, res, next) {
                         for (var i = 0; i < result[0].length; i++) {
                             result[0][i].users = result[0][i].users ? JSON.parse(result[0][i].users) : [];
                         }
+
+                        result[1][0].userList = (result[1] && result[1][0]) ? JSON.parse(result[1][0].userList) :[];
+
                         response.data = {
-                            jobList: (result[0] && result[0][0]) ? result[0] : []
+                            jobList: (result[0] && result[0][0]) ? result[0] : [],
+                            walkInWebConfig: result[1][0],
+                            vendors: result[2]
                         };
                         res.status(200).json(response);
                     }
-
 
                     else if (!err) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            jobList: []
+                            jobList: [],
+                            walkInWebConfig: {},
+                            vendors:[]
                         };
                         res.status(200).json(response);
 
@@ -1921,8 +1933,8 @@ walkInCvCtrl.saveVisitorCheckIn = function (req, res, next) {
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, results) {
                         console.log(err);
-                        if (!err && results && results[0]) {
-                            // senderGroupId = results[0][0].senderId;
+                        if(!err && results && results[0] ){
+                            senderGroupId = results[0][0].senderId;
                             // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                             //     senderName : results[0][0].message
                             // });
@@ -1985,40 +1997,39 @@ walkInCvCtrl.saveVisitorCheckIn = function (req, res, next) {
                             //         console.log('postNotification : notification for compose_message is sent successfully');
                             //     }
                             // }
-                            // notifyMessages.getMessagesNeedToNotify();
+                            notifyMessages.getMessagesNeedToNotify();
                             response.status = true;
-                            response.message = "Visitor data saved successfully";
+                            response.message = "Visitor gate pass request saved successfully";
                             response.error = null;
-                            response.data = null;
-                            // {
-                            //     messageList: {
-                            //         messageId: results[0][0].messageId,
-                            //         message: results[0][0].message,
-                            //         messageLink: results[0][0].messageLink,
-                            //         createdDate: results[0][0].createdDate,
-                            //         messageType: results[0][0].messageType,
-                            //         messageStatus: results[0][0].messageStatus,
-                            //         priority: results[0][0].priority,
-                            //         senderName: results[0][0].senderName,
-                            //         senderId: results[0][0].senderId,
-                            //         receiverId: results[0][0].receiverId,
-                            //         transId : results[0][0].transId,
-                            //         formId : results[0][0].formId,
-                            //         groupId: req.body.groupId,
-                            //         currentStatus : results[0][0].currentStatus,
-                            //         currentTransId : results[0][0].currentTransId,
-                            //         localMessageId : req.body.localMessageId,
-                            //         parentId : results[0][0].parentId,
-                            //         accessUserType : results[0][0].accessUserType,
-                            //         heUserId : results[0][0].heUserId,
-                            //         formData : JSON.parse(results[0][0].formDataJSON)
-                            //     }
-                            // };
-                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                            // zlib.gzip(buf, function (_, result) {
-                            //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                            // });
+                            response.data = {
+                                messageList: {
+                                    messageId: results[0][0].messageId,
+                                    message: results[0][0].message,
+                                    messageLink: results[0][0].messageLink,
+                                    createdDate: results[0][0].createdDate,
+                                    messageType: results[0][0].messageType,
+                                    messageStatus: results[0][0].messageStatus,
+                                    priority: results[0][0].priority,
+                                    senderName: results[0][0].senderName,
+                                    senderId: results[0][0].senderId,
+                                    receiverId: results[0][0].receiverId,
+                                    transId : results[0][0].transId,
+                                    formId : results[0][0].formId,
+                                    groupId: req.body.groupId,
+                                    currentStatus : results[0][0].currentStatus,
+                                    currentTransId : results[0][0].currentTransId,
+                                    localMessageId : req.body.localMessageId,
+                                    parentId : results[0][0].parentId,
+                                    accessUserType : results[0][0].accessUserType,
+                                    heUserId : results[0][0].heUserId,
+                                    formData : JSON.parse(results[0][0].formDataJSON)
+                                }
+                            };
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
                         }
                         else {
                             response.status = false;
@@ -2291,29 +2302,32 @@ walkInCvCtrl.getvisitorTrackerPdf = function (req, res, next) {
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
 
+
                     htmlContent = "";
-                    htmlContent += "<!DOCTYPE html><html><head lang='en'><meta charset='UTF-8'><title></title><body><h1 style='text-align:center;margin-bottom: 0px;'>";
-                    htmlContent += result[0][0].companyName;
-                    htmlContent += "</h1>";
-                    htmlContent += "<h3 style='text-align:center;margin-top:0px'>Visitor Register from " + result[2][0].startDate + " to " + result[2][0].endDate;
-                    htmlContent += "</h3>";
-                    htmlContent += '<center><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;">';
-                    htmlContent += "<thead><th>SL No.</th>";
+                    if (result[1].length) {
+                        
+                        htmlContent += "<!DOCTYPE html><html><head lang='en'><meta charset='UTF-8'><title></title><body><h1 style='text-align:center;margin-bottom: 0px;'>";
+                        htmlContent += result[0][0].companyName;
+                        htmlContent += "</h1>";
+                        htmlContent += "<h3 style='text-align:center;margin-top:0px'>Visitor Register from " + result[2][0].startDate + " to " + result[2][0].endDate;
+                        htmlContent += "</h3>";
+                        htmlContent += '<center><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;">';
+                        htmlContent += "<thead><th>SL No.</th>";
 
-                    for (var i = 0; i < Object.keys(result[1][0]).length; i++) {
-                        htmlContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + Object.keys(result[1][0])[i] + '</th>';
-                    }
-                    htmlContent += "</thead>";
-
-                    for (var j = 0; j < result[1].length; j++) {
-                        htmlContent += '<tr><td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + (j + 1) + '</td>';
                         for (var i = 0; i < Object.keys(result[1][0]).length; i++) {
-                            htmlContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[1][j][Object.keys(result[1][0])[i]] + '</td>';
+                            htmlContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + Object.keys(result[1][0])[i] + '</th>';
                         }
-                        htmlContent += "</tr>";
-                    }
-                    htmlContent += "<table></center></body></html>";
+                        htmlContent += "</thead>";
 
+                        for (var j = 0; j < result[1].length; j++) {
+                            htmlContent += '<tr><td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + (j + 1) + '</td>';
+                            for (var i = 0; i < Object.keys(result[1][0]).length; i++) {
+                                htmlContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[1][j][Object.keys(result[1][0])[i]] + '</td>';
+                            }
+                            htmlContent += "</tr>";
+                        }
+                        htmlContent += "<table></center></body></html>";
+                    }
 
                     // for (var k = 0; k < toMailId.length; k++) {
 
@@ -2350,12 +2364,12 @@ walkInCvCtrl.getvisitorTrackerPdf = function (req, res, next) {
                             contentType: "application/pdf"
                         });
 
-                        sendgrid.send(email, function (err, result) {
+                        sendgrid.send(email, function (err, results) {
                             if (err) {
                                 console.log("mail not sent", err);
                             }
                             else {
-                                console.log("mail sent successfully", result);
+                                console.log("mail sent successfully", results);
                                 if (!err && result && result[0] && result[1]) {
                                     response.status = true;
                                     response.message = "Visitor register mailed successfully";
@@ -2631,6 +2645,14 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
         validationFlag *= false;
     }
 
+    var userList = req.body.userList;
+    if (!userList) {
+        userList = [];
+    }
+    else if (typeof (userList) == "string") {
+        userList = JSON.parse(userList);
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -2641,6 +2663,15 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.body.tid = req.body.tid ? req.body.tid : 0;
+                req.body.subject = req.body.subject ? req.body.subject : '';
+                req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
+                req.body.walkInSignature = req.body.walkInSignature ? req.body.walkInSignature : '';
+                req.body.disclaimer = req.body.disclaimer ? req.body.disclaimer : '';
+                req.body.webLink = req.body.webLink ? req.body.webLink : '';
+                req.body.DOBRequired = req.body.DOBRequired ? req.body.DOBRequired : 0;
+                req.body.IDRequired = req.body.IDRequired ? req.body.IDRequired : 0;
+                req.body.IDType = req.body.IDType ? req.body.IDType : '';
+                
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -2652,7 +2683,17 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(req.body.DOBRequired),
                     req.st.db.escape(req.body.IDRequired),
                     req.st.db.escape(req.body.IDType),
-                    req.st.db.escape(req.body.DOBType)
+                    req.st.db.escape(req.body.DOBType),
+                    req.st.db.escape(req.body.walkinTokenGeneration),
+                    req.st.db.escape(req.body.walkinRegistrationType),
+                    req.st.db.escape(req.body.isVisitorCheckIn),
+                    req.st.db.escape(req.body.isWalkIn),
+                    req.st.db.escape(req.body.isVisitorCheckOut),
+                    req.st.db.escape(req.body.directWalkIn),
+                    req.st.db.escape(req.body.referredByEmployeeList),
+                    req.st.db.escape(req.body.referredByName),
+                    req.st.db.escape(req.body.vendors),
+                    req.st.db.escape(JSON.stringify(userList))
                 ];
 
                 var procQuery = 'CALL wm_save_walkWebConfig( ' + inputs.join(',') + ')';
