@@ -804,7 +804,7 @@ paceUsersCtrl.saveLayout = function (req, res, next) {
     }
     var layout = req.body.layout;
     if (typeof (layout) == "string") {
-        tagsJson = JSON.parse(layout);
+        layout = JSON.parse(layout);
     }
     if (!layout) {
         layout = [];
@@ -831,11 +831,14 @@ paceUsersCtrl.saveLayout = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(result);
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result) {
                         response.status = true;
                         response.message = "Layout saved successfully";
                         response.error = null;
-                        response.data = result[0][0].layout;
+                        if(typeof(layout)=="string"){
+                            layout = JSON.parse(layout);
+                        }
+                        response.data = layout;
                         res.status(200).json(response);
                     }
                     else {
