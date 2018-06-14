@@ -487,6 +487,15 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             output2.push(res4);
                         }
 
+                        // for (var i = 0; i < result[7].length; i++) {
+                        //     result[7][i].reqAppDetails = result[7][i].reqAppDetails ? JSON.parse(result[7][i].reqAppDetails) : [];
+                        // }
+
+                        // for (var i = 0; i < result[8].length; i++) {
+                        //     result[8][i].reqAppDetails = result[8][i].reqAppDetails ? JSON.parse(result[8][i].reqAppDetails) : [];
+                        // }
+
+
                         response.data =
                             {
                                 requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
@@ -494,7 +503,10 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                                 requirementReport:output1,
                                 requirementReportTotalCount:result[3],
                                 fullfilmentReport:output2,
-                                fullfilmentReportTotalCount:result[5]
+                                fullfilmentReportTotalCount:result[5],
+                                converstionReport:result[6][0],
+                                turnAroundTime:result[7][0],
+                                firstCVResponse:result[8][0]
                             };
                         res.status(200).json(response);
                     }
@@ -509,7 +521,10 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             requirementReport:[],
                                 requirementReportTotalCount:[],
                                 fullfilmentReport:[],
-                                fullfilmentReportTotalCount:[]
+                                fullfilmentReportTotalCount:[],
+                                converstionReport:{},
+                                turnAroundTime:[],
+                                firstCVResponse:[]
 
                         };
                         res.status(200).json(response);
