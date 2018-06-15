@@ -1858,6 +1858,15 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.body.offerManagerId = req.body.offerManagerId ? req.body.offerManagerId : 0;
+                req.body.heDepartmentId = req.body.heDepartmentId ? req.body.heDepartmentId : 0;
+                req.body.grossCTCAmount = req.body.grossCTCAmount ? req.body.grossCTCAmount : 0;
+                req.body.grossCTCCurrency = req.body.grossCTCCurrency ? req.body.grossCTCCurrency : 0;
+                req.body.grossCTCScale = req.body.grossCTCScale ? req.body.grossCTCScale : 0;
+                req.body.grossCTCDuration = req.body.grossCTCDuration ? req.body.grossCTCDuration : 0;
+                req.body.expectedJoining = req.body.expectedJoining ? req.body.expectedJoining : null;
+                req.body.billableCTCAmount = req.body.billableCTCAmount ? req.body.billableCTCAmount : 0;
+                req.body.billingCTCAmount = req.body.billingCTCAmount ? req.body.billingCTCAmount : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -1879,7 +1888,8 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(billingCurrency)),
                     req.st.db.escape(JSON.stringify(billingScale)),
                     req.st.db.escape(JSON.stringify(billingDuration)),
-                    req.st.db.escape(req.body.billingCTCAmount)];
+                    req.st.db.escape(req.body.billingCTCAmount)
+                ];
 
                 var procQuery = 'CALL wm_save_offerManager( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -3338,6 +3348,69 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
         applicant = [];
     }
 
+    var offerLocation = [];
+    offerLocation = req.body.offerLocation;
+    if (typeof (offerLocation) == "string") {
+        offerLocation = JSON.parse(offerLocation);
+    }
+    if (!offerLocation) {
+        offerLocation = [];
+    }
+
+    var offerCTCCurr = [];
+    offerCTCCurr = req.body.offerCTCCurr;
+    if (typeof (offerCTCCurr) == "string") {
+        offerCTCCurr = JSON.parse(offerCTCCurr);
+    }
+    if (!offerCTCCurr) {
+        offerCTCCurr = {};
+    }
+
+    var offerCTCScale = [];
+    offerCTCScale = req.body.offerCTCScale;
+    if (typeof (offerCTCScale) == "string") {
+        offerCTCScale = JSON.parse(offerCTCScale);
+    }
+    if (!offerCTCScale) {
+        offerCTCScale = {};
+    }
+
+    var offerCTCPeriod = [];
+    offerCTCPeriod = req.body.offerCTCPeriod;
+    if (typeof (offerCTCPeriod) == "string") {
+        offerCTCPeriod = JSON.parse(offerCTCPeriod);
+    }
+    if (!offerCTCPeriod) {
+        offerCTCPeriod = {};
+    }
+
+    var salaryCurr = [];
+    salaryCurr = req.body.salaryCurr;
+    if (typeof (salaryCurr) == "string") {
+        salaryCurr = JSON.parse(salaryCurr);
+    }
+    if (!salaryCurr) {
+        salaryCurr = {};
+    }
+
+    var salaryScale = [];
+    salaryScale = req.body.salaryScale;
+    if (typeof (salaryScale) == "string") {
+        salaryScale = JSON.parse(salaryScale);
+    }
+    if (!salaryScale) {
+        salaryScale = {};
+    }
+    
+    var salaryPeriod = [];
+    salaryPeriod = req.body.salaryPeriod;
+    if (typeof (salaryPeriod) == "string") {
+        salaryPeriod = JSON.parse(salaryPeriod);
+    }
+    if (!salaryPeriod) {
+        salaryPeriod = {};
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -3361,11 +3434,12 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                 req.body.offerCTCScaleId = req.body.offerCTCScaleId ? req.body.offerCTCScaleId : 0;
                 req.body.offerCTCPeriodId = req.body.offerCTCPeriodId ? req.body.offerCTCPeriodId : 0;
                 req.body.salaryCurrId = req.body.salaryCurrId ? req.body.salaryCurrId : 0;
-                req.body.salarySalary = req.body.salarySalary ? req.body.salarySalary : 0;
+                req.body.salaryAmount = req.body.salaryAmount ? req.body.salaryAmount : 0;
                 req.body.salaryScaleId = req.body.salaryScaleId ? req.body.salaryScaleId : 0;
                 req.body.salaryPeriodId = req.body.salaryPeriodId ? req.body.salaryPeriodId : 0;
                 req.body.notes = req.body.notes ? req.body.notes : '';
                 req.body.workInMentionedShifts = req.body.workInMentionedShifts ? req.body.workInMentionedShifts : 0;
+                req.body.grade = req.body.grade ? req.body.grade : '';
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -3380,18 +3454,30 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                     req.st.db.escape(req.body.offerJoiningDate),
                     req.st.db.escape(req.body.plannedJoiningDate),
                     req.st.db.escape(req.body.actualJoiningDate),
-                    req.st.db.escape(req.body.offerCTCCurrId),
+                    req.st.db.escape(JSON.stringify(offerCTCCurr)),
                     req.st.db.escape(req.body.offerCTCSalary),
-                    req.st.db.escape(req.body.offerCTCScaleId),
-                    req.st.db.escape(req.body.offerCTCPeriodId),
-                    req.st.db.escape(req.body.salaryCurrId),
-                    req.st.db.escape(req.body.salarySalary),
-                    req.st.db.escape(req.body.salaryScaleId),
-                    req.st.db.escape(req.body.salaryPeriodId),
+                    req.st.db.escape(JSON.stringify(offerCTCScale)),
+                    req.st.db.escape(JSON.stringify(offerCTCPeriod)),
+                    req.st.db.escape(JSON.stringify(salaryCurr)),
+                    req.st.db.escape(req.body.salaryAmount),
+                    req.st.db.escape(JSON.stringify(salaryScale)),
+                    req.st.db.escape(JSON.stringify(salaryPeriod)),
                     req.st.db.escape(req.body.notes),
                     req.st.db.escape(req.body.workInMentionedShifts),
-                    req.st.db.escape(JSON.stringify(documentAttachment))
-                ];
+                    req.st.db.escape(JSON.stringify(documentAttachment)),
+                    req.st.db.escape(JSON.stringify(offerLocation)),
+                    req.st.db.escape(req.body.grade),
+                    req.st.db.escape(JSON.stringify(billableCurrency)),
+                    req.st.db.escape(req.body.billableAmount),
+                    req.st.db.escape(JSON.stringify(billableScale)),
+                    req.st.db.escape(JSON.stringify(billableDuration)),
+                    req.st.db.escape(JSON.stringify(designation)),
+                    req.st.db.escape(req.body.empCode),
+                    req.st.db.escape(JSON.stringify(vendorCurrency)),
+                    req.st.db.escape(req.body.vendorAmount),
+                    req.st.db.escape(JSON.stringify(vendorScale)),
+                    req.st.db.escape(JSON.stringify(vendorDuration))
+                    ];
 
                 var procQuery = 'CALL wm_save_onBoarding( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -3464,43 +3550,41 @@ applicantCtrl.getOnBoarding = function (req, res, next) {
                         response.status = true;
                         response.message = "onBoarding details loaded successfully";
                         response.error = null;
-                        response.data =
-                            {
-                                result: result[0]
-                                // heMasterId: result[0][0].heMasterId,
-                                // heDepartmentId: result[0][0].heDepartmentId,
-                                // applicantId: result[0][0].applicantId,
-                                // jobTitleId: result[0][0].jobTitleId,
-                                // jobtitle: result[0][0].jobtitle,
-                                // expectedjoining: result[0][0].expectedjoining,
-                                // companyContactId: result[0][0].companyContactId,
-                                // companyContactName: result[0][0].companyContactName,
-                                // accountManagerId: result[0][0].accountManagerId,
-                                // accountManagerName: result[0][0].accountManagerName,
-                                // offerJoiningDate: result[0][0].offerJoiningDate,
-                                // plannedJoiningDate: result[0][0].plannedJoiningDate,
-                                // actualJoiningDate: result[0][0].actualJoiningDate,
-                                // offerCTCCurrId: result[0][0].offerCTCCurrId,
-                                // offerCTCSalary: result[0][0].offerCTCSalary,
-                                // offerCTCScaleId: result[0][0].offerCTCScaleId,
-                                // offerCTCPeriodId: result[0][0].offerCTCPeriodId,
-                                // salaryCurrId: result[0][0].salaryCurrId,
-                                // salarySalary: result[0][0].salarySalary,
-                                // salaryScaleId: result[0][0].salaryScaleId,
-                                // salaryPeriodId: result[0][0].salaryPeriodId,
-                                // notes: result[0][0].notes,
-                                // workInMentionedShifts: result[0][0].workInMentionedShifts,
-                                // attachmentList: JSON.parse(result[0][0].attachmentList) ? JSON.parse(result[0][0].attachmentList) : []
-                            };
+
+                        if(result[0][0]){
+                            result[0][0].documentAttachment = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].documentAttachment):[];
+                            result[0][0].offerLocation = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerLocation):[];
+    
+                            result[0][0].offerCTCCurr = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCCurr):{};
+                            result[0][0].offerCTCScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCScale):{};
+                            result[0][0].offerCTCPeriod = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCPeriod):{};
+                            result[0][0].salaryCurr = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryCurr):{};
+                            result[0][0].salaryScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryScale):{};
+                            result[0][0].salaryPeriod = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryPeriod):{};
+                            
+                            result[0][0].billableCurrency = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableCurrency):{};
+                            result[0][0].billableScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableScale):{};
+                            result[0][0].billableDuration = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableDuration):{};
+    
+                            result[0][0].vendorCurrency = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorCurrency):{};
+                            result[0][0].vendorScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorScale):{};
+                            result[0][0].vendorScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorScale):{};
+    
+                            result[0][0].designation = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].designation):{};
+                        }
+                        
+                        result[0][0].offerDate = (result[2] && result[2][0]) ? result[2][0].offerDate :null;
+                        result[0][0].plannedJoiningDate = (result[2] && result[2][0]) ? result[2][0].plannedJoiningDate :null;
+                        
+
+                        response.data =result[0][0];
                         res.status(200).json(response);
                     }
                     else if (!err) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
-                        response.data = {
-                            offerManager: []
-                        };
+                        response.data ={};
                         res.status(200).json(response);
                     }
                     else {

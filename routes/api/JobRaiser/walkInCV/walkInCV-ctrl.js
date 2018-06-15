@@ -479,12 +479,12 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
         currency = {};
     }
 
-    var userDetails = req.body.userDetails;
-    if (typeof (userDetails) == "string") {
-        userDetails = JSON.parse(currency);
+    var details = req.body.details;
+    if (typeof (details) == "string") {
+        details = JSON.parse(details);
     }
-    if (!userDetails) {
-        userDetails = {};
+    if (!details) {
+        details = {};
     }
 
     var scale = req.body.scale;
@@ -542,7 +542,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.walkinType = (req.body.walkinType) ? req.body.walkinType : 0;
                 req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
                 req.body.IDNumber = (req.body.IDNumber) ? req.body.IDNumber : '';
-                // req.body.referedByUserId = (req.body.referedByUserId) ? req.body.referedByUserId : 0;
+                req.body.profilePicture = (req.body.profilePicture) ? req.body.profilePicture : '';
                 req.body.middleName = (req.body.middleName) ? req.body.middleName : '';
 
 
@@ -578,7 +578,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.receiverCount),
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(req.body.walkInType),
-                    req.st.db.escape(JSON.stringify(userDetails)),
+                    req.st.db.escape(JSON.stringify(details)),
                     req.st.db.escape(JSON.stringify(location)),
                     req.st.db.escape(req.body.profilePicture),
                     req.st.db.escape(DBSecretKey),

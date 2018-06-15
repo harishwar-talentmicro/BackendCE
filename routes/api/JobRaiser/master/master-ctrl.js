@@ -267,20 +267,20 @@ masterCtrl.saveClients = function (req, res, next) {
         businessLocation = [];
     }
 
+    var contactList = req.body.contactList;
+    if (typeof (contactList) == "string") {
+        contactList = JSON.parse(contactList);
+    }
+    if (!contactList) {
+        contactList = [];
+    }
+
     var contracts = req.body.contracts;
     if (typeof (contracts) == "string") {
         contracts = JSON.parse(contracts);
     }
     if (!contracts) {
         contracts = [];
-    }
-
-    var contacts = req.body.contacts;
-    if (typeof (contacts) == "string") {
-        contacts = JSON.parse(contacts);
-    }
-    if (!contacts) {
-        contacts = [];
     }
 
     if (!validationFlag) {
@@ -299,7 +299,7 @@ masterCtrl.saveClients = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(heDepartment)),
                     req.st.db.escape(JSON.stringify(businessLocation)),
                     req.st.db.escape(JSON.stringify(contracts)),
-                    req.st.db.escape(JSON.stringify(contacts))
+                    req.st.db.escape(JSON.stringify(contactList))
                 ];
                 var procQuery = 'CALL wm_saveClientBusinessLocationContacts( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -1846,6 +1846,7 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                         }
 
                         result[0][0].managers = JSON.parse(result[0][0].managers);
+                        result[0][0].department = JSON.parse(result[0][0].department);
 
                         // contracts parsing
                         if (result[2] && result[2][0]) {
