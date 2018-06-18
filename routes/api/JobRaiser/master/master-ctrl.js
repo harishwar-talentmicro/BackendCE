@@ -1341,6 +1341,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                             var res2 = {};
                             res2.parentId = results[0][i].parentId ? results[0][i].parentId : 0,
                                 res2.transId = results[0][i].transId ? results[0][i].transId : 0,
+                                res2.notes = results[0][i].notes ? results[0][i].notes : '',
                                 res2.heDepartmentId = results[0][i].heDepartmentId ? results[0][i].heDepartmentId : 0,
                                 res2.positions = results[0][i].positions ? results[0][i].positions : 0,
                                 res2.positionsFilled = results[0][i].positionsFilled ? results[0][i].positionsFilled : 0,

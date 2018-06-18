@@ -89,7 +89,7 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
-                req.body.tid = (req.body.defId) ? req.body.defId : 0;
+                req.body.defId = (req.body.defId) ? req.body.defId : 0;
                 req.body.heMasterId = (req.body.heMasterId) ? req.body.heMasterId : 0;
                 req.body.purpose = (req.body.purpose) ? req.body.purpose : 0;
                 //req.body.jobType = (req.body.jobType) ? req.body.jobType :0;
@@ -1365,7 +1365,12 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 }
 
                                 response.status = true;
-                                response.message = "Requirement saved successfully";
+                                if (req.body.jdTemplateFlag==1){
+                                    response.message = "Requirement template saved successfully";    
+                                }
+                                else{
+                                    response.message = "Requirement saved successfully";
+                                }
                                 response.error = null;
                                 response.data = {
                                     messageList: {
@@ -1690,7 +1695,12 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                     }
 
                                     response.status = true;
-                                    response.message = "Requirement saved successfully";
+                                    if (req.body.jdTemplateFlag==1){
+                                        response.message = "Requirement template saved successfully";    
+                                    }
+                                    else{
+                                        response.message = "Requirement saved successfully";
+                                    }
                                     response.error = null;
                                     response.data = {
                                         messageList: {

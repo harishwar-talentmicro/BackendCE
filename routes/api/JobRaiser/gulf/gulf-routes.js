@@ -17,6 +17,6 @@ router.get('/visa',gulfCtrl.getVisa);
 router.post('/attestation',gulfCtrl.saveAttestation);
 router.get('/attestation',gulfCtrl.getAttestation);
 
-router.post('/bill',gulfCtrl.billingFilter);
+router.post('/billFilter',gulfCtrl.billingFilter);
 
 module.exports = router;

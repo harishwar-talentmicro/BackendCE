@@ -1367,6 +1367,14 @@ applicantCtrl.saveReqAppMapResult = function (req, res, next) {
         error.token = 'Invalid requirement';
         validationFlag *= false;
     }
+    var applicant = req.body.applicant;
+    if(typeof(applicant) == 'string'){
+        applicant = JSON.parse(applicant);
+    }
+    if(!applicant){
+        applicant =[];
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -1381,7 +1389,7 @@ applicantCtrl.saveReqAppMapResult = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.reqId),
-                    req.st.db.escape(JSON.stringify(req.body.applicant)),
+                    req.st.db.escape(JSON.stringify(applicant)),
                     req.st.db.escape(req.query.heMasterId)
                 ];
 
@@ -1389,13 +1397,21 @@ applicantCtrl.saveReqAppMapResult = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0]) {
+                    if (!err && result && result[0] && result[0][0].error) {
+                        response.status = false;
+                        response.message = result[0][0].error;
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else if (!err && result && result[0]) {
                         response.status = false;
                         response.message = "Requirement already mapped to the applicant";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
+
                     else if (!err && result) {
                         response.status = true;
                         response.message = "Requirement applicant map data saved successfully";
@@ -3411,6 +3427,70 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
         salaryPeriod = {};
     }
 
+    var billableCurrency = {};
+    billableCurrency = req.body.billableCurrency;
+    if (typeof (billableCurrency) == "string") {
+        billableCurrency = JSON.parse(billableCurrency);
+    }
+    if (!billableCurrency) {
+        billableCurrency = {};
+    }
+
+    var billableScale = {};
+    billableScale = req.body.billableScale;
+    if (typeof (billableScale) == "string") {
+        billableScale = JSON.parse(billableScale);
+    }
+    if (!billableScale) {
+        billableScale = {};
+    }
+
+    var billableDuration = {};
+    billableDuration = req.body.billableDuration;
+    if (typeof (billableDuration) == "string") {
+        billableDuration = JSON.parse(billableDuration);
+    }
+    if (!billableDuration) {
+        billableDuration = {};
+    }
+
+
+    var vendorCurrency = {};
+    vendorCurrency = req.body.vendorCurrency;
+    if (typeof (vendorCurrency) == "string") {
+        vendorCurrency = JSON.parse(vendorCurrency);
+    }
+    if (!vendorCurrency) {
+        vendorCurrency = {};
+    }
+
+    var vendorScale = {};
+    vendorScale = req.body.vendorScale;
+    if (typeof (vendorScale) == "string") {
+        vendorScale = JSON.parse(vendorScale);
+    }
+    if (!vendorScale) {
+        vendorScale = {};
+    }
+
+    var vendorDuration = {};
+    vendorDuration = req.body.vendorDuration;
+    if (typeof (vendorDuration) == "string") {
+        vendorDuration = JSON.parse(vendorDuration);
+    }
+    if (!vendorDuration) {
+        vendorDuration = {};
+    }
+
+    var designation = {};
+    designation = req.body.designation;
+    if (typeof (designation) == "string") {
+        designation = JSON.parse(designation);
+    }
+    if (!designation) {
+        designation = {};
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -3546,7 +3626,7 @@ applicantCtrl.getOnBoarding = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0]) {
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "onBoarding details loaded successfully";
                         response.error = null;
@@ -3568,23 +3648,30 @@ applicantCtrl.getOnBoarding = function (req, res, next) {
     
                             result[0][0].vendorCurrency = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorCurrency):{};
                             result[0][0].vendorScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorScale):{};
-                            result[0][0].vendorScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorScale):{};
+                            result[0][0].vendorDuration = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorDuration):{};
     
                             result[0][0].designation = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].designation):{};
                         }
                         
-                        result[0][0].offerDate = (result[2] && result[2][0]) ? result[2][0].offerDate :null;
-                        result[0][0].plannedJoiningDate = (result[2] && result[2][0]) ? result[2][0].plannedJoiningDate :null;
+                        if(result[1][0]){
+                            result[1][0].offerDate = (result[1] && result[1][0]) ? result[1][0].offerDate :null;
+                            result[1][0].plannedJoiningDate = (result[1] && result[1][0]) ? result[1][0].plannedJoiningDate :null;    
+                        }
                         
-
-                        response.data =result[0][0];
+                        response.data ={
+                            onBoarding : (result[0] && result[0][0]) ? result[0][0]:{},
+                            offer : (result[1] && result[1][0]) ? result[1][0] : {}
+                        };
                         res.status(200).json(response);
                     }
                     else if (!err) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
-                        response.data ={};
+                        response.data ={
+                            onBoarding :{},
+                            offer :{}
+                        };
                         res.status(200).json(response);
                     }
                     else {

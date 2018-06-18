@@ -295,8 +295,8 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                 var procQuery = 'CALL wm_save_pacePlanner( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
-                    console.log(result);
-                    if (!err && result && result[0] && result[0][0]) {
+                    // console.log(result);
+                    if (!err && result && result[0] || result[1]) {
                         response.status = true;
                         response.message = "Task saved successfully";
                         response.error = null;
@@ -368,7 +368,7 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0] || result[1]) {
                         response.status = true;
                         response.message = "Tasks loaded successfully";
                         response.error = null;

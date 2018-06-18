@@ -889,7 +889,9 @@ gulfCtrl.billingFilter = function (req, res, next) {
                         response.status = true;
                         response.message = "Billing Data loaded sucessfully";
                         response.error = null;
-                        response.data = (result && result[0] && result[0][0]) ? result[0]:[];
+                        response.data = {
+                            billingData = (result[0] && result[0][0]) ? result[0] :[]
+                        };
                         res.status(200).json(response);
                     }
                    
