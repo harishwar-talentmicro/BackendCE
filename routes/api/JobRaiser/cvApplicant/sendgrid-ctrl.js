@@ -1029,6 +1029,7 @@ sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
     var subject = req.body.subject ? req.body.subject : '';
     var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
     var isWeb = req.query.isWeb ? req.query.isWeb : 0;
+    var sendMailFlag = 0;
 
     var response = {
         status: false,
@@ -1077,7 +1078,8 @@ sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(reqApplicants))
+                    req.st.db.escape(JSON.stringify(reqApplicants)),
+                    req.st.db.escape(sendMailFlag)
                 ];
                 var idArray;
                 idArray = reqApplicants;
@@ -1176,7 +1178,7 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
         data: null,
         error: null
     };
-
+    var sendMailFlag = 1;
     var emailReceivers;                //emailReceivers to store the recipients
     var mailbody_array = [];    //array to store all mailbody after replacing tags
     var subject_array = [];
@@ -1290,7 +1292,8 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                     var inputs = [
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.query.heMasterId),
-                        req.st.db.escape(JSON.stringify(reqApplicants))
+                        req.st.db.escape(JSON.stringify(reqApplicants)),
+                        req.st.db.escape(sendMailFlag)
                     ];
                     
                     var procQuery = 'CALL wm_paceScreeningMailer( ' + inputs.join(',') + ')';
@@ -1605,6 +1608,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
     var subject = req.body.subject ? req.body.subject : '';
     var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
     var isWeb = req.query.isWeb ? req.query.isWeb : 0;
+    var sendMailFlag = 0;
 
     var response = {
         status: false,
@@ -1670,7 +1674,8 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(JSON.stringify(reqApplicants)),
-                    req.st.db.escape(JSON.stringify(clientContacts))
+                    req.st.db.escape(JSON.stringify(clientContacts)),
+                    req.st.db.escape(sendMailFlag)
                 ];
                 var idArray;
                 idArray = reqApplicants;
@@ -1806,7 +1811,7 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
         data: null,
         error: null
     };
-
+    var sendMailFlag =1;
     var emailReceivers;                //emailReceivers to store the recipients
     var mailbody_array = [];    //array to store all mailbody after replacing tags
     var subject_array = [];
@@ -1931,7 +1936,8 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.query.heMasterId),
                         req.st.db.escape(JSON.stringify(reqApplicants)),
-                        req.st.db.escape(JSON.stringify(clientContacts))
+                        req.st.db.escape(JSON.stringify(clientContacts)),
+                        req.st.db.escape(sendMailFlag)
                     ];
                     
                     var procQuery = 'CALL wm_paceSubmissionMailer( ' + inputs.join(',') + ')';
@@ -2872,7 +2878,7 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
     var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
     var isWeb = req.query.isWeb ? req.query.isWeb : 0;
     var interviewerFlag = req.body.interviewerFlag ? req.body.interviewerFlag : 0;  // if 0 mail is for  applicants if 1- mail is for client contacts
-
+    var sendMailFlag =0;
     var response = {
         status: false,
         message: "Invalid token",
@@ -2937,7 +2943,8 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(JSON.stringify(reqApplicants)),
-                    req.st.db.escape(JSON.stringify(clientContacts))
+                    req.st.db.escape(JSON.stringify(clientContacts)),
+                    req.st.db.escape(sendMailFlag)
                 ];
                 var idArray;
                 idArray = reqApplicants;
@@ -3113,7 +3120,7 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
         data: null,
         error: null
     };
-
+    var sendMailFlag =1;
     var emailReceivers;                //emailReceivers to store the recipients
     var mailbody_array = [];    //array to store all mailbody after replacing tags
     var subject_array = [];
@@ -3235,7 +3242,8 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.query.heMasterId),
                         req.st.db.escape(JSON.stringify(reqApplicants)),
-                        req.st.db.escape(JSON.stringify(clientContacts))
+                        req.st.db.escape(JSON.stringify(clientContacts)),
+                        req.st.db.escape(sendMailFlag)
                     ];
                     
                     var procQuery = 'CALL wm_paceInterviewMailer( ' + inputs.join(',') + ')';

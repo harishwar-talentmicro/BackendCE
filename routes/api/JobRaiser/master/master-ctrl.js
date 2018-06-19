@@ -613,9 +613,9 @@ masterCtrl.getmailTemplate = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0] || result[0][0] || result[1] || result[2] || result[5]) {
                         response.status = true;
-                        response.message = "Mail template list";
+                        response.message = "Mail template list loaded successfully";
                         response.error = null;
                         response.data = {
                             screeningMailer: result[0] ? result[0] : [],
@@ -627,7 +627,20 @@ masterCtrl.getmailTemplate = function (req, res, next) {
                         };
                         res.status(200).json(response);
                     }
-
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = {
+                            screeningMailer: [],
+                            submissionMailer:  [],
+                            jobseekerMailer: [],
+                            clientMailer:  [],
+                            interviewMailer:  [],
+                            trackerTemplates:  []
+                        };
+                        res.status(200).json(response);
+                    }
                     else {
                         response.status = false;
                         response.message = "Error while getting mail templates";

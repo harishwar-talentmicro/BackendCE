@@ -706,24 +706,24 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     // }
                     if (!err && (results[1] || results[2] && results[3])) {
 
-                        if (results[4] && results[4][0] && results[5] && results[5][0]) {
+                        if (results[4] && results[4][0] || results[5] || results[5][0]) {
 
                             var mailContent = (results[5] && results[5][0]) ? results[5][0].mailBody : "Dear [FirstName] <br>Thank you for registering your profile.  We will revert to you once we find your Resume match one of the requirements we have.In the mean time, please [ClickHere] to upload your latest CV that will help us with more detailed information about your profile.Wishing you all the best<br><br>[WalkINSignature]<br>[Disclaimer]";
 
-                            if(mailContent){
+                            if (mailContent) {
                                 mailContent = mailContent.replace("[FirstName]", req.body.firstName);
                                 mailContent = mailContent.replace("[FullName]", (req.body.firstName + ' ' + req.body.middleName + ' ' + req.body.lastName));
-    
+
                                 var webLink = (results[5] && results[5][0]) ? results[5][0].webLink : "";
                                 mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
-    
+
                                 var walkInSignature = (results[5] && results[5][0]) ? results[5][0].walkInSignature : "";
                                 var disclaimer = (results[5] && results[5][0]) ? results[5][0].disclaimer : "";
-    
+
                                 mailContent = mailContent.replace("[WalkINSignature]", walkInSignature);
                                 mailContent = mailContent.replace("[Disclaimer]", disclaimer);
                             }
-                           
+
                             var subject = results[5][0].mailSubject;
 
                             var email = new sendgrid.Email();
@@ -740,6 +740,116 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     console.log("mail sent successfully", result);
                                 }
                             });
+
+                            // To send mail to refered person
+                            if(result[6]){
+                                var refererEmail = new sendgrid.Email();
+                                refererEmail.from = results[4][0].fromEmailId;
+                                refererEmail.to = results[6][0].refererMailId;
+                                refererEmail.subject = results[6][0].message;
+                                refererEmail.html = results[6][0].message;
+    
+                                sendgrid.send(refererEmail, function (err1, result1) {
+                                    if (err1) {
+                                        console.log("mail not sent to referrer", err1);
+                                    }
+                                    else {
+                                        console.log("mail sent successfully to referrer", result1);
+                                    }
+                                });
+                            }
+                            
+                            // to send sms to candidate
+                            var isdMobile = req.body.mobileISD;
+                            var mobileNo = req.body.mobileNo;
+                            var message = "Congratulations your profile is successfully registered";
+                            if (isdMobile == "+977") {
+                                request({
+                                    url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                    qs: {
+                                        token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                        to: mobileNo,
+                                        message: message,
+                                        sender: 'Techingen'
+                                    },
+                                    method: 'GET'
+
+                                }, function (error, response, body) {
+                                    if (error) {
+                                        console.log(error, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+
+                                });
+                            }
+                            else if (isdMobile == "+91") {
+                                request({
+                                    url: 'https://aikonsms.co.in/control/smsapi.php',
+                                    qs: {
+                                        user_name: 'janardana@hirecraft.com',
+                                        password: 'Ezeid2015',
+                                        sender_id: 'WtMate',
+                                        service: 'TRANS',
+                                        mobile_no: mobileNo,
+                                        message: message,
+                                        method: 'send_sms'
+                                    },
+                                    method: 'GET'
+
+                                }, function (error, response, body) {
+                                    if (error) {
+                                        console.log(error, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+                                });
+
+                                var req = http.request(options, function (res) {
+                                    var chunks = [];
+
+                                    res.on("data", function (chunk) {
+                                        chunks.push(chunk);
+                                    });
+
+                                    res.on("end", function () {
+                                        var body = Buffer.concat(chunks);
+                                        console.log(body.toString());
+                                    });
+                                });
+
+                                req.write(qs.stringify({
+                                    userId: 'talentmicro',
+                                    password: 'TalentMicro@123',
+                                    senderId: 'WTMATE',
+                                    sendMethod: 'simpleMsg',
+                                    msgType: 'text',
+                                    mobile: isdMobile.replace("+", "") + mobileNo,
+                                    msg: message,
+                                    duplicateCheck: 'true',
+                                    format: 'json'
+                                }));
+                                req.end();
+                            }
+                            else if (isdMobile != "") {
+                                client.messages.create(
+                                    {
+                                        body: message,
+                                        to: isdMobile + mobileNo,
+                                        from: '+14434322305'
+                                    },
+                                    function (error, response) {
+                                        if (error) {
+                                            console.log(error, "SMS");
+                                        }
+                                        else {
+                                            console.log("SUCCESS", "SMS response");
+                                        }
+                                    }
+                                );
+                            }
                         }
 
                         response.status = true;
@@ -754,7 +864,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
 
                     else if (!err && (results[1] || results[2])) {
 
-                        if (results[4] && results[4][0] && results[5] && results[5][0]) {
+                        if (results[4] && results[4][0] || results[5] || results[5][0]) {
 
                             var mailContent = (results[5] && results[5][0]) ? results[5][0].mailBody : "Dear [FirstName] <br>Thank you for registering your profile.  We will revert to you once we find your Resume match one of the requirements we have.In the mean time, please [ClickHere] to upload your latest CV that will help us with more detailed information about your profile.Wishing you all the best<br><br>[WalkINSignature]<br>[Disclaimer]";
 
@@ -786,6 +896,116 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     console.log("mail sent successfully", result);
                                 }
                             });
+
+                            // To send mail to refered person
+                            if(result[6]){
+                                var refererEmail = new sendgrid.Email();
+                                refererEmail.from = results[4][0].fromEmailId;
+                                refererEmail.to = results[6][0].refererMailId;
+                                refererEmail.subject = results[6][0].message;
+                                refererEmail.html = results[6][0].message;
+    
+                                sendgrid.send(refererEmail, function (err1, result1) {
+                                    if (err1) {
+                                        console.log("mail not sent to referrer", err1);
+                                    }
+                                    else {
+                                        console.log("mail sent successfully to referrer", result1);
+                                    }
+                                });
+                            }
+                            
+                            // to send sms to candidate
+                            var isdMobile = req.body.mobileISD;
+                            var mobileNo = req.body.mobileNo;
+                            var message = "Congratulations your profile is successfully registered";
+                            if (isdMobile == "+977") {
+                                request({
+                                    url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                    qs: {
+                                        token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                        to: mobileNo,
+                                        message: message,
+                                        sender: 'Techingen'
+                                    },
+                                    method: 'GET'
+
+                                }, function (error, response, body) {
+                                    if (error) {
+                                        console.log(error, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+
+                                });
+                            }
+                            else if (isdMobile == "+91") {
+                                request({
+                                    url: 'https://aikonsms.co.in/control/smsapi.php',
+                                    qs: {
+                                        user_name: 'janardana@hirecraft.com',
+                                        password: 'Ezeid2015',
+                                        sender_id: 'WtMate',
+                                        service: 'TRANS',
+                                        mobile_no: mobileNo,
+                                        message: message,
+                                        method: 'send_sms'
+                                    },
+                                    method: 'GET'
+
+                                }, function (error, response, body) {
+                                    if (error) {
+                                        console.log(error, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+                                });
+
+                                var req = http.request(options, function (res) {
+                                    var chunks = [];
+
+                                    res.on("data", function (chunk) {
+                                        chunks.push(chunk);
+                                    });
+
+                                    res.on("end", function () {
+                                        var body = Buffer.concat(chunks);
+                                        console.log(body.toString());
+                                    });
+                                });
+
+                                req.write(qs.stringify({
+                                    userId: 'talentmicro',
+                                    password: 'TalentMicro@123',
+                                    senderId: 'WTMATE',
+                                    sendMethod: 'simpleMsg',
+                                    msgType: 'text',
+                                    mobile: isdMobile.replace("+", "") + mobileNo,
+                                    msg: message,
+                                    duplicateCheck: 'true',
+                                    format: 'json'
+                                }));
+                                req.end();
+                            }
+                            else if (isdMobile != "") {
+                                client.messages.create(
+                                    {
+                                        body: message,
+                                        to: isdMobile + mobileNo,
+                                        from: '+14434322305'
+                                    },
+                                    function (error, response) {
+                                        if (error) {
+                                            console.log(error, "SMS");
+                                        }
+                                        else {
+                                            console.log("SUCCESS", "SMS response");
+                                        }
+                                    }
+                                );
+                            }
                         }
 
                         response.status = true;
@@ -1172,8 +1392,10 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             ugEducationList: output ? output : [],
                             pgEducationList: output1 ? output1 : [],
                             isDOBRequired: result[13][0].isDOBRequired,
-                            isIDRequired: result[13][0].isIDRequired,
-                            IDType: result[13][0].IDType,
+                            isIDRequired: result[14][0].isIDRequired,
+                            IDType: result[14][0].IDType,  // field Name
+                            isIDNumberOrString:(result[14] && result[14][0]) ? result[14][0].isIDNumberOrString:1,
+                            maxIDLength :(result[14] && result[14][0]) ? result[14][0].maxIDLength:0,
                             DOBType: result[13][0].DOBType,
                             isVisitorCheckIn: result[14][0].isVisitorCheckIn,
                             isWalkIn: result[14][0].isWalkIn,
@@ -1707,7 +1929,7 @@ walkInCvCtrl.getWalkinJoblist = function (req, res, next) {
                             result[0][i].users = result[0][i].users ? JSON.parse(result[0][i].users) : [];
                         }
 
-                        result[1][0].userList = (result[1] && result[1][0]) ? JSON.parse(result[1][0].userList) :[];
+                        result[1][0].userList = (result[1] && result[1][0]) ? JSON.parse(result[1][0].userList) : [];
 
                         response.data = {
                             jobList: (result[0] && result[0][0]) ? result[0] : [],
@@ -1724,7 +1946,7 @@ walkInCvCtrl.getWalkinJoblist = function (req, res, next) {
                         response.data = {
                             jobList: [],
                             walkInWebConfig: {},
-                            vendors:[]
+                            vendors: []
                         };
                         res.status(200).json(response);
 
@@ -1935,7 +2157,7 @@ walkInCvCtrl.saveVisitorCheckIn = function (req, res, next) {
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, results) {
                         console.log(err);
-                        if(!err && results && results[0] ){
+                        if (!err && results && results[0]) {
                             senderGroupId = results[0][0].senderId;
                             // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                             //     senderName : results[0][0].message
@@ -2015,21 +2237,21 @@ walkInCvCtrl.saveVisitorCheckIn = function (req, res, next) {
                                     senderName: results[0][0].senderName,
                                     senderId: results[0][0].senderId,
                                     receiverId: results[0][0].receiverId,
-                                    transId : results[0][0].transId,
-                                    formId : results[0][0].formId,
+                                    transId: results[0][0].transId,
+                                    formId: results[0][0].formId,
                                     groupId: req.body.groupId,
-                                    currentStatus : results[0][0].currentStatus,
-                                    currentTransId : results[0][0].currentTransId,
-                                    localMessageId : req.body.localMessageId,
-                                    parentId : results[0][0].parentId,
-                                    accessUserType : results[0][0].accessUserType,
-                                    heUserId : results[0][0].heUserId,
-                                    formData : JSON.parse(results[0][0].formDataJSON)
+                                    currentStatus: results[0][0].currentStatus,
+                                    currentTransId: results[0][0].currentTransId,
+                                    localMessageId: req.body.localMessageId,
+                                    parentId: results[0][0].parentId,
+                                    accessUserType: results[0][0].accessUserType,
+                                    heUserId: results[0][0].heUserId,
+                                    formData: JSON.parse(results[0][0].formDataJSON)
                                 }
                             };
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                             zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                 res.status(200).json(response);
                             });
                         }
@@ -2307,7 +2529,7 @@ walkInCvCtrl.getvisitorTrackerPdf = function (req, res, next) {
 
                     htmlContent = "";
                     if (result[1].length) {
-                        
+
                         htmlContent += "<!DOCTYPE html><html><head lang='en'><meta charset='UTF-8'><title></title><body><h1 style='text-align:center;margin-bottom: 0px;'>";
                         htmlContent += result[0][0].companyName;
                         htmlContent += "</h1>";
@@ -2673,7 +2895,7 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 req.body.DOBRequired = req.body.DOBRequired ? req.body.DOBRequired : 0;
                 req.body.IDRequired = req.body.IDRequired ? req.body.IDRequired : 0;
                 req.body.IDType = req.body.IDType ? req.body.IDType : '';
-                
+
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
