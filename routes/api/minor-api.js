@@ -363,21 +363,21 @@ cron.schedule('*/15 * * * *', function () {
         }
     });
 });
-
-var cronJobMessage = new CronJob({
-    cronTime: '20 * * * * *',
-    onTick: function () {
-        notifyMessages.getMessagesNeedToNotify();
-        /*
-         * Runs every weekday (Monday through Friday)
-         * at 11:30:00 AM. It does not run on Saturday
-         * or Sunday.
-         */
-    },
-    start: false,
-    timeZone: 'America/Los_Angeles'
-});
-cronJobMessage.start();
+    var cronJobMessage = new CronJob({
+        cronTime: '20 * * * * *',
+        onTick: function () {
+    notifyMessages.getMessagesNeedToNotify();
+    
+    /*
+     * Runs every weekday (Monday through Friday)
+     * at 11:30:00 AM. It does not run on Saturday
+     * or Sunday.
+     */
+        },
+        start: false,
+        timeZone: 'America/Los_Angeles'
+    });
+    cronJobMessage.start();
 
 
 
@@ -387,9 +387,15 @@ cronJobMessage.start();
 
 
 // cron.schedule('*/15 * * * *', function () {
+    var cluster = require('cluster');
+
+ if (cluster.isWorker) {
+    console.log('asdf sundar', cluster.worker.id);
+
+if (cluster.worker.id == 1) {
 
 var cronJobInterview = new CronJob({
-    cronTime: '25 * * * * *',
+    cronTime: '*/15 * * * *',
     onTick: function () {
         var query = "call wm_integrationUrlForHircraft()";
         db.query(query, function (err, result) {
@@ -464,68 +470,85 @@ var cronJobInterview = new CronJob({
     timeZone: 'America/Los_Angeles'
 });
 cronJobInterview.start();
-
+}
+}
 // });
 
 
 // cron.schedule('*/15 * * * *', function () {
 
+var cluster = require('cluster');
 
-var cronJobWalkIn = new CronJob({
-    cronTime: '45 * * * * *',
-    onTick: function () {
-        var query = "call wm_integrationUrlwalkIn()";
-        db.query(query, function (err, result) {
-            console.log('Running walkin cron job for Hexaware');
-            if (err) {
-                console.log('error: integrationUrlForHircraft');
-            }
-            else if ((result[0].length != 0) && (result[1].length != 0)) {
-                var heMasterId;
-                var transId;
-                var formData = {};
-                var DBUrl;
-                if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
-                    heMasterId = result[0][0].heMasterId;
-                    DBUrl = result[0][0].url;
-                    transId = result[1][0].transId;
-                    formData = result[1][0].formData;
+ if (cluster.isWorker) {
+    console.log('asdf sundar', cluster.worker.id);
 
-                    // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
-                    var count = 0;
-                    request({
-                        url: DBUrl,
-                        method: "POST",
-                        json: true,   // <--Very important!!!
-                        body: JSON.parse(formData)
-                    }, function (error, response, body) {
-                        console.log(error);
-                        console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
-                        if (body && body.Code && ((body.Code == "SAVED") || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "INFO_03") || (body.Code == "ERR_07") || (body.Code == "ERR_08"))) {
-                            var updateQuery = "update 1039_trans set sync=1 where heParentId=" + transId;
-                            db.query(updateQuery, function (err, results) {
-                                if (err) {
-                                    console.log("update sync query throws error");
-                                }
-                                else {
-                                    console.log("sync is updated to 1 successfully of transId", transId);
-                                }
-                            });
-                        }
-                        count++;
-                    });
-                    console.log('tallint walkIn hit for ', count, ' times');
+if (cluster.worker.id == 1) {
+    // run job
+
+    console.log("bye take care")
+    var cronJobWalkIn = new CronJob({
+        cronTime: '45 * * * * *',
+        onTick: function () {
+            var query = "call wm_integrationUrlwalkIn()";
+            db.query(query, function (err, result) {
+                console.log('Running walkin cron job for Hexaware');
+                if (err) {
+                    console.log('error: integrationUrlForHircraft');
                 }
-            }
-        });
-    },
-    start: false,
-    timeZone: 'America/Los_Angeles'
-});
-cronJobWalkIn.start();
+                else if ((result[0].length != 0) && (result[1].length != 0)) {
+                    var heMasterId;
+                    var transId;
+                    var formData = {};
+                    var DBUrl;
+                    if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
+                        heMasterId = result[0][0].heMasterId;
+                        DBUrl = result[0][0].url;
+                        transId = result[1][0].transId;
+                        formData = result[1][0].formData;
 
+                        // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
+                        var count = 0;
+                        request({
+                            url: DBUrl,
+                            method: "POST",
+                            json: true,   // <--Very important!!!
+                            body: JSON.parse(formData)
+                        }, function (error, response, body) {
+                            console.log(error);
+                            console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
+                            if (body && body.Code && ((body.Code == "SAVED") || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "INFO_03") || (body.Code == "ERR_07") || (body.Code == "ERR_08"))) {
+                                var updateQuery = "update 1039_trans set sync=1 where heParentId=" + transId;
+                                db.query(updateQuery, function (err, results) {
+                                    if (err) {
+                                        console.log("update sync query throws error");
+                                    }
+                                    else {
+                                        console.log("sync is updated to 1 successfully of transId", transId);
+                                    }
+                                });
+                            }
+                            count++;
+                        });
+                        console.log('tallint walkIn hit for ', count, ' times');
+                    }
+                }
+            });
+        },
+        start: false,
+        timeZone: 'America/Los_Angeles'
+    });
+    cronJobWalkIn.start();
+}
+ }
 
 // });
+
+var cluster = require('cluster');
+
+ if (cluster.isWorker) {
+    console.log('asdf sundar', cluster.worker.id);
+
+if (cluster.worker.id == 1) {
 
 
 var cronJobWalkInQuessCorp = new CronJob({
@@ -580,5 +603,7 @@ var cronJobWalkInQuessCorp = new CronJob({
     timeZone: 'America/Los_Angeles'
 });
 cronJobWalkInQuessCorp.start();
+}
+ }
 
 module.exports = router;
