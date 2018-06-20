@@ -1274,7 +1274,13 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
     else {
         var inputs = [
             req.st.db.escape(req.query.mobileNo),
-            req.st.db.escape(req.query.otp)
+            req.st.db.escape(req.query.otp),
+            req.st.db.escape(req.body.heParentId),
+            req.st.db.escape(req.body.firstName),
+            req.st.db.escape(req.body.lastName),
+            req.st.db.escape(req.body.mobileISD),
+            req.st.db.escape(req.body.IDNumber),
+            req.st.db.escape(req.body.emailId)
         ];
 
         var procQuery = 'CALL wm_walkIn_verifyOtp( ' + inputs.join(',') + ')';
@@ -1287,7 +1293,9 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
                 response.message = result[0][0].message;
                 response.error = false;
                 response.data = {
-                    message: result[0][0].message
+                    message: (result[0] && result[0][0]) ? result[0][0].message:'',
+                    existsMessage: (result[1] && result[1][0]) ? result[1][0]._error:'',
+                    applicantDetails: (result[2] && result[2][0]) ? result[2][0] : {}
                 };
                 res.status(200).json(response);
             }
@@ -1432,7 +1440,11 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             scale: [],
                             duration: [],
                             ugEducationList: [],
-                            pgEducationList: []
+                            pgEducationList: [],
+                            isDOBRequired:0,
+                            isIDRequired:0,
+                            IDType:0,
+                            
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
