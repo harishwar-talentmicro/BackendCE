@@ -9,7 +9,7 @@ router.get('/skillindustryData',walkInCvCtrl.getskillIndustry);
 router.post('/candidateData',walkInCvCtrl.saveCandidate);
 
 router.post('/sendOtp',walkInCvCtrl.sendOtp);
-router.get('/verifyOtp',walkInCvCtrl.verifyOtp);
+router.post('/verifyOtp',walkInCvCtrl.verifyOtp);   // changed to post
 router.get('/bannerList',walkInCvCtrl.bannerList);
 
 router.post('/InterviewScheduler',walkInCvCtrl.InterviewSchedulerForPublish);
