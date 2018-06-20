@@ -558,7 +558,7 @@ jobCtrl.getJobDefaults = function (req, res, next) {
                         response.status = true;
                         response.message = "Requirement default data is";
                         response.error = null;
-                        response.data = JSON.parse(results[0][0].defaultFormData) ? JSON.parse(results[0][0].defaultFormData) : [];
+                        response.data = results[0][0].defaultFormData ? JSON.parse(results[0][0].defaultFormData) : {};
 
                         res.status(200).json(response);
                     }
@@ -566,7 +566,7 @@ jobCtrl.getJobDefaults = function (req, res, next) {
                         response.status = true;
                         response.message = "Default data not found";
                         response.error = null;
-                        response.data = null;
+                        response.data = {};
                         res.status(200).json(response);
                     }
                     else {

@@ -1714,11 +1714,11 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                                 }
 
                                 for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-                                    mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[1][applicantIndex][tags.client[tagIndex].tagName]);
+                                    mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
 
-                                    subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[1][applicantIndex][tags.client[tagIndex].tagName]);
+                                    subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
 
-                                    smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[1][applicantIndex][tags.client[tagIndex].tagName]);
+                                    smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
                                 }
                             }
                             for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
@@ -1969,11 +1969,11 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                     }
     
                                     for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[1][applicantIndex][tags.client[tagIndex].tagName]);
+                                        mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
     
-                                        subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[1][applicantIndex][tags.client[tagIndex].tagName]);
+                                        subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
     
-                                        smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[1][applicantIndex][tags.client[tagIndex].tagName]);
+                                        smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
                                     }
                                 }
                                 for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {

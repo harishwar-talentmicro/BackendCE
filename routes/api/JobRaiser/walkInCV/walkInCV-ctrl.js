@@ -529,7 +529,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-
+                var isWeb = req.query.isWeb;
                 req.body.heParentId = (req.body.heParentId) ? req.body.heParentId : 0;
                 req.body.fresherExperience = (req.body.fresherExperience) ? req.body.fresherExperience : 0;
                 req.body.lastName = (req.body.lastName) ? req.body.lastName : "";
@@ -595,7 +595,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    var isWeb = req.query.isWeb;
+                    
 
                     // if (!err && results && results[0][0]) {
                     //     senderGroupId = results[0][0].senderId;
@@ -704,7 +704,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     //     }
 
                     // }
-                    if (!err && (results[1] || results[2] && results[3])) {
+                    if (!err && (results[1] || results[2] && results[3])) {    // walkInForm Message with token
 
                         if (results[4] && results[4][0] || results[5] || results[5][0]) {
 
@@ -725,24 +725,24 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             }
 
                             var subject = results[5][0].mailSubject;
-
+                            // send mail to candidate
                             var email = new sendgrid.Email();
                             email.from = results[4][0].fromEmailId;
                             email.to = req.body.emailId;
                             email.subject = subject;
                             email.html = mailContent;
 
-                            sendgrid.send(email, function (err, result) {
-                                if (err) {
-                                    console.log("mail not sent", err);
+                            sendgrid.send(email, function (err11, result11) {
+                                if (err11) {
+                                    console.log("mail not sent", err11);
                                 }
                                 else {
-                                    console.log("mail sent successfully", result);
+                                    console.log("mail sent successfully", result11);
                                 }
                             });
 
                             // To send mail to refered person
-                            if(result[6]){
+                            if(results[6]){
                                 var refererEmail = new sendgrid.Email();
                                 refererEmail.from = results[4][0].fromEmailId;
                                 refererEmail.to = results[6][0].refererMailId;
@@ -774,9 +774,9 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     },
                                     method: 'GET'
 
-                                }, function (error, response, body) {
-                                    if (error) {
-                                        console.log(error, "SMS");
+                                }, function (error2, response2, body2) {
+                                    if (error2) {
+                                        console.log(error2, "SMS");
                                     }
                                     else {
                                         console.log("SUCCESS", "SMS response");
@@ -798,29 +798,29 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     },
                                     method: 'GET'
 
-                                }, function (error, response, body) {
-                                    if (error) {
-                                        console.log(error, "SMS");
+                                }, function (error2, response2, body2) {
+                                    if (error2) {
+                                        console.log(error2, "SMS");
                                     }
                                     else {
                                         console.log("SUCCESS", "SMS response");
                                     }
                                 });
 
-                                var req = http.request(options, function (res) {
+                                var req5 = http.request(options, function (res5) {
                                     var chunks = [];
 
-                                    res.on("data", function (chunk) {
+                                    res5.on("data", function (chunk) {
                                         chunks.push(chunk);
                                     });
 
-                                    res.on("end", function () {
-                                        var body = Buffer.concat(chunks);
-                                        console.log(body.toString());
+                                    res5.on("end", function () {
+                                        var body5 = Buffer.concat(chunks);
+                                        console.log(body5.toString());
                                     });
                                 });
 
-                                req.write(qs.stringify({
+                                req5.write(qs.stringify({
                                     userId: 'talentmicro',
                                     password: 'TalentMicro@123',
                                     senderId: 'WTMATE',
@@ -831,7 +831,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     duplicateCheck: 'true',
                                     format: 'json'
                                 }));
-                                req.end();
+                                req5.end();
                             }
                             else if (isdMobile != "") {
                                 client.messages.create(
@@ -840,9 +840,9 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                         to: isdMobile + mobileNo,
                                         from: '+14434322305'
                                     },
-                                    function (error, response) {
-                                        if (error) {
-                                            console.log(error, "SMS");
+                                    function (error6, response6) {
+                                        if (error6) {
+                                            console.log(error6, "SMS");
                                         }
                                         else {
                                             console.log("SUCCESS", "SMS response");
@@ -862,7 +862,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                         res.status(200).json(response);
                     }
 
-                    else if (!err && (results[1] || results[2])) {
+                    else if (!err && (results[1] || results[2])) {   //  walkIn formMessage without token
 
                         if (results[4] && results[4][0] || results[5] || results[5][0]) {
 
@@ -881,24 +881,24 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             mailContent = mailContent.replace("[Disclaimer]", disclaimer);
 
                             var subject = results[5][0].mailSubject;
-
+                            // send mail to candidate
                             var email = new sendgrid.Email();
                             email.from = results[4][0].fromEmailId;
                             email.to = req.body.emailId;
                             email.subject = subject;
                             email.html = mailContent;
 
-                            sendgrid.send(email, function (err, result) {
-                                if (err) {
-                                    console.log("mail not sent", err);
+                            sendgrid.send(email, function (err11, result11) {
+                                if (err11) {
+                                    console.log("mail not sent", err11);
                                 }
                                 else {
-                                    console.log("mail sent successfully", result);
+                                    console.log("mail sent successfully", result11);
                                 }
                             });
 
                             // To send mail to refered person
-                            if(result[6]){
+                            if(results[6]){
                                 var refererEmail = new sendgrid.Email();
                                 refererEmail.from = results[4][0].fromEmailId;
                                 refererEmail.to = results[6][0].refererMailId;
@@ -930,9 +930,9 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     },
                                     method: 'GET'
 
-                                }, function (error, response, body) {
-                                    if (error) {
-                                        console.log(error, "SMS");
+                                }, function (error2, response2, body2) {
+                                    if (error2) {
+                                        console.log(error2, "SMS");
                                     }
                                     else {
                                         console.log("SUCCESS", "SMS response");
@@ -954,29 +954,29 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     },
                                     method: 'GET'
 
-                                }, function (error, response, body) {
-                                    if (error) {
-                                        console.log(error, "SMS");
+                                }, function (error2, response2, body2) {
+                                    if (error2) {
+                                        console.log(error2, "SMS");
                                     }
                                     else {
                                         console.log("SUCCESS", "SMS response");
                                     }
                                 });
 
-                                var req = http.request(options, function (res) {
+                                var req5 = http.request(options, function (res5) {
                                     var chunks = [];
 
-                                    res.on("data", function (chunk) {
+                                    res5.on("data", function (chunk) {
                                         chunks.push(chunk);
                                     });
 
-                                    res.on("end", function () {
-                                        var body = Buffer.concat(chunks);
-                                        console.log(body.toString());
+                                    res5.on("end", function () {
+                                        var body5 = Buffer.concat(chunks);
+                                        console.log(body5.toString());
                                     });
                                 });
 
-                                req.write(qs.stringify({
+                                req5.write(qs.stringify({
                                     userId: 'talentmicro',
                                     password: 'TalentMicro@123',
                                     senderId: 'WTMATE',
@@ -987,7 +987,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     duplicateCheck: 'true',
                                     format: 'json'
                                 }));
-                                req.end();
+                                req5.end();
                             }
                             else if (isdMobile != "") {
                                 client.messages.create(
@@ -996,9 +996,9 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                         to: isdMobile + mobileNo,
                                         from: '+14434322305'
                                     },
-                                    function (error, response) {
-                                        if (error) {
-                                            console.log(error, "SMS");
+                                    function (error6, response6) {
+                                        if (error6) {
+                                            console.log(error6, "SMS");
                                         }
                                         else {
                                             console.log("SUCCESS", "SMS response");
@@ -1253,6 +1253,7 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
         data: null,
         error: null
     };
+
     var validationFlag = true;
 
     if (!req.query.mobileNo) {
@@ -1265,6 +1266,7 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
         validationFlag = false;
     }
 
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -1272,6 +1274,15 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
         console.log(response);
     }
     else {
+
+        req.body.heParentId = req.body.heParentId ? req.body.heParentId :0;
+        req.body.mobileISD = req.body.mobileISD ? req.body.mobileISD :'';
+        req.body.IDNumber = req.body.IDNumber ? req.body.IDNumber :'';
+        req.body.emailId = req.body.emailId ? req.body.emailId :'';
+        req.body.firstName = req.body.firstName ? req.body.firstName :'';
+        req.body.heMasterId = req.body.heMasterId ? req.body.heMasterId :0;
+
+        
         var inputs = [
             req.st.db.escape(req.query.mobileNo),
             req.st.db.escape(req.query.otp),
@@ -1280,22 +1291,81 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
             req.st.db.escape(req.body.lastName),
             req.st.db.escape(req.body.mobileISD),
             req.st.db.escape(req.body.IDNumber),
-            req.st.db.escape(req.body.emailId)
+            req.st.db.escape(req.body.emailId),
+            req.st.db.escape(req.body.heMasterId)
         ];
 
         var procQuery = 'CALL wm_walkIn_verifyOtp( ' + inputs.join(',') + ')';
         console.log(procQuery);
         req.db.query(procQuery, function (err, result) {
             console.log(err);
-            console.log(result);
-            if (!err && result && result[0][0].message == "OTP verified successfully") {
+            // console.log(result);
+            if (!err && result && result[0][0].message == "OTP verified successfully" && result[2] && result[2][0]) {
                 response.status = true;
                 response.message = result[0][0].message;
                 response.error = false;
+
+                if(result[2] && result[2][0]){
+                    result[2][0].location = (result[2] && result[2][0] && result[2][0].location) ? JSON.parse(result[2][0].location):{};
+                    if(result[2][0].location.locationId == 0){
+                        result[2][0].location = {};
+                    }
+                    
+                    result[2][0].currency = (result[2] && result[2][0]) ? JSON.parse(result[2][0].currency):{};
+                    if(result[2][0].currency.presentSalaryCurrId == 0){
+                        result[2][0].currency = {};
+                    }
+                    
+                    result[2][0].scale = (result[2] && result[2][0]) ? JSON.parse(result[2][0].scale):{};
+                    if(result[2][0].scale.presentSalaryScaleId == 0){
+                        result[2][0].scale = {};
+                    }
+
+                    result[2][0].period = (result[2] && result[2][0]) ? JSON.parse(result[2][0].period):{};
+                    if(result[2][0].period.presentSalaryPeriodId == 0){
+                        result[2][0].period = {};
+                    }
+
+                    result[2][0].details = (result[2] && result[2][0]) ? JSON.parse(result[2][0].details):{};
+                    if(result[2][0].details.referedId == 0 && result[2][0].details.empCode=="" && result[2][0].details.referedName == ""){
+                        result[2][0].details = {};
+                    }
+
+                    result[2][0].skills = (result[2] && result[2][0]) ? JSON.parse(result[2][0].skills):[];
+                    if(result[2][0].skills.skillId == 0){
+                        result[2][0].skills = {};
+                    }
+                    result[2][0].industry = (result[2] && result[2][0]) ? JSON.parse(result[2][0].industry):[];
+                    if(result[2][0].industry.industryId == 0){
+                        result[2][0].industry = {};
+                    }
+                    result[2][0].ugEducation = (result[2] && result[2][0]) ? JSON.parse(result[2][0].ugEducation):{};
+                    if(result[2][0].ugEducation.educationId == 0){
+                        result[2][0].ugEducation = {};
+                    }
+                    result[2][0].pgEducation = (result[2] && result[2][0]) ? JSON.parse(result[2][0].pgEducation):{};
+                    if(result[2][0].pgEducation.educationId == 0){
+                        result[2][0].pgEducation = {};
+                    }
+                    // result[2][0].walkInJobs = (result[2] && result[2][0]) ? JSON.parse(result[2][0].walkInJobs):{};
+    
+                }                
                 response.data = {
                     message: (result[0] && result[0][0]) ? result[0][0].message:'',
                     existsMessage: (result[1] && result[1][0]) ? result[1][0]._error:'',
                     applicantDetails: (result[2] && result[2][0]) ? result[2][0] : {}
+                };
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0][0].message == "OTP verified successfully") {
+                response.status = true;
+                response.message = result[0][0].message;
+                response.error = false;
+                response.data = {
+                    message: result[0][0].message
+                   // existsMessage:'',
+                   // applicantDetails:{}
                 };
                 res.status(200).json(response);
             }
@@ -1306,6 +1376,8 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
                 response.error = false;
                 response.data = {
                     message: result[0][0].message
+                   // existsMessage:'',
+                   // applicantDetails:{}
                 };
                 res.status(200).json(response);
             }
