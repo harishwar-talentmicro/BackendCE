@@ -50,9 +50,7 @@ var IOS_SNS = new SNS({
 });
 
 module.exports = function(favoriteBook,done) {
-    // console.log("startPage",favoriteBook.increment);
-    // console.log("results",favoriteBook.results[0]);
-    // console.log("limitValues",favoriteBook.limitValues);
+
 
     var startPage = favoriteBook.increment ;
     var limit = favoriteBook.limitValues ;
@@ -72,8 +70,7 @@ module.exports = function(favoriteBook,done) {
         limitValue = results.length ;
     }
 
-    console.log("initialValue",initialValue);
-    console.log("limitValue",limitValue);
+
     var msgBytes = 1024;
     var messagePayload = {} ;
 
@@ -98,7 +95,7 @@ module.exports = function(favoriteBook,done) {
                     senderId: results[i].senderId,
                     receiverId: results[i].receiverId,
                     groupId: results[i].senderId,
-                    groupType: 2,
+                    groupType: results[i].groupType,
                     transId: results[i].transId,
                     formId: results[i].formId,
                     currentStatus: results[i].currentStatus,
@@ -108,7 +105,7 @@ module.exports = function(favoriteBook,done) {
                     heUserId: results[i].heUserId,
                     formData: JSON.parse(results[i].formDataJSON)
                 },
-                contactList: null
+                contactList: results[i].contactData ? JSON.parse(results[i].contactData) : null
             } ;
 
             var buf = new Buffer(JSON.stringify(data), 'utf-8');
@@ -137,10 +134,11 @@ module.exports = function(favoriteBook,done) {
                     data : encryption.encrypt(result,results[i].secretKey).toString('base64')
                 };
 
+
+
                 var iphoneId =(results[i].iphoneId) ? (results[i].iphoneId) : '' ;
                 var GCM_Id = (results[i].GCM_Id) ? (results[i].GCM_Id) : '';
-                console.log("GCM_Id1",GCM_Id);
-                console.log("iphoneId1",iphoneId);
+
 
                 if(iphoneId != ""){
                     var sound = "default";
@@ -192,17 +190,29 @@ module.exports = function(favoriteBook,done) {
 
                     IOS_SNS.addUser(iphoneId, null, function(err, endpointArn) {
                         if (err) {
-                            console.log(err);
+                            if(messageIds == ""){
+                                messageIds = results[i].messageUserId ;
+                            }
+                            else {
+                                messageIds = messageIds + "," + results[i].messageUserId ;
+                            }
+
                             uploader(i+1);
                         }
                         else {
                             // Send notifications
                             IOS_SNS.sendMessage(endpointArn, params, function(err, data) {
                                 if (err) {
-                                    console.log(err.stack);
+                                    if(messageIds == ""){
+                                        messageIds = results[i].messageUserId ;
+                                    }
+                                    else {
+                                        messageIds = messageIds + "," + results[i].messageUserId ;
+                                    }
+                                    uploader(i+1);
                                 }
                                 else {
-                                    console.log("data",data);
+
                                     if(messageIds == ""){
                                         messageIds = results[i].messageUserId ;
                                     }
@@ -219,7 +229,7 @@ module.exports = function(favoriteBook,done) {
 
                 }
                 else if(GCM_Id != ""){
-                        console.log("GCM_Id",GCM_Id);
+
                         //  _Notification_aws.publish_Android(GCM_Id,messagePayload);
                         params = {
                             default : "This is the default message which must be present when publishing a message to a topic. The default message will only be used if a message is not present one of the notification platforms.",
@@ -234,15 +244,27 @@ module.exports = function(favoriteBook,done) {
 
                         ANDROID_SNS.addUser(GCM_Id, null, function(err, endpointArn) {
                             if (err) {
-                                console.log(err);
+                                // console.log(err);
+                                if(messageIds == ""){
+                                    messageIds = results[i].messageUserId ;
+                                }
+                                else {
+                                    messageIds = messageIds + "," + results[i].messageUserId ;
+                                }
                                 uploader(i+1);
                             }
                             else {
                                 ANDROID_SNS.sendMessage(endpointArn, params, function(err, messageId) {
                                     console.log("messageId",messageId,"======",endpointArn);
                                     if(err) {
-                                        console.log('An error occured sending message to device %s', endpointArn);
-                                        console.log(err);
+                                        if(messageIds == ""){
+                                            messageIds = results[i].messageUserId ;
+                                        }
+                                        else {
+                                            messageIds = messageIds + "," + results[i].messageUserId ;
+                                        }
+
+                                        uploader(i+1);
                                     } else {
                                         if(messageIds == ""){
                                             messageIds = results[i].messageUserId ;
