@@ -393,7 +393,7 @@ cron.schedule('*/15 * * * *', function () {
     var cluster = require('cluster');
 
  if (cluster.isWorker) {
-    console.log('asdf sundar', cluster.worker.id);
+   // console.log('asdf sundar', cluster.worker.id);
 
 if (cluster.worker.id == 1) {
 
@@ -483,7 +483,7 @@ cronJobInterview.start();
 var cluster = require('cluster');
 
  if (cluster.isWorker) {
-    console.log('asdf sundar', cluster.worker.id);
+    // console.log('asdf sundar', cluster.worker.id);
 
 if (cluster.worker.id == 1) {
     // run job
@@ -549,7 +549,7 @@ if (cluster.worker.id == 1) {
 var cluster = require('cluster');
 
  if (cluster.isWorker) {
-    console.log('asdf sundar', cluster.worker.id);
+  //  console.log('asdf sundar', cluster.worker.id);
 
 if (cluster.worker.id == 1) {
 
