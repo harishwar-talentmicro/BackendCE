@@ -330,14 +330,14 @@ router.use('/WM', gulfModule);
 // cron
 // var taskScheduler = require('../api/HEApp/task/task-ctrl');
 cron.schedule('*/15 * * * *', function () {
-    console.log('running a task every minute');
+
     var datetime = new Date();
-    console.log(datetime);
+
     var procQuery = 'CALL he_schedule_tasks()';
-    console.log(procQuery);
+
 
     db.query(procQuery, function (err, results) {
-        console.log(results);
+
         if (!err) {
             console.log(err);
         }
@@ -351,9 +351,8 @@ cron.schedule('*/15 * * * *', function () {
 cron.schedule('*/15 * * * *', function () {
     // console.log('running a leave calculation every minute');
     var procQuery = 'CALL he_leave_calculator()';
-    console.log(procQuery);
+
     db.query(procQuery, function (err, results) {
-        console.log(results);
         if (!err) {
             console.log(err);
         }
@@ -363,22 +362,27 @@ cron.schedule('*/15 * * * *', function () {
     });
 });
 
-var cronJobMessage = new CronJob({
-    cronTime: '20 * * * * *',
-    onTick: function () {
-        notifyMessages.getMessagesNeedToNotify();
-        /*
-         * Runs every weekday (Monday through Friday)
-         * at 11:30:00 AM. It does not run on Saturday
-         * or Sunday.
-         */
-    },
-    start: false,
-    timeZone: 'America/Los_Angeles'
+
+// notify messages
+cron.schedule('*/10 * * * *', function () {
+    console.log('running a notify messages');
+    notifyMessages.getMessagesNeedToNotify();
 });
-cronJobMessage.start();
 
-
+// var cronJobMessage = new CronJob({
+//     cronTime: '20 * * * * *',
+//     onTick: function () {
+//         notifyMessages.getMessagesNeedToNotify();
+//         /*
+//          * Runs every weekday (Monday through Friday)
+//          * at 11:30:00 AM. It does not run on Saturday
+//          * or Sunday.
+//          */
+//     },
+//     start: false,
+//     timeZone: 'America/Los_Angeles'
+// });
+// cronJobMessage.start();
 
 
 //Example POST method invocation
@@ -396,7 +400,7 @@ cron.schedule('*/5 * * * *', function () {
             var transId;
             var integrationFormData = {};
             var DBUrl;
-            // console.log(result);
+
             if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
                 heMasterId = result[0][0].heMasterId;
                 DBUrl = result[0][0].url;
@@ -434,8 +438,7 @@ cron.schedule('*/5 * * * *', function () {
                     body: response_server
                 }, function (error, response, body) {
 
-                    console.log(error);
-                    console.log(body);
+
                     if (body.Code == "SUCCESS0001") {
                         var updateQuery = "update 1014_trans set sync=1 where heParentId=" + transId;
                         db.query(updateQuery, function (err, results) {
@@ -458,7 +461,7 @@ cron.schedule('*/5 * * * *', function () {
 cron.schedule('*/5 * * * *', function () {
     var query = "call wm_integrationUrlwalkIn()";
     db.query(query, function (err, result) {
-        console.log('Running walkin cron job');
+
         if (err) {
             console.log('error: integrationUrlForHircraft');
         }
@@ -480,8 +483,7 @@ cron.schedule('*/5 * * * *', function () {
                 json: true,   // <--Very important!!!
                 body: JSON.parse(formData)
             }, function (error, response, body) {
-                console.log(error);
-                console.log(body);
+
                 if (body.Code == "SAVED") {
                     var updateQuery = "update 1039_trans set sync=1 where heParentId=" + transId;
                     db.query(updateQuery, function (err, results) {

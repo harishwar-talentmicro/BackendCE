@@ -587,8 +587,21 @@ signupCtrl.verifyOTP = function (req, res, next) {
     };
 
     var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
+
+    var mobileNo = req.body.mobileNo;
+    var isdMobile = req.body.isdMobile;
+    var emailId = req.body.emailId;
+
+    if (!mobileNo) {
+        error['mobile'] = 'mobile no is mandatory';
+        validationFlag *= false;
+    }
+    if (!isdMobile) {
+        error['isdMobile'] = 'isd mobile is mandatory';
+        validationFlag *= false;
+    }
+    if (!emailId) {
+        error['emailId'] = 'Email id is mandatory';
         validationFlag *= false;
     }
 
@@ -600,276 +613,239 @@ signupCtrl.verifyOTP = function (req, res, next) {
     }
     else {
         try {
-            req.st.validateToken(req.query.token, function (err, tokenResult) {
-                if ((!err) && tokenResult) {
-                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+            var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+            req.query.token = req.query.token ? req.query.token : "";
+            var pictureURL = req.body.pictureURL ? req.body.pictureURL : "";
+            var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
+            var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
+            var secretKey = (req.body.secretKey) ? (req.body.secretKey) : "";
+            var isOTPRequired = (req.body.isOTPRequired) ? (req.body.isOTPRequired) : 0;
+            var otp = (req.body.otp) ? (req.body.otp) : 0;
+            var name = (req.body.displayName) ? (req.body.displayName) : "";
+            if (req.body.otp == "") {
+                req.body.otp = 0;
+            }
 
-                        var mobileNo = req.body.mobileNo;
-                        var isdMobile = req.body.isdMobile;
-                        var emailId = req.body.emailId;
+            if (pictureURL != "") {
+                pictureURL = (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + pictureURL);
+            }
+            var password = randomstring.generate({
+                length: 6,
+                charset: 'alphanumeric'
+            });
+            var message = "";
 
-                        if (!mobileNo) {
-                            error['mobile'] = 'mobile no is mandatory';
-                            validationFlag *= false;
-                        }
-                        if (!isdMobile) {
-                            error['isdMobile'] = 'isd mobile is mandatory';
-                            validationFlag *= false;
-                        }
-                        if (!emailId) {
-                            error['emailId'] = 'Email id is mandatory';
-                            validationFlag *= false;
-                        }
+            var encryptPwd = req.st.hashPassword(password);
 
-                        if (!validationFlag) {
-                            response.error = error;
-                            response.message = 'Please check the errors';
-                            res.status(400).json(response);
-                            console.log(response);
-                        }
-                        else {
-                            var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
-                            req.query.token = req.query.token ? req.query.token : "";
-                            var pictureURL = req.body.pictureURL ? req.body.pictureURL : "";
-                            var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
-                            var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
-                            var secretKey = (req.body.secretKey) ? (req.body.secretKey) : "";
-                            var isOTPRequired = (req.body.isOTPRequired) ? (req.body.isOTPRequired) : 0;
-                            var otp = (req.body.otp) ? (req.body.otp) : 0;
-                            var name = (req.body.displayName) ? (req.body.displayName) : "";
-                            if (req.body.otp == "") {
-                                req.body.otp = 0;
+            var procParams = [
+                req.st.db.escape(mobileNo),
+                req.st.db.escape(req.body.otp),
+                req.st.db.escape(req.body.pictureURL ? req.body.pictureURL : ''),
+                req.st.db.escape(req.body.displayName),
+                req.st.db.escape(isdMobile),
+                req.st.db.escape(req.body.idTypeId),
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.body.isOTPRequired),
+                req.st.db.escape(emailId),
+                req.st.db.escape(encryptPwd),
+                req.st.db.escape(DBSecretKey)
+            ];
+
+            var procQuery = 'CALL verify_otp( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery, function (err, result) {
+                console.log("result", result);
+                if (!err && result && result[0] && result[0][0].message) {
+                    switch (result[0][0].message) {
+                        case 'INVALID':
+                            respMsg.status = false;
+                            respMsg.message = "Invalid OTP";
+                            respMsg.data = {
+                                code: "0"
+                            };
+                            res.status(200).json(respMsg);
+                            break;
+                        case 'NOT_AVAILABLE':
+                            respMsg.status = false;
+                            respMsg.message = "EmailId already exists";
+                            respMsg.data = {
+                                code: "0"
+                            };
+                            res.status(200).json(respMsg);
+                            break;
+                        case '-3':
+                            if (emailId) {
+                                mailerApi.sendMailNew('ResendCredentials', {
+                                    name: name,
+                                    UserName: result[0][0].whatmateId,
+                                    Password: password
+                                }, '', emailId, []);
                             }
+                            message = 'Dear ' + name + ', Your WhatMate credentials, Login ID: ' + result[0][0].whatmateId + ',Password: ' + password;
+                            if (mobileNo != "") {
+                                if (isdMobile == "+977") {
+                                    request({
+                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                        qs: {
+                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                            to: mobileNo,
+                                            message: message,
+                                            sender: 'Techingen'
+                                        },
+                                        method: 'GET'
 
-                            if (pictureURL != "") {
-                                pictureURL = (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + pictureURL);
-                            }
-                            var password = randomstring.generate({
-                                length: 6,
-                                charset: 'alphanumeric'
-                            });
-                            var message = "";
-
-                            var encryptPwd = req.st.hashPassword(password);
-
-                            var procParams = [
-                                req.st.db.escape(mobileNo),
-                                req.st.db.escape(req.body.otp),
-                                req.st.db.escape(req.body.pictureURL ? req.body.pictureURL : ''),
-                                req.st.db.escape(req.body.displayName),
-                                req.st.db.escape(isdMobile),
-                                req.st.db.escape(req.body.idTypeId),
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(req.body.isOTPRequired),
-                                req.st.db.escape(emailId),
-                                req.st.db.escape(encryptPwd),
-                                req.st.db.escape(DBSecretKey)
-                            ];
-
-                            var procQuery = 'CALL verify_otp( ' + procParams.join(',') + ')';
-                            console.log(procQuery);
-                            req.db.query(procQuery, function (err, result) {
-                                console.log("result", result);
-                                if (!err && result && result[0] && result[0][0].message) {
-                                    switch (result[0][0].message) {
-                                        case 'INVALID':
-                                            respMsg.status = false;
-                                            respMsg.message = "Invalid OTP";
-                                            respMsg.data = {
-                                                code: "0"
-                                            };
-                                            res.status(200).json(respMsg);
-                                            break;
-                                        case 'NOT_AVAILABLE':
-                                            respMsg.status = false;
-                                            respMsg.message = "EmailId already exists";
-                                            respMsg.data = {
-                                                code: "0"
-                                            };
-                                            res.status(200).json(respMsg);
-                                            break;
-                                        case '-3':
-                                            if (emailId) {
-                                                mailerApi.sendMailNew('ResendCredentials', {
-                                                    name: name,
-                                                    UserName: result[0][0].whatmateId,
-                                                    Password: password
-                                                }, '', emailId, []);
-                                            }
-                                            message = 'Dear ' + name + ', Your WhatMate credentials, Login ID: ' + result[0][0].whatmateId + ',Password: ' + password;
-                                            if (mobileNo != "") {
-                                                if (isdMobile == "+977") {
-                                                    request({
-                                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                                        qs: {
-                                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                                            to: mobileNo,
-                                                            message: message,
-                                                            sender: 'Techingen'
-                                                        },
-                                                        method: 'GET'
-
-                                                    }, function (error, response, body) {
-                                                        if (error) {
-                                                            console.log(error, "SMS");
-                                                        }
-                                                        else {
-                                                            console.log("SUCCESS", "SMS response");
-                                                        }
-
-                                                    });
-                                                }
-                                                else if (isdMobile == "+91") {
-                                                    request({
-                                                        url: 'https://aikonsms.co.in/control/smsapi.php',
-                                                        qs: {
-                                                            user_name: 'janardana@hirecraft.com',
-                                                            password: 'Ezeid2015',
-                                                            sender_id: 'WtMate',
-                                                            service: 'TRANS',
-                                                            mobile_no: mobileNo,
-                                                            message: message,
-                                                            method: 'send_sms'
-                                                        },
-                                                        method: 'GET'
-
-                                                    }, function (error, response, body) {
-                                                        if (error) {
-                                                            console.log(error, "SMS");
-                                                        }
-                                                        else {
-                                                            console.log("SUCCESS", "SMS response");
-                                                        }
-                                                    });
-
-                                                    var twilioReq = http.request(options, function (res) {
-                                                        var chunks = [];
-
-                                                        res.on("data", function (chunk) {
-                                                            chunks.push(chunk);
-                                                        });
-
-                                                        res.on("end", function () {
-                                                            var body = Buffer.concat(chunks);
-
-                                                        });
-                                                    });
-
-                                                    twilioReq.write(qs.stringify({
-                                                        userId: 'talentmicro',
-                                                        password: 'TalentMicro@123',
-                                                        senderId: 'WTMATE',
-                                                        sendMethod: 'simpleMsg',
-                                                        msgType: 'text',
-                                                        mobile: isdMobile.replace("+", "") + mobileNo,
-                                                        msg: message,
-                                                        duplicateCheck: 'true',
-                                                        format: 'json'
-                                                    }));
-                                                    twilioReq.end();
-
-                                                }
-                                                else if (isdMobile != "") {
-                                                    client.messages.create(
-                                                        {
-                                                            body: message,
-                                                            to: isdMobile + mobileNo,
-                                                            from: '+14434322305'
-                                                        },
-                                                        function (error, response) {
-                                                            if (error) {
-                                                                console.log(error, "SMS");
-                                                            }
-                                                            else {
-                                                                console.log("SUCCESS", "SMS response");
-                                                            }
-                                                        }
-                                                    );
-
-                                                }
-
-                                            }
-
-                                            respMsg.status = true;
-                                            respMsg.data = {
-                                                code: "-3"
-                                            };
-                                            respMsg.message = "Your User ID already exists. Please Sign In using the credentials sent to your mobile and e-mail.";
-                                            res.status(200).json(respMsg);
-                                            break;
-
-                                        default:
-                                            break;
-                                    }
-                                }
-                                else if (!err && result && result[0] && result[0][0].EZEID) {
-                                    var EZEOneId = result[0][0].EZEID;
-                                    var ip = req.headers['x-forwarded-for'] ||
-                                        req.connection.remoteAddress ||
-                                        req.socket.remoteAddress;
-                                    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
-
-                                    req.st.generateToken(ip, userAgent, EZEOneId, isWhatMate, APNS_Id, GCM_Id, secretKey, function (err, token) {
-                                        if (err) {
-                                            respMsg.status = false;
-                                            respMsg.message = "Error while generating token";
-                                            respMsg.data = {
-                                                code: "0"
-                                            };
-                                            respMsg.data = null;
-                                            res.status(500).json(respMsg);
+                                    }, function (error, response, body) {
+                                        if (error) {
+                                            console.log(error, "SMS");
                                         }
                                         else {
-                                            respMsg.status = true;
-                                            respMsg.message = "OTP is matched";
-                                            respMsg.data = {
-                                                code: "0"
-                                            };
-                                            respMsg.data = {
-                                                // EZEOneId : result[0][0].EZEOneId,
-                                                // masterId : result[0][0].masterId,
-                                                token: token,
-                                                IsAuthenticate: true,
-                                                TID: result[0][0].TID,
-                                                MasterID: result[0][0].MasterID,
-                                                ezeone_id: result[0][0].EZEID,
-                                                FirstName: result[0][0].FirstName,
-                                                LastName: result[0][0].LastName,
-                                                CompanyName: result[0][0].CompanyName,
-                                                Type: result[0][0].IDTypeID,
-                                                Verified: result[0][0].EZEIDVerifiedID,
-                                                isHelloEZE: result[0][0].isHelloEZE,
-                                                displayName: result[0][0].displayName,
-                                                group_id: result[0][0].group_id,
-                                                mobilenumber: result[0][0].mobilenumber,
-                                                pictureUrl: pictureURL
-                                            };
-                                            res.status(200).json(respMsg);
-
+                                            console.log("SUCCESS", "SMS response");
                                         }
+
                                     });
                                 }
-                                else if (!err) {
-                                    respMsg.status = true;
-                                    respMsg.message = "OTP is matched";
-                                    respMsg.data = {
-                                        code: "0"
-                                    };
-                                    res.status(200).json(respMsg);
+                                else if (isdMobile == "+91") {
+                                    request({
+                                        url: 'https://aikonsms.co.in/control/smsapi.php',
+                                        qs: {
+                                            user_name: 'janardana@hirecraft.com',
+                                            password: 'Ezeid2015',
+                                            sender_id: 'WtMate',
+                                            service: 'TRANS',
+                                            mobile_no: mobileNo,
+                                            message: message,
+                                            method: 'send_sms'
+                                        },
+                                        method: 'GET'
+
+                                    }, function (error, response, body) {
+                                        if (error) {
+                                            console.log(error, "SMS");
+                                        }
+                                        else {
+                                            console.log("SUCCESS", "SMS response");
+                                        }
+                                    });
+
+                                    var twilioReq = http.request(options, function (res) {
+                                        var chunks = [];
+
+                                        res.on("data", function (chunk) {
+                                            chunks.push(chunk);
+                                        });
+
+                                        res.on("end", function () {
+                                            var body = Buffer.concat(chunks);
+
+                                        });
+                                    });
+
+                                    twilioReq.write(qs.stringify({
+                                        userId: 'talentmicro',
+                                        password: 'TalentMicro@123',
+                                        senderId: 'WTMATE',
+                                        sendMethod: 'simpleMsg',
+                                        msgType: 'text',
+                                        mobile: isdMobile.replace("+", "") + mobileNo,
+                                        msg: message,
+                                        duplicateCheck: 'true',
+                                        format: 'json'
+                                    }));
+                                    twilioReq.end();
+
                                 }
-                                else {
-                                    respMsg.status = false;
-                                    respMsg.message = "Internal Server Error";
-                                    res.status(500).json(respMsg);
+                                else if (isdMobile != "") {
+                                    client.messages.create(
+                                        {
+                                            body: message,
+                                            to: isdMobile + mobileNo,
+                                            from: '+14434322305'
+                                        },
+                                        function (error, response) {
+                                            if (error) {
+                                                console.log(error, "SMS");
+                                            }
+                                            else {
+                                                console.log("SUCCESS", "SMS response");
+                                            }
+                                        }
+                                    );
+
                                 }
-                            });
+
+                            }
+
+                            respMsg.status = true;
+                            respMsg.data = {
+                                code: "-3"
+                            };
+                            respMsg.message = "Your User ID already exists. Please Sign In using the credentials sent to your mobile and e-mail.";
+                            res.status(200).json(respMsg);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                else if (!err && result && result[0] && result[0][0].EZEID) {
+                    var EZEOneId = result[0][0].EZEID;
+                    var ip = req.headers['x-forwarded-for'] ||
+                        req.connection.remoteAddress ||
+                        req.socket.remoteAddress;
+                    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+
+                    req.st.generateToken(ip, userAgent, EZEOneId, isWhatMate, APNS_Id, GCM_Id, secretKey, function (err, token) {
+                        if (err) {
+                            respMsg.status = false;
+                            respMsg.message = "Error while generating token";
+                            respMsg.data = {
+                                code: "0"
+                            };
+                            respMsg.data = null;
+                            res.status(500).json(respMsg);
+                        }
+                        else {
+                            respMsg.status = true;
+                            respMsg.message = "OTP is matched";
+                            respMsg.data = {
+                                code: "0"
+                            };
+                            respMsg.data = {
+                                // EZEOneId : result[0][0].EZEOneId,
+                                // masterId : result[0][0].masterId,
+                                token: token,
+                                IsAuthenticate: true,
+                                TID: result[0][0].TID,
+                                MasterID: result[0][0].MasterID,
+                                ezeone_id: result[0][0].EZEID,
+                                FirstName: result[0][0].FirstName,
+                                LastName: result[0][0].LastName,
+                                CompanyName: result[0][0].CompanyName,
+                                Type: result[0][0].IDTypeID,
+                                Verified: result[0][0].EZEIDVerifiedID,
+                                isHelloEZE: result[0][0].isHelloEZE,
+                                displayName: result[0][0].displayName,
+                                group_id: result[0][0].group_id,
+                                mobilenumber: result[0][0].mobilenumber,
+                                pictureUrl: pictureURL
+                            };
+                            res.status(200).json(respMsg);
+
                         }
                     });
                 }
+                else if (!err) {
+                    respMsg.status = true;
+                    respMsg.message = "OTP is matched";
+                    respMsg.data = {
+                        code: "0"
+                    };
+                    res.status(200).json(respMsg);
+                }
                 else {
-                    res.status(401).json(response);
+                    respMsg.status = false;
+                    respMsg.message = "Internal Server Error";
+                    res.status(500).json(respMsg);
                 }
             });
 
