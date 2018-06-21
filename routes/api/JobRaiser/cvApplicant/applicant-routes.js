@@ -56,4 +56,25 @@ router.post('/onBoarding',applicantCtrl.saveOnBoarding);
 router.get('/onBoarding',applicantCtrl.getOnBoarding);
 
 router.post('/medical',applicantCtrl.saveMedical);
+
+
+router.post('/jobSeekerMailer',sendgridCtrl.jobSeekerPreview);
+router.post('/sendJobSeekerMailer',sendgridCtrl.jobSeekerMailer);
+
+router.post('/screeningMailer',sendgridCtrl.ScreeningMailerPreview);
+router.post('/sendScreeningMailer',sendgridCtrl.screeningMailer);
+
+
+router.post('/submissionMailer',sendgridCtrl.SubmissionMailerPreview);
+router.post('/sendSubmissionMailer',sendgridCtrl.submissionMailer);
+
+router.post('/clientMailer',sendgridCtrl.clientMailerPreview);
+router.post('/sendClientMailer',sendgridCtrl.clientMailer);
+
+router.post('/interviewMailer',sendgridCtrl.interviewMailerPreview);
+router.post('/sendInterviewMailer',sendgridCtrl.interviewMailer);
+
+
+
 module.exports = router;
+

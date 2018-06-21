@@ -587,7 +587,6 @@ signupCtrl.verifyOTP = function (req, res, next) {
     };
 
     var validationFlag = true;
-
     var mobileNo = req.body.mobileNo;
     var isdMobile = req.body.isdMobile;
     var emailId = req.body.emailId;
@@ -613,6 +612,7 @@ signupCtrl.verifyOTP = function (req, res, next) {
     }
     else {
         try {
+
             var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
             req.query.token = req.query.token ? req.query.token : "";
             var pictureURL = req.body.pictureURL ? req.body.pictureURL : "";

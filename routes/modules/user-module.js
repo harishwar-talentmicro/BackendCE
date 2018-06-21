@@ -222,7 +222,7 @@ User.prototype.getCountry = function (req, res, next) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var langId = (!isNaN(parseInt(req.query.LangID))) ? (parseInt(req.query.LangID)) : 0;
         if (langId) {
-            var query = 'Select CountryID, CountryName, ISDCode from  mcountry where LangID=' + st.db.escape(langId);
+            var query = 'Select CountryID, CountryName, ISDCode,length from  mcountry where LangID=' + st.db.escape(langId);
             st.db.query(query, function (err, countryResult) {
                 if (!err) {
                     if (countryResult) {
@@ -670,12 +670,19 @@ User.prototype.changePassword = function (req, res, next) {
 
         var RtnMessage = {
             status: true,
+            error:null,
             message: "Invalid token",
             IsChanged: false
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         var validationFlag = true;
+
+    if (!req.query.Token) {
+        error.Token = 'Invalid token';
+        validationFlag *= false;
+    }
+
 
         if (!validationFlag){
             RtnMessage.message = 'Please check the errors';

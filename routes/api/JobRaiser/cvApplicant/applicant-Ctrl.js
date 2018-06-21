@@ -195,6 +195,13 @@ applicantCtrl.saveApplicant = function (req, res, next) {
     if (!functionalAreas) {
         functionalAreas = [];
     }
+    var requirementArray = req.body.requirementArray;
+    if (typeof (requirementArray) == "string") {
+        requirementArray = JSON.parse(requirementArray);
+    }
+    if (!requirementArray) {
+        requirementArray = [];
+    }
 
     if (!validationFlag) {
         response.error = error;
@@ -243,8 +250,9 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         req.body.transactions = (req.body.transactions) ? req.body.transactions : '';
                         req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
                         req.body.imageUrl = req.body.imageUrl ? req.body.imageUrl : '';
-                        req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0; 
+                        req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0;
                         req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
+                        req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 0;
 
                         var inputs = [
                             req.st.db.escape(req.query.token),
@@ -296,7 +304,9 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(req.body.htmlText),
                             req.st.db.escape(req.body.reqAppId),
                             req.st.db.escape(req.body.clientCvPath),
-                            req.st.db.escape(JSON.stringify(functionalAreas))                            
+                            req.st.db.escape(JSON.stringify(functionalAreas)),
+                            req.st.db.escape(req.body.importerFlag),
+                            req.st.db.escape(JSON.stringify(requirementArray)),
                         ];
 
                         var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -411,6 +421,20 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             output.push(res2);
                         }
 
+                        if (result[35].length){
+                            for (var p = 0; p < result[35].length; p++) {
+                                result[35][p].templateData = (result[35] && result[35][p]) ? JSON.parse(result[35] && result[35][p].templateData) : {};
+                            }
+                            var templateData = {};
+                            for (var i = 0; i < result[35][0].templateData.length; i++) {
+                                templateData[result[35][0].templateData[i].formId] = result[35][0].templateData[i];
+                                if(i==100){
+                                    break;
+                                }
+                            }
+                            result[35][0].templateData = templateData;
+                        }
+
                         response.data = {
                             jobType: result[0] ? result[0] : [],
                             currency: result[1] ? result[1] : [],
@@ -448,7 +472,9 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             paceUsers: result[29] ? result[29] : [],
                             reasons: result[31] ? result[31] : [],
                             reportingTo: result[32] ? result[32] : [],
-                            functionalAreas: result[34] ? result[34] :[]
+                            functionalAreas: result[34] ? result[34] : [],
+                            accessRightsTemplateDetails: result[35] ? result[35] : [],
+                            layout : (result && result[36] && result[36][0]) ? JSON.parse(result[36][0].layout):{}
                         };
 
                         if (req.query.isWeb == 0) {
@@ -504,7 +530,9 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             paceUsers: [],
                             reasons: [],
                             reportingTo: [],
-                            functionalAreas :[]
+                            functionalAreas: [],
+                            accessRightsTemplateDetails: [],
+                            layout:{}
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -748,7 +776,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
     else if (typeof (stageId) == "string") {
         stageId = JSON.parse(stageId);
     }
-    
+
     var statusId = req.body.statusId;
     if (!statusId) {
         statusId = [];
@@ -756,7 +784,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
     else if (typeof (statusId) == "string") {
         statusId = JSON.parse(statusId);
     }
-    
+
 
     if (!validationFlag) {
         response.error = error;
@@ -799,7 +827,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, Result) {
                     console.log(err);
-                    if (!err && Result && Result[0]) {
+                    if (!err && Result && Result[0] && Result[0][0]) {
                         response.status = true;
                         response.message = "Applicants loaded successfully";
                         response.error = null;
@@ -836,13 +864,20 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                             res2.statusId = Result[0][i].statusId;
                             res2.status = Result[0][i].statusTitle;
                             res2.statusTypeId = Result[0][i].statusTypeId;
-                            res2.clientContacts = JSON.parse(Result[0][i].clientContacts) ? JSON.parse(Result[0][i].clientContacts) : [];
+                            res2.clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
                             output.push(res2);
                         }
                         response.data = {
                             applicantlist: output,
-                            count: Result[1][0].count
+                            count: Result[1][0].count,
+                            offerMasterData: {
+                                currency: Result[2] ? Result[2] : [],
+                                scale: Result[3] ? Result[3] : [],
+                                duration: Result[4] ? Result[4] : [],
+                                attachment: Result[5] ? Result[5] : []
+                            }
                         };
+                        // console.log(response.data);
                         res.status(200).json(response);
                     }
                     else if (!err) {
@@ -851,7 +886,11 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             applicantlist: [],
-                            count: []
+                            count: [],
+                            currency: [],
+                            scale: [],
+                            duration: [],
+                            attachment: []
                         };
                         res.status(200).json(response);
                     }
@@ -1110,6 +1149,14 @@ applicantCtrl.resumeSearch = function (req, res, next) {
         requiredNationalities = [];
     }
 
+    var DOB = req.body.DOB;
+    if (typeof (DOB) == "string") {
+        DOB = JSON.parse(DOB);
+    }
+    if (!DOB) {
+        DOB = [];
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -1157,7 +1204,8 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                     req.st.db.escape(req.body.noticePeriodFrom),
                     req.st.db.escape(req.body.noticePeriodTo),
                     //req.st.db.escape(req.body.workLocation),
-                    req.st.db.escape(JSON.stringify(requiredNationalities))
+                    req.st.db.escape(JSON.stringify(requiredNationalities)),
+                    req.st.db.escape(JSON.stringify(DOB))
                 ];
 
                 var procQuery = 'CALL wd_resume_search_new2( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -1319,6 +1367,14 @@ applicantCtrl.saveReqAppMapResult = function (req, res, next) {
         error.token = 'Invalid requirement';
         validationFlag *= false;
     }
+    var applicant = req.body.applicant;
+    if(typeof(applicant) == 'string'){
+        applicant = JSON.parse(applicant);
+    }
+    if(!applicant){
+        applicant =[];
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -1333,7 +1389,7 @@ applicantCtrl.saveReqAppMapResult = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.reqId),
-                    req.st.db.escape(JSON.stringify(req.body.applicant)),
+                    req.st.db.escape(JSON.stringify(applicant)),
                     req.st.db.escape(req.query.heMasterId)
                 ];
 
@@ -1341,13 +1397,21 @@ applicantCtrl.saveReqAppMapResult = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0]) {
+                    if (!err && result && result[0] && result[0][0].error) {
+                        response.status = false;
+                        response.message = result[0][0].error;
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else if (!err && result && result[0]) {
                         response.status = false;
                         response.message = "Requirement already mapped to the applicant";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
+
                     else if (!err && result) {
                         response.status = true;
                         response.message = "Requirement applicant map data saved successfully";
@@ -1436,7 +1500,7 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         temp_result.primarySkills = JSON.parse(temp_result.primarySkills);
                         temp_result.secondarySkills = JSON.parse(temp_result.secondarySkills);
                         temp_result.functionalAreas = JSON.parse(temp_result.functionalAreas);
-                        
+
                         response.status = true;
                         response.message = "Applicant data loaded successfully";
                         response.error = null;
@@ -1444,7 +1508,7 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                             {
                                 applicantDetails: temp_result ? temp_result : [],
                                 applicantTransaction: result[1] ? result[1] : [],
-                                clientCvPath: (result[2] && result[2][0]) ? result[2][0].clientCvPath:""
+                                clientCvPath: (result[2] && result[2][0]) ? result[2][0].clientCvPath : ""
                             };
                         res.status(200).json(response);
                     }
@@ -1737,6 +1801,60 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
         reqApp = [];
     }
 
+    var billableCurrency = {};
+    billableCurrency = req.body.billableCurrency;
+    if (typeof (billableCurrency) == "string") {
+        billableCurrency = JSON.parse(billableCurrency);
+    }
+    if (!billableCurrency) {
+        billableCurrency = {};
+    }
+
+    var billableScale = {};
+    billableScale = req.body.billableScale;
+    if (typeof (billableScale) == "string") {
+        billableScale = JSON.parse(billableScale);
+    }
+    if (!billableScale) {
+        billableScale = {};
+    }
+
+    var billableDuration = {};
+    billableDuration = req.body.billableDuration;
+    if (typeof (billableDuration) == "string") {
+        billableDuration = JSON.parse(billableDuration);
+    }
+    if (!billableDuration) {
+        billableDuration = {};
+    }
+
+    var billingCurrency = {};
+    billingCurrency = req.body.billingCurrency;
+    if (typeof (billingCurrency) == "string") {
+        billingCurrency = JSON.parse(billingCurrency);
+    }
+    if (!billingCurrency) {
+        billingCurrency = {};
+    }
+
+    var billingScale = {};
+    billingScale = req.body.billingScale;
+    if (typeof (billingScale) == "string") {
+        billingScale = JSON.parse(billingScale);
+    }
+    if (!billingScale) {
+        billingScale = {};
+    }
+
+    var billingDuration = {};
+    billingDuration = req.body.billingDuration;
+    if (typeof (billingDuration) == "string") {
+        billingDuration = JSON.parse(billingDuration);
+    }
+    if (!billingDuration) {
+        billingDuration = {};
+    }
+
     var offerAttachment = [];
     offerAttachment = req.body.offerAttachment;
     if (typeof (offerAttachment) == "string") {
@@ -1756,13 +1874,21 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.body.offerManagerId = req.body.offerManagerId ? req.body.offerManagerId : 0;
+                req.body.heDepartmentId = req.body.heDepartmentId ? req.body.heDepartmentId : 0;
+                req.body.grossCTCAmount = req.body.grossCTCAmount ? req.body.grossCTCAmount : 0;
+                req.body.grossCTCCurrency = req.body.grossCTCCurrency ? req.body.grossCTCCurrency : 0;
+                req.body.grossCTCScale = req.body.grossCTCScale ? req.body.grossCTCScale : 0;
+                req.body.grossCTCDuration = req.body.grossCTCDuration ? req.body.grossCTCDuration : 0;
+                req.body.expectedJoining = req.body.expectedJoining ? req.body.expectedJoining : null;
+                req.body.billableCTCAmount = req.body.billableCTCAmount ? req.body.billableCTCAmount : 0;
+                req.body.billingCTCAmount = req.body.billingCTCAmount ? req.body.billingCTCAmount : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.offerManagerId),
                     req.st.db.escape(req.body.heMasterId),
                     req.st.db.escape(req.body.heDepartmentId),
-                    // req.st.db.escape(req.body.reqAppTransId),
                     req.st.db.escape(req.body.grossCTCAmount),
                     req.st.db.escape(req.body.grossCTCCurrency),
                     req.st.db.escape(req.body.grossCTCScale),
@@ -1770,7 +1896,15 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(offerAttachment)),
                     req.st.db.escape(JSON.stringify(reqApp)),
                     req.st.db.escape(req.body.expectedJoining),
-                    req.st.db.escape(JSON.stringify(documentAttachment))
+                    req.st.db.escape(JSON.stringify(documentAttachment)),
+                    req.st.db.escape(JSON.stringify(billableCurrency)),
+                    req.st.db.escape(JSON.stringify(billableScale)),
+                    req.st.db.escape(JSON.stringify(billableDuration)),
+                    req.st.db.escape(req.body.billableCTCAmount),
+                    req.st.db.escape(JSON.stringify(billingCurrency)),
+                    req.st.db.escape(JSON.stringify(billingScale)),
+                    req.st.db.escape(JSON.stringify(billingDuration)),
+                    req.st.db.escape(req.body.billingCTCAmount)
                 ];
 
                 var procQuery = 'CALL wm_save_offerManager( ' + inputs.join(',') + ')';
@@ -1842,32 +1976,26 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0]) {
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "Offer manager list loaded successfully";
                         response.error = null;
-                        response.data =
-                            {
-                                grossCTCAmount: result[0][0].grossCTCAmount,
-                                grossCTCCurrency: result[0][0].grossCTCCurrency,
-                                grossCTCCurrencySymbol: result[0][0].currencySymbol,
-                                grossCTCScale: result[0][0].grossCTCScale,
-                                grossCTCScaleName: result[0][0].scale,
-                                expectedjoining: result[0][0].expectedjoining,
-                                grossCTCDuration: result[0][0].grossCTCDuration,
-                                grossCTCDurationName: result[0][0].duration,
-                                offerAttachment: result[0][0].offerAttachment,
-                                reqAppList: JSON.parse(result[0][0].reqAppList) ? JSON.parse(result[0][0].reqAppList) : []
-                            };
+                        result[0][0].reqAppList = result[0][0].reqAppList ? JSON.parse(result[0][0].reqAppList) : [];
+                        result[0][0].documentAttachment = result[0][0].documentAttachment ? JSON.parse(result[0][0].documentAttachment) : [];
+                        result[0][0].billableCurrency = result[0][0].billableCurrency ? JSON.parse(result[0][0].billableCurrency) : {};
+                        result[0][0].billableScale = result[0][0].billableScale ? JSON.parse(result[0][0].billableScale) : {};
+                        result[0][0].billableDuration = result[0][0].billableDuration ? JSON.parse(result[0][0].billableDuration) : {};
+                        result[0][0].billingCurrency = result[0][0].billingCurrency ? JSON.parse(result[0][0].billingCurrency) : {};
+                        result[0][0].billingScale = result[0][0].billingScale ? JSON.parse(result[0][0].billingScale) : [];
+                        result[0][0].billingDuration = result[0][0].billingDuration ? JSON.parse(result[0][0].billingDuration) : {};
+                        response.data = result[0][0];
                         res.status(200).json(response);
                     }
                     else if (!err) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
-                        response.data = {
-                            offerManager: []
-                        };
+                        response.data = [];
                         res.status(200).json(response);
                     }
                     else {
@@ -3073,7 +3201,7 @@ applicantCtrl.saveInterviewSchedulerForApplicant = function (req, res, next) {
 
                             var isWeb = req.query.isWeb;
                             console.log(results);
-                            if(!err && results && results[0] ){
+                            if (!err && results && results[0]) {
                                 senderGroupId = results[0][0].senderId;
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                 //     senderName : results[0][0].message
@@ -3236,6 +3364,133 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
         applicant = [];
     }
 
+    var offerLocation = [];
+    offerLocation = req.body.offerLocation;
+    if (typeof (offerLocation) == "string") {
+        offerLocation = JSON.parse(offerLocation);
+    }
+    if (!offerLocation) {
+        offerLocation = [];
+    }
+
+    var offerCTCCurr = [];
+    offerCTCCurr = req.body.offerCTCCurr;
+    if (typeof (offerCTCCurr) == "string") {
+        offerCTCCurr = JSON.parse(offerCTCCurr);
+    }
+    if (!offerCTCCurr) {
+        offerCTCCurr = {};
+    }
+
+    var offerCTCScale = [];
+    offerCTCScale = req.body.offerCTCScale;
+    if (typeof (offerCTCScale) == "string") {
+        offerCTCScale = JSON.parse(offerCTCScale);
+    }
+    if (!offerCTCScale) {
+        offerCTCScale = {};
+    }
+
+    var offerCTCPeriod = [];
+    offerCTCPeriod = req.body.offerCTCPeriod;
+    if (typeof (offerCTCPeriod) == "string") {
+        offerCTCPeriod = JSON.parse(offerCTCPeriod);
+    }
+    if (!offerCTCPeriod) {
+        offerCTCPeriod = {};
+    }
+
+    var salaryCurr = [];
+    salaryCurr = req.body.salaryCurr;
+    if (typeof (salaryCurr) == "string") {
+        salaryCurr = JSON.parse(salaryCurr);
+    }
+    if (!salaryCurr) {
+        salaryCurr = {};
+    }
+
+    var salaryScale = [];
+    salaryScale = req.body.salaryScale;
+    if (typeof (salaryScale) == "string") {
+        salaryScale = JSON.parse(salaryScale);
+    }
+    if (!salaryScale) {
+        salaryScale = {};
+    }
+    
+    var salaryPeriod = [];
+    salaryPeriod = req.body.salaryPeriod;
+    if (typeof (salaryPeriod) == "string") {
+        salaryPeriod = JSON.parse(salaryPeriod);
+    }
+    if (!salaryPeriod) {
+        salaryPeriod = {};
+    }
+
+    var billableCurrency = {};
+    billableCurrency = req.body.billableCurrency;
+    if (typeof (billableCurrency) == "string") {
+        billableCurrency = JSON.parse(billableCurrency);
+    }
+    if (!billableCurrency) {
+        billableCurrency = {};
+    }
+
+    var billableScale = {};
+    billableScale = req.body.billableScale;
+    if (typeof (billableScale) == "string") {
+        billableScale = JSON.parse(billableScale);
+    }
+    if (!billableScale) {
+        billableScale = {};
+    }
+
+    var billableDuration = {};
+    billableDuration = req.body.billableDuration;
+    if (typeof (billableDuration) == "string") {
+        billableDuration = JSON.parse(billableDuration);
+    }
+    if (!billableDuration) {
+        billableDuration = {};
+    }
+
+
+    var vendorCurrency = {};
+    vendorCurrency = req.body.vendorCurrency;
+    if (typeof (vendorCurrency) == "string") {
+        vendorCurrency = JSON.parse(vendorCurrency);
+    }
+    if (!vendorCurrency) {
+        vendorCurrency = {};
+    }
+
+    var vendorScale = {};
+    vendorScale = req.body.vendorScale;
+    if (typeof (vendorScale) == "string") {
+        vendorScale = JSON.parse(vendorScale);
+    }
+    if (!vendorScale) {
+        vendorScale = {};
+    }
+
+    var vendorDuration = {};
+    vendorDuration = req.body.vendorDuration;
+    if (typeof (vendorDuration) == "string") {
+        vendorDuration = JSON.parse(vendorDuration);
+    }
+    if (!vendorDuration) {
+        vendorDuration = {};
+    }
+
+    var designation = {};
+    designation = req.body.designation;
+    if (typeof (designation) == "string") {
+        designation = JSON.parse(designation);
+    }
+    if (!designation) {
+        designation = {};
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -3259,11 +3514,12 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                 req.body.offerCTCScaleId = req.body.offerCTCScaleId ? req.body.offerCTCScaleId : 0;
                 req.body.offerCTCPeriodId = req.body.offerCTCPeriodId ? req.body.offerCTCPeriodId : 0;
                 req.body.salaryCurrId = req.body.salaryCurrId ? req.body.salaryCurrId : 0;
-                req.body.salarySalary = req.body.salarySalary ? req.body.salarySalary : 0;
+                req.body.salaryAmount = req.body.salaryAmount ? req.body.salaryAmount : 0;
                 req.body.salaryScaleId = req.body.salaryScaleId ? req.body.salaryScaleId : 0;
                 req.body.salaryPeriodId = req.body.salaryPeriodId ? req.body.salaryPeriodId : 0;
                 req.body.notes = req.body.notes ? req.body.notes : '';
                 req.body.workInMentionedShifts = req.body.workInMentionedShifts ? req.body.workInMentionedShifts : 0;
+                req.body.grade = req.body.grade ? req.body.grade : '';
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -3278,18 +3534,30 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                     req.st.db.escape(req.body.offerJoiningDate),
                     req.st.db.escape(req.body.plannedJoiningDate),
                     req.st.db.escape(req.body.actualJoiningDate),
-                    req.st.db.escape(req.body.offerCTCCurrId),
+                    req.st.db.escape(JSON.stringify(offerCTCCurr)),
                     req.st.db.escape(req.body.offerCTCSalary),
-                    req.st.db.escape(req.body.offerCTCScaleId),
-                    req.st.db.escape(req.body.offerCTCPeriodId),
-                    req.st.db.escape(req.body.salaryCurrId),
-                    req.st.db.escape(req.body.salarySalary),
-                    req.st.db.escape(req.body.salaryScaleId),
-                    req.st.db.escape(req.body.salaryPeriodId),
+                    req.st.db.escape(JSON.stringify(offerCTCScale)),
+                    req.st.db.escape(JSON.stringify(offerCTCPeriod)),
+                    req.st.db.escape(JSON.stringify(salaryCurr)),
+                    req.st.db.escape(req.body.salaryAmount),
+                    req.st.db.escape(JSON.stringify(salaryScale)),
+                    req.st.db.escape(JSON.stringify(salaryPeriod)),
                     req.st.db.escape(req.body.notes),
                     req.st.db.escape(req.body.workInMentionedShifts),
-                    req.st.db.escape(JSON.stringify(documentAttachment))
-                ];
+                    req.st.db.escape(JSON.stringify(documentAttachment)),
+                    req.st.db.escape(JSON.stringify(offerLocation)),
+                    req.st.db.escape(req.body.grade),
+                    req.st.db.escape(JSON.stringify(billableCurrency)),
+                    req.st.db.escape(req.body.billableAmount),
+                    req.st.db.escape(JSON.stringify(billableScale)),
+                    req.st.db.escape(JSON.stringify(billableDuration)),
+                    req.st.db.escape(JSON.stringify(designation)),
+                    req.st.db.escape(req.body.empCode),
+                    req.st.db.escape(JSON.stringify(vendorCurrency)),
+                    req.st.db.escape(req.body.vendorAmount),
+                    req.st.db.escape(JSON.stringify(vendorScale)),
+                    req.st.db.escape(JSON.stringify(vendorDuration))
+                    ];
 
                 var procQuery = 'CALL wm_save_onBoarding( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -3358,46 +3626,51 @@ applicantCtrl.getOnBoarding = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0]) {
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "onBoarding details loaded successfully";
                         response.error = null;
-                        response.data =
-                            {
-                                result: result[0]
-                                // heMasterId: result[0][0].heMasterId,
-                                // heDepartmentId: result[0][0].heDepartmentId,
-                                // applicantId: result[0][0].applicantId,
-                                // jobTitleId: result[0][0].jobTitleId,
-                                // jobtitle: result[0][0].jobtitle,
-                                // expectedjoining: result[0][0].expectedjoining,
-                                // companyContactId: result[0][0].companyContactId,
-                                // companyContactName: result[0][0].companyContactName,
-                                // accountManagerId: result[0][0].accountManagerId,
-                                // accountManagerName: result[0][0].accountManagerName,
-                                // offerJoiningDate: result[0][0].offerJoiningDate,
-                                // plannedJoiningDate: result[0][0].plannedJoiningDate,
-                                // actualJoiningDate: result[0][0].actualJoiningDate,
-                                // offerCTCCurrId: result[0][0].offerCTCCurrId,
-                                // offerCTCSalary: result[0][0].offerCTCSalary,
-                                // offerCTCScaleId: result[0][0].offerCTCScaleId,
-                                // offerCTCPeriodId: result[0][0].offerCTCPeriodId,
-                                // salaryCurrId: result[0][0].salaryCurrId,
-                                // salarySalary: result[0][0].salarySalary,
-                                // salaryScaleId: result[0][0].salaryScaleId,
-                                // salaryPeriodId: result[0][0].salaryPeriodId,
-                                // notes: result[0][0].notes,
-                                // workInMentionedShifts: result[0][0].workInMentionedShifts,
-                                // attachmentList: JSON.parse(result[0][0].attachmentList) ? JSON.parse(result[0][0].attachmentList) : []
-                            };
+
+                        if(result[0][0]){
+                            result[0][0].documentAttachment = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].documentAttachment):[];
+                            result[0][0].offerLocation = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerLocation):[];
+    
+                            result[0][0].offerCTCCurr = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCCurr):{};
+                            result[0][0].offerCTCScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCScale):{};
+                            result[0][0].offerCTCPeriod = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCPeriod):{};
+                            result[0][0].salaryCurr = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryCurr):{};
+                            result[0][0].salaryScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryScale):{};
+                            result[0][0].salaryPeriod = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryPeriod):{};
+                            
+                            result[0][0].billableCurrency = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableCurrency):{};
+                            result[0][0].billableScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableScale):{};
+                            result[0][0].billableDuration = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableDuration):{};
+    
+                            result[0][0].vendorCurrency = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorCurrency):{};
+                            result[0][0].vendorScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorScale):{};
+                            result[0][0].vendorDuration = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorDuration):{};
+    
+                            result[0][0].designation = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].designation):{};
+                        }
+                        
+                        if(result[1][0]){
+                            result[1][0].offerDate = (result[1] && result[1][0]) ? result[1][0].offerDate :null;
+                            result[1][0].plannedJoiningDate = (result[1] && result[1][0]) ? result[1][0].plannedJoiningDate :null;    
+                        }
+                        
+                        response.data ={
+                            onBoarding : (result[0] && result[0][0]) ? result[0][0]:{},
+                            offer : (result[1] && result[1][0]) ? result[1][0] : {}
+                        };
                         res.status(200).json(response);
                     }
                     else if (!err) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
-                        response.data = {
-                            offerManager: []
+                        response.data ={
+                            onBoarding :{},
+                            offer :{}
                         };
                         res.status(200).json(response);
                     }

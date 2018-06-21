@@ -10,9 +10,12 @@ router.get('/getUsers',paceUsersCtrl.getUsers);
 router.post('/saveTask',paceUsersCtrl.saveTaskPlanner);
 router.get('/getTasks',paceUsersCtrl.getTaskPlanner);
 
-router.get('/dashBoard',paceUsersCtrl.getdashBoard);
+router.post('/dashBoard',paceUsersCtrl.getdashBoard);
 
 router.post('/saveTrackerTemplate',paceUsersCtrl.saveTrackerTemplate);
 router.get('/baseFile',paceUsersCtrl.getBaseFile);
+
+router.post('/verifyotp',paceUsersCtrl.toVerifyOtp);
+router.post('/saveLayout',paceUsersCtrl.saveLayout);
 
 module.exports = router;

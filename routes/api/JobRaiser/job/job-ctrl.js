@@ -13,7 +13,7 @@ var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 var CONFIG = require('../../../../ezeone-config.json');
-var DBSecretKey=CONFIG.DB.secretKey;
+var DBSecretKey = CONFIG.DB.secretKey;
 
 var jobCtrl = {};
 var error = {};
@@ -89,7 +89,7 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
-                req.body.tid = (req.body.defId) ? req.body.defId : 0;
+                req.body.defId = (req.body.defId) ? req.body.defId : 0;
                 req.body.heMasterId = (req.body.heMasterId) ? req.body.heMasterId : 0;
                 req.body.purpose = (req.body.purpose) ? req.body.purpose : 0;
                 //req.body.jobType = (req.body.jobType) ? req.body.jobType :0;
@@ -121,7 +121,7 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                         response.message = "Requirement default saved successfully";
                         response.data = {
                             defaultId: results[0],
-                            defaultData:(results[1] && results[1][0] &&results[1][0].defaultFormData) ? JSON.parse(results[1][0].defaultFormData): {}
+                            defaultData: (results[1] && results[1][0] && results[1][0].defaultFormData) ? JSON.parse(results[1][0].defaultFormData) : {}
                         };
                         res.status(200).json(response);
                     }
@@ -558,7 +558,7 @@ jobCtrl.getJobDefaults = function (req, res, next) {
                         response.status = true;
                         response.message = "Requirement default data is";
                         response.error = null;
-                        response.data = JSON.parse(results[0][0].defaultFormData) ? JSON.parse(results[0][0].defaultFormData) : [];
+                        response.data = results[0][0].defaultFormData ? JSON.parse(results[0][0].defaultFormData) : {};
 
                         res.status(200).json(response);
                     }
@@ -566,7 +566,7 @@ jobCtrl.getJobDefaults = function (req, res, next) {
                         response.status = true;
                         response.message = "Default data not found";
                         response.error = null;
-                        response.data = null;
+                        response.data = {};
                         res.status(200).json(response);
                     }
                     else {
@@ -1366,7 +1366,13 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 }
 
                                 response.status = true;
-                                response.message = "Requirement saved successfully";
+                                if (req.body.jdTemplateFlag==1){
+                                    response.message = "Requirement template saved successfully";    
+                                }
+                                else{
+                                    response.message = "Requirement saved successfully";
+                                }
+
                                 response.error = null;
                                 response.data = {
                                     messageList: {
@@ -1389,10 +1395,12 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                         parentId: results[0][0].parentId,
                                         accessUserType: results[0][0].accessUserType,
                                         heUserId: results[0][0].heUserId,
-                                        formData: JSON.parse(results[0][0].formDataJSON)
-                                    },
-                                    requirementList: results[2]
-                                };
+                                        formData: JSON.parse(results[0][0].formDataJSON),
+                                        requirementList: (results && results[2] && results[2][0]) ? results[2] : [],
+                                        jdTemplateList: (results && results[3] && results[3][0]) ? results[3] : []
+
+                                    }
+                            };
                                 if (isWeb == 0) {
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                     zlib.gzip(buf, function (_, result) {
@@ -1690,7 +1698,13 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                     }
 
                                     response.status = true;
-                                    response.message = "Requirement saved successfully";
+                                    if (req.body.jdTemplateFlag==1){
+                                        response.message = "Requirement template saved successfully";    
+                                    }
+                                    else{
+                                        response.message = "Requirement saved successfully";
+                                    }
+
                                     response.error = null;
                                     response.data = {
                                         messageList: {
@@ -2369,7 +2383,7 @@ jobCtrl.getClientManagerList = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    
+
     if (!req.query.heMasterId) {
         error.heMasterId = 'Invalid heMasterId';
         validationFlag *= false;
@@ -2407,11 +2421,11 @@ jobCtrl.getClientManagerList = function (req, res, next) {
                     else if (!err) {
                         response.status = true;
                         response.message = "Clients  not found";
-                        response.error = 
-                        response.data = {
-                            internalList: [],
-                            clientList: []
-                        };
+                        response.error =
+                            response.data = {
+                                internalList: [],
+                                clientList: []
+                            };
                         res.status(200).json(response);
                     }
                     else {

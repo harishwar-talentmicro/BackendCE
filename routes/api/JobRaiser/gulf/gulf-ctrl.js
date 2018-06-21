@@ -172,17 +172,27 @@ gulfCtrl.getMedical = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, Result) {
                     console.log(err);
-                    if (!err && Result) {
+                    if (!err && Result[0] && Result[0][0]) {
                         response.status = true;
                         response.message = "Medical data loaded successfully";
                         response.error = null;
-                        response.data = {
-                           
+
+                        Result[0][0].currency=(Result[0] && Result[0][0]) ? JSON.parse(Result[0][0].currency):{};
+                        Result[0][0].scale=(Result[0] && Result[0][0]) ? JSON.parse(Result[0][0].scale):{};
+
+                        response.data = {   
                             medicalDetails: Result[0][0]
                         };
                         res.status(200).json(response);
                     }
-                    
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }              
                     else {
                         response.status = false;
                         response.message = "Error while loading medical data";
@@ -815,4 +825,5 @@ gulfCtrl.getAttestation = function (req, res, next) {
         });
     }
 };
+
 module.exports = gulfCtrl;

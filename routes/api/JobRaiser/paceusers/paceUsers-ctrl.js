@@ -271,9 +271,10 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 req.body.taskId = req.body.taskId ? req.body.taskId : 0;
-                req.body.priority = req.body.priority ? req.body.priority : 1;
+                req.body.priority = req.body.priority ? req.body.priority : 0;
                 req.body.taskDateTime = req.body.taskDateTime ? req.body.taskDateTime : null;
                 req.body.taskEndDate = req.body.taskEndDate ? req.body.taskEndDate : null;
+                req.body.status = req.body.status ? req.body.status : 0;  // 0 pending ,1- completed
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -286,18 +287,32 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                     req.st.db.escape(req.body.priority),
                     req.st.db.escape(req.body.taskEndDate),
                     req.st.db.escape(JSON.stringify(venue)),
-                    req.st.db.escape(JSON.stringify(anchor))
+                    req.st.db.escape(JSON.stringify(anchor)),
+                    req.st.db.escape(req.body.status)
+
                 ];
 
                 var procQuery = 'CALL wm_save_pacePlanner( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
-                    console.log(result);
-                    if (!err && result && result[0] && result[0][0]) {
+                    // console.log(result);
+                    if (!err && result && result[0] || result[1]) {
                         response.status = true;
                         response.message = "Task saved successfully";
                         response.error = null;
-                        response.data = result[0];
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
+                            result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
+                        }
+
+                        for (var i = 0; i < result[1].length; i++) {
+                            result[1][i].anchor = result[1][i].anchor ? JSON.parse(result[1][i].anchor) : {};
+                            result[1][i].venue = result[1][i].venue ? JSON.parse(result[1][i].venue) : {};
+                        }
+                        response.data = {
+                            pendingTasks:result[0],
+                            tasks: result[1]
+                        }
                         res.status(200).json(response);
                     }
                     else {
@@ -353,19 +368,23 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0] || result[1]) {
                         response.status = true;
                         response.message = "Tasks loaded successfully";
                         response.error = null;
-                        var output = [];
                         for (var i = 0; i < result[0].length; i++) {
                             result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
                             result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
+                        }
 
+                        for (var i = 0; i < result[1].length; i++) {
+                            result[1][i].anchor = result[1][i].anchor ? JSON.parse(result[1][i].anchor) : {};
+                            result[1][i].venue = result[1][i].venue ? JSON.parse(result[1][i].venue) : {};
                         }
                         response.data =
                             {
-                                tasks: result[0]
+                                pendingTasks:result[0],
+                                tasks: result[1]
                             };
                         res.status(200).json(response);
                     }
@@ -408,7 +427,7 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
     }
 
     if (!req.query.userMasterId) {
-        error.userMasterId = "Invalid Company";
+        error.userMasterId = "Invalid user";
         validationFlag = false;
     }
 
@@ -431,7 +450,9 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.query.userMasterId),
-                    req.st.db.escape(req.query.type)
+                    req.st.db.escape(req.query.type),
+                    req.st.db.escape(req.body.from),
+                    req.st.db.escape(req.body.to)
                 ];
 
                 var procQuery = 'CALL wm_get_DashBoard( ' + inputs.join(',') + ')';
@@ -449,11 +470,44 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             output.push(res2);
                         }
 
+                        var output1 = [];
+                        
+                        for (var i = 0; i < result[2].length; i++) {
+                            var res3 = {};
+                            res3.name=result[2][i].name;
+                            res3.stage = result[2][i].stage ? JSON.parse(result[2][i].stage) : [];
+                            output1.push(res3);
+                        }
+
+                        var output2 = [];
+                        for (var i = 0; i < result[4].length; i++) {
+                            var res4 = {};
+                            res4.clientId = result[4][i].clientId;
+                            res4.clientName = result[4][i].clientName;
+                            res4.stage = result[4][i].stage ? JSON.parse(result[4][i].stage) : {};
+                            output2.push(res4);
+                        }
+
+                        // for (var i = 0; i < result[7].length; i++) {
+                        //     result[7][i].reqAppDetails = result[7][i].reqAppDetails ? JSON.parse(result[7][i].reqAppDetails) : [];
+                        // }
+
+                        // for (var i = 0; i < result[8].length; i++) {
+                        //     result[8][i].reqAppDetails = result[8][i].reqAppDetails ? JSON.parse(result[8][i].reqAppDetails) : [];
+                        // }
+
 
                         response.data =
                             {
                                 requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
-                                stages: output
+                                stages: output,
+                                requirementReport:output1,
+                                requirementReportTotalCount:result[3],
+                                fullfilmentReport:output2,
+                                fullfilmentReportTotalCount:result[5],
+                                converstionReport:result[6][0],
+                                turnAroundTime:result[7][0],
+                                firstCVResponse:result[8][0]
                             };
                         res.status(200).json(response);
                     }
@@ -464,7 +518,15 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             requirementStatus: {},
-                            stages: []
+                            stages: [],
+                            requirementReport:[],
+                                requirementReportTotalCount:[],
+                                fullfilmentReport:[],
+                                fullfilmentReportTotalCount:[],
+                                converstionReport:{},
+                                turnAroundTime:[],
+                                firstCVResponse:[]
+
                         };
                         res.status(200).json(response);
                     }
@@ -560,6 +622,7 @@ paceUsersCtrl.saveTrackerTemplate = function (req, res, next) {
 paceUsersCtrl.getBaseFile = function (req, res, next) {
     var response = {
         status: false,
+        code:null,
         message: "bas64 File",
         data: null,
         error: null
@@ -619,5 +682,181 @@ paceUsersCtrl.getBaseFile = function (req, res, next) {
         });
     }
 };
+
+paceUsersCtrl.toVerifyOtp = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid otp",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.body.mobileNo) {
+        error.mobileNo = "Mobile number is mandatory";
+        validationFlag = false;
+    }
+    if (!req.body.isdMobile) {
+        error.isdMobile = "isdMobile number is mandatory";
+        validationFlag = false;
+    }
+
+    if (!req.body.otp) {
+        error.otp = "Please enter OTP";
+        validationFlag = false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        var inputs = [
+            req.st.db.escape(req.body.isdMobile),
+            req.st.db.escape(req.body.mobileNo),
+            req.st.db.escape(req.body.otp),
+            req.st.db.escape(DBSecretKey)
+        ];
+
+        var procQuery = 'CALL wm_paceUserManager_verifyOtpInuse( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            console.log(err);
+            // console.log(result);
+            if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].error=="user already exist") {
+                response.status = false;
+                response.message = result[0][0].message;
+                response.code =100;
+                response.error = false;
+                response.data = {
+                    message: result[1][0].error
+                };
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].success== "paceuser does not exist") {
+                response.status = true;
+                response.message = result[1][0].success;
+                response.code =200;
+                response.error = false;
+                response.data = {
+                    userDetails: result[2][0]
+                };
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].success== "user does not exist in whatmate") {
+                response.status = true;
+                response.message = result[1][0].success;
+                response.code =300;
+                response.error = false;
+                response.data = null;
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0][0].message == "INVALID OTP") {
+                response.status = false;
+                response.message = result[0][0].message;
+                response.error = false;
+                response.code =400;
+                response.data = {
+                    message: result[0][0].message
+                };
+                res.status(200).json(response);
+            }
+            else if (!err) {
+                response.status = true;
+                response.message = "No result found";
+                response.code =600;
+                response.error = false;
+                response.data = null;
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while verifying OTP";
+                response.error = true;
+                response.code =500;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+    }
+};
+
+paceUsersCtrl.saveLayout = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = "Invalid Company";
+        validationFlag *= false;
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    var layout = req.body.layout;
+    if (typeof (layout) == "string") {
+        layout = JSON.parse(layout);
+    }
+    if (!layout) {
+        layout = [];
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(layout))
+                ];
+
+                var procQuery = 'CALL wm_save_pacelayout( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(result);
+                    if (!err && result) {
+                        response.status = true;
+                        response.message = "Layout saved successfully";
+                        response.error = null;
+                        if(typeof(layout)=="string"){
+                            layout = JSON.parse(layout);
+                        }
+                        response.data = layout;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving layout";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
 
 module.exports = paceUsersCtrl;

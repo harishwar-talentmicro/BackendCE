@@ -267,6 +267,14 @@ masterCtrl.saveClients = function (req, res, next) {
         businessLocation = [];
     }
 
+    var contactList = req.body.contactList;
+    if (typeof (contactList) == "string") {
+        contactList = JSON.parse(contactList);
+    }
+    if (!contactList) {
+        contactList = [];
+    }
+
     var contracts = req.body.contracts;
     if (typeof (contracts) == "string") {
         contracts = JSON.parse(contracts);
@@ -274,6 +282,7 @@ masterCtrl.saveClients = function (req, res, next) {
     if (!contracts) {
         contracts = [];
     }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
@@ -289,8 +298,8 @@ masterCtrl.saveClients = function (req, res, next) {
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(JSON.stringify(heDepartment)),
                     req.st.db.escape(JSON.stringify(businessLocation)),
-                    req.st.db.escape(JSON.stringify(contracts))
-
+                    req.st.db.escape(JSON.stringify(contracts)),
+                    req.st.db.escape(JSON.stringify(contactList))
                 ];
                 var procQuery = 'CALL wm_saveClientBusinessLocationContacts( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -604,9 +613,9 @@ masterCtrl.getmailTemplate = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0] || result[0][0] || result[1] || result[2] || result[5]) {
                         response.status = true;
-                        response.message = "Mail template list";
+                        response.message = "Mail template list loaded successfully";
                         response.error = null;
                         response.data = {
                             screeningMailer: result[0] ? result[0] : [],
@@ -618,7 +627,20 @@ masterCtrl.getmailTemplate = function (req, res, next) {
                         };
                         res.status(200).json(response);
                     }
-
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = {
+                            screeningMailer: [],
+                            submissionMailer:  [],
+                            jobseekerMailer: [],
+                            clientMailer:  [],
+                            interviewMailer:  [],
+                            trackerTemplates:  []
+                        };
+                        res.status(200).json(response);
+                    }
                     else {
                         response.status = false;
                         response.message = "Error while getting mail templates";
@@ -1311,6 +1333,8 @@ masterCtrl.getRequirementView = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+                req.query.status = (req.query.status) ? req.query.status : 0;
+
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.status),
@@ -1321,7 +1345,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if (!err && results && results[0]) {
+                    if (!err && results && (results[0] || results[1])) {
                         response.status = true;
                         response.message = " Requirement View loaded sucessfully";
                         response.error = null;
@@ -1330,6 +1354,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                             var res2 = {};
                             res2.parentId = results[0][i].parentId ? results[0][i].parentId : 0,
                                 res2.transId = results[0][i].transId ? results[0][i].transId : 0,
+                                res2.notes = results[0][i].notes ? results[0][i].notes : '',
                                 res2.heDepartmentId = results[0][i].heDepartmentId ? results[0][i].heDepartmentId : 0,
                                 res2.positions = results[0][i].positions ? results[0][i].positions : 0,
                                 res2.positionsFilled = results[0][i].positionsFilled ? results[0][i].positionsFilled : 0,
@@ -1350,8 +1375,10 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                 res2.stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : []
                             output.push(res2);
                         }
+                        
                         response.data = {
-                            requirementView: output
+                            requirementView: output,
+                            stageList : (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList):[]
                         };
 
                         if (req.query.isWeb == 0) {
@@ -1371,7 +1398,8 @@ masterCtrl.getRequirementView = function (req, res, next) {
                         response.message = " Requirement View is empty";
                         response.error = null;
                         response.data = {
-                            requirementView: []
+                            requirementView: [],
+                            stageList: (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList):[]
 
                         };
                         if (req.query.isWeb == 0) {
@@ -1454,9 +1482,9 @@ masterCtrl.getClientView = function (req, res, next) {
                             var res2 = {};
                             res2.stageDetail = results[0][i].stageDetail ? JSON.parse(results[0][i].stageDetail) : [],
                                 res2.heDepartmentId = results[0][i].departmentId ? results[0][i].departmentId : 0;
-                            res2.clientName = results[0][i].clientName ? results[0][i].clientName : 0;
+                            res2.clientName = results[0][i].clientName ? results[0][i].clientName : '';
                             res2.requirementCount = results[0][i].count ? results[0][i].count : 0;
-                            res2.notes = results[0][i].notes ? results[0][i].notes : 0;
+                            res2.notes = results[0][i].notes ? results[0][i].notes : '';
                             res2.createdDate = results[0][i].createdDate ? results[0][i].createdDate : null;
                             res2.updateDate = results[0][i].updateDate ? results[0][i].updateDate : null;
                             res2.createdUserName = results[0][i].createdUserName ? results[0][i].createdUserName : '';
@@ -1822,36 +1850,36 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                         response.status = true;
                         response.message = "client data loaded successfully";
                         response.error = null;
-                        var output = [];
-                        for (var i = 0; i < result[1].length; i++) {
-                            var res2 = {};
-                            res2.businessLocationId = result[1][i].businessLocationId;
-                            res2.businessLocationTitle = result[1][i].businessLocationTitle;
-                            res2.location = result[1][i].location;
-                            res2.address = result[1][i].type;
-                            res2.latitude = result[1][i].latitude;
-                            res2.longitude = result[1][i].longitude;
-                            res2.nearestParking = result[1][i].nearestParking;
-                            res2.entryProcedure = result[1][i].entryProcedure;
-                            res2.landmark = result[1][i].landmark;
-                            res2.contactList = JSON.parse(result[1][i].contactList) ? JSON.parse(result[1][i].contactList) : [];
-                            output.push(res2);
-                        }
-                        result[0][0].managers = JSON.parse(result[0][0].managers);
+                        if (result[1] && result[1][0]) {
+                            for (var i = 0; i < result[1].length; i++) {
+                                // var res2 = {};
+                                // result[1][i].contactList = result[1][i].contactList ? JSON.parse(result[1][i].contactList) : [];
 
+                                result[1][i].location = result[1][i].location ? JSON.parse(result[1][i].location) : [];
+                            }
+                        }
+
+                        result[0][0].managers = JSON.parse(result[0][0].managers);
+                        result[0][0].department = JSON.parse(result[0][0].department);
+
+                        // contracts parsing
                         if (result[2] && result[2][0]) {
                             var contracts = (result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : [];
-                            if(contracts){
+                            if (contracts) {
                                 for (var j = 0; j < contracts.length; j++) {
                                     contracts[j].managers = JSON.parse(contracts[j].managers);
                                 }
                             }
                         }
 
+                        // client contact parsing
+                        result[3][0].contactList = (result && result[3] && result[3][0]) ? JSON.parse(result[3][0].contactList) :[];
+
                         response.data = {
                             heDepartment: result[0][0],
-                            businessLocation: output,
-                            contracts: contracts//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
+                            businessLocation: result[1],
+                            contracts: contracts,//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
+                            contactList : result[3][0].contactList
                         };
 
 
@@ -1875,7 +1903,8 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                         response.data = {
                             heDepartment: {},
                             businessLocation: [],
-                            contracts: []
+                            contracts: [],
+                            contactList : []
                         };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -2140,6 +2169,8 @@ masterCtrl.saveUserManager = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
+
+                
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 req.query.apiKey = req.query.apiKey ? req.query.apiKey : 0;
                 req.body.userMasterId = req.body.userMasterId ? req.body.userMasterId : 0;
@@ -2157,7 +2188,9 @@ masterCtrl.saveUserManager = function (req, res, next) {
                 req.body.gradeId = req.body.gradeId ? req.body.gradeId : 0;
                 req.body.workGroupId = req.body.workGroupId ? req.body.workGroupId : 0;
                 req.body.RMId = req.body.RMId ? req.body.RMId : 0;
-                req.body.RMId = req.body.RMId ? req.body.exitDate : 0;
+                req.body.exitDate = req.body.exitDate ? req.body.exitDate : 0;
+                req.body.password = req.body.password ? req.body.password : '';
+                var encryptPwd = req.st.hashPassword(req.body.password);
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -2185,7 +2218,8 @@ masterCtrl.saveUserManager = function (req, res, next) {
                     req.st.db.escape(req.body.RMId),
                     req.st.db.escape(req.body.exitDate),
                     req.st.db.escape(req.body.joiningDate),
-                    req.st.db.escape(DBSecretKey)
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(encryptPwd)
                 ];
                 var procQuery = 'CALL save_Pace_User( ' + inputs.join(',') + ')';
                 console.log(procQuery);

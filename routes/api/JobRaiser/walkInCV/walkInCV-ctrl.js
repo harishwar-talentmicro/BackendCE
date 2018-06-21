@@ -13,6 +13,12 @@ var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 
+var htmlpdf = require('html-pdf');
+var Mailer = require('../../../../mail/mailer.js');
+var mailerApi = new Mailer();
+
+var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+
 
 var request = require('request');
 var path = require('path');
@@ -44,6 +50,7 @@ var Mailer = require('../../../../mail/mailer.js');
 var mailerApi = new Mailer();
 var randomstring = require("randomstring");
 
+
 try {
     bcrypt = require('bcrypt');
 }
@@ -70,6 +77,61 @@ function hashPassword(password) {
     }
 }
 
+var gcloud = require('gcloud');
+// var fs = require('fs');
+
+var appConfig = require('../../../../ezeone-config.json');
+
+var gcs = gcloud.storage({
+    projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
+    keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+});
+
+// Reference an existing bucket.
+var bucket = gcs.bucket(appConfig.CONSTANT.STORAGE_BUCKET);
+
+bucket.acl.default.add({
+    entity: 'allUsers',
+    role: gcs.acl.READER_ROLE
+}, function (err, aclObject) {
+});
+
+
+var uploadDocumentToCloud = function (uniqueName, readStream, callback) {
+    var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
+    readStream.pipe(remoteWriteStream);
+
+    remoteWriteStream.on('finish', function () {
+        console.log('done');
+        if (callback) {
+            if (typeof (callback) == 'function') {
+                callback(null);
+            }
+            else {
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else {
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+
+    remoteWriteStream.on('error', function (err) {
+        if (callback) {
+            if (typeof (callback) == 'function') {
+                console.log(err);
+                callback(err);
+            }
+            else {
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else {
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+};
+
 /**
  * Compare the password and the hash for authenticating purposes
  * @param password
@@ -88,6 +150,47 @@ function comparePassword(password, hash) {
 
 var walkInCvCtrl = {};
 var error = {};
+
+var candidateDetailsHirecraft;
+var cloudUrl;
+
+/*var attachFile = new Promise(function (resolve, reject) {
+
+    var CVFile=candidateDetailsHirecraft.cvFile;
+    var CVFileType=candidateDetailsHirecraft.cvFileType;
+    var CVFileName=candidateDetailsHirecraft.CVFileName;
+    var b64=CVFile;
+    var buff = new Buffer(b64, 'base64');
+    fs.writeFileSync('Resume.'+ CVFileType , buff);
+    var attachment={
+        path:'Resume.'+ CVFileType ,
+        extension:CVFileType,
+        fileName:CVFileName
+    };
+
+    var uniqueId = uuid.v4();
+    var filetype = (attachment.extension) ? attachment.extension : '';
+    console.log(filetype);
+    cloudUrl = uniqueId + '.' + filetype;
+    console.log (uniqueId);
+    aFilename = attachment.fileName;
+    console.log("aFilenameaFilename",aFilename);
+    console.log("req.files.attachment.path",attachment.path);
+
+    var readStream = fs.createReadStream(attachment.path);
+
+
+    uploadDocumentToCloud(cloudUrl, readStream, function (err) {
+        if (!err) {
+            console.log(cloudUrl)
+        }
+        else {
+
+            console.log('FnSaveServiceAttachment:attachment not upload');
+        }
+        fs.unlinkSync('Resume.'+ CVFileType);
+    });
+});*/
 
 walkInCvCtrl.getmasterData = function (req, res, next) {
     var response = {
@@ -341,7 +444,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
         ugEducation = JSON.parse(ugEducation);
     }
     if (!ugEducation) {
-        ugEducation = [];
+        ugEducation = {};
     }
 
     var pgEducation = req.body.pgEducation;
@@ -349,7 +452,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
         pgEducation = JSON.parse(pgEducation);
     }
     if (!pgEducation) {
-        pgEducation = [];
+        pgEducation = {};
     }
 
     var skills = req.body.skills;
@@ -375,6 +478,15 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
     if (!currency) {
         currency = {};
     }
+
+    var details = req.body.details;
+    if (typeof (details) == "string") {
+        details = JSON.parse(details);
+    }
+    if (!details) {
+        details = {};
+    }
+
     var scale = req.body.scale;
     if (typeof (scale) == "string") {
         scale = JSON.parse(scale);
@@ -417,7 +529,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-
+                var isWeb = req.query.isWeb;
                 req.body.heParentId = (req.body.heParentId) ? req.body.heParentId : 0;
                 req.body.fresherExperience = (req.body.fresherExperience) ? req.body.fresherExperience : 0;
                 req.body.lastName = (req.body.lastName) ? req.body.lastName : "";
@@ -428,7 +540,10 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.experience = (req.body.experience) ? req.body.experience : '0.0';
                 req.body.presentSalary = (req.body.presentSalary) ? req.body.presentSalary : '0.0';
                 req.body.walkinType = (req.body.walkinType) ? req.body.walkinType : 0;
-                // req.body.referedByUserId = (req.body.referedByUserId) ? req.body.referedByUserId : 0;
+                req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
+                req.body.IDNumber = (req.body.IDNumber) ? req.body.IDNumber : '';
+                req.body.profilePicture = (req.body.profilePicture) ? req.body.profilePicture : '';
+                req.body.middleName = (req.body.middleName) ? req.body.middleName : '';
 
 
                 var inputs = [
@@ -463,12 +578,16 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.receiverCount),
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(req.body.walkInType),
-                    req.st.db.escape(req.body.userId),
+                    req.st.db.escape(JSON.stringify(details)),
                     req.st.db.escape(JSON.stringify(location)),
                     req.st.db.escape(req.body.profilePicture),
                     req.st.db.escape(DBSecretKey),
-                    req.st.db.escape(JSON.stringify(walkInJobs))
+                    req.st.db.escape(JSON.stringify(walkInJobs)),
+                    req.st.db.escape(req.body.DOB),
+                    req.st.db.escape(req.body.IDNumber),
+                    req.st.db.escape(req.body.middleName)
                 ];
+
 
                 var procQuery = 'CALL wm_save_wlkinForm( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -476,116 +595,262 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    var isWeb = req.query.isWeb;
+                    
 
-                    if (!err && results && results[0][0]) {
-                        senderGroupId = results[0][0].senderId;
-                        notificationTemplaterRes = notificationTemplater.parse('compose_message', {
-                            senderName: results[0][0].senderName
-                        });
+                    // if (!err && results && results[0][0]) {
+                    //     senderGroupId = results[0][0].senderId;
+                    //     notificationTemplaterRes = notificationTemplater.parse('compose_message', {
+                    //         senderName: results[0][0].senderName
+                    //     });
 
-                        for (var i = 0; i < results[1].length; i++) {         // main line 
-                            if (notificationTemplaterRes.parsedTpl) {
-                                notification.publish(
-                                    results[1][i].receiverId,
-                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                    results[0][0].senderId,
-                                    notificationTemplaterRes.parsedTpl,
-                                    31,
-                                    0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    1,
-                                    moment().format("YYYY-MM-DD HH:mm:ss"),
-                                    '',
-                                    0,
-                                    0,
-                                    null,
-                                    '',
-                                    /** Data object property to be sent with notification **/
-                                    {
-                                        messageList: {
-                                            messageId: results[1][i].messageId,
-                                            message: results[1][i].message,
-                                            messageLink: results[1][i].messageLink,
-                                            createdDate: results[1][i].createdDate,
-                                            messageType: results[1][i].messageType,
-                                            messageStatus: results[1][i].messageStatus,
-                                            priority: results[1][i].priority,
-                                            senderName: results[1][i].senderName,
-                                            senderId: results[1][i].senderId,
-                                            receiverId: results[1][i].receiverId,
-                                            groupId: results[1][i].senderId,
-                                            groupType: 2,
-                                            transId: results[1][i].transId,
-                                            formId: results[1][i].formId,
-                                            currentStatus: results[1][i].currentStatus,
-                                            currentTransId: results[1][i].currentTransId,
-                                            parentId: results[1][i].parentId,
-                                            accessUserType: results[1][i].accessUserType,
-                                            heUserId: results[1][i].heUserId,
-                                            formData: JSON.parse(results[1][i].formDataJSON)
-                                        }
-                                    },
-                                    null,
-                                    tokenResult[0].isWhatMate,
-                                    results[1][i].secretKey);
-                                console.log('postNotification : notification for compose_message is sent successfully');
+                    //     for (var i = 0; i < results[1].length; i++) {         // main line 
+                    //         if (notificationTemplaterRes.parsedTpl) {
+                    //             notification.publish(
+                    //                 results[1][i].receiverId,
+                    //                 (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                    //                 (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                    //                 results[0][0].senderId,
+                    //                 notificationTemplaterRes.parsedTpl,
+                    //                 31,
+                    //                 0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                    //                 (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                    //                 0,
+                    //                 0,
+                    //                 0,
+                    //                 0,
+                    //                 1,
+                    //                 moment().format("YYYY-MM-DD HH:mm:ss"),
+                    //                 '',
+                    //                 0,
+                    //                 0,
+                    //                 null,
+                    //                 '',
+                    //                 /** Data object property to be sent with notification **/
+                    //                 {
+                    //                     messageList: {
+                    //                         messageId: results[1][i].messageId,
+                    //                         message: results[1][i].message,
+                    //                         messageLink: results[1][i].messageLink,
+                    //                         createdDate: results[1][i].createdDate,
+                    //                         messageType: results[1][i].messageType,
+                    //                         messageStatus: results[1][i].messageStatus,
+                    //                         priority: results[1][i].priority,
+                    //                         senderName: results[1][i].senderName,
+                    //                         senderId: results[1][i].senderId,
+                    //                         receiverId: results[1][i].receiverId,
+                    //                         groupId: results[1][i].senderId,
+                    //                         groupType: 2,
+                    //                         transId: results[1][i].transId,
+                    //                         formId: results[1][i].formId,
+                    //                         currentStatus: results[1][i].currentStatus,
+                    //                         currentTransId: results[1][i].currentTransId,
+                    //                         parentId: results[1][i].parentId,
+                    //                         accessUserType: results[1][i].accessUserType,
+                    //                         heUserId: results[1][i].heUserId,
+                    //                         formData: JSON.parse(results[1][i].formDataJSON)
+                    //                     }
+                    //                 },
+                    //                 null,
+                    //                 tokenResult[0].isWhatMate,
+                    //                 results[1][i].secretKey);
+                    //             console.log('postNotification : notification for compose_message is sent successfully');
+                    //         }
+                    //         else {
+                    //             console.log('Error in parsing notification compose_message template - ',
+                    //                 notificationTemplaterRes.error);
+                    //             console.log('postNotification : notification for compose_message is sent successfully');
+                    //         }
+                    //     }
+
+                    //     response.status = true;
+                    //     response.message = "Walkin Form saved successfully";
+                    //     response.error = null;
+                    //     response.data = {
+                    //         messageList:
+                    //             {
+                    //                 messageId: results[0][0].messageId,
+                    //                 message: results[0][0].message,
+                    //                 messageLink: results[0][0].messageLink,
+                    //                 createdDate: results[0][0].createdDate,
+                    //                 messageType: results[0][0].messageType,
+                    //                 messageStatus: results[0][0].messageStatus,
+                    //                 priority: results[0][0].priority,
+                    //                 senderName: results[0][0].senderName,
+                    //                 senderId: results[0][0].senderId,
+                    //                 receiverId: results[0][0].receiverId,
+                    //                 transId: results[0][0].transId,
+                    //                 formId: results[0][0].formId,
+                    //                 groupId: req.body.groupId,
+                    //                 currentStatus: results[0][0].currentStatus,
+                    //                 currentTransId: results[0][0].currentTransId,
+                    //                 localMessageId: req.body.localMessageId,
+                    //                 parentId: results[0][0].parentId,
+                    //                 accessUserType: results[0][0].accessUserType,
+                    //                 heUserId: results[0][0].heUserId,
+                    //                 formData: JSON.parse(results[0][0].formDataJSON)
+                    //             },
+                    //         walkinMessage: results[2][0],
+                    //         token: results[3][0].token
+                    //     };
+                    //     if (isWeb == 0) {
+                    //         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    //         zlib.gzip(buf, function (_, result) {
+                    //             response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                    //             res.status(200).json(response);
+                    //         });
+                    //     }
+                    //     else {
+                    //         res.status(200).json(response);
+                    //     }
+
+                    // }
+                    if (!err && (results[1] || results[2] && results[3])) {    // walkInForm Message with token
+
+                        if (results[4] && results[4][0] || results[5] || results[5][0]) {
+
+                            var mailContent = (results[5] && results[5][0]) ? results[5][0].mailBody : "Dear [FirstName] <br>Thank you for registering your profile.  We will revert to you once we find your Resume match one of the requirements we have.In the mean time, please [ClickHere] to upload your latest CV that will help us with more detailed information about your profile.Wishing you all the best<br><br>[WalkINSignature]<br>[Disclaimer]";
+
+                            if (mailContent) {
+                                mailContent = mailContent.replace("[FirstName]", req.body.firstName);
+                                mailContent = mailContent.replace("[FullName]", (req.body.firstName + ' ' + req.body.middleName + ' ' + req.body.lastName));
+
+                                var webLink = (results[5] && results[5][0]) ? results[5][0].webLink : "";
+                                mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
+
+                                var walkInSignature = (results[5] && results[5][0]) ? results[5][0].walkInSignature : "";
+                                var disclaimer = (results[5] && results[5][0]) ? results[5][0].disclaimer : "";
+
+                                mailContent = mailContent.replace("[WalkINSignature]", walkInSignature);
+                                mailContent = mailContent.replace("[Disclaimer]", disclaimer);
                             }
-                            else {
-                                console.log('Error in parsing notification compose_message template - ',
-                                    notificationTemplaterRes.error);
-                                console.log('postNotification : notification for compose_message is sent successfully');
-                            }
-                        }
 
-                        response.status = true;
-                        response.message = "Walkin Form saved successfully";
-                        response.error = null;
-                        response.data = {
-                            messageList:
-                                {
-                                    messageId: results[0][0].messageId,
-                                    message: results[0][0].message,
-                                    messageLink: results[0][0].messageLink,
-                                    createdDate: results[0][0].createdDate,
-                                    messageType: results[0][0].messageType,
-                                    messageStatus: results[0][0].messageStatus,
-                                    priority: results[0][0].priority,
-                                    senderName: results[0][0].senderName,
-                                    senderId: results[0][0].senderId,
-                                    receiverId: results[0][0].receiverId,
-                                    transId: results[0][0].transId,
-                                    formId: results[0][0].formId,
-                                    groupId: req.body.groupId,
-                                    currentStatus: results[0][0].currentStatus,
-                                    currentTransId: results[0][0].currentTransId,
-                                    localMessageId: req.body.localMessageId,
-                                    parentId: results[0][0].parentId,
-                                    accessUserType: results[0][0].accessUserType,
-                                    heUserId: results[0][0].heUserId,
-                                    formData: JSON.parse(results[0][0].formDataJSON)
-                                },
-                            walkinMessage: results[2][0],
-                            token: results[3][0].token
-                        };
-                        if (isWeb == 0) {
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                            zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                res.status(200).json(response);
+                            var subject = results[5][0].mailSubject;
+                            // send mail to candidate
+                            var email = new sendgrid.Email();
+                            email.from = results[4][0].fromEmailId;
+                            email.to = req.body.emailId;
+                            email.subject = subject;
+                            email.html = mailContent;
+
+                            sendgrid.send(email, function (err11, result11) {
+                                if (err11) {
+                                    console.log("mail not sent", err11);
+                                }
+                                else {
+                                    console.log("mail sent successfully", result11);
+                                }
                             });
-                        }
-                        else {
-                            res.status(200).json(response);
-                        }
 
-                    }
-                    else if (!err && (results[1] || results[2] && results[3])) {
+                            // To send mail to refered person
+                            if(results[6]){
+                                var refererEmail = new sendgrid.Email();
+                                refererEmail.from = results[4][0].fromEmailId;
+                                refererEmail.to = results[6][0].refererMailId;
+                                refererEmail.subject = results[6][0].message;
+                                refererEmail.html = results[6][0].message;
+    
+                                sendgrid.send(refererEmail, function (err1, result1) {
+                                    if (err1) {
+                                        console.log("mail not sent to referrer", err1);
+                                    }
+                                    else {
+                                        console.log("mail sent successfully to referrer", result1);
+                                    }
+                                });
+                            }
+                            
+                            // to send sms to candidate
+                            var isdMobile = req.body.mobileISD;
+                            var mobileNo = req.body.mobileNo;
+                            var message = "Congratulations your profile is successfully registered";
+                            if (isdMobile == "+977") {
+                                request({
+                                    url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                    qs: {
+                                        token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                        to: mobileNo,
+                                        message: message,
+                                        sender: 'Techingen'
+                                    },
+                                    method: 'GET'
+
+                                }, function (error2, response2, body2) {
+                                    if (error2) {
+                                        console.log(error2, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+
+                                });
+                            }
+                            else if (isdMobile == "+91") {
+                                request({
+                                    url: 'https://aikonsms.co.in/control/smsapi.php',
+                                    qs: {
+                                        user_name: 'janardana@hirecraft.com',
+                                        password: 'Ezeid2015',
+                                        sender_id: 'WtMate',
+                                        service: 'TRANS',
+                                        mobile_no: mobileNo,
+                                        message: message,
+                                        method: 'send_sms'
+                                    },
+                                    method: 'GET'
+
+                                }, function (error2, response2, body2) {
+                                    if (error2) {
+                                        console.log(error2, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+                                });
+
+                                var req5 = http.request(options, function (res5) {
+                                    var chunks = [];
+
+                                    res5.on("data", function (chunk) {
+                                        chunks.push(chunk);
+                                    });
+
+                                    res5.on("end", function () {
+                                        var body5 = Buffer.concat(chunks);
+                                        console.log(body5.toString());
+                                    });
+                                });
+
+                                req5.write(qs.stringify({
+                                    userId: 'talentmicro',
+                                    password: 'TalentMicro@123',
+                                    senderId: 'WTMATE',
+                                    sendMethod: 'simpleMsg',
+                                    msgType: 'text',
+                                    mobile: isdMobile.replace("+", "") + mobileNo,
+                                    msg: message,
+                                    duplicateCheck: 'true',
+                                    format: 'json'
+                                }));
+                                req5.end();
+                            }
+                            else if (isdMobile != "") {
+                                client.messages.create(
+                                    {
+                                        body: message,
+                                        to: isdMobile + mobileNo,
+                                        from: '+14434322305'
+                                    },
+                                    function (error6, response6) {
+                                        if (error6) {
+                                            console.log(error6, "SMS");
+                                        }
+                                        else {
+                                            console.log("SUCCESS", "SMS response");
+                                        }
+                                    }
+                                );
+                            }
+                        }
 
                         response.status = true;
                         response.message = "Walkin Form saved successfully";
@@ -597,7 +862,151 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                         res.status(200).json(response);
                     }
 
-                    else if (!err && (results[1] || results[2])) {
+                    else if (!err && (results[1] || results[2])) {   //  walkIn formMessage without token
+
+                        if (results[4] && results[4][0] || results[5] || results[5][0]) {
+
+                            var mailContent = (results[5] && results[5][0]) ? results[5][0].mailBody : "Dear [FirstName] <br>Thank you for registering your profile.  We will revert to you once we find your Resume match one of the requirements we have.In the mean time, please [ClickHere] to upload your latest CV that will help us with more detailed information about your profile.Wishing you all the best<br><br>[WalkINSignature]<br>[Disclaimer]";
+
+                            mailContent = mailContent.replace("[FirstName]", req.body.firstName);
+                            mailContent = mailContent.replace("[FullName]", (req.body.firstName + ' ' + req.body.middleName + ' ' + req.body.lastName));
+
+                            var webLink = (results[5] && results[5][0]) ? results[5][0].webLink : "";
+                            mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
+
+                            var walkInSignature = (results[5] && results[5][0]) ? results[5][0].walkInSignature : "";
+                            var disclaimer = (results[5] && results[5][0]) ? results[5][0].disclaimer : "";
+
+                            mailContent = mailContent.replace("[WalkINSignature]", walkInSignature);
+                            mailContent = mailContent.replace("[Disclaimer]", disclaimer);
+
+                            var subject = results[5][0].mailSubject;
+                            // send mail to candidate
+                            var email = new sendgrid.Email();
+                            email.from = results[4][0].fromEmailId;
+                            email.to = req.body.emailId;
+                            email.subject = subject;
+                            email.html = mailContent;
+
+                            sendgrid.send(email, function (err11, result11) {
+                                if (err11) {
+                                    console.log("mail not sent", err11);
+                                }
+                                else {
+                                    console.log("mail sent successfully", result11);
+                                }
+                            });
+
+                            // To send mail to refered person
+                            if(results[6]){
+                                var refererEmail = new sendgrid.Email();
+                                refererEmail.from = results[4][0].fromEmailId;
+                                refererEmail.to = results[6][0].refererMailId;
+                                refererEmail.subject = results[6][0].message;
+                                refererEmail.html = results[6][0].message;
+    
+                                sendgrid.send(refererEmail, function (err1, result1) {
+                                    if (err1) {
+                                        console.log("mail not sent to referrer", err1);
+                                    }
+                                    else {
+                                        console.log("mail sent successfully to referrer", result1);
+                                    }
+                                });
+                            }
+                            
+                            // to send sms to candidate
+                            var isdMobile = req.body.mobileISD;
+                            var mobileNo = req.body.mobileNo;
+                            var message = "Congratulations your profile is successfully registered";
+                            if (isdMobile == "+977") {
+                                request({
+                                    url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                    qs: {
+                                        token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                        to: mobileNo,
+                                        message: message,
+                                        sender: 'Techingen'
+                                    },
+                                    method: 'GET'
+
+                                }, function (error2, response2, body2) {
+                                    if (error2) {
+                                        console.log(error2, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+
+                                });
+                            }
+                            else if (isdMobile == "+91") {
+                                request({
+                                    url: 'https://aikonsms.co.in/control/smsapi.php',
+                                    qs: {
+                                        user_name: 'janardana@hirecraft.com',
+                                        password: 'Ezeid2015',
+                                        sender_id: 'WtMate',
+                                        service: 'TRANS',
+                                        mobile_no: mobileNo,
+                                        message: message,
+                                        method: 'send_sms'
+                                    },
+                                    method: 'GET'
+
+                                }, function (error2, response2, body2) {
+                                    if (error2) {
+                                        console.log(error2, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+                                });
+
+                                var req5 = http.request(options, function (res5) {
+                                    var chunks = [];
+
+                                    res5.on("data", function (chunk) {
+                                        chunks.push(chunk);
+                                    });
+
+                                    res5.on("end", function () {
+                                        var body5 = Buffer.concat(chunks);
+                                        console.log(body5.toString());
+                                    });
+                                });
+
+                                req5.write(qs.stringify({
+                                    userId: 'talentmicro',
+                                    password: 'TalentMicro@123',
+                                    senderId: 'WTMATE',
+                                    sendMethod: 'simpleMsg',
+                                    msgType: 'text',
+                                    mobile: isdMobile.replace("+", "") + mobileNo,
+                                    msg: message,
+                                    duplicateCheck: 'true',
+                                    format: 'json'
+                                }));
+                                req5.end();
+                            }
+                            else if (isdMobile != "") {
+                                client.messages.create(
+                                    {
+                                        body: message,
+                                        to: isdMobile + mobileNo,
+                                        from: '+14434322305'
+                                    },
+                                    function (error6, response6) {
+                                        if (error6) {
+                                            console.log(error6, "SMS");
+                                        }
+                                        else {
+                                            console.log("SUCCESS", "SMS response");
+                                        }
+                                    }
+                                );
+                            }
+                        }
 
                         response.status = true;
                         response.message = "Walkin Form saved successfully";
@@ -844,6 +1253,7 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
         data: null,
         error: null
     };
+
     var validationFlag = true;
 
     if (!req.query.mobileNo) {
@@ -856,6 +1266,7 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
         validationFlag = false;
     }
 
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -863,22 +1274,98 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
         console.log(response);
     }
     else {
+
+        req.body.heParentId = req.body.heParentId ? req.body.heParentId :0;
+        req.body.mobileISD = req.body.mobileISD ? req.body.mobileISD :'';
+        req.body.IDNumber = req.body.IDNumber ? req.body.IDNumber :'';
+        req.body.emailId = req.body.emailId ? req.body.emailId :'';
+        req.body.firstName = req.body.firstName ? req.body.firstName :'';
+        req.body.heMasterId = req.body.heMasterId ? req.body.heMasterId :0;
+
+        
         var inputs = [
             req.st.db.escape(req.query.mobileNo),
-            req.st.db.escape(req.query.otp)
+            req.st.db.escape(req.query.otp),
+            req.st.db.escape(req.body.heParentId),
+            req.st.db.escape(req.body.firstName),
+            req.st.db.escape(req.body.lastName),
+            req.st.db.escape(req.body.mobileISD),
+            req.st.db.escape(req.body.IDNumber),
+            req.st.db.escape(req.body.emailId),
+            req.st.db.escape(req.body.heMasterId)
         ];
 
         var procQuery = 'CALL wm_walkIn_verifyOtp( ' + inputs.join(',') + ')';
         console.log(procQuery);
         req.db.query(procQuery, function (err, result) {
             console.log(err);
-            console.log(result);
-            if (!err && result && result[0][0].message == "OTP verified successfully") {
+            // console.log(result);
+            if (!err && result && result[0][0].message == "OTP verified successfully" && result[2] && result[2][0]) {
+                response.status = true;
+                response.message = result[0][0].message;
+                response.error = false;
+
+                if(result[2] && result[2][0]){
+                    result[2][0].location = (result[2] && result[2][0] && result[2][0].location) ? JSON.parse(result[2][0].location):{};
+                    if(result[2][0].location.locationId == 0){
+                        result[2][0].location = {};
+                    }
+                    
+                    result[2][0].currency = (result[2] && result[2][0]) ? JSON.parse(result[2][0].currency):{};
+                    if(result[2][0].currency.presentSalaryCurrId == 0){
+                        result[2][0].currency = {};
+                    }
+                    
+                    result[2][0].scale = (result[2] && result[2][0]) ? JSON.parse(result[2][0].scale):{};
+                    if(result[2][0].scale.presentSalaryScaleId == 0){
+                        result[2][0].scale = {};
+                    }
+
+                    result[2][0].period = (result[2] && result[2][0]) ? JSON.parse(result[2][0].period):{};
+                    if(result[2][0].period.presentSalaryPeriodId == 0){
+                        result[2][0].period = {};
+                    }
+
+                    result[2][0].details = (result[2] && result[2][0]) ? JSON.parse(result[2][0].details):{};
+                    if(result[2][0].details.referedId == 0 && result[2][0].details.empCode=="" && result[2][0].details.referedName == ""){
+                        result[2][0].details = {};
+                    }
+
+                    result[2][0].skills = (result[2] && result[2][0]) ? JSON.parse(result[2][0].skills):[];
+                    if(result[2][0].skills.skillId == 0){
+                        result[2][0].skills = {};
+                    }
+                    result[2][0].industry = (result[2] && result[2][0]) ? JSON.parse(result[2][0].industry):[];
+                    if(result[2][0].industry.industryId == 0){
+                        result[2][0].industry = {};
+                    }
+                    result[2][0].ugEducation = (result[2] && result[2][0]) ? JSON.parse(result[2][0].ugEducation):{};
+                    if(result[2][0].ugEducation.educationId == 0){
+                        result[2][0].ugEducation = {};
+                    }
+                    result[2][0].pgEducation = (result[2] && result[2][0]) ? JSON.parse(result[2][0].pgEducation):{};
+                    if(result[2][0].pgEducation.educationId == 0){
+                        result[2][0].pgEducation = {};
+                    }
+                    // result[2][0].walkInJobs = (result[2] && result[2][0]) ? JSON.parse(result[2][0].walkInJobs):{};
+    
+                }                
+                response.data = {
+                    message: (result[0] && result[0][0]) ? result[0][0].message:'',
+                    existsMessage: (result[1] && result[1][0]) ? result[1][0]._error:'',
+                    applicantDetails: (result[2] && result[2][0]) ? result[2][0] : {}
+                };
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0][0].message == "OTP verified successfully") {
                 response.status = true;
                 response.message = result[0][0].message;
                 response.error = false;
                 response.data = {
                     message: result[0][0].message
+                   // existsMessage:'',
+                   // applicantDetails:{}
                 };
                 res.status(200).json(response);
             }
@@ -889,6 +1376,8 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
                 response.error = false;
                 response.data = {
                     message: result[0][0].message
+                   // existsMessage:'',
+                   // applicantDetails:{}
                 };
                 res.status(200).json(response);
             }
@@ -970,8 +1459,9 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             bannerList: result[0],
                             companyLogo: result[1][0].companyLogo,
                             registrationType: result[6][0].walkinRegistrationType,  // need to come from backend, will be done later.
-                            tokenGeneration : result[6][0].walkinTokenGeneration,
-                            // tokenGeneration: 0,
+                            tokenGeneration: result[6][0].walkinTokenGeneration,
+
+
                             industryList: result[2] ? result[2] : [],
                             skillList: result[3] ? result[3] : [],// need to come from backend, will be done later.
                             locationList: result[4] ? result[4] : [],
@@ -981,7 +1471,22 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             scale: (result && result[9]) ? result[9] : [],
                             duration: (result && result[10]) ? result[10] : [],
                             ugEducationList: output ? output : [],
-                            pgEducationList: output1 ? output1 : []
+                            pgEducationList: output1 ? output1 : [],
+                            isDOBRequired: result[13][0].isDOBRequired,
+                            isIDRequired: result[14][0].isIDRequired,
+                            IDType: result[14][0].IDType,  // field Name
+                            isIDNumberOrString:(result[14] && result[14][0]) ? result[14][0].isIDNumberOrString:1,
+                            maxIDLength :(result[14] && result[14][0]) ? result[14][0].maxIDLength:0,
+                            DOBType: result[13][0].DOBType,
+                            isVisitorCheckIn: result[14][0].isVisitorCheckIn,
+                            isWalkIn: result[14][0].isWalkIn,
+                            isVisitorCheckOut: result[14][0].isVisitorCheckOut,
+                            vendorDetails: (result && result[15]) ? result[15] : [],
+                            directWalkIn: result[14][0].directWalkIn,
+                            referredByEmployeeList: result[14][0].referredByEmployeeList,
+                            referredByName: result[14][0].referredByName,
+                            vendors: result[14][0].vendors
+
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -1009,7 +1514,10 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             scale: [],
                             duration: [],
                             ugEducationList: [],
-                            pgEducationList: []
+                            pgEducationList: [],
+                            isDOBRequired:0,
+                            isIDRequired:0,
+                            IDType:0
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -1155,18 +1663,20 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                     else {
 
                         if (comparePassword(password, loginResult[0][0].Password)) {
-                            var heMasterId = loginResult[1][0].heMasterId;
-
-                            var CVFile = candidateDetails.cvFile;
-                            function base64_decode(base64str, CVFile) {
-                                // create buffer object from base64 encoded string, it is important to tell the constructor that the string is base64 encoded
-                                var bitmap = new Buffer(base64str, 'base64');
-                                // write buffer to file
-                                fs.writeFileSync(CVFile, bitmap);
-                                console.log();
-                            }
 
                             if ((!err) && loginResult[0]) {
+                                var heMasterId = loginResult[1][0].heMasterId;
+                                console.log('heMasterId is', heMasterId);
+                                candidateDetailsHirecraft = candidateDetails;
+                                console.log(candidateDetailsHirecraft)
+
+                                // attachFile.then(function (resp) {
+
+                                //     candidateDetails.cvFile=cloudUrl;
+
+                                //     console.log(candidateDetails);
+
+
                                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                                 req.body.parentId = req.body.parentId ? req.body.parentId : 0;
                                 req.body.status = req.body.status ? req.body.status : 1;
@@ -1177,8 +1687,8 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                 req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
                                 req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
                                 // req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
-                                req.body.approverCount = req.body.approverCount ? req.body.approverCount : 1;
-                                req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 1;
+                                req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
+                                req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
                                 req.body.notes = req.body.notes ? req.body.notes : "";
                                 req.body.interviewDuration = req.body.interviewDuration ? req.body.interviewDuration : 0;
 
@@ -1320,6 +1830,9 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                         res.status(500).json(response);
                                     }
                                 });
+                                //  });
+
+
                             }  // loginDetails[0] closes here
                         }
                         else {
@@ -1402,6 +1915,12 @@ walkInCvCtrl.saveWalkInJobs = function (req, res, next) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 req.body.walkInJobId = req.body.walkInJobId ? req.body.walkInJobId : 0;
                 req.body.status = req.body.status ? req.body.status : 1;
+                req.body.DOBRequired = req.body.DOBRequired ? req.body.DOBRequired : 0;
+                req.body.IDRequired = req.body.IDRequired ? req.body.IDRequired : 0;
+                req.body.IDType = req.body.IDType ? req.body.IDType : "";
+                req.body.DOBType = req.body.DOBType ? req.body.DOBType : "";
+
+                var walkinJobCode = req.body.jobCode.replace(/<(.*)>/g, '');
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -1412,7 +1931,12 @@ walkInCvCtrl.saveWalkInJobs = function (req, res, next) {
                     req.st.db.escape(req.body.jobSummary),
                     req.st.db.escape(req.body.jobDescription),
                     req.st.db.escape(JSON.stringify(users)),
-                    req.st.db.escape(req.body.status)
+                    req.st.db.escape(req.body.status),
+                    req.st.db.escape(req.body.DOBRequired),
+                    req.st.db.escape(req.body.IDRequired),
+                    req.st.db.escape(req.body.IDType),
+                    req.st.db.escape(req.body.DOBType),
+                    req.st.db.escape(walkinJobCode)
                 ];
 
                 var procQuery = 'CALL wm_save_walkinJobs( ' + inputs.join(',') + ')';
@@ -1486,22 +2010,28 @@ walkInCvCtrl.getWalkinJoblist = function (req, res, next) {
                         response.status = true;
                         response.message = "Walkin Joblist loaded successfully";
                         response.error = null;
-                        for(var i=0 ; i<result[0].length; i++){
-                            result[0][i].users = result[0][i].users ? JSON.parse( result[0][i].users):[];
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].users = result[0][i].users ? JSON.parse(result[0][i].users) : [];
                         }
+
+                        result[1][0].userList = (result[1] && result[1][0]) ? JSON.parse(result[1][0].userList) : [];
+
                         response.data = {
-                            jobList: (result[0] && result[0][0]) ? result[0] : []
+                            jobList: (result[0] && result[0][0]) ? result[0] : [],
+                            walkInWebConfig: result[1][0],
+                            vendors: result[2]
                         };
                         res.status(200).json(response);
                     }
-
 
                     else if (!err) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            jobList: []
+                            jobList: [],
+                            walkInWebConfig: {},
+                            vendors: []
                         };
                         res.status(200).json(response);
 
@@ -1524,7 +2054,7 @@ walkInCvCtrl.getWalkinJoblist = function (req, res, next) {
 };
 
 
-walkInCvCtrl.getUsersOnSearch= function (req, res, next) {
+walkInCvCtrl.getUsersOnSearch = function (req, res, next) {
     var response = {
         status: false,
         message: "Invalid token",
@@ -1553,7 +2083,7 @@ walkInCvCtrl.getUsersOnSearch= function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.keywords)                    
+                    req.st.db.escape(req.query.keywords)
                 ];
 
                 var procQuery = 'CALL wm_get_walkinUsers( ' + inputs.join(',') + ')';
@@ -1597,6 +2127,911 @@ walkInCvCtrl.getUsersOnSearch= function (req, res, next) {
         });
     }
 
+};
+
+
+walkInCvCtrl.saveVisitorCheckIn = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid tenant';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                if (!req.body.mobileNumber) {
+                    error.mobileNumber = 'Invalid mobileNumber';
+                    validationFlag *= false;
+                }
+
+                var toMeetWhom = req.body.toMeetWhom;
+                if (typeof (toMeetWhom) == "string") {
+                    toMeetWhom = JSON.stringify(toMeetWhom);
+                }
+                if (!toMeetWhom) {
+                    toMeetWhom = {};
+                }
+
+                var senderGroupId;
+
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                }
+                else {
+                    req.body.parentId = req.body.parentId ? req.body.parentId : 0;
+                    req.body.expectedTime = req.body.expectedTime ? req.body.expectedTime : null;
+                    req.body.assetDetails = req.body.assetDetails ? req.body.assetDetails : '';
+                    req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : '';
+                    req.body.purposeOfGuest = req.body.purposeOfGuest ? req.body.purposeOfGuest : 0;
+                    req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
+                    req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
+                    req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
+                    req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
+                    req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
+                    req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
+                    req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                    req.body.companyName = req.body.companyName ? req.body.companyName : '';
+                    req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
+                    req.body.mobileISD = req.body.mobileISD ? req.body.mobileISD : '';
+                    req.body.status = req.body.status ? req.body.status : 1;
+                    req.body.name = req.body.name ? req.body.name : '';
+                    req.body.emailId = req.body.emailId ? req.body.emailId : '';
+                    req.body.visitorBadgeNumber = req.body.visitorBadgeNumber ? req.body.visitorBadgeNumber : '';
+                    req.body.signInHere = req.body.signInHere ? req.body.signInHere : '';
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.body.parentId),
+                        req.st.db.escape(req.body.pictureUrl),
+                        req.st.db.escape(req.body.name),
+                        req.st.db.escape(req.body.mobileNumber),
+                        req.st.db.escape(req.body.emailId),
+                        req.st.db.escape(req.body.purposeOfGuest),
+                        req.st.db.escape(req.body.expectedTime),
+                        req.st.db.escape(req.body.assetDetails),
+                        req.st.db.escape(req.body.senderNotes),
+                        req.st.db.escape(req.body.receiverNotes),
+                        req.st.db.escape(req.body.changeLog),
+                        req.st.db.escape(req.body.groupId),
+                        req.st.db.escape(req.body.learnMessageId),
+                        req.st.db.escape(req.body.accessUserType),
+                        req.st.db.escape(req.body.approverCount),
+                        req.st.db.escape(req.body.receiverCount),
+                        req.st.db.escape(req.body.companyName),
+                        req.st.db.escape(req.body.status),
+                        req.st.db.escape(req.body.approverNotes),
+                        req.st.db.escape(req.body.mobileISD),
+                        req.st.db.escape(DBSecretKey),
+                        req.st.db.escape(req.body.firstName),
+                        req.st.db.escape(req.body.middleName),
+                        req.st.db.escape(req.body.lastName),
+                        req.st.db.escape(req.body.IDNumber),
+                        req.st.db.escape(req.body.visitorBadgeNumber),
+                        req.st.db.escape(JSON.stringify(toMeetWhom)),
+                        req.st.db.escape(req.body.signInHere),
+                        req.st.db.escape(req.query.heMasterId)
+                    ];
+
+                    /**
+                     * Calling procedure to save form template
+                     * @type {string}
+                     */
+                    var procQuery = 'CALL wm_save_visitorCheckIn( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, results) {
+                        console.log(err);
+                        if (!err && results && results[0]) {
+                            senderGroupId = results[0][0].senderId;
+                            // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
+                            //     senderName : results[0][0].message
+                            // });
+                            //
+                            // for (var i = 0; i < results[1].length; i++ ) {
+                            //     if (notificationTemplaterRes.parsedTpl) {
+                            //         notification.publish(
+                            //             results[1][i].receiverId,
+                            //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                            //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                            //             results[0][0].senderId,
+                            //             notificationTemplaterRes.parsedTpl,
+                            //             31,
+                            //             0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                            //             (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                            //             0,
+                            //             0,
+                            //             0,
+                            //             0,
+                            //             1,
+                            //             moment().format("YYYY-MM-DD HH:mm:ss"),
+                            //             '',
+                            //             0,
+                            //             0,
+                            //             null,
+                            //             '',
+                            //             /** Data object property to be sent with notification **/
+                            //             {
+                            //                 messageList: {
+                            //                     messageId: results[1][i].messageId,
+                            //                     message: results[1][i].message,
+                            //                     messageLink: results[1][i].messageLink,
+                            //                     createdDate: results[1][i].createdDate,
+                            //                     messageType: results[1][i].messageType,
+                            //                     messageStatus: results[1][i].messageStatus,
+                            //                     priority: results[1][i].priority,
+                            //                     senderName: results[1][i].senderName,
+                            //                     senderId: results[1][i].senderId,
+                            //                     receiverId: results[1][i].receiverId,
+                            //                     groupId: results[1][i].senderId,
+                            //                     groupType: 2,
+                            //                     transId : results[1][i].transId,
+                            //                     formId : results[1][i].formId,
+                            //                     currentStatus : results[1][i].currentStatus,
+                            //                     currentTransId : results[1][i].currentTransId,
+                            //                     parentId : results[1][i].parentId,
+                            //                     accessUserType : results[1][i].accessUserType,
+                            //                     heUserId : results[1][i].heUserId,
+                            //                     formData : JSON.parse(results[1][i].formDataJSON)
+                            //
+                            //                 }
+                            //             },
+                            //             null,tokenResult[0].isWhatMate,
+                            //             results[1][i].secretKey);
+                            //         console.log('postNotification : notification for compose_message is sent successfully');
+                            //     }
+                            //     else {
+                            //         console.log('Error in parsing notification compose_message template - ',
+                            //             notificationTemplaterRes.error);
+                            //         console.log('postNotification : notification for compose_message is sent successfully');
+                            //     }
+                            // }
+                            notifyMessages.getMessagesNeedToNotify();
+                            response.status = true;
+                            response.message = "Visitor gate pass request saved successfully";
+                            response.error = null;
+                            response.data = {
+                                messageList: {
+                                    messageId: results[0][0].messageId,
+                                    message: results[0][0].message,
+                                    messageLink: results[0][0].messageLink,
+                                    createdDate: results[0][0].createdDate,
+                                    messageType: results[0][0].messageType,
+                                    messageStatus: results[0][0].messageStatus,
+                                    priority: results[0][0].priority,
+                                    senderName: results[0][0].senderName,
+                                    senderId: results[0][0].senderId,
+                                    receiverId: results[0][0].receiverId,
+                                    transId: results[0][0].transId,
+                                    formId: results[0][0].formId,
+                                    groupId: req.body.groupId,
+                                    currentStatus: results[0][0].currentStatus,
+                                    currentTransId: results[0][0].currentTransId,
+                                    localMessageId: req.body.localMessageId,
+                                    parentId: results[0][0].parentId,
+                                    accessUserType: results[0][0].accessUserType,
+                                    heUserId: results[0][0].heUserId,
+                                    formData: JSON.parse(results[0][0].formDataJSON)
+                                }
+                            };
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while saving Visitor gate pass request";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+
+        });
+    }
+};
+
+
+walkInCvCtrl.getvisitorTracker = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.date) {
+        error.date = 'Invalid date';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.date)
+                ];
+
+                var procQuery = 'CALL wm_get_visitorTracker( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result) {
+                        response.status = true;
+                        response.message = "data loaded successfully";
+                        response.error = null;
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].toMeetWhom = result[0][i].toMeetWhom ? JSON.parse(result[0][i].toMeetWhom) : {};
+                        }
+                        response.data = {
+                            visitorData: result[0]
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+walkInCvCtrl.getUser = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.body.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.heMasterId),
+                    req.st.db.escape(req.body.mobileISD),
+                    req.st.db.escape(req.body.mobileNumber)
+                ];
+
+                var procQuery = 'CALL wm_get_visitorData( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result) {
+                        response.status = true;
+                        response.message = "Visitor data loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            visitorData: result[0][0]
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading Visitor data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+walkInCvCtrl.getMaster = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+
+                ];
+
+                var procQuery = 'CALL wm_get_masterForVisitor( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result[0][0]) {
+                        response.status = true;
+                        response.message = "Master data loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            IDRequired: result[0][0].isIDRequired,
+                            IDType: result[0][0].IDType,
+                            users: result[1]
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading Master data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+walkInCvCtrl.getvisitorTrackerPdf = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.body.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    var toMailId = req.body.toMailId;
+    if (typeof (toMailId) == "string") {
+        toMailId = JSON.parse(toMailId);
+    }
+    if (!toMailId) {
+        toMailId = []
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.heMasterId),
+                    req.st.db.escape(req.body.startDate),
+                    req.st.db.escape(req.body.endDate)
+                ];
+
+                var procQuery = 'CALL wm_get_visitorTrackerpdf( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+
+                    htmlContent = "";
+                    if (result[1].length) {
+
+                        htmlContent += "<!DOCTYPE html><html><head lang='en'><meta charset='UTF-8'><title></title><body><h1 style='text-align:center;margin-bottom: 0px;'>";
+                        htmlContent += result[0][0].companyName;
+                        htmlContent += "</h1>";
+                        htmlContent += "<h3 style='text-align:center;margin-top:0px'>Visitor Register from " + result[2][0].startDate + " to " + result[2][0].endDate;
+                        htmlContent += "</h3>";
+                        htmlContent += '<center><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;">';
+                        htmlContent += "<thead><th>SL No.</th>";
+
+                        for (var i = 0; i < Object.keys(result[1][0]).length; i++) {
+                            htmlContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + Object.keys(result[1][0])[i] + '</th>';
+                        }
+                        htmlContent += "</thead>";
+
+                        for (var j = 0; j < result[1].length; j++) {
+                            htmlContent += '<tr><td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + (j + 1) + '</td>';
+                            for (var i = 0; i < Object.keys(result[1][0]).length; i++) {
+                                htmlContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[1][j][Object.keys(result[1][0])[i]] + '</td>';
+                            }
+                            htmlContent += "</tr>";
+                        }
+                        htmlContent += "<table></center></body></html>";
+                    }
+
+                    // for (var k = 0; k < toMailId.length; k++) {
+
+                    var options = { format: 'A4', width: '8in', height: '10.5in', border: '0', timeout: 30000, "zoomFactor": "1" };
+
+                    var myBuffer = [];
+                    var buffer = new Buffer(htmlContent, 'utf16le');
+                    for (var i = 0; i < buffer.length; i++) {
+                        myBuffer.push(buffer[i]);
+                    }
+
+                    var attachmentObjectsList = [];
+                    htmlpdf.create(htmlContent, options).toBuffer(function (err, buffer) {
+                        attachmentObjectsList = [{
+                            filename: "VisitorList" + '.pdf',
+                            content: buffer
+
+                        }];
+
+                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                        var email = new sendgrid.Email();
+                        email.from = "noreply@talentMicro.com";
+                        email.to = toMailId;
+                        email.subject = "Visitor Register from " + result[2][0].startDate + " to " + result[2][0].endDate;
+                        email.html = "Please find the Visitor Register for the period from " + result[2][0].startDate + " to " + result[2][0].endDate + " attached herewith. <br><br><br><br>Whatmate Team.<br><br> This email is intended only for the person to whom it is addressed and/or otherwise authorized personnel. The information contained herein and attached is confidential TalentMicro Innovations and the property of TalentMicro Innovations Pvt. Ltd. If you are not the intended recipient, please be advised that viewing this message and any attachments, as well as copying, forwarding, printing, and disseminating any information related to this email is prohibited, and that you should not take any action based on the content of this email and/or its attachments. If you received this message in error, please contact the sender and destroy all copies of this email and any attachment. Please note that the views and opinions expressed herein are solely those of the author and do not necessarily reflect those of the company. While antivirus protection tools have been employed, you should check this email and attachments for the presence of viruses. No warranties or assurances are made in relation to the safety and content of this email and ttachments. TalentMicro Innovations Pvt. Ltd. accepts no liability for any damage caused by any virus transmitted by or contained in this email and attachments. No liability is accepted for any consequences arising from this email";
+                        // email.cc = mailOptions.cc;
+                        // email.bcc = mailOptions.bcc;
+                        // email.html = mailOptions.html;
+                        //if 1 or more attachments are present
+
+                        email.addFile({
+                            filename: attachmentObjectsList[0].filename,
+                            content: attachmentObjectsList[0].content,
+                            contentType: "application/pdf"
+                        });
+
+                        sendgrid.send(email, function (err, results) {
+                            if (err) {
+                                console.log("mail not sent", err);
+                            }
+                            else {
+                                console.log("mail sent successfully", results);
+                                if (!err && result && result[0] && result[1]) {
+                                    response.status = true;
+                                    response.message = "Visitor register mailed successfully";
+                                    response.error = null;
+                                    response.data = {
+                                        companyDetails: (result && result[0]) ? result[0][0] : {},
+                                        visitorList: (result && result[1]) ? result[1] : []
+                                    };
+                                    res.status(200).json(response);
+                                }
+                                else if (!err) {
+                                    response.status = true;
+                                    response.message = "No result found";
+                                    response.error = null;
+                                    response.data = {
+                                        companyDetails: {},
+                                        visitorList: []
+                                    };
+                                    res.status(200).json(response);
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while sending mail";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            }
+                        });
+                    });
+                    // }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+walkInCvCtrl.checkOUT = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.body.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.heMasterId),
+                    req.st.db.escape(req.body.mobileISD),
+                    req.st.db.escape(req.body.mobileNumber),
+                    req.st.db.escape(DBSecretKey)
+                ];
+
+                var procQuery = 'CALL wm_get_checkOut( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result) {
+                        response.status = true;
+                        response.message = "Visitor Checked OUT successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while  Visitor Checked OUT";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+walkInCvCtrl.forceCheckOUT = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.transId),
+                    req.st.db.escape(DBSecretKey)
+                ];
+
+                var procQuery = 'CALL wm_get_forceCheckOut( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result) {
+                        response.status = true;
+                        response.message = "Visitor Checked OUT successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while  Visitor Checked OUT";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+
+walkInCvCtrl.vendorDetails = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.body.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+    if (!req.body.vendorId) {
+        error.vendorId = 'Invalid vendorId';
+        validationFlag *= false;
+    }
+
+    var contactLocation = req.body.contactLocation;
+    if (typeof (contactLocation) == "string") {
+        contactLocation = JSON.parse(contactLocation);
+    }
+    if (!contactLocation) {
+        contactLocation = {};
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.body.tid = req.body.tid ? req.body.tid : 0;
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.tid),
+                    req.st.db.escape(req.body.vendorId),
+                    req.st.db.escape(req.body.heMasterId),
+                    req.st.db.escape(req.body.name),
+                    req.st.db.escape(req.body.status),
+                    req.st.db.escape(req.body.contactName),
+                    req.st.db.escape(req.body.mobileISD),
+                    req.st.db.escape(req.body.mobileNumber),
+                    req.st.db.escape(req.body.emailId),
+                    req.st.db.escape(JSON.stringify(contactLocation))
+                ];
+
+                var procQuery = 'CALL wm_save_vendorDetails( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0] && result[0][0].vendorId) {
+                        response.status = true;
+                        response.message = "Vendor details saved successfully";
+                        response.error = null;
+                        response.data = result[0][0].vendorId;
+                        res.status(200).json(response);
+                    }
+                    else if (!err && result && result[0] && result[0][0] && result[0][0]._error) {
+                        response.status = true;
+                        response.message = "Vendor details already exists";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while  saving vendor details";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+walkInCvCtrl.walkInWebConfig = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    var userList = req.body.userList;
+    if (!userList) {
+        userList = [];
+    }
+    else if (typeof (userList) == "string") {
+        userList = JSON.parse(userList);
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.body.tid = req.body.tid ? req.body.tid : 0;
+                req.body.subject = req.body.subject ? req.body.subject : '';
+                req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
+                req.body.walkInSignature = req.body.walkInSignature ? req.body.walkInSignature : '';
+                req.body.disclaimer = req.body.disclaimer ? req.body.disclaimer : '';
+                req.body.webLink = req.body.webLink ? req.body.webLink : '';
+                req.body.DOBRequired = req.body.DOBRequired ? req.body.DOBRequired : 0;
+                req.body.IDRequired = req.body.IDRequired ? req.body.IDRequired : 0;
+                req.body.IDType = req.body.IDType ? req.body.IDType : '';
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.subject),
+                    req.st.db.escape(req.body.mailBody),
+                    req.st.db.escape(req.body.walkInSignature),
+                    req.st.db.escape(req.body.disclaimer),
+                    req.st.db.escape(req.body.webLink),
+                    req.st.db.escape(req.body.DOBRequired),
+                    req.st.db.escape(req.body.IDRequired),
+                    req.st.db.escape(req.body.IDType),
+                    req.st.db.escape(req.body.DOBType),
+                    req.st.db.escape(req.body.walkinTokenGeneration),
+                    req.st.db.escape(req.body.walkinRegistrationType),
+                    req.st.db.escape(req.body.isVisitorCheckIn),
+                    req.st.db.escape(req.body.isWalkIn),
+                    req.st.db.escape(req.body.isVisitorCheckOut),
+                    req.st.db.escape(req.body.directWalkIn),
+                    req.st.db.escape(req.body.referredByEmployeeList),
+                    req.st.db.escape(req.body.referredByName),
+                    req.st.db.escape(req.body.vendors),
+                    req.st.db.escape(JSON.stringify(userList))
+                ];
+
+                var procQuery = 'CALL wm_save_walkWebConfig( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Walk-In configuration details saved successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while  saving walk-In configuration details";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
 };
 
 module.exports = walkInCvCtrl;

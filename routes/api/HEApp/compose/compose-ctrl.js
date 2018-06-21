@@ -185,7 +185,7 @@ composeCtrl.learnMessage = function(req,res,next){
     }
 
 };
-// arun
+
 composeCtrl.learnKeywords = function(req,res,next){
     var response = {
         status : false,
@@ -249,6 +249,7 @@ composeCtrl.learnKeywords = function(req,res,next){
                         var procQuery = 'CALL wm_update_formKeywords( ' + procParams.join(',') + ')';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
+                            console.log(err);
                             console.log(results);
                             if(!err && results[0] && results[0][0]){
                                 response.status = true;
