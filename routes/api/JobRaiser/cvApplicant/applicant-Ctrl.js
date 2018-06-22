@@ -474,7 +474,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             reportingTo: result[32] ? result[32] : [],
                             functionalAreas: result[34] ? result[34] : [],
                             accessRightsTemplateDetails: result[35] ? result[35] : [],
-                            layout : (result && result[36] && result[36][0]) ? JSON.parse(result[36][0].layout):{}
+                            layout : (result && result[36] && result[36][0]) ? JSON.parse(result[36][0].layout):{},
+                            clientStatus: result[37] ? result[37]:[]
                         };
 
                         if (req.query.isWeb == 0) {
@@ -532,7 +533,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             reportingTo: [],
                             functionalAreas: [],
                             accessRightsTemplateDetails: [],
-                            layout:{}
+                            layout:{},
+                            clientStatus:[]
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1976,7 +1978,7 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0] && result[0][0] && result[0][0].offerManagerId !=0) {
                         response.status = true;
                         response.message = "Offer manager list loaded successfully";
                         response.error = null;
@@ -1991,11 +1993,11 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                         response.data = result[0][0];
                         res.status(200).json(response);
                     }
-                    else if (!err) {
+                    else if (!err && result) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
-                        response.data = [];
+                        response.data = {};
                         res.status(200).json(response);
                     }
                     else {

@@ -544,7 +544,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.IDNumber = (req.body.IDNumber) ? req.body.IDNumber : '';
                 req.body.profilePicture = (req.body.profilePicture) ? req.body.profilePicture : '';
                 req.body.middleName = (req.body.middleName) ? req.body.middleName : '';
-
+                req.body.registrationType = req.body.registrationType ? req.body.registrationType : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -585,7 +585,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(walkInJobs)),
                     req.st.db.escape(req.body.DOB),
                     req.st.db.escape(req.body.IDNumber),
-                    req.st.db.escape(req.body.middleName)
+                    req.st.db.escape(req.body.middleName),
+                    req.st.db.escape(req.body.registrationType)
                 ];
 
 

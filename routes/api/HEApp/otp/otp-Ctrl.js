@@ -40,8 +40,8 @@ var error=null;
 
 otpCtrl.sendOtp = function (req, res, next) {
 
-    var mobileNo = req.body.mobileNo;
-    var isdMobile = req.body.isdMobile;
+    var mobileNo; //= req.body.mobileNo;
+    var isdMobile; //= req.body.isdMobile;
     // var displayName = req.body.displayName ;
     var emailId = req.body.emailId ? req.body.emailId : "";
     var status = true, error = {};
@@ -51,6 +51,20 @@ otpCtrl.sendOtp = function (req, res, next) {
         data: null,
         error: null
     };
+
+    if (req.body.mobileNo){
+        mobileNo = req.body.mobileNo;    
+    }
+    else if(req.body.mobileNumber){
+        mobileNo = req.body.mobileNumber;    
+    }
+
+    if (req.body.isdMobile){
+        isdMobile = req.body.isdMobile;
+    }
+    else if (req.body.mobileISD){
+        isdMobile = req.body.mobileISD;
+    }
 
     if (!mobileNo) {
         error['mobile'] = 'mobile no is mandatory';
@@ -250,24 +264,42 @@ otpCtrl.sendOtp = function (req, res, next) {
 
 
 otpCtrl.toVerifyOtp = function (req, res, next) {
+    console.log("inside otp");
     var response = {
         status: false,
         message: "Invalid otp",
         data: null,
         error: null
     };
-    var validationFlag = true;
+    var mobileNo;
+    var isdMobile;
+    var otp = req.body.otp;
 
-    if (!req.body.mobileNo) {
+    if (req.body.mobileNo){
+        mobileNo = req.body.mobileNo;    
+    }
+    else if(req.body.mobileNumber){
+        mobileNo = req.body.mobileNumber;    
+    }
+
+    if (req.body.isdMobile){
+        isdMobile = req.body.isdMobile;
+    }
+    else if (req.body.mobileISD){
+        isdMobile = req.body.mobileISD;
+    }
+
+    var validationFlag = true;
+    if (!mobileNo) {
         error.mobileNo = "Mobile number is mandatory";
         validationFlag = false;
     }
-    if (!req.body.isdMobile) {
+    if (!isdMobile) {
         error.isdMobile = "isdMobile number is mandatory";
         validationFlag = false;
     }
 
-    if (!req.body.otp) {
+    if (!otp) {
         error.otp = "Please enter OTP";
         validationFlag = false;
     }
@@ -280,13 +312,14 @@ otpCtrl.toVerifyOtp = function (req, res, next) {
     }
     else {
         var inputs = [
-            req.st.db.escape(req.body.isdMobile),
-            req.st.db.escape(req.body.mobileNo),
-            req.st.db.escape(req.body.otp)
+            req.st.db.escape(isdMobile),
+            req.st.db.escape(mobileNo),
+            req.st.db.escape(otp)
         ];
 
         var procQuery = 'CALL wm_walkIn_verifyOtpInuse( ' + inputs.join(',') + ')';
         console.log(procQuery);
+
         req.db.query(procQuery, function (err, result) {
             console.log(err);
             console.log(result);

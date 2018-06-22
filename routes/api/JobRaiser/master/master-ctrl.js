@@ -1861,6 +1861,8 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
 
                         result[0][0].managers = JSON.parse(result[0][0].managers);
                         result[0][0].department = JSON.parse(result[0][0].department);
+                        result[0][0].clientStatus = JSON.parse(result[0][0].clientStatus);
+                        
 
                         // contracts parsing
                         if (result[2] && result[2][0]) {
