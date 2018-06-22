@@ -366,21 +366,26 @@ cron.schedule('*/15 * * * *', function () {
         }
     });
 });
-var cronJobMessage = new CronJob({
-    cronTime: '20 * * * * *',
-    onTick: function () {
-        notifyMessages.getMessagesNeedToNotify();
+// var cronJobMessage = new CronJob({
+//     cronTime: '20 * * * * *',
+//     onTick: function () {
+//         notifyMessages.getMessagesNeedToNotify();
+//
+//         /*
+//          * Runs every weekday (Monday through Friday)
+//          * at 11:30:00 AM. It does not run on Saturday
+//          * or Sunday.
+//          */
+//     },
+//     start: false,
+//     timeZone: 'America/Los_Angeles'
+// });
+// cronJobMessage.start();
 
-        /*
-         * Runs every weekday (Monday through Friday)
-         * at 11:30:00 AM. It does not run on Saturday
-         * or Sunday.
-         */
-    },
-    start: false,
-    timeZone: 'America/Los_Angeles'
+cron.schedule('*/10 * * * *', function () {
+    console.log('running a notify messages');
+    notifyMessages.getMessagesNeedToNotify();
 });
-cronJobMessage.start();
 
 
 
@@ -392,8 +397,13 @@ cronJobMessage.start();
 // cron.schedule('*/15 * * * *', function () {
 var cluster = require('cluster');
 
+<<<<<<< HEAD
+ if (cluster.isWorker) {
+   // console.log('asdf sundar', cluster.worker.id);
+=======
 if (cluster.isWorker) {
     console.log('asdf', cluster.worker.id);
+>>>>>>> 99e757293e9a5769fc2cb523bd115dfd6a79ab49
 
     if (cluster.worker.id == 1) {
 
@@ -482,6 +492,59 @@ if (cluster.isWorker) {
 
 var cluster = require('cluster');
 
+<<<<<<< HEAD
+ if (cluster.isWorker) {
+    // console.log('asdf sundar', cluster.worker.id);
+
+if (cluster.worker.id == 1) {
+    // run job
+
+    console.log("bye take care")
+    var cronJobWalkIn = new CronJob({
+        cronTime: '45 * * * * *',
+        onTick: function () {
+            var query = "call wm_integrationUrlwalkIn()";
+            db.query(query, function (err, result) {
+                console.log('Running walkin cron job for Hexaware');
+                if (err) {
+                    console.log('error: integrationUrlForHircraft');
+                }
+                else if ((result[0].length != 0) && (result[1].length != 0)) {
+                    var heMasterId;
+                    var transId;
+                    var formData = {};
+                    var DBUrl;
+                    if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
+                        heMasterId = result[0][0].heMasterId;
+                        DBUrl = result[0][0].url;
+                        transId = result[1][0].transId;
+                        formData = result[1][0].formData;
+
+                        // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
+                        var count = 0;
+                        request({
+                            url: DBUrl,
+                            method: "POST",
+                            json: true,   // <--Very important!!!
+                            body: JSON.parse(formData)
+                        }, function (error, response, body) {
+                            console.log(error);
+                            console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
+                            if (body && body.Code && ((body.Code == "SAVED") || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "INFO_03") || (body.Code == "ERR_07") || (body.Code == "ERR_08"))) {
+                                var updateQuery = "update 1039_trans set sync=1 where heParentId=" + transId;
+                                db.query(updateQuery, function (err, results) {
+                                    if (err) {
+                                        console.log("update sync query throws error");
+                                    }
+                                    else {
+                                        console.log("sync is updated to 1 successfully of transId", transId);
+                                    }
+                                });
+                            }
+                            count++;
+                        });
+                        console.log('tallint walkIn hit for ', count, ' times');
+=======
 if (cluster.isWorker) {
     console.log('asdf', cluster.worker.id);
 
@@ -497,6 +560,7 @@ if (cluster.isWorker) {
                     console.log('Running walkin cron job for Hexaware');
                     if (err) {
                         console.log('error: integrationUrlForHircraft');
+>>>>>>> 99e757293e9a5769fc2cb523bd115dfd6a79ab49
                     }
                     else if ((result[0].length != 0) && (result[1].length != 0)) {
                         var heMasterId;
@@ -550,7 +614,7 @@ var cluster = require('cluster');
 
 if (cluster.isWorker) {
     console.log('asdf', cluster.worker.id);
-
+    
     if (cluster.worker.id == 1) {
 
 

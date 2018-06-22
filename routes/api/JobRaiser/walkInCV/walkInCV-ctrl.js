@@ -1462,6 +1462,7 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             registrationType: result[6][0].walkinRegistrationType,  // need to come from backend, will be done later.
                             tokenGeneration: result[6][0].walkinTokenGeneration,
 
+
                             industryList: result[2] ? result[2] : [],
                             skillList: result[3] ? result[3] : [],// need to come from backend, will be done later.
                             locationList: result[4] ? result[4] : [],
@@ -1486,6 +1487,7 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             referredByEmployeeList: result[14][0].referredByEmployeeList,
                             referredByName: result[14][0].referredByName,
                             vendors: result[14][0].vendors
+
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -1516,8 +1518,7 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             pgEducationList: [],
                             isDOBRequired:0,
                             isIDRequired:0,
-                            IDType:0,
-                            
+                            IDType:0
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);

@@ -666,7 +666,7 @@ User.prototype.changePassword = function (req, res, next) {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var TokenNo = req.query.Token;   // token is now query
+        var TokenNo = req.body.Token;   // token is now query  //token was in body
 
         var RtnMessage = {
             status: true,
@@ -677,24 +677,23 @@ User.prototype.changePassword = function (req, res, next) {
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         var validationFlag = true;
+
     if (!req.query.Token) {
         error.Token = 'Invalid token';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
-        RtnMessage.message = 'Please check the errors';
-        res.status(400).json(RtnMessage);
-        console.log(RtnMessage);
-    }
-    else{
-        // if (OldPassword && NewPassword && TokenNo ) {
-        st.validateToken(TokenNo, function (err, tokenResult) {
-            if (!err) {
-                if (tokenResult) {
-                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+        if (!validationFlag){
+            RtnMessage.message = 'Please check the errors';
+            res.status(400).json(RtnMessage);
+            console.log(RtnMessage);
+        }
+        else{
+            // if (OldPassword && NewPassword && TokenNo ) {
+            st.validateToken(TokenNo, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
 
                         var OldPassword = req.body.OldPassword;
                         var NewPassword = req.body.NewPassword;
@@ -786,39 +785,38 @@ User.prototype.changePassword = function (req, res, next) {
                                 }
                             }
                         });
-                    });
 
 
+                    } else {
+                        RtnMessage.status = false;
+                        RtnMessage.message = "Invalid token..";
+                        res.status(401).json(RtnMessage);
+                        console.log('FnChangePassword:pChangePassword: Invalid Token');
+                    }
                 } else {
                     RtnMessage.status = false;
-                    RtnMessage.message = "Invalid token..";
-                    res.status(401).json(RtnMessage);
-                    console.log('FnChangePassword:pChangePassword: Invalid Token');
+                    RtnMessage.message = "Something went wrong..";
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                    console.log('FnChangePassword:pChangePassword: Error in validating token:  ' + err);
                 }
-            } else {
-                RtnMessage.status = false;
-                RtnMessage.message = "Something went wrong..";
-                res.statusCode = 500;
-                res.send(RtnMessage);
-                console.log('FnChangePassword:pChangePassword: Error in validating token:  ' + err);
-            }
-        });
-        // }
-        // else {
-        //     if (!OldPassword) {
-        //         console.log('FnChangePassword: OldPassword is empty');
-        //     }
-        //     else if (!NewPassword) {
-        //         console.log('FnChangePassword: NewPassword is empty');
-        //     }
-        //     else if (!TokenNo) {
-        //         console.log('FnChangePassword: TokenNo is empty');
-        //     }
-        //     RtnMessage.status = false;
-        //     RtnMessage.message = "Fill all required fields..";
-        //     res.statusCode = 400;
-        //     res.send(RtnMessage);
-        // }
+            });
+            // }
+            // else {
+            //     if (!OldPassword) {
+            //         console.log('FnChangePassword: OldPassword is empty');
+            //     }
+            //     else if (!NewPassword) {
+            //         console.log('FnChangePassword: NewPassword is empty');
+            //     }
+            //     else if (!TokenNo) {
+            //         console.log('FnChangePassword: TokenNo is empty');
+            //     }
+            //     RtnMessage.status = false;
+            //     RtnMessage.message = "Fill all required fields..";
+            //     res.statusCode = 400;
+            //     res.send(RtnMessage);
+            // }
         }
     }
     catch (ex) {
@@ -831,6 +829,7 @@ User.prototype.changePassword = function (req, res, next) {
 
     }
 };
+
 
 User.prototype.forgetPassword = function (req, res, next) {
     /**
