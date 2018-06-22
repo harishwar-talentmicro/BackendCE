@@ -2027,7 +2027,8 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             requirementDetails: statusResult[0][0] ? statusResult[0][0] : [],
-                            requirementCompleteDetails: JSON.parse(statusResult[1][0].reqJsonData) ? JSON.parse(statusResult[1][0].reqJsonData) : []
+                            requirementCompleteDetails: JSON.parse(statusResult[1][0].reqJsonData) ? JSON.parse(statusResult[1][0].reqJsonData) : [],
+                            requirementNew: statusResult[0][0]
                         };
 
                         if (isWeb == 1) {
@@ -2047,8 +2048,9 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                         response.message = "Requirement Details not found";
                         response.error = null;
                         response.data = {
-                            requirementDetails: [],
-                            requirementCompleteDetails: []
+                            requirementDetails: {},
+                            requirementCompleteDetails: {},
+                            requirementNew: {}
                         };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
