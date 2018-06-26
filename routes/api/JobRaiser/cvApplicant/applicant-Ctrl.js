@@ -253,6 +253,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0;
                         req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
                         req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 0;
+                        req.body.referredBy = req.body.referredBy ? req.body.referredBy : "";
 
                         var inputs = [
                             req.st.db.escape(req.query.token),
@@ -307,6 +308,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(functionalAreas)),
                             req.st.db.escape(req.body.importerFlag),
                             req.st.db.escape(JSON.stringify(requirementArray)),
+                            req.st.db.escape(req.body.referredBy)
                         ];
 
                         var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -453,7 +455,9 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                 client: result[13] ? result[13] : [],
                                 general: result[27] ? result[27] : [],
                                 clientContact: result[30] ? result[30] : [],
-                                interview: result[33] ? result[33] : []
+                                interview: result[33] ? result[33] : [],
+                                billing : result[38] ? result[38]:[],
+                                billingTable: result[40] ? result[40]: []
                             },
                             educationList: output1,
                             Stage: result[15] ? result[15] : [],
@@ -475,7 +479,9 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             functionalAreas: result[34] ? result[34] : [],
                             accessRightsTemplateDetails: result[35] ? result[35] : [],
                             layout : (result && result[36] && result[36][0]) ? JSON.parse(result[36][0].layout):{},
-                            clientStatus: result[37] ? result[37]:[]
+                            clientStatus: result[37] ? result[37]:[],
+                            group : result[39] ? result[39]: [],
+                            faceSheetTemplates: result[41] ? result[41]:[]
                         };
 
                         if (req.query.isWeb == 0) {
@@ -512,7 +518,9 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                 client: [],
                                 general: [],
                                 clientContact: [],
-                                interview: []
+                                interview: [],
+                                billing: [],
+                                billingTable: []
                             },
                             educationList: [],
                             stage: [],
@@ -534,7 +542,9 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             functionalAreas: [],
                             accessRightsTemplateDetails: [],
                             layout:{},
-                            clientStatus:[]
+                            clientStatus:[],
+                            group:[],
+                            faceSheetTemplates:[]
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -953,6 +963,7 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
                 req.body.stage = (req.body.stage) ? req.body.stage : 0;
                 req.body.status = (req.body.status) ? req.body.status : 0;
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.body.reasonId = (req.body.reasonId) ? req.body.reasonId : 0;
 
                 var statusParams = [
                     req.st.db.escape(req.query.token),
@@ -960,7 +971,8 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
                     req.st.db.escape(req.body.stage),
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(req.body.notes),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.reasonId)
                 ];
 
                 var statusQuery = 'CALL wm_save_reqStageStatus( ' + statusParams.join(',') + ')';
@@ -3779,5 +3791,90 @@ applicantCtrl.saveMedical = function (req, res, next) {
         });
     }
 };
+
+
+
+applicantCtrl.faceSheetTemplate = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.body.templateName) {
+        error.templateName = 'Invalid templateName';
+        validationFlag *= false;
+    }
+
+    var questions = req.body.questions;
+    if(typeof(questions) == "string"){
+        questions = JSON.parse(questions);
+    }
+    if(!questions){
+        questions = []
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.body.templateId = req.body.templateId ? req.body.templateId :0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.templateId),                   
+                    req.st.db.escape(req.body.templateName),                            
+                    req.st.db.escape(JSON.stringify(questions))                   
+                ];
+
+                var procQuery = 'CALL wm_save_paceFacesheetTemplate( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0][0]) {
+                        response.status = true;
+                        response.message = "Facesheet Template saved sucessfully";
+                        response.error = null;
+                        response.data = {
+                            templateId : result[0][0] ?  result[0][0].templateId : 0
+                        };
+                        res.status(200).json(response);
+                    }
+                   
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving Facesheet";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
 
 module.exports = applicantCtrl;

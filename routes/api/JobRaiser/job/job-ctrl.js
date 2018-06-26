@@ -92,6 +92,7 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                 req.body.defId = (req.body.defId) ? req.body.defId : 0;
                 req.body.heMasterId = (req.body.heMasterId) ? req.body.heMasterId : 0;
                 req.body.purpose = (req.body.purpose) ? req.body.purpose : 0;
+                req.body.logoFile = (req.body.logoFile) ? req.body.logoFile : '';
                 //req.body.jobType = (req.body.jobType) ? req.body.jobType :0;
                 //req.body.currencyId = (req.body.currencyId) ? req.body.currencyId : 1;
                 //req.body.scaleId = (req.body.scaleId) ? req.body.scaleId : 0;
@@ -109,7 +110,8 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(duration)),
                     req.st.db.escape(JSON.stringify(country)),
                     req.st.db.escape(JSON.stringify(heDepartment)),
-                    req.st.db.escape(JSON.stringify(defaultClient))
+                    req.st.db.escape(JSON.stringify(defaultClient)),
+                    req.st.db.escape(req.body.logoFile)
                 ];
                 var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
                 console.log(procQuery);

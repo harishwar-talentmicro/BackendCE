@@ -1852,9 +1852,7 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                         response.error = null;
                         if (result[1] && result[1][0]) {
                             for (var i = 0; i < result[1].length; i++) {
-                                // var res2 = {};
-                                // result[1][i].contactList = result[1][i].contactList ? JSON.parse(result[1][i].contactList) : [];
-
+                                
                                 result[1][i].location = result[1][i].location ? JSON.parse(result[1][i].location) : [];
                             }
                         }

@@ -666,7 +666,7 @@ User.prototype.changePassword = function (req, res, next) {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var TokenNo = req.body.Token;   // token is now query  //token was in body
+        var TokenNo = req.query.token;   // token is now query  //token was in body  T was caps before
 
         var RtnMessage = {
             status: true,
@@ -678,13 +678,14 @@ User.prototype.changePassword = function (req, res, next) {
 
         var validationFlag = true;
 
-    if (!req.query.Token) {
-        error.Token = 'Invalid token';
+    if (!TokenNo) {
+        error.TokenNo = 'Invalid token';
         validationFlag *= false;
     }
 
 
         if (!validationFlag){
+            RtnMessage.error = error;
             RtnMessage.message = 'Please check the errors';
             res.status(400).json(RtnMessage);
             console.log(RtnMessage);
