@@ -74,6 +74,10 @@ router.post('/sendClientMailer',sendgridCtrl.clientMailer);
 router.post('/interviewMailer',sendgridCtrl.interviewMailerPreview);
 router.post('/sendInterviewMailer',sendgridCtrl.interviewMailer);
 
+router.post('/saveFacesheet',applicantCtrl.faceSheetTemplate);
+
+router.post('/faceSheetDetails',applicantCtrl.faceSheetReplaceDetails);
+
 
 
 module.exports = router;

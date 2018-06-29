@@ -482,6 +482,7 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
         error: null
     };
 
+    var sentMailFlag=1;
     var emailReceivers;                //emailReceivers to store the recipients
     var mailbody_array = [];    //array to store all mailbody after replacing tags
     var subject_array = [];
@@ -591,7 +592,8 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                     var inputs = [
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.query.heMasterId),
-                        req.st.db.escape(JSON.stringify(applicants))
+                        req.st.db.escape(JSON.stringify(applicants)),
+                        req.st.db.escape(sentMailFlag)
 
                     ];
 
@@ -825,6 +827,23 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                         }
                     });
                 }
+                // else if(!templateId && !overWrite){
+                //     response.status = false;
+                //     response.message = "To mail is empty. Mail not sent";
+                //     response.error = null;
+                //     response.data = null;
+                //     res.status(200).json(response);
+                //     return;
+                // }
+
+                else if(templateId && !overWrite && !emailReceivers.length){
+                    response.status = false;
+                    response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                    return;
+                }
                 //save it as a template if flag is true or template id is 0
                 if (templateId == 0 || overWrite) {
                     req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
@@ -896,7 +915,7 @@ sendgridCtrl.jobSeekerPreview = function (req, res, next) {
     var subject = req.body.subject ? req.body.subject : '';
     var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
     var isWeb = req.query.isWeb ? req.query.isWeb : 0;
-
+    var sentMailFlag = 0;
     var response = {
         status: false,
         message: "Invalid token",
@@ -943,7 +962,8 @@ sendgridCtrl.jobSeekerPreview = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(applicants))
+                    req.st.db.escape(JSON.stringify(applicants)),
+                    req.st.db.escape(sentMailFlag)
                 ];
                 var idArray;
                 idArray = applicants;
@@ -1534,6 +1554,23 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                         }
                     });
                 }
+                else if(!templateId && !overWrite){
+                    response.status = false;
+                    response.message = "To mail is empty. Mail not sent";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                    return;
+                }
+
+                else if(templateId && !overWrite && !emailReceivers.length){
+                    response.status = false;
+                    response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                    return;
+                }
                 //save it as a template if flag is true or template id is 0
                 if (templateId == 0 || overWrite) {
                     req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
@@ -2022,7 +2059,8 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                             }
 
                             var buffer;
-                            if (trackerTemplate) {
+                            if (trackerTemplate.trackerId) {
+                                console.log('tracker',trackerTemplate.trackerId);
                                 var ws_data = '[[';
                                 // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
                                 for (var i = 0; i < trackerTags.length; i++) {
@@ -2086,7 +2124,8 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                     });
                                 }
 
-                                if (trackerTemplate) {
+                                if (trackerTemplate.trackerId) {
+                                    console.log('trackerTemplate send mail attach',trackerTemplate.trackerId);
                                     email.addFile({
                                         filename: trackerTemplate.templateName + '.xlsx',
                                         content: new Buffer(new Buffer(buffer).toString("base64"), 'base64'),
@@ -2255,6 +2294,23 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                             return;
                         }
                     });
+                }
+                else if(!templateId && !overWrite){
+                    response.status = false;
+                    response.message = "To mail is empty. Mail not sent";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                    return;
+                }
+
+                else if(templateId && !overWrite && !emailReceivers.length){
+                    response.status = false;
+                    response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                    return;
                 }
                 //save it as a template if flag is true or template id is 0
                 if (templateId == 0 || overWrite) {
@@ -2805,6 +2861,23 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                             return;
                         }
                     });
+                }
+                else if(!templateId && !overWrite){
+                    response.status = false;
+                    response.message = "To mail is empty. Mail not sent";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                    return;
+                }
+
+                else if(templateId && !overWrite && !emailReceivers.length){
+                    response.status = false;
+                    response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                    return;
                 }
                 //save it as a template if flag is true or template id is 0
                 if (templateId == 0 || overWrite) {
@@ -3605,6 +3678,23 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                             return;
                         }
                     });
+                }
+                else if(!templateId && !overWrite){
+                    response.status = false;
+                    response.message = "To mail is empty. Mail not sent";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                    return;
+                }
+
+                else if(templateId && !overWrite && !emailReceivers.length){
+                    response.status = false;
+                    response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                    return;
                 }
                 //save it as a template if flag is true or template id is 0
                 if (templateId == 0 || overWrite) {

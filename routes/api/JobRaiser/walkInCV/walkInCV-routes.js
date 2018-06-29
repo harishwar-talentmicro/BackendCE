@@ -31,4 +31,8 @@ router.post('/vendorDetails',walkInCvCtrl.vendorDetails);
 
 router.post('/walkInConfig',walkInCvCtrl.walkInWebConfig);
 
+router.post('/walkincvupload',walkInCvCtrl.walkInCVUpload);
+
+router.get('/validateLink',walkInCvCtrl.walkInUploadLinkFlag);
+
 module.exports = router;

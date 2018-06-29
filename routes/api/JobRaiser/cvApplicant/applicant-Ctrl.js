@@ -203,6 +203,22 @@ applicantCtrl.saveApplicant = function (req, res, next) {
         requirementArray = [];
     }
 
+    var faceSheet = req.body.faceSheet;
+    if (typeof (faceSheet) == "string") {
+        faceSheet = JSON.parse(faceSheet);
+    }
+    if (!faceSheet) {
+        faceSheet = {};
+    }
+
+    var presentLocation = req.body.presentLocation;
+    if (typeof (presentLocation) == "string") {
+        presentLocation = JSON.parse(presentLocation);
+    }
+    if (!presentLocation) {
+        presentLocation = {};
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please Check the Errors';
@@ -253,6 +269,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0;
                         req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
                         req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 0;
+                        req.body.referredBy = req.body.referredBy ? req.body.referredBy : "";
 
                         var inputs = [
                             req.st.db.escape(req.query.token),
@@ -307,6 +324,10 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(functionalAreas)),
                             req.st.db.escape(req.body.importerFlag),
                             req.st.db.escape(JSON.stringify(requirementArray)),
+                            req.st.db.escape(req.body.referredBy),
+                            req.st.db.escape(JSON.stringify(faceSheet)),
+                            req.st.db.escape(JSON.stringify(presentLocation))
+                      
                         ];
 
                         var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -423,7 +444,7 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
 
                         if (result[35].length){
                             for (var p = 0; p < result[35].length; p++) {
-                                result[35][p].templateData = (result[35] && result[35][p]) ? JSON.parse(result[35] && result[35][p].templateData) : {};
+                                result[35][p].templateData = (result[35] && result[35][p]) ? JSON.parse(result[35][p].templateData) : {};
                             }
                             var templateData = {};
                             for (var i = 0; i < result[35][0].templateData.length; i++) {
@@ -434,6 +455,10 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             }
                             result[35][0].templateData = templateData;
                         }
+
+                        for (var i = 0; i < result[41].length; i++) {
+                            result[41][i].questions = (result[41] && result[41][i]) ? JSON.parse(result[41][i].questions) : [];
+                        }                        
 
                         response.data = {
                             jobType: result[0] ? result[0] : [],
@@ -453,7 +478,9 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                 client: result[13] ? result[13] : [],
                                 general: result[27] ? result[27] : [],
                                 clientContact: result[30] ? result[30] : [],
-                                interview: result[33] ? result[33] : []
+                                interview: result[33] ? result[33] : [],
+                                billing : result[38] ? result[38]:[],
+                                billingTable: result[40] ? result[40]: []
                             },
                             educationList: output1,
                             Stage: result[15] ? result[15] : [],
@@ -474,7 +501,10 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             reportingTo: result[32] ? result[32] : [],
                             functionalAreas: result[34] ? result[34] : [],
                             accessRightsTemplateDetails: result[35] ? result[35] : [],
-                            layout : (result && result[36] && result[36][0]) ? JSON.parse(result[36][0].layout):{}
+                            layout : (result && result[36] && result[36][0]) ? JSON.parse(result[36][0].layout):{},
+                            clientStatus: result[37] ? result[37]:[],
+                            group : result[39] ? result[39]: [],
+                            faceSheetTemplates: result[41] ? result[41]:[]
                         };
 
                         if (req.query.isWeb == 0) {
@@ -511,7 +541,9 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                 client: [],
                                 general: [],
                                 clientContact: [],
-                                interview: []
+                                interview: [],
+                                billing: [],
+                                billingTable: []
                             },
                             educationList: [],
                             stage: [],
@@ -532,7 +564,10 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             reportingTo: [],
                             functionalAreas: [],
                             accessRightsTemplateDetails: [],
-                            layout:{}
+                            layout:{},
+                            clientStatus:[],
+                            group:[],
+                            faceSheetTemplates:[]
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -803,6 +838,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                 req.body.limit = (req.body.limit) ? req.body.limit : 12;
                 req.body.applicantId = (req.body.applicantId) || (req.body.applicantId == "") ? req.body.applicantId : 0;
                 req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
+                req.body.type = (req.body.type) ? req.body.type : 1;
 
 
                 var getStatus = [
@@ -820,7 +856,8 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                     req.st.db.escape(req.body.startPage),
                     req.st.db.escape(req.body.limit),
                     req.st.db.escape(req.body.requirementId),
-                    req.st.db.escape(DBSecretKey)
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape( req.body.type)
                 ];
 
                 var procQuery = 'CALL wm_get_applicants( ' + getStatus.join(',') + ')';
@@ -951,6 +988,7 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
                 req.body.stage = (req.body.stage) ? req.body.stage : 0;
                 req.body.status = (req.body.status) ? req.body.status : 0;
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.body.reasonId = (req.body.reasonId) ? req.body.reasonId : 0;
 
                 var statusParams = [
                     req.st.db.escape(req.query.token),
@@ -958,7 +996,8 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
                     req.st.db.escape(req.body.stage),
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(req.body.notes),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.reasonId)
                 ];
 
                 var statusQuery = 'CALL wm_save_reqStageStatus( ' + statusParams.join(',') + ')';
@@ -1500,15 +1539,20 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         temp_result.primarySkills = JSON.parse(temp_result.primarySkills);
                         temp_result.secondarySkills = JSON.parse(temp_result.secondarySkills);
                         temp_result.functionalAreas = JSON.parse(temp_result.functionalAreas);
+                        temp_result.presentLocation = JSON.parse(temp_result.presentLocation);
 
                         response.status = true;
                         response.message = "Applicant data loaded successfully";
                         response.error = null;
+
+
                         response.data =
                             {
                                 applicantDetails: temp_result ? temp_result : [],
                                 applicantTransaction: result[1] ? result[1] : [],
-                                clientCvPath: (result[2] && result[2][0]) ? result[2][0].clientCvPath : ""
+                                clientCvPath: (result[2] && result[2][0]) ? result[2][0].clientCvPath : "",
+                                previousClientCvPath: (result[3] && result[3][0]) ? result[3][0].previousClientCvPath : "",
+                                faceSheet: (result[4] && result[4][0]) ? JSON.parse(result[4][0].faceSheet) :{}
                             };
                         res.status(200).json(response);
                     }
@@ -1518,7 +1562,9 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             applicantDetails: [],
-                            applicantTransaction: []
+                            applicantTransaction: [],
+                            clientCvPath:"",
+                            previousClientCvPath:""  
                         };
                         res.status(200).json(response);
                     }
@@ -1916,7 +1962,8 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
                         response.message = "Offer manager data saved successfully";
                         response.error = null;
                         response.data = {
-                            offerManagerId: result[0][0].offerManagerId
+                            offerManagerId: result[0][0].offerManagerId,
+                            transactionHistory: (result[1] && result[1][0]) ? result[1] :[]
                         };
                         res.status(200).json(response);
                     }
@@ -1976,7 +2023,7 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0] && result[0][0] && result[0][0].offerManagerId !=0) {
                         response.status = true;
                         response.message = "Offer manager list loaded successfully";
                         response.error = null;
@@ -1991,11 +2038,11 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                         response.data = result[0][0];
                         res.status(200).json(response);
                     }
-                    else if (!err) {
+                    else if (!err && result) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
-                        response.data = [];
+                        response.data = {};
                         res.status(200).json(response);
                     }
                     else {
@@ -3567,7 +3614,10 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                         response.status = true;
                         response.message = "OnBoarding data saved successfully";
                         response.error = null;
-                        response.data = null;
+                        response.data = {
+                            onBoardingId: (result[0] && result[0][0]) ? result[0][0].onBoardingId :0,
+                            transactionHistory: (result[1] && result[1][0]) ? result[1] :[]
+                        };
                         res.status(200).json(response);
                     }
                     else {
@@ -3777,5 +3827,175 @@ applicantCtrl.saveMedical = function (req, res, next) {
         });
     }
 };
+
+
+
+applicantCtrl.faceSheetTemplate = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.body.templateName) {
+        error.templateName = 'Invalid templateName';
+        validationFlag *= false;
+    }
+
+    var questions = req.body.questions;
+    if(typeof(questions) == "string"){
+        questions = JSON.parse(questions);
+    }
+    if(!questions){
+        questions = []
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.body.templateId = req.body.templateId ? req.body.templateId :0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.templateId),                   
+                    req.st.db.escape(req.body.templateName),                            
+                    req.st.db.escape(JSON.stringify(questions))                   
+                ];
+
+                var procQuery = 'CALL wm_save_paceFacesheetTemplate( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0][0]) {
+                        response.status = true;
+                        response.message = "Facesheet Template saved sucessfully";
+                        response.error = null;
+                        response.data = {
+                            templateId : result[0][0] ?  result[0][0].templateId : 0
+                        };
+                        res.status(200).json(response);
+                    }
+                   
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving Facesheet";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.applicantId) {
+        error.applicantId = 'Invalid applicantId';
+        validationFlag *= false;
+    }
+
+    var faceSheet = req.body.faceSheet;
+    if(typeof(faceSheet) == "string"){
+        faceSheet = JSON.parse(faceSheet);
+    }
+    if(!faceSheet){
+        faceSheet = []
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.applicantId)                   
+                ];
+
+                var procQuery = 'CALL wm_get_fillFaceSheet( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0][0]) {
+                        response.status = true;
+                        response.message = "Facesheet Template loaded sucessfully";
+                        response.error = null;
+                        if(faceSheet.questions)
+                        for(var i=0; i<faceSheet.questions.length; i++){
+                            faceSheet.questions[i].answer = result[0][0][faceSheet.questions[i].type.tagName];
+                        }
+                        
+                        response.data = {
+                            faceSheet : faceSheet ? faceSheet : {},
+                        };
+                        res.status(200).json(response);
+                    }
+                   
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading Facesheet";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
 
 module.exports = applicantCtrl;

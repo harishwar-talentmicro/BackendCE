@@ -131,7 +131,7 @@ paceUsersCtrl.paceLoginValidation = function (req, res, next) {
                         res.status(200).json(response);
                     }
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "No results found";
                         response.error = null;
                         response.data = null;

@@ -417,6 +417,11 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
         data: null,
         error: null
     };
+
+    var isdMobile = req.body.mobileISD;
+    var mobileNo = req.body.mobileNumber;
+    var message = "Congratulations your profile is successfully registered";
+
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -544,7 +549,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.IDNumber = (req.body.IDNumber) ? req.body.IDNumber : '';
                 req.body.profilePicture = (req.body.profilePicture) ? req.body.profilePicture : '';
                 req.body.middleName = (req.body.middleName) ? req.body.middleName : '';
-
+                req.body.registrationType = req.body.registrationType ? req.body.registrationType : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -585,7 +590,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(walkInJobs)),
                     req.st.db.escape(req.body.DOB),
                     req.st.db.escape(req.body.IDNumber),
-                    req.st.db.escape(req.body.middleName)
+                    req.st.db.escape(req.body.middleName),
+                    req.st.db.escape(req.body.registrationType)
                 ];
 
 
@@ -595,7 +601,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    
+
 
                     // if (!err && results && results[0][0]) {
                     //     senderGroupId = results[0][0].senderId;
@@ -704,8 +710,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     //     }
 
                     // }
-                    if (!err && (results[1] || results[2] && results[3])) {    // walkInForm Message with token
-
+                    if (!err && (results[1] || results[2] && results[2][0] && results[3] && results[3][0] && results[3][0].token)) {    // walkInForm Message with token
+                        console.log('Result with walk-In Message and Token');
                         if (results[4] && results[4][0] || results[5] || results[5][0]) {
 
                             var mailContent = (results[5] && results[5][0]) ? results[5][0].mailBody : "Dear [FirstName] <br>Thank you for registering your profile.  We will revert to you once we find your Resume match one of the requirements we have.In the mean time, please [ClickHere] to upload your latest CV that will help us with more detailed information about your profile.Wishing you all the best<br><br>[WalkINSignature]<br>[Disclaimer]";
@@ -715,6 +721,15 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                 mailContent = mailContent.replace("[FullName]", (req.body.firstName + ' ' + req.body.middleName + ' ' + req.body.lastName));
 
                                 var webLink = (results[5] && results[5][0]) ? results[5][0].webLink : "";
+
+                                // For updating resume though url link after registering for walkIn
+
+                                // var parentId=(results[6] && results[6][0]) ? results[6][0].walkInApplicantId : undefined;
+                                // walkInApplicantId = Date.now().toString().concat(parentId);
+                                // var webLinkTo = 'www.whatmate.com/walkInApplicantId='+walkInApplicantId;
+                                // mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
+                                // ------------------------------------------------
+
                                 mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
 
                                 var walkInSignature = (results[5] && results[5][0]) ? results[5][0].walkInSignature : "";
@@ -734,35 +749,35 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
 
                             sendgrid.send(email, function (err11, result11) {
                                 if (err11) {
-                                    console.log("mail not sent", err11);
+                                    console.log("Failed to send to candidate", err11);
                                 }
                                 else {
-                                    console.log("mail sent successfully", result11);
+                                    console.log("mail sent successfully to candidate", result11);
                                 }
                             });
 
                             // To send mail to refered person
-                            if(results[6]){
+                            if (results[4] && results[6] && results[6][0]) {
                                 var refererEmail = new sendgrid.Email();
                                 refererEmail.from = results[4][0].fromEmailId;
                                 refererEmail.to = results[6][0].refererMailId;
                                 refererEmail.subject = results[6][0].message;
                                 refererEmail.html = results[6][0].message;
-    
+
                                 sendgrid.send(refererEmail, function (err1, result1) {
                                     if (err1) {
-                                        console.log("mail not sent to referrer", err1);
+                                        console.log("Failed to send to referrer", err1);
                                     }
                                     else {
                                         console.log("mail sent successfully to referrer", result1);
                                     }
                                 });
                             }
-                            
+
                             // to send sms to candidate
-                            var isdMobile = req.body.mobileISD;
-                            var mobileNo = req.body.mobileNo;
-                            var message = "Congratulations your profile is successfully registered";
+                            // if(results[5][0].sendCandidateSms){
+
+                            // }
                             if (isdMobile == "+977") {
                                 request({
                                     url: 'http://beta.thesmscentral.com/api/v3/sms?',
@@ -780,11 +795,13 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     }
                                     else {
                                         console.log("SUCCESS", "SMS response");
+                                        console.log("SUCCESS", "SMS response");
                                     }
 
                                 });
                             }
                             else if (isdMobile == "+91") {
+                                console.log('mobile number and isd is', isdMobile, mobileNo);
                                 request({
                                     url: 'https://aikonsms.co.in/control/smsapi.php',
                                     qs: {
@@ -803,7 +820,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                         console.log(error2, "SMS");
                                     }
                                     else {
-                                        console.log("SUCCESS", "SMS response");
+                                        console.log("SUCCESS", "SMS response with ISD");
                                     }
                                 });
 
@@ -831,6 +848,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     duplicateCheck: 'true',
                                     format: 'json'
                                 }));
+                                console.log('sms type 2 gateway worked');
                                 req5.end();
                             }
                             else if (isdMobile != "") {
@@ -845,7 +863,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                             console.log(error6, "SMS");
                                         }
                                         else {
-                                            console.log("SUCCESS", "SMS response");
+                                            console.log("SUCCESS", "SMS response with empty isd");
                                         }
                                     }
                                 );
@@ -862,7 +880,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                         res.status(200).json(response);
                     }
 
-                    else if (!err && (results[1] || results[2])) {   //  walkIn formMessage without token
+                    else if (!err && (results[1] || results[2] && results[2][0].walkinFormMessage)) {   //  walkIn formMessage without token
+                        console.log('Result with only walk-In Message');
 
                         if (results[4] && results[4][0] || results[5] || results[5][0]) {
 
@@ -890,35 +909,36 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
 
                             sendgrid.send(email, function (err11, result11) {
                                 if (err11) {
-                                    console.log("mail not sent", err11);
+                                    console.log("Failed to send to candidate", err11);
                                 }
                                 else {
-                                    console.log("mail sent successfully", result11);
+                                    console.log("mail sent successfully to candidate", result11);
                                 }
                             });
 
                             // To send mail to refered person
-                            if(results[6]){
+                            if (results[6]) {
                                 var refererEmail = new sendgrid.Email();
                                 refererEmail.from = results[4][0].fromEmailId;
                                 refererEmail.to = results[6][0].refererMailId;
                                 refererEmail.subject = results[6][0].message;
                                 refererEmail.html = results[6][0].message;
-    
+
                                 sendgrid.send(refererEmail, function (err1, result1) {
                                     if (err1) {
-                                        console.log("mail not sent to referrer", err1);
+                                        console.log("Failed to send to referrer", err1);
                                     }
                                     else {
                                         console.log("mail sent successfully to referrer", result1);
                                     }
                                 });
                             }
-                            
+
                             // to send sms to candidate
-                            var isdMobile = req.body.mobileISD;
-                            var mobileNo = req.body.mobileNo;
-                            var message = "Congratulations your profile is successfully registered";
+
+                            // if(results[5][0].sendCandidateSms){
+
+                            // }
                             if (isdMobile == "+977") {
                                 request({
                                     url: 'http://beta.thesmscentral.com/api/v3/sms?',
@@ -936,11 +956,13 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     }
                                     else {
                                         console.log("SUCCESS", "SMS response");
+                                        console.log("SUCCESS", "SMS response");
                                     }
 
                                 });
                             }
                             else if (isdMobile == "+91") {
+                                console.log('mobile number and isd is', isdMobile, mobileNo);
                                 request({
                                     url: 'https://aikonsms.co.in/control/smsapi.php',
                                     qs: {
@@ -959,7 +981,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                         console.log(error2, "SMS");
                                     }
                                     else {
-                                        console.log("SUCCESS", "SMS response");
+                                        console.log("SUCCESS", "SMS response with ISD");
                                     }
                                 });
 
@@ -987,6 +1009,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     duplicateCheck: 'true',
                                     format: 'json'
                                 }));
+                                console.log('sms type 2 gateway worked');
                                 req5.end();
                             }
                             else if (isdMobile != "") {
@@ -1001,7 +1024,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                             console.log(error6, "SMS");
                                         }
                                         else {
-                                            console.log("SUCCESS", "SMS response");
+                                            console.log("SUCCESS", "SMS response with empty isd");
                                         }
                                     }
                                 );
@@ -1275,14 +1298,14 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
     }
     else {
 
-        req.body.heParentId = req.body.heParentId ? req.body.heParentId :0;
-        req.body.mobileISD = req.body.mobileISD ? req.body.mobileISD :'';
-        req.body.IDNumber = req.body.IDNumber ? req.body.IDNumber :'';
-        req.body.emailId = req.body.emailId ? req.body.emailId :'';
-        req.body.firstName = req.body.firstName ? req.body.firstName :'';
-        req.body.heMasterId = req.body.heMasterId ? req.body.heMasterId :0;
+        req.body.heParentId = req.body.heParentId ? req.body.heParentId : 0;
+        req.body.mobileISD = req.body.mobileISD ? req.body.mobileISD : '';
+        req.body.IDNumber = req.body.IDNumber ? req.body.IDNumber : '';
+        req.body.emailId = req.body.emailId ? req.body.emailId : '';
+        req.body.firstName = req.body.firstName ? req.body.firstName : '';
+        req.body.heMasterId = req.body.heMasterId ? req.body.heMasterId : 0;
 
-        
+
         var inputs = [
             req.st.db.escape(req.query.mobileNo),
             req.st.db.escape(req.query.otp),
@@ -1305,54 +1328,54 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
                 response.message = result[0][0].message;
                 response.error = false;
 
-                if(result[2] && result[2][0]){
-                    result[2][0].location = (result[2] && result[2][0] && result[2][0].location) ? JSON.parse(result[2][0].location):{};
-                    if(result[2][0].location.locationId == 0){
+                if (result[2] && result[2][0]) {
+                    result[2][0].location = (result[2] && result[2][0] && result[2][0].location) ? JSON.parse(result[2][0].location) : {};
+                    if (result[2][0].location.locationId == 0) {
                         result[2][0].location = {};
                     }
-                    
-                    result[2][0].currency = (result[2] && result[2][0]) ? JSON.parse(result[2][0].currency):{};
-                    if(result[2][0].currency.presentSalaryCurrId == 0){
+
+                    result[2][0].currency = (result[2] && result[2][0]) ? JSON.parse(result[2][0].currency) : {};
+                    if (result[2][0].currency.presentSalaryCurrId == 0) {
                         result[2][0].currency = {};
                     }
-                    
-                    result[2][0].scale = (result[2] && result[2][0]) ? JSON.parse(result[2][0].scale):{};
-                    if(result[2][0].scale.presentSalaryScaleId == 0){
+
+                    result[2][0].scale = (result[2] && result[2][0]) ? JSON.parse(result[2][0].scale) : {};
+                    if (result[2][0].scale.presentSalaryScaleId == 0) {
                         result[2][0].scale = {};
                     }
 
-                    result[2][0].period = (result[2] && result[2][0]) ? JSON.parse(result[2][0].period):{};
-                    if(result[2][0].period.presentSalaryPeriodId == 0){
+                    result[2][0].period = (result[2] && result[2][0]) ? JSON.parse(result[2][0].period) : {};
+                    if (result[2][0].period.presentSalaryPeriodId == 0) {
                         result[2][0].period = {};
                     }
 
-                    result[2][0].details = (result[2] && result[2][0]) ? JSON.parse(result[2][0].details):{};
-                    if(result[2][0].details.referedId == 0 && result[2][0].details.empCode=="" && result[2][0].details.referedName == ""){
+                    result[2][0].details = (result[2] && result[2][0]) ? JSON.parse(result[2][0].details) : {};
+                    if (result[2][0].details.referedId == 0 && result[2][0].details.empCode == "" && result[2][0].details.referedName == "") {
                         result[2][0].details = {};
                     }
 
-                    result[2][0].skills = (result[2] && result[2][0]) ? JSON.parse(result[2][0].skills):[];
-                    if(result[2][0].skills.skillId == 0){
+                    result[2][0].skills = (result[2] && result[2][0]) ? JSON.parse(result[2][0].skills) : [];
+                    if (result[2][0].skills.skillId == 0) {
                         result[2][0].skills = {};
                     }
-                    result[2][0].industry = (result[2] && result[2][0]) ? JSON.parse(result[2][0].industry):[];
-                    if(result[2][0].industry.industryId == 0){
+                    result[2][0].industry = (result[2] && result[2][0]) ? JSON.parse(result[2][0].industry) : [];
+                    if (result[2][0].industry.industryId == 0) {
                         result[2][0].industry = {};
                     }
-                    result[2][0].ugEducation = (result[2] && result[2][0]) ? JSON.parse(result[2][0].ugEducation):{};
-                    if(result[2][0].ugEducation.educationId == 0){
+                    result[2][0].ugEducation = (result[2] && result[2][0]) ? JSON.parse(result[2][0].ugEducation) : {};
+                    if (result[2][0].ugEducation.educationId == 0) {
                         result[2][0].ugEducation = {};
                     }
-                    result[2][0].pgEducation = (result[2] && result[2][0]) ? JSON.parse(result[2][0].pgEducation):{};
-                    if(result[2][0].pgEducation.educationId == 0){
+                    result[2][0].pgEducation = (result[2] && result[2][0]) ? JSON.parse(result[2][0].pgEducation) : {};
+                    if (result[2][0].pgEducation.educationId == 0) {
                         result[2][0].pgEducation = {};
                     }
                     // result[2][0].walkInJobs = (result[2] && result[2][0]) ? JSON.parse(result[2][0].walkInJobs):{};
-    
-                }                
+
+                }
                 response.data = {
-                    message: (result[0] && result[0][0]) ? result[0][0].message:'',
-                    existsMessage: (result[1] && result[1][0]) ? result[1][0]._error:'',
+                    message: (result[0] && result[0][0]) ? result[0][0].message : '',
+                    existsMessage: (result[1] && result[1][0]) ? result[1][0]._error : '',
                     applicantDetails: (result[2] && result[2][0]) ? result[2][0] : {}
                 };
                 res.status(200).json(response);
@@ -1364,8 +1387,8 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
                 response.error = false;
                 response.data = {
                     message: result[0][0].message
-                   // existsMessage:'',
-                   // applicantDetails:{}
+                    // existsMessage:'',
+                    // applicantDetails:{}
                 };
                 res.status(200).json(response);
             }
@@ -1376,8 +1399,8 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
                 response.error = false;
                 response.data = {
                     message: result[0][0].message
-                   // existsMessage:'',
-                   // applicantDetails:{}
+                    // existsMessage:'',
+                    // applicantDetails:{}
                 };
                 res.status(200).json(response);
             }
@@ -1475,8 +1498,8 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             isDOBRequired: result[13][0].isDOBRequired,
                             isIDRequired: result[14][0].isIDRequired,
                             IDType: result[14][0].IDType,  // field Name
-                            isIDNumberOrString:(result[14] && result[14][0]) ? result[14][0].isIDNumberOrString:1,
-                            maxIDLength :(result[14] && result[14][0]) ? result[14][0].maxIDLength:0,
+                            isIDNumberOrString: (result[14] && result[14][0]) ? result[14][0].isIDNumberOrString : 1,
+                            maxIDLength: (result[14] && result[14][0]) ? result[14][0].maxIDLength : 0,
                             DOBType: result[13][0].DOBType,
                             isVisitorCheckIn: result[14][0].isVisitorCheckIn,
                             isWalkIn: result[14][0].isWalkIn,
@@ -1515,9 +1538,9 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             duration: [],
                             ugEducationList: [],
                             pgEducationList: [],
-                            isDOBRequired:0,
-                            isIDRequired:0,
-                            IDType:0
+                            isDOBRequired: 0,
+                            isIDRequired: 0,
+                            IDType: 0
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -2014,8 +2037,12 @@ walkInCvCtrl.getWalkinJoblist = function (req, res, next) {
                             result[0][i].users = result[0][i].users ? JSON.parse(result[0][i].users) : [];
                         }
 
-                        result[1][0].userList = (result[1] && result[1][0]) ? JSON.parse(result[1][0].userList) : [];
+                        for (var i = 0; i < result[2].length; i++) {
+                            result[2][i].contactLocation = result[2][i].contactLocation ? JSON.parse(result[2][i].contactLocation) : [];
+                        }
 
+                        result[1][0].userList = (result[1] && result[1][0]) ? JSON.parse(result[1][0].userList) : [];
+                        
                         response.data = {
                             jobList: (result[0] && result[0][0]) ? result[0] : [],
                             walkInWebConfig: result[1][0],
@@ -2980,6 +3007,10 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 req.body.DOBRequired = req.body.DOBRequired ? req.body.DOBRequired : 0;
                 req.body.IDRequired = req.body.IDRequired ? req.body.IDRequired : 0;
                 req.body.IDType = req.body.IDType ? req.body.IDType : '';
+                req.body.maxIDLength = req.body.maxIDLength ? req.body.maxIDLength : 0;
+                req.body.isIDNumberOrString = req.body.isIDNumberOrString ? req.body.isIDNumberOrString : 1;
+                req.body.sendCandidateSms = req.body.sendCandidateSms ? req.body.sendCandidateSms : 0;
+                req.body.candidateSmsFormat = req.body.candidateSmsFormat ? req.body.candidateSmsFormat : "";
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -3002,7 +3033,11 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(req.body.referredByEmployeeList),
                     req.st.db.escape(req.body.referredByName),
                     req.st.db.escape(req.body.vendors),
-                    req.st.db.escape(JSON.stringify(userList))
+                    req.st.db.escape(JSON.stringify(userList)),
+                    req.st.db.escape(req.body.maxIDLength),
+                    req.st.db.escape(req.body.isIDNumberOrString),
+                    req.st.db.escape(req.body.sendCandidateSms),
+                    req.st.db.escape(req.body.candidateSmsFormat)
                 ];
 
                 var procQuery = 'CALL wm_save_walkWebConfig( ' + inputs.join(',') + ')';
@@ -3031,6 +3066,123 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 res.status(401).json(response);
             }
         });
+    }
+};
+
+
+walkInCvCtrl.walkInCVUpload = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Some Error occurred",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.walkInApplicantId) {
+        error.token = 'Invalid walkInApplicantId';
+        validationFlag *= false;
+    }
+    if (!req.body.cdnPath) {
+        error.cdnPath = 'Invalid cdnPath';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+
+        var walkInApplicantId = req.query.walkInApplicantId;
+        parentId = walkInApplicantId.substr(13);  // parentId is in string
+        parentId = parseInt(parentId);   // parse to string
+
+        var inputs = [
+            req.st.db.escape(parentId),
+            req.st.db.escape(req.body.cdnPath)
+        ];
+
+        var procQuery = 'CALL wm_walkInCvUploadLink( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            console.log(err);
+
+            if (!err && result && result[0] && result[0][0]) {
+                response.status = true;
+                response.message = "CV uploaded successfully";
+                response.error = null;
+                response.data = result[0][0].cvUploadRes;
+                res.status(200).json(response);
+            }
+
+            else {
+                response.status = false;
+                response.message = "Error while  uploading cv";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+
+    }
+};
+
+
+walkInCvCtrl.walkInUploadLinkFlag = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Some Error occurred",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.walkInApplicantId) {
+        error.token = 'Invalid walkInApplicantId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+
+        var walkInApplicantId = req.query.walkInApplicantId;
+        parentId = walkInApplicantId.substr(13);  // parentId is in string
+        parentId = parseInt(parentId);   // parse to string
+
+        var inputs = [
+            req.st.db.escape(parentId)
+        ];
+
+        var procQuery = 'CALL wm_get_walkInUploadLinkExpiryFlag( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            console.log(err);
+
+            if (!err && result && result[0] && result[0][0]) {
+                result[0][0].validateLinkFlag = (result[0][0].validateLinkFlag === result[0][0].validateLinkFlag);  //indicator strict
+                
+                response.status = (result[0] && result[0][0]) ? result[0][0].validateLinkFlag: false;
+                response.message = "Validate upload link";
+                response.error = null;
+                response.data = null;
+                res.status(200).json(response);
+            }
+
+            else {
+                response.status = false;
+                response.message = "Error while validating upload link";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+
     }
 };
 
