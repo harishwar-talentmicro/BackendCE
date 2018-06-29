@@ -10,4 +10,6 @@ var greetingCtrl = require('./greeting-ctrl');
 
 router.post('/',greetingCtrl.sendGreeting);
 
+router.get('/greetingMaster',greetingCtrl.getGreetingsMaster);
+
 module.exports = router;

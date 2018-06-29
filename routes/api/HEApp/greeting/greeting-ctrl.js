@@ -242,4 +242,82 @@ greetingCtrl.sendGreeting = function(req,res,next){
     }
 };
 
+
+greetingCtrl.getGreetingsMaster  = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+               
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    
+                ];
+                
+                var procQuery = 'CALL he_get_greetingsMaster( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, results) {
+                    console.log(err);
+                    if (!err && results && results[0][1] && results[1]) {
+                        
+                        response.status = true;
+                        response.message = "Greetings loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            userList: results[0],
+                            greetingList: results[1]
+                        };
+                         res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No Greetings found";
+                        response.error = null;
+                        response.data = {
+                            userList: [],
+                            greetingList: []
+                        };
+                        
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting Greetings";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 module.exports = greetingCtrl;

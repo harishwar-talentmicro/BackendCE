@@ -87,7 +87,7 @@ billingCtrl.billingFilter = function (req, res, next) {
                         response.message = "Billing Data loaded sucessfully";
                         response.error = null;
                         response.data = {
-                            billingData = (result[0] && result[0][0]) ? result[0] :[]
+                            billingData : (result[0] && result[0][0]) ? result[0] :[]
                         };
                         res.status(200).json(response);
                     }

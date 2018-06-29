@@ -1001,7 +1001,7 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                         console.log(response);
                     }
                     else {
-                        req.body.type = req.body.type ? req.body.type : 1;
+                        req.body.type = req.body.type ? req.body.type : 3;
                         req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
                         req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
                         var startPage = 0;
