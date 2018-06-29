@@ -310,10 +310,42 @@ masterCtrl.saveClients = function (req, res, next) {
                         response.status = true;
                         response.message = "Client saved sucessfully";
                         response.error = null;
+
+                        if (results[2] && results[2][0]) {
+                            for (var i = 0; i < results[2].length; i++) {
+                                
+                                results[2][i].location = results[2][i].location ? JSON.parse(results[2][i].location) : [];
+                            }
+                        }
+
+                        results[1][0].managers = JSON.parse(results[1][0].managers);
+                        results[1][0].department = JSON.parse(results[1][0].department);
+                        results[1][0].clientStatus = JSON.parse(results[1][0].clientStatus);
+                        
+
+                        // contracts parsing
+                        if (results[3] && results[3][0]) {
+                            var contracts = (results[3] && results[3][0]) ? JSON.parse(results[3][0].contracts) : [];
+                            if (contracts) {
+                                for (var j = 0; j < contracts.length; j++) {
+                                    contracts[j].managers = JSON.parse(contracts[j].managers);
+                                }
+                            }
+                        }
+
+                        // client contact parsing
+                        results[4][0].contactList = (results && results[4] && results[4][0]) ? JSON.parse(results[4][0].contactList) :[];
+
                         response.data = {
                             heDepartmentId: results[0][0].heDepartmentId,
-                            department: (results[1] && results[1][0]) ? results[1] : [],
-                            client: (results[2] && results[2][0]) ? results[2] : [],
+                           // department: (results[1] && results[1][0]) ? results[1] : [],
+                           // client: (results[2] && results[2][0]) ? results[2] : [],
+
+                            heDepartment: results[1][0],
+                            businessLocation: results[2],
+                            contracts: contracts,//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
+                            contactList : results[4][0].contactList
+
                         };
                         res.status(200).json(response);
                     }
@@ -2174,7 +2206,7 @@ masterCtrl.saveUserManager = function (req, res, next) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 req.query.apiKey = req.query.apiKey ? req.query.apiKey : 0;
                 req.body.userMasterId = req.body.userMasterId ? req.body.userMasterId : 0;
-                req.body.status = req.body.status ? req.body.status : 1;
+                req.body.status = req.body.status ? req.body.status : true;
                 req.body.shortSignature = req.body.shortSignature ? req.body.shortSignature : '';
                 req.body.fullSignature = req.body.userMasterId ? req.body.fullSignature : '';
                 req.body.userType = req.body.userType ? req.body.userType : 0;

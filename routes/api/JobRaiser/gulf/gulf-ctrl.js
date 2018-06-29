@@ -72,7 +72,10 @@ gulfCtrl.saveMedical = function (req, res, next) {
                 req.body.tokenNumber = (req.body.tokenNumber) ? req.body.tokenNumber : 0;
                 req.body.medicalNotes = (req.body.medicalNotes) ? req.body.medicalNotes : "";
                 req.body.notes = (req.body.notes) ? req.body.notes : "";
+                req.body.medicalStatus = (req.body.medicalStatus) ? req.body.medicalStatus : 0;
+                req.body.medicalStage = (req.body.medicalStage) ? req.body.medicalStage : 0;
                 
+
                 var getStatus = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.medicalId),                    
@@ -92,7 +95,8 @@ gulfCtrl.saveMedical = function (req, res, next) {
                     req.st.db.escape(req.body.medicalStatus),
                     req.st.db.escape(req.body.medicalNotes),
                     req.st.db.escape(req.body.notes),
-                    req.st.db.escape(req.body.reMedical)
+                    req.st.db.escape(req.body.reMedical),
+                    req.st.db.escape(req.body.medicalStage)
                 ];
             
                 var procQuery = 'CALL wm_save_1010_medical( ' + getStatus.join(',') + ')';
@@ -104,8 +108,8 @@ gulfCtrl.saveMedical = function (req, res, next) {
                         response.message = "Medical data saved successfully";
                         response.error = null;
                         response.data = {
-                           
-                            medicalId: Result[0][0].medicalId
+                            medicalId: Result[0][0].medicalId,
+                            transactionHistory: (Result[1] && Result[1][0]) ? Result[1]:[]
                         };
                         res.status(200).json(response);
                     }
@@ -284,7 +288,7 @@ gulfCtrl.saveDeparture = function (req, res, next) {
                     req.st.db.escape(req.body.reqApplicantId),
                     req.st.db.escape(req.body.applicantId),
                     req.st.db.escape(req.body.requirementId),
-                    req.st.db.escape(req.body.status),
+                    req.st.db.escape(req.body.statusId),
                     req.st.db.escape(req.body.applicantName),
                     req.st.db.escape(req.body.joiningDate),
                     req.st.db.escape(req.body.travelDateFrom),
@@ -301,7 +305,8 @@ gulfCtrl.saveDeparture = function (req, res, next) {
                     req.st.db.escape(req.body.notes),
                     req.st.db.escape(req.body.isClearanceGiven),
                     req.st.db.escape(req.body.spokeToCandidateToDepart),
-                    req.st.db.escape(req.body.receivedCandidateArrivalInfo)
+                    req.st.db.escape(req.body.receivedCandidateArrivalInfo),
+                    req.st.db.escape(req.body.stageId)
                 ];
                 var procQuery = 'CALL wm_save_paceDeparture( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -314,7 +319,10 @@ gulfCtrl.saveDeparture = function (req, res, next) {
                         response.error = null;
                         results[0][0].departureCurrency= results[0][0].departureCurrency ? JSON.parse(results[0][0].departureCurrency):{};
                         results[0][0].departureCurrencyScale= results[0][0].departureCurrencyScale ? JSON.parse(results[0][0].departureCurrencyScale):{};                        
-                        response.data = (results && results[0] && results[0][0]) ? results[0][0]:{};
+                        response.data = {
+                            departureDetails: (results[0] && results[0][0]) ? results[0][0]:{},
+                            transactionHistory:(results[1] && results[1][0]) ? results[1]:[]
+                        }
                         res.status(200).json(response);
                     }
                    
@@ -496,6 +504,8 @@ gulfCtrl.saveVisa = function (req, res, next) {
                 req.body.billTo = req.body.billTo ? req.body.billTo : 0;
                 req.body.visaAmount = req.body.visaAmount ? req.body.visaAmount : 0.0;
                 req.body.passportNumber = req.body.passportNumber ? req.body.passportNumber : '';
+                req.body.stageId = req.body.stageId ? req.body.stageId : 0;
+                req.body.statusId = req.body.statusId ? req.body.statusId : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -529,7 +539,10 @@ gulfCtrl.saveVisa = function (req, res, next) {
                     req.st.db.escape(req.body.billTo),
                     req.st.db.escape(JSON.stringify(visaCurrency)),
                     req.st.db.escape(JSON.stringify(visaScale)),
-                    req.st.db.escape(req.body.visaAmount)
+                    req.st.db.escape(req.body.visaAmount),
+                    req.st.db.escape(req.body.stageId),
+                    req.st.db.escape(req.body.statusId)
+                
                 ];
                 var procQuery = 'CALL wm_save_paceVisa( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -543,7 +556,12 @@ gulfCtrl.saveVisa = function (req, res, next) {
                         result[0][0].visaCurrency=result[0][0].visaCurrency ? JSON.parse(result[0][0].visaCurrency):{};
                         result[0][0].country=result[0][0].country ? JSON.parse(result[0][0].country):{};
                         result[0][0].visaScale=result[0][0].visaScale ? JSON.parse(result[0][0].visaScale):{};
-                        response.data = (result && result[0] && result[0][0]) ? result[0][0]:{};
+                        
+                        response.data = {
+                            visaDetails: (result[0] && result[0][0]) ? result[0][0]:{},
+                            transactionHistory: (result[1] && result[1][0]) ? result[1]:[]
+                        }
+                        
                         res.status(200).json(response);
                     }
                    
@@ -686,6 +704,7 @@ gulfCtrl.saveAttestation = function (req, res, next) {
                 req.body.applicantId = req.body.applicantId ? req.body.applicantId : 0;
                 req.body.requirementId = req.body.requirementId ? req.body.requirementId : 0;
                 req.body.statusId = req.body.statusId ? req.body.statusId : 0;
+                req.body.stageId = req.body.stageId ? req.body.stageId : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -696,7 +715,7 @@ gulfCtrl.saveAttestation = function (req, res, next) {
                     req.st.db.escape(req.body.applicantName),
                     req.st.db.escape(req.body.statusId),
                     req.st.db.escape(JSON.stringify(attestation)),
-                   
+                    req.st.db.escape(req.body.stageId)
                 ];
                 var procQuery = 'CALL wm_save_paceAttestation( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -719,7 +738,10 @@ gulfCtrl.saveAttestation = function (req, res, next) {
                             }
                             result[0][0].attestation=temp;
                         }
-                        response.data = (result && result[0] && result[0][0]) ? result[0][0]:{};
+                        response.data = {
+                            attestationDetails: (result[0] && result[0][0]) ? result[0][0]:{},
+                            transactionHistory: (result[1] && result[1][0]) ? result[1]:[]
+                        }
                         res.status(200).json(response);
                     }
                    

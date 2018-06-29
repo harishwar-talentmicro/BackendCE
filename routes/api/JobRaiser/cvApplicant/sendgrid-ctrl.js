@@ -827,14 +827,14 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                         }
                     });
                 }
-                else if(!templateId && !overWrite){
-                    response.status = false;
-                    response.message = "To mail is empty. Mail not sent";
-                    response.error = null;
-                    response.data = null;
-                    res.status(200).json(response);
-                    return;
-                }
+                // else if(!templateId && !overWrite){
+                //     response.status = false;
+                //     response.message = "To mail is empty. Mail not sent";
+                //     response.error = null;
+                //     response.data = null;
+                //     res.status(200).json(response);
+                //     return;
+                // }
 
                 else if(templateId && !overWrite && !emailReceivers.length){
                     response.status = false;

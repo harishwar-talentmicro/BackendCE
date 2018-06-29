@@ -3079,10 +3079,10 @@ walkInCvCtrl.walkInCVUpload = function (req, res, next) {
     };
     var validationFlag = true;
     if (!req.query.walkInApplicantId) {
-        error.token = 'Invalid token';
+        error.token = 'Invalid walkInApplicantId';
         validationFlag *= false;
     }
-    if (!req.query.cdnPath) {
+    if (!req.body.cdnPath) {
         error.cdnPath = 'Invalid cdnPath';
         validationFlag *= false;
     }
@@ -3101,7 +3101,7 @@ walkInCvCtrl.walkInCVUpload = function (req, res, next) {
 
         var inputs = [
             req.st.db.escape(parentId),
-            req.st.db.escape(req.query.cdnPath)
+            req.st.db.escape(req.body.cdnPath)
         ];
 
         var procQuery = 'CALL wm_walkInCvUploadLink( ' + inputs.join(',') + ')';
@@ -3111,7 +3111,7 @@ walkInCvCtrl.walkInCVUpload = function (req, res, next) {
 
             if (!err && result && result[0] && result[0][0]) {
                 response.status = true;
-                response.message = "CV saved successfully";
+                response.message = "CV uploaded successfully";
                 response.error = null;
                 response.data = result[0][0].cvUploadRes;
                 res.status(200).json(response);
@@ -3119,7 +3119,64 @@ walkInCvCtrl.walkInCVUpload = function (req, res, next) {
 
             else {
                 response.status = false;
-                response.message = "Error while  saving cv";
+                response.message = "Error while  uploading cv";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+
+    }
+};
+
+
+walkInCvCtrl.walkInUploadLinkFlag = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Some Error occurred",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.walkInApplicantId) {
+        error.token = 'Invalid walkInApplicantId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+
+        var walkInApplicantId = req.query.walkInApplicantId;
+        parentId = walkInApplicantId.substr(13);  // parentId is in string
+        parentId = parseInt(parentId);   // parse to string
+
+        var inputs = [
+            req.st.db.escape(parentId)
+        ];
+
+        var procQuery = 'CALL wm_get_walkInUploadLinkExpiryFlag( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            console.log(err);
+
+            if (!err && result && result[0] && result[0][0]) {
+                result[0][0].validateLinkFlag = (result[0][0].validateLinkFlag === result[0][0].validateLinkFlag);  //indicator strict
+                
+                response.status = (result[0] && result[0][0]) ? result[0][0].validateLinkFlag: false;
+                response.message = "Validate upload link";
+                response.error = null;
+                response.data = null;
+                res.status(200).json(response);
+            }
+
+            else {
+                response.status = false;
+                response.message = "Error while validating upload link";
                 response.error = null;
                 response.data = null;
                 res.status(500).json(response);
