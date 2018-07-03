@@ -78,7 +78,7 @@ router.post('/saveFacesheet',applicantCtrl.faceSheetTemplate);
 
 router.post('/faceSheetDetails',applicantCtrl.faceSheetReplaceDetails);
 
-
+router.post('/referFriend',applicantCtrl.referFriend );
 
 module.exports = router;
 
