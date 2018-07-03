@@ -68,6 +68,7 @@ billingCtrl.billingFilter = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.body.heDepartmentId = req.body.heDepartmentId ? req.body.heDepartmentId : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),

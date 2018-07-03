@@ -73,7 +73,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
         error.firstName = 'First Name is Mandatory';
         validationFlag *= false;
     }
-    if (!req.body.emailId && !req.body.mobileNumber) {
+    if (!req.body.emailId || !req.body.mobileNumber) {
         error.emailId = 'EMail ID or Mobile Number is mandatory';
         validationFlag *= false;
     }
@@ -3976,7 +3976,7 @@ applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
                         }
                         
                         response.data = {
-                            faceSheet : faceSheet ? faceSheet : {},
+                            faceSheet : faceSheet ? faceSheet : {}
                         };
                         res.status(200).json(response);
                     }

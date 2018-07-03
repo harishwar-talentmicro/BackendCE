@@ -344,8 +344,9 @@ masterCtrl.saveClients = function (req, res, next) {
                             heDepartment: results[1][0],
                             businessLocation: results[2],
                             contracts: contracts,//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
-                            contactList : results[4][0].contactList
-
+                            contactList : results[4][0].contactList,
+                            roles: results[5] ? results[5] : [],
+                            group: results[6] ? results[6] : [] 
                         };
                         res.status(200).json(response);
                     }
