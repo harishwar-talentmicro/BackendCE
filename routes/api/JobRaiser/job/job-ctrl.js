@@ -30,6 +30,12 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+
+    if (!req.body.heMasterId) {
+        error.heMasterId = 'Invalid tenant';
+        validationFlag *= false;
+    }
+
     var jobType = req.body.jobType;
     if (typeof (jobType) == "string") {
         jobType = JSON.parse(jobType);
@@ -41,6 +47,10 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
     if (typeof (heDepartment) == "string") {
         heDepartment = JSON.parse(heDepartment);
     }
+    if (!heDepartment){
+        heDepartment = [];
+    }
+
     var currency = req.body.currency;
     if (typeof (currency) == "string") {
         currency = JSON.parse(currency);
@@ -90,14 +100,8 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
                 req.body.defId = (req.body.defId) ? req.body.defId : 0;
-                req.body.heMasterId = (req.body.heMasterId) ? req.body.heMasterId : 0;
                 req.body.purpose = (req.body.purpose) ? req.body.purpose : 0;
                 req.body.logoFile = (req.body.logoFile) ? req.body.logoFile : '';
-                //req.body.jobType = (req.body.jobType) ? req.body.jobType :0;
-                //req.body.currencyId = (req.body.currencyId) ? req.body.currencyId : 1;
-                //req.body.scaleId = (req.body.scaleId) ? req.body.scaleId : 0;
-                //req.body.durationId = (req.body.durationId) ? req.body.durationId : 1;
-
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -1211,6 +1215,14 @@ jobCtrl.saveRequirement = function (req, res, next) {
                         attachmentList = [];
                     }
 
+                    var industry = req.body.industry;
+                    if (typeof (industry) == "string") {
+                   industry = JSON.parse(industry);
+                    }
+                    if (!industry) {
+                    industry = [];
+                    }
+
                     if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
@@ -1292,7 +1304,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                             req.st.db.escape(req.body.jdTemplateFlag),
                             req.st.db.escape(req.body.jdTemplateId),
                             req.st.db.escape(DBSecretKey),
-                            req.st.db.escape(req.body.jdAttachment)
+                            req.st.db.escape(req.body.jdAttachment),
+                            req.st.db.escape(JSON.stringify(industry))
                         ];
 
                         var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
@@ -1399,8 +1412,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                         heUserId: results[0][0].heUserId,
                                         formData: JSON.parse(results[0][0].formDataJSON),
                                         requirementList: (results && results[2] && results[2][0]) ? results[2] : [],
-                                        jdTemplateList: (results && results[3] && results[3][0]) ? results[3] : []
-
+                                        jdTemplateList: (results && results[3] && results[3][0]) ? results[3] : [],
+                                        requirementJobTitle:(results && results[4] && results[4][0]) ? results[4] : []
                                     }
                             };
                                 if (isWeb == 0) {
@@ -2023,18 +2036,36 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
 
                 var procQuery = 'CALL wm_get_requirementDetails( ' + getStatus.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery, function (err, statusResult) {
+                req.db.query(procQuery, function (err, result) {
                     console.log(err);
                     var isWeb = req.query.isWeb;
 
-                    if (!err && statusResult && statusResult[0]) {
+                    if (!err && result && result[0]) {
                         response.status = true;
                         response.message = "Requirement Details loaded successfully";
                         response.error = null;
+
+                        result[2][0].branchList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].branchList):[];
+                        result[2][0].contactList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].contactList):[];
+                        result[2][0].currency = (result[2] && result[2][0]) ? JSON.parse(result[2][0].currency):{};
+                        result[2][0].duration = (result[2] && result[2][0]) ? JSON.parse(result[2][0].duration):{};
+                        result[2][0].educationSpecialization = (result[2] && result[2][0]) ? JSON.parse(result[2][0].educationSpecialization):[];
+                        result[2][0].heDepartment = (result[2] && result[2][0]) ? JSON.parse(result[2][0].heDepartment):{};
+                        result[2][0].jobTitle = (result[2] && result[2][0]) ? JSON.parse(result[2][0].jobTitle):{};
+                        result[2][0].jobType = (result[2] && result[2][0]) ? JSON.parse(result[2][0].jobType):{};
+                        result[2][0].locationlist = (result[2] && result[2][0]) ? JSON.parse(result[2][0].locationlist):[];
+                        result[2][0].memberInterviewRound = (result[2] && result[2][0]) ? JSON.parse(result[2][0].memberInterviewRound):[]; 
+                        result[2][0].members = (result[2] && result[2][0]) ? JSON.parse(result[2][0].members):[];
+                        result[2][0].primarySkills = (result[2] && result[2][0]) ? JSON.parse(result[2][0].primarySkills):[];
+                        result[2][0].scale = (result[2] && result[2][0]) ? JSON.parse(result[2][0].scale):{};
+                        result[2][0].secondarySkills = (result[2] && result[2][0]) ? JSON.parse(result[2][0].secondarySkills):[];
+                        result[2][0].industry = (result[2] && result[2][0]) ? JSON.parse(result[2][0].industry):[];
+                        result[2][0].attachmentList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].attachmentList):[];
+
                         response.data = {
-                            requirementDetails: statusResult[0][0] ? statusResult[0][0] : [],
-                            requirementCompleteDetails: JSON.parse(statusResult[1][0].reqJsonData) ? JSON.parse(statusResult[1][0].reqJsonData) : [],
-                            requirementNew: statusResult[0][0]
+                            requirementDetails: result[0][0] ? result[0][0] : [],
+                            //  requirementCompleteDetails: (result[1][0].reqJsonData) ? JSON.parse(result[1][0].reqJsonData) : {},
+                             requirementCompleteDetails: (result[2] && result[2][0]) ? result[2][0]: {}
                         };
 
                         if (isWeb == 1) {

@@ -3011,6 +3011,7 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 req.body.isIDNumberOrString = req.body.isIDNumberOrString ? req.body.isIDNumberOrString : 1;
                 req.body.sendCandidateSms = req.body.sendCandidateSms ? req.body.sendCandidateSms : 0;
                 req.body.candidateSmsFormat = req.body.candidateSmsFormat ? req.body.candidateSmsFormat : "";
+                req.body.configureUsersFlag = req.body.configureUsersFlag ? req.body.configureUsersFlag : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -3037,7 +3038,8 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(req.body.maxIDLength),
                     req.st.db.escape(req.body.isIDNumberOrString),
                     req.st.db.escape(req.body.sendCandidateSms),
-                    req.st.db.escape(req.body.candidateSmsFormat)
+                    req.st.db.escape(req.body.candidateSmsFormat),
+                    req.st.db.escape(req.body.configureUsersFlag)  
                 ];
 
                 var procQuery = 'CALL wm_save_walkWebConfig( ' + inputs.join(',') + ')';
