@@ -320,4 +320,102 @@ greetingCtrl.getGreetingsMaster  = function (req, res, next) {
 
 };
 
+
+greetingCtrl.getrewardandrecognition  = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                var startPage = 0;
+
+                startPage = ((((parseInt(req.query.pageNo)) * req.query.limit) + 1) - req.query.limit) - 1;
+               
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.type),
+                    req.st.db.escape(startPage),
+                    req.st.db.escape(req.query.limit),
+                    
+                ];
+                
+                var procQuery = 'CALL wm_get_rewardAndRcognition( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, results) {
+                    console.log(err);
+                    if (!err && results && results[0]) {
+                        
+                        response.status = true;
+                        response.message = "rewards and recognition loaded successfully";
+                        response.error = null;
+                        // if(typeof(results[0])=='string'){
+                        //        results=JSON.parse(results[0][0].rewardAndRecognitionList);
+                        // }
+                        response.data = {
+
+                            rewardAndRecognitionList: JSON.parse(results[0][0].rewardANDrecognition)
+                        };
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        // });
+
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No rewards and recognition found";
+                        response.error = null;
+                        response.data = {
+                            rewardAndRecognitionList:[]
+                        };
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        // });
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting rewards and recognition";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 module.exports = greetingCtrl;
