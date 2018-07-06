@@ -724,13 +724,13 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
 
                                 // For updating resume though url link after registering for walkIn
 
-                                // var parentId=(results[6] && results[6][0]) ? results[6][0].walkInApplicantId : undefined;
-                                // walkInApplicantId = Date.now().toString().concat(parentId);
-                                // var webLinkTo = 'www.whatmate.com/walkInApplicantId='+walkInApplicantId;
-                                // mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
+                                var parentId=(results[6] && results[6][0]) ? results[6][0].walkInApplicantId : undefined;
+                                walkInApplicantId = Date.now().toString().concat(parentId);
+                                var webLinkTo = 'http://23.236.49.140/whatmate/cv-upload/'+walkInApplicantId;
+                                mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
                                 // ------------------------------------------------
 
-                                mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
+                                // mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
 
                                 var walkInSignature = (results[5] && results[5][0]) ? results[5][0].walkInSignature : "";
                                 var disclaimer = (results[5] && results[5][0]) ? results[5][0].disclaimer : "";
@@ -891,8 +891,16 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             mailContent = mailContent.replace("[FullName]", (req.body.firstName + ' ' + req.body.middleName + ' ' + req.body.lastName));
 
                             var webLink = (results[5] && results[5][0]) ? results[5][0].webLink : "";
-                            mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
+                            
+                               // For updating resume though url link after registering for walkIn
 
+                               var parentId=(results[6] && results[6][0]) ? results[6][0].walkInApplicantId : undefined;
+                               walkInApplicantId = Date.now().toString().concat(parentId);
+                               var webLinkTo = 'http://23.236.49.140/whatmate/cv-upload/'+walkInApplicantId;
+                               mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
+                               // ------------------------------------------------
+
+                               // mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
                             var walkInSignature = (results[5] && results[5][0]) ? results[5][0].walkInSignature : "";
                             var disclaimer = (results[5] && results[5][0]) ? results[5][0].disclaimer : "";
 
@@ -2941,7 +2949,7 @@ walkInCvCtrl.vendorDetails = function (req, res, next) {
                         res.status(200).json(response);
                     }
                     else if (!err && result && result[0] && result[0][0] && result[0][0]._error) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "Vendor details already exists";
                         response.error = null;
                         response.data = null;

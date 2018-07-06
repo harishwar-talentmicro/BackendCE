@@ -18,4 +18,8 @@ router.get('/baseFile',paceUsersCtrl.getBaseFile);
 router.post('/verifyotp',paceUsersCtrl.toVerifyOtp);
 router.post('/saveLayout',paceUsersCtrl.saveLayout);
 
+router.get('/mailDetails',paceUsersCtrl.getMailDetails);
+
+router.post('/savePortalDetails',paceUsersCtrl.saveJobPortalUsers);
+
 module.exports = router;

@@ -859,4 +859,161 @@ paceUsersCtrl.saveLayout = function (req, res, next) {
 };
 
 
+
+paceUsersCtrl.getMailDetails = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        validationFlag *= false;
+        error.heMasterId = "Invalid Company";
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.reqAppId) {
+        error.reqAppId = 'Invalid reqApplicant';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.transactionId = req.query.transactionId ? req.query.transactionId :0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.reqAppId),
+                    req.st.db.escape(req.query.stageId),
+                    req.st.db.escape(req.query.transactionId)
+                ];
+
+                var procQuery = 'CALL wm_getMailDetails( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Mail details loaded successfully";
+                        response.error = null;
+                        response.data =JSON.parse(result[0][0].mailDetails);
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading mails";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+paceUsersCtrl.saveJobPortalUsers = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = "Invalid Company";
+        validationFlag *= false;
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    var portalName = req.body.portalName;
+    if (typeof (portalName) == "string") {
+        portalName = JSON.parse(portalName);
+    }
+    if (!portalName) {
+        portalName = {};
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(portalName)),
+                    req.st.db.escape(req.body.userName),
+                    req.st.db.escape(req.body.password)
+                ];
+
+                var procQuery = 'CALL wm_save_jobPortalUsers( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(result);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Job portal details saved successfully";
+                        response.error = null;
+
+                        for(var i=0; i<result[0].length; i++){
+                            result[0][i].portalName = result[0] ? JSON.parse(result[0][i].portalName):{};
+                        }
+
+                        response.data = {
+                            portalUsersList: result[0] ? result[0] :[]
+                        }
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while job portal details";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
 module.exports = paceUsersCtrl;

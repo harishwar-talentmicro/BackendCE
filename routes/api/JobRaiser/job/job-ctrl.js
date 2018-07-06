@@ -1117,15 +1117,25 @@ jobCtrl.saveRequirement = function (req, res, next) {
                         contactList = JSON.parse(contactList);
                     }
 
+                    if(!contactList){
+                        contactList=[];
+                    }
 
                     var branchList = req.body.branchList;
                     if (typeof (branchList) == "string") {
                         branchList = JSON.parse(branchList);
                     }
 
+                    if(!branchList){
+                        branchList=[];
+                    }
+
                     var jobTitle = req.body.jobTitle;
                     if (typeof (jobTitle) == "string") {
                         jobTitle = JSON.parse(jobTitle);
+                    }
+                    if(!jobTitle){
+                        jobTitle=[];
                     }
 
                     if (!req.body.jobCode) {
@@ -1464,9 +1474,17 @@ jobCtrl.saveRequirement = function (req, res, next) {
                             branchList = JSON.parse(branchList);
                         }
 
+                        if(!branchList){
+                            branchList = [];
+                        }
+
                         var jobTitle = req.body.jobTitle;
                         if (typeof (jobTitle) == "string") {
                             jobTitle = JSON.parse(jobTitle);
+                        }
+
+                        if(!jobTitle){
+                            jobTitle = {};
                         }
 
                         if (!req.body.jobCode) {
@@ -2258,8 +2276,26 @@ jobCtrl.getJdTemplateDetails = function (req, res, next) {
                         response.status = true;
                         response.message = "Jd Template Details  loaded successfully";
                         response.error = null;
+
+                        result[0][0].branchList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].branchList):[];
+                        result[0][0].contactList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].contactList):[];
+                        result[0][0].currency = (result[0] && result[0][0]) ? JSON.parse(result[0][0].currency):{};
+                        result[0][0].duration = (result[0] && result[0][0]) ? JSON.parse(result[0][0].duration):{};
+                        result[0][0].educationSpecialization = (result[0] && result[0][0]) ? JSON.parse(result[0][0].educationSpecialization):[];
+                        result[0][0].heDepartment = (result[0] && result[0][0]) ? JSON.parse(result[0][0].heDepartment):{};
+                        result[0][0].jobTitle = (result[0] && result[0][0]) ? JSON.parse(result[0][0].jobTitle):{};
+                        result[0][0].jobType = (result[0] && result[0][0]) ? JSON.parse(result[0][0].jobType):{};
+                        result[0][0].locationlist = (result[0] && result[0][0]) ? JSON.parse(result[0][0].locationlist):[];
+                        result[0][0].memberInterviewRound = (result[0] && result[0][0]) ? JSON.parse(result[0][0].memberInterviewRound):[]; 
+                        result[0][0].members = (result[0] && result[0][0]) ? JSON.parse(result[0][0].members):[];
+                        result[0][0].primarySkills = (result[0] && result[0][0]) ? JSON.parse(result[0][0].primarySkills):[];
+                        result[0][0].scale = (result[0] && result[0][0]) ? JSON.parse(result[0][0].scale):{};
+                        result[0][0].secondarySkills = (result[0] && result[0][0]) ? JSON.parse(result[0][0].secondarySkills):[];
+                        result[0][0].industry = (result[0] && result[0][0]) ? JSON.parse(result[0][0].industry):[];
+                        result[0][0].attachmentList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].attachmentList):[];
+
                         response.data = {
-                            jdTemplateDetails: JSON.parse(result[0][0].reqjsondata) ? JSON.parse(result[0][0].reqjsondata) : []
+                            jdTemplateDetails:(result[0] && result[0][0]) ? result[0][0] : []
                         };
 
                         if (isWeb == 0) {

@@ -80,5 +80,8 @@ router.post('/faceSheetDetails',applicantCtrl.faceSheetReplaceDetails);
 
 router.post('/referFriend',applicantCtrl.referFriend );
 
+
+// router.post('/saveMailSentByGmail',sendgridCtrl.saveMailSentByGmail);
+
 module.exports = router;
 

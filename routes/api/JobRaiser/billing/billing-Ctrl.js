@@ -92,7 +92,16 @@ billingCtrl.billingFilter = function (req, res, next) {
                         };
                         res.status(200).json(response);
                     }
-                   
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = {
+                            billingData : []
+                        };
+                        res.status(200).json(response);
+                    }
+                
                     else {
                         response.status = false;
                         response.message = "Error while loading billing data";

@@ -2224,6 +2224,7 @@ masterCtrl.saveUserManager = function (req, res, next) {
                 req.body.exitDate = req.body.exitDate ? req.body.exitDate : 0;
                 req.body.password = req.body.password ? req.body.password : '';
                 var encryptPwd = req.st.hashPassword(req.body.password);
+                req.body.mailer = req.body.mailer ? req.body.mailer : 2;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -2252,7 +2253,8 @@ masterCtrl.saveUserManager = function (req, res, next) {
                     req.st.db.escape(req.body.exitDate),
                     req.st.db.escape(req.body.joiningDate),
                     req.st.db.escape(DBSecretKey),
-                    req.st.db.escape(encryptPwd)
+                    req.st.db.escape(encryptPwd),
+                    req.st.db.escape(req.body.mailer)
                 ];
                 var procQuery = 'CALL save_Pace_User( ' + inputs.join(',') + ')';
                 console.log(procQuery);
