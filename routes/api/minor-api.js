@@ -8,6 +8,9 @@ var DbHelper = require('../../helpers/DatabaseHandler'),
 var CronJob = require('cron').CronJob;
 var notifyMessages = require('../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var appConfig = require('../../ezeone-config.json');
+
+var DBSecretKey=appConfig.DB.secretKey;
 
 var request = require('request');
 // var Client = require('node-rest-client').Client;   // for interview scheduler hirecraft
@@ -99,7 +102,8 @@ var WMWindowsApp = require('./WMWindowsApp/WMWindowsApp-routes');
 var zoom = require('./zoomMeeting/zoomMeeting-routes');
 var appGeneralRequest = require('./HEApp/generalRequest.js');
 var WGRM = require('./HEBackEnd/WGRMTemplates.js');
-
+var eSurvey=require('./HEBackEnd/employeeSurvey.js')
+var likeShareComment=require('./HEApp/likeShareComment.js')
 
 var hospitalTokenManagement = require('./HEApp/hospitalTokenManagement.js');
 
@@ -203,6 +207,8 @@ router.use('/WhatMate/Windows', WMWindowsApp);
 
 //created by Arun
 router.use('/helloEZE/app', hospitalTokenManagement);
+router.use('/helloEZE', eSurvey);
+router.use('/helloEZE/app', likeShareComment);
 
 //router.use('/test_info',testInfoV1);
 //router.use('/association-ap',associationAPV1);
@@ -385,6 +391,10 @@ cron.schedule('*/15 * * * *', function () {
 cron.schedule('*/10 * * * *', function () {
     console.log('running a notify messages');
     notifyMessages.getMessagesNeedToNotify();
+    
+
+
+
 });
 
 
@@ -613,5 +623,93 @@ if (cluster.isWorker) {
         cronJobWalkInQuessCorp.start();
     }
 }
+
+var cluster = require('cluster');
+
+if (cluster.isWorker) {
+
+    if (cluster.worker.id == 1) {
+var cronJobgreeting = new CronJob({
+    cronTime: '30 * * * * *',
+    onTick: function () {
+
+    // console.log('running a notify messages');
+    // notifyMessages.getMessagesNeedToNotify();
+    cronjob=function (req, res, next) {
+    console.log("greeting cron");
+
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var procQuery = 'CALL wm_get_todayDOBList("'+DBSecretKey+'")';
+                console.log(procQuery);
+               db.query(procQuery, function (err, results) {
+
+                    if (!err && results && results[0]) {
+                        console.log("results[0].senderName", results[0][0].senderName);
+
+                        senderGroupId = results[0][0].senderId;
+                        notifyMessages.getMessagesNeedToNotify();
+                            //     response.status = true;
+                            //     response.message = "greetings saved successfully";
+                            //     response.error = null;
+                            //     response.data = {
+                            //         messageList: {
+                            //             messageId: results[0][0].messageId,
+                            //             message: results[0][0].message,
+                            //             messageLink: results[0][0].messageLink,
+                            //             createdDate: results[0][0].createdDate,
+                            //             messageType: results[0][0].messageType,
+                            //             messageStatus: results[0][0].messageStatus,
+                            //             priority: results[0][0].priority,
+                            //             senderName: results[0][0].senderName,
+                            //             senderId: results[0][0].senderId,
+                            //             // groupId: req.body.groupId,
+                            //             receiverId: results[0][0].receiverId,
+                            //             transId : results[0][0].transId,
+                            //             formId : results[0][0].formId,
+                            //             currentStatus : results[0][0].currentStatus,
+                            //             currentTransId : results[0][0].currentTransId,
+                            //            // localMessageId : req.body.localMessageId,
+                            //             parentId : results[0][0].parentId,
+                            //             accessUserType : results[0][0].accessUserType,
+                            //             heUserId : results[0][0].heUserId,
+                            //             formData : JSON.parse(results[0][0].formDataJSON)
+                            //         }
+                            //     };
+                            //     // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            //     // zlib.gzip(buf, function (_, result) {
+                            //     //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            //     //     res.status(200).json(response);
+                            //     // });
+                            
+                            //    // res.status(200).json(response);
+                            console.log("Greetings sent successfully")
+                            }
+                            
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving greeting";
+                                response.error = null;
+                                response.data = null;
+                                // res.status(500).json(response);
+                                console.log("error");
+                            }
+                        });
+                    }
+                    cronjob();
+                    },
+                    start: false,
+                    timeZone: 'America/Los_Angeles'
+                
+                });
+                cronJobgreeting.start();
+            }
+        }
+
 
 module.exports = router;

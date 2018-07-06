@@ -60,6 +60,13 @@ formTypeCtrl.getFormTypeList = function(req,res,next){
                         response.status = true;
                         response.message = "Form type list loaded successfully";
                         response.error = null;
+                        for(var i=0; i<formTypeResult[0].length; i++){
+                            
+                            if(typeof(formTypeResult[0][i].commentList)=='string'){
+                                formTypeResult[0][i].commentList = JSON.parse(formTypeResult[0][i].commentList);
+                            }
+                        }
+
                         response.data = {
                             formTypeList : formTypeResult[0]
                         };
@@ -69,7 +76,7 @@ formTypeCtrl.getFormTypeList = function(req,res,next){
                             res.status(200).json(response);
                         });
 
-                    }
+                    } 
                     else if(!err){
                         response.status = true;
                         response.message = "Form type list loaded successfully";

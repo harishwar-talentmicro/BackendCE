@@ -12,4 +12,6 @@ router.get('/company/search',companyCtrl.searchComapny);
 router.get('/company/masters',companyCtrl.getComapnyMasters);
 router.post('/company/join',companyCtrl.joinComapny);
 
+router.get('/media/icons',companyCtrl.getSocialMediaLinks);
+
 module.exports = router;
