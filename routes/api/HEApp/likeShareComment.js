@@ -1,8 +1,9 @@
+
 var express = require('express');
 var router = express.Router();
 
-var likeShareForm = require('./LikeShareComment/LSComment-routes');
+var likesharecomment = require('./likesharecomment/likesharecomment-routes');
 
-router.use('/LSComment',likeShareForm);
+router.use('/',likesharecomment);
 
 module.exports = router;

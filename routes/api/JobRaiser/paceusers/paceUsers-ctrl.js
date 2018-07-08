@@ -17,6 +17,49 @@ var DBSecretKey = CONFIG.DB.secretKey;
 
 var paceUsersCtrl = {};
 var error = {};
+var bcrypt = null;
+
+// try {
+//     bcrypt = require('bcrypt');
+// }
+// catch (ex) {
+//     console.log('Bcrypt not found, falling back to bcrypt-nodejs');
+//     bcrypt = require('bcrypt-nodejs');
+// }
+
+// /**
+//  * Hashes the password for saving into database
+//  * @param password
+//  * @returns {*}
+//  */
+// function hashPassword(password) {
+//     if (!password) {
+//         return null;
+//     }
+//     try {
+//         var hash = bcrypt.hashSync(password, 12);
+//         return hash;
+//     }
+//     catch (ex) {
+//         console.log(ex);
+//     }
+// }
+
+// /**
+//  * Compare the password and the hash for authenticating purposes
+//  * @param password
+//  * @param hash
+//  * @returns {*}
+//  */
+// function comparePassword(password, hash) {
+//     if (!password) {
+//         return false;
+//     }
+//     if (!hash) {
+//         return false;
+//     }
+//     return bcrypt.compareSync(password, hash);
+// }
 
 paceUsersCtrl.checkUser = function (req, res, next) {
     var response = {
@@ -310,7 +353,7 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                             result[1][i].venue = result[1][i].venue ? JSON.parse(result[1][i].venue) : {};
                         }
                         response.data = {
-                            pendingTasks:result[0],
+                            pendingTasks: result[0],
                             tasks: result[1]
                         }
                         res.status(200).json(response);
@@ -383,7 +426,7 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
                         }
                         response.data =
                             {
-                                pendingTasks:result[0],
+                                pendingTasks: result[0],
                                 tasks: result[1]
                             };
                         res.status(200).json(response);
@@ -471,10 +514,10 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         }
 
                         var output1 = [];
-                        
+
                         for (var i = 0; i < result[2].length; i++) {
                             var res3 = {};
-                            res3.name=result[2][i].name;
+                            res3.name = result[2][i].name;
                             res3.stage = result[2][i].stage ? JSON.parse(result[2][i].stage) : [];
                             output1.push(res3);
                         }
@@ -501,13 +544,13 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             {
                                 requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
                                 stages: output,
-                                requirementReport:output1,
-                                requirementReportTotalCount:result[3],
-                                fullfilmentReport:output2,
-                                fullfilmentReportTotalCount:result[5],
-                                converstionReport:result[6][0],
-                                turnAroundTime:result[7][0],
-                                firstCVResponse:result[8][0]
+                                requirementReport: output1,
+                                requirementReportTotalCount: result[3],
+                                fullfilmentReport: output2,
+                                fullfilmentReportTotalCount: result[5],
+                                converstionReport: result[6][0],
+                                turnAroundTime: result[7][0],
+                                firstCVResponse: result[8][0]
                             };
                         res.status(200).json(response);
                     }
@@ -519,13 +562,13 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         response.data = {
                             requirementStatus: {},
                             stages: [],
-                            requirementReport:[],
-                                requirementReportTotalCount:[],
-                                fullfilmentReport:[],
-                                fullfilmentReportTotalCount:[],
-                                converstionReport:{},
-                                turnAroundTime:[],
-                                firstCVResponse:[]
+                            requirementReport: [],
+                            requirementReportTotalCount: [],
+                            fullfilmentReport: [],
+                            fullfilmentReportTotalCount: [],
+                            converstionReport: {},
+                            turnAroundTime: [],
+                            firstCVResponse: []
 
                         };
                         res.status(200).json(response);
@@ -622,7 +665,7 @@ paceUsersCtrl.saveTrackerTemplate = function (req, res, next) {
 paceUsersCtrl.getBaseFile = function (req, res, next) {
     var response = {
         status: false,
-        code:null,
+        code: null,
         message: "bas64 File",
         data: null,
         error: null
@@ -653,22 +696,22 @@ paceUsersCtrl.getBaseFile = function (req, res, next) {
                 var url = "https://storage.googleapis.com/ezeone/" + req.query.cdnPath;
                 http.get(url, function (fileResponse) {
                     var bufs = [];
-        
+
                     fileResponse.on('data', function (d) { bufs.push(d); });
                     fileResponse.on('end', function () {
                         var buf = Buffer.concat(bufs);
-                        buf=new Buffer(buf).toString("base64");
-                        response.data=buf;
+                        buf = new Buffer(buf).toString("base64");
+                        response.data = buf;
                         res.status(200).json(response);
-                        });
                     });
-               
+                });
 
-                    
+
+
                 // request.get(url, function (error, response, body) { 
                 //     if (!error && response.statusCode == 200) 
                 //     { 
-                        
+
                 //         data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64'); 
                 //         // console.log(data);
                 //         res.status(200).json(data);
@@ -725,10 +768,10 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
         req.db.query(procQuery, function (err, result) {
             console.log(err);
             // console.log(result);
-            if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].error=="user already exist") {
+            if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].error == "user already exist") {
                 response.status = false;
                 response.message = result[0][0].message;
-                response.code =100;
+                response.code = 100;
                 response.error = false;
                 response.data = {
                     message: result[1][0].error
@@ -736,10 +779,10 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
                 res.status(200).json(response);
             }
 
-            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].success== "paceuser does not exist") {
+            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].success == "paceuser does not exist") {
                 response.status = true;
                 response.message = result[1][0].success;
-                response.code =200;
+                response.code = 200;
                 response.error = false;
                 response.data = {
                     userDetails: result[2][0]
@@ -747,10 +790,10 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
                 res.status(200).json(response);
             }
 
-            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].success== "user does not exist in whatmate") {
+            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].success == "user does not exist in whatmate") {
                 response.status = true;
                 response.message = result[1][0].success;
-                response.code =300;
+                response.code = 300;
                 response.error = false;
                 response.data = null;
                 res.status(200).json(response);
@@ -760,7 +803,7 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
                 response.status = false;
                 response.message = result[0][0].message;
                 response.error = false;
-                response.code =400;
+                response.code = 400;
                 response.data = {
                     message: result[0][0].message
                 };
@@ -769,7 +812,7 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
             else if (!err) {
                 response.status = true;
                 response.message = "No result found";
-                response.code =600;
+                response.code = 600;
                 response.error = false;
                 response.data = null;
                 res.status(200).json(response);
@@ -778,7 +821,7 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
                 response.status = false;
                 response.message = "Error while verifying OTP";
                 response.error = true;
-                response.code =500;
+                response.code = 500;
                 response.data = null;
                 res.status(500).json(response);
             }
@@ -836,7 +879,7 @@ paceUsersCtrl.saveLayout = function (req, res, next) {
                         response.status = true;
                         response.message = "Layout saved successfully";
                         response.error = null;
-                        if(typeof(layout)=="string"){
+                        if (typeof (layout) == "string") {
                             layout = JSON.parse(layout);
                         }
                         response.data = layout;
@@ -891,7 +934,7 @@ paceUsersCtrl.getMailDetails = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.transactionId = req.query.transactionId ? req.query.transactionId :0;
+                req.query.transactionId = req.query.transactionId ? req.query.transactionId : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -909,7 +952,7 @@ paceUsersCtrl.getMailDetails = function (req, res, next) {
                         response.status = true;
                         response.message = "Mail details loaded successfully";
                         response.error = null;
-                        response.data =JSON.parse(result[0][0].mailDetails);
+                        response.data = JSON.parse(result[0][0].mailDetails);
                         res.status(200).json(response);
                     }
 
@@ -973,6 +1016,11 @@ paceUsersCtrl.saveJobPortalUsers = function (req, res, next) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
+                // var encryptPwd = '';
+                // if (req.body.password) {
+                //     encryptPwd = req.st.hashPassword(req.body.password);
+                // }
+
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -980,6 +1028,8 @@ paceUsersCtrl.saveJobPortalUsers = function (req, res, next) {
                     req.st.db.escape(req.body.userName),
                     req.st.db.escape(req.body.password)
                 ];
+
+                //if (comparePassword(password, loginResult[0][0].Password)) {
 
                 var procQuery = 'CALL wm_save_jobPortalUsers( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -990,18 +1040,98 @@ paceUsersCtrl.saveJobPortalUsers = function (req, res, next) {
                         response.message = "Job portal details saved successfully";
                         response.error = null;
 
-                        for(var i=0; i<result[0].length; i++){
-                            result[0][i].portalName = result[0] ? JSON.parse(result[0][i].portalName):{};
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].portalName = result[0] ? JSON.parse(result[0][i].portalName) : {};
                         }
 
                         response.data = {
-                            portalUsersList: result[0] ? result[0] :[]
+                            portalUsersList: result[0] ? result[0] : []
                         }
                         res.status(200).json(response);
                     }
                     else {
                         response.status = false;
                         response.message = "Error while job portal details";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+paceUsersCtrl.getJobPortalUsers = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = "Invalid Company";
+        validationFlag *= false;
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL wm_get_jobPortalUsersList( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(result);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Job portal details loaded successfully";
+                        response.error = null;
+
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].portalName = result[0] ? JSON.parse(result[0][i].portalName) : {};
+                        }
+
+                        response.data = {
+                            portalUsersList: result[0] ? result[0] : [],
+                            jobPortalList: result[1] ? result[1] : []
+                        }
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = {
+                            portalUsersList: [],
+                            jobPortalList: []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading job portal details";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

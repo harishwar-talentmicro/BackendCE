@@ -849,6 +849,26 @@ router.post('/sync', function (req, res, next) {
                                                         keywords_list[keywordIndex].keywordList = results[5][keywordIndex].keywords.split(' ');
                                                 }
                                             }
+
+
+                                            var output1 = [];
+                                          if(results[6]){
+                                            for (var i=0; i<results[6].length; i++){
+                                                output1.push({
+                                                    transId: results[6][i].transId ? results[6][i].transId : 0,
+                                                    currentTransId:results[6][i].currentTransId ? results[6][i].currentTransId : 0,
+                                                    heUserId: results[6][i].heUserId ? results[6][i].heUserId : 0,
+                                                    formId: results[6][i].formId ? results[6][i].formId : 0,
+                                                    parentId: results[6][i].parentId ? results[6][i].parentId : 0,
+
+                                                    likeCount : results[6][i].likeCount ? results[6][i].likeCount : 0,
+                                                    commentCount : results[6][i].commentCount ? results[6][i].commentCount : 0,
+                                                    shareCount : results[6][i].shareCount ? results[6][i].shareCount : 0,
+                                                    likeStatus : results[6][i].likeStatus ? results[6][i].likeStatus : 0
+                                                });
+                                            }
+                                          }
+                                            
                                         //console.log(results,"results");
                                         if (results && results[0] && results[0].length > 0) {
                                             var messageObj;
@@ -916,10 +936,11 @@ router.post('/sync', function (req, res, next) {
                                                     accessUserType: results[0][i].accessUserType ? results[0][i].accessUserType : 0,
                                                     heUserId: results[0][i].heUserId ? results[0][i].heUserId : 0,
                                                     formData: results[0][i].formDataJSON ? JSON.parse(results[0][i].formDataJSON) : null
+                                                    
                                                 });
                                             }
-                                            
 
+                                            
                                             // console.log("results[5][0].GCM_Id",results[5][0].GCM_Id);
                                             responseMessage.data = {
                                                 messageList: output,
@@ -928,7 +949,8 @@ router.post('/sync', function (req, res, next) {
                                                 APNSId: (results[3] && results[3][0]) ? JSON.parse(results[3][0].APNS_Id) : [],
                                                 GCMId: (results[4] && results[4][0]) ? JSON.parse(results[4][0].GCM_Id) : [],
                                                 // supportFeedback : (results[4]) ? results[4] : [],
-                                                learnMessageList : (keywords_list) ? keywords_list : []
+                                                learnMessageList : (keywords_list) ? keywords_list : [],
+                                                likeShareCommentCount: output1 ? output1:[]
                                             };
 
                                             var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
@@ -939,6 +961,8 @@ router.post('/sync', function (req, res, next) {
 
                                         }
                                         else {
+
+                                            // console.log("else part",output1);
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.totalCount = 0;
@@ -949,7 +973,8 @@ router.post('/sync', function (req, res, next) {
                                                 deleteMessageIdList: [],
                                                 APNSId: (results[3] && results[3][0]) ? JSON.parse(results[3][0].APNS_Id) : [],
                                                 GCMId: (results[4] && results[4][0]) ? JSON.parse(results[4][0].GCM_Id) : [],
-                                                learnMessageList: keywords_list ? keywords_list : []
+                                                learnMessageList: keywords_list ? keywords_list : [],
+                                                likeShareCommentCount: output1 ? output1:[]
                                             };
                                             var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
                                             zlib.gzip(buf, function (_, result) {

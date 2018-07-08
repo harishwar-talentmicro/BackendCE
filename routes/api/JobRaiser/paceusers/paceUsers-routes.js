@@ -22,4 +22,6 @@ router.get('/mailDetails',paceUsersCtrl.getMailDetails);
 
 router.post('/savePortalDetails',paceUsersCtrl.saveJobPortalUsers);
 
+router.get('/getJobPortalUsers',paceUsersCtrl.getJobPortalUsers);
+
 module.exports = router;

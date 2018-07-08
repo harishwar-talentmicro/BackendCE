@@ -2131,7 +2131,8 @@ walkInCvCtrl.getUsersOnSearch = function (req, res, next) {
                         response.message = "User list loaded successfully";
                         response.error = null;
                         response.data = {
-                            userList: (result[0] && result[0][0]) ? result[0] : []
+                            userList: (result[0] && result[0][0]) ? result[0] : [],
+                            unconfiguredUserList : (result[1] && result[1][0]) ? result[1] : []
                         };
                         res.status(200).json(response);
                     }
@@ -2142,7 +2143,8 @@ walkInCvCtrl.getUsersOnSearch = function (req, res, next) {
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            List: []
+                            userList: [],
+                            unconfiguredUserList:[]
                         };
                         res.status(200).json(response);
 

@@ -102,12 +102,14 @@ var WMWindowsApp = require('./WMWindowsApp/WMWindowsApp-routes');
 var zoom = require('./zoomMeeting/zoomMeeting-routes');
 var appGeneralRequest = require('./HEApp/generalRequest.js');
 var WGRM = require('./HEBackEnd/WGRMTemplates.js');
-var eSurvey=require('./HEBackEnd/employeeSurvey.js')
-var likeShareComment=require('./HEApp/likeShareComment.js')
+var eSurvey=require('./HEBackEnd/employeeSurvey.js');
+// var likeShareComment=require('./HEApp/likeShareComment.js');
 
 var hospitalTokenManagement = require('./HEApp/hospitalTokenManagement.js');
 
 var generalOtp = require('./HEApp/otp/otp-routes.js');
+
+var likeShareComment = require('./HEApp/likesharecomment.js');
 
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
@@ -205,10 +207,12 @@ router.use('/helloEZE/', WGRM);
 router.use('/WhatMate/Windows', WMWindowsApp);
 
 
-//created by Arun
+
 router.use('/helloEZE/app', hospitalTokenManagement);
 router.use('/helloEZE', eSurvey);
+
 router.use('/helloEZE/app', likeShareComment);
+
 
 //router.use('/test_info',testInfoV1);
 //router.use('/association-ap',associationAPV1);
