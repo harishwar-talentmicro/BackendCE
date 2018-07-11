@@ -638,7 +638,7 @@ paceUsersCtrl.saveTrackerTemplate = function (req, res, next) {
                 var procQuery = 'CALL paceusers_tracker( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
-                    console.log(result);
+                    // console.log(result);
                     if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "tracker saved successfully";
@@ -874,7 +874,7 @@ paceUsersCtrl.saveLayout = function (req, res, next) {
                 var procQuery = 'CALL wm_save_pacelayout( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
-                    console.log(result);
+                    // console.log(result);
                     if (!err && result) {
                         response.status = true;
                         response.message = "Layout saved successfully";
@@ -1034,7 +1034,7 @@ paceUsersCtrl.saveJobPortalUsers = function (req, res, next) {
                 var procQuery = 'CALL wm_save_jobPortalUsers( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
-                    console.log(result);
+                    // console.log(result);
                     if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "Job portal details saved successfully";
@@ -1103,8 +1103,8 @@ paceUsersCtrl.getJobPortalUsers = function (req, res, next) {
                 var procQuery = 'CALL wm_get_jobPortalUsersList( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
-                    console.log(result);
-                    if (!err && result && result[0] && result[0][0]) {
+                    // console.log(result);
+                    if (!err && result&& (result[0] || result[1][0])) {
                         response.status = true;
                         response.message = "Job portal details loaded successfully";
                         response.error = null;

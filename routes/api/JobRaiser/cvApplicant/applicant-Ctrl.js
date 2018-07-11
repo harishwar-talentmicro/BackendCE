@@ -1223,6 +1223,11 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                 req.body.noticePeriodFrom = (req.body.noticePeriodFrom) ? req.body.noticePeriodFrom : 0;
                 req.body.noticePeriodTo = (req.body.noticePeriodTo) ? req.body.noticePeriodTo : 0;
                 req.body.workLocation = (req.body.workLocation) ? req.body.workLocation : '';
+                req.body.start = req.body.start ? req.body.start : 1;
+                req.body.limit = (req.body.limit) ? req.body.limit : 50;
+                
+                req.body.start = ((((req.body.start) * req.body.limit) + 1) - req.body.limit)-1;
+
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -1248,7 +1253,10 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                     req.st.db.escape(req.body.noticePeriodTo),
                     //req.st.db.escape(req.body.workLocation),
                     req.st.db.escape(JSON.stringify(requiredNationalities)),
-                    req.st.db.escape(JSON.stringify(DOB))
+                    req.st.db.escape(JSON.stringify(DOB)),
+                    req.st.db.escape(req.body.start),
+                    req.st.db.escape(req.body.limit)
+
                 ];
 
                 var procQuery = 'CALL wd_resume_search_new2( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -1260,35 +1268,15 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                         response.message = "Applicants list loaded successfully";
                         response.error = null;
 
-                        var output = [];
                         for (var i = 0; i < result[0].length; i++) {
-                            var res2 = {};
-                            res2.applicantId = result[0][i].applicantId;
-                            res2.name = result[0][i].name;
-                            res2.emailId = result[0][i].emailId;
-                            res2.mobileISD = result[0][i].mobileISD;
-                            res2.mobileNumber = result[0][i].mobileNumber;
-                            res2.noticePeriod = result[0][i].noticePeriod;
-                            res2.jobTitleId = result[0][i].jobTitleId;
-                            res2.jobTitle = result[0][i].jobTitle;
-                            res2.cvPath = result[0][i].cvPath;
-                            res2.experience = result[0][i].experience;
-                            res2.employer = result[0][i].employer;
-                            res2.CTCcurrencyId = result[0][i].CTCcurrencyId;
-                            res2.currencySymbol = result[0][i].currencySymbol;
-                            res2.CTC = result[0][i].CTC;
-                            res2.scaleId = result[0][i].scaleId;
-                            res2.scale = result[0][i].scale;
-                            res2.durationId = result[0][i].durationId;
-                            res2.duration = result[0][i].duration;
-                            res2.education = JSON.parse(result[0][i].education) ? JSON.parse(result[0][i].education) : [];
-                            res2.keySkills = JSON.parse(result[0][i].keySkills) ? JSON.parse(result[0][i].keySkills) : [];
-                            res2.location = JSON.parse(result[0][i].location) ? JSON.parse(result[0][i].location) : [];
-                            res2.requirementApplicantCount = result[0][i].requirementApplicantCount ? result[0][i].requirementApplicantCount : 0;
-                            output.push(res2);
+                            result[0][i].education = JSON.parse(result[0][i].education) ? JSON.parse(result[0][i].education) : [];
+                            result[0][i].keySkills = JSON.parse(result[0][i].keySkills) ? JSON.parse(result[0][i].keySkills) : [];
+                            result[0][i].location = JSON.parse(result[0][i].location) ? JSON.parse(result[0][i].location) : [];
+                            result[0][i].requirementApplicantCount = result[0][i].requirementApplicantCount ? result[0][i].requirementApplicantCount : 0;
                         }
                         response.data = {
-                            applicantList: output
+                            applicantList: result[0],
+                            count: result[1][0].count
                         };
                         res.status(200).json(response);
 
@@ -1298,7 +1286,8 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                         response.message = "Applicants not found";
                         response.error = null;
                         response.data = {
-                            applicantList: []
+                            applicantList: [],
+                            count: 0
                         };
                         res.status(200).json(response);
                     }
@@ -2131,6 +2120,8 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                             res2.assessmentTitle = result[2][i].title ? result[2][i].title : "";
                             res2.applicant = JSON.parse(result[2][i].applicant) ? JSON.parse(result[2][i].applicant) : [];
                             res2.panelMembers = JSON.parse(result[2][i].panelMembers) ? JSON.parse(result[2][i].panelMembers) : [];
+                            res2.address = result[2][i].address ? result[2][i].address : '';
+                            
                             output.push(res2);
                         }
                         response.data =
@@ -2388,6 +2379,7 @@ applicantCtrl.saveInterviewSchedulerNew = function (req, res, next) {
         data: null,
         error: null
     };
+    
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -2481,6 +2473,7 @@ applicantCtrl.saveInterviewSchedulerNew = function (req, res, next) {
                 req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
                 req.body.notes = req.body.notes ? req.body.notes : "";
                 req.body.groupId = req.body.groupId ? req.body.groupId : 0;
+                req.body.address = req.body.address ? req.body.address : '';
 
 
                 var procParams = [
@@ -2510,14 +2503,15 @@ applicantCtrl.saveInterviewSchedulerNew = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(skillAssessment)),
                     req.st.db.escape(JSON.stringify(interviewLocation)),
                     req.st.db.escape(JSON.stringify(heDepartment)),
-                    req.st.db.escape(DBSecretKey)
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.body.address)
                 ];
 
                 var procQuery = 'CALL wm_save_interviewSchedular_new1( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
-                    console.log(results);
+                    // console.log(results);
                     var isWeb = req.query.isWeb;
                     if (!err && results && results[0]) {
                         senderGroupId = results[0][0].senderId;

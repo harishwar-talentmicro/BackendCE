@@ -3080,12 +3080,12 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                     
                                     }
 
-                                    for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[interview.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                    for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+                                        mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
 
-                                        subject = subject.replace('[interview.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                        subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
                                     
-                                        smsMsg = smsMsg.replace('[interview.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                        smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
                                     
                                     }
                                 }
@@ -3150,12 +3150,12 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                     
                                 }
 
-                                for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-                                    mailBody = mailBody.replace('[interview.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+                                    mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
 
-                                    subject = subject.replace('[interview.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                    subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
                                 
-                                    smsMsg = smsMsg.replace('[interview.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                    smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
                                 
                                 }
                             }
@@ -3174,7 +3174,10 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                         response.data = {
                             tagsPreview: mailbody_array,
                             subjectPreview: subject_array,
-                            smsMsgPreview: smsMsg_array
+                            smsMsgPreview: smsMsg_array,
+                            applicants:result[0],
+                            clientContacts: result[1],
+
                         };
                         res.status(200).json(response);
                     }

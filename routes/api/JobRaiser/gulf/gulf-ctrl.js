@@ -185,7 +185,8 @@ gulfCtrl.getMedical = function (req, res, next) {
                         Result[0][0].scale=(Result[0] && Result[0][0]) ? JSON.parse(Result[0][0].scale):{};
 
                         response.data = {   
-                            medicalDetails: Result[0][0]
+                            medicalDetails: Result[0][0],
+                            medicalNotes : Result[1]
                         };
                         res.status(200).json(response);
                     }
@@ -194,7 +195,11 @@ gulfCtrl.getMedical = function (req, res, next) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
-                        response.data = null;
+                        response.data = {
+                            medicalDetails: {},
+                            medicalNotes:[]
+
+                        };
                         res.status(200).json(response);
                     }              
                     else {

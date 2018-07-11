@@ -866,20 +866,26 @@ jobCtrl.saveEducation = function (req, res, next) {
                     req.st.db.escape(req.body.level),
                     req.st.db.escape(req.body.educationAlternateName),
                     req.st.db.escape(req.body.specialization),
-                    req.st.db.escape(req.body.specializationAlternateName)
-
+                    req.st.db.escape(req.body.specializationAlternateName),
+                    req.st.db.escape(req.body.educationType)
                 ];
                 var procQuery = 'CALL wm_save_educationDetails( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
                     var isWeb = req.query.isWeb;
-                    if (!err && results && results[0]) {
+                    if (!err && results && results[0] && results[0][0]) {
                         response.status = true;
                         response.message = "Education and Specialization saved sucessfully";
                         response.error = null;
+
+                        for (var j = 0; j < results[0].length; j++) {
+                            results[0][j].educationId = results[0][j].educationId;
+                            results[0][j].educationTitle = results[0][j].EducationTitle;
+                            results[0][j].specialization = results[0][j].specialization ? JSON.parse(results[0][j].specialization) : [];
+                        }
                         response.data = {
-                            educationSpecialization: results[0]
+                            educationList: results[0]
                         };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

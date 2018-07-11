@@ -499,7 +499,7 @@ if (cluster.isWorker) {
 
 // cron.schedule('*/15 * * * *', function () {
 
-var cluster = require('cluster');
+// var cluster = require('cluster');
 
 if (cluster.isWorker) {
     console.log('asdf', cluster.worker.id);
@@ -565,7 +565,7 @@ if (cluster.isWorker) {
 
 // });
 
-var cluster = require('cluster');
+// var cluster = require('cluster');
 
 if (cluster.isWorker) {
     console.log('asdf', cluster.worker.id);
@@ -628,7 +628,7 @@ if (cluster.isWorker) {
     }
 }
 
-var cluster = require('cluster');
+// var cluster = require('cluster');
 
 if (cluster.isWorker) {
 

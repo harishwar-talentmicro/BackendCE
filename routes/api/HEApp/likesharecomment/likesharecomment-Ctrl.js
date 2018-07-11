@@ -192,7 +192,6 @@ likesharecommentCtrl.getlikecommentusers=function(req,res,next){
                                 commentList: results[0],
                                 count: results[1][0].count
                             }
-
                         }
                         else{
                             likeCommentResult = {
@@ -234,7 +233,7 @@ likesharecommentCtrl.getlikecommentusers=function(req,res,next){
 likesharecommentCtrl.getcommentmaster=function(req,res,next){
     var response = {
         status : false,
-        message : "Error while loading users",
+        message : "Error while loading comment list",
         data : null,
         error : null
     };

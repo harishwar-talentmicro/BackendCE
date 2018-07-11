@@ -724,9 +724,11 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
 
                                 // For updating resume though url link after registering for walkIn
 
-                                var parentId=(results[6] && results[6][0]) ? results[6][0].walkInApplicantId : undefined;
+                                var parentId = (results[6] && results[6][0]) ? results[6][0].walkInApplicantId : undefined;
                                 walkInApplicantId = Date.now().toString().concat(parentId);
-                                var webLinkTo = 'http://23.236.49.140/whatmate/cv-upload/'+walkInApplicantId;
+                                var webLinkTo = 'http://23.236.49.140/whatmate/cv-upload/' + walkInApplicantId;
+                                webLinkTo = webLinkTo.replace('"', '');
+
                                 mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
                                 // ------------------------------------------------
 
@@ -775,99 +777,102 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             }
 
                             // to send sms to candidate
-                            // if(results[5][0].sendCandidateSms){
+                            if (results[5][0].sendCandidateSms) {
+                                message = results[5][0].candidateSmsFormat ? results[5][0].candidateSmsFormat : message;
+                                message = message.replace('[token]', results[3][0].token);
 
-                            // }
-                            if (isdMobile == "+977") {
-                                request({
-                                    url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                    qs: {
-                                        token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                        to: mobileNo,
-                                        message: message,
-                                        sender: 'Techingen'
-                                    },
-                                    method: 'GET'
+                                if (isdMobile == "+977") {
+                                    request({
+                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                        qs: {
+                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                            to: mobileNo,
+                                            message: message,
+                                            sender: 'Techingen'
+                                        },
+                                        method: 'GET'
 
-                                }, function (error2, response2, body2) {
-                                    if (error2) {
-                                        console.log(error2, "SMS");
-                                    }
-                                    else {
-                                        console.log("SUCCESS", "SMS response");
-                                        console.log("SUCCESS", "SMS response");
-                                    }
-
-                                });
-                            }
-                            else if (isdMobile == "+91") {
-                                console.log('mobile number and isd is', isdMobile, mobileNo);
-                                request({
-                                    url: 'https://aikonsms.co.in/control/smsapi.php',
-                                    qs: {
-                                        user_name: 'janardana@hirecraft.com',
-                                        password: 'Ezeid2015',
-                                        sender_id: 'WtMate',
-                                        service: 'TRANS',
-                                        mobile_no: mobileNo,
-                                        message: message,
-                                        method: 'send_sms'
-                                    },
-                                    method: 'GET'
-
-                                }, function (error2, response2, body2) {
-                                    if (error2) {
-                                        console.log(error2, "SMS");
-                                    }
-                                    else {
-                                        console.log("SUCCESS", "SMS response with ISD");
-                                    }
-                                });
-
-                                var req5 = http.request(options, function (res5) {
-                                    var chunks = [];
-
-                                    res5.on("data", function (chunk) {
-                                        chunks.push(chunk);
-                                    });
-
-                                    res5.on("end", function () {
-                                        var body5 = Buffer.concat(chunks);
-                                        console.log(body5.toString());
-                                    });
-                                });
-
-                                req5.write(qs.stringify({
-                                    userId: 'talentmicro',
-                                    password: 'TalentMicro@123',
-                                    senderId: 'WTMATE',
-                                    sendMethod: 'simpleMsg',
-                                    msgType: 'text',
-                                    mobile: isdMobile.replace("+", "") + mobileNo,
-                                    msg: message,
-                                    duplicateCheck: 'true',
-                                    format: 'json'
-                                }));
-                                console.log('sms type 2 gateway worked');
-                                req5.end();
-                            }
-                            else if (isdMobile != "") {
-                                client.messages.create(
-                                    {
-                                        body: message,
-                                        to: isdMobile + mobileNo,
-                                        from: '+14434322305'
-                                    },
-                                    function (error6, response6) {
-                                        if (error6) {
-                                            console.log(error6, "SMS");
+                                    }, function (error2, response2, body2) {
+                                        if (error2) {
+                                            console.log(error2, "SMS");
                                         }
                                         else {
-                                            console.log("SUCCESS", "SMS response with empty isd");
+                                            console.log("SUCCESS", "SMS response");
+                                            console.log("SUCCESS", "SMS response");
                                         }
-                                    }
-                                );
+
+                                    });
+                                }
+                                else if (isdMobile == "+91") {
+                                    console.log('mobile number and isd is', isdMobile, mobileNo);
+                                    request({
+                                        url: 'https://aikonsms.co.in/control/smsapi.php',
+                                        qs: {
+                                            user_name: 'janardana@hirecraft.com',
+                                            password: 'Ezeid2015',
+                                            sender_id: 'WtMate',
+                                            service: 'TRANS',
+                                            mobile_no: mobileNo,
+                                            message: message,
+                                            method: 'send_sms'
+                                        },
+                                        method: 'GET'
+
+                                    }, function (error2, response2, body2) {
+                                        if (error2) {
+                                            console.log(error2, "SMS");
+                                        }
+                                        else {
+                                            console.log("SUCCESS", "SMS response with ISD");
+                                        }
+                                    });
+
+                                    var req5 = http.request(options, function (res5) {
+                                        var chunks = [];
+
+                                        res5.on("data", function (chunk) {
+                                            chunks.push(chunk);
+                                        });
+
+                                        res5.on("end", function () {
+                                            var body5 = Buffer.concat(chunks);
+                                            console.log(body5.toString());
+                                        });
+                                    });
+
+                                    req5.write(qs.stringify({
+                                        userId: 'talentmicro',
+                                        password: 'TalentMicro@123',
+                                        senderId: 'WTMATE',
+                                        sendMethod: 'simpleMsg',
+                                        msgType: 'text',
+                                        mobile: isdMobile.replace("+", "") + mobileNo,
+                                        msg: message,
+                                        duplicateCheck: 'true',
+                                        format: 'json'
+                                    }));
+                                    console.log('sms type 2 gateway worked');
+                                    req5.end();
+                                }
+                                else if (isdMobile != "") {
+                                    client.messages.create(
+                                        {
+                                            body: message,
+                                            to: isdMobile + mobileNo,
+                                            from: '+14434322305'
+                                        },
+                                        function (error6, response6) {
+                                            if (error6) {
+                                                console.log(error6, "SMS");
+                                            }
+                                            else {
+                                                console.log("SUCCESS", "SMS response with empty isd");
+                                            }
+                                        }
+                                    );
+                                }
                             }
+
                         }
 
                         response.status = true;
@@ -891,16 +896,16 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             mailContent = mailContent.replace("[FullName]", (req.body.firstName + ' ' + req.body.middleName + ' ' + req.body.lastName));
 
                             var webLink = (results[5] && results[5][0]) ? results[5][0].webLink : "";
-                            
-                               // For updating resume though url link after registering for walkIn
 
-                               var parentId=(results[6] && results[6][0]) ? results[6][0].walkInApplicantId : undefined;
-                               walkInApplicantId = Date.now().toString().concat(parentId);
-                               var webLinkTo = 'http://23.236.49.140/whatmate/cv-upload/'+walkInApplicantId;
-                               mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
-                               // ------------------------------------------------
+                            // For updating resume though url link after registering for walkIn
 
-                               // mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
+                            var parentId = (results[6] && results[6][0]) ? results[6][0].walkInApplicantId : undefined;
+                            walkInApplicantId = Date.now().toString().concat(parentId);
+                            var webLinkTo = 'http://23.236.49.140/whatmate/cv-upload/' + walkInApplicantId;
+                            mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
+                            // ------------------------------------------------
+
+                            // mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
                             var walkInSignature = (results[5] && results[5][0]) ? results[5][0].walkInSignature : "";
                             var disclaimer = (results[5] && results[5][0]) ? results[5][0].disclaimer : "";
 
@@ -944,99 +949,101 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
 
                             // to send sms to candidate
 
-                            // if(results[5][0].sendCandidateSms){
+                            if (results[5][0].sendCandidateSms) {
+                                message = results[5][0].candidateSmsFormat ? results[5][0].candidateSmsFormat : message;
+                                message = message.replace('[token]', '');
+                                if (isdMobile == "+977") {
+                                    request({
+                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                        qs: {
+                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                            to: mobileNo,
+                                            message: message,
+                                            sender: 'Techingen'
+                                        },
+                                        method: 'GET'
 
-                            // }
-                            if (isdMobile == "+977") {
-                                request({
-                                    url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                    qs: {
-                                        token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                        to: mobileNo,
-                                        message: message,
-                                        sender: 'Techingen'
-                                    },
-                                    method: 'GET'
-
-                                }, function (error2, response2, body2) {
-                                    if (error2) {
-                                        console.log(error2, "SMS");
-                                    }
-                                    else {
-                                        console.log("SUCCESS", "SMS response");
-                                        console.log("SUCCESS", "SMS response");
-                                    }
-
-                                });
-                            }
-                            else if (isdMobile == "+91") {
-                                console.log('mobile number and isd is', isdMobile, mobileNo);
-                                request({
-                                    url: 'https://aikonsms.co.in/control/smsapi.php',
-                                    qs: {
-                                        user_name: 'janardana@hirecraft.com',
-                                        password: 'Ezeid2015',
-                                        sender_id: 'WtMate',
-                                        service: 'TRANS',
-                                        mobile_no: mobileNo,
-                                        message: message,
-                                        method: 'send_sms'
-                                    },
-                                    method: 'GET'
-
-                                }, function (error2, response2, body2) {
-                                    if (error2) {
-                                        console.log(error2, "SMS");
-                                    }
-                                    else {
-                                        console.log("SUCCESS", "SMS response with ISD");
-                                    }
-                                });
-
-                                var req5 = http.request(options, function (res5) {
-                                    var chunks = [];
-
-                                    res5.on("data", function (chunk) {
-                                        chunks.push(chunk);
-                                    });
-
-                                    res5.on("end", function () {
-                                        var body5 = Buffer.concat(chunks);
-                                        console.log(body5.toString());
-                                    });
-                                });
-
-                                req5.write(qs.stringify({
-                                    userId: 'talentmicro',
-                                    password: 'TalentMicro@123',
-                                    senderId: 'WTMATE',
-                                    sendMethod: 'simpleMsg',
-                                    msgType: 'text',
-                                    mobile: isdMobile.replace("+", "") + mobileNo,
-                                    msg: message,
-                                    duplicateCheck: 'true',
-                                    format: 'json'
-                                }));
-                                console.log('sms type 2 gateway worked');
-                                req5.end();
-                            }
-                            else if (isdMobile != "") {
-                                client.messages.create(
-                                    {
-                                        body: message,
-                                        to: isdMobile + mobileNo,
-                                        from: '+14434322305'
-                                    },
-                                    function (error6, response6) {
-                                        if (error6) {
-                                            console.log(error6, "SMS");
+                                    }, function (error2, response2, body2) {
+                                        if (error2) {
+                                            console.log(error2, "SMS");
                                         }
                                         else {
-                                            console.log("SUCCESS", "SMS response with empty isd");
+                                            console.log("SUCCESS", "SMS response");
+                                            console.log("SUCCESS", "SMS response");
                                         }
-                                    }
-                                );
+
+                                    });
+                                }
+                                else if (isdMobile == "+91") {
+                                    console.log('mobile number and isd is', isdMobile, mobileNo);
+                                    request({
+                                        url: 'https://aikonsms.co.in/control/smsapi.php',
+                                        qs: {
+                                            user_name: 'janardana@hirecraft.com',
+                                            password: 'Ezeid2015',
+                                            sender_id: 'WtMate',
+                                            service: 'TRANS',
+                                            mobile_no: mobileNo,
+                                            message: message,
+                                            method: 'send_sms'
+                                        },
+                                        method: 'GET'
+
+                                    }, function (error2, response2, body2) {
+                                        if (error2) {
+                                            console.log(error2, "SMS");
+                                        }
+                                        else {
+                                            console.log("SUCCESS", "SMS response with ISD");
+                                        }
+                                    });
+
+                                    var req5 = http.request(options, function (res5) {
+                                        var chunks = [];
+
+                                        res5.on("data", function (chunk) {
+                                            chunks.push(chunk);
+                                        });
+
+                                        res5.on("end", function () {
+                                            var body5 = Buffer.concat(chunks);
+                                            console.log(body5.toString());
+                                        });
+                                    });
+
+                                    req5.write(qs.stringify({
+                                        userId: 'talentmicro',
+                                        password: 'TalentMicro@123',
+                                        senderId: 'WTMATE',
+                                        sendMethod: 'simpleMsg',
+                                        msgType: 'text',
+                                        mobile: isdMobile.replace("+", "") + mobileNo,
+                                        msg: message,
+                                        duplicateCheck: 'true',
+                                        format: 'json'
+                                    }));
+                                    console.log('sms type 2 gateway worked');
+                                    req5.end();
+                                }
+                                else if (isdMobile != "") {
+                                    client.messages.create(
+                                        {
+                                            body: message,
+                                            to: isdMobile + mobileNo,
+                                            from: '+14434322305'
+                                        },
+                                        function (error6, response6) {
+                                            if (error6) {
+                                                console.log(error6, "SMS");
+                                            }
+                                            else {
+                                                console.log("SUCCESS", "SMS response with empty isd");
+                                            }
+                                        }
+                                    );
+                                }
                             }
+
                         }
 
                         response.status = true;
@@ -1491,6 +1498,7 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             companyLogo: result[1][0].companyLogo,
                             registrationType: result[6][0].walkinRegistrationType,  // need to come from backend, will be done later.
                             tokenGeneration: result[6][0].walkinTokenGeneration,
+                            walkInWelcomeMessage: result[6][0].walkInWelcomeMessage,
 
 
                             industryList: result[2] ? result[2] : [],
@@ -1539,6 +1547,7 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             companyLogo: "",
                             registrationType: 0,  // need to come from backend, will be done later.
                             tokenGeneration: 0,
+                            walkInWelcomeMessage: '',
                             industryList: [],
                             skillList: [],
                             currency: [],
@@ -1548,7 +1557,18 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             pgEducationList: [],
                             isDOBRequired: 0,
                             isIDRequired: 0,
-                            IDType: 0
+                            IDType: 0,
+                            isIDNumberOrString: 1,
+                            maxIDLength: 0,
+                            DOBType: '',
+                            isVisitorCheckIn: 0,
+                            isWalkIn: 0,
+                            isVisitorCheckOut: 0,
+                            vendorDetails: [],
+                            directWalkIn: 0,
+                            referredByEmployeeList: 0,
+                            referredByName: 0,
+                            vendors: 0
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -2050,7 +2070,7 @@ walkInCvCtrl.getWalkinJoblist = function (req, res, next) {
                         }
 
                         result[1][0].userList = (result[1] && result[1][0]) ? JSON.parse(result[1][0].userList) : [];
-                        
+
                         response.data = {
                             jobList: (result[0] && result[0][0]) ? result[0] : [],
                             walkInWebConfig: result[1][0],
@@ -2132,7 +2152,7 @@ walkInCvCtrl.getUsersOnSearch = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             userList: (result[0] && result[0][0]) ? result[0] : [],
-                            unconfiguredUserList : (result[1] && result[1][0]) ? result[1] : []
+                            unconfiguredUserList: (result[1] && result[1][0]) ? result[1] : []
                         };
                         res.status(200).json(response);
                     }
@@ -2144,7 +2164,7 @@ walkInCvCtrl.getUsersOnSearch = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             userList: [],
-                            unconfiguredUserList:[]
+                            unconfiguredUserList: []
                         };
                         res.status(200).json(response);
 
@@ -3022,6 +3042,9 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 req.body.sendCandidateSms = req.body.sendCandidateSms ? req.body.sendCandidateSms : 0;
                 req.body.candidateSmsFormat = req.body.candidateSmsFormat ? req.body.candidateSmsFormat : "";
                 req.body.configureUsersFlag = req.body.configureUsersFlag ? req.body.configureUsersFlag : 0;
+                req.body.walkinFormMessage = req.body.walkinFormMessage ? req.body.walkinFormMessage : '';
+                req.body.walkInWelcomeMessage = req.body.walkInWelcomeMessage ? req.body.walkInWelcomeMessage : '';
+
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -3049,7 +3072,9 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(req.body.isIDNumberOrString),
                     req.st.db.escape(req.body.sendCandidateSms),
                     req.st.db.escape(req.body.candidateSmsFormat),
-                    req.st.db.escape(req.body.configureUsersFlag)  
+                    req.st.db.escape(req.body.configureUsersFlag),
+                    req.st.db.escape(req.body.walkinFormMessage),
+                    req.st.db.escape(req.body.walkInWelcomeMessage)
                 ];
 
                 var procQuery = 'CALL wm_save_walkWebConfig( ' + inputs.join(',') + ')';
@@ -3178,8 +3203,8 @@ walkInCvCtrl.walkInUploadLinkFlag = function (req, res, next) {
 
             if (!err && result && result[0] && result[0][0]) {
                 result[0][0].validateLinkFlag = (result[0][0].validateLinkFlag === result[0][0].validateLinkFlag);  //indicator strict
-                
-                response.status = (result[0] && result[0][0]) ? result[0][0].validateLinkFlag: false;
+
+                response.status = (result[0] && result[0][0]) ? result[0][0].validateLinkFlag : false;
                 response.message = "Validate upload link";
                 response.error = null;
                 response.data = null;
@@ -3194,7 +3219,405 @@ walkInCvCtrl.walkInUploadLinkFlag = function (req, res, next) {
                 res.status(500).json(response);
             }
         });
+    }
+};
 
+
+walkInCvCtrl.masterDataofCVUpdate = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+
+        req.query.heMasterId = req.query.heMasterId ? req.query.heMasterId : 0;
+        req.query.token = req.query.token ? req.query.token : '';
+
+        var inputs = [
+            req.st.db.escape(req.query.token),
+            req.st.db.escape(req.query.heMasterId)
+        ];
+
+        var procQuery = 'CALL wm_get_walkInBanners( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            console.log(err);
+            console.log(req.query.isWeb);
+            var output = [];
+            for (var i = 0; i < result[10].length; i++) {
+                var res2 = {};
+                res2.educationId = result[10][i].educationId;
+                res2.educationTitle = result[10][i].EducationTitle;
+                res2.specialization = result[10][i].specialization ? JSON.parse(result[10][i].specialization) : [];
+                output.push(res2);
+            }
+
+            var output1 = [];
+            for (var j = 0; j < result[11].length; j++) {
+                var res3 = {};
+                res3.educationId = result[11][j].educationId;
+                res3.educationTitle = result[11][j].EducationTitle;
+                res3.specialization = result[11][j].specialization ? JSON.parse(result[11][j].specialization) : [];
+                output1.push(res3);
+            }
+
+
+            var isWeb = req.query.isWeb;
+            if (!err && result && result[0] && result[0][0]) {
+                response.status = true;
+                response.message = "Banner List loaded successfully";
+                response.error = null;
+                response.data = {
+                    bannerList: result[0],
+                    companyLogo: result[1][0].companyLogo,
+                    registrationType: result[6][0].walkinRegistrationType,  // need to come from backend, will be done later.
+                    tokenGeneration: result[6][0].walkinTokenGeneration,
+                    walkInWelcomeMessage: result[6][0].walkInWelcomeMessage,
+
+                    industryList: result[2] ? result[2] : [],
+                    skillList: result[3] ? result[3] : [],// need to come from backend, will be done later.
+                    locationList: result[4] ? result[4] : [],
+                    referedNameList: result[5] ? result[5] : [],
+                    // walkInJobs: (result[7] && result[7][0]) ? result[7] : [],
+                    currency: (result && result[7]) ? result[7] : [],
+                    scale: (result && result[8]) ? result[8] : [],
+                    duration: (result && result[9]) ? result[9] : [],
+                    ugEducationList: output ? output : [],
+                    pgEducationList: output1 ? output1 : [],
+                    isDOBRequired: result[12][0].isDOBRequired,
+                    DOBType: result[12][0].DOBType,
+                    // isIDRequired: result[14][0].isIDRequired,
+                    // IDType: result[14][0].IDType,  // field Name
+                    // isIDNumberOrString: (result[14] && result[14][0]) ? result[14][0].isIDNumberOrString : 1,
+                    // maxIDLength: (result[14] && result[14][0]) ? result[14][0].maxIDLength : 0,
+                    // isVisitorCheckIn: result[14][0].isVisitorCheckIn,
+                    // isWalkIn: result[14][0].isWalkIn,
+                    // isVisitorCheckOut: result[14][0].isVisitorCheckOut,
+                    vendorDetails: (result && result[13]) ? result[13] : [],
+                    // directWalkIn: result[14][0].directWalkIn,
+                    // referredByEmployeeList: result[14][0].referredByEmployeeList,
+                    // referredByName: result[14][0].referredByName,
+                    // vendors: result[14][0].vendors
+
+                };
+                res.status(200).json(response);
+            }
+            else if (!err) {
+                response.status = true;
+                response.message = "No results found";
+                response.error = null;
+                response.data = {
+                    bannerList: [],
+                    companyLogo: "",
+                    registrationType: 0,  // need to come from backend, will be done later.
+                    tokenGeneration: 0,
+                    walkInWelcomeMessage: '',
+                    industryList: [],
+                    skillList: [],
+                    currency: [],
+                    scale: [],
+                    duration: [],
+                    ugEducationList: [],
+                    pgEducationList: [],
+                    isDOBRequired: 0,
+                    DOBType: '',
+                    isVisitorCheckOut: 0,
+                    vendorDetails: [],
+                    directWalkIn: 0,
+                    referredByEmployeeList: 0,
+                    referredByName: 0,
+                    vendors: 0
+                };
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while getting bannerList";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+
+    }
+
+};
+
+
+
+walkInCvCtrl.saveCVUpdatedData = function (req, res, next) {
+
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var isdMobile = req.body.mobileISD;
+    var mobileNo = req.body.mobileNumber;
+    var message = "Congratulations your profile is successfully registered";
+
+    var validationFlag = true;
+   
+    if (!req.body.firstName) {
+        error.firstName = 'First Name is Mandatory';
+        validationFlag *= false;
+    }
+    if (!req.body.emailId) {
+        error.emailId = 'EmailId is Mandatory';
+        validationFlag *= false;
+    }
+
+    if (!req.body.mobileNumber) {
+        error.mobileNumber = 'Mobile Number is Mandatory';
+        validationFlag *= false;
+    }
+    var ugEducation = req.body.ugEducation;
+    if (typeof (ugEducation) == "string") {
+        ugEducation = JSON.parse(ugEducation);
+    }
+    if (!ugEducation) {
+        ugEducation = {};
+    }
+
+    var pgEducation = req.body.pgEducation;
+    if (typeof (pgEducation) == "string") {
+        pgEducation = JSON.parse(pgEducation);
+    }
+    if (!pgEducation) {
+        pgEducation = {};
+    }
+
+    var skills = req.body.skills;
+    if (typeof (Skills) == "string") {
+        skills = JSON.parse(skills);
+    }
+    if (!skills) {
+        skills = [];
+    }
+
+    var industry = req.body.industry;
+    if (typeof (industry) == "string") {
+        industry = JSON.parse(industry);
+    }
+    if (!industry) {
+        industry = [];
+    }
+
+    var currency = req.body.currency;
+    if (typeof (currency) == "string") {
+        currency = JSON.parse(currency);
+    }
+    if (!currency) {
+        currency = {};
+    }
+
+    var details = req.body.details;
+    if (typeof (details) == "string") {
+        details = JSON.parse(details);
+    }
+    if (!details) {
+        details = {};
+    }
+
+    var scale = req.body.scale;
+    if (typeof (scale) == "string") {
+        scale = JSON.parse(scale);
+    }
+    if (!scale) {
+        scale = {};
+    }
+    var period = req.body.period;
+    if (typeof (period) == "string") {
+        period = JSON.parse(period);
+    }
+    if (!period) {
+        period = {};
+    }
+
+    var location = req.body.location;
+    if (typeof (location) == "string") {
+        location = JSON.parse(location);
+    }
+    if (!location) {
+        location = {};
+    }
+
+    var walkInJobs = req.body.walkInJobs;
+    if (typeof (walkInJobs) == "string") {
+        walkInJobs = JSON.parse(walkInJobs);
+    }
+    if (!walkInJobs) {
+        walkInJobs = {};
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please Check the Errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+
+        var isWeb = req.query.isWeb;
+        req.body.heMasterId = (req.body.heMasterId) ? req.body.heMasterId : 2;
+        req.body.fresherExperience = (req.body.fresherExperience) ? req.body.fresherExperience : 0;
+        req.body.lastName = (req.body.lastName) ? req.body.lastName : "";
+        req.body.mobileISD = (req.body.mobileISD) ? req.body.mobileISD : "";
+        req.body.presentEmployer = (req.body.presentEmployer) ? req.body.presentEmployer : "";
+        req.body.noticePeriod = (req.body.noticePeriod) ? req.body.noticePeriod : 0;
+        req.body.status = (req.body.status) ? req.body.status : 1;
+        req.body.experience = (req.body.experience) ? req.body.experience : '0.0';
+        req.body.presentSalary = (req.body.presentSalary) ? req.body.presentSalary : '0.0';
+        req.body.walkinType = (req.body.walkinType) ? req.body.walkinType : 0;
+        req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
+        req.body.IDNumber = (req.body.IDNumber) ? req.body.IDNumber : '';
+        req.body.profilePicture = (req.body.profilePicture) ? req.body.profilePicture : '';
+        req.body.middleName = (req.body.middleName) ? req.body.middleName : '';
+        req.body.registrationType = req.body.registrationType ? req.body.registrationType : 2;
+        req.body.jobCode = req.body.jobCode ? req.body.jobCode : '';
+        req.body.resumeCdnPath = req.body.resumeCdnPath ? req.body.resumeCdnPath : '';
+
+        var cvSourcingParentId = req.body.cvSourcingParentId;
+        parentId = cvSourcingParentId.substr(13);  // parentId is in string
+        parentId = parseInt(parentId);   // parse to string
+
+s
+        var inputs = [
+            req.st.db.escape(req.body.heMasterId),
+            req.st.db.escape(parentId),
+            req.st.db.escape(req.body.fresherExperience),
+            req.st.db.escape(req.body.firstName),
+            req.st.db.escape(req.body.lastName),
+            req.st.db.escape(req.body.mobileISD),
+            req.st.db.escape(req.body.mobileNumber),
+            req.st.db.escape(req.body.emailId),
+            req.st.db.escape(JSON.stringify(skills)),
+            req.st.db.escape(JSON.stringify(industry)),
+            req.st.db.escape(JSON.stringify(ugEducation)),
+            req.st.db.escape(JSON.stringify(pgEducation)),
+            req.st.db.escape(req.body.experience),
+            req.st.db.escape(req.body.presentEmployer),
+            req.st.db.escape(req.body.noticePeriod),
+            req.st.db.escape(JSON.stringify(currency)),
+            req.st.db.escape(req.body.presentSalary),
+            req.st.db.escape(JSON.stringify(scale)),
+            req.st.db.escape(JSON.stringify(period)),
+            // req.st.db.escape(req.body.senderNotes),
+            // req.st.db.escape(req.body.approverNotes),
+            // req.st.db.escape(req.body.receiverNotes),
+            // req.st.db.escape(req.body.changeLog),
+            // req.st.db.escape(req.body.groupId),
+            // req.st.db.escape(req.body.learnMessageId),
+            // req.st.db.escape(req.body.accessUserType),
+            // req.st.db.escape(req.body.approverCount),
+            // req.st.db.escape(req.body.receiverCount),
+            // req.st.db.escape(req.body.status),
+            req.st.db.escape(req.body.walkInType),
+            req.st.db.escape(JSON.stringify(details)),
+            req.st.db.escape(JSON.stringify(location)),
+            req.st.db.escape(req.body.profilePicture),
+            req.st.db.escape(DBSecretKey),
+            req.st.db.escape(req.body.jobCode),  // i have to send job code to candidate mail. the same is taken back while updating
+            req.st.db.escape(req.body.DOB),
+            req.st.db.escape(req.body.IDNumber),
+            req.st.db.escape(req.body.middleName),
+            req.st.db.escape(req.body.registrationType),
+            req.st.db.escape(req.body.resumeCdnPath)
+        ];
+
+        var procQuery = 'CALL wm_save_webCVUpdatePage( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+
+        req.db.query(procQuery, function (err, results) {
+            console.log(err);
+
+            if (!err && (results[0] || results[1] || results[2])) {    // walkInForm Message with token
+                // console.log('Result with walk-In Message and Token');
+                // if (results[2] ) {  // check 
+
+                //     var mailContent = (results[5] && results[5][0]) ? results[5][0].mailBody : " Dear [FirstName],<br><br> Your profile is successfully registered.  We will call you back once we scrutinize  your profile. Thank You <br><br>[WalkINSignature]<br>[Disclaimer]";
+
+                //     if (mailContent) {
+                //         mailContent = mailContent.replace("[FirstName]", req.body.firstName);
+                //         mailContent = mailContent.replace("[FullName]", (req.body.firstName + ' ' + req.body.middleName + ' ' + req.body.lastName));
+
+                //         var webLink = (results[5] && results[5][0]) ? results[5][0].webLink : "";
+
+                //         var walkInSignature = (results[5] && results[5][0]) ? results[5][0].walkInSignature : "";
+                //         var disclaimer = (results[5] && results[5][0]) ? results[5][0].disclaimer : "";
+
+                //         mailContent = mailContent.replace("[WalkINSignature]", walkInSignature);
+                //         mailContent = mailContent.replace("[Disclaimer]", disclaimer);
+                //     }
+
+                //     var subject = results[5][0].mailSubject ? results[5][0].mailSubject:"Congratulations your profile is successfully registered";
+                //     // send mail to candidate
+                //     var email = new sendgrid.Email();
+                //     email.from = results[4][0].fromEmailId ? results[4][0].fromEmailId: "noreply@talentmicro.com";
+                //     email.to = req.body.emailId;
+                //     email.subject = subject;
+                //     email.html = mailContent;
+
+                //     sendgrid.send(email, function (err11, result11) {
+                //         if (err11) {
+                //             console.log("Failed to send to candidate", err11);
+                //         }
+                //         else {
+                //             console.log("mail sent successfully to candidate", result11);
+                //         }
+                //     });
+
+                //     // To send mail to refered person
+                //     // if (results[4] && results[6] && results[6][0]) {
+                //     //     var refererEmail = new sendgrid.Email();
+                //     //     refererEmail.from = results[4][0].fromEmailId;
+                //     //     refererEmail.to = results[6][0].refererMailId;
+                //     //     refererEmail.subject = results[6][0].message;
+                //     //     refererEmail.html = results[6][0].message;
+
+                //     //     sendgrid.send(refererEmail, function (err1, result1) {
+                //     //         if (err1) {
+                //     //             console.log("Failed to send to referrer", err1);
+                //     //         }
+                //     //         else {
+                //     //             console.log("mail sent successfully to referrer", result1);
+                //     //         }
+                //     //     });
+                //     // }
+
+
+                // }
+
+                response.status = true;
+                response.message = "Data saved successfully";
+                response.error = null;
+                response.data = {
+                    walkinFormMessage: results[0][0].walkinFormMessage ? results[0][0].walkinFormMessage :''
+                    // token: results[3][0].token
+                };
+                res.status(200).json(response);
+            }
+
+            else {
+                response.status = false;
+                response.message = "Error While Saving cv update data";
+                response.error = null;
+                console.log(err);
+                res.status(500).json(response);
+            }
+        });
     }
 };
 
