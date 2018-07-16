@@ -1023,6 +1023,12 @@ UserCtrl.saveProfileData = function (req, res, next) {
                         req.body.jobTitle = req.body.jobTitle ? req.body.jobTitle : "";
                         req.body.companyName = req.body.companyName ? req.body.companyName : "";
                         req.body.EZEOneId = req.st.alterEzeoneId(req.body.EZEOneId);
+                        req.body.latitude = req.body.latitude ? req.body.latitude : 0.0;
+                        req.body.longitude = req.body.longitude ? req.body.longitude : 0.0;
+                        req.body.displayName = req.body.displayName ? req.body.displayName : '';
+                        req.body.isdMobile = req.body.isdMobile ? req.body.isdMobile : '';
+                        req.body.mobileNo = req.body.mobileNo ? req.body.mobileNo : '';
+                        req.body.emailId = req.body.emailId ? req.body.emailId : '';
 
                         var procParams = [
                             req.st.db.escape(req.query.token),

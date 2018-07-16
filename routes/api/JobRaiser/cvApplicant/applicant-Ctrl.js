@@ -507,7 +507,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             clientStatus: result[37] ? result[37]:[],
                             group : result[39] ? result[39]: [],
                             faceSheetTemplates: result[41] ? result[41]:[],
-                            reportingToList : result[42] ? result[42]:[]
+                            reportingToList : result[42] ? result[42]:[],
+                            jdTemplateList : result[43] ? result[43]:[]
                         };
 
                         if (req.query.isWeb == 0) {
@@ -571,7 +572,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             clientStatus:[],
                             group:[],
                             faceSheetTemplates:[],
-                            reportingToList: []
+                            reportingToList: [],
+                            jdTemplateList:[]
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -2128,12 +2130,13 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                             {
                                 interviewPanel: result[0] ? result[0] : [],
                                 AssessmentTemplateList: result[1] ? result[1] : [],
-                                interviewScheduler: output[0] ? output[0] : [],
+                                interviewScheduler: output[0] ? output[0] : {},
                                 interviewStageRounds: result[3] ? result[3] : [],
                                 assessmentDetail: JSON.stringify(result[4][0].assessment) ? JSON.stringify(result[4][0].assessment) : [],
                                 skillAssessment: JSON.parse(result[5][0].skillAssessment) ? JSON.parse(result[5][0].skillAssessment) : [],
                                 clientLocations: result[6][0] ? result[6][0] : {},
-                                interviewMailerTemplate: (result[7] && result[7][0]) ? JSON.parse(result[7][0].formDataJson): []
+                                interviewMailerTemplate: (result[7] && result[7][0]) ? JSON.parse(result[7][0].formDataJson): [],
+                                address: (result[8] && result[8][0]) ? result[8][0].address :'' 
                             };
 
                         if (req.query.isWeb == 0) {
@@ -2155,7 +2158,13 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                             interviewPanel: [],
                             AssessmentTemplateList: [],
                             interviewScheduler: [],
-                            interviewStageType: []
+                            interviewStageRounds: [],
+                            assessmentDetail:[],
+                            skillAssessment:[],
+                            clientLocations:{},
+                            interviewMailerTemplate:{},
+                            address:''
+
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

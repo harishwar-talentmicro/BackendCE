@@ -69,7 +69,8 @@ employeeSurveyCtrl.getSurveyList = function (req, res, next) {
                         }
 
                         response.data = {
-                            surveyList: results[0]                            
+                            surveyList: results[0],
+                            upcomingEvents: results[1]                            
                         };
                         // res.status(200).json(response);
                         buf = new Buffer(JSON.stringify(response.data), 'utf-8');

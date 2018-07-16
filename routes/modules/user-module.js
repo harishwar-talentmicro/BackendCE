@@ -515,6 +515,13 @@ User.prototype.getUserDetails = function (req, res, next) {
                                         console.log('FnGetUserDetails : tmaster: User details sent successfully');
                                         UserDetailsResult[0][0].versionStatus = rtnMessage.versionStatus;
                                         UserDetailsResult[0][0].versionMessage = rtnMessage.versionMessage;
+
+                                        for (var i=0 ; i<UserDetailsResult[1].length ; i++){
+                                            UserDetailsResult[1][i].trackTemplateDetails = UserDetailsResult[1][i] && UserDetailsResult[1][i].trackTemplateDetails ?  JSON.parse(UserDetailsResult[1][i].trackTemplateDetails):[];
+                                        }
+                                        console.log('user details',UserDetailsResult[1][0]);
+
+                                        UserDetailsResult[0][0].companyDetails = UserDetailsResult[1][0] ? UserDetailsResult[1][0]:{}
                                         res.send(UserDetailsResult[0]);
                                     }
                                     else {
@@ -3988,7 +3995,7 @@ User.prototype.saveUserDetails = function (req, res, next) {
     var locTitle = (req.body.loc_title) ? req.body.loc_title : '';
     // var latitude = (req.body.lat) ? req.body.lat : '';
     // var longitude = (req.body.lng) ? req.body.lng : '';
-    var address1 = (req.body.address_line1) ? req.body.address_line1 : '';
+    var address1 = (req.body.address_line1) ? req.body.address_line1 : ''; 
     var address2 = (req.body.address_line2) ? req.body.address_line2 : '';
     var city = (req.body.city) ? req.body.city : '';
     var stateId = (req.body.state_id) ? req.body.state_id : '';

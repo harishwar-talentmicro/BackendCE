@@ -403,4 +403,91 @@ companyCtrl.getSocialMediaLinks = function(req, res, next){
     }
 };
 
+
+companyCtrl.getuserProfileDetails = function(req, res, next){
+
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    var error = {};
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+            req.st.validateToken(req.query.token,function(err,tokenResult){
+                if((!err) && tokenResult){
+
+
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.query.heMasterId),
+                req.st.db.escape(req.query.groupId),
+            ];
+
+            var procQuery = 'CALL wm_get_profileDataDetails(' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,Result){
+                if(!err && Result && Result[0] && Result[0][0]){
+                    response.status = true;
+                    response.message = "userData loaded successfully";
+                    response.error = null;
+                    var leaveTypes = JSON.parse(Result[1][0].leaveJSON);
+                    for(var i=0; i<Result[0].length; i++){
+                        if(typeof(Result[0][i].leaveDetails)=='string'){
+                            Result[0][i].leaveDetails = JSON.parse(Result[0][i].leaveDetails);
+                        }
+                    }
+                    response.data = {
+                        profileDetails : Result[0] ? Result[0] :[],
+                        leaveTypes : JSON.parse(leaveTypes["leaveTypes"]),
+                        totalLeaves : leaveTypes["totalLeaves"]
+                    };
+                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                     });
+                }
+                else{
+                    response.status = false;
+                    response.message = "Error while loading userData ";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else{
+            res.status(401).json(response);
+
+        }
+    });
+        }
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + '......... error .........');
+            console.log(ex);
+            console.log('Error: ' + ex);
+        }
+    }
+};
+
+
+
 module.exports = companyCtrl;

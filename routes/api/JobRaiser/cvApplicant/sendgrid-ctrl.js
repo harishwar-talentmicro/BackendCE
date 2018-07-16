@@ -611,11 +611,15 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                             for (var applicantIndex = 0; applicantIndex < emailReceivers.length; applicantIndex++) {
                               
                                 for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-                                    mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                    subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                    smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                
+                                    if(result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=''){
+    
+                                        mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                   
+                                        subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+        
+                                        smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                    }
                                 }
 
                                 mailbody_array.push(mailBody);
@@ -987,18 +991,23 @@ sendgridCtrl.jobSeekerPreview = function (req, res, next) {
                         var temp = mailBody;
                         var temp1 = subject;
                         var temp2 = smsMsg;
-
+                        var applicantData = [];
                         for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
                             console.log('applicantIndex=', applicantIndex);
 
                             for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-                                mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                               
-                                subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                
+                                if(result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=''){
 
-                                smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                    mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                               
+                                    subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+    
+                                    smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                }
                             }
 
+                            applicantData.push(result[0][applicantIndex].EmailId);
                             mailbody_array.push(mailBody);
                             subject_array.push(subject);
                             smsMsg_array.push(smsMsg);
@@ -1013,7 +1022,8 @@ sendgridCtrl.jobSeekerPreview = function (req, res, next) {
                         response.data = {
                             tagsPreview: mailbody_array,
                             subjectPreview: subject_array,
-                            smsMsgPreview: smsMsg_array
+                            smsMsgPreview: smsMsg_array,
+                            receiverData : applicantData
                         };
                         res.status(200).json(response);
                     }
@@ -1025,7 +1035,8 @@ sendgridCtrl.jobSeekerPreview = function (req, res, next) {
                         response.data = {
                             tagsPreview: [],
                             subjectPreview: [],
-                            smsMsgPreview: []
+                            smsMsgPreview: [],
+                            receiverData: []
                         };
                         res.status(200).json(response);
                     }
@@ -1127,21 +1138,27 @@ sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
                             console.log('applicantIndex=', applicantIndex);
 
                             for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-                                mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                if(result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=''){
+
+                                    mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
                                 
-                                subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                console.log('subject',subject);
-                                console.log('tag','[applicant.' + tags.applicant[tagIndex].tagName + ']');
-                                smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                    subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+    
+                                    smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                }
                             }
 
                             for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
                                 
-                                mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                
-                                subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                if(result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=''){
 
-                                smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                    mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                
+                                    subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+    
+                                    smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                }
                             }
 
                            
@@ -1343,20 +1360,27 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                             for (var applicantIndex = 0; applicantIndex < emailReceivers.length; applicantIndex++) {
                               
                                 for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-                                    mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                    if(result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=''){
+
+                                        mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
                                     
-                                    subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-    
-                                    smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                        subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+        
+                                        smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                    }
                                 }
     
                                 for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
                                     
-                                    mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                    if(result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=''){
+
+                                        mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
                                     
-                                    subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-    
-                                    smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                        subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+        
+                                        smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                    }
                                 }
 
                                 mailbody_array.push(mailBody);
@@ -1752,36 +1776,52 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                             for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
 
                                 for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-                                    mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
 
-                                    subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                    if(result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=''){
 
-                                    smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                        mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                        subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+    
+                                        smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                    }
                                 }
 
                                 for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-                                    mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
 
-                                    subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                    if(result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=''){
 
-                                    smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                        mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                        subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+    
+                                        smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                    }
                                 }
 
                                 for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-                                    mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
 
-                                    subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                    if(result[0][applicantIndex][tags.client[tagIndex].tagName] && result[0][applicantIndex][tags.client[tagIndex].tagName] !=null && result[0][applicantIndex][tags.client[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.client[tagIndex].tagName] !=''){
 
-                                    smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                        mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                        subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+    
+                                        smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                    }
+
                                 }
                             }
                             for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
-                                mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
 
-                                subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                if(result[1][clientIndex][tags.clientContacts[tagIndex].tagName] && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] !=null && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] !='null' && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] !=''){
 
-                                smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                    mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
 
+                                    subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+    
+                                    smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                }
                             }
 
                             if (tableTags.applicant.length > 0) {
@@ -2008,36 +2048,52 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                 for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
     
                                     for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                        if(result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=''){
+
+                                            mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
     
-                                        subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-    
-                                        smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                            subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+        
+                                            smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                        }
                                     }
     
                                     for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                        if(result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=''){
+
+                                            mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
     
-                                        subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-    
-                                        smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                            subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+        
+                                            smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                        }
                                     }
     
                                     for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                        if(result[0][applicantIndex][tags.client[tagIndex].tagName] && result[0][applicantIndex][tags.client[tagIndex].tagName] !=null && result[0][applicantIndex][tags.client[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.client[tagIndex].tagName] !=''){
+
+                                            mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
     
-                                        subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
-    
-                                        smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                            subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+        
+                                            smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                        }
+
                                     }
                                 }
                                 for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
-                                    mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                    if(result[1][clientIndex][tags.clientContacts[tagIndex].tagName] && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] !=null && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] !='null' && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] !=''){
+
+                                        mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
     
-                                    subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-    
-                                    smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-    
+                                        subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+        
+                                        smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                    }
                                 }
     
                                 if (tableTags.applicant.length > 0) {
@@ -2474,11 +2530,14 @@ sendgridCtrl.clientMailerPreview = function (req, res, next) {
                         for (var clientIndex = 0; clientIndex < idArray.length; clientIndex++) {
 
                             for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
-                                mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                if(result[0][clientIndex][tags.clientContacts[tagIndex].tagName] && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] !=null && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] !='null' && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] !=''){
 
-                                subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                    mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
 
-                                smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                    subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+    
+                                    smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                }
                             }
                             mailbody_array.push(mailBody);
                             subject_array.push(subject);
@@ -2664,11 +2723,15 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                             for (var clientIndex = 0; clientIndex < emailReceivers.length; clientIndex++) {
 
                                 for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
-                                    mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                    if(result[0][clientIndex][tags.clientContacts[tagIndex].tagName] && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] !=null && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] !='null' && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] !=''){
+
+                                        mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
     
-                                    subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
-    
-                                    smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                        subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+        
+                                        smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                    }
                                 }
 
                                 mailbody_array.push(mailBody);
@@ -3064,38 +3127,51 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                 for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
 
                                     for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                        if(result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=''){
+                                    
+                                            mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
 
                                         subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
                                     
                                         smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                        }
                                     }
 
                                     for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
 
-                                        subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                        if(result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName]!=null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=''){
 
-                                        smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                    
+                                            mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                            subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+    
+                                            smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                        }
                                     }
 
                                     for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
 
-                                        subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-                                    
-                                        smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-                                    
+                                        if(result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName]!='' && result[0][applicantIndex][tags.interview[tagIndex].tagName] !='null'){
+                                            mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                            subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                        
+                                            smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                        }                                    
                                     }
                                 }
                                 for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
-                                    mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
 
-                                    subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                    if(result[1][clientIndex][tags.clientContacts[tagIndex].tagName] && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] !=null && result[1][clientIndex][tags.clientContacts[tagIndex].tagName]!='null' && result[1][clientIndex][tags.clientContacts[tagIndex].tagName]!=''){
 
-                                    smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-                                
+                                        mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                        subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+    
+                                        smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+    
+                                    }                                
                                 }
 
                                 if (tableTags.applicant.length > 0) {
@@ -3133,30 +3209,39 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                             for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
 
                                 for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                    
+                                if(result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=''){
+                                 
                                     mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
 
                                     subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
                                 
                                     smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                
+                                }
                                 }
 
                                 for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-                                    mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
 
-                                    subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                
-                                    smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                    if(result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=''){
+
+                                        mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                        subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
                                     
+                                        smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                    }
                                 }
 
                                 for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
-                                    mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
 
-                                    subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-                                
-                                    smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-                                
+                                    if(result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] !=null && result[0][applicantIndex][tags.interview[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] !=''){
+
+                                        mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                        subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                    
+                                        smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                    }
                                 }
                             }
                             mailbody_array.push(mailBody);
@@ -3368,38 +3453,54 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                     for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
     
                                         for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-                                            mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                            if(result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=''){
+
+                                                mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
     
-                                            subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                        
-                                            smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                            
+                                                smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                            }
+                                           
                                         }
     
                                         for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-                                            mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                            if(result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName]!=''){
+
+                                                mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
     
-                                            subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-    
-                                            smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                        
+                                                subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+        
+                                                smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                            }
                                         }
     
-                                        for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-                                            mailBody = mailBody.replace('[interview.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                        for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+                                            
+                                            if(result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] !=null && result[0][applicantIndex][tags.interview[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] !=''){
+
+                                                mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
     
-                                            subject = subject.replace('[interview.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
-                                        
-                                            smsMsg = smsMsg.replace('[interview.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
-                                        
+                                                subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                            
+                                                smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                            
+                                            }
+
                                         }
                                     }
                                     for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                        if(result[1][clientIndex][tags.clientContacts[tagIndex].tagName] && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] !=null && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] !='null' && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] !=''){
+
+                                            mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
     
-                                        subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-    
-                                        smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-                                    
+                                            subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+        
+                                            smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                        }
                                     }
     
                                     if (tableTags.applicant.length > 0) {
@@ -3469,30 +3570,39 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                 for (var applicantIndex = 0; applicantIndex < emailReceivers.length; applicantIndex++) {
 
                                     for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                        if(result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] !=''){
+
+                                            mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
     
-                                        subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                    
-                                        smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                    
+                                            subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                        
+                                            smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                        }
                                     }
     
                                     for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                        if(result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] !=''){
+
+                                            mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
     
-                                        subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                    
-                                        smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                            subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
                                         
+                                            smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                        }
                                     }
     
-                                    for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[interview.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                    for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+
+                                        if(result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] !=null && result[0][applicantIndex][tags.interview[tagIndex].tagName] !='null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] !=''){
+
+                                            mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
     
-                                        subject = subject.replace('[interview.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
-                                    
-                                        smsMsg = smsMsg.replace('[interview.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
-                                    
+                                            subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                        
+                                            smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                        }
                                     }
 
                                     mailbody_array.push(mailBody);

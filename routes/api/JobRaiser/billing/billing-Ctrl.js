@@ -87,6 +87,36 @@ billingCtrl.billingFilter = function (req, res, next) {
                         response.status = true;
                         response.message = "Billing Data loaded sucessfully";
                         response.error = null;
+
+                        for(var i=0; i<result[0].length; i++){
+                            result[0][i].billingCurrency = result[0][i].billingCurrency.currencyId ? JSON.parse(result[0][i].billingCurrency) :{};
+                          
+                            result[0][i].receiptCurrency = result[0][i].receiptCurrency.currencyId ? JSON.parse(result[0][i].receiptCurrency) :{};
+                            result[0][i].taxCurrency = result[0][i].taxCurrency.currencyId ? JSON.parse(result[0][i].taxCurrency) :{};
+
+                            result[0][i].TDSCurrency = result[0][i].TDSCurrency.currencyId ? JSON.parse(result[0][i].TDSCurrency) :{};
+                        
+                            result[0][i].actualCTCCurrency = result[0][i].actualCTCCurrency.currencyId ? JSON.parse(result[0][i].actualCTCCurrency) :{};
+
+                            result[0][i].actualCTCScale = result[0][i].actualCTCScale.scaleId ? JSON.parse(result[0][i].actualCTCScale) :{};
+
+                            result[0][i].actualCTCDuration = result[0][i].actualCTCDuration.durationId ? JSON.parse(result[0][i].actualCTCDuration) :{};
+
+                            result[0][i].billableCurrency = result[0][i].billableCurrency.currencyId ? JSON.parse(result[0][i].billableCurrency) :{};
+                            
+                            result[0][i].billableScale = result[0][i].billableScale.scaleId ? JSON.parse(result[0][i].billableScale) :{};
+
+                            result[0][i].billableDuration = result[0][i].billableDuration.durationId ? JSON.parse(result[0][i].billableDuration) :{};
+
+                            result[0][i].designation = result[0][i].designation.roleId ? JSON.parse(result[0][i].designation) :{};
+                        
+                            result[0][i].vendorCurrency = result[0][i].vendorCurrency.currencyId ? JSON.parse(result[0][i].vendorCurrency) :{};
+
+                            result[0][i].vendorScale = result[0][i].vendorScale.scaleId ? JSON.parse(result[0][i].vendorScale) :{};
+
+                            result[0][i].vendorDuration = result[0][i].vendorDuration.durationId ? JSON.parse(result[0][i].vendorDuration) :{};
+                        }
+
                         response.data = {
                             billingData : (result[0] && result[0][0]) ? result[0] :[]
                         };

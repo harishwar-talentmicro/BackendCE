@@ -710,7 +710,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     //     }
 
                     // }
-                    if (!err && (results[1] || results[2] && results[2][0] && results[3] && results[3][0] && results[3][0].token)) {    // walkInForm Message with token
+                    if (!err && (results[1] || results[2] && results[2][0] && results[3] && results[3][0])) {    // walkInForm Message with token
                         console.log('Result with walk-In Message and Token');
                         if (results[4] && results[4][0] || results[5] || results[5][0]) {
 
@@ -728,6 +728,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                 walkInApplicantId = Date.now().toString().concat(parentId);
                                 var webLinkTo = 'http://23.236.49.140/whatmate/cv-upload/' + walkInApplicantId;
                                 webLinkTo = webLinkTo.replace('"', '');
+                                webLinkTo = webLinkTo.replace('"', '');
 
                                 mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
                                 // ------------------------------------------------
@@ -741,10 +742,10 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                 mailContent = mailContent.replace("[Disclaimer]", disclaimer);
                             }
 
-                            var subject = results[5][0].mailSubject;
+                            var subject = results[5][0].mailSubject ? results[5][0].mailSubject: 'Registration Completed Successfully';
                             // send mail to candidate
                             var email = new sendgrid.Email();
-                            email.from = results[4][0].fromEmailId;
+                            email.from = results[4][0].fromEmailId ? results[4][0].fromEmailId :'noreply@talentmicro.com';
                             email.to = req.body.emailId;
                             email.subject = subject;
                             email.html = mailContent;
@@ -761,7 +762,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             // To send mail to refered person
                             if (results[4] && results[6] && results[6][0]) {
                                 var refererEmail = new sendgrid.Email();
-                                refererEmail.from = results[4][0].fromEmailId;
+                                refererEmail.from = results[4][0].fromEmailId ? results[4][0].fromEmailId: 'noreply@talentmicro.com';
                                 refererEmail.to = results[6][0].refererMailId;
                                 refererEmail.subject = results[6][0].message;
                                 refererEmail.html = results[6][0].message;
@@ -872,185 +873,14 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     );
                                 }
                             }
-
                         }
-
+                        
                         response.status = true;
                         response.message = "Walkin Form saved successfully";
                         response.error = null;
                         response.data = {
                             walkinMessage: results[2][0],
                             token: results[3][0].token
-                        };
-                        res.status(200).json(response);
-                    }
-
-                    else if (!err && (results[1] || results[2] && results[2][0].walkinFormMessage)) {   //  walkIn formMessage without token
-                        console.log('Result with only walk-In Message');
-
-                        if (results[4] && results[4][0] || results[5] || results[5][0]) {
-
-                            var mailContent = (results[5] && results[5][0]) ? results[5][0].mailBody : "Dear [FirstName] <br>Thank you for registering your profile.  We will revert to you once we find your Resume match one of the requirements we have.In the mean time, please [ClickHere] to upload your latest CV that will help us with more detailed information about your profile.Wishing you all the best<br><br>[WalkINSignature]<br>[Disclaimer]";
-
-                            mailContent = mailContent.replace("[FirstName]", req.body.firstName);
-                            mailContent = mailContent.replace("[FullName]", (req.body.firstName + ' ' + req.body.middleName + ' ' + req.body.lastName));
-
-                            var webLink = (results[5] && results[5][0]) ? results[5][0].webLink : "";
-
-                            // For updating resume though url link after registering for walkIn
-
-                            var parentId = (results[6] && results[6][0]) ? results[6][0].walkInApplicantId : undefined;
-                            walkInApplicantId = Date.now().toString().concat(parentId);
-                            var webLinkTo = 'http://23.236.49.140/whatmate/cv-upload/' + walkInApplicantId;
-                            mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
-                            // ------------------------------------------------
-
-                            // mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
-                            var walkInSignature = (results[5] && results[5][0]) ? results[5][0].walkInSignature : "";
-                            var disclaimer = (results[5] && results[5][0]) ? results[5][0].disclaimer : "";
-
-                            mailContent = mailContent.replace("[WalkINSignature]", walkInSignature);
-                            mailContent = mailContent.replace("[Disclaimer]", disclaimer);
-
-                            var subject = results[5][0].mailSubject;
-                            // send mail to candidate
-                            var email = new sendgrid.Email();
-                            email.from = results[4][0].fromEmailId;
-                            email.to = req.body.emailId;
-                            email.subject = subject;
-                            email.html = mailContent;
-
-                            sendgrid.send(email, function (err11, result11) {
-                                if (err11) {
-                                    console.log("Failed to send to candidate", err11);
-                                }
-                                else {
-                                    console.log("mail sent successfully to candidate", result11);
-                                }
-                            });
-
-                            // To send mail to refered person
-                            if (results[6]) {
-                                var refererEmail = new sendgrid.Email();
-                                refererEmail.from = results[4][0].fromEmailId;
-                                refererEmail.to = results[6][0].refererMailId;
-                                refererEmail.subject = results[6][0].message;
-                                refererEmail.html = results[6][0].message;
-
-                                sendgrid.send(refererEmail, function (err1, result1) {
-                                    if (err1) {
-                                        console.log("Failed to send to referrer", err1);
-                                    }
-                                    else {
-                                        console.log("mail sent successfully to referrer", result1);
-                                    }
-                                });
-                            }
-
-                            // to send sms to candidate
-
-                            if (results[5][0].sendCandidateSms) {
-                                message = results[5][0].candidateSmsFormat ? results[5][0].candidateSmsFormat : message;
-                                message = message.replace('[token]', '');
-                                if (isdMobile == "+977") {
-                                    request({
-                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                        qs: {
-                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                            to: mobileNo,
-                                            message: message,
-                                            sender: 'Techingen'
-                                        },
-                                        method: 'GET'
-
-                                    }, function (error2, response2, body2) {
-                                        if (error2) {
-                                            console.log(error2, "SMS");
-                                        }
-                                        else {
-                                            console.log("SUCCESS", "SMS response");
-                                            console.log("SUCCESS", "SMS response");
-                                        }
-
-                                    });
-                                }
-                                else if (isdMobile == "+91") {
-                                    console.log('mobile number and isd is', isdMobile, mobileNo);
-                                    request({
-                                        url: 'https://aikonsms.co.in/control/smsapi.php',
-                                        qs: {
-                                            user_name: 'janardana@hirecraft.com',
-                                            password: 'Ezeid2015',
-                                            sender_id: 'WtMate',
-                                            service: 'TRANS',
-                                            mobile_no: mobileNo,
-                                            message: message,
-                                            method: 'send_sms'
-                                        },
-                                        method: 'GET'
-
-                                    }, function (error2, response2, body2) {
-                                        if (error2) {
-                                            console.log(error2, "SMS");
-                                        }
-                                        else {
-                                            console.log("SUCCESS", "SMS response with ISD");
-                                        }
-                                    });
-
-                                    var req5 = http.request(options, function (res5) {
-                                        var chunks = [];
-
-                                        res5.on("data", function (chunk) {
-                                            chunks.push(chunk);
-                                        });
-
-                                        res5.on("end", function () {
-                                            var body5 = Buffer.concat(chunks);
-                                            console.log(body5.toString());
-                                        });
-                                    });
-
-                                    req5.write(qs.stringify({
-                                        userId: 'talentmicro',
-                                        password: 'TalentMicro@123',
-                                        senderId: 'WTMATE',
-                                        sendMethod: 'simpleMsg',
-                                        msgType: 'text',
-                                        mobile: isdMobile.replace("+", "") + mobileNo,
-                                        msg: message,
-                                        duplicateCheck: 'true',
-                                        format: 'json'
-                                    }));
-                                    console.log('sms type 2 gateway worked');
-                                    req5.end();
-                                }
-                                else if (isdMobile != "") {
-                                    client.messages.create(
-                                        {
-                                            body: message,
-                                            to: isdMobile + mobileNo,
-                                            from: '+14434322305'
-                                        },
-                                        function (error6, response6) {
-                                            if (error6) {
-                                                console.log(error6, "SMS");
-                                            }
-                                            else {
-                                                console.log("SUCCESS", "SMS response with empty isd");
-                                            }
-                                        }
-                                    );
-                                }
-                            }
-
-                        }
-
-                        response.status = true;
-                        response.message = "Walkin Form saved successfully";
-                        response.error = null;
-                        response.data = {
-                            walkinMessage: results[2][0]
                         };
                         res.status(200).json(response);
                     }
@@ -1512,6 +1342,8 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             ugEducationList: output ? output : [],
                             pgEducationList: output1 ? output1 : [],
                             isDOBRequired: result[13][0].isDOBRequired,
+                            acceptTnCFlag: result[13][0].acceptTnCFlag,
+                            acceptTnCMsgFormat: result[13][0].acceptTnCMsgFormat,
                             isIDRequired: result[14][0].isIDRequired,
                             IDType: result[14][0].IDType,  // field Name
                             isIDNumberOrString: (result[14] && result[14][0]) ? result[14][0].isIDNumberOrString : 1,
@@ -1524,7 +1356,8 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             directWalkIn: result[14][0].directWalkIn,
                             referredByEmployeeList: result[14][0].referredByEmployeeList,
                             referredByName: result[14][0].referredByName,
-                            vendors: result[14][0].vendors
+                            vendors: result[14][0].vendors,
+                            isProfileMandatory:(result[16] && result[16][0] && result[16][0].isProfileMandatory) ? result[16][0].isProfileMandatory:0
 
                         };
                         if (isWeb == 1) {
@@ -1556,6 +1389,8 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             ugEducationList: [],
                             pgEducationList: [],
                             isDOBRequired: 0,
+                            acceptTnCFlag:0,
+                            acceptTnCMsgFormat:'',
                             isIDRequired: 0,
                             IDType: 0,
                             isIDNumberOrString: 1,
@@ -3044,8 +2879,10 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 req.body.configureUsersFlag = req.body.configureUsersFlag ? req.body.configureUsersFlag : 0;
                 req.body.walkinFormMessage = req.body.walkinFormMessage ? req.body.walkinFormMessage : '';
                 req.body.walkInWelcomeMessage = req.body.walkInWelcomeMessage ? req.body.walkInWelcomeMessage : '';
+                req.body.acceptTnCFlag = req.body.acceptTnCFlag ? req.body.acceptTnCFlag :0;
+                req.body.acceptTnCMsgFormat = req.body.acceptTnCMsgFormat ? req.body.acceptTnCMsgFormat : '';
 
-
+            
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -3074,7 +2911,9 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(req.body.candidateSmsFormat),
                     req.st.db.escape(req.body.configureUsersFlag),
                     req.st.db.escape(req.body.walkinFormMessage),
-                    req.st.db.escape(req.body.walkInWelcomeMessage)
+                    req.st.db.escape(req.body.walkInWelcomeMessage),
+                    req.st.db.escape(req.body.acceptTnCFlag),
+                    req.st.db.escape(req.body.acceptTnCMsgFormat)
                 ];
 
                 var procQuery = 'CALL wm_save_walkWebConfig( ' + inputs.join(',') + ')';

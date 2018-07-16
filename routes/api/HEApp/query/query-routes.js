@@ -13,6 +13,6 @@ router.post('/accounts',queryCtrl.saveAccountsQuery);
 router.post('/admin',queryCtrl.saveAdminQuery);
 router.post('/frontOffice',queryCtrl.saveFrontOfficeQuery);
 
-router.get('/querytypes',queryCtrl.gtQueryTypeList);
+router.get('/querytypes',queryCtrl.getQueryTypeList);
 
 module.exports = router ;

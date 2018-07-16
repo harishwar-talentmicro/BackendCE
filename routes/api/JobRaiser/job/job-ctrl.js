@@ -843,6 +843,13 @@ jobCtrl.saveEducation = function (req, res, next) {
         validationFlag *= false;
     }
 
+    var education = req.body.education;
+    if(typeof(education)=='string'){
+        education = JSON.parse(education);
+    }
+    if(!education){
+        education=[];
+    }
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
@@ -853,7 +860,6 @@ jobCtrl.saveEducation = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
-                req.body.education = (req.body.education) ? req.body.education : '';
                 req.body.level = (req.body.level) ? req.body.level : 0;
                 req.body.educationAlternateName = (req.body.educationAlternateName) ? req.body.educationAlternateName : '';
                 req.body.specialization = (req.body.specialization) ? req.body.specialization : '';
@@ -862,7 +868,7 @@ jobCtrl.saveEducation = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     // req.st.db.escape(req.body.tid),  
-                    req.st.db.escape(req.body.education),
+                    req.st.db.escape(JSON.stringify(education)),
                     req.st.db.escape(req.body.level),
                     req.st.db.escape(req.body.educationAlternateName),
                     req.st.db.escape(req.body.specialization),
@@ -2278,7 +2284,7 @@ jobCtrl.getJdTemplateDetails = function (req, res, next) {
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
                     var isWeb = req.query.isWeb;
-                    if (!err && result && result[0]) {
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "Jd Template Details  loaded successfully";
                         response.error = null;

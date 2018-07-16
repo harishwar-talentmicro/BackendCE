@@ -378,14 +378,15 @@ greetingCtrl.getrewardandrecognition  = function (req, res, next) {
                         //        results=JSON.parse(results[0][0].rewardAndRecognitionList);
                         // }
                         response.data = {
-
-                            rewardAndRecognitionList: JSON.parse(results[0][0].rewardANDrecognition)
+                            typeList:results[0],
+                            rewardRecognitionList: JSON.parse(results[1][0].rewardANDrecognition),
+                            totalCount:results[2][0].totalCount
                         };
-                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        // zlib.gzip(buf, function (_, result) {
-                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                         zlib.gzip(buf, function (_, result) {
+                             response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
-                        // });
+                         });
 
                     }
                     else if (!err) {
@@ -393,13 +394,15 @@ greetingCtrl.getrewardandrecognition  = function (req, res, next) {
                         response.message = "No rewards and recognition found";
                         response.error = null;
                         response.data = {
-                            rewardAndRecognitionList:[]
+                            typeList:[],
+                            rewardAndRecognitionList:[],
+                            totalCount:0
                         };
-                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        // zlib.gzip(buf, function (_, result) {
-                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
-                        // });
+                        });
                     }
                     else {
                         response.status = false;
@@ -418,4 +421,9 @@ greetingCtrl.getrewardandrecognition  = function (req, res, next) {
 
 };
 
+
+
+
 module.exports = greetingCtrl;
+
+

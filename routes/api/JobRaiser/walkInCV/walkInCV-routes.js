@@ -36,7 +36,7 @@ router.post('/walkincvupload',walkInCvCtrl.walkInCVUpload);
 router.get('/validateLink',walkInCvCtrl.walkInUploadLinkFlag);
 
 router.get('/masterDataCVUpdate',walkInCvCtrl.masterDataofCVUpdate);
-router.post('/saveCVUpdate',walkInCvCtrl.saveCVUpdatedData);
+router.post('/cvSourcingUpdate',walkInCvCtrl.saveCVUpdatedData);
 
 
 module.exports = router;

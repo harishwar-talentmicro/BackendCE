@@ -236,16 +236,16 @@ paceUsersCtrl.getUsers = function (req, res, next) {
                 var procQuery = 'CALL wm_get_pace_users( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
-                    if (!err && result && result[0]) {
+                    if (!err && result && result[0] && result[0][0] && result[1]) {
                         response.status = true;
                         response.message = "Users loaded successfully";
                         response.error = false;
                         if (result[1].length > 0) {
-                            result[1][0].jobTitle = result[1][0].jobTitle ? JSON.parse(result[1][0].jobTitle) : {};
-                            result[1][0].userType = result[1][0].userType ? JSON.parse(result[1][0].userType) : {};
-                            result[1][0].transferredTo = result[1][0].transferredTo ? JSON.parse(result[1][0].transferredTo) : {};
+                            result[1][0].jobTitle = result[1][0].jobTitle.jobTitleId ? JSON.parse(result[1][0].jobTitle) : {};
+                            result[1][0].userType = result[1][0].userType.userTypeId ? JSON.parse(result[1][0].userType) : {};
+                            result[1][0].transferredTo = result[1][0].transferredTo.transferredToUserId ? JSON.parse(result[1][0].transferredTo) : {};
                             result[1][0].reportingTo = result[1][0].reportingTo ? JSON.parse(result[1][0].reportingTo) : [];
-                            result[1][0].accessRights = result[1][0].accessRights ? JSON.parse(result[1][0].accessRights) : {};
+                            result[1][0].accessRights = result[1][0].accessRights.templateId ? JSON.parse(result[1][0].accessRights) : {};
                         }
                         response.data = {
                             userList: result[0] ? result[0] : [],

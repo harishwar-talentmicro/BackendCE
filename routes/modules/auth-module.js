@@ -1778,6 +1778,12 @@ Auth.prototype.loginNew = function (req, res, next) {
                                                                     req.db.query(procQuery, function (err, contactResult) {
                                                                         if (!err) {
                                                                             if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
+                                                                                
+
+                                                                                for (var i=0 ; i<UserDetailsResult[1].length ; i++){
+                                                                                    UserDetailsResult[1][i].trackTemplateDetails = UserDetailsResult[1][i] && UserDetailsResult[1][i].trackTemplateDetails ?  JSON.parse(UserDetailsResult[1][i].trackTemplateDetails):[];
+                                                                                }
+                                                                                console.log('user details',UserDetailsResult[1]);
 
                                                                                 UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
                                                                                     (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
@@ -1844,6 +1850,7 @@ Auth.prototype.loginNew = function (req, res, next) {
                                                                                 else {
                                                                                     responseMessage.contactDetails = null;
                                                                                 }
+                                                                                responseMessage.companyDetails = UserDetailsResult[1][0] ? UserDetailsResult[1][0] :{};
 
                                                                                 // saving ios device id to database
                                                                                 // if (isIphone == 1) {
@@ -1905,6 +1912,12 @@ Auth.prototype.loginNew = function (req, res, next) {
                                                 }
                                             }
                                             else {
+
+                                                for (var i=0 ; i<loginResult[1].length ; i++){
+                                                    loginResult[1][i].trackTemplateDetails = loginResult[1][i] && loginResult[1][i].trackTemplateDetails ?  JSON.parse(loginResult[1][i].trackTemplateDetails):[];
+                                                }
+                                                console.log("login company details",loginResult[1][0]);
+
                                                 responseMessage.Token = token;
                                                 responseMessage.IsAuthenticate = true;
                                                 responseMessage.TID = loginDetails[0].TID;
@@ -1949,6 +1962,8 @@ Auth.prototype.loginNew = function (req, res, next) {
                                                 responseMessage.isNewUser = loginDetails[0].isNewUser;
                                                 responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
                                                 responseMessage.attachmentCount = loginDetails[0].attachmentCount;
+                                                responseMessage.companyDetails = loginResult[1][0] ? loginResult[1][0] :{};
+
 
                                                 response.status = true;
                                                 response.message = "Logged in successfully";

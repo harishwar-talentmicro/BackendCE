@@ -96,7 +96,7 @@ BufferStream.prototype._read = function( size ) {
 var gcloud = require('gcloud');
 var fs = require('fs');
 
-var appConfig = require('../../ezeone-config.json');
+// var appConfig = require('../../ezeone-config.json');
 
 var gcs = gcloud.storage({
     projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
@@ -1753,5 +1753,89 @@ Service.prototype.isCommunityMember = function(req,res,next){
 };
 
 
+//To delete files from cloud storage permanently
+/*
+Service.prototype.deleteFileFromCloud = function(req,res,next) {
+
+    var aUrl='',aFilename='';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    try{
+        if(req.body) {
+            if(req.body.attachment) {
+
+                
+                // var gcloud = require('gcloud')({
+                //     projectId: "sampleProject1"
+                //   });
+                //   var gcs = gcloud.storage();
+                //   var myBucket = gcs.bucket('sampleBucket1');
+                //   var file = myBucket.file('1.png');
+                  
+                //   file.delete(function (err, apiResponse) {
+                //     if (err) {
+                //       console.log(err);
+                //     }
+                //     else {
+                //       console.log("Deleted successfully");
+                //     }
+                //   });
+                
+
+                function deleteFile(bucketName, filename) {
+                    // [START storage_delete_file]
+                    // Imports the Google Cloud client library
+                    const Storage = require('@google-cloud/storage');
+                  
+                    // Creates a client
+                    const storage = new Storage();
+                  
+                    
+                     // TODO(developer): Uncomment the following lines before running the sample.
+                     
+                    // const bucketName = 'Name of a bucket, e.g. my-bucket';
+                    // const filename = 'File to delete, e.g. file.txt';
+                  
+                    // Deletes the file from the bucket
+                    storage
+                      .bucket(bucket)
+                      .file(req.body.attachment)
+                      .delete()
+                      .then(() => {
+                        console.log(`gs://${bucket}/${req.body.attachment} deleted.`);
+                      })
+                      .catch(err => {
+                        console.error('ERROR:', err);
+                      });
+                    // [END storage_delete_file]
+                    responseMessage.message = 'File Deleted Successfully';
+                    res.status(200).json(responseMessage);                   
+                }
+            }
+        }
+        else{
+            responseMessage.message = 'path is required';
+            res.status(200).json(responseMessage);
+            console.log('path is required');
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server error'
+        };
+        responseMessage.message = 'An error occurred !';
+        console.log('FnSaveServiceAttachment:error ' + ex);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};*/
 
 module.exports = Service;

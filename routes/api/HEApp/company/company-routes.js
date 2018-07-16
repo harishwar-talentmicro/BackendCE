@@ -13,5 +13,7 @@ router.get('/company/masters',companyCtrl.getComapnyMasters);
 router.post('/company/join',companyCtrl.joinComapny);
 
 router.get('/media/icons',companyCtrl.getSocialMediaLinks);
+router.get('/userData',companyCtrl.getuserProfileDetails);
+
 
 module.exports = router;

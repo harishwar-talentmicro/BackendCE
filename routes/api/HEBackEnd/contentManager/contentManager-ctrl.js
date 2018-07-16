@@ -9,6 +9,10 @@ var Notification_aws = require('../../../modules/notification/aws-sns-push');
 
 var _Notification_aws = new  Notification_aws();
 
+var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
+var notifyMessages = new notifyMessages();
+
+
 contentManagerCtrl.saveContent = function(req,res,next){
     var response = {
         status : false,
@@ -112,6 +116,8 @@ contentManagerCtrl.saveContent = function(req,res,next){
                         if(contentResult[2] && contentResult[2][0].GCM_Id){
                             _Notification_aws.publish_Android(contentResult[2][0].GCM_Id ,messagePayload);
                         }
+
+                        notifyMessages.getMessagesNeedToNotify();
 
                         response.status = true;
                         response.message = "Content saved successfully";
