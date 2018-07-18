@@ -3,11 +3,14 @@ var NotificationTemplater = require('../../../lib/NotificationTemplater.js');
 var notificationTemplater = new NotificationTemplater();
 var Notification = require('../../../modules/notification/notification-master.js');
 var notification = new Notification();
-var fs = require('fs');
+// var fs = require('fs');
 var bodyParser = require('body-parser');
 
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
+var b64;
+var extensionType;
+var name;
 
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
@@ -35,6 +38,10 @@ const client = require('twilio')(accountSid, authToken);
 var CONFIG = require('../../../../ezeone-config.json');
 var DBSecretKey = CONFIG.DB.secretKey;
 
+var uuid = require('node-uuid');
+const fs = require('fs');
+var defer = require('q');
+
 var qs = require("querystring");
 var options = {
     "method": "POST",
@@ -49,6 +56,7 @@ var options = {
 var Mailer = require('../../../../mail/mailer.js');
 var mailerApi = new Mailer();
 var randomstring = require("randomstring");
+
 
 
 try {
@@ -191,6 +199,8 @@ var cloudUrl;
         fs.unlinkSync('Resume.'+ CVFileType);
     });
 });*/
+
+
 
 walkInCvCtrl.getmasterData = function (req, res, next) {
     var response = {
@@ -742,10 +752,10 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                 mailContent = mailContent.replace("[Disclaimer]", disclaimer);
                             }
 
-                            var subject = results[5][0].mailSubject ? results[5][0].mailSubject: 'Registration Completed Successfully';
+                            var subject = results[5][0].mailSubject ? results[5][0].mailSubject : 'Registration Completed Successfully';
                             // send mail to candidate
                             var email = new sendgrid.Email();
-                            email.from = results[4][0].fromEmailId ? results[4][0].fromEmailId :'noreply@talentmicro.com';
+                            email.from = results[4][0].fromEmailId ? results[4][0].fromEmailId : 'noreply@talentmicro.com';
                             email.to = req.body.emailId;
                             email.subject = subject;
                             email.html = mailContent;
@@ -762,7 +772,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             // To send mail to refered person
                             if (results[4] && results[6] && results[6][0]) {
                                 var refererEmail = new sendgrid.Email();
-                                refererEmail.from = results[4][0].fromEmailId ? results[4][0].fromEmailId: 'noreply@talentmicro.com';
+                                refererEmail.from = results[4][0].fromEmailId ? results[4][0].fromEmailId : 'noreply@talentmicro.com';
                                 refererEmail.to = results[6][0].refererMailId;
                                 refererEmail.subject = results[6][0].message;
                                 refererEmail.html = results[6][0].message;
@@ -874,7 +884,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                 }
                             }
                         }
-                        
+
                         response.status = true;
                         response.message = "Walkin Form saved successfully";
                         response.error = null;
@@ -1357,7 +1367,7 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             referredByEmployeeList: result[14][0].referredByEmployeeList,
                             referredByName: result[14][0].referredByName,
                             vendors: result[14][0].vendors,
-                            isProfileMandatory:(result[16] && result[16][0] && result[16][0].isProfileMandatory) ? result[16][0].isProfileMandatory:0
+                            isProfileMandatory: (result[16] && result[16][0] && result[16][0].isProfileMandatory) ? result[16][0].isProfileMandatory : 0
 
                         };
                         if (isWeb == 1) {
@@ -1389,8 +1399,8 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             ugEducationList: [],
                             pgEducationList: [],
                             isDOBRequired: 0,
-                            acceptTnCFlag:0,
-                            acceptTnCMsgFormat:'',
+                            acceptTnCFlag: 0,
+                            acceptTnCMsgFormat: '',
                             isIDRequired: 0,
                             IDType: 0,
                             isIDNumberOrString: 1,
@@ -1554,14 +1564,72 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                 var heMasterId = loginResult[1][0].heMasterId;
                                 console.log('heMasterId is', heMasterId);
                                 candidateDetailsHirecraft = candidateDetails;
-                                console.log(candidateDetailsHirecraft)
+                                // console.log(candidateDetailsHirecraft)
 
-                                // attachFile.then(function (resp) {
+                                var b64 = candidateDetails.cvFile;
+                                console.log("----------", b64, "-=-==--=--=-");
+                                var extensionType = candidateDetails.cvFileType;
+                                // console.log("----------",extensionType);
+                                var name = candidateDetails.CVFileName;
 
-                                //     candidateDetails.cvFile=cloudUrl;
+                                var attachFile = new Promise(function (resolve, reject) {
+                                  
+                                    
+                                
+                                    // new Buffer(b64, 'base64').toString();
+                                    var buff = new Buffer(b64, 'base64');
+                                    fs.writeFileSync('stack-abuse-logo-out.docx', buff);
+                                
+                                    // console.log('Base64 image data converted to file: stack-abuse-logo-out.txt');
+                                
+                                    fs.readFile('stack-abuse-logo-out.docx', 'utf8', function (err, data) {
+                                        if (err) {
+                                            return console.log(err);
+                                        }
+                                        console.log("-hbjkliu-", data);
+                                    });
+                                
+                                    var attachment = {
+                                        path: 'stack-abuse-logo-out.docx',
+                                        extension: extensionType,
+                                        fileName: name
+                                    };
+                                
+                                    var uniqueId = uuid.v4();
+                                    var filetype = (attachment.extension) ? attachment.extension : '';
+                                    //    console.log(filetype);
+                                    aUrl = uniqueId + '.' + filetype;
+                                    //    console.log (uniqueId);
+                                    aFilename = attachment.fileName;
+                                    //    console.log("aFilenameaFilename",aFilename);
+                                    //    console.log("req.files.attachment.path",attachment.path);
+                                
+                                    var readStream = fs.createReadStream(attachment.path);
+                                
+                                
+                                    uploadDocumentToCloud(aUrl, readStream, function (err) {
+                                        if (!err) {
+                                            console.log(aUrl)
+                                        }
+                                        else {
+                                
+                                            console.log('FnSaveServiceAttachment:attachment not upload');
+                                        }
+                                    });
+                                    fs.unlinkSync('stack-abuse-logo-out.docx');
+                                
+                                });
 
-                                //     console.log(candidateDetails);
+                                attachFile.then(function (result) {
+                                    // Use user details from here
+                                    console.log(result)
+                                }, function (err) {
+                                    console.log(err);
+                                })
 
+
+
+                                  candidateDetails.cvFile=aUrl;
 
                                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                                 req.body.parentId = req.body.parentId ? req.body.parentId : 0;
@@ -1606,7 +1674,7 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                 ];
 
                                 var procQuery = 'CALL wm_save_interviewSchedulerForHirecraft( ' + procParams.join(',') + ')';
-                                console.log(procQuery);
+                                //  console.log(procQuery);
                                 req.db.query(procQuery, function (err, results) {
                                     console.log(err);
 
@@ -2879,10 +2947,10 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 req.body.configureUsersFlag = req.body.configureUsersFlag ? req.body.configureUsersFlag : 0;
                 req.body.walkinFormMessage = req.body.walkinFormMessage ? req.body.walkinFormMessage : '';
                 req.body.walkInWelcomeMessage = req.body.walkInWelcomeMessage ? req.body.walkInWelcomeMessage : '';
-                req.body.acceptTnCFlag = req.body.acceptTnCFlag ? req.body.acceptTnCFlag :0;
+                req.body.acceptTnCFlag = req.body.acceptTnCFlag ? req.body.acceptTnCFlag : 0;
                 req.body.acceptTnCMsgFormat = req.body.acceptTnCMsgFormat ? req.body.acceptTnCMsgFormat : '';
 
-            
+
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -3208,7 +3276,7 @@ walkInCvCtrl.saveCVUpdatedData = function (req, res, next) {
     var message = "Congratulations your profile is successfully registered";
 
     var validationFlag = true;
-   
+
     if (!req.body.firstName) {
         error.firstName = 'First Name is Mandatory';
         validationFlag *= false;
@@ -3332,7 +3400,7 @@ walkInCvCtrl.saveCVUpdatedData = function (req, res, next) {
         parentId = cvSourcingParentId.substr(13);  // parentId is in string
         parentId = parseInt(parentId);   // parse to string
 
-s
+        s
         var inputs = [
             req.st.db.escape(req.body.heMasterId),
             req.st.db.escape(parentId),
@@ -3443,7 +3511,7 @@ s
                 response.message = "Data saved successfully";
                 response.error = null;
                 response.data = {
-                    walkinFormMessage: results[0][0].walkinFormMessage ? results[0][0].walkinFormMessage :''
+                    walkinFormMessage: results[0][0].walkinFormMessage ? results[0][0].walkinFormMessage : ''
                     // token: results[3][0].token
                 };
                 res.status(200).json(response);
