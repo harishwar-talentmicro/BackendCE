@@ -12,5 +12,6 @@ router.post('/',greetingCtrl.sendGreeting);
 
 router.get('/greetingMaster',greetingCtrl.getGreetingsMaster);
 router.get('/rewardandrecognition',greetingCtrl.getrewardandrecognition);
+router.post('/rewardandrecognition',greetingCtrl.saverewardAndrecognition);
 
 module.exports = router;

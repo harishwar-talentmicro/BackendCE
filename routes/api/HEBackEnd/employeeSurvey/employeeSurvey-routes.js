@@ -9,6 +9,7 @@ router.post('/saveSurvey',employeeSurveyCtrl.serveyConfigureToUsers);
 
 router.post('/surveySaveByUsers',employeeSurveyCtrl.saveServeyOfUsers);
 
+router.get('/surveyReport',employeeSurveyCtrl.getSurveyReport);
 module.exports = router;
 
 
