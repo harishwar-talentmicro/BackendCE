@@ -31,4 +31,6 @@ router.get('/announcementDetail',messageCtrl.GetAnnouncementDetail);
 
 router.post('/test',messageCtrl.sendMessageTest);
 
+router.post('/processUpdate',messageCtrl.processUpdate);
+
 module.exports = router;

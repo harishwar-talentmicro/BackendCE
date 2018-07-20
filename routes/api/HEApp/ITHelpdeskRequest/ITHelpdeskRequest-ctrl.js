@@ -65,6 +65,14 @@ helpdeskCtrl.saveHelpdesk = function(req,res,next){
                         if(!keywordList){
                             keywordList = [];
                         }
+
+                        var queryType = req.body.queryType;
+                    if (typeof (queryType) == "string") {
+                        queryType = JSON.parse(queryType);
+                    }
+                    if (!queryType) {
+                        queryType = {};
+                    }
                                         
                     var senderGroupId;
                 
@@ -101,7 +109,8 @@ helpdeskCtrl.saveHelpdesk = function(req,res,next){
                             req.st.db.escape(JSON.stringify(attachmentList)),
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
-                            req.st.db.escape(DBSecretKey)                
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(JSON.stringify(queryType))                
                         ];
 
                         var ITHelpDeskFormId=1027;

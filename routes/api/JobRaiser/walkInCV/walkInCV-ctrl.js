@@ -3202,7 +3202,7 @@ walkInCvCtrl.saveCVUpdatedData = function (req, res, next) {
         data: null,
         error: null
     };
-
+    // var s;
     var isdMobile = req.body.mobileISD;
     var mobileNo = req.body.mobileNumber;
     var message = "Congratulations your profile is successfully registered";
@@ -3332,7 +3332,7 @@ walkInCvCtrl.saveCVUpdatedData = function (req, res, next) {
         parentId = cvSourcingParentId.substr(13);  // parentId is in string
         parentId = parseInt(parentId);   // parse to string
 
-s
+
         var inputs = [
             req.st.db.escape(req.body.heMasterId),
             req.st.db.escape(parentId),

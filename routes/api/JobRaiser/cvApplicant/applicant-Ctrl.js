@@ -250,8 +250,10 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         req.body.phoneNumber = (req.body.phoneNumber) ? req.body.phoneNumber : "";
                         req.body.mobileISD = (req.body.mobileISD) ? req.body.mobileISD : "";
                         req.body.address = (req.body.address) ? req.body.address : "";
-                        req.body.latitude = (req.body.latitude) ? req.body.latitude : 0.0;
-                        req.body.longitude = (req.body.longitude) ? req.body.longitude : 0.0;
+                        // req.body.latitude = (req.body.latitude) ? req.body.latitude : 0.0;
+                        // req.body.longitude = (req.body.longitude) ? req.body.longitude : 0.0;
+                        req.body.longitude = 0.0;
+                        req.body.latitude = 0.0;
                         req.body.IDadhaarNumber = (req.body.IDadhaarNumber) ? req.body.IDadhaarNumber : "";
                         req.body.passportNumber = (req.body.passportNumber) ? req.body.passportNumber : "";
                         req.body.ppExpiryDate = (req.body.ppExpiryDate) ? req.body.ppExpiryDate : "0000-00-00 00:00:00";
@@ -271,6 +273,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
                         req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 0;
                         req.body.referredBy = req.body.referredBy ? req.body.referredBy : "";
+                        req.body.gender = (req.body.gender && req.body.gender  !='null')  ? req.body.gender : undefined;
 
                         var inputs = [
                             req.st.db.escape(req.query.token),

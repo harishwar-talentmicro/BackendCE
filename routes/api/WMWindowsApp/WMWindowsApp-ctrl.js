@@ -401,7 +401,8 @@ windowsCtrl.uploadUsers = function(req,res,next){
 
                 var encryptPwd = req.st.hashPassword(password);
                 var Qndata = req.body.data;
-
+                console.log("req.body.data",req.body.data);
+               
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.HEMasterId),
@@ -415,8 +416,8 @@ windowsCtrl.uploadUsers = function(req,res,next){
                     req.st.db.escape(Qndata[0].workgroup),
                     req.st.db.escape(Qndata[0].rm),
                     req.st.db.escape(Qndata[0].email),
-                    req.st.db.escape(DBSecretKey)                                                                                                                        
-                ];
+                    req.st.db.escape(DBSecretKey)
+                ]; 
 
                 //CompanyName
                 var procQuery = 'CALL he_import_bulkUsers( ' + procParams.join(',') + ')';

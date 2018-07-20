@@ -236,20 +236,29 @@ paceUsersCtrl.getUsers = function (req, res, next) {
                 var procQuery = 'CALL wm_get_pace_users( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
-                    if (!err && result && result[0] && result[0][0] && result[1]) {
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "Users loaded successfully";
                         response.error = false;
-                        if (result[1].length > 0) {
-                            result[1][0].jobTitle = result[1][0].jobTitle.jobTitleId ? JSON.parse(result[1][0].jobTitle) : {};
-                            result[1][0].userType = result[1][0].userType.userTypeId ? JSON.parse(result[1][0].userType) : {};
-                            result[1][0].transferredTo = result[1][0].transferredTo.transferredToUserId ? JSON.parse(result[1][0].transferredTo) : {};
-                            result[1][0].reportingTo = result[1][0].reportingTo ? JSON.parse(result[1][0].reportingTo) : [];
-                            result[1][0].accessRights = result[1][0].accessRights.templateId ? JSON.parse(result[1][0].accessRights) : {};
+
+                        if (req.query.userMasterId == 0){
+                            for(var i=0; i<result[0].length;i++){
+                                result[0][i].accessRights = result[0][i].accessRights.templateId ? JSON.parse(result[0][i].accessRights) :{};
+                            }    
                         }
+                        else{
+                       
+                                result[0][0].jobTitle = result[0][0].jobTitle.jobTitleId ? JSON.parse(result[0][0].jobTitle) : {};
+                                result[0][0].userType = result[0][0].userType.userTypeId ? JSON.parse(result[0][0].userType) : {};
+                                result[0][0].transferredTo = result[0][0].transferredTo.transferredToUserId ? JSON.parse(result[0][0].transferredTo) : {};
+                                result[0][0].reportingTo = result[0][0].reportingTo ? JSON.parse(result[0][0].reportingTo) : [];
+                                console.log('result[0][0].accessRights.templateId',result[0][0].accessRights.templateId);
+                                result[0][0].accessRights = result[0][0].accessRights ? JSON.parse(result[0][0].accessRights) : {};   
+                        }
+                       
                         response.data = {
                             userList: result[0] ? result[0] : [],
-                            userDetail: result[1][0] ? result[1][0] : {}
+                            userDetail: result[0][0] ? result[0][0] : {}
                         };
                         res.status(200).json(response);
                     }

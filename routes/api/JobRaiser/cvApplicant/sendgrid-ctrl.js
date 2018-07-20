@@ -1771,6 +1771,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                         var temp = mailBody;
                         var temp1 = subject;
                         var temp2 = smsMsg;
+                        var clientData = [];
 
                         for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
                             for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
@@ -1846,7 +1847,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                                 mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
 
                             }
-
+                            clientData.push(result[1][clientIndex].EmailId);
                             mailbody_array.push(mailBody);
                             subject_array.push(subject);
                             smsMsg_array.push(smsMsg);
@@ -1862,7 +1863,8 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                         response.data = {
                             tagsPreview: mailbody_array,
                             subjectPreview: subject_array,
-                            smsMsgPreview: smsMsg_array
+                            smsMsgPreview: smsMsg_array,
+                            clientData : clientData
                         };
                         res.status(200).json(response);
                     }
@@ -1874,7 +1876,8 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                         response.data = {
                             tagsPreview: [],
                             subjectPreview: [],
-                            smsMsgPreview: []
+                            smsMsgPreview: [],
+                            clientData: []
                         };
                         res.status(200).json(response);
                     }
@@ -2191,11 +2194,13 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                 email.html = mailOptions.html;
                                 //if 1 or more attachments are present
                                 for (var file = 0; file < attachment.length; file++) {
-                                    email.addFile({
-                                        filename: attachment[file].fileName,
-                                        content: new Buffer(attachment[file].binaryFile, 'base64'),
-                                        contentType: attachment[file].fileType
-                                    });
+                                    if (attachment[file].binaryFile){
+                                        email.addFile({
+                                            filename: attachment[file].fileName,
+                                            content: new Buffer(attachment[file].binaryFile, 'base64'),
+                                            contentType: attachment[file].fileType
+                                        });
+                                    }
                                 }
 
                                 if (trackerTemplate.trackerId) {
@@ -2526,6 +2531,7 @@ sendgridCtrl.clientMailerPreview = function (req, res, next) {
                         var temp = mailBody;
                         var temp1 = subject;
                         var temp2 = smsMsg;
+                        var clientData =[];
 
                         for (var clientIndex = 0; clientIndex < idArray.length; clientIndex++) {
 
@@ -2539,6 +2545,8 @@ sendgridCtrl.clientMailerPreview = function (req, res, next) {
                                     smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
                                 }
                             }
+
+                            clientData.push(result[0][clientIndex].EmailId);                            
                             mailbody_array.push(mailBody);
                             subject_array.push(subject);
                             smsMsg_array.push(smsMsg);
@@ -2553,7 +2561,8 @@ sendgridCtrl.clientMailerPreview = function (req, res, next) {
                         response.data = {
                             tagsPreview: mailbody_array,
                             subjectPreview: subject_array,
-                            smsMsgPreview: smsMsg_array
+                            smsMsgPreview: smsMsg_array,
+                            clientData : clientData
                         };
                         res.status(200).json(response);
                     }
@@ -2565,7 +2574,8 @@ sendgridCtrl.clientMailerPreview = function (req, res, next) {
                         response.data = {
                             tagsPreview: [],
                             subjectPreview: [],
-                            smsMsgPreview: []
+                            smsMsgPreview: [],
+                            clientData :[]
                         };
                         res.status(200).json(response);
                     }
@@ -3121,6 +3131,8 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                         var temp = mailBody;
                         var temp1 = subject;
                         var temp2 = smsMsg;
+                        var clientData =[];
+                        var applicantData=[];
 
                         if (interviewerFlag) {
                             for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
@@ -3197,6 +3209,7 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
 
                                 }
 
+                                clientData.push(result[1][clientIndex].EmailId);
                                 mailbody_array.push(mailBody);
                                 subject_array.push(subject);
                                 smsMsg_array.push(smsMsg);
@@ -3243,7 +3256,9 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                         smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
                                     }
                                 }
+                                applicantData.push(result[0][applicantIndex].EmailId);
                             }
+                            
                             mailbody_array.push(mailBody);
                             subject_array.push(subject);
                             smsMsg_array.push(smsMsg);
@@ -3262,7 +3277,8 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                             smsMsgPreview: smsMsg_array,
                             applicants:result[0],
                             clientContacts: result[1],
-
+                            clientData : clientData,
+                            applicantData : applicantData
                         };
                         res.status(200).json(response);
                     }
@@ -3274,7 +3290,9 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                         response.data = {
                             tagsPreview: [],
                             subjectPreview: [],
-                            smsMsgPreview: []
+                            smsMsgPreview: [],
+                            clientData :[],
+                            applicantData :[]
                         };
                         res.status(200).json(response);
                     }

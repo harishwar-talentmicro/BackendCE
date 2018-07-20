@@ -1754,7 +1754,7 @@ Auth.prototype.loginNew = function (req, res, next) {
                         var query = 'CALL PLoginNew(' + queryParams + ')';
                         console.log('query', query);
                         st.db.query(query, function (err, loginResult) {
-                            console.log(loginResult);
+                            // console.log(loginResult);
                             if (!err) {
                                 if (loginResult && password) {
                                     //console.log('loginDetails',loginDetails);
@@ -1783,7 +1783,7 @@ Auth.prototype.loginNew = function (req, res, next) {
                                                                                 for (var i=0 ; i<UserDetailsResult[1].length ; i++){
                                                                                     UserDetailsResult[1][i].trackTemplateDetails = UserDetailsResult[1][i] && UserDetailsResult[1][i].trackTemplateDetails ?  JSON.parse(UserDetailsResult[1][i].trackTemplateDetails):[];
                                                                                 }
-                                                                                console.log('user details',UserDetailsResult[1]);
+                                                                                console.log('login new token generation',UserDetailsResult[1]);
 
                                                                                 UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
                                                                                     (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
@@ -1916,7 +1916,7 @@ Auth.prototype.loginNew = function (req, res, next) {
                                                 for (var i=0 ; i<loginResult[1].length ; i++){
                                                     loginResult[1][i].trackTemplateDetails = loginResult[1][i] && loginResult[1][i].trackTemplateDetails ?  JSON.parse(loginResult[1][i].trackTemplateDetails):[];
                                                 }
-                                                console.log("login company details",loginResult[1][0]);
+                                                console.log("login company details with existing token",loginResult[1][0]);
 
                                                 responseMessage.Token = token;
                                                 responseMessage.IsAuthenticate = true;
