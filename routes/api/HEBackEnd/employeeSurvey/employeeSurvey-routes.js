@@ -19,6 +19,7 @@ router.post('/uploadUsersfromweb',employeeSurveyCtrl.uploadUsersfromweb);
 
 router.get('/surveyListWeb',employeeSurveyCtrl.getSurveyListWeb);
 
+router.get('/surveyReport',employeeSurveyCtrl.getSurveyReport);
 module.exports = router;
 
 

@@ -681,10 +681,10 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.body.type) {
-        error.type = 'Invalid type';
-        validationFlag *= false;
-    }
+    // if (!req.body.type) {
+    //     error.type = 'Invalid type';
+    //     validationFlag *= false;
+    // }
 
     if (!req.body.heMasterId) {
         error.heMasterId = 'Invalid heMasterId';
@@ -761,8 +761,8 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                                         lenna.print(font, 50, 610, title1)
                                         Jimp.loadFont(Jimp.FONT_SANS_32_WHITE).then(function (font) {
                                             lenna.print(font, 50, 660, title2, 650)
-                                            lenna.write("lena-small-bw.png")
-                                            resolve(lenna.write("lena-small-bw.png"));
+                                            resolve(lenna.write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw.png"));
+                                            // resolve(lenna.write("lena-small-bw.png"));
                 
                                         });
                 
@@ -779,13 +779,13 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                     console.log("response after promise", resp);
                     // setTimeout(function () {
                         var attachment = {
-                            path: "lena-small-bw.png",
+                            path: "/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw.png",
                             extension: 'png',
                             fileName: 'gunasheel'
                         };
 
                         console.log("lena-small-bw.png")
-
+ 
                         var filetype = (attachment.extension) ? attachment.extension : '';
 
                         // console.log(filetype);

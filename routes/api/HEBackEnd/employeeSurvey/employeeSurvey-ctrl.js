@@ -1193,4 +1193,102 @@ employeeSurveyCtrl.getSurveyListWeb=function(req,res,next){
     }
 };
 
+employeeSurveyCtrl.getSurveyReport = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+               
+                req.body.QTemplateId = (req.body.QTemplateId) ? req.body.QTemplateId : 0;
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    
+                ];
+                /**
+                 * Calling procedure to My self and my team leave apllications
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_get_surveyReports( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, results) {
+                  
+                    if (!err && results && results[0] && results[0][0]) {
+                        response.status = true;
+                        response.message = "Survey Report loaded successfully";
+                        response.error = null;
+
+
+                        for(var i=0; i<results.length; i++){
+                            if(typeof(results[i][0].userDetails)=='string'){
+                                results[i][0].questionDetails = JSON.parse(results[i][0].questionDetails);
+                            }
+                            
+                            
+                        }
+
+                        response.data = {
+                            surveyUserReport: results[0],
+                            // upcomingEvents: results[1]                            
+                        };
+                        // res.status(200).json(response);
+                        buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                       });
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No task requests found";
+                        response.error = null;
+                        response.data = {
+                            surveyList: []
+                        };
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                         });
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting task requests";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 module.exports = employeeSurveyCtrl;
