@@ -143,7 +143,7 @@ employeeSurveyCtrl.getSurveyList = function (req, res, next) {
 employeeSurveyCtrl.serveyConfigureToUsers=function(req,res,next){
     var response = {
         status : false,
-        message : "Error while loading users",
+        message : "Error while publishing survey",
         data : null,
         error : null
     };
@@ -264,7 +264,7 @@ employeeSurveyCtrl.serveyConfigureToUsers=function(req,res,next){
                         response.message = "Survey data saved successfully";
                         response.error = null;
 
-                        notifyMessages.getMessagesNeedToNotify();
+                        // notifyMessages.getMessagesNeedToNotify();
 
                         response.data = results[0][0];
                         res.status(200).json(response);
