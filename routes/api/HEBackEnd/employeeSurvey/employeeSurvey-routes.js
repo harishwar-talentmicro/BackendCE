@@ -11,7 +11,7 @@ router.post('/surveySaveByUsers',employeeSurveyCtrl.saveServeyOfUsers);
 
 router.get('/surveyMaster',employeeSurveyCtrl.getSurveyMaster);
 
-router.post('/saveSurveyTemplate',employeeSurveyCtrl.saveSurveyForWebConfig);
+router.post('/saveSurveyQuestion',employeeSurveyCtrl.saveSurveyForWebConfig);
 
 router.post('/saveSurveyTemplateWithQuestions',employeeSurveyCtrl.saveSurveyTemplateWithQuestions);
 
@@ -19,7 +19,14 @@ router.post('/uploadUsersfromweb',employeeSurveyCtrl.uploadUsersfromweb);
 
 router.get('/surveyListWeb',employeeSurveyCtrl.getSurveyListWeb);
 
-router.get('/surveyReport',employeeSurveyCtrl.getSurveyReport);
+router.get('/surveyNotifier',employeeSurveyCtrl.notifySurvey);
+
+router.get('/surveyReportExport',employeeSurveyCtrl.surveyReportExport);
+
+router.get('/surveyStatusChange',employeeSurveyCtrl.surveyStatusChange);
+
+router.get('/surveySummary',employeeSurveyCtrl.surveyQuestionReport);
+
 module.exports = router;
 
 

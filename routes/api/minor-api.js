@@ -10,7 +10,7 @@ var notifyMessages = require('../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
 var appConfig = require('../../ezeone-config.json');
 
-var DBSecretKey=appConfig.DB.secretKey;
+var DBSecretKey = appConfig.DB.secretKey;
 
 var request = require('request');
 // var Client = require('node-rest-client').Client;   // for interview scheduler hirecraft
@@ -102,7 +102,7 @@ var WMWindowsApp = require('./WMWindowsApp/WMWindowsApp-routes');
 var zoom = require('./zoomMeeting/zoomMeeting-routes');
 var appGeneralRequest = require('./HEApp/generalRequest.js');
 var WGRM = require('./HEBackEnd/WGRMTemplates.js');
-var eSurvey=require('./HEBackEnd/employeeSurvey.js');
+var eSurvey = require('./HEBackEnd/employeeSurvey.js');
 // var likeShareComment=require('./HEApp/likeShareComment.js');
 
 var hospitalTokenManagement = require('./HEApp/hospitalTokenManagement.js');
@@ -367,7 +367,7 @@ cron.schedule('*/15 * * * *', function () {
     var procQuery = 'CALL he_leave_calculator()';
     console.log(procQuery);
     db.query(procQuery, function (err, results) {
-        console.log(results);
+        // console.log(results);
         if (!err) {
             console.log(err);
         }
@@ -395,13 +395,7 @@ cron.schedule('*/15 * * * *', function () {
 cron.schedule('*/10 * * * *', function () {
     console.log('running a notify messages');
     notifyMessages.getMessagesNeedToNotify();
-    
-
-
-
 });
-
-
 
 
 //Example POST method invocation
@@ -417,7 +411,7 @@ if (cluster.isWorker) {
     if (cluster.worker.id == 1) {
 
         var cronJobInterview = new CronJob({
-            cronTime: '*/15 * * * *',
+            cronTime: '*/30 * * * *',
             onTick: function () {
                 var query = "call wm_integrationUrlForHircraft()";
                 db.query(query, function (err, result) {
@@ -459,7 +453,7 @@ if (cluster.isWorker) {
                                     }
                                 }
                             }
-                            // console.log(response_server);
+                            console.log("response_server", response_server);
                             var count = 0;
                             request({
                                 url: DBUrl,
@@ -469,6 +463,7 @@ if (cluster.isWorker) {
                             }, function (error, response, body) {
                                 console.log(error);
                                 console.log(body);
+                                console.log("response_server", response_server);
                                 if (body && body.Code && body.Code == "SUCCESS0001") {
                                     var updateQuery = "update 1014_trans set sync=1 where heParentId=" + transId;
                                     db.query(updateQuery, function (err, results) {
@@ -497,19 +492,16 @@ if (cluster.isWorker) {
 // });
 
 
-// cron.schedule('*/15 * * * *', function () {
-
-// var cluster = require('cluster');
 
 if (cluster.isWorker) {
-    console.log('asdf', cluster.worker.id);
+    console.log('walkIn cluster', cluster.worker.id);
 
     if (cluster.worker.id == 1) {
         // run job
 
         console.log("bye take care")
         var cronJobWalkIn = new CronJob({
-            cronTime: '45 * * * * *',
+            cronTime: '/1 * * * * *',
             onTick: function () {
                 var query = "call wm_integrationUrlwalkIn()";
                 db.query(query, function (err, result) {
@@ -539,7 +531,8 @@ if (cluster.isWorker) {
                                 console.log(error);
                                 console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
                                 if (body && body.Code && ((body.Code == "SAVED") || body.Rid || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "INFO_03") || (body.Code == "ERR_07") || (body.Code == "ERR_08"))) {
-                                    var updateQuery = "update 1039_trans set sync=1 and Rid="+body.Rid+" where heParentId=" + transId ;
+                                    var updateQuery = "update 1039_trans set sync=1, Rid=" + body.Rid + " where heParentId=" + transId;
+                                    console.log("walkIn", updateQuery);
                                     db.query(updateQuery, function (err, results) {
                                         if (err) {
                                             console.log("update sync query throws error");
@@ -568,17 +561,17 @@ if (cluster.isWorker) {
 // var cluster = require('cluster');
 
 if (cluster.isWorker) {
-    console.log('asdf', cluster.worker.id);
-    
+    console.log('quess walkIn cluster', cluster.worker.id);
+
     if (cluster.worker.id == 1) {
 
 
         var cronJobWalkInQuessCorp = new CronJob({
-            cronTime: '30 * * * * *',
+            cronTime: '*/2 * * * * *',
             onTick: function () {
                 var query = "call wm_integrationUrlwalkInForQuessCorp()";
                 db.query(query, function (err, result) {
-                    console.log('Running walkin cron job For Quess Corp');
+                    console.log('Running walkin cron job For Quess Corp ', query);
                     if (err) {
                         console.log('error: integrationUrl For Quess Corp');
                     }
@@ -604,7 +597,7 @@ if (cluster.isWorker) {
                                 console.log(error);
                                 console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
                                 if (body && body.Code && ((body.Code == "SAVED") || body.Rid || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "INFO_03") || (body.Code == "ERR_07") || (body.Code == "ERR_08"))) {
-                                    var updateQuery = "update 1039_trans set sync=1 and Rid="+body.Rid+" where heParentId=" + transId;
+                                    var updateQuery = "update 1039_trans set sync=1, Rid=" + body.Rid + " where heParentId=" + transId;
                                     db.query(updateQuery, function (err, results) {
                                         if (err) {
                                             console.log("update sync query throws error");
@@ -628,92 +621,79 @@ if (cluster.isWorker) {
     }
 }
 
-// var cluster = require('cluster');
+
+
 
 if (cluster.isWorker) {
 
     if (cluster.worker.id == 1) {
-var cronJobgreeting = new CronJob({
-    cronTime: '30 * * * * *',
-    onTick: function () {
+        var cronJobgreeting = new CronJob({
+            cronTime: '00 08 * * * *',
+            onTick: function () {
 
-    // console.log('running a notify messages');
-    // notifyMessages.getMessagesNeedToNotify();
-    cronjob=function (req, res, next) {
-    console.log("greeting cron");
+                // console.log('running a notify messages');
+                // notifyMessages.getMessagesNeedToNotify();
+                cronjob = function (req, res, next) {
+                    console.log("greeting cron");
 
-    var response = {
-        status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
+                    var response = {
+                        status: false,
+                        message: "Invalid token",
+                        data: null,
+                        error: null
+                    };
 
-    var procQuery = 'CALL wm_get_todayDOBList("'+DBSecretKey+'")';
-                console.log(procQuery);
-               db.query(procQuery, function (err, results) {
+                    var procQuery = 'CALL wm_get_todayDOBList("' + DBSecretKey + '")';
+                    console.log(procQuery);
+                    db.query(procQuery, function (err, results) {
 
-                    if (!err && results && results[0]) {
-                        console.log("results[0].senderName", results[0][0].senderName);
-
-                        senderGroupId = results[0][0].senderId;
-                        notifyMessages.getMessagesNeedToNotify();
-                            //     response.status = true;
-                            //     response.message = "greetings saved successfully";
-                            //     response.error = null;
-                            //     response.data = {
-                            //         messageList: {
-                            //             messageId: results[0][0].messageId,
-                            //             message: results[0][0].message,
-                            //             messageLink: results[0][0].messageLink,
-                            //             createdDate: results[0][0].createdDate,
-                            //             messageType: results[0][0].messageType,
-                            //             messageStatus: results[0][0].messageStatus,
-                            //             priority: results[0][0].priority,
-                            //             senderName: results[0][0].senderName,
-                            //             senderId: results[0][0].senderId,
-                            //             // groupId: req.body.groupId,
-                            //             receiverId: results[0][0].receiverId,
-                            //             transId : results[0][0].transId,
-                            //             formId : results[0][0].formId,
-                            //             currentStatus : results[0][0].currentStatus,
-                            //             currentTransId : results[0][0].currentTransId,
-                            //            // localMessageId : req.body.localMessageId,
-                            //             parentId : results[0][0].parentId,
-                            //             accessUserType : results[0][0].accessUserType,
-                            //             heUserId : results[0][0].heUserId,
-                            //             formData : JSON.parse(results[0][0].formDataJSON)
-                            //         }
-                            //     };
-                            //     // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                            //     // zlib.gzip(buf, function (_, result) {
-                            //     //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                            //     //     res.status(200).json(response);
-                            //     // });
-                            
-                            //    // res.status(200).json(response);
+                        if (!err && results && results[0]) {
+                            senderGroupId = results[0][0].senderId;
+                            notifyMessages.getMessagesNeedToNotify();
                             console.log("Greetings sent successfully")
-                            }
-                            
-                            else {
-                                response.status = false;
-                                response.message = "Error while saving greeting";
-                                response.error = null;
-                                response.data = null;
-                                // res.status(500).json(response);
-                                console.log("error");
-                            }
-                        });
-                    }
-                    cronjob();
-                    },
-                    start: false,
-                    timeZone: 'America/Los_Angeles'
-                
-                });
-                cronJobgreeting.start();
-            }
-        }
+                        }
 
+                        else {
+                            console.log("error",err);
+                        }
+                    });
+                }
+                cronjob();
+            },
+            start: false,
+            timeZone: 'America/Los_Angeles'
+
+        });
+        cronJobgreeting.start();
+    }
+}
+
+
+//  query re notifier
+if (cluster.isWorker) {
+
+    if (cluster.worker.id == 1) {
+        var cronJobgreeting = new CronJob({
+            cronTime: '00 08 * * * *',
+            onTick: function () {
+
+                console.log('running a help desk re notifier');
+                var query = "call wm_get_remainderForQuery()";
+                db.query(query, function (err, result) {
+                    if (err) {
+                        console.log('error:wm_get_remainderForQuery', err);
+                    }
+                    else {
+                        notifyMessages.getMessagesNeedToNotify();
+                    }
+                });
+            },
+            start: false,
+            timeZone: 'America/Los_Angeles'
+
+        });
+        cronJobgreeting.start();
+    }
+}
 
 module.exports = router;

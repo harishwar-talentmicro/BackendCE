@@ -15,7 +15,7 @@ const authToken = '3abf04f536ede7f6964919936a35e614';
 const client = require('twilio')(accountSid, authToken);
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
 var appConfig = require('../../../../ezeone-config.json');
-var DBSecretKey=appConfig.DB.secretKey;
+var DBSecretKey = appConfig.DB.secretKey;
 
 
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
@@ -38,6 +38,7 @@ var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 
 
 var employeeSurveyCtrl = {};
+var error = {};
 
 employeeSurveyCtrl.getSurveyList = function (req, res, next) {
     var response = {
@@ -67,12 +68,12 @@ employeeSurveyCtrl.getSurveyList = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-               
+
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    
+
                 ];
                 /**
                  * Calling procedure to My self and my team leave apllications
@@ -81,35 +82,35 @@ employeeSurveyCtrl.getSurveyList = function (req, res, next) {
                 var procQuery = 'CALL wm_get_surveyTemplate( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {
-                  
+
                     if (!err && results && results[0] && results[0][0]) {
                         response.status = true;
                         response.message = "Survey list loaded successfully";
                         response.error = null;
 
 
-                        for(var i=0; i<results[0].length; i++){
-                            if(typeof(results[0][i].questionDetails)=='string'){
+                        for (var i = 0; i < results[0].length; i++) {
+                            if (typeof (results[0][i].questionDetails) == 'string') {
                                 results[0][i].questionDetails = JSON.parse(results[0][i].questionDetails);
                             }
-                            
-                            for(var j=0; j< results[0][i].questionDetails.length; j++){
-                                if(typeof(results[0][i].questionDetails[j].options)=='string'){
-                                    results[0][i].questionDetails[j].options = JSON.parse(results[0][i].questionDetails[j].options); 
+
+                            for (var j = 0; j < results[0][i].questionDetails.length; j++) {
+                                if (typeof (results[0][i].questionDetails[j].options) == 'string') {
+                                    results[0][i].questionDetails[j].options = JSON.parse(results[0][i].questionDetails[j].options);
                                 }
                             }
                         }
 
                         response.data = {
                             surveyList: results[0],
-                            upcomingEvents: results[1]                            
+                            upcomingEvents: results[1]
                         };
                         // res.status(200).json(response);
                         buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
-                       });
+                        });
                     }
                     else if (!err) {
                         response.status = true;
@@ -122,7 +123,7 @@ employeeSurveyCtrl.getSurveyList = function (req, res, next) {
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
-                         });
+                        });
                     }
                     else {
                         response.status = false;
@@ -140,12 +141,12 @@ employeeSurveyCtrl.getSurveyList = function (req, res, next) {
     }
 };
 
-employeeSurveyCtrl.serveyConfigureToUsers=function(req,res,next){
+employeeSurveyCtrl.serveyConfigureToUsers = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Error while publishing survey",
-        data : null,
-        error : null
+        status: false,
+        message: "Error while publishing survey",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -154,12 +155,12 @@ employeeSurveyCtrl.serveyConfigureToUsers=function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.body.heMasterId){
+    if (!req.body.heMasterId) {
         error.hemasterId = 'Invalid company';
         validationFlag *= false;
     }
 
-    if (!req.body.templateId){
+    if (!req.body.templateId) {
         error.templateId = 'Invalid templateId';
         validationFlag *= false;
     }
@@ -179,26 +180,26 @@ employeeSurveyCtrl.serveyConfigureToUsers=function(req,res,next){
     if (!branchList) {
         branchList = [];
     }
-    var department = req.body.department;
-    if (typeof (department) == "string") {
-        department = JSON.parse(department);
+    var departmentList = req.body.departmentList;
+    if (typeof (departmentList) == "string") {
+        departmentList = JSON.parse(departmentList);
     }
-    if (!department) {
-        department = [];
+    if (!departmentList) {
+        departmentList = [];
     }
-    var grade = req.body.grade;
-    if (typeof (grade) == "string") {
-        grade = JSON.parse(grade);
+    var gradeList = req.body.gradeList;
+    if (typeof (gradeList) == "string") {
+        gradeList = JSON.parse(gradeList);
     }
-    if (!grade) {
-        grade = [];
+    if (!gradeList) {
+        gradeList = [];
     }
-    var rmGroup = req.body.rmGroup;
-    if (typeof (rmGroup) == "string") {
-        rmGroup = JSON.parse(rmGroup);
+    var groupList = req.body.groupList;
+    if (typeof (groupList) == "string") {
+        groupList = JSON.parse(groupList);
     }
-    if (!rmGroup) {
-        rmGroup = [];
+    if (!groupList) {
+        groupList = [];
     }
 
     var userList = req.body.userList;
@@ -208,16 +209,16 @@ employeeSurveyCtrl.serveyConfigureToUsers=function(req,res,next){
     if (!userList) {
         userList = [];
     }
-    
-    if (!validationFlag){
+
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.body.surveyManagerId = (req.body.surveyManagerId) ? (req.body.surveyManagerId) : 0;
                 req.body.publishingType = (req.body.publishingType) ? req.body.publishingType : 0;
@@ -226,12 +227,7 @@ employeeSurveyCtrl.serveyConfigureToUsers=function(req,res,next){
                 req.body.endDate = (req.body.endDate) ? (req.body.endDate) : null;
                 req.body.reminderDate = (req.body.reminderDate) ? (req.body.reminderDate) : null;
                 req.body.publishSurvey = (req.body.publishSurvey) ? (req.body.publishSurvey) : 0;
-
-                // req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
-                // req.query.searchKeywords = (req.query.searchKeywords) ? (req.query.searchKeywords) : '';
-                // var startPage = 0;
-
-                // startPage = ((((parseInt(req.query.pageNo)) * req.query.limit) + 1) - req.query.limit) - 1;
+                req.body.status = 1;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -242,35 +238,33 @@ employeeSurveyCtrl.serveyConfigureToUsers=function(req,res,next){
                     req.st.db.escape(req.body.endDate),
                     req.st.db.escape(req.body.reminderDate),
                     req.st.db.escape(req.body.reminderText),
-                    req.st.db.escape(req.body.publishingType),   
+                    req.st.db.escape(req.body.publishingType),
                     req.st.db.escape(JSON.stringify(users)),
                     req.st.db.escape(req.body.publishSurvey),
                     req.st.db.escape(JSON.stringify(userList)),
                     req.st.db.escape(JSON.stringify(branchList)),
-                    req.st.db.escape(JSON.stringify(department)),
-                    req.st.db.escape(JSON.stringify(grade)),
-                    req.st.db.escape(JSON.stringify(rmGroup))
+                    req.st.db.escape(JSON.stringify(departmentList)),
+                    req.st.db.escape(JSON.stringify(gradeList)),
+                    req.st.db.escape(JSON.stringify(groupList)),
+                    req.st.db.escape(req.body.status)
                 ];
-                /**
+                /**CALL wm_save_employeeSurveypublish
                  * Calling procedure to get form template
                  * @type {string}
                  */
-                var procQuery = 'CALL wm_save_employeeSurveypublish( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL wm_save_employeeSurveypublish_New( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
+                req.db.query(procQuery, function (err, results) {
                     console.log(err);
-                    if(!err && results && results[0] &&results[0][0]){
+                    if (!err && results && results[0] && results[0][0]) {
                         response.status = true;
                         response.message = "Survey data saved successfully";
                         response.error = null;
-
-                        // notifyMessages.getMessagesNeedToNotify();
-
                         response.data = results[0][0];
                         res.status(200).json(response);
 
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving data";
                         response.error = null;
@@ -279,7 +273,7 @@ employeeSurveyCtrl.serveyConfigureToUsers=function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -288,12 +282,12 @@ employeeSurveyCtrl.serveyConfigureToUsers=function(req,res,next){
 };
 
 
-employeeSurveyCtrl.saveServeyOfUsers=function(req,res,next){
+employeeSurveyCtrl.saveServeyOfUsers = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Error while loading users",
-        data : null,
-        error : null
+        status: false,
+        message: "Error while loading users",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -302,12 +296,12 @@ employeeSurveyCtrl.saveServeyOfUsers=function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.heMasterId){
+    if (!req.query.heMasterId) {
         error.hemasterId = 'Invalid company';
         validationFlag *= false;
     }
 
-    if (!req.query.groupId){
+    if (!req.query.groupId) {
         error.groupId = 'Invalid groupId';
         validationFlag *= false;
     }
@@ -320,20 +314,20 @@ employeeSurveyCtrl.saveServeyOfUsers=function(req,res,next){
     if (!questionDetails) {
         questionDetails = [];
     }
-    
-    if (!validationFlag){
+
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.body.surveyMasterId = (req.body.surveyMasterId) ? (req.body.surveyMasterId) : 0;
                 req.body.QTemplateId = (req.body.QTemplateId) ? req.body.QTemplateId : 0;
-                
+
                 // req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
                 // req.query.searchKeywords = (req.query.searchKeywords) ? (req.query.searchKeywords) : '';
                 // var startPage = 0;
@@ -345,7 +339,7 @@ employeeSurveyCtrl.saveServeyOfUsers=function(req,res,next){
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.query.groupId),
                     req.st.db.escape(req.body.surveyMasterId),
-                    req.st.db.escape(req.body.QTemplateId),   
+                    req.st.db.escape(req.body.QTemplateId),
                     req.st.db.escape(JSON.stringify(questionDetails))
                 ];
                 /**
@@ -354,9 +348,9 @@ employeeSurveyCtrl.saveServeyOfUsers=function(req,res,next){
                  */
                 var procQuery = 'CALL wm_save_employeeSurveyByUsers( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
+                req.db.query(procQuery, function (err, results) {
                     console.log(err);
-                    if(!err && results && results[0] &&results[0][0]){
+                    if (!err && results && results[0] && results[0][0]) {
                         response.status = true;
                         response.message = "Survey submitted successfully";
                         response.error = null;
@@ -364,7 +358,7 @@ employeeSurveyCtrl.saveServeyOfUsers=function(req,res,next){
                         res.status(200).json(response);
 
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while submitting data";
                         response.error = null;
@@ -373,19 +367,19 @@ employeeSurveyCtrl.saveServeyOfUsers=function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 };
 
-employeeSurveyCtrl.getSurveyMaster=function(req,res,next){
+employeeSurveyCtrl.getSurveyMaster = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Error while loading data",
-        data : null,
-        error : null
+        status: false,
+        message: "Error while loading data",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -394,20 +388,20 @@ employeeSurveyCtrl.getSurveyMaster=function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.heMasterId){
+    if (!req.query.heMasterId) {
         error.hemasterId = 'Invalid company';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.token = req.query.token ? req.query.token : '';
                 req.query.heMasterId = req.query.heMasterId ? req.query.heMasterId : 0;
@@ -422,50 +416,50 @@ employeeSurveyCtrl.getSurveyMaster=function(req,res,next){
                  */
                 var procQuery = 'CALL wm_get_SurveyMaster( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
+                req.db.query(procQuery, function (err, results) {
                     console.log(err);
-                    if(!err && results && results[0] &&results[0][0]){
+                    if (!err && results && results[0] && results[0][0]) {
                         response.status = true;
                         response.message = "Survey master loaded successfully";
                         response.error = null;
 
                         // template list with questions options
-                        for(var i=0; i<results[3].length; i++){
-                            if(typeof(results[3][i].questionDetails)=='string'){
+                        for (var i = 0; i < results[3].length; i++) {
+                            if (typeof (results[3][i].questionDetails) == 'string') {
                                 results[3][i].questionDetails = JSON.parse(results[3][i].questionDetails);
                             }
-                            
-                            for(var j=0; j< results[3][i].questionDetails.length; j++){
-                                if(typeof(results[3][i].questionDetails[j].options)=='string'){
-                                    results[3][i].questionDetails[j].options = JSON.parse(results[3][i].questionDetails[j].options); 
+
+                            for (var j = 0; j < results[3][i].questionDetails.length; j++) {
+                                if (typeof (results[3][i].questionDetails[j].options) == 'string') {
+                                    results[3][i].questionDetails[j].options = JSON.parse(results[3][i].questionDetails[j].options);
                                 }
                             }
                         }
 
 
-                        for(var i=0;i<results[2].length;i++){
-                            results[2][i].questionType = (results[2][i] && results[2][i].questionType) ? JSON.parse(results[2][i].questionType) :{};
-                            results[2][i].dropDownType = (results[2][i] && results[2][i].dropDownType) ? JSON.parse(results[2][i].dropDownType) :{};
+                        for (var i = 0; i < results[2].length; i++) {
+                            results[2][i].questionType = (results[2][i] && results[2][i].questionType) ? JSON.parse(results[2][i].questionType) : {};
+                            results[2][i].dropDownType = (results[2][i] && results[2][i].dropDownType) ? JSON.parse(results[2][i].dropDownType) : {};
                         }
 
                         response.data = {
-                            questionTypeList: results[0] ? results[0] :[],
-                            dropDownTypeList: results[1] ? results[1]: [],
-                            questionList : (results[2] && results[2][0]) ? results[2]:[],
-                            templateList : (results[3] && results[3][0]) ? results[3]:[],
-                            userList : (results[4] && results[4][0]) ? results[4]:[]
+                            questionTypeList: results[0] ? results[0] : [],
+                            dropDownTypeList: results[1] ? results[1] : [],
+                            questionList: (results[2] && results[2][0]) ? results[2] : [],
+                            templateList: (results[3] && results[3][0]) ? results[3] : [],
+                            userList: (results[4] && results[4][0]) ? results[4] : []
                         };
                         res.status(200).json(response);
                     }
 
-                    else if(!err){
+                    else if (!err) {
                         response.status = false;
                         response.message = "No data found";
                         response.error = null;
                         response.data = {};
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while loading survey data";
                         response.error = null;
@@ -474,7 +468,7 @@ employeeSurveyCtrl.getSurveyMaster=function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -482,12 +476,12 @@ employeeSurveyCtrl.getSurveyMaster=function(req,res,next){
 };
 
 
-employeeSurveyCtrl.saveSurveyForWebConfig=function(req,res,next){
+employeeSurveyCtrl.saveSurveyForWebConfig = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Error while saving datass",
-        data : null,
-        error : null
+        status: false,
+        message: "Error while saving datass",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -496,11 +490,11 @@ employeeSurveyCtrl.saveSurveyForWebConfig=function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.heMasterId){
+    if (!req.query.heMasterId) {
         error.hemasterId = 'Invalid company';
         validationFlag *= false;
     }
-    
+
     var questions = req.body.questions;
     if (typeof (questions) == "string") {
         questions = JSON.parse(questions);
@@ -509,19 +503,19 @@ employeeSurveyCtrl.saveSurveyForWebConfig=function(req,res,next){
         questions = [];
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.body.token = (req.body.token) ? (req.body.token) : '';
                 req.body.heMasterId = (req.body.heMasterId) ? req.body.heMasterId : 0;
-                
+
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -533,31 +527,31 @@ employeeSurveyCtrl.saveSurveyForWebConfig=function(req,res,next){
                  */
                 var procQuery = 'CALL wm_save_EmployeeSurveyForQuestionsMaster( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
+                req.db.query(procQuery, function (err, results) {
                     console.log(err);
-                    if(!err && results && results[0] &&results[0][0]){
+                    if (!err && results && results[0] && results[0][0]) {
                         response.status = true;
-                        response.message = "Survey master questions successfully";
+                        response.message = "Question added successfully";
                         response.error = null;
 
-                        for(var i=0;i<results[0].length;i++){
-                            results[0][i].dropDownType = (results[0][i] && results[0][i].dropDownType) ? results[0][i].dropDownType :{}
-                            results[0][i].questionType = (results[0][i] && results[0][i].questionType) ? results[0][i].questionType :{}
+                        for (var i = 0; i < results[0].length; i++) {
+                            results[0][i].dropDownType = (results[0][i] && results[0][i].dropDownType) ? results[0][i].dropDownType : {}
+                            results[0][i].questionType = (results[0][i] && results[0][i].questionType) ? results[0][i].questionType : {}
                         }
                         response.data = results[0];
                         res.status(200).json(response);
 
                     }
-                    else{
+                    else {
                         response.status = false;
-                        response.message = "Error while saving data";
+                        response.message = "Error while adding question";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -567,12 +561,12 @@ employeeSurveyCtrl.saveSurveyForWebConfig=function(req,res,next){
 
 
 
-employeeSurveyCtrl.saveSurveyTemplateWithQuestions=function(req,res,next){
+employeeSurveyCtrl.saveSurveyTemplateWithQuestions = function (req, res, next) {
     var response = {
-        status : false,
-        message : "No token Found",
-        data : null,
-        error : null
+        status: false,
+        message: "No token Found",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -581,7 +575,7 @@ employeeSurveyCtrl.saveSurveyTemplateWithQuestions=function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.heMasterId){
+    if (!req.query.heMasterId) {
         error.hemasterId = 'Invalid company';
         validationFlag *= false;
     }
@@ -593,7 +587,7 @@ employeeSurveyCtrl.saveSurveyTemplateWithQuestions=function(req,res,next){
     if (!template) {
         template = {};
     }
-    
+
     var questions = req.body.questions;
     if (typeof (questions) == "string") {
         questions = JSON.parse(questions);
@@ -602,19 +596,19 @@ employeeSurveyCtrl.saveSurveyTemplateWithQuestions=function(req,res,next){
         questions = [];
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
-    else {   
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.body.token = (req.body.token) ? (req.body.token) : '';
                 req.body.heMasterId = (req.body.heMasterId) ? req.body.heMasterId : 0;
-                
+
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -627,9 +621,9 @@ employeeSurveyCtrl.saveSurveyTemplateWithQuestions=function(req,res,next){
                  */
                 var procQuery = 'CALL wm_save_EmployeeSurveyTemplate( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
+                req.db.query(procQuery, function (err, results) {
                     console.log(err);
-                    if(!err && results && results[0] &&results[0][0]){
+                    if (!err && results && results[0] && results[0][0]) {
                         response.status = true;
                         response.message = "Survey template saved successfully";
                         response.error = null;
@@ -637,7 +631,7 @@ employeeSurveyCtrl.saveSurveyTemplateWithQuestions=function(req,res,next){
                         res.status(200).json(response);
 
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving survey template";
                         response.error = null;
@@ -646,7 +640,7 @@ employeeSurveyCtrl.saveSurveyTemplateWithQuestions=function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -654,68 +648,71 @@ employeeSurveyCtrl.saveSurveyTemplateWithQuestions=function(req,res,next){
 
 };
 
-employeeSurveyCtrl.uploadUsersfromweb = function(req,res,next){
-    
+employeeSurveyCtrl.uploadUsersfromweb = function (req, res, next) {
+
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.query.heMasterId)
-    {
+    if (!req.query.heMasterId) {
         error.heMasterId = 'Invalid heMasterId';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
-                req.body.Department  = req.body.Department ? req.body.Department :'';
-                req.body.JobTitle  = req.body.JobTitle ? req.body.JobTitle :'';
-                req.body.Location  = req.body.Location ? req.body.Location :'';
+                req.body.Department = req.body.Department ? req.body.Department : '';
+                req.body.JobTitle = req.body.JobTitle ? req.body.JobTitle : '';
+                req.body.Location = req.body.Location ? req.body.Location : '';
 
                 var password = randomstring.generate({
                     length: 6,
                     charset: 'alphanumeric'
                 });
-                var message = "" ;
+                var message = "";
 
                 var encryptPwd = req.st.hashPassword(password);
                 // var Qndata = req.body.data;
                 // console.log("req.body.data",req.body.data);
-               var name = req.body.Name;
-               var email = req.body.Email;
-               var mobile = req.body.Mobile;
-               var isdmobile = req.body.ISDMobile;
-            
-               var resinput = {
-                Name :req.body.Name,
-                LoginId: req.body.LoginId,
-                EmployeeCode : req.body.EmployeeCode,
-                Mobile: req.body.Mobile,
-                ISDMobile: req.body.ISDMobile,
-                TrackTemplate : req.body.TrackTemplate,
-                WorkLocation : req.body.WorkLocation,
-                WorkGroup : req.body.WorkGroup,
-                ReportingManager : req.body.ReportingManager,
-                Email : req.body.Email,
-                Department : req.body.Department,
-                JobTitle :req.body.JobTitle,
-                Location : req.body.Location
-               };
+                console.log('req.body', req.body);
+
+                var name = req.body.Name;
+                var email = req.body.Email;
+                var mobile = req.body.Mobile;
+                var isdmobile = req.body.ISDMobile;
+
+                var resinput = {
+                    Name: req.body.Name,
+                    LoginId: req.body.LoginId,
+                    EmployeeCode: req.body.EmployeeCode,
+                    Mobile: req.body.Mobile,
+                    ISDMobile: req.body.ISDMobile,
+                    TrackTemplate: req.body.TrackTemplate,
+                    WorkLocation: req.body.WorkLocation,
+                    WorkGroup: req.body.WorkGroup,
+                    ReportingManager: req.body.ReportingManager,
+                    Email: req.body.Email,
+                    Department: req.body.Department,
+                    JobTitle: req.body.JobTitle,
+                    Location: req.body.Location
+                };
+
+
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -735,139 +732,152 @@ employeeSurveyCtrl.uploadUsersfromweb = function(req,res,next){
                     req.st.db.escape(req.body.JobTitle),
                     req.st.db.escape(req.body.Location),
                     req.st.db.escape(DBSecretKey)
-                ]; 
+                ];
 
                 //CompanyName
                 var procQuery = 'CALL he_import_bulkUsersfromweb( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query("select title as companyName from wmlist where tid=(select wmlistId from themaster where tid="+req.query.heMasterId+");",function(err1,companyResult){
-                    console.log('err',err);
-                    console.log("companyResult",companyResult[0].companyName);
-                    if (!err1 && companyResult && companyResult[0] ){
-                        var companyName = companyResult[0] ? companyResult[0].companyName :'';
-                
-                        req.db.query(procQuery,function(err,userResult){
-                            console.log('err',err);
+                req.db.query("select title as companyName from wmlist where tid=(select wmlistId from themaster where tid=" + req.query.heMasterId + ");", function (err1, companyResult) {
+                    console.log('err', err);
+                    console.log("companyResult", companyResult[0].companyName);
+                    if (!err1 && companyResult && companyResult[0]) {
+                        var companyName = companyResult[0] ? companyResult[0].companyName : '';
+
+                        req.db.query(procQuery, function (err, userResult) {
+                            console.log('err', err);
                             // console.log('userResult',userResult);
-                            if (!err && userResult && userResult[0] ){
-                                if (userResult[0][0].status == "New" ){
-                                    if(resinput.Email != ""){
+                            if (!err && userResult && userResult[0]) {
+                                if (userResult[0][0].status == "New") {
+                                    if (resinput.Email != "") {
                                         // mailerApi.sendMailNew('NewUserUpload', {
                                         //     name : Qndata[0].name,
                                         //     UserName : userResult[0][0].whatmateId,
                                         //     Password : password
                                         // }, '',Qndata[0].email,[]);
-                                        
+
                                         if (userResult[0][0].emailtext != "") {
-                                            userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[name]",name);
-                                            userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[UserName]",userResult[0][0].whatmateId);
-                                            userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[Password]",password);
-        
+                                            userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[name]", name);
+                                            userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[UserName]", userResult[0][0].whatmateId);
+                                            userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[Password]", password);
+
+
+                                            // done for jamaica
+                                            userResult[0][0].whatmateSignUpemailText = userResult[0][0].whatmateSignUpemailText.replace("[FirstName]", name);
+                                            userResult[0][0].whatmateSignUpemailText = userResult[0][0].whatmateSignUpemailText.replace("[UserID]", userResult[0][0].loginId);
+                                            userResult[0][0].whatmateSignUpemailText = userResult[0][0].whatmateSignUpemailText.replace("[Password]", password);
+
+
                                             var mail = {
                                                 from: 'noreply@talentmicro.com',
                                                 to: resinput.Email,
-                                                subject: 'Your user Credentials for WhatMate App',
-                                                html: userResult[0][0].emailtext // html body
+                                                subject: userResult[0][0].whatmateSignUpSubject ? userResult[0][0].whatmateSignUpSubject : 'Your user Credentials for WhatMate App',
+                                                html: userResult[0][0].whatmateSignUpemailText ? userResult[0][0].whatmateSignUpemailText : userResult[0][0].emailtext // html body
                                             };
-        
+
                                             var email = new sendgrid.Email();
                                             email.from = mail.from;
                                             email.to = mail.to;
-        
+
                                             // email.addCc(cc);
                                             email.subject = mail.subject;
                                             email.html = mail.html;
                                             sendgrid.send(email, function (err, result) {
                                                 if (!err) {
-                                                    console.log("Mail sent success") ;
+                                                    console.log("Mail sent success");
                                                 }
-                                                else{
-                                                    console.log("Mail Error",err);
+                                                else {
+                                                    console.log("Mail Error", err);
                                                 }
                                             });
-        
+
                                         }
                                     }
-        
-                                    message = 'Dear ' + name  + ', Your WhatMate credentials, Login ID: ' + userResult[0][0].whatmateId + ',Password: ' + password ;
-        
-                                    if(mobile !="")
-                                    {
-                                        if(isdmobile == "+977"){
+                                    //whatmateId
+                                    message = 'Dear ' + name + ', Your WhatMate credentials, Login ID: ' + userResult[0][0].loginId + ',Password: ' + password;
+
+                                    if (userResult[0][0].heMasterId == 36) {
+
+                                        message = userResult[0][0].whatmateSignUpMessage ? userResult[0][0].whatmateSignUpMessage : message;
+                                        message = message.replace('[LoginId]', userResult[0][0].loginId);
+                                        message = message.replace('[password]', password);
+
+                                    }
+
+
+                                    if (mobile != "") {
+                                        if (isdmobile == "+977") {
                                             request({
                                                 url: 'http://beta.thesmscentral.com/api/v3/sms?',
                                                 qs: {
-                                                    token : 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                                    to : mobile,
+                                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                    to: mobile,
                                                     message: message,
                                                     sender: 'Techingen'
                                                 },
                                                 method: 'GET'
-        
+
                                             }, function (error, response, body) {
-                                                if(error)
-                                                {
-                                                    console.log(error,"SMS");
+                                                if (error) {
+                                                    console.log(error, "SMS");
                                                 }
-                                                else{
-                                                    console.log("SUCCESS","SMS response");
+                                                else {
+                                                    console.log("SUCCESS", "SMS response");
                                                 }
-        
+
                                             });
                                         }
-                                        else if(isdmobile == "+91")
-                                        {
+                                        else if (isdmobile == "+91") {
                                             request({
                                                 url: 'https://aikonsms.co.in/control/smsapi.php',
                                                 qs: {
-                                                    user_name : 'janardana@hirecraft.com',
-                                                    password : 'Ezeid2015',
-                                                    sender_id : 'WtMate',
-                                                    service : 'TRANS',
+                                                    user_name: 'janardana@hirecraft.com',
+                                                    password: 'Ezeid2015',
+                                                    sender_id: 'WtMate',
+                                                    service: 'TRANS',
                                                     mobile_no: mobile,
                                                     message: message,
-                                                    method : 'send_sms'
+                                                    method: 'send_sms'
                                                 },
                                                 method: 'GET'
-        
+
                                             }, function (error, response, body) {
-                                                if(error)
-                                                {
-                                                    console.log(error,"SMS");
+                                                if (error) {
+                                                    console.log(error, "SMS");
                                                 }
-                                                else{
-                                                    console.log("SUCCESS","SMS response");
+                                                else {
+                                                    console.log("SUCCESS", "SMS response");
                                                 }
                                             });
-        
+
                                             var req = http.request(options, function (res) {
                                                 var chunks = [];
-        
+
                                                 res.on("data", function (chunk) {
                                                     chunks.push(chunk);
                                                 });
-        
+
                                                 res.on("end", function () {
                                                     var body = Buffer.concat(chunks);
                                                     console.log(body.toString());
                                                 });
                                             });
-        
-                                            req.write(qs.stringify({ userId: 'talentmicro',
+
+                                            req.write(qs.stringify({
+                                                userId: 'talentmicro',
                                                 password: 'TalentMicro@123',
                                                 senderId: 'WTMATE',
                                                 sendMethod: 'simpleMsg',
                                                 msgType: 'text',
-                                                mobile: isdmobile.replace("+","") + mobile,
+                                                mobile: isdmobile.replace("+", "") + mobile,
                                                 msg: message,
                                                 duplicateCheck: 'true',
-                                                format: 'json' }));
+                                                format: 'json'
+                                            }));
                                             req.end();
-        
-        
+
+
                                         }
-                                        else if(isdmobile != "")
-                                        {
+                                        else if (isdmobile != "") {
                                             client.messages.create(
                                                 {
                                                     body: message,
@@ -875,16 +885,15 @@ employeeSurveyCtrl.uploadUsersfromweb = function(req,res,next){
                                                     from: '+14434322305'
                                                 },
                                                 function (error, response) {
-                                                    if(error)
-                                                    {
-                                                        console.log(error,"SMS");
+                                                    if (error) {
+                                                        console.log(error, "SMS");
                                                     }
-                                                    else{
-                                                        console.log("SUCCESS","SMS response");
+                                                    else {
+                                                        console.log("SUCCESS", "SMS response");
                                                     }
                                                 }
                                             );
-        
+
                                             // request({
                                             //     url: 'https://rest.nexmo.com/sms/json',
                                             //     qs: {
@@ -905,14 +914,14 @@ employeeSurveyCtrl.uploadUsersfromweb = function(req,res,next){
                                             //         console.log("SUCCESS","SMS response");
                                             //     }
                                             // });
-        
+
                                         }
-        
+
                                     }
-        
+
                                 }
-                                else if(userResult[0][0].status == "Existing") {
-                                    if(email != ""){
+                                else if (userResult[0][0].status == "Existing" || userResult[0][0].status == "Duplicate") {
+                                    if (email != "") {
                                         // mailerApi.sendMailNew('existingUsers', {
                                         //     name : Qndata[0].name,
                                         //     UserName : userResult[0][0].whatmateId,
@@ -920,16 +929,16 @@ employeeSurveyCtrl.uploadUsersfromweb = function(req,res,next){
                                         // }, '',Qndata[0].email,[]);
                                         if (userResult[0][0].ExistingUserEmailText != "") {
                                             userResult[0][0].ExistingUserEmailText = userResult[0][0].ExistingUserEmailText.replace("[name]", name);
-                                            userResult[0][0].ExistingUserEmailText = userResult[0][0].ExistingUserEmailText.replace("[UserName]",userResult[0][0].whatmateId);
-                                            userResult[0][0].ExistingUserEmailText = userResult[0][0].ExistingUserEmailText.replace("[CompanyName]",companyName);
-        
+                                            userResult[0][0].ExistingUserEmailText = userResult[0][0].ExistingUserEmailText.replace("[UserName]", userResult[0][0].whatmateId);
+                                            userResult[0][0].ExistingUserEmailText = userResult[0][0].ExistingUserEmailText.replace("[CompanyName]", companyName);
+
                                             mail = {
                                                 from: 'noreply@talentmicro.com',
                                                 to: resinput.Email,
                                                 subject: 'Your user Credentials for WhatMate App',
                                                 html: userResult[0][0].ExistingUserEmailText // html body
                                             };
-        
+
                                             email = new sendgrid.Email();
                                             email.from = mail.from;
                                             email.to = mail.to;
@@ -938,95 +947,92 @@ employeeSurveyCtrl.uploadUsersfromweb = function(req,res,next){
                                             email.html = mail.html;
                                             sendgrid.send(email, function (err, result) {
                                                 if (!err) {
-                                                    console.log("Mail sent success") ;
+                                                    console.log("Mail sent success");
                                                 }
-                                                else{
-                                                    console.log("Mail Error",err);
+                                                else {
+                                                    console.log("Mail Error", err);
                                                 }
                                             });
-        
+
                                         }
-        
-        
+
+
                                     }
-        
-                                    message = 'Dear ' + name  + ', Your existing profile on WhatMate is successfully linked to ' + companyName + ' now.';
-        
-                                    if(mobile !="")
-                                    {
-                                        if(isdmobile == "+977"){
+
+                                    message = 'Dear ' + name + ', Your existing profile on WhatMate is successfully linked to ' + companyName + ' now.';
+
+                                    if (mobile != "") {
+                                        if (isdmobile == "+977") {
                                             request({
                                                 url: 'http://beta.thesmscentral.com/api/v3/sms?',
                                                 qs: {
-                                                    token : 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                                    to : mobile,
+                                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                    to: mobile,
                                                     message: message,
                                                     sender: 'Techingen'
                                                 },
                                                 method: 'GET'
-        
+
                                             }, function (error, response, body) {
-                                                if(error)
-                                                {
-                                                    console.log(error,"SMS");
+                                                if (error) {
+                                                    console.log(error, "SMS");
                                                 }
-                                                else{
-                                                    console.log("SUCCESS","SMS response");
+                                                else {
+                                                    console.log("SUCCESS", "SMS response");
                                                 }
-        
+
                                             });
                                         }
-                                        else if(isdmobile == "+91")
-                                        {
+                                        else if (isdmobile == "+91") {
                                             request({
                                                 url: 'https://aikonsms.co.in/control/smsapi.php',
                                                 qs: {
-                                                    user_name : 'janardana@hirecraft.com',
-                                                    password : 'Ezeid2015',
-                                                    sender_id : 'WtMate',
-                                                    service : 'TRANS',
+                                                    user_name: 'janardana@hirecraft.com',
+                                                    password: 'Ezeid2015',
+                                                    sender_id: 'WtMate',
+                                                    service: 'TRANS',
                                                     mobile_no: mobile,
                                                     message: message,
-                                                    method : 'send_sms'
+                                                    method: 'send_sms'
                                                 },
                                                 method: 'GET'
-        
+
                                             }, function (error, response, body) {
-                                                if(error)
-                                                {
-                                                    console.log(error,"SMS");
+                                                if (error) {
+                                                    console.log(error, "SMS");
                                                 }
-                                                else{
-                                                    console.log("SUCCESS","SMS response");
+                                                else {
+                                                    console.log("SUCCESS", "SMS response");
                                                 }
                                             });
-        
+
                                             req = http.request(options, function (res) {
                                                 var chunks = [];
-        
+
                                                 res.on("data", function (chunk) {
                                                     chunks.push(chunk);
                                                 });
-        
+
                                                 res.on("end", function () {
                                                     var body = Buffer.concat(chunks);
                                                     console.log(body.toString());
                                                 });
                                             });
-        
-                                            req.write(qs.stringify({ userId: 'talentmicro',
+
+                                            req.write(qs.stringify({
+                                                userId: 'talentmicro',
                                                 password: 'TalentMicro@123',
                                                 senderId: 'WTMATE',
                                                 sendMethod: 'simpleMsg',
                                                 msgType: 'text',
-                                                mobile: isdmobile.replace("+","") + mobile,
+                                                mobile: isdmobile.replace("+", "") + mobile,
                                                 msg: message,
                                                 duplicateCheck: 'true',
-                                                format: 'json' }));
+                                                format: 'json'
+                                            }));
                                             req.end();
                                         }
-                                        else if(isdmobile != "")
-                                        {
+                                        else if (isdmobile != "") {
                                             client.messages.create(
                                                 {
                                                     body: message,
@@ -1034,12 +1040,11 @@ employeeSurveyCtrl.uploadUsersfromweb = function(req,res,next){
                                                     from: '+14434322305'
                                                 },
                                                 function (error, response) {
-                                                    if(error)
-                                                    {
-                                                        console.log(error,"SMS");
+                                                    if (error) {
+                                                        console.log(error, "SMS");
                                                     }
-                                                    else{
-                                                        console.log("SUCCESS","SMS response");
+                                                    else {
+                                                        console.log("SUCCESS", "SMS response");
                                                     }
                                                 }
                                             );
@@ -1063,34 +1068,34 @@ employeeSurveyCtrl.uploadUsersfromweb = function(req,res,next){
                                             //         console.log("SUCCESS","SMS response");
                                             //     }
                                             // });
-        
+
                                         }
-        
+
                                     }
                                 }
-        
+
                                 response.status = true;
                                 response.message = "Users uploaded successfully";
                                 response.error = null;
                                 response.data = {
-                                    LoginId:resinput.LoginId,
-                                    EmployeeCode:resinput.EmployeeCode,
+                                    LoginId: resinput.LoginId,
+                                    EmployeeCode: resinput.EmployeeCode,
                                     Name: resinput.Name,
-                                    Mobile:resinput.Mobile,
-                                    ISDMobile:resinput.ISDMobile,
-                                    TrackTemplate:resinput.TrackTemplate,
-                                    WorkLocation:resinput.WorkLocation,
-                                    WorkGroup:resinput.WorkGroup,
-                                    ReportingManager:resinput.ReportingManager,
-                                    Email:resinput.Email,
-                                    Department:resinput.Department,
-                                    JobTitle:resinput.JobTitle,
-                                    Location:resinput.Location,
-                                    status : userResult[0][0].status
+                                    Mobile: resinput.Mobile,
+                                    ISDMobile: resinput.ISDMobile,
+                                    TrackTemplate: resinput.TrackTemplate,
+                                    WorkLocation: resinput.WorkLocation,
+                                    WorkGroup: resinput.WorkGroup,
+                                    ReportingManager: resinput.ReportingManager,
+                                    Email: resinput.Email,
+                                    Department: resinput.Department,
+                                    JobTitle: resinput.JobTitle,
+                                    Location: resinput.Location,
+                                    status: userResult[0][0].status
                                 };
                                 res.status(200).json(response);
                             }
-                            else{
+                            else {
                                 response.status = false;
                                 response.message = "Error while uploading users";
                                 response.error = null;
@@ -1100,9 +1105,9 @@ employeeSurveyCtrl.uploadUsersfromweb = function(req,res,next){
                         });
                     }
                 });
-                
+
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1110,12 +1115,12 @@ employeeSurveyCtrl.uploadUsersfromweb = function(req,res,next){
 
 };
 
-employeeSurveyCtrl.getSurveyListWeb=function(req,res,next){
+employeeSurveyCtrl.getSurveyListWeb = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Error while loading data",
-        data : null,
-        error : null
+        status: false,
+        message: "Error while loading data",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -1124,20 +1129,20 @@ employeeSurveyCtrl.getSurveyListWeb=function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.heMasterId){
+    if (!req.query.heMasterId) {
         error.hemasterId = 'Invalid company';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.token = req.query.token ? req.query.token : '';
                 req.query.heMasterId = req.query.heMasterId ? req.query.heMasterId : 0;
@@ -1152,32 +1157,44 @@ employeeSurveyCtrl.getSurveyListWeb=function(req,res,next){
                  */
                 var procQuery = 'CALL wm_get_surveyListWeb( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
+                req.db.query(procQuery, function (err, results) {
                     console.log(err);
-                    if(!err && results && results[0] &&results[0][0]){
+                    if (!err && results && results[0] && results[0][0]) {
                         response.status = true;
                         response.message = "Survey list loaded successfully";
                         response.error = null;
 
                         // template list with questions options
-                        for(var i=0; i<results[0].length; i++){
-                            if(typeof(results[0][i].questionDetails)=='string'){
+                        for (var i = 0; i < results[0].length; i++) {
+                            if (typeof (results[0][i].questionDetails) == 'string') {
                                 results[0][i].questionDetails = JSON.parse(results[0][i].questionDetails);
                             }
-                            
-                            for(var j=0; j< results[0][i].questionDetails.length; j++){
-                                if(typeof(results[0][i].questionDetails[j].options)=='string'){
-                                    results[0][i].questionDetails[j].options = JSON.parse(results[0][i].questionDetails[j].options); 
+
+                            if (typeof (results[0][i].userDetails) == 'string') {
+                                results[0][i].userDetails = JSON.parse(results[0][i].userDetails);
+                            }
+
+                            for (var j = 0; j < results[0][i].questionDetails.length; j++) {
+                                if (typeof (results[0][i].questionDetails[j].options) == 'string') {
+                                    results[0][i].questionDetails[j].options = JSON.parse(results[0][i].questionDetails[j].options);
                                 }
                             }
                         }
 
+
                         response.data = {
-                            surveyList : (results[0] && results[0][0]) ? results[0]:[]
+                            surveyList: (results[0] && results[0][0]) ? results[0] : []
                         };
                         res.status(200).json(response);
                     }
-                    else{
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = {};
+                        res.status(200).json(response);
+                    }
+                    else {
                         response.status = false;
                         response.message = "Error while loading survey list";
                         response.error = null;
@@ -1186,14 +1203,15 @@ employeeSurveyCtrl.getSurveyListWeb=function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 };
 
-employeeSurveyCtrl.getSurveyReport = function (req, res, next) {
+
+employeeSurveyCtrl.notifySurvey = function (req, res, next) {
     var response = {
         status: false,
         message: "Invalid token",
@@ -1221,62 +1239,46 @@ employeeSurveyCtrl.getSurveyReport = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-               
-                req.body.QTemplateId = (req.body.QTemplateId) ? req.body.QTemplateId : 0;
+
+                req.query.usersFlag = req.query.usersFlag != undefined ? req.query.usersFlag : 3;
+                req.query.reminderTitle = req.query.reminderTitle != undefined ? req.query.reminderTitle : '';
+
                 var procParams = [
                     req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.surveyMasterId),
                     req.st.db.escape(req.query.heMasterId),
-                    
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(req.query.reminderTitle),
+                    req.st.db.escape(req.query.usersFlag),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to My self and my team leave apllications
                  * @type {string}
                  */
-                var procQuery = 'CALL wm_get_surveyReports( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL wm_save_surveyNotifier( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {
-                  
+
                     if (!err && results && results[0] && results[0][0]) {
                         response.status = true;
-                        response.message = "Survey Report loaded successfully";
+                        response.message = "Survey notified successfully";
                         response.error = null;
+                        response.data = (results[0] && results[0][0]) ? results[0][0] : {};
+                        res.status(200).json(response);
 
-
-                        for(var i=0; i<results.length; i++){
-                            if(typeof(results[i][0].userDetails)=='string'){
-                                results[i][0].questionDetails = JSON.parse(results[i][0].questionDetails);
-                            }
-                            
-                            
-                        }
-
-                        response.data = {
-                            surveyUserReport: results[0],
-                            // upcomingEvents: results[1]                            
-                        };
-                        // res.status(200).json(response);
-                        buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                       });
+                        notifyMessages.getMessagesNeedToNotify();
                     }
                     else if (!err) {
                         response.status = true;
-                        response.message = "No task requests found";
+                        response.message = "Survey notify failed";
                         response.error = null;
-                        response.data = {
-                            surveyList: []
-                        };
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                         });
+                        response.data = {};
+                        res.status(200).json(response);
                     }
                     else {
                         response.status = false;
-                        response.message = "Error while getting task requests";
+                        response.message = "Error while notifying survey";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
@@ -1287,6 +1289,275 @@ employeeSurveyCtrl.getSurveyReport = function (req, res, next) {
                 res.status(401).json(response);
             }
         });
+    }
+
+};
+
+
+employeeSurveyCtrl.surveyReportExport = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+    if (!req.query.surveyMasterId) {
+        error.surveyMasterId = 'Invalid surveyId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.surveyMasterId),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+                /**
+                 * Calling procedure to My self and my team leave apllications
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_surveyReportExport( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, results) {
+
+                    if (!err && results && results[0] && results[0][0] && results[1] && results[1][0]) {
+                        response.status = true;
+                        response.message = "Survey report loaded successfully";
+                        response.error = null;
+
+                        for (var i = 0; i < results[1].length; i++) {
+                            results[1][i].answers = (results[1] && results[1][i]) ? JSON.parse(results[1][i].answers) : [];
+                        }
+
+                        response.data = {
+                            questions: (results[0] && results[0][0]) ? results[0] : [],
+                            userReport: (results[1] && results[1][0]) ? results[1] : []
+
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Survey report empty";
+                        response.error = null;
+                        response.data = {};
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting survey report";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+employeeSurveyCtrl.surveyStatusChange = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+
+    if (!req.query.surveyStatus) {
+        error.surveyStatus = 'Invalid survey status';
+        validationFlag *= false;
+    }
+
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.surveyMasterId),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.surveyStatus)
+                ];
+                /**
+                 * Calling procedure to My self and my team leave apllications
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_update_surveyStatus( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, results) {
+
+                    if (!err && results && results[0] && results[0][0]) {
+                        response.status = true;
+                        response.message = "Survey status changed successfully";
+                        response.error = null;
+                        response.data = (results[0] && results[0][0]) ? results[0][0] : {};
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Unable to change status";
+                        response.error = null;
+                        response.data = {};
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while notifying survey";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+employeeSurveyCtrl.surveyQuestionReport = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+
+    if (!req.query.surveyMasterId) {
+        error.surveyMasterId = 'Invalid surveyId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+
+        try {
+            
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                
+                if ((!err) && tokenResult) {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.query.surveyMasterId)
+
+                    ];
+                    
+                    /**
+                     * Calling procedure to My self and my team leave apllications
+                     * @type {string}
+                     */
+                    var procQuery = 'CALL wm_get_surveyQuestionReports( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, results) {
+
+                        if (!err && results && results[0] && results[0][0]) {
+                            response.status = true;
+                            response.message = "Survey report loaded successfully";
+                            response.error = null;
+
+                            for (var i = 0; i < results[0].length; i++) {
+                                results[0][i].optionDetail = (results[0] && results[0][i]) ? JSON.parse(results[0][i].optionDetail) : [];
+                            }
+
+                            response.data = results[0];
+                            res.status(200).json(response);
+                        }
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "Survey report empty";
+                            response.error = null;
+                            response.data = {};
+                            res.status(200).json(response);
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while getting survey report";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                else {
+                    res.status(401).json(response);
+                }
+            });
+        }
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + '......... error .........');
+            response.status = false;
+            response.message = "An error occurred!";
+            response.error = null;
+            response.data = null;
+            res.status(500).json(response);
+        }
+
     }
 
 };

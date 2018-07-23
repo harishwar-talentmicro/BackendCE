@@ -157,6 +157,8 @@ sendMessageCtrl.sendMessage = function (req, res, next) {
                         req.body.startDate = req.body.startDate != undefined ? req.body.startDate : null;
                         req.body.endDate = req.body.endDate != undefined ? req.body.endDate : null;
                         req.body.isDraft = req.body.isDraft != undefined ? req.body.isDraft : 0;
+                        req.body.status = req.body.status != undefined ? req.body.status : 0;
+                        req.body.approverNotes = req.body.approverNotes != undefined ? req.body.approverNotes : '';
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -182,7 +184,10 @@ sendMessageCtrl.sendMessage = function (req, res, next) {
                             req.st.db.escape(req.body.startDate),
                             req.st.db.escape(req.body.endDate),
                             req.st.db.escape(req.body.isDraft),
-                            req.st.db.escape(DBSecretKey)
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.status),
+                            req.st.db.escape(req.body.approverNotes)
+                        
                         ];
 
                         var announcementFormId = 1033;
@@ -433,6 +438,8 @@ sendMessageCtrl.getMemberCount = function (req, res, next) {
                 var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                   
+                    console.log("req.body.data",req.body.data);
                     if (!req.body.groupId) {
                         error.groupId = 'Invalid groupId';
                         validationFlag *= false;
@@ -2093,6 +2100,14 @@ sendMessageCtrl.processUpdate = function (req, res, next) {
                         if (!gradeList) {
                             gradeList = [];
                         }
+
+                        // var approverList = req.body.approverList;
+                        // if (typeof (approverList) == "string") {
+                        //     approverList = JSON.parse(approverList);
+                        // }
+                        // if (!approverList) {
+                        //     approverList = [];
+                        // }
     
                         var groupList = req.body.groupList;
                         if (typeof (groupList) == "string") {
@@ -2140,7 +2155,7 @@ sendMessageCtrl.processUpdate = function (req, res, next) {
                             req.body.startDate = req.body.startDate != undefined ? req.body.startDate : null;
                             req.body.endDate = req.body.endDate != undefined ? req.body.endDate : null;
                             req.body.isDraft = req.body.isDraft != undefined ? req.body.isDraft : 0;
-                            req.body.approvalStatus = req.body.approvalStatus != undefined ? req.body.approvalStatus : 0;
+                            req.body.status = req.body.status != undefined ? req.body.status : 0;
                             req.body.approverNotes = req.body.approverNotes != undefined ? req.body.approverNotes : '';
     
                             var procParams = [
@@ -2168,7 +2183,7 @@ sendMessageCtrl.processUpdate = function (req, res, next) {
                                 req.st.db.escape(req.body.endDate),
                                 req.st.db.escape(req.body.isDraft),
                                 req.st.db.escape(DBSecretKey),
-                                req.st.db.escape(req.body.approvalStatus),
+                                req.st.db.escape(req.body.status),
                                 req.st.db.escape(req.body.approverNotes)
                            
                             ];
@@ -2582,6 +2597,180 @@ sendMessageCtrl.processUpdate = function (req, res, next) {
                     // });
                 }
                 
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+sendMessageCtrl.GetProcessUpdateSummaryList = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var isweb;
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isweb = req.query.isweb ? req.query.isweb : 0;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
+                var startPage = 0;
+
+                startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
+                req.query.type = (req.query.type) ? (req.query.type) : 0;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(startPage),
+                    req.st.db.escape(req.query.limit),
+                    req.st.db.escape(req.query.type),
+                    req.st.db.escape(req.query.groupId)
+                ];
+
+                var procQuery = 'CALL he_get_processtrackerList( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, processResult) {
+                    if (!err && processResult && processResult[0]) {
+                        response.status = true;
+                        response.message = "Process data loaded successfully .";
+                        response.error = null;
+
+                        for (var i = 0; i < processResult[0].length; i++) {
+                            processResult[0].total = processResult[0][i].read + processResult[0][i].unRead;
+                        }
+                        response.data = {
+                            processList: processResult[0],
+                            count: processResult[1][0].count,
+                            isNormal: (processResult[2] && processResult[2][0] && processResult[2][0].isNormal) ? processResult[2][0].isNormal : 0
+                            // isTaxSaving: (announcementResult[2] && announcementResult[2][0] && announcementResult[2][0].isTaxSaving) ? announcementResult[2][0].isTaxSaving : 0
+                        };
+
+                        // res.status(200).json(response)
+                        if (req.query.isweb == 0) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
+                            res.status(200).json(response);
+                        }
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = {};
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting process update data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+sendMessageCtrl.GetProcessUpdateDetail = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var isweb;
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.transId) {
+        error.transId = 'Invalid transId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isweb = req.query.isweb ? req.query.isweb : 0;
+                //req.query.status = req.query.status ? req.query.status : 0;
+                req.query.parentId = req.query.parentId ? req.query.parentId:0;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.parentId),
+                    req.st.db.escape(req.query.transId)
+                ];
+
+                var procQuery = 'CALL he_get_processUpdatedetail( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, Result) {
+                    if (!err && Result && Result[0]) {
+                        response.status = true;
+                        response.message = "Data loaded successfully .";
+                        response.error = null;
+             
+                        response.data = {
+                            userDetails: (Result[0] && Result[0][0] && Result[0][0].formDataJSON) ? (JSON.parse(Result[0][0].formDataJSON)) : []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
             }
             else {
                 res.status(401).json(response);

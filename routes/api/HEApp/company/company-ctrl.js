@@ -489,5 +489,245 @@ companyCtrl.getuserProfileDetails = function(req, res, next){
 };
 
 
+companyCtrl.saveSocialMediaLinks = function(req, res, next){
+
+    var error = {};
+
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+            req.st.validateToken(req.query.token,function(err,tokenResult){
+                if((!err) && tokenResult){
+
+                    req.body.socialMediaId = req.body.socialMediaId ? req.body.socialMediaId :0;
+                    req.body.socialMediaIconId = req.body.socialMediaIconId ? req.body.socialMediaIconId :0;
+                    req.body.companyLink = req.body.companyLink ? req.body.companyLink :'';
+
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.query.heMasterId),
+                req.st.db.escape(req.body.socialMediaId),
+                req.st.db.escape(req.body.socialMediaIconId),
+                req.st.db.escape(req.body.companyLink)           
+            ];
+
+            var procQuery = 'CALL wm_save_clientSocialMediaLinks(' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,Result){
+                if(!err && Result && Result[0] && Result[0][0]){
+                    response.status = true;
+                    response.message = "Socail Media Link saved successfully";
+                    response.error = null;
+                    response.data ={
+                        socialMediaLinkList: (Result[1] && Result[1][1]) ? Result[1] :[]
+                    };
+                    res.status(200).json(response);
+                }
+                else{
+                    response.status = false;
+                    response.message = "Error while saving data ";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else{
+            res.status(401).json(response);
+
+        }
+    });
+        }
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + '......... error .........');
+            console.log(ex);
+            console.log('Error: ' + ex);
+        }
+    }
+};
+
+
+companyCtrl.getSocialMediaList = function(req, res, next){
+
+    var error = {};
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+            req.st.validateToken(req.query.token,function(err,tokenResult){
+                if((!err) && tokenResult){
+
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.query.heMasterId)
+            ];
+
+            var procQuery = 'CALL wm_get_socialMediatypes(' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,Result){
+                if(!err && Result && Result[0] && Result[0][0]){
+                    response.status = true;
+                    response.message = "Icons loaded successfully";
+                    response.error = null;
+                    response.data = {
+                        socialMediaTypes: (Result[0] && Result[0][0]) ? Result[0] :[],
+                        socialMediaLinkList: (Result[1] && Result[1][1]) ? Result[1] :[]
+                    };
+                    res.status(200).json(response);
+                }
+                else{
+                    response.status = false;
+                    response.message = "Error while loading data ";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else{
+            res.status(401).json(response);
+
+        }
+    });
+        }
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + '......... error .........');
+            console.log(ex);
+            console.log('Error: ' + ex);
+        }
+    }
+};
+
+
+companyCtrl.deleteMediaLink = function(req, res, next){
+
+    var error = {};
+
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.socialMediaId) {
+        error.socialMediaId = 'Invalid socialMediaId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+            req.st.validateToken(req.query.token,function(err,tokenResult){
+                if((!err) && tokenResult){
+
+
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.query.heMasterId),
+                req.st.db.escape(req.query.socialMediaId)
+            ];
+
+            var procQuery = 'CALL wm_socialMediaDeleteofClient(' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,Result){
+                if(!err && Result && Result[0] && Result[0][0]){
+                    response.status = true;
+                    response.message = "Social media link deleted successfully";
+                    response.error = null;
+                    response.data ={
+                        socialMediaLinkList: (Result[1] && Result[1][1]) ? Result[1] :[]
+                    };
+                    res.status(200).json(response);
+                }
+                else{
+                    response.status = false;
+                    response.message = "Error while deleting link";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else{
+            res.status(401).json(response);
+
+        }
+    });
+        }
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + '......... error .........');
+            console.log(ex);
+            console.log('Error: ' + ex);
+        }
+    }
+};
+
 
 module.exports = companyCtrl;
