@@ -62,9 +62,9 @@
   },
   "VERSION_LIST" : {
     "IOS" : [[],[23,24]],
-    "ANDROID" : [46],
-    "WhatMateIOS" : [[],[25]],
-    "WhatMateANDROID" : [38],
+    "ANDROID" : [42],
+    "WhatMateIOS" : [[],[27]],
+    "WhatMateANDROID" : [42],
     "dialerIOS" : [[],[1,2]],
     "dialerANDROID" : [3],
     "WEB" : [1]

@@ -566,7 +566,7 @@ greetingCtrl.saveRewardRecognization = function (req, res, next) {
                             response.message = "Reward saved successfully";
                         }
                         else if (req.body.type == 2) {
-                            response.message = "Recognization saved successfully";
+                            response.message = "Recognition saved successfully";
                         }
                         response.error = null;
                         response.data = results[0] ? results[0] : [];
@@ -696,6 +696,14 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
     }
     if (!rewardRecognition) {
         rewardRecognition = [];
+    }
+
+    var template = req.body.template;
+    if (typeof (template) == "string") {
+        template = JSON.parse(template);
+    }
+    if (!template) {
+        template = {};
     }
 
 
@@ -895,7 +903,9 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                                 req.st.db.escape(req.body.accessUserType),
                                 req.st.db.escape(req.body.learnMessageId),
                                 req.st.db.escape(req.body.status),
-                                req.st.db.escape(DBSecretKey)
+                                req.st.db.escape(DBSecretKey),
+                                req.st.db.escape(JSON.stringify(template))
+
                             ];
 
 
@@ -915,7 +925,7 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                                     notifyMessages.getMessagesNeedToNotify();
 
                                     response.status = true;
-                                    response.message = "Expense claim saved successfully";
+                                    response.message = "Greetings saved successfully";
                                     response.error = null;
                                     response.data = {
                                         messageList: {
@@ -949,7 +959,7 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                                 }
                                 else {
                                     response.status = false;
-                                    response.message = "Error while saving expense claim";
+                                    response.message = "Error while saving greetings";
                                     response.error = null;
                                     response.data = null;
                                     res.status(500).json(response);

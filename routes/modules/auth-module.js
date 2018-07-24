@@ -2058,7 +2058,8 @@ Auth.prototype.loginNew = function (req, res, next) {
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log(ex);
         console.log('FnLogin:: error:' + ex);
-
+        response.message = "Internal server error";
+        res.status(500).json(response);
     }
 };
 
