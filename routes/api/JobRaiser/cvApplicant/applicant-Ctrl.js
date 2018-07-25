@@ -73,7 +73,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
         error.firstName = 'First Name is Mandatory';
         validationFlag *= false;
     }
-    if (!req.body.emailId && !req.body.mobileNumber) {
+    if (!req.body.emailId || !req.body.mobileNumber) {   // any one is mandatory
         error.emailId = 'EMail ID or Mobile Number is mandatory';
         validationFlag *= false;
     }

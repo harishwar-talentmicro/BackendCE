@@ -501,7 +501,7 @@ if (cluster.isWorker) {
 
         console.log("bye take care")
         var cronJobWalkIn = new CronJob({
-            cronTime: '/1 * * * * *',
+            cronTime: '*/15 * * * * *',
             onTick: function () {
                 var query = "call wm_integrationUrlwalkIn()";
                 db.query(query, function (err, result) {
@@ -567,7 +567,7 @@ if (cluster.isWorker) {
 
 
         var cronJobWalkInQuessCorp = new CronJob({
-            cronTime: '*/2 * * * * *',
+            cronTime: '*/5 * * * * *',
             onTick: function () {
                 var query = "call wm_integrationUrlwalkInForQuessCorp()";
                 db.query(query, function (err, result) {
