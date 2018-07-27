@@ -15,5 +15,11 @@ router.post('/company/join',companyCtrl.joinComapny);
 router.get('/media/icons',companyCtrl.getSocialMediaLinks);
 router.get('/userData',companyCtrl.getuserProfileDetails);
 
+router.post('/savesocialmedia',companyCtrl.saveSocialMediaLinks);
+
+router.get('/socialmediaiconlist',companyCtrl.getSocialMediaList);
+
+router.get('/deleteMediaLink',companyCtrl.deleteMediaLink);
+
 
 module.exports = router;
