@@ -31,4 +31,10 @@ router.get('/announcementDetail',messageCtrl.GetAnnouncementDetail);
 
 router.post('/test',messageCtrl.sendMessageTest);
 
+router.post('/processUpdate',messageCtrl.processUpdate);
+
+router.get('/processUpdateTracker',messageCtrl.GetProcessUpdateSummaryList);
+
+router.get('/processUpdateDetail',messageCtrl.GetProcessUpdateDetail);
+
 module.exports = router;

@@ -732,6 +732,14 @@ queryCtrl.saveFrontOfficeQuery = function (req, res, next) {
                         keywordList = [];
                     }
 
+                    var queryType = req.body.queryType;
+                    if (typeof (queryType) == "string") {
+                        queryType = JSON.parse(queryType);
+                    }
+                    if (!queryType) {
+                        queryType = {};
+                    }
+
                     var senderGroupId;
 
                     if (!validationFlag) {
@@ -767,7 +775,8 @@ queryCtrl.saveFrontOfficeQuery = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(attachmentList)),
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
-                            req.st.db.escape(DBSecretKey)
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(JSON.stringify(queryType))
                         ];
 
                         var frontOfficeFormId = 1026;
@@ -956,7 +965,7 @@ queryCtrl.getQueryTypeList = function (req, res, next) {
                         response.status = true;
                         response.message = "No  data found";
                         response.error =
-                            response.data = [];
+                            response.data = {};
                         res.status(200).json(response);
                     }
                     else {

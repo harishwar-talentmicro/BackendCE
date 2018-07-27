@@ -705,69 +705,82 @@ User.prototype.changePassword = function (req, res, next) {
                 if (!err) {
                     if (tokenResult) {
 
-                        var OldPassword = req.body.OldPassword;
-                        var NewPassword = req.body.NewPassword;
+                        var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                        
+                            var OldPassword = req.body.OldPassword;
+                            // console.log("OldPassword input",req.body.OldPassword,"hashed output",OldPassword);
+                            // console.log("req.body",req.body);
+                            var NewPassword = req.body.NewPassword;
+    
+                            var oldPassQueryParams = st.db.escape(TokenNo);
 
-                        var oldPassQueryParams = st.db.escape(TokenNo);
-                        var oldPassQuery = 'CALL pgetoldpassword(' + oldPassQueryParams + ')';
-                        console.log(oldPassQuery);
-                        st.db.query(oldPassQuery, function (err, oldPassResult) {
-                            if (err) {
-                                console.log('Error : FnChangePassword - During old password retrieval; Procedure: pgetoldpassword');
-                                console.log(err);
-                                RtnMessage.status = false;
-                                RtnMessage.message = "Something went wrong";
-                                res.status(400).json(RtnMessage);
-                            }
-                            else {
-                                console.log(oldPassResult);
-                                if (oldPassResult) {
-                                    if (oldPassResult[0]) {
-                                        if (oldPassResult[0][0]) {
-                                            if (oldPassResult[0][0].Password) {
-
-                                                if (comparePassword(OldPassword, oldPassResult[0][0].Password)) {
-                                                    var ip = req.headers['x-forwarded-for'] ||
-                                                        req.connection.remoteAddress ||
-                                                        req.socket.remoteAddress ||
-                                                        req.connection.socket.remoteAddress;
-                                                    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
-
-                                                    var newPassword = hashPassword(NewPassword);
-                                                    var passChangeQueryParams = st.db.escape(TokenNo) + ',' +
-                                                        st.db.escape(newPassword) + ',' + st.db.escape(ip) + ',' + st.db.escape(userAgent);
-
-                                                    var passChangeQuery = 'CALL pChangePassword(' + passChangeQueryParams + ')';
-                                                    console.log(passChangeQuery);
-
-
-                                                    st.db.query(passChangeQuery, function (err, passChangeResult) {
-                                                        if (err) {
-                                                            console.log('Error FnChangePassword :  procedure pChangePassword');
-                                                            console.log(err);
-                                                            RtnMessage.status = false;
-                                                            RtnMessage.message = "Something went wrong";
-                                                            res.status(500).json(RtnMessage);
-                                                        }
-                                                        else {
-                                                            if (passChangeResult) {
-                                                                RtnMessage.IsChanged = true;
-                                                                RtnMessage.status = true;
-                                                                RtnMessage.message = "Password changed ..";
-                                                                res.status(200).json(RtnMessage);
+                            var oldPassQuery = 'CALL pgetoldpassword(' + oldPassQueryParams + ')';
+                            console.log(oldPassQuery);
+                            st.db.query(oldPassQuery, function (err, oldPassResult) {
+                                if (err) {
+                                    console.log('Error : FnChangePassword - During old password retrieval; Procedure: pgetoldpassword');
+                                    console.log(err);
+                                    RtnMessage.status = false;
+                                    RtnMessage.message = "Something went wrong";
+                                    res.status(400).json(RtnMessage);
+                                }
+                                else {
+                                    console.log("oldPassResult",oldPassResult);
+                                    if (oldPassResult) {
+                                        if (oldPassResult[0]) {
+                                            if (oldPassResult[0][0]) {
+                                                if (oldPassResult[0][0].Password) {
+    
+                                                    if (comparePassword(OldPassword, oldPassResult[0][0].Password)) {
+                                                        var ip = req.headers['x-forwarded-for'] ||
+                                                            req.connection.remoteAddress ||
+                                                            req.socket.remoteAddress ||
+                                                            req.connection.socket.remoteAddress;
+                                                        var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+    
+                                                        var newPassword = hashPassword(NewPassword);
+                                                        var passChangeQueryParams = st.db.escape(TokenNo) + ',' +
+                                                            st.db.escape(newPassword) + ',' + st.db.escape(ip) + ',' + st.db.escape(userAgent);
+    
+                                                        var passChangeQuery = 'CALL pChangePassword(' + passChangeQueryParams + ')';
+                                                        console.log(passChangeQuery);
+    
+    
+                                                        st.db.query(passChangeQuery, function (err, passChangeResult) {
+                                                            if (err) {
+                                                                console.log('Error FnChangePassword :  procedure pChangePassword');
+                                                                console.log(err);
+                                                                RtnMessage.status = false;
+                                                                RtnMessage.message = "Something went wrong";
+                                                                res.status(500).json(RtnMessage);
                                                             }
                                                             else {
-                                                                RtnMessage.status = true;
-                                                                RtnMessage.message = "Password changed ..";
-                                                                res.status(200).status(RtnMessage);
+                                                                if (passChangeResult) {
+                                                                    RtnMessage.IsChanged = true;
+                                                                    RtnMessage.status = true;
+                                                                    RtnMessage.message = "Password changed ..";
+                                                                    res.status(200).json(RtnMessage);
+                                                                }
+                                                                else {
+                                                                    RtnMessage.status = true;
+                                                                    RtnMessage.message = "Password changed ..";
+                                                                    res.status(200).status(RtnMessage);
+                                                                }
                                                             }
-                                                        }
-                                                    });
+                                                        });
+                                                    }
+                                                    else {
+                                                        RtnMessage.status = false;
+                                                        RtnMessage.message = "Password do not match. Please re-enter password..";
+                                                        res.status(200).json(RtnMessage);
+                                                    }
                                                 }
                                                 else {
                                                     RtnMessage.status = false;
-                                                    RtnMessage.message = "Password do not match. Please re-enter password..";
-                                                    res.status(200).json(RtnMessage);
+                                                    RtnMessage.message = "Unable to fetch old password ..";
+                                                    res.status(401).json(RtnMessage);
                                                 }
                                             }
                                             else {
@@ -788,14 +801,8 @@ User.prototype.changePassword = function (req, res, next) {
                                         res.status(401).json(RtnMessage);
                                     }
                                 }
-                                else {
-                                    RtnMessage.status = false;
-                                    RtnMessage.message = "Unable to fetch old password ..";
-                                    res.status(401).json(RtnMessage);
-                                }
-                            }
+                            });
                         });
-
 
                     } else {
                         RtnMessage.status = false;

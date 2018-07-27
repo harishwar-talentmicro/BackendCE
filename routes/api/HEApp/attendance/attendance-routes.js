@@ -9,4 +9,6 @@ var attendanceCtrl = require('./attendance-ctrl');
 
 router.post('/',attendanceCtrl.saveAttendance);
 
+router.get('/inoutStatus',attendanceCtrl.attendanceInoutStatus);
+
 module.exports = router;

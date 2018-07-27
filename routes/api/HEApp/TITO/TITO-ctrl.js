@@ -215,6 +215,8 @@ TITOCtrl.getAttendanceRegister = function(req,res,next){
                             res1.totalHours = attendance[i].totalHours;
                             res1.attendance = attendance[i].attendance;
                             res1.timeInOutList = JSON.parse(attendance[i].timeInOutList);
+                            res1.dayTitle = attendance[i].dayTitle;
+                            res1.dayType = attendance[i].dayType;
                             output.push(res1);
                         }
 

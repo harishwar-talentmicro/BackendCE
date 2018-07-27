@@ -99,7 +99,7 @@ userCtrl.saveUser = function(req,res,next){
                 req.db.query(procQuery,function(err,currencyResult){
                     if(!err){
                         response.status = true;
-                        response.message = "Hello EZE user saved successfully";
+                        response.message = "User data saved successfully";
                         response.error = null;
                         res.status(200).json(response);
                     }
@@ -117,7 +117,6 @@ userCtrl.saveUser = function(req,res,next){
             }
         });
     }
-
 };
 
 userCtrl.getMasterData = function(req,res,next){

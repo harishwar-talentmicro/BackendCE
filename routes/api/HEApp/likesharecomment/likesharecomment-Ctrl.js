@@ -53,6 +53,7 @@ likesharecommentCtrl.saveLSComment=function(req,res,next){
     if (!share) {
         share = {};
     }
+
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
@@ -63,12 +64,7 @@ likesharecommentCtrl.saveLSComment=function(req,res,next){
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
 
-                // req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
-                // req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
-                // req.query.searchKeywords = (req.query.searchKeywords) ? (req.query.searchKeywords) : '';
-                // var startPage = 0;
-
-                // startPage = ((((parseInt(req.query.pageNo)) * req.query.limit) + 1) - req.query.limit) - 1;
+                // req.body.messageId = req.body.messageId ? req.body.messageId: 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -81,6 +77,8 @@ likesharecommentCtrl.saveLSComment=function(req,res,next){
                     req.st.db.escape(JSON.stringify(comment)),
                     req.st.db.escape(JSON.stringify(share)),
                     req.st.db.escape(req.body.likeStatus),
+                    req.st.db.escape(req.body.messageId),
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to get form template
@@ -88,16 +86,17 @@ likesharecommentCtrl.saveLSComment=function(req,res,next){
                  */
                 var procQuery = 'CALL wm_saveLikeShareComment( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,userData){
+                req.db.query(procQuery,function(err,results){
                     console.log(err);
-                    if(!err && userData){
+                    if(!err && results[0] && results[0][0]){
                         response.status = true;
                         response.message = "data saved successfully";
                         response.error = null;
-                        response.data = null
-
+                        if (req.body.type == 3){
+                            notifyMessages.getMessagesNeedToNotify();
+                        }
+                        response.data = null;
                         res.status(200).json(response);
-
                     }
                     else{
                         response.status = false;
@@ -193,6 +192,13 @@ likesharecommentCtrl.getlikecommentusers=function(req,res,next){
                                 count: results[1][0].count
                             }
                         }
+
+                        else if(req.body.type ==3){
+                            likeCommentResult ={
+                                shareList: results[0],
+                                count: results[1][0].count
+                            }
+                        }
                         else{
                             likeCommentResult = {
                                 likeList: results[0],
@@ -206,10 +212,10 @@ likesharecommentCtrl.getlikecommentusers=function(req,res,next){
 
                     }
                     else if(!err){
-                        response.status = false;
+                        response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null;
+                        response.data = {};
                         res.status(200).json(response);
                     }
                     else{

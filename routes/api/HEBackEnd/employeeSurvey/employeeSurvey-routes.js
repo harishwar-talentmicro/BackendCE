@@ -5,11 +5,28 @@ var employeeSurveyCtrl = require('./employeeSurvey-ctrl');
 
 router.get('/surveyList',employeeSurveyCtrl.getSurveyList);
 
-router.post('/saveSurvey',employeeSurveyCtrl.serveyConfigureToUsers);
+router.post('/surveyPublish',employeeSurveyCtrl.serveyConfigureToUsers);
 
 router.post('/surveySaveByUsers',employeeSurveyCtrl.saveServeyOfUsers);
 
-router.get('/surveyReport',employeeSurveyCtrl.getSurveyReport);
+router.get('/surveyMaster',employeeSurveyCtrl.getSurveyMaster);
+
+router.post('/saveSurveyQuestion',employeeSurveyCtrl.saveSurveyForWebConfig);
+
+router.post('/saveSurveyTemplateWithQuestions',employeeSurveyCtrl.saveSurveyTemplateWithQuestions);
+
+router.post('/uploadUsersfromweb',employeeSurveyCtrl.uploadUsersfromweb);
+
+router.get('/surveyListWeb',employeeSurveyCtrl.getSurveyListWeb);
+
+router.get('/surveyNotifier',employeeSurveyCtrl.notifySurvey);
+
+router.get('/surveyReportExport',employeeSurveyCtrl.surveyReportExport);
+
+router.get('/surveyStatusChange',employeeSurveyCtrl.surveyStatusChange);
+
+router.get('/surveySummary',employeeSurveyCtrl.surveyQuestionReport);
+
 module.exports = router;
 
 

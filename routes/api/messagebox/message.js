@@ -842,14 +842,13 @@ router.post('/sync', function (req, res, next) {
 
                                         var keywords_list = [];
                                             if(results[5]){
-                                                for(var keywordIndex = 0; keywordIndex < results[5].length; keywordIndex++){
-                                                    keywords_list[keywordIndex] = {};
-                                                    keywords_list[keywordIndex].formId = results[5][keywordIndex].formID;
-                                                    if(results[5][keywordIndex].keywords)
-                                                        keywords_list[keywordIndex].keywordList = results[5][keywordIndex].keywords.split(' ');
+                                                for(var i = 0; i < results[5].length; i++){
+                                                    keywords_list[i] = {};
+                                                    keywords_list[i].formId = results[5][i].formID;
+
+                                                    keywords_list[i].keywordList = (results[5][i] && results[5][i].keywords) ? results[5][i].keywords.split(' ') :[];
                                                 }
                                             }
-
 
                                             var output1 = [];
                                           if(results[6]){
