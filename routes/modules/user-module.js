@@ -499,13 +499,15 @@ User.prototype.getUserDetails = function (req, res, next) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
+        var APNSID= req.query.APNSID;
+        var GCMID=req.query.GCMID;
         if (Token) {
             st.validateToken(Token, function (err, tokenResult) {
                 console.log(err);
                 //console.log(Result);
                 if (!err) {
                     if (tokenResult) {
-                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ')', function (err, UserDetailsResult) {
+                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ',' +  st.db.escape(APNSID) + ',' +  st.db.escape(GCMID) + ')', function (err, UserDetailsResult) {
                             if (!err) {
                                 //console.log('UserDetailsResult',UserDetailsResult);
                                 if (UserDetailsResult[0]) {
