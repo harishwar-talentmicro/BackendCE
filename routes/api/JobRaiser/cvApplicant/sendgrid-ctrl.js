@@ -1065,6 +1065,7 @@ sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
     var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
     var isWeb = req.query.isWeb ? req.query.isWeb : 0;
     var sendMailFlag = 0;
+    var attachJD=req.body.attachJD !=undefined ? req.body.attachJD: 0;
 
     var response = {
         status: false,
@@ -1134,6 +1135,7 @@ sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
                         var temp1 = subject;
                         var temp2 = smsMsg;
                         var applicantData = [];
+                        var JDAttachment =[];
                         for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
                             console.log('applicantIndex=', applicantIndex);
 
@@ -1163,6 +1165,7 @@ sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
 
                            
                            applicantData.push(result[0][applicantIndex].EmailId);
+                           JDAttachment.push(result[0][applicantIndex].JDAttachment);
                             console.log(subject_array);
                             console.log(smsMsg_array);
                             mailbody_array.push(mailBody);
@@ -1180,7 +1183,8 @@ sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
                             tagsPreview: mailbody_array,
                             subjectPreview: subject_array,
                             smsMsgPreview: smsMsg_array,
-                            applicantData: applicantData
+                            applicantData: applicantData,
+                            JDAttachment: JDAttachment
                         };
                         res.status(200).json(response);
                     }
@@ -1193,7 +1197,8 @@ sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
                             tagsPreview: [],
                             subjectPreview: [],
                             smsMsgPreview:[],
-                            applicantData: []
+                            applicantData: [],
+                            JDAttachment: []
                         };
                         res.status(200).json(response);
                     }
@@ -1223,11 +1228,13 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
         data: null,
         error: null
     };
+    var attachJD =req.body.attachJD != undefined ? req.body.attachJD : 0;
     var sendMailFlag = 1;
     var emailReceivers;                //emailReceivers to store the recipients
     var mailbody_array = [];    //array to store all mailbody after replacing tags
     var subject_array = [];
     var smsMsg_array = [];
+
     
     var transactions =[];
 
@@ -1235,6 +1242,7 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
     var validationFlag = true;
     var fromEmailID;
     var toEmailID = [];
+    var JDAttachment =[];
     var MobileISD = [];
     var MobileNumber = [];
     var isdMobile = '';
@@ -1388,6 +1396,7 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                 smsMsg_array.push(smsMsg);
 
                                 fromEmailID = result[1][0].fromEmailId;
+                                JDAttachment.push("http://storage.googleapis.com/ezeone/"+result[0][applicantIndex].JDAttachment);
                                 toEmailID.push(result[0][applicantIndex].EmailId);
                                 MobileISD.push(result[0][applicantIndex].MobileISD);
                                 MobileNumber.push(result[0][applicantIndex].MobileNo);
@@ -1432,6 +1441,10 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                         contentType: attachment[file].fileType
                                     });
                                 }
+
+                                // if (attachJD){
+                                    
+                                // }
 
                                 // assign mobile no and isdMobile to send sms
                                 isdMobile = MobileISD[receiverIndex];

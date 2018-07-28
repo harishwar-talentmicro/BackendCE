@@ -373,7 +373,7 @@ attendanceCtrl.attendanceReport=function(req,res,next){
                         response.error = null;
 
                         // template list with questions options
-                           response.data = results[0] 
+                           response.data = results[0] ;
                         //    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         //    zlib.gzip(buf, function (_, result) {
                         //        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
