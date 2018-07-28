@@ -567,7 +567,7 @@ if (cluster.isWorker) {
 
 
         var cronJobWalkInQuessCorp = new CronJob({
-            cronTime: '*/5 * * * * *',
+            cronTime: '*/15 * * * * *',
             onTick: function () {
                 var query = "call wm_integrationUrlwalkInForQuessCorp()";
                 db.query(query, function (err, result) {
@@ -701,7 +701,7 @@ if (cluster.isWorker) {
 
     if (cluster.worker.id == 1) {
         var login = new CronJob({
-            cronTime: '* */1 * * * *',
+            cronTime: '1 * * * * *',
             onTick: function () {
 
                 console.log('running a attendance Login notifier');
@@ -729,7 +729,7 @@ if (cluster.isWorker) {
 
     if (cluster.worker.id == 1) {
         var logout = new CronJob({
-            cronTime: '* */1 * * * *',
+            cronTime: '0 * * * * *',
             onTick: function () {
 
                 console.log('running a attendance Logout notifier');
