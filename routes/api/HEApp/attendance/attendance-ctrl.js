@@ -318,5 +318,83 @@ attendanceCtrl.attendanceInoutStatus=function(req,res,next){
     }
 };
 
+attendanceCtrl.attendanceReport=function(req,res,next){
+    var response = {
+        status : false,
+        message : "Error while loading data",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId){
+        error.hemasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                req.query.startDay = req.query.startDay ? req.query.startDay : null;
+                req.query.endDay = req.query.endDay ? req.query.endDay : null;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                     req.st.db.escape(req.query.startDay),
+                     req.st.db.escape(req.query.endDay),
+                     req.st.db.escape(DBSecretKey),
+                     
+                     
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_get_absentDaysReport( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+                    console.log(err);
+                    if(!err && results && results[0]){
+                        response.status = true;
+                        response.message = "Attendance reports loaded successfully";
+                        response.error = null;
+
+                        // template list with questions options
+                           response.data = results[0] 
+                        //    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        //    zlib.gzip(buf, function (_, result) {
+                        //        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                               res.status(200).json(response);
+                        //    });
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while loading AtendanceInOut";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
 
 module.exports = attendanceCtrl;

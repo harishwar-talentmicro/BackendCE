@@ -11,4 +11,6 @@ router.post('/',attendanceCtrl.saveAttendance);
 
 router.get('/inoutStatus',attendanceCtrl.attendanceInoutStatus);
 
+router.get('/report',attendanceCtrl.attendanceReport);
+
 module.exports = router;
