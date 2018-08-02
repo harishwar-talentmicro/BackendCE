@@ -886,6 +886,7 @@ UserCtrl.login = function (req, res, next) {
         console.log(errorDate.toTimeString() + '......... error .........');
         console.log(ex);
         console.log('Error: ' + ex);
+        res.send("Something went wrong! Please try again");
     }
 };
 

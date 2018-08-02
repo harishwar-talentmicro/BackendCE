@@ -756,24 +756,21 @@ employeeSurveyCtrl.uploadUsersfromweb = function (req, res, next) {
                                         // }, '',Qndata[0].email,[]);
 
                                         if (userResult[0][0].emailtext != "") {
-                                            userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[name]", name);
-                                            userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[UserName]", userResult[0][0].whatmateId);
+                                            userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[Name]", name);
+                                            userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[UserName]", (userResult[0][0].loginId ? userResult[0][0].loginId : userResult[0][0].whatmateId));
                                             userResult[0][0].emailtext = userResult[0][0].emailtext.replace("[Password]", password);
 
-
-                                            // done for jamaica
-                                            userResult[0][0].whatmateSignUpemailText = userResult[0][0].whatmateSignUpemailText.replace("[FirstName]", name);
-                                            userResult[0][0].whatmateSignUpemailText = userResult[0][0].whatmateSignUpemailText.replace("[UserID]", userResult[0][0].loginId);
-                                            userResult[0][0].whatmateSignUpemailText = userResult[0][0].whatmateSignUpemailText.replace("[Password]", password);
 
 
                                             var mail = {
                                                 from: 'noreply@talentmicro.com',
                                                 to: resinput.Email,
                                                 subject: userResult[0][0].whatmateSignUpSubject ? userResult[0][0].whatmateSignUpSubject : 'Your user Credentials for WhatMate App',
-                                                html: userResult[0][0].whatmateSignUpemailText ? userResult[0][0].whatmateSignUpemailText : userResult[0][0].emailtext // html body
+                                                html: userResult[0][0].emailtext // html body
                                             };
 
+                                            // console.log('new mail details',mail);
+                                        
                                             var email = new sendgrid.Email();
                                             email.from = mail.from;
                                             email.to = mail.to;
@@ -793,15 +790,13 @@ employeeSurveyCtrl.uploadUsersfromweb = function (req, res, next) {
                                         }
                                     }
                                     //whatmateId
-                                    message = 'Dear ' + name + ', Your WhatMate credentials, Login ID: ' + userResult[0][0].loginId + ',Password: ' + password;
+                                    message = 'Dear ' + name + ', Your WhatMate credentials, Login ID: ' + (userResult[0][0].loginId ? userResult[0][0].loginId : userResult[0][0].whatmateId) + ',Password: ' + password;
 
-                                    if (userResult[0][0].heMasterId == 36) {
 
-                                        message = userResult[0][0].whatmateSignUpMessage ? userResult[0][0].whatmateSignUpMessage : message;
-                                        message = message.replace('[LoginId]', userResult[0][0].loginId);
-                                        message = message.replace('[password]', password);
+                                    message = userResult[0][0].whatmateSignUpMessage ? userResult[0][0].whatmateSignUpMessage : message;
+                                    message = message.replace('[LoginId]', (userResult[0][0].loginId ? userResult[0][0].loginId : userResult[0][0].whatmateId));
+                                    message = message.replace('[password]', password);
 
-                                    }
 
 
                                     if (mobile != "") {
@@ -921,23 +916,26 @@ employeeSurveyCtrl.uploadUsersfromweb = function (req, res, next) {
 
                                 }
                                 else if (userResult[0][0].status == "Existing" || userResult[0][0].status == "Duplicate") {
-                                    if (email != "") {
+                                    if (resinput.Email != "") {
                                         // mailerApi.sendMailNew('existingUsers', {
                                         //     name : Qndata[0].name,
                                         //     UserName : userResult[0][0].whatmateId,
                                         //     CompanyName : req.query.CompanyName
                                         // }, '',Qndata[0].email,[]);
                                         if (userResult[0][0].ExistingUserEmailText != "") {
-                                            userResult[0][0].ExistingUserEmailText = userResult[0][0].ExistingUserEmailText.replace("[name]", name);
-                                            userResult[0][0].ExistingUserEmailText = userResult[0][0].ExistingUserEmailText.replace("[UserName]", userResult[0][0].whatmateId);
+                                            userResult[0][0].ExistingUserEmailText = userResult[0][0].ExistingUserEmailText.replace("[Name]", name);
+                                            userResult[0][0].ExistingUserEmailText = userResult[0][0].ExistingUserEmailText.replace("[UserName]", (userResult[0][0].loginId ? userResult[0][0].loginId : userResult[0][0].whatmateId));
                                             userResult[0][0].ExistingUserEmailText = userResult[0][0].ExistingUserEmailText.replace("[CompanyName]", companyName);
 
+                                            
                                             mail = {
                                                 from: 'noreply@talentmicro.com',
                                                 to: resinput.Email,
                                                 subject: 'Your user Credentials for WhatMate App',
                                                 html: userResult[0][0].ExistingUserEmailText // html body
                                             };
+
+                                            // console.log('existing mail details',mail);
 
                                             email = new sendgrid.Email();
                                             email.from = mail.from;
@@ -1495,9 +1493,9 @@ employeeSurveyCtrl.surveyQuestionReport = function (req, res, next) {
     else {
 
         try {
-            
+
             req.st.validateToken(req.query.token, function (err, tokenResult) {
-                
+
                 if ((!err) && tokenResult) {
 
                     var procParams = [
@@ -1506,7 +1504,7 @@ employeeSurveyCtrl.surveyQuestionReport = function (req, res, next) {
                         req.st.db.escape(req.query.surveyMasterId)
 
                     ];
-                    
+
                     /**
                      * Calling procedure to My self and my team leave apllications
                      * @type {string}

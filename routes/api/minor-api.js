@@ -673,7 +673,7 @@ if (cluster.isWorker) {
 if (cluster.isWorker) {
 
     if (cluster.worker.id == 1) {
-        var cronJobgreeting = new CronJob({
+        var reminder = new CronJob({
             cronTime: '00 08 * * * *',
             onTick: function () {
 
@@ -692,7 +692,62 @@ if (cluster.isWorker) {
             timeZone: 'America/Los_Angeles'
 
         });
-        cronJobgreeting.start();
+        reminder.start();
+    }
+}
+
+//  cron for attendance login
+if (cluster.isWorker) {
+
+    if (cluster.worker.id == 1) {
+        var login = new CronJob({
+            cronTime: '* */1 * * * *',
+            onTick: function () {
+
+                console.log('running a attendance Login notifier');
+                var query = 'call wm_get_attendanceLoginusers("' + DBSecretKey + '")';
+                db.query(query, function (err, result) {
+                    if (err) {
+                        console.log('error:wm_get_attendanceLoginusers', err);
+                    }
+                    else if(result && result[0] && result[0][0]){
+                        notifyMessages.getMessagesNeedToNotify();
+                    }
+                });
+            },
+            start: false,
+            timeZone: 'America/Los_Angeles'
+
+        });
+        login.start();
+    }
+}
+
+
+//  cron for attendance login
+if (cluster.isWorker) {
+
+    if (cluster.worker.id == 1) {
+        var logout = new CronJob({
+            cronTime: '* */1 * * * *',
+            onTick: function () {
+
+                console.log('running a attendance Logout notifier');
+                var query = 'call wm_get_attendanceLogoutusers("' + DBSecretKey + '")';
+                db.query(query, function (err, result) {
+                    if (err) {
+                        console.log('error:wm_get_attendanceLogoutusers', err);
+                    }
+                    else if(result && result[0] && result[0][0]) {
+                        notifyMessages.getMessagesNeedToNotify();
+                    }
+                });
+            },
+            start: false,
+            timeZone: 'America/Los_Angeles'
+
+        });
+        logout.start();
     }
 }
 

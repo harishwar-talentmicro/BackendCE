@@ -24,4 +24,6 @@ router.post('/savePortalDetails',paceUsersCtrl.saveJobPortalUsers);
 
 router.get('/getJobPortalUsers',paceUsersCtrl.getJobPortalUsers);
 
+router.get('/freeJobPortalUsers',paceUsersCtrl.freeJobPortalUsers);
+
 module.exports = router;
