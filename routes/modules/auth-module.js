@@ -2063,4 +2063,512 @@ Auth.prototype.loginNew = function (req, res, next) {
     }
 };
 
+
+
+/**
+ * @todo FnLogin
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+Auth.prototype.loginLatest = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+    // var ezeoneId = req.st.alterEzeoneId(req.body.UserName);
+
+    // var password = req.body.Password;
+    // var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+    // var deviceToken = req.body.device_token ? req.body.device_token : '';
+    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+    var ip = req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress;
+
+    var token = req.query.token ? req.query.token : ''; // token in query now
+    // var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
+    // var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+    // var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
+    // var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
+    // var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
+    // console.log("secretKey",secretKey);
+
+    var responseMessage = {
+        token: '',
+        tId: '',
+        isAuthenticate: false,
+        ezeoneId: '',
+        displayName:'',
+        groupId:'',
+        pendingViewCount:'',
+        attachmentCount: '',
+        isNewUser: '',
+        brandingPageUrl:'',
+         masterId:''
+
+    };
+    // if(isWhatMate == 0){
+    //     switch(req.platform){
+    //         case 'ios':
+    //             /**
+    //              * If IOS version is not supported
+    //              */
+    //             if(req.CONFIG.VERSION_LIST.IOS[0].indexOf(parseInt(req.query.versionCode)) == -1 && req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1 ){
+    //                 responseMessage.versionStatus = 2;
+    //                 responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //                 res.send(responseMessage);
+    //                 return;
+    //             }
+    //             else if(req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1){
+    //                 responseMessage.versionStatus = 1;
+    //                 responseMessage.versionMessage = "New update available. Please update your application to latest version";
+    //                 //res.send(responseMessage);
+    //                 //return;
+    //             }
+    //             else{
+    //                 responseMessage.versionStatus = 0;
+    //                 responseMessage.versionMessage = "Applications is up to date";
+    //                 //res.send(responseMessage);
+    //             }
+    //             break;
+    //         case 'android':
+    //             /**
+    //              * If Android version is not supported
+    //              */
+    //             if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
+    //                 responseMessage.versionStatus = 2;
+    //                 responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //                 res.send(responseMessage);
+    //                 return;
+    //             }
+    //             else{
+    //                 responseMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
+    //                 (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+    //                 responseMessage.versionMessage = (responseMessage.versionStatus)
+    //                     ? "New update available. Please update your application to latest version" : responseMessage.versionMessage;
+    //
+    //             }
+    //             break;
+    //         case 'web':
+    //             /**
+    //              * If Web version is not supported
+    //              */
+    //             if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
+    //                 responseMessage.versionStatus = 2;
+    //                 responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //                 res.send(responseMessage);
+    //                 return;
+    //             }
+    //             else{
+    //                 responseMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
+    //                 (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+    //                 responseMessage.versionMessage = (responseMessage.versionStatus)
+    //                     ? "New update available. Please update your application to latest version" : responseMessage.versionMessage;
+    //             }
+    //             break;
+    //         default:
+    //             responseMessage.versionStatus = 2;
+    //             responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //             res.send(responseMessage);
+    //             return;
+    //             break;
+    //     }
+    // }
+    //  else{
+    //     switch(req.platform){
+    //         case 'ios':
+    //             /**
+    //              * If IOS version is not supported
+    //              */
+    //             if(req.CONFIG.VERSION_LIST.WhatMateIOS[0].indexOf(parseInt(req.query.versionCode)) == -1 && req.CONFIG.VERSION_LIST.WhatMateIOS[1].indexOf(parseInt(req.query.versionCode)) == -1 ){
+    //                 responseMessage.versionStatus = 2;
+    //                 responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //                 res.send(responseMessage);
+    //                 return;
+    //             }
+    //             else if(req.CONFIG.VERSION_LIST.WhatMateIOS[1].indexOf(parseInt(req.query.versionCode)) == -1){
+    //                 responseMessage.versionStatus = 1;
+    //                 responseMessage.versionMessage = "New update available. Please update your application to latest version";
+    //             }
+    //             else{
+    //                 responseMessage.versionStatus = 0;
+    //                 responseMessage.versionMessage = "Applications is up to date";
+    //             }
+    //             break;
+    //         case 'android':
+    //             /**
+    //              * If Android version is not supported
+    //              */
+    //             if(req.CONFIG.VERSION_LIST.WhatMateANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
+    //                 responseMessage.versionStatus = 2;
+    //                 responseMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //                 res.send(responseMessage);
+    //                 return;
+    //             }
+    //             else{
+    //                 responseMessage.versionStatus = (req.CONFIG.VERSION_LIST.WhatMateANDROID.length ==
+    //                 (req.CONFIG.VERSION_LIST.WhatMateANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+    //                 responseMessage.versionMessage = (responseMessage.versionStatus)
+    //                     ? "New update available. Please update your application to latest version" : responseMessage.versionMessage;
+    //
+    //
+    //             }
+    //             break;
+    //         case 'web':
+    //             /**
+    //              * If Web version is not supported
+    //              */
+    //             if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
+    //                 rtnMessage.data = {
+    //                     versionStatus : 2,
+    //                     versionMessage : "Please update your application to latest version to continue using it"
+    //                 };
+    //
+    //                 res.json(rtnMessage);
+    //                 return;
+    //             }
+    //             else{
+    //                 rtnMessage.data = {
+    //                     versionStatus : (req.CONFIG.VERSION_LIST.WEB.length ==
+    //                     (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1,
+    //                     versionMessage : "New update available. Please update your application to latest version"
+    //
+    //                 };
+    //
+    //             }
+    //             break;
+    //         default:
+    //             rtnMessage.data = {
+    //                 versionStatus : 2,
+    //                 versionMessage : "Please update your application to latest version to continue using it"
+    //             };
+    //
+    //             res.json(rtnMessage);
+    //             return;
+    //             break;
+    //     }
+    // }
+
+    try {
+
+                    var ezeoneId = req.st.alterEzeoneId(req.body.userName);
+
+                    var password = req.body.password;
+                    var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+                    var deviceToken = req.body.device_token ? req.body.device_token : '';
+                    var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
+                    var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+                    var apnsId = (req.body.apnsId) ? (req.body.apnsId) : "";
+                    var gcmId = (req.body.gcmId) ? (req.body.gcmId) : "";
+                    var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
+                    console.log("secretKey", secretKey);
+
+                    if (ezeoneId && password) {
+
+                        var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey);
+                        var query = 'CALL PLoginNew(' + queryParams + ')';
+                        console.log('query', query);
+                        st.db.query(query, function (err, loginResult) {
+                            // console.log(loginResult);
+                            if (!err) {
+                                if (loginResult && password) {
+                                    //console.log('loginDetails',loginDetails);
+                                    if (loginResult[0]) {
+                                        if (loginResult[0].length > 0) {
+                                            var loginDetails = loginResult[0];
+                                            if (!token) {
+                                                if (comparePassword(password, loginDetails[0].Password)) {
+                                                    st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, apnsId, gcmId, secretKey, function (err, tokenResult) {
+                                                        if ((!err) && tokenResult && loginDetails[0]) {
+                                                         
+                                                            responseMessage.token = tokenResult,
+                                                            responseMessage.isAuthenticate = true;
+                                                            responseMessage.tId = loginDetails[0].TID;
+                                                            responseMessage.ezeoneId = loginDetails[0].EZEID;
+                                                            responseMessage.displayName = loginDetails[0].displayName;
+                                                            // responseMessage.companyName = loginDetails[0].CompanyName;
+                                                            // responseMessage.Type = loginDetails[0].IDTypeID;
+                                                            // responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                                            // responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                                            // responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                                            // responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                                            // responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                                            // responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                                            // responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                                            // responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
+                                                            // responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
+                                                            // responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
+                                                            // responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
+                                                            // responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
+                                                            // responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
+                                                            // responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
+                                                            // responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                                            // responseMessage.LastName = loginDetails[0].LastName;
+                                                            if (loginDetails[0].ParentMasterID == 0) {
+                                                                responseMessage.masterId = loginDetails[0].TID;
+                                                            }
+                                                            else {
+                                                                responseMessage.masterId = loginDetails[0].ParentMasterID;
+                                                            }
+                                                            // responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
+                                                            // responseMessage.VisibleModules = loginDetails[0].VisibleModules;
+                                                            // responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
+                                                            // responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                                            // responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                                            // responseMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                                            // responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
+                                                            responseMessage.groupId = loginDetails[0].group_id;
+                                                            // responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+                                                            // responseMessage.cvid = loginDetails[0].cvid;
+                                                            // responseMessage.profile_status = loginDetails[0].ps;
+                                                            // responseMessage.isHelloEZE = loginDetails[0].isHelloEZE;
+                                                            // responseMessage.isWMAdmin = loginDetails[0].isWMAdmin;
+                                                            // responseMessage.displayName = loginDetails[0].displayName;
+                                                            // responseMessage.whatMateCount = loginDetails[0].whatMateCount;
+                                                            // responseMessage.isEmployee = loginDetails[0].isEmployee;
+                                                            responseMessage.isNewUser = loginDetails[0].isNewUser;
+                                                            responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
+                                                            responseMessage.attachmentCount = loginDetails[0].attachmentCount;
+                                                            // responseMessage.userDetails = UserDetailsResult[0];
+                                                            // if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
+                                                            //     responseMessage.contactDetails = contactResult[0];
+                                                            // }
+                                                            // else {
+                                                            //     responseMessage.contactDetails = null;
+                                                            // }
+                                                            responseMessage.brandingPageUrl = loginDetails[0].brandingPageUrl;
+
+                                                            // saving ios device id to database
+                                                            // if (isIphone == 1) {
+                                                            //     var queryParams1 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
+                                                            //     var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
+                                                            //     //console.log(query);
+                                                            //     st.db.query(query1, function (err, deviceResult) {
+                                                            //         if (!err) {
+                                                            //             console.log('FnLogin:Ios Device Id saved successfully');
+                                                            //         }
+                                                            //         else {
+                                                            //             console.log(err);
+                                                            //         }
+                                                            //     });
+                                                            // }
+                                                    
+                                                            response.status = true;
+                                                            response.message = "Logged in successfully";
+                                                            response.error = null;
+                                                            // response.data=(responseMessage);
+
+                                                            var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                                                            zlib.gzip(buf, function (_, result) {
+                                                                response.data = encryption.encrypt(result, secretKey).toString('base64');
+                                                                res.status(200).json(response);
+                                                            });
+
+                                                          }
+                                                            
+                                                        else {
+
+                                                            response.status = false;
+                                                            response.message = "failed to generate a token";
+                                                            response.error = null;
+                                                            var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                                                            zlib.gzip(buf, function (_, result) {
+                                                                response.data = encryption.encrypt(result, secretKey).toString('base64');
+                                                                res.status(500).json(response);
+                                                            });
+
+                                                            console.log('FnLogin:failed to generate a token ');
+                                                            console.log('FnLogin:' + err);
+                                                        }
+                                                    });
+                                                }
+                                                else {
+                                                    response.status = false;
+                                                    response.message = "Invalid credentials";
+                                                    response.error = null;
+                                                    var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                                                    zlib.gzip(buf, function (_, result) {
+                                                        response.data = encryption.encrypt(result, secretKey).toString('base64');
+                                                        res.status(200).json(response);
+                                                    });
+
+                                                    console.log('FnLogin:password not matched ');
+                                                }
+                                            }
+                                            else {
+
+                                                for (var i=0 ; i<loginResult[1].length ; i++){
+                                                    loginResult[1][i].trackTemplateDetails = loginResult[1][i] && loginResult[1][i].trackTemplateDetails ?  JSON.parse(loginResult[1][i].trackTemplateDetails):[];
+                                                }
+                                                console.log("login company details with existing token",loginResult[1][0]);
+
+                                                responseMessage.token = tokenResult;
+                                                responseMessage.isAuthenticate = true;
+                                                responseMessage.tId = loginDetails[0].TID;
+                                                responseMessage.ezeoneId = loginDetails[0].EZEID;
+                                                responseMessage.displayName = loginDetails[0].displayName;
+                                                // responseMessage.companyName = loginDetails[0].CompanyName;
+                                                // responseMessage.Type = loginDetails[0].IDTypeID;
+                                                // responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                                // responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                                // responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                                // responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                                // responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                                // responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                                // responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                                // responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
+                                                // responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
+                                                // responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
+                                                // responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
+                                                // responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
+                                                // responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
+                                                // responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
+                                                // responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                                // responseMessage.LastName = loginDetails[0].LastName;
+                                                if (loginDetails[0].ParentMasterID == 0) {
+                                                    responseMessage.masterId = loginDetails[0].TID;
+                                                }
+                                                else {
+                                                    responseMessage.masterId = loginDetails[0].ParentMasterID;
+                                                }
+                                                // responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
+                                                // responseMessage.VisibleModules = loginDetails[0].VisibleModules;
+                                                // responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
+                                                // responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                                // responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                                // responseMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                                // responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
+                                                responseMessage.groupId = loginDetails[0].group_id;
+                                                // responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+                                                // responseMessage.cvid = loginDetails[0].cvid;
+                                                // responseMessage.profile_status = loginDetails[0].ps;
+                                                // responseMessage.isHelloEZE = loginDetails[0].isHelloEZE;
+                                                // responseMessage.isWMAdmin = loginDetails[0].isWMAdmin;
+                                                // responseMessage.displayName = loginDetails[0].displayName;
+                                                // responseMessage.whatMateCount = loginDetails[0].whatMateCount;
+                                                // responseMessage.isEmployee = loginDetails[0].isEmployee;
+                                                responseMessage.isNewUser = loginDetails[0].isNewUser;
+                                                responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
+                                                responseMessage.attachmentCount = loginDetails[0].attachmentCount;
+                                                // responseMessage.userDetails = UserDetailsResult[0];
+                                                // if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
+                                                //     responseMessage.contactDetails = contactResult[0];
+                                                // }
+                                                // else {
+                                                //     responseMessage.contactDetails = null;
+                                                // }
+                                                responseMessage.brandingPageUrl = loginDetails[0].brandingPageUrl;
+
+                                                response.status = true;
+                                                response.message = "Logged in successfully";
+                                                response.error = null;
+                                                var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                                                zlib.gzip(buf, function (_, result) {
+                                                    response.data = encryption.encrypt(result, secretKey).toString('base64');
+                                                    res.status(200).json(response);
+                                                });
+
+                                                // res.send(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            response.status = false;
+                                            response.message = "Invalid credentials";
+                                            response.error = null;
+                                            var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                response.data = encryption.encrypt(result, secretKey).toString('base64');
+                                                res.status(200).json(response);
+                                            });
+
+                                            console.log('FnLogin:login result not found');
+                                        }
+                                    }
+                                    else {
+                                        response.status = false;
+                                        response.message = "Invalid credentials";
+                                        response.error = null;
+                                        var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        });
+
+                                        console.log('FnLogin:login result not found');
+                                    }
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Invalid credentials";
+                                    response.error = null;
+                                    var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+
+                                    console.log('FnLogin: Invalid login credentials');
+                                }
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Internal server error..";
+                                response.error = null;
+                                var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, secretKey).toString('base64');
+                                    res.status(500).json(response);
+                                });
+
+                                console.log('FnLogin:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        if (!ezeoneId) {
+                            console.log('FnLogin: EZEOneId is mandatory');
+                        }
+                        else if (!password) {
+                            console.log('FnLogin: password is mandatory');
+                        }
+
+                        response.status = false;
+                        response.message = "Please fill mandatory fields";
+                        response.error = null;
+                        var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, secretKey).toString('base64');
+                            res.status(400).json(response);
+                        });
+
+                    }
+
+
+
+        //close here
+    }
+    catch (ex) {
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log(ex);
+        console.log('FnLogin:: error:' + ex);
+        response.message = "Internal server error";
+        res.status(500).json(response);
+    }
+};
+
+
+
+
+
 module.exports = Auth;
