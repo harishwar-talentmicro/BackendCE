@@ -499,8 +499,8 @@ User.prototype.getUserDetails = function (req, res, next) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var APNSID= req.query.APNSID;
-        var GCMID=req.query.GCMID;
+        var APNSID= req.query.APNSID ? req.query.APNSID :'';
+        var GCMID=req.query.GCMID ? req.query.GCMID :'';
         if (Token) {
             st.validateToken(Token, function (err, tokenResult) {
                 console.log(err);
@@ -5279,7 +5279,7 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
 
                                         
                                           response.status = true;
-                                        response.message = "User details sent successfully";
+                                        response.message = "User details loaded successfully";
                                         response.error = null;
                                         response.data = {
                                             isdMobile:UserDetailsResult[0][0].ISDMobileNumber,
@@ -5293,7 +5293,9 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
                                             attachmentCount:UserDetailsResult[0][0].attachmentCount,
                                             isNewUser:UserDetailsResult[0][0].isNewUser,
                                             isConfigManager:UserDetailsResult[0][0].isConfigManager,
-                                           companyDetails = UserDetailsResult[1][0] ? UserDetailsResult[1][0]:{}
+                                            groupId:UserDetailsResult[0][0].groupId,
+                                            
+                                           companyDetails : UserDetailsResult[1][0] ? (UserDetailsResult[1][0]):{}
                                         }
                                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                         zlib.gzip(buf, function (_, result) {
@@ -5335,29 +5337,49 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
 
                             }
                             else {
-                                res.json(null);
-                                res.statusCode = 500;
-                                console.log('FnGetUserDetails : tmaster:' + err);
+                                // res.json(null);
+                                // res.statusCode = 500;
+                                // console.log('FnGetUserDetails : tmaster:' + err);
+
+                                response.status = false;
+                                   response.message = "FnGetUserDetails : tmaster:" + err;
+                                   response.error = null;
+                                   response.data = null;
+
+                                   res.status(500).json(response);
                             }
                         });
                     }
                     else {
-                        console.log('FnGetUserDetails: Invalid token');
-                        res.statusCode = 401;
-                        res.json(null);
+                        // console.log('FnGetUserDetails: Invalid token');
+                        // res.statusCode = 401;
+                        // res.json(null);
+                        response.status = false;
+                        response.message = "Invalid Token";
+                        response.error = null;
+                        response.data = null;
+
+                        res.status(401).json(response);
                     }
                 }
                 else {
-                    console.log('FnGetUserDetails: ' + err);
-                    res.statusCode = 500;
-                    res.json(null);
+                    response.status = false;
+                    response.message = "FnGetUserDetails : tmaster:" + err;
+                    response.error = null;
+                    response.data = null;
+
+                    res.status(500).json(response);
                 }
             });
         }
         else {
-            res.json(null);
-            res.statusCode = 400;
-            console.log('FnGetUserDetails :  token is empty');
+            response.status = false;
+            response.message = "token is empty";
+            response.error = null;
+            response.data = null;
+
+            res.status(400).json(response);
+            // console.log('FnGetUserDetails :  token is empty');
         }
     }
     catch (ex) {
