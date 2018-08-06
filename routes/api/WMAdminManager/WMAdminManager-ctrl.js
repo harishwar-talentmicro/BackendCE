@@ -41,6 +41,12 @@ wmAdminManagerCtrl.saveWhatMate = function(req, res, next){
             req.body.type = req.body.type ? req.body.type : 1;
             req.body.eventId = req.body.eventId ? req.body.eventId : 0;
             req.body.tileStyle = req.body.tileStyle ? req.body.tileStyle : 0;
+            req.body.hideSearchPage = req.body.hideSearchPage ? req.body.hideSearchPage : 0;
+            req.body.hideChatPage = req.body.hideChatPage ? req.body.hideChatPage : 0;
+            req.body.hideProfilePage = req.body.hideProfilePage ? req.body.hideProfilePage : 0;
+            req.body.isTopScroll = req.body.isTopScroll ? req.body.isTopScroll : 0;
+            req.body.isChatBotHide = req.body.isChatBotHide ? req.body.isChatBotHide : 0;
+            req.body.isFormGroupHide = req.body.isFormGroupHide ? req.body.isFormGroupHide : 0;
 
             var procParams = [
                 req.st.db.escape(req.body.WMId),
@@ -58,7 +64,16 @@ wmAdminManagerCtrl.saveWhatMate = function(req, res, next){
                 req.st.db.escape(req.body.keywords),
                 req.st.db.escape(req.body.topBannerId),
                 req.st.db.escape(req.body.address),
-                req.st.db.escape(req.body.tileStyle)
+                req.st.db.escape(req.body.tileStyle),
+                req.st.db.escape(req.body.hideSearchPage),
+                req.st.db.escape(req.body.hideChatPage),
+                req.st.db.escape(req.body.hideProfilePage),
+                req.st.db.escape(req.body.isTopScroll),
+                req.st.db.escape(req.body.isChatBotHide),
+                req.st.db.escape(req.body.isFormGroupHide),
+                req.st.db.escape(req.body.brandingPage),
+                req.st.db.escape(req.body.isHideTransactionPage)
+              
             ];
 
             var procQuery = 'CALL wm_save_whatmateList( ' + procParams.join(',') + ')';
