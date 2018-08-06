@@ -30,8 +30,8 @@ var http = require('https');
 // var Readable = require('stream').Readable;
 var bcrypt = null;
 var EZEIDEmail = 'noreply@talentmicro.com';
-const accountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
-const authToken = '3abf04f536ede7f6964919936a35e614';
+const accountSid = 'ACdc7d20f3e7be56555e65fc0b20ef2c22';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'ACdc7d20f3e7be56555e65fc0b20ef2c22';
+const authToken = '5451d20c01f47a0d10c4e5b34807ca6d';   //'3abf04f536ede7f6964919936a35e614';  //'5451d20c01f47a0d10c4e5b34807ca6d';//
 const client = require('twilio')(accountSid, authToken);
 // const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
@@ -1033,7 +1033,7 @@ walkInCvCtrl.sendOtp = function (req, res, next) {
                             {
                                 body: message,
                                 to: isdMobile + mobileNo,
-                                from: '+14434322305'
+                                from: '+18647547021'//'+14434322305' //+18647547021
                             },
                             function (error, response) {
                                 if (error) {
@@ -3109,9 +3109,15 @@ walkInCvCtrl.walkInUploadLinkFlag = function (req, res, next) {
             console.log(err);
 
             if (!err && result && result[0] && result[0][0]) {
-                result[0][0].validateLinkFlag = (result[0][0].validateLinkFlag === result[0][0].validateLinkFlag);  //indicator strict
 
-                response.status = (result[0] && result[0][0]) ? result[0][0].validateLinkFlag : false;
+                if(result[0][0].validateLinkFlag=='true'){
+                    result[0][0].validateLinkFlag= true;
+                }
+                else{
+                    result[0][0].validateLinkFlag=false;
+                }
+
+                response.status = result[0][0].validateLinkFlag;
                 response.message = "Validate upload link";
                 response.error = null;
                 response.data = null;

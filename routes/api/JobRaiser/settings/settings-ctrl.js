@@ -83,7 +83,7 @@ settingsCtrl.getAccessrightsMaster = function (req, res, next) {
 
                         else if (!err) {
                             response.status = true;
-                            response.message = "No results found";
+                            response.message = "Your are Not Admin! No data found";
                             response.error = null;
                             response.data = {
                                 formDetails: [],
@@ -685,5 +685,98 @@ settingsCtrl.saveAccessrightsTemplate = function (req, res, next) {
   
   imap.connect();
 */
+
+settingsCtrl.temporary = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    var query = "call wm_integrationUrlForHircraft()";
+    req.db.query(query, function (err, result) {
+        if (err) {
+            console.log('Interview database error: integrationUrlForHircraft',err);
+        }
+        else if ((result[0].length != 0) && (result[1].length != 0)) {
+            var heMasterId;
+            var transId;
+            var integrationFormData = {};
+            var DBUrl;
+            // console.log(result);
+            if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
+                heMasterId = result[0][0].heMasterId;
+                DBUrl = result[0][0].url;
+                transId = result[1][0].transId;
+                var response_server = (result[1][0].integrationFormdata);
+                // console.log('response_server',response_server);
+                if (typeof (response_server) == "string") {
+                    response_server = JSON.parse(response_server);
+                }
+
+                if (typeof (response_server.skillAssessment) == 'string') {
+                    response_server.skillAssessment = JSON.parse(response_server.skillAssessment);
+                    
+                }
+
+
+                if (typeof (response_server.assessment) == 'string') {
+                    response_server.assessment = JSON.parse(response_server.assessment);
+                    response_server.skillAssessment = JSON.parse(response_server.skillAssessment);
+                    
+                }
+
+                if (typeof (response_server.assessment.integrationAssessmentDetails) == 'string') {
+                    response_server.assessment.integrationAssessmentDetails = JSON.parse(response_server.assessment.integrationAssessmentDetails);
+                }
+
+                for (var r = 0; r < response_server.assessment.integrationAssessmentDetails.length; r++) {
+
+                    if (typeof (response_server.assessment.integrationAssessmentDetails[r].integrationQuestions) == 'string') {
+                        response_server.assessment.integrationAssessmentDetails[r].integrationQuestions = JSON.parse(response_server.assessment.integrationAssessmentDetails[r].integrationQuestions);
+                    }
+                    for (var s = 0; s < response_server.assessment.integrationAssessmentDetails[r].integrationQuestions.length; s++) {
+                        if (typeof (response_server.assessment.integrationAssessmentDetails[r].integrationQuestions[s].integrationselectedOption) == 'string') {
+                            response_server.assessment.integrationAssessmentDetails[r].integrationQuestions[s].integrationselectedOption = JSON.parse(response_server.assessment.integrationAssessmentDetails[r].integrationQuestions[s].integrationselectedOption);
+                        }
+                    }
+                }
+                console.log("response_server", JSON.stringify(response_server));
+                var count = 0;
+                request({
+                    url: DBUrl,
+                    method: "POST",
+                    json: true,   // <--Very important!!!
+                    body: response_server
+                }, function (error, response, body) {
+                    console.log('Tallint error',error);
+                    console.log('Tallint body after success',body);
+                    // console.log("response_server", response_server);
+                    if (body && body.Code && body.Code == "SUCCESS0001") {
+                        var updateQuery = "update 1014_trans set sync=1 where heParentId=" + transId;
+                        db.query(updateQuery, function (err, results) {
+                            if (err) {
+                                console.log("update sync query throws error");
+                            }
+                            else {
+                                console.log("sync is updated to 1 successfully", transId);
+                            }
+                        });
+                    }
+                    count++;
+                });
+
+                response.status=true;
+                response.data=response_server;
+                res.status(200).json(response);
+                console.log('tallint interview hit for ', count, ' times');
+            }
+        }
+    });
+          
+};
+
 
 module.exports = settingsCtrl;

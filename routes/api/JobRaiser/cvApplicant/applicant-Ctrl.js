@@ -511,7 +511,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             group : result[39] ? result[39]: [],
                             faceSheetTemplates: result[41] ? result[41]:[],
                             reportingToList : result[42] ? result[42]:[],
-                            jdTemplateList : result[43] ? result[43]:[]
+                            jdTemplateList : result[43] ? result[43]:[],
+                            cvStatus : result[44] ? result[44]:[]
                         };
 
                         if (req.query.isWeb == 0) {
@@ -576,7 +577,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             group:[],
                             faceSheetTemplates:[],
                             reportingToList: [],
-                            jdTemplateList:[]
+                            jdTemplateList:[],
+                            cvStatus: []
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -848,6 +850,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                 req.body.applicantId = (req.body.applicantId) || (req.body.applicantId == "") ? req.body.applicantId : 0;
                 req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
                 req.body.type = (req.body.type) ? req.body.type : 1;
+                req.body.name = (req.body.name) ? req.body.name : '';
 
 
                 var getStatus = [
@@ -866,7 +869,8 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                     req.st.db.escape(req.body.limit),
                     req.st.db.escape(req.body.requirementId),
                     req.st.db.escape(DBSecretKey),
-                    req.st.db.escape( req.body.type)
+                    req.st.db.escape( req.body.type),
+                    req.st.db.escape( req.body.name)
                 ];
 
                 var procQuery = 'CALL wm_get_applicants( ' + getStatus.join(',') + ')';
@@ -1228,6 +1232,8 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                 req.body.noticePeriodFrom = (req.body.noticePeriodFrom) ? req.body.noticePeriodFrom : 0;
                 req.body.noticePeriodTo = (req.body.noticePeriodTo) ? req.body.noticePeriodTo : 0;
                 req.body.workLocation = (req.body.workLocation) ? req.body.workLocation : '';
+                req.body.cvRating = req.body.cvRating ? req.body.cvRating : 0;
+                                
                 req.body.start = req.body.start ? req.body.start : 1;
                 req.body.limit = (req.body.limit) ? req.body.limit : 50;
                 
@@ -1260,7 +1266,8 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(requiredNationalities)),
                     req.st.db.escape(JSON.stringify(DOB)),
                     req.st.db.escape(req.body.start),
-                    req.st.db.escape(req.body.limit)
+                    req.st.db.escape(req.body.limit),
+                    req.st.db.escape(req.body.cvRating)
 
                 ];
 

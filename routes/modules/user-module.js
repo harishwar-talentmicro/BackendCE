@@ -499,8 +499,8 @@ User.prototype.getUserDetails = function (req, res, next) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var APNSID= req.query.APNSID;
-        var GCMID=req.query.GCMID;
+        var APNSID= req.query.APNSID ? req.query.APNSID :'';
+        var GCMID=req.query.GCMID ? req.query.GCMID :'';
         if (Token) {
             st.validateToken(Token, function (err, tokenResult) {
                 console.log(err);

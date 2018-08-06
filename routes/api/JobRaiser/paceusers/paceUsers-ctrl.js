@@ -243,17 +243,20 @@ paceUsersCtrl.getUsers = function (req, res, next) {
 
                         if (req.query.userMasterId == 0){
                             for(var i=0; i<result[0].length;i++){
-                                result[0][i].accessRights = result[0][i].accessRights.templateId ? JSON.parse(result[0][i].accessRights) :{};
+                                result[0][i].accessRights = (result[0][i].accessRights && JSON.parse(result[0][i].accessRights).templateId) ? JSON.parse(result[0][i].accessRights) :{};
                             }    
                         }
                         else{
                        
-                                result[0][0].jobTitle = result[0][0].jobTitle.jobTitleId ? JSON.parse(result[0][0].jobTitle) : {};
-                                result[0][0].userType = result[0][0].userType.userTypeId ? JSON.parse(result[0][0].userType) : {};
-                                result[0][0].transferredTo = result[0][0].transferredTo.transferredToUserId ? JSON.parse(result[0][0].transferredTo) : {};
+                                result[0][0].jobTitle = (result[0][0].jobTitle && JSON.parse(result[0][0].jobTitle).jobTitleId) ? JSON.parse(result[0][0].jobTitle) : {};
+
+                                result[0][0].userType = (result[0][0].userType && JSON.parse(result[0][0].userType).userTypeId) ? JSON.parse(result[0][0].userType) : {};
+
+                                result[0][0].transferredTo = (result[0][0].transferredTo && JSON.parse(result[0][0].transferredTo).transferredToUserId) ? JSON.parse(result[0][0].transferredTo) : {};
+
                                 result[0][0].reportingTo = result[0][0].reportingTo ? JSON.parse(result[0][0].reportingTo) : [];
-                                console.log('result[0][0].accessRights.templateId',result[0][0].accessRights.templateId);
-                                result[0][0].accessRights = result[0][0].accessRights ? JSON.parse(result[0][0].accessRights) : {};   
+
+                                result[0][0].accessRights = (result[0][0].accessRights && JSON.parse(result[0][0].accessRights).templateId) ? JSON.parse(result[0][0].accessRights) : {};   
                         }
                        
                         response.data = {
@@ -413,7 +416,8 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.taskByMonth)
                 ];
 
                 var procQuery = 'CALL wm_get_pacePlanner( ' + inputs.join(',') + ')';
@@ -709,7 +713,9 @@ paceUsersCtrl.getBaseFile = function (req, res, next) {
                     fileResponse.on('data', function (d) { bufs.push(d); });
                     fileResponse.on('end', function () {
                         var buf = Buffer.concat(bufs);
+                        // console.log('before base',buf);
                         buf = new Buffer(buf).toString("base64");
+                        // console.log('base 64',buf);
                         response.data = buf;
                         res.status(200).json(response);
                     });
@@ -1223,6 +1229,87 @@ paceUsersCtrl.freeJobPortalUsers = function (req, res, next) {
                     else {
                         response.status = false;
                         response.message = "Error while loading job portal details";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+paceUsersCtrl.checkApplicantExists = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = "Invalid Company";
+        validationFlag *= false;
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.body.portalId) {
+        error.portalId = 'Invalid portalId';
+        validationFlag *= false;
+    }
+
+    if (!req.body.firstName) {
+        error.firstName = 'Invalid firstName';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.body.lastName = req.body.lastName ? req.body.lastName : '';
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.firstName),
+                    req.st.db.escape(req.body.lastName),
+                    req.st.db.escape(req.body.portalId)
+                ];
+
+                var procQuery = 'CALL wm_checkApplicantsFromPortal( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    // console.log(result);
+                    if (!err && result && result[0] && result[0][0] && result[0][0].applicantExist ) {
+                        response.status = false;
+                        response.message = result[0][0].applicantExist;
+                        response.error = null;
+                        response.data =null;
+                        res.status(200).json(response);
+                    }
+                    else if (!err && result && result[0] && result[0][0] && result[0][0].newResume) {
+                        response.status = true;
+                        response.message =result[0][0].newResume;
+                        response.error = null;
+                        response.data =null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Something went wrong! Please try again";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
