@@ -524,7 +524,12 @@ if (cluster.isWorker) {
                             heMasterId = result[0][0].heMasterId;
                             DBUrl = result[0][0].url;
                             transId = result[1][0].transId;
-                            formData = result[1][0].formData;
+                            if(typeof(result[1][0].formData)=='string'){
+                                formData = result[1][0].formData ? JSON.parse(result[1][0].formData):{};
+                            }
+                            else{
+                                formData = result[1][0].formData ;
+                            }
 
                             // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
                             var count = 0;
@@ -532,7 +537,7 @@ if (cluster.isWorker) {
                                 url: DBUrl,
                                 method: "POST",
                                 json: true,   // <--Very important!!!
-                                body: JSON.parse(formData)
+                                body: formData
                             }, function (error, response, body) {
                                 console.log(error);
                                 console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
@@ -590,7 +595,13 @@ if (cluster.isWorker) {
                             heMasterId = result[0][0].heMasterId;
                             DBUrl = result[0][0].url;
                             transId = result[1][0].transId;
-                            formData = result[1][0].formData;
+                            if(typeof(result[1][0].formData)=='string'){
+                                formData = result[1][0].formData ? JSON.parse(result[1][0].formData):{};
+                            }
+                            else{
+                                formData = result[1][0].formData ;
+                            }
+
 
                             // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
                             var count = 0;
@@ -598,7 +609,7 @@ if (cluster.isWorker) {
                                 url: DBUrl,
                                 method: "POST",
                                 json: true,   // <--Very important!!!
-                                body: JSON.parse(formData)
+                                body: formData
                             }, function (error, response, body) {
                                 console.log(error);
                                 console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)

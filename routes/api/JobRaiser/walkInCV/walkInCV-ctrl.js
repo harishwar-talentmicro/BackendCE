@@ -1873,9 +1873,10 @@ walkInCvCtrl.saveWalkInJobs = function (req, res, next) {
                 req.body.IDRequired = req.body.IDRequired ? req.body.IDRequired : 0;
                 req.body.IDType = req.body.IDType ? req.body.IDType : "";
                 req.body.DOBType = req.body.DOBType ? req.body.DOBType : "";
+                req.body.profilePic = req.body.profilePic ? req.body.profilePic : 1;
 
                 var walkinJobCode = req.body.jobCode.replace(/<(.*)>/g, '');
-
+                
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.walkInJobId),
@@ -1890,7 +1891,9 @@ walkInCvCtrl.saveWalkInJobs = function (req, res, next) {
                     req.st.db.escape(req.body.IDRequired),
                     req.st.db.escape(req.body.IDType),
                     req.st.db.escape(req.body.DOBType),
-                    req.st.db.escape(walkinJobCode)
+                    req.st.db.escape(walkinJobCode),
+                    req.st.db.escape(req.body.profilePic)
+                
                 ];
 
                 var procQuery = 'CALL wm_save_walkinJobs( ' + inputs.join(',') + ')';
@@ -2949,8 +2952,9 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 req.body.walkInWelcomeMessage = req.body.walkInWelcomeMessage ? req.body.walkInWelcomeMessage : '';
                 req.body.acceptTnCFlag = req.body.acceptTnCFlag ? req.body.acceptTnCFlag : 0;
                 req.body.acceptTnCMsgFormat = req.body.acceptTnCMsgFormat ? req.body.acceptTnCMsgFormat : '';
+                req.body.profilePic = req.body.profilePic ? req.body.profilePic : 1;
 
-
+                
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -2981,7 +2985,9 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(req.body.walkinFormMessage),
                     req.st.db.escape(req.body.walkInWelcomeMessage),
                     req.st.db.escape(req.body.acceptTnCFlag),
-                    req.st.db.escape(req.body.acceptTnCMsgFormat)
+                    req.st.db.escape(req.body.acceptTnCMsgFormat),
+                    req.st.db.escape(req.body.profilePic)
+             
                 ];
 
                 var procQuery = 'CALL wm_save_walkWebConfig( ' + inputs.join(',') + ')';

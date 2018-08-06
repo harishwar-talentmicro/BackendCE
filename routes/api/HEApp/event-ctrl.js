@@ -1617,6 +1617,11 @@ eventCtrl.getStatusOfWMList = function(req,res,next){
                         response.status = true;
                         response.message = "Details loaded successfully";
                         response.error = null;
+
+                        if(homePageData[0][0].isFormGroupHide !=0){
+                            homePageData[0][0].homePageBanner='';
+                        }
+
                         response.data = {
                             details : homePageData[0][0]
                         };
@@ -1625,7 +1630,7 @@ eventCtrl.getStatusOfWMList = function(req,res,next){
                     }
                     else if (!err) {
                         response.status = true;
-                        response.message = "Details loaded successfully";
+                        response.message = "No details found";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);

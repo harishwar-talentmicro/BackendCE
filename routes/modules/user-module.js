@@ -5263,6 +5263,9 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
                                             UserDetailsResult[1][i].trackTemplateDetails = UserDetailsResult[1][i] && UserDetailsResult[1][i].trackTemplateDetails ?  JSON.parse(UserDetailsResult[1][i].trackTemplateDetails):[];
                                         }
                                       
+                                        if(UserDetailsResult[1][0].isFormGroupHide !=0 || UserDetailsResult[3][0].count !=0){
+                                            UserDetailsResult[1][0].homePageBanner='';
+                                        }
 
                                         // UserDetailsResult[0][0].companyDetails = UserDetailsResult[1][0] ? UserDetailsResult[1][0]:{}
                                        

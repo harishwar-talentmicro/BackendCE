@@ -1265,9 +1265,13 @@ paceUsersCtrl.checkApplicantExists = function (req, res, next) {
         validationFlag *= false;
     }
 
-    if (!req.body.firstName) {
-        error.firstName = 'Invalid firstName';
-        validationFlag *= false;
+    var applicants = req.body.applicants;
+    if (typeof(applicants) == 'string'){
+        applicants = JSON.parse(applicants);
+    }
+
+    if(!applicants){
+        applicants=[];
     }
 
     if (!validationFlag) {
@@ -1284,8 +1288,7 @@ paceUsersCtrl.checkApplicantExists = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.body.firstName),
-                    req.st.db.escape(req.body.lastName),
+                    req.st.db.escape(JSON.parse(applicants)),                    
                     req.st.db.escape(req.body.portalId)
                 ];
 
@@ -1293,20 +1296,23 @@ paceUsersCtrl.checkApplicantExists = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     // console.log(result);
-                    if (!err && result && result[0] && result[0][0] && result[0][0].applicantExist ) {
-                        response.status = false;
-                        response.message = result[0][0].applicantExist;
-                        response.error = null;
-                        response.data =null;
-                        res.status(200).json(response);
-                    }
-                    else if (!err && result && result[0] && result[0][0] && result[0][0].newResume) {
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
-                        response.message =result[0][0].newResume;
+                        response.message ="Applicants imported successfully";
                         response.error = null;
-                        response.data =null;
+                        if(result[0][0].importerResults && typeof(result[0][0].importerResults)=='string'){
+                            result[0][0].importerResults = JSON.parse(result[0][0].importerResults);
+                        }
+                        response.data = result[0][0].importerResults ? result[0][0].importerResults:[];
                         res.status(200).json(response);
                     }
+                    // else if (!err && result && result[0] && result[0][0] && result[0][0].newResume) {
+                    //     response.status = true;
+                    //     response.message =result[0][0].newResume;
+                    //     response.error = null;
+                    //     response.data =null;
+                    //     res.status(200).json(response);
+                    // }
                     else {
                         response.status = false;
                         response.message = "Something went wrong! Please try again";
