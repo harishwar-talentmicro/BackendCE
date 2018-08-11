@@ -82,6 +82,7 @@ itemRequestCtrl.saveStationaryRequest = function(req,res,next){
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
         
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -99,7 +100,9 @@ itemRequestCtrl.saveStationaryRequest = function(req,res,next){
                             req.st.db.escape(JSON.stringify(itemList)),
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
-                            req.st.db.escape(DBSecretKey)
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)
                         ];
                         
                         var stationaryFormId=1008;
@@ -294,6 +297,7 @@ itemRequestCtrl.savePantryRequest = function(req,res,next){
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
         
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -311,7 +315,9 @@ itemRequestCtrl.savePantryRequest = function(req,res,next){
                             req.st.db.escape(JSON.stringify(itemList)),
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
-                            req.st.db.escape(DBSecretKey)
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)
                         ];
 
                         var pantryFormId=1009;
@@ -512,6 +518,7 @@ itemRequestCtrl.saveAssetRequest = function(req,res,next){
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
         
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -530,8 +537,10 @@ itemRequestCtrl.saveAssetRequest = function(req,res,next){
                             req.st.db.escape(JSON.stringify(itemList)),
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
-                            req.st.db.escape(DBSecretKey)
-                        ];
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)
+            ];
 
                         var assestFormId=1018;
                         var keywordsParams=[
@@ -729,6 +738,7 @@ itemRequestCtrl.saveDocRequestToHR = function(req,res,next){
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
                         req.body.status = req.body.status ? req.body.status : 1;
                         req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
         
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -748,7 +758,9 @@ itemRequestCtrl.saveDocRequestToHR = function(req,res,next){
                             req.st.db.escape(JSON.stringify(attachmentList)),
                             req.st.db.escape(req.body.status),
                             req.st.db.escape(req.body.approverNotes),
-                            req.st.db.escape(DBSecretKey)
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)
                         ];
 
                         var docrequestFormId=1022;

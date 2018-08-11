@@ -227,6 +227,7 @@ salesCtrl.saveSalesRequest = function (req, res, next) {
                         req.body.notes = req.body.notes != undefined ? req.body.notes : "";
                         req.body.contactId = req.body.contactId != undefined ? req.body.contactId : 0;
                         req.body.targetDate = req.body.targetDate != undefined ? req.body.targetDate : null;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
 
                         if (req.body.phoneNo == "") {
                             req.body.isdPhone = "";
@@ -273,7 +274,9 @@ salesCtrl.saveSalesRequest = function (req, res, next) {
                             req.st.db.escape(req.body.notes),
                             req.st.db.escape(req.body.contactId),
                             req.st.db.escape(req.body.targetDate),
-                            req.st.db.escape(DBSecretKey)                            
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)                             
                         ];
                         var salesFormId=2000;
                         var keywordsParams=[

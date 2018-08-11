@@ -2163,6 +2163,7 @@ walkInCvCtrl.saveVisitorCheckIn = function (req, res, next) {
                     req.body.emailId = req.body.emailId ? req.body.emailId : '';
                     req.body.visitorBadgeNumber = req.body.visitorBadgeNumber ? req.body.visitorBadgeNumber : '';
                     req.body.signInHere = req.body.signInHere ? req.body.signInHere : '';
+                    req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
 
                     var procParams = [
                         req.st.db.escape(req.query.token),
@@ -2194,7 +2195,9 @@ walkInCvCtrl.saveVisitorCheckIn = function (req, res, next) {
                         req.st.db.escape(req.body.visitorBadgeNumber),
                         req.st.db.escape(JSON.stringify(toMeetWhom)),
                         req.st.db.escape(req.body.signInHere),
-                        req.st.db.escape(req.query.heMasterId)
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.body.timestamp),
+                        req.st.db.escape(req.body.createdTimeStamp)
                     ];
 
                     /**

@@ -18,5 +18,9 @@ router.get('/portalApplicantDetails',jobPortalCtrl.getPortalApplicantDetails);
 
 router.get('/searchJob',jobPortalCtrl.getPortalSearchJob);
 
+router.post('/portalverifyotp',jobPortalCtrl.portalverifyotp);
+
+router.post('/portalsignup',jobPortalCtrl.portalsignup);
+
 module.exports = router;
 

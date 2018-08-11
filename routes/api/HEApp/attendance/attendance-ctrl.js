@@ -86,6 +86,8 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                         req.body.workedDate = req.body.workedDate ? req.body.workedDate : null;
                         req.body.availedDate = req.body.availedDate ? req.body.availedDate : null;
                         req.body.isCompOffAvailed = req.body.isCompOffAvailed ? req.body.isCompOffAvailed : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+                        // req.body.createdTimeStamp = req.body.createdTimeStamp ? req.body.createdTimeStamp : null;
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -109,7 +111,10 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                             req.st.db.escape(req.body.workedDate),
                             req.st.db.escape(req.body.availedDate),
                             req.st.db.escape(req.body.isCompOffAvailed),
-                            req.st.db.escape(DBSecretKey)
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)
+                  
                         ];
                         // changes
                         var attendenceFormId=1002;

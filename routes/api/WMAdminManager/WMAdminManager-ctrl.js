@@ -76,7 +76,8 @@ wmAdminManagerCtrl.saveWhatMate = function(req, res, next){
                 req.st.db.escape(req.body.isHideTransactionPage || 0),
                 req.st.db.escape(req.body.enableHomePageScroll || 0),
                 req.st.db.escape(req.body.showFormsOnHomePage || 0),
-                req.st.db.escape(req.body.homePageTutorialBanner || '')
+                req.st.db.escape(req.body.homePageTutorialBanner || ''),
+                req.st.db.escape(req.body.isHideDashboard || 0)
               
             ];
 
@@ -238,7 +239,9 @@ wmAdminManagerCtrl.getWhatMateDetails = function(req, res, next){
                         enableHomePageScroll : whatMateResult[0][0].enableHomePageScroll,
                         showFormsOnHomePage : whatMateResult[0][0].showFormsOnHomePage,
                         homePageTutorialBanner : whatMateResult[0][0].homePageTutorialBanner,
-                        isHideSearchPage : whatMateResult[0][0].isHideSearchPage
+                        isHideDashboard : whatMateResult[0][0].isHideDashboard,
+                        isHideSearchPage : whatMateResult[0][0].isHideSearchPage,
+                        isHideDashboard : whatMateResult[0][0].isHideDashboard
 
                     };
                     res.status(200).json(response);

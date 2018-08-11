@@ -88,6 +88,7 @@ generalRequestCtrl.saveGeneralRequest = function(req,res,next){
                         req.body.isBudget = req.body.isBudget !=undefined ? req.body.isBudget : 0;
                         req.body.budgetLabel = req.body.budgetLabel !=undefined ? req.body.budgetLabel : 0;
                         req.body.budgetFrequencyTitle = req.body.budgetFrequencyTitle !=undefined ? req.body.budgetFrequencyTitle : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
         
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -111,7 +112,9 @@ generalRequestCtrl.saveGeneralRequest = function(req,res,next){
                             req.st.db.escape(req.body.isBudget),
                             req.st.db.escape(req.body.budgetLabel),
                             req.st.db.escape(req.body.budgetFrequencyTitle),
-                            req.st.db.escape(DBSecretKey)                                                                                                            
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)                                                                                                            
                         ];
 
                         var generalFormId=1037;

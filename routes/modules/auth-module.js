@@ -870,9 +870,9 @@ Auth.prototype.login = function (req, res, next) {
                                     if (comparePassword(password, loginDetails[0].Password)) {
                                         st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, APNS_Id, GCM_Id, secretKey, function (err, tokenResult) {
                                             if ((!err) && tokenResult && loginDetails[0]) {
-                                                var APNSID= req.query.APNSID ? req.query.APNSID :'';
-                                                var GCMID=req.query.GCMID ? req.query.GCMID :''; 
-                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) +',' + st.db.escape(APNSID) +',' + st.db.escape(GCMID) + ')', function (err, UserDetailsResult) {
+                                                var APNSID = req.query.APNSID ? req.query.APNSID : '';
+                                                var GCMID = req.query.GCMID ? req.query.GCMID : '';
+                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ')', function (err, UserDetailsResult) {
                                                     if (!err) {
                                                         var procParams = [
                                                             req.db.escape(tokenResult),
@@ -1738,261 +1738,169 @@ Auth.prototype.loginNew = function (req, res, next) {
 
     try {
 
-                    var ezeoneId = req.st.alterEzeoneId(req.body.UserName);
+        var ezeoneId = req.st.alterEzeoneId(req.body.UserName);
 
-                    var password = req.body.Password;
-                    var isIphone = req.body.device ? parseInt(req.body.device) : 0;
-                    var deviceToken = req.body.device_token ? req.body.device_token : '';
-                    var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
-                    var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
-                    var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
-                    var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
-                    var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
-                    console.log("secretKey", secretKey);
+        var password = req.body.Password;
+        var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+        var deviceToken = req.body.device_token ? req.body.device_token : '';
+        var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
+        var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+        var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
+        var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
+        var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
+        console.log("secretKey", secretKey);
 
-                    if (ezeoneId && password) {
+        if (ezeoneId && password) {
 
-                        var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey);
-                        var query = 'CALL PLoginNew(' + queryParams + ')';
-                        console.log('query', query);
-                        st.db.query(query, function (err, loginResult) {
-                            // console.log(loginResult);
-                            if (!err) {
-                                if (loginResult && password) {
-                                    //console.log('loginDetails',loginDetails);
-                                    if (loginResult[0]) {
-                                        if (loginResult[0].length > 0) {
-                                            var loginDetails = loginResult[0];
-                                            if (!token) {
-                                                if (comparePassword(password, loginDetails[0].Password)) {
-                                                    st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, APNS_Id, GCM_Id, secretKey, function (err, tokenResult) {
-                                                        if ((!err) && tokenResult && loginDetails[0]) {
-                                                            var APNSID= req.query.APNSID ? req.query.APNSID :'';
-                                                            var GCMID=req.query.GCMID ? req.query.GCMID :''; 
-                                                            st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) +',' + st.db.escape(APNSID) +',' + st.db.escape(GCMID) + ')', function (err, UserDetailsResult) {
-                                                                if (!err) {
-                                                                    var procParams = [
-                                                                        req.db.escape(tokenResult),
-                                                                        req.db.escape(null),
-                                                                        req.db.escape(DBSecretKey)
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey);
+            var query = 'CALL PLoginNew(' + queryParams + ')';
+            console.log('query', query);
+            st.db.query(query, function (err, loginResult) {
+                // console.log(loginResult);
+                if (!err) {
+                    if (loginResult && password) {
+                        //console.log('loginDetails',loginDetails);
+                        if (loginResult[0]) {
+                            if (loginResult[0].length > 0) {
+                                var loginDetails = loginResult[0];
+                                if (!token) {
+                                    if (comparePassword(password, loginDetails[0].Password)) {
+                                        st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, APNS_Id, GCM_Id, secretKey, function (err, tokenResult) {
+                                            if ((!err) && tokenResult && loginDetails[0]) {
+                                                var APNSID = req.query.APNSID ? req.query.APNSID : '';
+                                                var GCMID = req.query.GCMID ? req.query.GCMID : '';
+                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ')', function (err, UserDetailsResult) {
+                                                    if (!err) {
+                                                        var procParams = [
+                                                            req.db.escape(tokenResult),
+                                                            req.db.escape(null),
+                                                            req.db.escape(DBSecretKey)
 
-                                                                    ];
-                                                                    var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(' ,') + ')';
-                                                                    console.log(procQuery);
-                                                                    req.db.query(procQuery, function (err, contactResult) {
-                                                                        if (!err) {
-                                                                            if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
-                                                                                
+                                                        ];
+                                                        var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(' ,') + ')';
+                                                        console.log(procQuery);
+                                                        req.db.query(procQuery, function (err, contactResult) {
+                                                            if (!err) {
+                                                                if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
 
-                                                                                for (var i=0 ; i<UserDetailsResult[1].length ; i++){
-                                                                                    UserDetailsResult[1][i].trackTemplateDetails = UserDetailsResult[1][i] && UserDetailsResult[1][i].trackTemplateDetails ?  JSON.parse(UserDetailsResult[1][i].trackTemplateDetails):[];
-                                                                                }
-                                                                                console.log('login new token generation',UserDetailsResult[1]);
 
-                                                                                UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
-                                                                                    (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
+                                                                    for (var i = 0; i < UserDetailsResult[1].length; i++) {
+                                                                        UserDetailsResult[1][i].trackTemplateDetails = UserDetailsResult[1][i] && UserDetailsResult[1][i].trackTemplateDetails ? JSON.parse(UserDetailsResult[1][i].trackTemplateDetails) : [];
+                                                                    }
+                                                                    console.log('login new token generation', UserDetailsResult[1]);
 
-                                                                                /**
-                                                                                 * Every time the user loads the website the browser sends the cookie back to the server to notify the user previous activity
-                                                                                 */
-                                                                                res.cookie('Token', tokenResult, {
-                                                                                    maxAge: 900000,
-                                                                                    httpOnly: true
-                                                                                });
-                                                                                responseMessage.Token = tokenResult;
-                                                                                responseMessage.IsAuthenticate = true;
-                                                                                responseMessage.TID = loginDetails[0].TID;
-                                                                                responseMessage.ezeone_id = loginDetails[0].EZEID;
-                                                                                responseMessage.FirstName = loginDetails[0].FirstName;
-                                                                                responseMessage.CompanyName = loginDetails[0].CompanyName;
-                                                                                responseMessage.Type = loginDetails[0].IDTypeID;
-                                                                                responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
-                                                                                responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
-                                                                                responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
-                                                                                responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
-                                                                                responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
-                                                                                responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
-                                                                                responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
-                                                                                responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
-                                                                                responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
-                                                                                responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
-                                                                                responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
-                                                                                responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
-                                                                                responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
-                                                                                responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
-                                                                                responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
-                                                                                responseMessage.LastName = loginDetails[0].LastName;
-                                                                                if (loginDetails[0].ParentMasterID == 0) {
-                                                                                    responseMessage.MasterID = loginDetails[0].TID;
-                                                                                }
-                                                                                else {
-                                                                                    responseMessage.MasterID = loginDetails[0].ParentMasterID;
-                                                                                }
-                                                                                responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
-                                                                                responseMessage.VisibleModules = loginDetails[0].VisibleModules;
-                                                                                responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
-                                                                                responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
-                                                                                responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
-                                                                                responseMessage.mobilenumber = loginDetails[0].mobilenumber;
-                                                                                responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
-                                                                                responseMessage.group_id = loginDetails[0].group_id;
-                                                                                responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
-                                                                                responseMessage.cvid = loginDetails[0].cvid;
-                                                                                responseMessage.profile_status = loginDetails[0].ps;
-                                                                                responseMessage.isHelloEZE = loginDetails[0].isHelloEZE;
-                                                                                responseMessage.isWMAdmin = loginDetails[0].isWMAdmin;
-                                                                                responseMessage.displayName = loginDetails[0].displayName;
-                                                                                responseMessage.whatMateCount = loginDetails[0].whatMateCount;
-                                                                                responseMessage.isEmployee = loginDetails[0].isEmployee;
-                                                                                responseMessage.isNewUser = loginDetails[0].isNewUser;
-                                                                                responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
-                                                                                responseMessage.attachmentCount = loginDetails[0].attachmentCount;
-                                                                                responseMessage.userDetails = UserDetailsResult[0];
-                                                                                if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
-                                                                                    responseMessage.contactDetails = contactResult[0];
-                                                                                }
-                                                                                else {
-                                                                                    responseMessage.contactDetails = null;
-                                                                                }
-                                                                                responseMessage.companyDetails = UserDetailsResult[1][0] ? UserDetailsResult[1][0] :{};
+                                                                    UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
+                                                                        (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
 
-                                                                                // saving ios device id to database
-                                                                                // if (isIphone == 1) {
-                                                                                //     var queryParams1 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
-                                                                                //     var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
-                                                                                //     //console.log(query);
-                                                                                //     st.db.query(query1, function (err, deviceResult) {
-                                                                                //         if (!err) {
-                                                                                //             console.log('FnLogin:Ios Device Id saved successfully');
-                                                                                //         }
-                                                                                //         else {
-                                                                                //             console.log(err);
-                                                                                //         }
-                                                                                //     });
-                                                                                // }
-                                                                                response.status = true;
-                                                                                response.message = "Logged in successfully";
-                                                                                response.error = null;
-
-                                                                                var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
-                                                                                zlib.gzip(buf, function (_, result) {
-                                                                                    response.data = encryption.encrypt(result, secretKey).toString('base64');
-                                                                                    res.status(200).json(response);
-                                                                                });
-
-                                                                            }
-                                                                        }
+                                                                    /**
+                                                                     * Every time the user loads the website the browser sends the cookie back to the server to notify the user previous activity
+                                                                     */
+                                                                    res.cookie('Token', tokenResult, {
+                                                                        maxAge: 900000,
+                                                                        httpOnly: true
                                                                     });
+                                                                    responseMessage.Token = tokenResult;
+                                                                    responseMessage.IsAuthenticate = true;
+                                                                    responseMessage.TID = loginDetails[0].TID;
+                                                                    responseMessage.ezeone_id = loginDetails[0].EZEID;
+                                                                    responseMessage.FirstName = loginDetails[0].FirstName;
+                                                                    responseMessage.CompanyName = loginDetails[0].CompanyName;
+                                                                    responseMessage.Type = loginDetails[0].IDTypeID;
+                                                                    responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                                                    responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                                                    responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                                                    responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                                                    responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                                                    responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                                                    responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                                                    responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
+                                                                    responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
+                                                                    responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
+                                                                    responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
+                                                                    responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
+                                                                    responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
+                                                                    responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
+                                                                    responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                                                    responseMessage.LastName = loginDetails[0].LastName;
+                                                                    if (loginDetails[0].ParentMasterID == 0) {
+                                                                        responseMessage.MasterID = loginDetails[0].TID;
+                                                                    }
+                                                                    else {
+                                                                        responseMessage.MasterID = loginDetails[0].ParentMasterID;
+                                                                    }
+                                                                    responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
+                                                                    responseMessage.VisibleModules = loginDetails[0].VisibleModules;
+                                                                    responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
+                                                                    responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                                                    responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                                                    responseMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                                                    responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
+                                                                    responseMessage.group_id = loginDetails[0].group_id;
+                                                                    responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+                                                                    responseMessage.cvid = loginDetails[0].cvid;
+                                                                    responseMessage.profile_status = loginDetails[0].ps;
+                                                                    responseMessage.isHelloEZE = loginDetails[0].isHelloEZE;
+                                                                    responseMessage.isWMAdmin = loginDetails[0].isWMAdmin;
+                                                                    responseMessage.displayName = loginDetails[0].displayName;
+                                                                    responseMessage.whatMateCount = loginDetails[0].whatMateCount;
+                                                                    responseMessage.isEmployee = loginDetails[0].isEmployee;
+                                                                    responseMessage.isNewUser = loginDetails[0].isNewUser;
+                                                                    responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
+                                                                    responseMessage.attachmentCount = loginDetails[0].attachmentCount;
+                                                                    responseMessage.userDetails = UserDetailsResult[0];
+                                                                    if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
+                                                                        responseMessage.contactDetails = contactResult[0];
+                                                                    }
+                                                                    else {
+                                                                        responseMessage.contactDetails = null;
+                                                                    }
+                                                                    responseMessage.companyDetails = UserDetailsResult[1][0] ? UserDetailsResult[1][0] : {};
+
+                                                                    // saving ios device id to database
+                                                                    // if (isIphone == 1) {
+                                                                    //     var queryParams1 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
+                                                                    //     var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
+                                                                    //     //console.log(query);
+                                                                    //     st.db.query(query1, function (err, deviceResult) {
+                                                                    //         if (!err) {
+                                                                    //             console.log('FnLogin:Ios Device Id saved successfully');
+                                                                    //         }
+                                                                    //         else {
+                                                                    //             console.log(err);
+                                                                    //         }
+                                                                    //     });
+                                                                    // }
+                                                                    response.status = true;
+                                                                    response.message = "Logged in successfully";
+                                                                    response.error = null;
+
+                                                                    var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                                                                    zlib.gzip(buf, function (_, result) {
+                                                                        response.data = encryption.encrypt(result, secretKey).toString('base64');
+                                                                        res.status(200).json(response);
+                                                                    });
+
                                                                 }
-                                                            });
-                                                        }
-                                                        else {
-
-                                                            response.status = false;
-                                                            response.message = "failed to generate a token";
-                                                            response.error = null;
-                                                            var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
-                                                            zlib.gzip(buf, function (_, result) {
-                                                                response.data = encryption.encrypt(result, secretKey).toString('base64');
-                                                                res.status(500).json(response);
-                                                            });
-
-                                                            console.log('FnLogin:failed to generate a token ');
-                                                            console.log('FnLogin:' + err);
-                                                        }
-                                                    });
-                                                }
-                                                else {
-                                                    response.status = false;
-                                                    response.message = "Invalid credentials";
-                                                    response.error = null;
-                                                    var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
-                                                    zlib.gzip(buf, function (_, result) {
-                                                        response.data = encryption.encrypt(result, secretKey).toString('base64');
-                                                        res.status(200).json(response);
-                                                    });
-
-                                                    console.log('FnLogin:password not matched ');
-                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                });
                                             }
                                             else {
 
-                                                for (var i=0 ; i<loginResult[1].length ; i++){
-                                                    loginResult[1][i].trackTemplateDetails = loginResult[1][i] && loginResult[1][i].trackTemplateDetails ?  JSON.parse(loginResult[1][i].trackTemplateDetails):[];
-                                                }
-                                                console.log("login company details with existing token",loginResult[1][0]);
-
-                                                responseMessage.Token = token;
-                                                responseMessage.IsAuthenticate = true;
-                                                responseMessage.TID = loginDetails[0].TID;
-                                                responseMessage.ezeone_id = loginDetails[0].EZEID;
-                                                responseMessage.FirstName = loginDetails[0].FirstName;
-                                                responseMessage.CompanyName = loginDetails[0].CompanyName;
-                                                responseMessage.Type = loginDetails[0].IDTypeID;
-                                                responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
-                                                responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
-                                                responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
-                                                responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
-                                                responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
-                                                responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
-                                                responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
-                                                responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
-                                                responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
-                                                responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
-                                                responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
-                                                responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
-                                                responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
-                                                responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
-                                                responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
-                                                if (loginDetails[0].ParentMasterID == 0) {
-                                                    responseMessage.MasterID = loginDetails[0].TID;
-                                                }
-                                                else {
-                                                    responseMessage.MasterID = loginDetails[0].ParentMasterID;
-                                                }
-                                                responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
-                                                responseMessage.VisibleModules = loginDetails[0].VisibleModules;
-                                                responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
-                                                responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
-                                                responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
-                                                responseMessage.mobilenumber = loginDetails[0].mobilenumber;
-                                                responseMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
-                                                responseMessage.group_id = loginDetails[0].group_id;
-                                                responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
-                                                responseMessage.cvid = loginDetails[0].cvid;
-                                                responseMessage.profile_status = loginDetails[0].ps;
-                                                responseMessage.isHelloEZE = loginDetails[0].isHelloEZE;
-                                                responseMessage.isWMAdmin = loginDetails[0].isWMAdmin;
-                                                responseMessage.isNewUser = loginDetails[0].isNewUser;
-                                                responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
-                                                responseMessage.attachmentCount = loginDetails[0].attachmentCount;
-                                                responseMessage.companyDetails = loginResult[1][0] ? loginResult[1][0] :{};
-
-
-                                                response.status = true;
-                                                response.message = "Logged in successfully";
+                                                response.status = false;
+                                                response.message = "failed to generate a token";
                                                 response.error = null;
                                                 var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
                                                 zlib.gzip(buf, function (_, result) {
                                                     response.data = encryption.encrypt(result, secretKey).toString('base64');
-                                                    res.status(200).json(response);
+                                                    res.status(500).json(response);
                                                 });
 
-                                                // res.send(responseMessage);
+                                                console.log('FnLogin:failed to generate a token ');
+                                                console.log('FnLogin:' + err);
                                             }
-                                        }
-                                        else {
-                                            response.status = false;
-                                            response.message = "Invalid credentials";
-                                            response.error = null;
-                                            var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
-                                            zlib.gzip(buf, function (_, result) {
-                                                response.data = encryption.encrypt(result, secretKey).toString('base64');
-                                                res.status(200).json(response);
-                                            });
-
-                                            console.log('FnLogin:login result not found');
-                                        }
+                                        });
                                     }
                                     else {
                                         response.status = false;
@@ -2004,12 +1912,65 @@ Auth.prototype.loginNew = function (req, res, next) {
                                             res.status(200).json(response);
                                         });
 
-                                        console.log('FnLogin:login result not found');
+                                        console.log('FnLogin:password not matched ');
                                     }
                                 }
                                 else {
-                                    response.status = false;
-                                    response.message = "Invalid credentials";
+
+                                    for (var i = 0; i < loginResult[1].length; i++) {
+                                        loginResult[1][i].trackTemplateDetails = loginResult[1][i] && loginResult[1][i].trackTemplateDetails ? JSON.parse(loginResult[1][i].trackTemplateDetails) : [];
+                                    }
+                                    console.log("login company details with existing token", loginResult[1][0]);
+
+                                    responseMessage.Token = token;
+                                    responseMessage.IsAuthenticate = true;
+                                    responseMessage.TID = loginDetails[0].TID;
+                                    responseMessage.ezeone_id = loginDetails[0].EZEID;
+                                    responseMessage.FirstName = loginDetails[0].FirstName;
+                                    responseMessage.CompanyName = loginDetails[0].CompanyName;
+                                    responseMessage.Type = loginDetails[0].IDTypeID;
+                                    responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                    responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                    responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                    responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                    responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                    responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                    responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                    responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
+                                    responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
+                                    responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
+                                    responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
+                                    responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
+                                    responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
+                                    responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
+                                    responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                    if (loginDetails[0].ParentMasterID == 0) {
+                                        responseMessage.MasterID = loginDetails[0].TID;
+                                    }
+                                    else {
+                                        responseMessage.MasterID = loginDetails[0].ParentMasterID;
+                                    }
+                                    responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
+                                    responseMessage.VisibleModules = loginDetails[0].VisibleModules;
+                                    responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
+                                    responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                    responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                    responseMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                    responseMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
+                                    responseMessage.group_id = loginDetails[0].group_id;
+                                    responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+                                    responseMessage.cvid = loginDetails[0].cvid;
+                                    responseMessage.profile_status = loginDetails[0].ps;
+                                    responseMessage.isHelloEZE = loginDetails[0].isHelloEZE;
+                                    responseMessage.isWMAdmin = loginDetails[0].isWMAdmin;
+                                    responseMessage.isNewUser = loginDetails[0].isNewUser;
+                                    responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
+                                    responseMessage.attachmentCount = loginDetails[0].attachmentCount;
+                                    responseMessage.companyDetails = loginResult[1][0] ? loginResult[1][0] : {};
+
+
+                                    response.status = true;
+                                    response.message = "Logged in successfully";
                                     response.error = null;
                                     var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
                                     zlib.gzip(buf, function (_, result) {
@@ -2017,41 +1978,80 @@ Auth.prototype.loginNew = function (req, res, next) {
                                         res.status(200).json(response);
                                     });
 
-                                    console.log('FnLogin: Invalid login credentials');
+                                    // res.send(responseMessage);
                                 }
                             }
                             else {
                                 response.status = false;
-                                response.message = "Internal server error..";
+                                response.message = "Invalid credentials";
                                 response.error = null;
                                 var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
                                     response.data = encryption.encrypt(result, secretKey).toString('base64');
-                                    res.status(500).json(response);
+                                    res.status(200).json(response);
                                 });
 
-                                console.log('FnLogin:' + err);
+                                console.log('FnLogin:login result not found');
                             }
-                        });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Invalid credentials";
+                            response.error = null;
+                            var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+
+                            console.log('FnLogin:login result not found');
+                        }
                     }
                     else {
-                        if (!ezeoneId) {
-                            console.log('FnLogin: EZEOneId is mandatory');
-                        }
-                        else if (!password) {
-                            console.log('FnLogin: password is mandatory');
-                        }
-
                         response.status = false;
-                        response.message = "Please fill mandatory fields";
+                        response.message = "Invalid credentials";
                         response.error = null;
                         var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result, secretKey).toString('base64');
-                            res.status(400).json(response);
+                            res.status(200).json(response);
                         });
 
+                        console.log('FnLogin: Invalid login credentials');
                     }
+                }
+                else {
+                    response.status = false;
+                    response.message = "Internal server error..";
+                    response.error = null;
+                    var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result, secretKey).toString('base64');
+                        res.status(500).json(response);
+                    });
+
+                    console.log('FnLogin:' + err);
+                }
+            });
+        }
+        else {
+            if (!ezeoneId) {
+                console.log('FnLogin: EZEOneId is mandatory');
+            }
+            else if (!password) {
+                console.log('FnLogin: password is mandatory');
+            }
+
+            response.status = false;
+            response.message = "Please fill mandatory fields";
+            response.error = null;
+            var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+            zlib.gzip(buf, function (_, result) {
+                response.data = encryption.encrypt(result, secretKey).toString('base64');
+                res.status(400).json(response);
+            });
+
+        }
 
 
 
@@ -2112,13 +2112,13 @@ Auth.prototype.loginLatest = function (req, res, next) {
         tId: '',
         isAuthenticate: false,
         ezeoneId: '',
-        displayName:'',
-        groupId:'',
-        pendingViewCount:'',
+        displayName: '',
+        groupId: '',
+        pendingViewCount: '',
         attachmentCount: '',
         isNewUser: '',
-        brandingPageUrl:'',
-         masterId:''
+        brandingPageUrl: '',
+        masterId: ''
 
     };
     // if(isWhatMate == 0){
@@ -2265,159 +2265,38 @@ Auth.prototype.loginLatest = function (req, res, next) {
 
     try {
 
-                    var ezeoneId = req.st.alterEzeoneId(req.body.userName);
+        var ezeoneId = req.st.alterEzeoneId(req.body.userName);
 
-                    var password = req.body.password;
-                    var isIphone = req.body.device ? parseInt(req.body.device) : 0;
-                    var deviceToken = req.body.device_token ? req.body.device_token : '';
-                    var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
-                    var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
-                    var apnsId = (req.body.apnsId) ? (req.body.apnsId) : "";
-                    var gcmId = (req.body.gcmId) ? (req.body.gcmId) : "";
-                    var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
-                    console.log("secretKey", secretKey);
+        var password = req.body.password;
+        var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+        var deviceToken = req.body.device_token ? req.body.device_token : '';
+        var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
+        var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+        var apnsId = (req.body.apnsId) ? (req.body.apnsId) : "";
+        var gcmId = (req.body.gcmId) ? (req.body.gcmId) : "";
+        var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
+        console.log("secretKey", secretKey);
 
-                    if (ezeoneId && password) {
+        if (ezeoneId && password) {
 
-                        var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey);
-                        var query = 'CALL PLoginNew(' + queryParams + ')';
-                        console.log('query', query);
-                        st.db.query(query, function (err, loginResult) {
-                            // console.log(loginResult);
-                            if (!err) {
-                                if (loginResult && password) {
-                                    //console.log('loginDetails',loginDetails);
-                                    if (loginResult[0]) {
-                                        if (loginResult[0].length > 0) {
-                                            var loginDetails = loginResult[0];
-                                            if (!token) {
-                                                if (comparePassword(password, loginDetails[0].Password)) {
-                                                    st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, apnsId, gcmId, secretKey, function (err, tokenResult) {
-                                                        if ((!err) && tokenResult && loginDetails[0]) {
-                                                         
-                                                            responseMessage.token = tokenResult,
-                                                            responseMessage.isAuthenticate = true;
-                                                            responseMessage.tId = loginDetails[0].TID;
-                                                            responseMessage.ezeoneId = loginDetails[0].EZEID;
-                                                            responseMessage.displayName = loginDetails[0].displayName;
-                                                            // responseMessage.companyName = loginDetails[0].CompanyName;
-                                                            // responseMessage.Type = loginDetails[0].IDTypeID;
-                                                            // responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
-                                                            // responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
-                                                            // responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
-                                                            // responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
-                                                            // responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
-                                                            // responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
-                                                            // responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
-                                                            // responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
-                                                            // responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
-                                                            // responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
-                                                            // responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
-                                                            // responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
-                                                            // responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
-                                                            // responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
-                                                            // responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
-                                                            // responseMessage.LastName = loginDetails[0].LastName;
-                                                            if (loginDetails[0].ParentMasterID == 0) {
-                                                                responseMessage.masterId = loginDetails[0].TID;
-                                                            }
-                                                            else {
-                                                                responseMessage.masterId = loginDetails[0].ParentMasterID;
-                                                            }
-                                                            // responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
-                                                            // responseMessage.VisibleModules = loginDetails[0].VisibleModules;
-                                                            // responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
-                                                            // responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
-                                                            // responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
-                                                            // responseMessage.mobilenumber = loginDetails[0].mobilenumber;
-                                                            // responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
-                                                            responseMessage.groupId = loginDetails[0].group_id;
-                                                            // responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
-                                                            // responseMessage.cvid = loginDetails[0].cvid;
-                                                            // responseMessage.profile_status = loginDetails[0].ps;
-                                                            // responseMessage.isHelloEZE = loginDetails[0].isHelloEZE;
-                                                            // responseMessage.isWMAdmin = loginDetails[0].isWMAdmin;
-                                                            // responseMessage.displayName = loginDetails[0].displayName;
-                                                            // responseMessage.whatMateCount = loginDetails[0].whatMateCount;
-                                                            // responseMessage.isEmployee = loginDetails[0].isEmployee;
-                                                            responseMessage.isNewUser = loginDetails[0].isNewUser;
-                                                            responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
-                                                            responseMessage.attachmentCount = loginDetails[0].attachmentCount;
-                                                            // responseMessage.userDetails = UserDetailsResult[0];
-                                                            // if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
-                                                            //     responseMessage.contactDetails = contactResult[0];
-                                                            // }
-                                                            // else {
-                                                            //     responseMessage.contactDetails = null;
-                                                            // }
-                                                            responseMessage.brandingPageUrl = loginDetails[0].brandingPageUrl;
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey);
+            var query = 'CALL PLoginNew(' + queryParams + ')';
+            console.log('query', query);
+            st.db.query(query, function (err, loginResult) {
+                // console.log(loginResult);
+                if (!err) {
+                    if (loginResult && password) {
+                        //console.log('loginDetails',loginDetails);
+                        if (loginResult[0]) {
+                            if (loginResult[0].length > 0) {
+                                var loginDetails = loginResult[0];
+                                if (!token) {
+                                    if (comparePassword(password, loginDetails[0].Password)) {
+                                        st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, apnsId, gcmId, secretKey, function (err, tokenResult) {
+                                            if ((!err) && tokenResult && loginDetails[0]) {
 
-                                                            // saving ios device id to database
-                                                            // if (isIphone == 1) {
-                                                            //     var queryParams1 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
-                                                            //     var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
-                                                            //     //console.log(query);
-                                                            //     st.db.query(query1, function (err, deviceResult) {
-                                                            //         if (!err) {
-                                                            //             console.log('FnLogin:Ios Device Id saved successfully');
-                                                            //         }
-                                                            //         else {
-                                                            //             console.log(err);
-                                                            //         }
-                                                            //     });
-                                                            // }
-                                                    
-                                                            response.status = true;
-                                                            response.message = "Logged in successfully";
-                                                            response.error = null;
-                                                            // response.data=(responseMessage);
-
-                                                            var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
-                                                            zlib.gzip(buf, function (_, result) {
-                                                                response.data = encryption.encrypt(result, secretKey).toString('base64');
-                                                                res.status(200).json(response);
-                                                            });
-
-                                                          }
-                                                            
-                                                        else {
-
-                                                            response.status = false;
-                                                            response.message = "failed to generate a token";
-                                                            response.error = null;
-                                                            var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
-                                                            zlib.gzip(buf, function (_, result) {
-                                                                response.data = encryption.encrypt(result, secretKey).toString('base64');
-                                                                res.status(500).json(response);
-                                                            });
-
-                                                            console.log('FnLogin:failed to generate a token ');
-                                                            console.log('FnLogin:' + err);
-                                                        }
-                                                    });
-                                                }
-                                                else {
-                                                    response.status = false;
-                                                    response.message = "Invalid credentials";
-                                                    response.error = null;
-                                                    var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
-                                                    zlib.gzip(buf, function (_, result) {
-                                                        response.data = encryption.encrypt(result, secretKey).toString('base64');
-                                                        res.status(200).json(response);
-                                                    });
-
-                                                    console.log('FnLogin:password not matched ');
-                                                }
-                                            }
-                                            else {
-
-                                                for (var i=0 ; i<loginResult[1].length ; i++){
-                                                    loginResult[1][i].trackTemplateDetails = loginResult[1][i] && loginResult[1][i].trackTemplateDetails ?  JSON.parse(loginResult[1][i].trackTemplateDetails):[];
-                                                }
-                                                console.log("login company details with existing token",loginResult[1][0]);
-
-                                                responseMessage.token = tokenResult;
-                                                responseMessage.isAuthenticate = true;
+                                                responseMessage.token = tokenResult,
+                                                    responseMessage.isAuthenticate = true;
                                                 responseMessage.tId = loginDetails[0].TID;
                                                 responseMessage.ezeoneId = loginDetails[0].EZEID;
                                                 responseMessage.displayName = loginDetails[0].displayName;
@@ -2473,30 +2352,49 @@ Auth.prototype.loginLatest = function (req, res, next) {
                                                 // }
                                                 responseMessage.brandingPageUrl = loginDetails[0].brandingPageUrl;
 
+                                                // saving ios device id to database
+                                                // if (isIphone == 1) {
+                                                //     var queryParams1 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
+                                                //     var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
+                                                //     //console.log(query);
+                                                //     st.db.query(query1, function (err, deviceResult) {
+                                                //         if (!err) {
+                                                //             console.log('FnLogin:Ios Device Id saved successfully');
+                                                //         }
+                                                //         else {
+                                                //             console.log(err);
+                                                //         }
+                                                //     });
+                                                // }
+
                                                 response.status = true;
                                                 response.message = "Logged in successfully";
                                                 response.error = null;
+                                                // response.data=(responseMessage);
+
                                                 var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
                                                 zlib.gzip(buf, function (_, result) {
                                                     response.data = encryption.encrypt(result, secretKey).toString('base64');
                                                     res.status(200).json(response);
                                                 });
 
-                                                // res.send(responseMessage);
                                             }
-                                        }
-                                        else {
-                                            response.status = false;
-                                            response.message = "Invalid credentials";
-                                            response.error = null;
-                                            var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
-                                            zlib.gzip(buf, function (_, result) {
-                                                response.data = encryption.encrypt(result, secretKey).toString('base64');
-                                                res.status(200).json(response);
-                                            });
 
-                                            console.log('FnLogin:login result not found');
-                                        }
+                                            else {
+
+                                                response.status = false;
+                                                response.message = "failed to generate a token";
+                                                response.error = null;
+                                                var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                                                zlib.gzip(buf, function (_, result) {
+                                                    response.data = encryption.encrypt(result, secretKey).toString('base64');
+                                                    res.status(500).json(response);
+                                                });
+
+                                                console.log('FnLogin:failed to generate a token ');
+                                                console.log('FnLogin:' + err);
+                                            }
+                                        });
                                     }
                                     else {
                                         response.status = false;
@@ -2508,12 +2406,75 @@ Auth.prototype.loginLatest = function (req, res, next) {
                                             res.status(200).json(response);
                                         });
 
-                                        console.log('FnLogin:login result not found');
+                                        console.log('FnLogin:password not matched ');
                                     }
                                 }
                                 else {
-                                    response.status = false;
-                                    response.message = "Invalid credentials";
+
+                                    for (var i = 0; i < loginResult[1].length; i++) {
+                                        loginResult[1][i].trackTemplateDetails = loginResult[1][i] && loginResult[1][i].trackTemplateDetails ? JSON.parse(loginResult[1][i].trackTemplateDetails) : [];
+                                    }
+                                    console.log("login company details with existing token", loginResult[1][0]);
+
+                                    responseMessage.token = tokenResult;
+                                    responseMessage.isAuthenticate = true;
+                                    responseMessage.tId = loginDetails[0].TID;
+                                    responseMessage.ezeoneId = loginDetails[0].EZEID;
+                                    responseMessage.displayName = loginDetails[0].displayName;
+                                    // responseMessage.companyName = loginDetails[0].CompanyName;
+                                    // responseMessage.Type = loginDetails[0].IDTypeID;
+                                    // responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                    // responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                    // responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                    // responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                    // responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                    // responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                    // responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                    // responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
+                                    // responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
+                                    // responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
+                                    // responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
+                                    // responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
+                                    // responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
+                                    // responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
+                                    // responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                    // responseMessage.LastName = loginDetails[0].LastName;
+                                    if (loginDetails[0].ParentMasterID == 0) {
+                                        responseMessage.masterId = loginDetails[0].TID;
+                                    }
+                                    else {
+                                        responseMessage.masterId = loginDetails[0].ParentMasterID;
+                                    }
+                                    // responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
+                                    // responseMessage.VisibleModules = loginDetails[0].VisibleModules;
+                                    // responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
+                                    // responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                    // responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                    // responseMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                    // responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
+                                    responseMessage.groupId = loginDetails[0].group_id;
+                                    // responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+                                    // responseMessage.cvid = loginDetails[0].cvid;
+                                    // responseMessage.profile_status = loginDetails[0].ps;
+                                    // responseMessage.isHelloEZE = loginDetails[0].isHelloEZE;
+                                    // responseMessage.isWMAdmin = loginDetails[0].isWMAdmin;
+                                    // responseMessage.displayName = loginDetails[0].displayName;
+                                    // responseMessage.whatMateCount = loginDetails[0].whatMateCount;
+                                    // responseMessage.isEmployee = loginDetails[0].isEmployee;
+                                    responseMessage.isNewUser = loginDetails[0].isNewUser;
+                                    responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
+                                    responseMessage.attachmentCount = loginDetails[0].attachmentCount;
+                                    // responseMessage.userDetails = UserDetailsResult[0];
+                                    // if (UserDetailsResult[0] && UserDetailsResult[0][0]) {
+                                    //     responseMessage.contactDetails = contactResult[0];
+                                    // }
+                                    // else {
+                                    //     responseMessage.contactDetails = null;
+                                    // }
+                                    responseMessage.brandingPageUrl = loginDetails[0].brandingPageUrl;
+
+                                    response.status = true;
+                                    response.message = "Logged in successfully";
                                     response.error = null;
                                     var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
                                     zlib.gzip(buf, function (_, result) {
@@ -2521,41 +2482,80 @@ Auth.prototype.loginLatest = function (req, res, next) {
                                         res.status(200).json(response);
                                     });
 
-                                    console.log('FnLogin: Invalid login credentials');
+                                    // res.send(responseMessage);
                                 }
                             }
                             else {
                                 response.status = false;
-                                response.message = "Internal server error..";
+                                response.message = "Invalid credentials";
                                 response.error = null;
                                 var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
                                     response.data = encryption.encrypt(result, secretKey).toString('base64');
-                                    res.status(500).json(response);
+                                    res.status(200).json(response);
                                 });
 
-                                console.log('FnLogin:' + err);
+                                console.log('FnLogin:login result not found');
                             }
-                        });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Invalid credentials";
+                            response.error = null;
+                            var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+
+                            console.log('FnLogin:login result not found');
+                        }
                     }
                     else {
-                        if (!ezeoneId) {
-                            console.log('FnLogin: EZEOneId is mandatory');
-                        }
-                        else if (!password) {
-                            console.log('FnLogin: password is mandatory');
-                        }
-
                         response.status = false;
-                        response.message = "Please fill mandatory fields";
+                        response.message = "Invalid credentials";
                         response.error = null;
                         var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result, secretKey).toString('base64');
-                            res.status(400).json(response);
+                            res.status(200).json(response);
                         });
 
+                        console.log('FnLogin: Invalid login credentials');
                     }
+                }
+                else {
+                    response.status = false;
+                    response.message = "Internal server error..";
+                    response.error = null;
+                    var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+                    zlib.gzip(buf, function (_, result) {
+                        response.data = encryption.encrypt(result, secretKey).toString('base64');
+                        res.status(500).json(response);
+                    });
+
+                    console.log('FnLogin:' + err);
+                }
+            });
+        }
+        else {
+            if (!ezeoneId) {
+                console.log('FnLogin: EZEOneId is mandatory');
+            }
+            else if (!password) {
+                console.log('FnLogin: password is mandatory');
+            }
+
+            response.status = false;
+            response.message = "Please fill mandatory fields";
+            response.error = null;
+            var buf = new Buffer(JSON.stringify(responseMessage), 'utf-8');
+            zlib.gzip(buf, function (_, result) {
+                response.data = encryption.encrypt(result, secretKey).toString('base64');
+                res.status(400).json(response);
+            });
+
+        }
 
 
 
@@ -2572,7 +2572,186 @@ Auth.prototype.loginLatest = function (req, res, next) {
 };
 
 
+/**
+ * @todo FnLogin
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+Auth.prototype.portalLogin = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
 
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+
+    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+    var ip = req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress;
+
+    var token = req.query.token ? req.query.token : ''; // token in query now
+
+    try {
+
+        var ezeoneId = req.st.alterEzeoneId(req.body.userName);
+
+        var password = req.body.password;
+        var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+        var deviceToken = req.body.device_token ? req.body.device_token : '';
+        var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
+        var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+        var apnsId = (req.body.apnsId) ? (req.body.apnsId) : "";
+        var gcmId = (req.body.gcmId) ? (req.body.gcmId) : "";
+        var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
+        console.log("secretKey", secretKey);
+
+        if (ezeoneId && password) {
+
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(DBSecretKey);
+            var query = 'CALL wm_portal_login(' + queryParams + ')';
+            console.log('query', query);
+            st.db.query(query, function (err, loginResult) {
+                // console.log(loginResult);
+                if (!err) {
+                    if (loginResult && password) {
+
+                        if (loginResult[0]) {
+                            if (loginResult[0].length > 0) {
+                                var loginDetails = loginResult[0];
+                                if (!token) {
+                                    if (comparePassword(password, loginDetails[0].Password)) {
+                                        st.generateToken(ip, userAgent, loginDetails[0].ezeid, isWhatMate, apnsId, gcmId, secretKey, function (err, tokenResult) {
+                                            if ((!err) && tokenResult && loginDetails[0]) {
+
+                                                response.status = true;
+                                                response.message = "Logged in successfully";
+                                                response.error = null;
+
+                                                response.data = {
+                                                    token: tokenResult,
+                                                    isAuthenticate: true,
+                                                    userMasterId: loginDetails[0].userMasterId,
+                                                    ezeoneId: loginDetails[0].ezeid,
+                                                    displayName: loginDetails[0].displayName,
+                                                    groupId: loginDetails[0].groupId
+                                                }
+                                                res.status(200).json(response);
+
+                                            }
+
+                                            else {
+                                                response.status = false;
+                                                response.message = "failed to generate a token";
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(500).json(response);
+
+                                                console.log('FnLogin:failed to generate a token ');
+                                                console.log('FnLogin:' + err);
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        response.status = false;
+                                        response.message = "Invalid credentials";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(500).json(response);
+
+                                        console.log('FnLogin:password not matched ');
+                                    }
+                                }
+                                else {
+
+
+                                    response.status = true;
+                                    response.message = "Logged in successfully";
+                                    response.error = null;
+
+                                    response.data = {
+                                        token: tokenResult,
+                                        isAuthenticate: true,
+                                        userMasterId: loginDetails[0].userMasterId,
+                                        ezeoneId: loginDetails[0].ezeid,
+                                        displayName: loginDetails[0].displayName,
+                                        groupId: loginDetails[0].groupId
+                                    }
+                                    res.status(200).json(response);
+                                }
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Invalid credentials";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+
+                                console.log('FnLogin:login result not found');
+                            }
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Invalid credentials";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                            console.log('FnLogin:login result not found');
+                        }
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Invalid credentials";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+
+                        console.log('FnLogin: Invalid login credentials');
+                    }
+                }
+                else {
+                    response.status = false;
+                    response.message = "Invalid credentials";
+                    response.error = null;
+                    response.data=null;
+                    res.status(500).json(response);
+
+                    console.log('FnLogin:' + err);
+                }
+            });
+        }
+        else {
+            if (!ezeoneId) {
+                console.log('FnLogin: EZEOneId is mandatory');
+            }
+            else if (!password) {
+                console.log('FnLogin: password is mandatory');
+            }
+
+            response.status = false;
+            response.message = "Please fill mandatory fields";
+            response.error = null;
+            res.status(400).json(response);
+        }
+
+    }
+    catch (ex) {
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log(ex);
+        console.log('FnLogin:: error:' + ex);
+        response.message = "Internal server error";
+        res.status(500).json(response);
+    }
+};
 
 
 module.exports = Auth;

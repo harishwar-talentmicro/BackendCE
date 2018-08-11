@@ -934,7 +934,20 @@ router.post('/sync', function (req, res, next) {
                                                     parentId: results[0][i].parentId ? results[0][i].parentId : 0,
                                                     accessUserType: results[0][i].accessUserType ? results[0][i].accessUserType : 0,
                                                     heUserId: results[0][i].heUserId ? results[0][i].heUserId : 0,
-                                                    formData: results[0][i].formDataJSON ? JSON.parse(results[0][i].formDataJSON) : null
+                                                    formData: results[0][i].formDataJSON ? JSON.parse(results[0][i].formDataJSON) : null ,
+
+                                                    likeCount: results[0][i].likeCount ? results[0][i].likeCount : 0,
+                                                    commentCount: results[0][i].commentCount ? results[0][i].commentCount : 0,
+                                                    shareCount: results[0][i].shareCount ? results[0][i].shareCount : 0,
+                                                    likeStatus: results[0][i].likeStatus ? results[0][i].likeStatus : 0,
+                                                    isTopScroll: results[0][i].isTopScroll ? results[0][i].isTopScroll : 0,
+                                                    isChatBotHide: results[0][i].isChatBotHide ? results[0][i].isChatBotHide : 0,
+                                                    isFormGroupHide: results[0][i].isFormGroupHide ? results[0][i].isFormGroupHide : 0,
+                                                    enableHomePageScroll: results[0][i].enableHomePageScroll ? results[0][i].enableHomePageScroll : 0,
+                                                    showFormsOnHomePage: results[0][i].showFormsOnHomePage ? results[0][i].showFormsOnHomePage : 0,
+
+                                                    homePageBanner: results[0][i].homePageBanner ? results[0][i].homePageBanner : '',
+                                                    hideDashboard: results[0][i].hideDashboard ? results[0][i].hideDashboard : 0
                                                     
                                                 });
                                             }

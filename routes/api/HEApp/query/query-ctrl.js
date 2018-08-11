@@ -94,6 +94,7 @@ queryCtrl.saveHRQuery = function (req, res, next) {
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -111,7 +112,9 @@ queryCtrl.saveHRQuery = function (req, res, next) {
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(DBSecretKey),
-                            req.st.db.escape(JSON.stringify(queryType))
+                            req.st.db.escape(JSON.stringify(queryType)),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)
                         ];
 
                         var hrQueryFormId = 1023;
@@ -315,6 +318,7 @@ queryCtrl.saveAccountsQuery = function (req, res, next) {
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -332,7 +336,10 @@ queryCtrl.saveAccountsQuery = function (req, res, next) {
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(DBSecretKey),
-                            req.st.db.escape(JSON.stringify(queryType))
+                            req.st.db.escape(JSON.stringify(queryType)),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)
+
                         ];
 
                         var accountsFormId = 1024;
@@ -537,6 +544,7 @@ queryCtrl.saveAdminQuery = function (req, res, next) {
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -554,8 +562,10 @@ queryCtrl.saveAdminQuery = function (req, res, next) {
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(DBSecretKey),
-                            req.st.db.escape(JSON.stringify(queryType))
-                        ];
+                            req.st.db.escape(JSON.stringify(queryType)),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)
+              ];
 
                         var accountsFormId = 1025;
                         var keywordsParams = [
@@ -759,6 +769,7 @@ queryCtrl.saveFrontOfficeQuery = function (req, res, next) {
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -776,7 +787,9 @@ queryCtrl.saveFrontOfficeQuery = function (req, res, next) {
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(DBSecretKey),
-                            req.st.db.escape(JSON.stringify(queryType))
+                            req.st.db.escape(JSON.stringify(queryType)),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)
                         ];
 
                         var frontOfficeFormId = 1026;

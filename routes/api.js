@@ -97,6 +97,10 @@ router.get('/pass_reset_code',authModule.verifyResetCode);
 router.post('/verify_secret_code',authModule.verifySecretCode);
 router.post('/otp', authModule.sendOtp);
 
+//job portal login
+router.post('/portalLogin', authModule.portalLogin);
+
+
 //User module methods
 var User = require('./modules/user-module.js');
 var userModule = new User(db,stdLib);

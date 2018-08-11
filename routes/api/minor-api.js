@@ -109,6 +109,8 @@ var hospitalTokenManagement = require('./HEApp/hospitalTokenManagement.js');
 
 var generalOtp = require('./HEApp/otp/otp-routes.js');
 
+var onboardingctrl = require('./HEApp/onBoarding/onboarding-routes.js');
+
 var likeShareComment = require('./HEApp/likesharecomment.js');
 
 //var testInfoV1 =  require('./info/test_info.js');
@@ -212,6 +214,8 @@ router.use('/helloEZE/app', hospitalTokenManagement);
 router.use('/helloEZE', eSurvey);
 
 router.use('/helloEZE/app', likeShareComment);
+
+router.use('/helloEZE/app', onboardingctrl);
 
 
 //router.use('/test_info',testInfoV1);
@@ -392,7 +396,7 @@ cron.schedule('*/15 * * * *', function () {
 // });
 // cronJobMessage.start();
 
-cron.schedule('*/10 * * * *', function () {
+cron.schedule('*/15 * * * *', function () {
     console.log('running a notify messages');
     notifyMessages.getMessagesNeedToNotify();
 });
@@ -411,7 +415,7 @@ if (cluster.isWorker) {
     if (cluster.worker.id == 1) {
 
         var cronJobInterview = new CronJob({
-            cronTime: '*/2 * * * *',
+            cronTime: '*/30 * * * *',
             onTick: function () {
                 var query = "call wm_integrationUrlForHircraft()";
                 db.query(query, function (err, result) {
@@ -507,7 +511,7 @@ if (cluster.isWorker) {
 
         console.log("bye take care")
         var cronJobWalkIn = new CronJob({
-            cronTime: '*/1 * * * * *',
+            cronTime: '*/30 * * * *',
             onTick: function () {
                 var query = "call wm_integrationUrlwalkIn()";
                 db.query(query, function (err, result) {
@@ -578,7 +582,7 @@ if (cluster.isWorker) {
 
 
         var cronJobWalkInQuessCorp = new CronJob({
-            cronTime: '*/15 * * * * *',
+            cronTime: '*/30 * * * *',
             onTick: function () {
                 var query = "call wm_integrationUrlwalkInForQuessCorp()";
                 db.query(query, function (err, result) {
@@ -591,7 +595,7 @@ if (cluster.isWorker) {
                         var transId;
                         var formData = {};
                         var DBUrl;
-                        if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
+                        if (result && result[0] && result[0][0] && result[1] && result[1][0] ) {
                             heMasterId = result[0][0].heMasterId;
                             DBUrl = result[0][0].url;
                             transId = result[1][0].transId;
@@ -640,12 +644,12 @@ if (cluster.isWorker) {
 
 
 
-
+// birthday notifier
 if (cluster.isWorker) {
 
     if (cluster.worker.id == 1) {
         var cronJobgreeting = new CronJob({
-            cronTime: '00 08 * * * *',
+            cronTime: '00 08 * * *',     // to run in seconds 30 * * * * *
             onTick: function () {
 
                 // console.log('running a notify messages');
@@ -686,12 +690,12 @@ if (cluster.isWorker) {
 }
 
 
-//  query re notifier
+// query reNotifier
 if (cluster.isWorker) {
 
     if (cluster.worker.id == 1) {
         var reminder = new CronJob({
-            cronTime: '00 08 * * * *',
+            cronTime: '00 14 * * *',
             onTick: function () {
 
                 console.log('running a help desk re notifier');

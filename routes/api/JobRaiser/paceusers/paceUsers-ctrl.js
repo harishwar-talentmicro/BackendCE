@@ -1205,11 +1205,12 @@ paceUsersCtrl.freeJobPortalUsers = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     // console.log(result);
-                    if (!err && result&& (result[0] || result[1][0])) {
+                    if (!err && result&& result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "Job portal details loaded successfully";
                         response.error = null;
-                        result[0][0].portalName = result[0] ? JSON.parse(result[0][0].portalName) : {};
+                        
+                        result[0][0].portalName = (result[0] && result[0][0] && JSON.parse(result[0][0].portalName)) ? JSON.parse(result[0][0].portalName) : {};
 
                         response.data = {
                             freePortal: (result[0] && result[0]) ? result[0][0] : {}
@@ -1260,7 +1261,7 @@ paceUsersCtrl.checkApplicantExists = function (req, res, next) {
         validationFlag *= false;
     }
 
-    if (!req.body.portalId) {
+    if (!req.query.portalId) {
         error.portalId = 'Invalid portalId';
         validationFlag *= false;
     }
@@ -1288,8 +1289,8 @@ paceUsersCtrl.checkApplicantExists = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.parse(applicants)),                    
-                    req.st.db.escape(req.body.portalId)
+                    req.st.db.escape(JSON.stringify(applicants)),                    
+                    req.st.db.escape(req.query.portalId)
                 ];
 
                 var procQuery = 'CALL wm_checkApplicantsFromPortal( ' + inputs.join(',') + ')';

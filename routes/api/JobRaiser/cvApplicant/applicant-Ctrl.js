@@ -24,6 +24,7 @@ var cv = '';
 var text = '';
 var gs_url = '';
 var storage_bucket = '';
+
 var attachFile = new Promise(function (resolve, reject) {
     if (cv != '') {
         cv = gs_url + storage_bucket + '/' + cv;
@@ -236,12 +237,13 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                 gs_url = req.CONFIG.CONSTANT.GS_URL;
                 storage_bucket = req.CONFIG.CONSTANT.STORAGE_BUCKET;
 
-                // console.log(cv);
+                console.log(cv);
                 attachFile.then(function (resp) {
                     console.log("response after promise",resp);
                     if (1) {
 
-                     //   cvKeywords = text;
+                       cvKeywords = text;
+                       console.log('text from promise',resp);
 
                         req.body.applicantId = (req.body.applicantId) ? req.body.applicantId : 0;
 
@@ -319,7 +321,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(prefLocations)),
                             req.st.db.escape(JSON.stringify(industry)),
                             req.st.db.escape(JSON.stringify(nationality)),
-                            req.st.db.escape(req.body.cvKeywords),
+                            req.st.db.escape(cvKeywords),
                             req.st.db.escape(req.body.requirementId),
                             req.st.db.escape(req.body.imageUrl),
                             req.st.db.escape(req.body.htmlText),
@@ -4082,6 +4084,7 @@ applicantCtrl.referFriend = function(req,res,next){
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.approverCount  = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount  = req.body.receiverCount ? req.body.receiverCount : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
                         
         
                         var procParams = [
@@ -4108,7 +4111,9 @@ applicantCtrl.referFriend = function(req,res,next){
                             req.st.db.escape(req.body.learnMessageId),
                             req.st.db.escape(req.body.accessUserType),
                             req.st.db.escape(req.body.approverCount),
-                            req.st.db.escape(req.body.receiverCount)
+                            req.st.db.escape(req.body.receiverCount),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp) 
                         ];
         
                         var procQuery = 'CALL HE_save_referCV_new1( ' + procParams.join(',') + ')';
@@ -4232,5 +4237,337 @@ applicantCtrl.referFriend = function(req,res,next){
     }
 };
 
+
+applicantCtrl.saveApplicantForImporter = function (req, res, next) {
+    // var cvKeywords = '';
+ 
+     var response = {
+         status: false,
+         message: "Invalid token",
+         data: null,
+         error: null
+     };
+     var validationFlag = true;
+     if (!req.query.token) {
+         error.token = 'Invalid token';
+         validationFlag *= false;
+     }
+     if (!req.body.heMasterId) {
+         error.heMasterId = 'Invalid Company';
+         validationFlag *= false;
+     }
+     if (!req.body.firstName) {
+         error.firstName = 'First Name is Mandatory';
+         validationFlag *= false;
+     }
+     if (!req.body.emailId || !req.body.mobileNumber) {   // any one is mandatory
+         error.emailId = 'EMail ID or Mobile Number is mandatory';
+         validationFlag *= false;
+     }
+ 
+     // if (!req.body.mobileNumber) {
+     //     error.mobileNumber = 'Mobile Number is Mandatory';
+     //     validationFlag *= false;
+     // }
+     var education = req.body.education;
+     if (typeof (education) == "string") {
+         education = JSON.parse(education);
+     }
+     if (!education) {
+         education = [];
+     }
+     var jobTitle = req.body.jobTitle;
+     if (typeof (jobTitle) == "string") {
+         jobTitle = JSON.parse(jobTitle);
+     }
+     if (!jobTitle) {
+         jobTitle = {};
+     }
+     var primarySkills = req.body.primarySkills;
+     if (typeof (primarySkills) == "string") {
+         primarySkills = JSON.parse(primarySkills);
+     }
+     if (!primarySkills) {
+         primarySkills = [];
+     }
+     var secondarySkills = req.body.secondarySkills;
+     if (typeof (secondarySkills) == "string") {
+         secondarySkills = JSON.parse(secondarySkills);
+     }
+     if (!secondarySkills) {
+         secondarySkills = [];
+     }
+     var cvSource = req.body.cvSource;
+     if (typeof (cvSource) == "string") {
+         cvSource = JSON.parse(cvSource);
+     }
+     if (!cvSource) {
+         cvSource = {};
+     }
+     var prefLocations = req.body.prefLocations;
+     if (typeof (prefLocations) == "string") {
+         prefLocations = JSON.parse(prefLocations);
+     }
+     if (!prefLocations) {
+         prefLocations = [];
+     }
+     var industry = req.body.industry;
+     if (typeof (industry) == "string") {
+         industry = JSON.parse(industry);
+     }
+     if (!industry) {
+         industry = [];
+     }
+     var nationality = req.body.nationality;
+     if (typeof (nationality) == "string") {
+         nationality = JSON.parse(nationality);
+     }
+     if (!nationality) {
+         nationality = {};
+     }
+     var expectedSalaryCurr = req.body.expectedSalaryCurr;
+     if (typeof (expectedSalaryCurr) == "string") {
+         expectedSalaryCurr = JSON.parse(expectedSalaryCurr);
+     }
+     if (!expectedSalaryCurr) {
+         expectedSalaryCurr = {};
+     }
+ 
+     var expectedSalaryScale = req.body.expectedSalaryScale;
+     if (typeof (expectedSalaryScale) == "string") {
+         expectedSalaryScale = JSON.parse(expectedSalaryScale);
+     }
+     if (!expectedSalaryScale) {
+         expectedSalaryScale = {};
+     }
+     var expectedSalaryPeriod = req.body.expectedSalaryPeriod;
+     if (typeof (expectedSalaryPeriod) == "string") {
+         expectedSalaryPeriod = JSON.parse(expectedSalaryPeriod);
+     }
+     if (!expectedSalaryPeriod) {
+         expectedSalaryPeriod = {};
+     }
+     var presentSalaryCurr = req.body.presentSalaryCurr;
+     if (typeof (presentSalaryCurr) == "string") {
+         presentSalaryCurr = JSON.parse(presentSalaryCurr);
+     }
+     if (!presentSalaryCurr) {
+         presentSalaryCurr = {};
+     }
+     var presentSalaryScale = req.body.presentSalaryScale;
+     if (typeof (presentSalaryScale) == "string") {
+         presentSalaryScale = JSON.parse(presentSalaryScale);
+     }
+     if (!presentSalaryScale) {
+         presentSalaryScale = {};
+     }
+     var presentSalaryPeriod = req.body.presentSalaryPeriod;
+     if (typeof (presentSalaryPeriod) == "string") {
+         presentSalaryPeriod = JSON.parse(presentSalaryPeriod);
+     }
+     if (!presentSalaryPeriod) {
+         presentSalaryPeriod = {};
+     }
+     var attachmentList = req.body.attachmentList;
+     if (typeof (attachmentList) == "string") {
+         attachmentList = JSON.parse(attachmentList);
+     }
+     if (!attachmentList) {
+         attachmentList = [];
+     }
+     var functionalAreas = req.body.functionalAreas;
+     if (typeof (functionalAreas) == "string") {
+         functionalAreas = JSON.parse(functionalAreas);
+     }
+     if (!functionalAreas) {
+         functionalAreas = [];
+     }
+     var requirementArray = req.body.requirementArray;
+     if (typeof (requirementArray) == "string") {
+         requirementArray = JSON.parse(requirementArray);
+     }
+     if (!requirementArray) {
+         requirementArray = [];
+     }
+ 
+     var faceSheet = req.body.faceSheet;
+     if (typeof (faceSheet) == "string") {
+         faceSheet = JSON.parse(faceSheet);
+     }
+     if (!faceSheet) {
+         faceSheet = {};
+     }
+ 
+     var presentLocation = req.body.presentLocation;
+     if (typeof (presentLocation) == "string") {
+         presentLocation = JSON.parse(presentLocation);
+     }
+     if (!presentLocation) {
+         presentLocation = {};
+     }
+ 
+     if (!validationFlag) {
+         response.error = error;
+         response.message = 'Please Check the Errors';
+         res.status(400).json(response);
+         console.log(response);
+     }
+     else {
+         req.st.validateToken(req.query.token, function (err, tokenResult) {
+             if ((!err) && tokenResult) {
+                 // req.body.cvPath = (req.body.cvPath) ? req.body.cvPath : "";
+                 req.query.isWeb = (req.body.isWeb) ? req.body.isWeb : 0;
+                 if (attachmentList.length) {
+                     cv = attachmentList[0].CDNPath;
+                 }
+                 gs_url = req.CONFIG.CONSTANT.GS_URL;
+                 storage_bucket = req.CONFIG.CONSTANT.STORAGE_BUCKET;
+ 
+                 // console.log(cv);
+                 attachFile.then(function (resp) {
+                     console.log("response after promise",resp);
+                     if (1) {
+ 
+                      //   cvKeywords = text;
+ 
+                         req.body.applicantId = (req.body.applicantId) ? req.body.applicantId : 0;
+ 
+                         req.body.lastName = (req.body.lastName) ? req.body.lastName : "";
+                         req.body.phoneISD = (req.body.phoneISD) ? req.body.phoneISD : "";
+                         req.body.phoneNumber = (req.body.phoneNumber) ? req.body.phoneNumber : "";
+                         req.body.mobileISD = (req.body.mobileISD) ? req.body.mobileISD : "";
+                         req.body.address = (req.body.address) ? req.body.address : "";
+                         // req.body.latitude = (req.body.latitude) ? req.body.latitude : 0.0;
+                         // req.body.longitude = (req.body.longitude) ? req.body.longitude : 0.0;
+                         req.body.longitude = 0.0;
+                         req.body.latitude = 0.0;
+                         req.body.IDadhaarNumber = (req.body.IDadhaarNumber) ? req.body.IDadhaarNumber : "";
+                         req.body.passportNumber = (req.body.passportNumber) ? req.body.passportNumber : "";
+                         req.body.ppExpiryDate = (req.body.ppExpiryDate) ? req.body.ppExpiryDate : "0000-00-00 00:00:00";
+                         req.body.experience = (req.body.experience) ? req.body.experience : 0;
+                         req.body.employer = (req.body.employer) ? req.body.employer : "";
+                         req.body.noticePeriod = (req.body.noticePeriod) ? req.body.noticePeriod : 0;
+                         req.body.notes = (req.body.notes) ? req.body.notes : "";
+                         req.body.DOB = (req.body.DOB) ? req.body.DOB : "0000-00-00";
+                         //req.body.originalCvId = (req.body.originalCvId) ? req.body.originalCvId : 0;
+                         req.body.status = (req.body.status) ? req.body.status : 0;
+                         req.body.blockingPeriod = (req.body.blockingPeriod) ? req.body.blockingPeriod : 0;
+                         req.body.affirmitive = (req.body.affirmitive) ? req.body.affirmitive : '';
+                         req.body.transactions = (req.body.transactions) ? req.body.transactions : '';
+                         req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
+                         req.body.imageUrl = req.body.imageUrl ? req.body.imageUrl : '';
+                         req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0;
+                         req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
+                         req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 1;
+                         req.body.referredBy = req.body.referredBy ? req.body.referredBy : "";
+                         req.body.gender = (req.body.gender && req.body.gender  !='null')  ? req.body.gender : undefined;
+ 
+                         var inputs = [
+                             req.st.db.escape(req.query.token),
+                             req.st.db.escape(req.body.heMasterId),
+                             req.st.db.escape(req.body.applicantId),
+                             req.st.db.escape(req.body.firstName),
+                             req.st.db.escape(req.body.lastName),
+                             req.st.db.escape(req.body.phoneISD),
+                             req.st.db.escape(req.body.phoneNumber),
+                             req.st.db.escape(req.body.mobileISD),
+                             req.st.db.escape(req.body.mobileNumber),
+                             req.st.db.escape(req.body.emailId),
+                             req.st.db.escape(JSON.stringify(education)),
+                             req.st.db.escape(req.body.address),
+                             req.st.db.escape(req.body.latitude),
+                             req.st.db.escape(req.body.longitude),
+                             req.st.db.escape(req.body.IDadhaarNumber),
+                             req.st.db.escape(req.body.passportNumber),
+                             req.st.db.escape(req.body.ppExpiryDate),
+                             req.st.db.escape(req.body.experience),
+                             req.st.db.escape(req.body.employer),
+                             req.st.db.escape(JSON.stringify(jobTitle[0])),
+                             req.st.db.escape(req.body.noticePeriod),
+                             req.st.db.escape(JSON.stringify(expectedSalaryCurr)),
+                             req.st.db.escape(req.body.expectedSalary),
+                             req.st.db.escape(JSON.stringify(expectedSalaryScale)),
+                             req.st.db.escape(JSON.stringify(expectedSalaryPeriod)),
+                             req.st.db.escape(JSON.stringify(presentSalaryCurr)),
+                             req.st.db.escape(req.body.presentSalary),
+                             req.st.db.escape(JSON.stringify(presentSalaryScale)),
+                             req.st.db.escape(JSON.stringify(presentSalaryPeriod)),
+                             req.st.db.escape(JSON.stringify(primarySkills)),
+                             req.st.db.escape(JSON.stringify(secondarySkills)),
+                             req.st.db.escape(req.body.notes),
+                             req.st.db.escape(req.body.cvRating),
+                             req.st.db.escape(JSON.stringify(attachmentList)),
+                             req.st.db.escape(JSON.stringify(cvSource)),
+                             req.st.db.escape(req.body.gender),
+                             req.st.db.escape(req.body.DOB),
+                             //req.st.db.escape(req.body.originalCvId),
+                             req.st.db.escape(req.body.blockingPeriod),
+                             req.st.db.escape(req.body.status),
+                             req.st.db.escape(JSON.stringify(prefLocations)),
+                             req.st.db.escape(JSON.stringify(industry)),
+                             req.st.db.escape(JSON.stringify(nationality)),
+                             req.st.db.escape(req.body.cvKeywords),
+                             req.st.db.escape(req.body.requirementId),
+                             req.st.db.escape(req.body.imageUrl),
+                             req.st.db.escape(req.body.htmlText),
+                             req.st.db.escape(req.body.reqAppId),
+                             req.st.db.escape(req.body.clientCvPath),
+                             req.st.db.escape(JSON.stringify(functionalAreas)),
+                             req.st.db.escape(req.body.importerFlag || 1),
+                             req.st.db.escape(JSON.stringify(requirementArray)),
+                             req.st.db.escape(req.body.referredBy),
+                             req.st.db.escape(JSON.stringify(faceSheet)),
+                             req.st.db.escape(JSON.stringify(presentLocation))
+                       
+                         ];
+ 
+                         var procQuery = 'CALL wm_save_applicantForImporter( ' + inputs.join(',') + ')';  // call procedure to save requirement data
+                         console.log(procQuery);
+ 
+                         req.db.query(procQuery, function (err, result) {
+                             console.log(err);
+ 
+                             if (!err && result && result[0] && result[0][0].applicantId) {
+ 
+                                 response.status = true;
+                                 response.message = "Resume Saved Successfully";
+                                 response.error = null;
+                                 response.data = {
+                                     applicantId: result[0][0].applicantId
+                                 };
+                                 res.status(200).json(response);
+ 
+                             }
+                             else if (!err && result && result[0] && result[0][0]._applicantExists) {
+ 
+                                 response.status = false;
+                                 response.message = "Resume already exists";
+                                 response.error = null;
+                                 response.data = {
+                                     applicantId: result[0][0]._applicantExists
+                                 };
+                                 response.duplicate = 1;
+                                 res.status(200).json(response);
+ 
+                             }
+                             else {
+                                 response.status = false;
+                                 response.message = "Error While Saving Resume";
+                                 response.error = 1;
+                                 console.log(err);
+                                 res.status(500).json(response);
+                             }
+                         });
+                     }
+                 });
+ 
+             }
+             else {
+                 res.status(401).json(response);
+             }
+         });
+     }
+ };
+ 
 
 module.exports = applicantCtrl;

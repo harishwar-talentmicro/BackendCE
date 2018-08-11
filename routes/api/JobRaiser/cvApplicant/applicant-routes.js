@@ -83,5 +83,8 @@ router.post('/referFriend',applicantCtrl.referFriend);
 
 // router.post('/saveMailSentByGmail',sendgridCtrl.saveMailSentByGmail);
 
+
+router.post('/importApplicants',applicantCtrl.saveApplicantForImporter);
+
 module.exports = router;
 
