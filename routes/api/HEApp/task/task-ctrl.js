@@ -323,6 +323,8 @@ taskCtrl.saveTask = function (req, res, next) {
                         req.body.alertType = req.body.alertType ? req.body.alertType : 0;
                         req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : "";
                         req.body.ends = req.body.ends != undefined ? req.body.ends : null;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+
 
                         var memberList = req.body.memberList;
                         if (typeof (memberList) == "string") {
@@ -385,7 +387,10 @@ taskCtrl.saveTask = function (req, res, next) {
                             req.st.db.escape(req.body.alertType),
                             req.st.db.escape(JSON.stringify(sharedMemberList)),
                             req.st.db.escape(req.body.senderNotes),
-                            req.st.db.escape(DBSecretKey)
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp) 
+
                         ];
 
                         var taskFormId = 1000;
