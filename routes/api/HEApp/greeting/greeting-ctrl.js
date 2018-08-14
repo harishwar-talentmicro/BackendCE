@@ -723,354 +723,366 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                     var timestamp = Date.now();
                     console.log(template.templateId);
                     console.log(req.body.heMasterId);
-                    var backGround = 'select templateImage from mRewardsRecognition where  tId=' + template.templateId + '  and heMasterId=' + req.body.heMasterId;
+                    var backGround = 'select templateType,templateImage from mRewardsRecognition where  tId=' + template.templateId + '  and heMasterId=' + req.body.heMasterId;
 
                     console.log(backGround);
                     req.db.query(backGround, function (err, results) {
+                        console.log('err',err);
+                        console.log('results',results);
 
-                        if (!err && results[0]) {
-                            backGroundImage = results[0].templateImage;
-                            console.log("--=", backGroundImage);
-                        }
-                        else if (!err) {
-                            backGroundImage = '783f44a0-0ba3-45d3-af79-64be754b497d.png';
-                            console.log(backGroundImage);
+                        if (results[0].templateType == 1) {
 
-                        }
-                        else {
-                            backGroundImage = '783f44a0-0ba3-45d3-af79-64be754b497d.png';
-                            console.log(backGroundImage);
-                        };
+                            if (!err && results[0]) {
+                                backGroundImage = results[0].templateImage;
+                                console.log("--=", backGroundImage);
+                            }
+                            else if (!err) {
+                                backGroundImage = '783f44a0-0ba3-45d3-af79-64be754b497d.png';
+                                console.log(backGroundImage);
 
-                        var proc = "select a.picture from tmaster a,theusers b where  a.tId=b.userMasterId and b.employeeCode= '" + rewardRecognition[0].EmployeeCode + "' and b.heMasterId=" + req.body.heMasterId;
-                        console.log(proc);
-                        req.db.query(proc, function (err, results) {
-                            if (req.body.imageMandatory == 1) {
+                            }
+                            else {
+                                backGroundImage = '783f44a0-0ba3-45d3-af79-64be754b497d.png';
+                                console.log(backGroundImage);
+                            };
 
-                                if (!err && results[0]) {
-                                    imageUrl = results[0].picture;
-                                    console.log("--=", imageUrl);
-                                }
-                                else if (!err) {
-                                    imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
-                                    console.log("dummy", imageUrl);
+                            var proc = "select a.picture from tmaster a,theusers b where  a.tId=b.userMasterId and b.employeeCode= '" + rewardRecognition[0].EmployeeCode + "' and b.heMasterId=" + req.body.heMasterId;
+                            console.log(proc);
+                            req.db.query(proc, function (err, results) {
+                                if (req.body.imageMandatory == 1) {
 
+                                    if (!err && results[0]) {
+                                        imageUrl = results[0].picture;
+                                        console.log("--=", imageUrl);
+                                    }
+                                    else if (!err) {
+                                        imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
+                                        console.log("dummy", imageUrl);
+
+                                    }
+                                    else {
+                                        imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
+                                        console.log(imageUrl);
+
+                                    };
                                 }
                                 else {
                                     imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
-                                    console.log(imageUrl);
+                                    console.log("no mandatory image", imageUrl);
+                                }
+                                Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png").then(function (image2) {
+                                    Jimp.read("https://storage.googleapis.com/ezeone/" + backGroundImage, function (err, lenna) {
 
-                                };
-                            }
-                            else {
-                                imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
-                                console.log("no mandatory image", imageUrl);
-                            }
-                            Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png").then(function (image2) {
-                                Jimp.read("https://storage.googleapis.com/ezeone/" + backGroundImage, function (err, lenna) {
+                                        var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + imageUrl).then(function (image1) {
 
-                                    var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + imageUrl).then(function (image1) {
+                                            var profile = image1;
+                                            var mask = image2;
+                                            var w = mask.bitmap.width; // the width of the image
+                                            var h = mask.bitmap.height;
+                                            // console.log(w, h);
+                                            profile.resize(w, h);
+                                            // console.log(h);
 
-                                        var profile = image1;
-                                        var mask = image2;
-                                        var w = mask.bitmap.width; // the width of the image
-                                        var h = mask.bitmap.height;
-                                        // console.log(w, h);
-                                        profile.resize(w, h);
-                                        // console.log(h);
+                                            profile.mask(mask, 0, 0)
+                                                .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function () {
+                                                    console.log('imposing profile picture over dummy');
+                                                    Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function (err, penna) {
+                                                        penna.resize(160, 160);
+                                                        console.log('reading edited profile picture');
+                                                        console.log('reading background image');
+                                                        if (err) throw err;
 
-                                        profile.mask(mask, 0, 0)
-                                            .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function () {
-                                                console.log('imposing profile picture over dummy');
-                                                Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function (err, penna) {
-                                                    penna.resize(160, 160);
-                                                    console.log('reading edited profile picture');
-                                                    console.log('reading background image');
-                                                    if (err) throw err;
+                                                        var w = (lenna.bitmap.width); // the width of the image
+                                                        var h = lenna.bitmap.height;
+                                                        var name = title = type = title1 = title2 = '';
+                                                        var name = "";
 
-                                                    var w = (lenna.bitmap.width); // the width of the image
-                                                    var h = lenna.bitmap.height;
-                                                    var name = title = type = title1 = title2 = '';
-                                                    var name = "";
+                                                        var name = rewardRecognition[0].UserName;    //name on card
+                                                        var title = rewardRecognition[0].SubTitle;  // subtitle below main title
+                                                        var type = rewardRecognition[0].TitleoftheAward;   //mainTitle
+                                                        var title1 = rewardRecognition[0].Content;    //  below contentTitle
+                                                        var title2 = rewardRecognition[0].ContentTitle;  //below name
 
-                                                    var name = rewardRecognition[0].UserName;
-                                                    var title = rewardRecognition[0].SubTitle;
-                                                    var type = rewardRecognition[0].TitleoftheAward;
-                                                    var title1 = rewardRecognition[0].Content;
-                                                    var title2 = rewardRecognition[0].ContentTitle;
-
-                                                    var nameLength = (((name.length / 2)));
-                                                    var TypeLength = (((type.length / 2)));
-                                                    var titleLength = (((title.length / 2)));
-                                                    lenna.quality(100)
-                                                    Jimp.loadFont(Jimp.FONT_SANS_64_BLACK).then(function (font) {
-                                                        lenna.print(font, 50, 490, name)
-                                                        Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                                            lenna.print(font, 50, 270, type)
-                                                            Jimp.loadFont(Jimp.FONT_SANS_32_WHITE).then(function (font) {
-                                                                lenna.print(font, 50, 330, title)
-                                                                Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                                                    lenna.print(font, 50, 610, title2)
+                                                        var nameLength = (((name.length / 2)));
+                                                        var TypeLength = (((type.length / 2)));
+                                                        var titleLength = (((title.length / 2)));
+                                                        lenna.quality(100)
+                                                        Jimp.loadFont(Jimp.FONT_SANS_64_BLACK).then(function (font) {
+                                                            lenna.print(font, 50, 490, name)
+                                                            Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
+                                                                lenna.print(font, 50, 270, type)
+                                                                Jimp.loadFont(Jimp.FONT_SANS_32_WHITE).then(function (font) {
+                                                                    lenna.print(font, 50, 330, title)
                                                                     Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                                                        lenna.print(font, 50, 660, title1, 700)
-                                                                        console.log("image processed");
+                                                                        lenna.print(font, 50, 610, title2)
+                                                                        Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
+                                                                            lenna.print(font, 50, 660, title1, 700)
+                                                                            console.log("image processed");
 
-                                                                        lenna.composite(penna, 562, 338)
-                                                                            .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + timestamp + ".png", function () {
-                                                                                console.log('writing final image');
-                                                                                // console.log("response after promise", resp);
-                                                                                // setTimeout(function () {
-                                                                                var attachment = {
-                                                                                    path: "/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + timestamp + ".png",
-                                                                                    extension: 'png',
-                                                                                    fileName: 'gunasheel'
-                                                                                };
+                                                                            lenna.composite(penna, 562, 338)
+                                                                                .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + timestamp + ".png", function () {
+                                                                                    console.log('writing final image');
+                                                                                    // console.log("response after promise", resp);
+                                                                                    // setTimeout(function () {
+                                                                                    var attachment = {
+                                                                                        path: "/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + timestamp + ".png",
+                                                                                        extension: 'png',
+                                                                                        fileName: 'gunasheel'
+                                                                                    };
 
-                                                                                console.log("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + timestamp + ".png")
+                                                                                    console.log("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + timestamp + ".png")
 
-                                                                                var filetype = (attachment.extension) ? attachment.extension : '';
-                                                                                var uniqueId = uuid.v4();
-                                                                                // consol.log()
-                                                                                aUrl = uniqueId + '.' + filetype;
-                                                                                console.log(uniqueId);
-                                                                                aFilename = attachment.fileName;
-                                                                                // console.log("aFilenameaFilename", aFilename);
-                                                                                // console.log("req.files.attachment.path", attachment.path);
+                                                                                    var filetype = (attachment.extension) ? attachment.extension : '';
+                                                                                    var uniqueId = uuid.v4();
+                                                                                    // consol.log()
+                                                                                    aUrl = uniqueId + '.' + filetype;
+                                                                                    console.log(uniqueId);
+                                                                                    aFilename = attachment.fileName;
+                                                                                    // console.log("aFilenameaFilename", aFilename);
+                                                                                    // console.log("req.files.attachment.path", attachment.path);
 
-                                                                                var readStream = fs.createReadStream(attachment.path);
+                                                                                    var readStream = fs.createReadStream(attachment.path);
 
-                                                                                // console.log(readStream);
-                                                                                uploadDocumentToCloud(aUrl, readStream, function (err) {
-                                                                                    if (!err) {
-                                                                                        console.log(aUrl);
-                                                                                        fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + timestamp + ".png");
-                                                                                        fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png");
+                                                                                    // console.log(readStream);
+                                                                                    uploadDocumentToCloud(aUrl, readStream, function (err) {
+                                                                                        if (!err) {
+                                                                                            console.log(aUrl);
+                                                                                            fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + timestamp + ".png");
+                                                                                            fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png");
 
-                                                                                    }
-                                                                                    else {
+                                                                                        }
+                                                                                        else {
 
-                                                                                        console.log('FnSaveServiceAttachment:attachment not upload');
-                                                                                    }
+                                                                                            console.log('FnSaveServiceAttachment:attachment not upload');
+                                                                                        }
+                                                                                    });
+
+
+                                                                                    rewardRecognition[0].image = aUrl;
+
+                                                                                    var rewards = rewardRecognition;
+
+                                                                                    req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
+                                                                                    req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
+                                                                                    req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
+                                                                                    req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
+                                                                                    req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
+                                                                                    req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
+                                                                                    req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
+
+                                                                                    req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                                                                                    req.body.parentId = req.body.parentId ? req.body.parentId : 0;
+                                                                                    req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+
+                                                                                    var procParams = [
+                                                                                        req.st.db.escape(req.query.token),
+
+                                                                                        req.st.db.escape(req.body.heMasterId),
+                                                                                        req.st.db.escape(req.body.type),
+                                                                                        req.st.db.escape(JSON.stringify(rewards)),
+
+                                                                                        req.st.db.escape(req.body.parentId),
+
+                                                                                        req.st.db.escape(req.body.approverNotes),
+
+                                                                                        req.st.db.escape(req.body.receiverNotes),
+                                                                                        req.st.db.escape(req.body.approverCount),
+                                                                                        req.st.db.escape(req.body.receiverCount),
+                                                                                        req.st.db.escape(req.body.accessUserType),
+                                                                                        req.st.db.escape(req.body.learnMessageId),
+                                                                                        req.st.db.escape(req.body.status),
+                                                                                        req.st.db.escape(DBSecretKey),
+                                                                                        req.st.db.escape(JSON.stringify(template)),
+                                                                                        req.st.db.escape(req.body.timestamp),
+                                                                                        req.st.db.escape(req.body.createdTimeStamp)                                                            
+
+                                                                                    ];
+
+
+                                                                                    /**
+                                                                                     * Calling procedure to save form template
+                                                                                     * @type {string}
+                                                                                     */
+
+
+                                                                                    var procQuery = 'CALL wm_save_rewardsandRecognition( ' + procParams.join(',') + ');';
+                                                                                    console.log(procQuery);
+                                                                                    req.db.query(procQuery, function (err, results) {
+                                                                                        console.log(results);
+                                                                                        if (!err && results && results[0]) {
+                                                                                            senderGroupId = results[0][0].senderId;
+
+                                                                                            notifyMessages.getMessagesNeedToNotify();
+
+                                                                                            response.status = true;
+                                                                                            response.message = "Greetings saved successfully";
+                                                                                            response.error = null;
+                                                                                            response.data = {
+                                                                                                messageList: {
+                                                                                                    messageId: results[0][0].messageId,
+                                                                                                    message: results[0][0].message,
+                                                                                                    messageLink: results[0][0].messageLink,
+                                                                                                    createdDate: results[0][0].createdDate,
+                                                                                                    messageType: results[0][0].messageType,
+                                                                                                    messageStatus: results[0][0].messageStatus,
+                                                                                                    priority: results[0][0].priority,
+                                                                                                    senderName: results[0][0].senderName,
+                                                                                                    senderId: results[0][0].senderId,
+                                                                                                    receiverId: results[0][0].receiverId,
+                                                                                                    transId: results[0][0].transId,
+                                                                                                    formId: results[0][0].formId,
+                                                                                                    groupId: req.body.groupId,
+                                                                                                    currentStatus: results[0][0].currentStatus,
+                                                                                                    currentTransId: results[0][0].currentTransId,
+                                                                                                    localMessageId: req.body.localMessageId,
+                                                                                                    parentId: results[0][0].parentId,
+                                                                                                    accessUserType: results[0][0].accessUserType,
+                                                                                                    heUserId: results[0][0].heUserId,
+                                                                                                    formData: JSON.parse(results[0][0].formDataJSON)
+                                                                                                }
+                                                                                            };
+                                                                                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                                                            // zlib.gzip(buf, function (_, result) {
+                                                                                            //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                                                                            res.status(200).json(response);
+                                                                                            // });
+                                                                                        }
+                                                                                        else {
+                                                                                            response.status = false;
+                                                                                            response.message = "Error while saving greetings";
+                                                                                            response.error = null;
+                                                                                            response.data = null;
+                                                                                            res.status(500).json(response);
+                                                                                        }
+                                                                                    });
+
+                                                                                    // }
+                                                                                    // resolve(rewardRecognition);
+                                                                                    // console.log("=-=-=-==-==-=-=", rewardRecognition);
+                                                                                    // })
+                                                                                    // promise.then(function () {
+
+                                                                                    // });
+                                                                                    //  }
                                                                                 });
-
-                                                                              
-                                                                                rewardRecognition[0].image = aUrl;
-
-                                                                                var rewards = rewardRecognition;
-
-                                                                                req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
-                                                                                req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
-                                                                                req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
-                                                                                req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
-                                                                                req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
-                                                                                req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
-                                                                                req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
-
-                                                                                req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
-                                                                                req.body.parentId = req.body.parentId ? req.body.parentId : 0;
-
-                                                                                var procParams = [
-                                                                                    req.st.db.escape(req.query.token),
-
-                                                                                    req.st.db.escape(req.body.heMasterId),
-                                                                                    req.st.db.escape(req.body.type),
-                                                                                    req.st.db.escape(JSON.stringify(rewards)),
-
-                                                                                    req.st.db.escape(req.body.parentId),
-
-                                                                                    req.st.db.escape(req.body.approverNotes),
-
-                                                                                    req.st.db.escape(req.body.receiverNotes),
-                                                                                    req.st.db.escape(req.body.approverCount),
-                                                                                    req.st.db.escape(req.body.receiverCount),
-                                                                                    req.st.db.escape(req.body.accessUserType),
-                                                                                    req.st.db.escape(req.body.learnMessageId),
-                                                                                    req.st.db.escape(req.body.status),
-                                                                                    req.st.db.escape(DBSecretKey),
-                                                                                    req.st.db.escape(JSON.stringify(template))
-
-                                                                                ];
-
-
-                                                                                /**
-                                                                                 * Calling procedure to save form template
-                                                                                 * @type {string}
-                                                                                 */
-
-
-                                                                                var procQuery = 'CALL wm_save_rewardsandRecognition( ' + procParams.join(',') + ');';
-                                                                                console.log(procQuery);
-                                                                                req.db.query(procQuery, function (err, results) {
-                                                                                    console.log(results);
-                                                                                    if (!err && results && results[0]) {
-                                                                                        senderGroupId = results[0][0].senderId;
-
-                                                                                        notifyMessages.getMessagesNeedToNotify();
-
-                                                                                        response.status = true;
-                                                                                        response.message = "Greetings saved successfully";
-                                                                                        response.error = null;
-                                                                                        response.data = {
-                                                                                            messageList: {
-                                                                                                messageId: results[0][0].messageId,
-                                                                                                message: results[0][0].message,
-                                                                                                messageLink: results[0][0].messageLink,
-                                                                                                createdDate: results[0][0].createdDate,
-                                                                                                messageType: results[0][0].messageType,
-                                                                                                messageStatus: results[0][0].messageStatus,
-                                                                                                priority: results[0][0].priority,
-                                                                                                senderName: results[0][0].senderName,
-                                                                                                senderId: results[0][0].senderId,
-                                                                                                receiverId: results[0][0].receiverId,
-                                                                                                transId: results[0][0].transId,
-                                                                                                formId: results[0][0].formId,
-                                                                                                groupId: req.body.groupId,
-                                                                                                currentStatus: results[0][0].currentStatus,
-                                                                                                currentTransId: results[0][0].currentTransId,
-                                                                                                localMessageId: req.body.localMessageId,
-                                                                                                parentId: results[0][0].parentId,
-                                                                                                accessUserType: results[0][0].accessUserType,
-                                                                                                heUserId: results[0][0].heUserId,
-                                                                                                formData: JSON.parse(results[0][0].formDataJSON)
-                                                                                            }
-                                                                                        };
-                                                                                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                                                                        // zlib.gzip(buf, function (_, result) {
-                                                                                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                                                                                        res.status(200).json(response);
-                                                                                        // });
-                                                                                    }
-                                                                                    else {
-                                                                                        response.status = false;
-                                                                                        response.message = "Error while saving greetings";
-                                                                                        response.error = null;
-                                                                                        response.data = null;
-                                                                                        res.status(500).json(response);
-                                                                                    }
-                                                                                });
-
-                                                                                // }
-                                                                                // resolve(rewardRecognition);
-                                                                                // console.log("=-=-=-==-==-=-=", rewardRecognition);
-                                                                                // })
-                                                                                // promise.then(function () {
-
-                                                                                // });
-                                                                                //  }
-                                                                            });
+                                                                        });
                                                                     });
                                                                 });
                                                             });
                                                         });
+
                                                     });
-
                                                 });
-                                            });
-                                    })
-                                        .catch(function () {
-                                            console.log('error');
                                         })
+                                            .catch(function () {
+                                                console.log('error');
+                                            })
+                                    });
+                                    // });
+
+                                    // var attachFile = new Promise(function (resolve, reject) {
+                                    //     var p1 = 0;
+                                    //     var p2 = 0;
+
+                                    //     var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + imageUrl);
+                                    //     console.log(p1);
+                                    //     // var p1 = Jimp.read("https://storage.googleapis.com/ezeone/c7eb1b98-cb0d-4f82-8c9d-ef9067994617.png");
+                                    //     var p2 = Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png");
+                                    //     var guna;
+                                    //     Promise.all([p1, p2]).then(function (images) {
+                                    //         var circleImage = new Promise(function (resolve, reject) {
+                                    //             var profile = images[0];
+                                    //             var mask = images[1];
+                                    //             var w = mask.bitmap.width; // the width of the image
+                                    //             var h = mask.bitmap.height;
+                                    //             console.log(w, h);
+                                    //             profile.resize(w, h);
+                                    //             console.log(h);
+
+                                    //             profile.mask(mask, 0, 0)
+                                    //                 .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/" + rewardRecognition[0].UserName + ".png");
+
+                                    //             resolve(profile.mask(mask, 0, 0).write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/" + rewardRecognition[0].UserName + ".png"));
+                                    //             //  resolve("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle.png");
+                                    //         })
+                                    //         circleImage.then(function (resp) {
+                                    //             setTimeout(function () {
+                                    //                 console.log("lenna-circle.png written", resp)
+                                    //                 Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/" + rewardRecognition[0].UserName + ".png", function (err, penna) {
+                                    //                     penna.resize(160, 160);
+
+                                    //                     Jimp.read("https://storage.googleapis.com/ezeone/"+backGroundImage, function (err, lenna) {
+                                    //                         console.log("hi how r u")
+                                    //                         if (err) throw err;
+
+                                    //                         var w = (lenna.bitmap.width); // the width of the image
+                                    //                         var h = lenna.bitmap.height;
+                                    //                         var name = title = type = title1 = title2 = '';
+                                    //                         var name = "";
+                                    //                         if (rewardRecognition.length > 0) {
+
+                                    //                             var name = rewardRecognition[0].UserName;
+                                    //                             var title = rewardRecognition[0].SubTitle;
+                                    //                             var type = rewardRecognition[0].TitleoftheAward;
+                                    //                             var title2 = rewardRecognition[0].Content;
+                                    //                             var title1 = rewardRecognition[0].ContentTitle;
+
+                                    //                             // console.log(name);
+
+                                    //                             console.log(w);
+                                    //                             console.log(name);
+                                    //                             var nameLength = (((name.length / 2)));
+                                    //                             var TypeLength = (((type.length / 2)));
+                                    //                             var titleLength = (((title.length / 2)));
+                                    //                         };
+
+
+                                    //                         lenna.quality(100)
+                                    //                         Jimp.loadFont(Jimp.FONT_SANS_64_BLACK).then(function (font) {
+                                    //                             lenna.print(font, 50, 490, name)
+                                    //                             Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
+                                    //                                 lenna.print(font, 50, 270, type)
+                                    //                                 Jimp.loadFont(Jimp.FONT_SANS_32_WHITE).then(function (font) {
+                                    //                                     lenna.print(font, 50, 330, title)
+                                    //                                     Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
+                                    //                                         lenna.print(font, 50, 610, title1)
+                                    //                                         Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
+                                    //                                             lenna.print(font, 50, 660, title2, 700)
+                                    //                                             console.log("image processed");
+
+                                    //                                             lenna.composite(penna, 562, 338)
+                                    //                                                 .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + rewardRecognition[0].UserName + ".png");
+                                    //                                             setTimeout(function () {
+                                    //                                                 resolve(lenna.write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + rewardRecognition[0].UserName + ".png"));
+                                    //                                             }, 2000);
+
+                                    //                                         });
+
+                                    //                                     });
+
+                                    //                                 });
+
+                                    //                             });
+
+                                    //                         });
+
+                                    //                     });
+
+                                    //                 });
+                                    //             }, 1000);
+
+                                    //         });
+                                    //     });
+
+                                }).then(function (resp) {
+
                                 });
-                                // });
+                            })
+                        }   
+                        // else if(results[0].templateType == 2){
 
-                                // var attachFile = new Promise(function (resolve, reject) {
-                                //     var p1 = 0;
-                                //     var p2 = 0;
+                        // }
 
-                                //     var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + imageUrl);
-                                //     console.log(p1);
-                                //     // var p1 = Jimp.read("https://storage.googleapis.com/ezeone/c7eb1b98-cb0d-4f82-8c9d-ef9067994617.png");
-                                //     var p2 = Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png");
-                                //     var guna;
-                                //     Promise.all([p1, p2]).then(function (images) {
-                                //         var circleImage = new Promise(function (resolve, reject) {
-                                //             var profile = images[0];
-                                //             var mask = images[1];
-                                //             var w = mask.bitmap.width; // the width of the image
-                                //             var h = mask.bitmap.height;
-                                //             console.log(w, h);
-                                //             profile.resize(w, h);
-                                //             console.log(h);
-
-                                //             profile.mask(mask, 0, 0)
-                                //                 .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/" + rewardRecognition[0].UserName + ".png");
-
-                                //             resolve(profile.mask(mask, 0, 0).write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/" + rewardRecognition[0].UserName + ".png"));
-                                //             //  resolve("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle.png");
-                                //         })
-                                //         circleImage.then(function (resp) {
-                                //             setTimeout(function () {
-                                //                 console.log("lenna-circle.png written", resp)
-                                //                 Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/" + rewardRecognition[0].UserName + ".png", function (err, penna) {
-                                //                     penna.resize(160, 160);
-
-                                //                     Jimp.read("https://storage.googleapis.com/ezeone/"+backGroundImage, function (err, lenna) {
-                                //                         console.log("hi how r u")
-                                //                         if (err) throw err;
-
-                                //                         var w = (lenna.bitmap.width); // the width of the image
-                                //                         var h = lenna.bitmap.height;
-                                //                         var name = title = type = title1 = title2 = '';
-                                //                         var name = "";
-                                //                         if (rewardRecognition.length > 0) {
-
-                                //                             var name = rewardRecognition[0].UserName;
-                                //                             var title = rewardRecognition[0].SubTitle;
-                                //                             var type = rewardRecognition[0].TitleoftheAward;
-                                //                             var title2 = rewardRecognition[0].Content;
-                                //                             var title1 = rewardRecognition[0].ContentTitle;
-
-                                //                             // console.log(name);
-
-                                //                             console.log(w);
-                                //                             console.log(name);
-                                //                             var nameLength = (((name.length / 2)));
-                                //                             var TypeLength = (((type.length / 2)));
-                                //                             var titleLength = (((title.length / 2)));
-                                //                         };
-
-
-                                //                         lenna.quality(100)
-                                //                         Jimp.loadFont(Jimp.FONT_SANS_64_BLACK).then(function (font) {
-                                //                             lenna.print(font, 50, 490, name)
-                                //                             Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                //                                 lenna.print(font, 50, 270, type)
-                                //                                 Jimp.loadFont(Jimp.FONT_SANS_32_WHITE).then(function (font) {
-                                //                                     lenna.print(font, 50, 330, title)
-                                //                                     Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                //                                         lenna.print(font, 50, 610, title1)
-                                //                                         Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                //                                             lenna.print(font, 50, 660, title2, 700)
-                                //                                             console.log("image processed");
-
-                                //                                             lenna.composite(penna, 562, 338)
-                                //                                                 .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + rewardRecognition[0].UserName + ".png");
-                                //                                             setTimeout(function () {
-                                //                                                 resolve(lenna.write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + rewardRecognition[0].UserName + ".png"));
-                                //                                             }, 2000);
-
-                                //                                         });
-
-                                //                                     });
-
-                                //                                 });
-
-                                //                             });
-
-                                //                         });
-
-                                //                     });
-
-                                //                 });
-                                //             }, 1000);
-
-                                //         });
-                                //     });
-
-                            }).then(function (resp) {
-
-                            });
-                        })
                     })
                 }
                 else {

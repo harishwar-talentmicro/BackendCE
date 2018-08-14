@@ -15,4 +15,6 @@ router.post('/template',settingsCtrl.saveAccessrightsTemplate);
 // router.get('/imapExt2',settingsCtrl.imapExt2);
 
 
+router.get('/temporary',settingsCtrl.temporary);
+
 module.exports = router;

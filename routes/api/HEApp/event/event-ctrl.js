@@ -1765,6 +1765,10 @@ eventCtrl.getStatusOfWMList = function (req, res, next) {
                         if (homePageData[0][0].trackTemplateDetails) {
                             for (var i = 0; i < homePageData[0].length; i++) {
                                 homePageData[0][i].trackTemplateDetails = (homePageData[0][i].trackTemplateDetails) ? JSON.parse(homePageData[0][i].trackTemplateDetails) : [];
+                            
+                                if(homePageData[0][i].isFormGroupHide !=0){
+                                    homePageData[0][i].homePageBanner='';
+                                }
                             }
                         }
 

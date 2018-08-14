@@ -37,4 +37,8 @@ router.get('/processUpdateTracker',messageCtrl.GetProcessUpdateSummaryList);
 
 router.get('/processUpdateDetail',messageCtrl.GetProcessUpdateDetail);
 
+router.post('/bulkEmployeeAnnouncementTitle',messageCtrl.getBulkEmployeeAnnouncementTitle);   //save api
+
+router.get('/getBulkEmployeeAnnouncementTitles',messageCtrl.getBulkEmployeeAnnouncementTitles);   //save api
+
 module.exports = router;

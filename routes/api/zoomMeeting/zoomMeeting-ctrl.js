@@ -19,9 +19,14 @@ const VideoGrant = AccessToken.VideoGrant;
 const VoiceGrant = AccessToken.VoiceGrant;
 
 // Used when generating any kind of tokens
-const twilioAccountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
-const twilioApiKey = 'SK325bcee2fd8a349792f9772907f0bfe8';
-const twilioApiSecret = 'oMrS8ymAimGGiIFIz80LhNrbQoSIWoUu';
+// const accountSid = appConfig.DB.accountSid;  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'ACdc7d20f3e7be56555e65fc0b20ef2c22';
+const authToken = appConfig.DB.authToken || '5451d20c01f47a0d10c4e5b34807ca6d';   //'3abf04f536ede7f6964919936a35e614';  //'5451d20c01f47a0d10c4e5b34807ca6d';//
+const FromNumber = appConfig.DB.FromNumber || '+18647547021';  
+
+// used to get access token video
+const twilioAccountSid = 'AC3765f2ec587b6b5b893566f1393a00f4';//'ACcf64b25bcacbac0b6f77b28770852ec9';
+const twilioApiKey = 'SK1e1fac39290cebabde43283468428f07';//'SK325bcee2fd8a349792f9772907f0bfe8';
+const twilioApiSecret = 'Hdp0VqbQTKGRNwBh2p6NPQhFuCRoSZMK';// old 'oMrS8ymAimGGiIFIz80LhNrbQoSIWoUu'; 
 
 
 // Used specifically for creating Voice tokens

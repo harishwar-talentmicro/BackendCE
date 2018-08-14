@@ -110,6 +110,7 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
                         req.body.travelRequestType = req.body.travelRequestType ? req.body.travelRequestType : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
         
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -137,7 +138,9 @@ travelRequestCtrl.saveTravelRequest = function(req,res,next){
                             req.st.db.escape(req.body.isAdvanceAmountRequired),
                             req.st.db.escape(JSON.stringify(travelRequests)),
                             req.st.db.escape(req.body.travelRequestType),
-                            req.st.db.escape(DBSecretKey)                                                                    
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)                                                                    
                         ];
                         var travelFormId=1006;
                         var keywordsParams=[

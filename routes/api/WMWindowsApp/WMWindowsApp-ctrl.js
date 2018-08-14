@@ -9,11 +9,15 @@ var http = require('https');
 var error = {};
 var Mailer = require('../../../mail/mailer.js');
 var mailerApi = new Mailer();
-const accountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
-const authToken = '3abf04f536ede7f6964919936a35e614';
+var appConfig = require('../../../ezeone-config.json');
+
+const accountSid = 'ACdc7d20f3e7be56555e65fc0b20ef2c22';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'ACdc7d20f3e7be56555e65fc0b20ef2c22';
+const authToken = '5451d20c01f47a0d10c4e5b34807ca6d';   //'3abf04f536ede7f6964919936a35e614';  //'5451d20c01f47a0d10c4e5b34807ca6d';//
+const FromNumber = appConfig.DB.FromNumber || '+18647547021';  
+
 const client = require('twilio')(accountSid, authToken);
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
-var appConfig = require('../../../ezeone-config.json');
+
 var DBSecretKey=appConfig.DB.secretKey;
 
 var qs = require("querystring");
@@ -546,7 +550,7 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                         {
                                             body: message,
                                             to: Qndata[0].isdmobile + Qndata[0].mobile,
-                                            from: '+14434322305'
+                                            from: FromNumber
                                         },
                                         function (error, response) {
                                             if(error)
@@ -705,7 +709,7 @@ windowsCtrl.uploadUsers = function(req,res,next){
                                         {
                                             body: message,
                                             to: Qndata[0].isdmobile + Qndata[0].mobile,
-                                            from: '+14434322305'
+                                            from: FromNumber
                                         },
                                         function (error, response) {
                                             if(error)

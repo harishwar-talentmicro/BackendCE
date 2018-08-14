@@ -88,6 +88,7 @@ transportCtrl.saveTransportRequest = function(req,res,next){
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
                         req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
                         req.body.status = req.body.status ? req.body.status : 1;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
         
                         if(req.body.expenseAmount == ""){
                             req.body.expenseAmount = 0;
@@ -113,7 +114,9 @@ transportCtrl.saveTransportRequest = function(req,res,next){
                             req.st.db.escape(req.body.expenseCurrencyId),
                             req.st.db.escape(req.body.expenseAmount),
                             req.st.db.escape(JSON.stringify(attachmentList)),
-                            req.st.db.escape(DBSecretKey)                                                                    
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)                                                                      
                         ];
 
                         var transportFormId=1036;

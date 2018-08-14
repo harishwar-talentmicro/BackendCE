@@ -17,5 +17,11 @@ router.get('/access_rights',userCtrl.getUserDataAccessRights);
 router.get('/',userCtrl.searchUser);
 router.get('/EZEOneId',userCtrl.validateEzeoneId);
 router.post('/postToProfile',userCtrl.postToProfile);
+router.post('/uploadUsersfromweb',userCtrl.uploadUsersfromweb);
+
+router.get('/bulkImportTitle',userCtrl.bulkImporterTitleSave);  //save bulk import title,but is get api
+
+router.get('/getBulkImportTitles',userCtrl.getBulkImporterTitles);
+
 
 module.exports = router;

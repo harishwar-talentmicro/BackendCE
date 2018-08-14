@@ -105,6 +105,7 @@ visitorCtrl.saveGatePassRequest = function (req, res, next) {
                         req.body.visitorBadgeNumber = req.body.visitorBadgeNumber ? req.body.visitorBadgeNumber : '';
                         req.body.signInHere = req.body.signInHere ? req.body.signInHere : '';
                         req.query.heMasterId = req.query.heMasterId ? req.query.heMasterId : 0; 
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
 
 
                         var procParams = [
@@ -137,7 +138,9 @@ visitorCtrl.saveGatePassRequest = function (req, res, next) {
                             req.st.db.escape(req.body.visitorBadgeNumber),
                             req.st.db.escape(JSON.stringify(toMeetWhom)),
                             req.st.db.escape(req.body.signInHere),
-                            req.st.db.escape(req.query.heMasterId)   // not used yet keep
+                            req.st.db.escape(req.query.heMasterId),   // not used yet keep
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp) 
                         ];
                         var visitorFormId = 1028;
                         var keywordsParams = [
@@ -406,6 +409,7 @@ visitorCtrl.saveGateAssetPassRequest = function (req, res, next) {
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
                         req.body.isdPhone = req.body.isdPhone ? req.body.isdPhone : "";
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
 
 
                         var procParams = [
@@ -432,7 +436,9 @@ visitorCtrl.saveGateAssetPassRequest = function (req, res, next) {
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(req.body.isdPhone),
-                            req.st.db.escape(DBSecretKey)
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)
                         ];
                         var assetFormId = 1029;
                         var keywordsParams = [
@@ -729,6 +735,7 @@ visitorCtrl.saveGuestHospitalityRequest = function (req, res, next) {
                         req.body.status = req.body.status ? req.body.status : 1;
                         req.body.expenseAmount = req.body.expenseAmount ? req.body.expenseAmount : 0;
                         req.body.expenseCurrencyId = req.body.expenseCurrencyId ? req.body.expenseCurrencyId : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -750,7 +757,9 @@ visitorCtrl.saveGuestHospitalityRequest = function (req, res, next) {
                             req.st.db.escape(req.body.approverNotes),
                             req.st.db.escape(req.body.expenseCurrencyId),
                             req.st.db.escape(req.body.expenseAmount),
-                            req.st.db.escape(DBSecretKey)
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)
                         ];
                         var guestFormId = 1032;
                         var keywordsParams = [
@@ -961,6 +970,7 @@ visitorCtrl.saveInternetRequest = function (req, res, next) {
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
                         req.body.isdPhone = req.body.isdPhone ? req.body.isdPhone : "";
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
 
 
                         var procParams = [
@@ -987,7 +997,9 @@ visitorCtrl.saveInternetRequest = function (req, res, next) {
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(req.body.isdPhone),
-                            req.st.db.escape(DBSecretKey)
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)
                         ];
                         var visitorInternetFormId = 1030;
                         var keywordsParams = [

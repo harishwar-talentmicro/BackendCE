@@ -259,6 +259,9 @@ router.get('/', function(req,res,next){
 
                                             contactResults[0][i].trackTemplateDetails = (contactResults[0][i].trackTemplateDetails) ? JSON.parse(contactResults[0][i].trackTemplateDetails) : [] ;
 
+                                            if(contactResults[0][i].isFormGroupHide !=0){
+                                                contactResults[0][i].homePageBanner ='';
+                                            }
                                             // contactResults[0][i].attendence = isAttendence;
 
                                             for (var j = 0; j < countResults[0].length; j++) {

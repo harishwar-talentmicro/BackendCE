@@ -5,6 +5,10 @@ var WGRMTemplateCtrl = {};
 var error = {};
 var appConfig = require('../../../../ezeone-config.json');
 var DBSecretKey=appConfig.DB.secretKey;
+var Notification_aws = require('../../../modules/notification/aws-sns-push.js');
+
+var _Notification_aws = new Notification_aws();
+
 
 WGRMTemplateCtrl.saveWGTemplate = function(req,res,next){
     var response = {
@@ -39,6 +43,8 @@ WGRMTemplateCtrl.saveWGTemplate = function(req,res,next){
             if((!err) && tokenResult){
                 req.body.workGroupId = (req.body.workGroupId) ? req.body.workGroupId : 0;
                 req.body.title = (req.body.title) ? req.body.title : "";
+                // req.body.approvalLevels = (req.body.approvalLevels) ? req.body.approvalLevels : 0;
+                // req.body.approvalEscalation = (req.body.approvalEscalation) ? req.body.approvalEscalation : 0;
 
 
                 var procParams = [
@@ -48,19 +54,41 @@ WGRMTemplateCtrl.saveWGTemplate = function(req,res,next){
                     req.st.db.escape(JSON.stringify(req.body.userType)),
                     req.st.db.escape(JSON.stringify(req.body.workGroup)),
                     req.st.db.escape(req.query.APIKey)
-
-
                 ];
 
                 var procQuery = 'CALL he_save_workGroup( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,workgroupresult){
-                    console.log(err);
+                    console.log('error',err);
 
                     if(!err && workgroupresult && workgroupresult[0]){
                         response.status = true;
                         response.message = "Workgroup Template saved successfully";
                         response.error = null;
+
+                        var messagePayload = {
+                            message: "Changes in form group",
+                            type: 201,
+                            alarmType: 4,
+                            data :{
+                                groupId : workgroupresult[3][0].companyGroupId
+
+                            }
+                        };
+
+                        console.log('messagePayload',messagePayload);
+                        console.log('workgroupresult[1] ApnsId',workgroupresult[1]);
+                        console.log('workgroupresult[2] GcmId',workgroupresult[2]);
+
+
+                            if (workgroupresult && workgroupresult[1] && workgroupresult[1][0] && workgroupresult[1][0].APNS_Id) {
+                                _Notification_aws.publish_IOS(workgroupresult[1][0].APNS_Id, messagePayload, 0);
+                            }
+
+                            if (workgroupresult && workgroupresult[2] && workgroupresult[2][0] && workgroupresult[2][0].GCM_Id) {
+                                _Notification_aws.publish_Android(workgroupresult[2][0].GCM_Id, messagePayload);
+                            }
+
                         response.data = {
                             workGroupId : workgroupresult[0][0].workGroupId
                         };
@@ -367,6 +395,8 @@ WGRMTemplateCtrl.getWGTemplatedetailes = function(req,res,next){
                         for(var i=0; i<workgroupresult[2].length; i++){
                             var res2={};
                                 res2.heFormId=workgroupresult[2][i].heFormId,
+                                res2.approvalLevels=workgroupresult[2][i].approvalLevels,
+                                res2.approvalEscalation=workgroupresult[2][i].approvalEscalation,
                                 res2.formTitle=workgroupresult[2][i].title,
                                 res2.receivers=workgroupresult[2][i].receivers ? JSON.parse(workgroupresult[2][i].receivers):[];
                             output.push(res2);

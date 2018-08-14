@@ -99,6 +99,7 @@ leaveLetterCtrl.saveLeaveLetter = function(req,res,next){
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
                         req.body.senderInstructions = req.body.senderInstructions ? req.body.senderInstructions : '';
                         req.body.backdatePeriod = req.body.backdatePeriod ? req.body.backdatePeriod : null;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
         
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -123,7 +124,9 @@ leaveLetterCtrl.saveLeaveLetter = function(req,res,next){
                             req.st.db.escape(req.body.senderInstructions),
                             req.st.db.escape(req.body.backdatePeriod),
                             req.st.db.escape(JSON.stringify(attachmentList)),
-                            req.st.db.escape(DBSecretKey)                
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)                   
                         ];
 
                         var leaveFormId=1004;

@@ -717,7 +717,7 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
                         filetype = "jpg"
                     }
                     else if(mimeType.indexOf('doc') > 0 ){
-                        filetype = "doc"
+                        filetype = "docx"
                     }
                     else if(mimeType.indexOf('docx') > 0 ){
                         filetype = "docx"
@@ -727,6 +727,9 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
                     }
                     else if(mimeType.indexOf('pdf') > 0 ){
                         filetype = "pdf"
+                    }
+                    else if(mimeType.indexOf('application/msword') > -1 ){
+                        filetype = "docx"
                     }
                 }
                 aUrl = uniqueId + '.' + filetype;

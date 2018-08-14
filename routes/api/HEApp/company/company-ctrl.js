@@ -449,16 +449,32 @@ companyCtrl.getuserProfileDetails = function(req, res, next){
                     response.status = true;
                     response.message = "userData loaded successfully";
                     response.error = null;
-                    var leaveTypes = JSON.parse(Result[1][0].leaveJSON);
+
+                    if(Result[1] && Result[1][0] && Result[1][0].leaveJSON && JSON.parse(Result[1][0].leaveJSON).leaveTypes!=null && JSON.parse(Result[1][0].leaveJSON).leaveTypes!='null' && JSON.parse(Result[1][0].leaveJSON).leaveTypes!=''){
+                      
+                        var leaveTypesData = JSON.parse(JSON.parse(Result[1][0].leaveJSON).leaveTypes);
+                        var totalLeavesData = JSON.parse(Result[1][0].leaveJSON).totalLeaves;
+                       
+                    }
+
+                    else{
+                       
+                        var leaveTypesData =[];
+                        var totalLeavesData=0.0;
+                    }
+
                     for(var i=0; i<Result[0].length; i++){
-                        if(typeof(Result[0][i].leaveDetails)=='string'){
+                        if(Result[0][i].leaveDetails!=null && Result[0][i].leaveDetails!='null' && typeof(Result[0][i].leaveDetails)=='string'){
                             Result[0][i].leaveDetails = JSON.parse(Result[0][i].leaveDetails);
+                        }
+                        else{
+                            Result[0][i].leaveDetails =[];
                         }
                     }
                     response.data = {
                         profileDetails : Result[0] ? Result[0] :[],
-                        leaveTypes : JSON.parse(leaveTypes["leaveTypes"]),
-                        totalLeaves : leaveTypes["totalLeaves"]
+                        leaveTypes : leaveTypesData,
+                        totalLeaves : totalLeavesData
                     };
                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                     zlib.gzip(buf, function (_, result) {

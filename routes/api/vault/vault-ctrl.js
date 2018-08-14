@@ -4,9 +4,16 @@
 
 var moment = require('moment');
 var vaultCtrl = {};
+var error = {};
 var zlib = require('zlib');
 var AES_256_encryption = require('../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
+
+var notifyMessages = require('../../../routes/api/messagebox/notifyMessages.js');
+var notifyMessages = new notifyMessages();
+
+var appConfig = require('../../../ezeone-config.json');
+var DBSecretKey = appConfig.DB.secretKey;
 
 vaultCtrl.getVaultList = function (req, res, next) {
 
@@ -589,6 +596,193 @@ vaultCtrl.getVaultItem = function (req, res, next) {
             console.log('Error: ' + ex);
         }
     }
+};
+
+
+vaultCtrl.saveBulkVaultTitleList = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId){
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if(req.body.isPublish ==0){
+
+        if (!req.body.tagId){
+            error.tagId = 'Invalid tagId';
+            validationFlag *= false;
+        }
+    
+        if (!req.body.tag){
+            error.tag = 'Invalid tag';
+            validationFlag *= false;
+        }
+    
+    }
+
+    var vaultFormData = req.body.vaultFormData;
+    if(typeof(vaultFormData)=='string'){
+        vaultFormData = JSON.parse(vaultFormData);
+    }
+
+    if(!vaultFormData){
+        vaultFormData=[];
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+             
+                req.body.bulkVaultTitleId = (req.body.bulkVaultTitleId) ? req.body.bulkVaultTitleId : 0;
+                req.body.bulkVaultTitle = (req.body.bulkVaultTitle) ? req.body.bulkVaultTitle : '';
+                req.body.isPublish = req.body.isPublish ? req.body.isPublish : 0;
+                var isPublish = req.body.isPublish ;
+                
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.bulkVaultTitleId),
+                    req.st.db.escape(req.body.bulkVaultTitle),
+                    req.st.db.escape(req.body.isPublish),
+                    req.st.db.escape(JSON.stringify(vaultFormData)),
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.body.tagId),
+                    req.st.db.escape(req.body.tag)
+                ];
+                /**
+                 * Calling procedure to save form sales items
+                 */
+                var procQuery = 'CALL wm_save_bulkVaultImporter( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,result){
+                    if(!err && result[0] && result[0][0]){
+                        response.status = true;
+                        response.message = "Vault data saved successfully";
+                        response.error = null;
+                        response.data = result[0][0];
+
+                        res.status(200).json(response);
+                        if (isPublish){
+                            notifyMessages.getMessagesNeedToNotify();
+                        }
+                    }
+                    
+                    else{
+                        response.status = false;
+                        response.message = "Error while saving vault data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+vaultCtrl.getvaultBulkList = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId){
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+             
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+          
+                ];
+                /**
+                 * Calling procedure to save form sales items
+                 */
+                var procQuery = 'CALL wm_get_bulkVaultList( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,result){
+                    if(!err || result[0] || result[1]){
+                        response.status = true;
+                        response.message = "Vault data list saved successfully";
+                        response.error = null;
+                        
+                        for (var i=0;i<result[0].length;i++){
+                            result[0][i].vaultFormData = (result[0] && result[0][i]) ? JSON.parse(result[0][i].vaultFormData) :[];
+                        }
+
+                        response.data = result[0] ? result[0] : [];
+                        response.tagTypeList = result[1] ? result[1] :[];
+
+                        res.status(200).json(response);
+                    }
+                    
+                    else if(!err){
+                        response.status = false;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = [];
+                        response.tagTypeList=[];
+
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while loading vault listss";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
 };
 
 module.exports = vaultCtrl;

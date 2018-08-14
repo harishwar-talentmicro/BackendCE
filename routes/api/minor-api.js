@@ -109,6 +109,8 @@ var hospitalTokenManagement = require('./HEApp/hospitalTokenManagement.js');
 
 var generalOtp = require('./HEApp/otp/otp-routes.js');
 
+var onboardingctrl = require('./HEApp/onBoarding/onboarding-routes.js');
+
 var likeShareComment = require('./HEApp/likesharecomment.js');
 
 //var testInfoV1 =  require('./info/test_info.js');
@@ -212,6 +214,8 @@ router.use('/helloEZE/app', hospitalTokenManagement);
 router.use('/helloEZE', eSurvey);
 
 router.use('/helloEZE/app', likeShareComment);
+
+router.use('/helloEZE/app', onboardingctrl);
 
 
 //router.use('/test_info',testInfoV1);
@@ -392,7 +396,7 @@ cron.schedule('*/15 * * * *', function () {
 // });
 // cronJobMessage.start();
 
-cron.schedule('*/10 * * * *', function () {
+cron.schedule('*/15 * * * *', function () {
     console.log('running a notify messages');
     notifyMessages.getMessagesNeedToNotify();
 });
@@ -416,7 +420,7 @@ if (cluster.isWorker) {
                 var query = "call wm_integrationUrlForHircraft()";
                 db.query(query, function (err, result) {
                     if (err) {
-                        console.log('error: integrationUrlForHircraft');
+                        console.log('Interview database error: integrationUrlForHircraft',err);
                     }
                     else if ((result[0].length != 0) && (result[1].length != 0)) {
                         var heMasterId;
@@ -429,14 +433,20 @@ if (cluster.isWorker) {
                             DBUrl = result[0][0].url;
                             transId = result[1][0].transId;
                             var response_server = (result[1][0].integrationFormdata);
-                            // console.log(response_server);
+                            // console.log('response_server',response_server);
                             if (typeof (response_server) == "string") {
                                 response_server = JSON.parse(response_server);
                             }
 
+                            if (typeof (response_server.skillAssessment) == 'string') {
+                                response_server.skillAssessment = JSON.parse(response_server.skillAssessment);
+                            }
+
                             if (typeof (response_server.assessment) == 'string') {
                                 response_server.assessment = JSON.parse(response_server.assessment);
+                                response_server.skillAssessment = JSON.parse(response_server.skillAssessment);
                             }
+
 
                             if (typeof (response_server.assessment.integrationAssessmentDetails) == 'string') {
                                 response_server.assessment.integrationAssessmentDetails = JSON.parse(response_server.assessment.integrationAssessmentDetails);
@@ -453,7 +463,7 @@ if (cluster.isWorker) {
                                     }
                                 }
                             }
-                            console.log("response_server", response_server);
+                            console.log("response_server", JSON.stringify(response_server));
                             var count = 0;
                             request({
                                 url: DBUrl,
@@ -461,9 +471,9 @@ if (cluster.isWorker) {
                                 json: true,   // <--Very important!!!
                                 body: response_server
                             }, function (error, response, body) {
-                                console.log(error);
-                                console.log(body);
-                                console.log("response_server", response_server);
+                                console.log('Tallint error',error);
+                                console.log('Tallint body after success',body);
+                                // console.log("response_server", response_server);
                                 if (body && body.Code && body.Code == "SUCCESS0001") {
                                     var updateQuery = "update 1014_trans set sync=1 where heParentId=" + transId;
                                     db.query(updateQuery, function (err, results) {
@@ -501,13 +511,13 @@ if (cluster.isWorker) {
 
         console.log("bye take care")
         var cronJobWalkIn = new CronJob({
-            cronTime: '*/15 * * * * *',
+            cronTime: '*/30 * * * *',
             onTick: function () {
                 var query = "call wm_integrationUrlwalkIn()";
                 db.query(query, function (err, result) {
-                    console.log('Running walkin cron job for Hexaware');
+                    console.log('Running walkin cron job for Hexaware Walk-In');
                     if (err) {
-                        console.log('error: integrationUrlForHircraft');
+                        console.log('error: integrationUrl For walkIn Hircraft',err);
                     }
                     else if ((result[0].length != 0) && (result[1].length != 0)) {
                         var heMasterId;
@@ -518,7 +528,12 @@ if (cluster.isWorker) {
                             heMasterId = result[0][0].heMasterId;
                             DBUrl = result[0][0].url;
                             transId = result[1][0].transId;
-                            formData = result[1][0].formData;
+                            if(typeof(result[1][0].formData)=='string'){
+                                formData = result[1][0].formData ? JSON.parse(result[1][0].formData):{};
+                            }
+                            else{
+                                formData = result[1][0].formData ;
+                            }
 
                             // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
                             var count = 0;
@@ -526,7 +541,7 @@ if (cluster.isWorker) {
                                 url: DBUrl,
                                 method: "POST",
                                 json: true,   // <--Very important!!!
-                                body: JSON.parse(formData)
+                                body: formData
                             }, function (error, response, body) {
                                 console.log(error);
                                 console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
@@ -567,7 +582,7 @@ if (cluster.isWorker) {
 
 
         var cronJobWalkInQuessCorp = new CronJob({
-            cronTime: '*/15 * * * * *',
+            cronTime: '*/30 * * * *',
             onTick: function () {
                 var query = "call wm_integrationUrlwalkInForQuessCorp()";
                 db.query(query, function (err, result) {
@@ -580,11 +595,17 @@ if (cluster.isWorker) {
                         var transId;
                         var formData = {};
                         var DBUrl;
-                        if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
+                        if (result && result[0] && result[0][0] && result[1] && result[1][0] ) {
                             heMasterId = result[0][0].heMasterId;
                             DBUrl = result[0][0].url;
                             transId = result[1][0].transId;
-                            formData = result[1][0].formData;
+                            if(typeof(result[1][0].formData)=='string'){
+                                formData = result[1][0].formData ? JSON.parse(result[1][0].formData):{};
+                            }
+                            else{
+                                formData = result[1][0].formData ;
+                            }
+
 
                             // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
                             var count = 0;
@@ -592,7 +613,7 @@ if (cluster.isWorker) {
                                 url: DBUrl,
                                 method: "POST",
                                 json: true,   // <--Very important!!!
-                                body: JSON.parse(formData)
+                                body: formData
                             }, function (error, response, body) {
                                 console.log(error);
                                 console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
@@ -623,12 +644,12 @@ if (cluster.isWorker) {
 
 
 
-
+// birthday notifier
 if (cluster.isWorker) {
 
     if (cluster.worker.id == 1) {
         var cronJobgreeting = new CronJob({
-            cronTime: '00 08 * * * *',
+            cronTime: '00 08 * * *',     // to run in seconds 30 * * * * *
             onTick: function () {
 
                 // console.log('running a notify messages');
@@ -669,12 +690,12 @@ if (cluster.isWorker) {
 }
 
 
-//  query re notifier
+// query reNotifier
 if (cluster.isWorker) {
 
     if (cluster.worker.id == 1) {
         var reminder = new CronJob({
-            cronTime: '00 08 * * * *',
+            cronTime: '00 14 * * *',
             onTick: function () {
 
                 console.log('running a help desk re notifier');
@@ -696,59 +717,59 @@ if (cluster.isWorker) {
     }
 }
 
-//  cron for attendance login
-if (cluster.isWorker) {
+// //  cron for attendance login
+// if (cluster.isWorker) {
 
-    if (cluster.worker.id == 1) {
-        var login = new CronJob({
-            cronTime: '1 * * * * *',
-            onTick: function () {
+//     if (cluster.worker.id == 1) {
+//         var login = new CronJob({
+//             cronTime: '1 * * * * *',
+//             onTick: function () {
 
-                console.log('running a attendance Login notifier');
-                var query = 'call wm_get_attendanceLoginusers("' + DBSecretKey + '")';
-                db.query(query, function (err, result) {
-                    if (err) {
-                        console.log('error:wm_get_attendanceLoginusers', err);
-                    }
-                    else if(result && result[0] && result[0][0]){
-                        notifyMessages.getMessagesNeedToNotify();
-                    }
-                });
-            },
-            start: false,
-            timeZone: 'America/Los_Angeles'
+//                 console.log('running a attendance Login notifier');
+//                 var query = 'call wm_get_attendanceLoginusers("' + DBSecretKey + '")';
+//                 db.query(query, function (err, result) {
+//                     if (err) {
+//                         console.log('error:wm_get_attendanceLoginusers', err);
+//                     }
+//                     else if(result && result[0] && result[0][0]){
+//                         notifyMessages.getMessagesNeedToNotify();
+//                     }
+//                 });
+//             },
+//             start: false,
+//             timeZone: 'America/Los_Angeles'
 
-        });
-        login.start();
-    }
-}
+//         });
+//         login.start();
+//     }
+// }
 
 
-//  cron for attendance login
-if (cluster.isWorker) {
+// //  cron for attendance login
+// if (cluster.isWorker) {
 
-    if (cluster.worker.id == 1) {
-        var logout = new CronJob({
-            cronTime: '0 * * * * *',
-            onTick: function () {
+//     if (cluster.worker.id == 1) {
+//         var logout = new CronJob({
+//             cronTime: '0 * * * * *',
+//             onTick: function () {
 
-                console.log('running a attendance Logout notifier');
-                var query = 'call wm_get_attendanceLogoutusers("' + DBSecretKey + '")';
-                db.query(query, function (err, result) {
-                    if (err) {
-                        console.log('error:wm_get_attendanceLogoutusers', err);
-                    }
-                    else if(result && result[0] && result[0][0]) {
-                        notifyMessages.getMessagesNeedToNotify();
-                    }
-                });
-            },
-            start: false,
-            timeZone: 'America/Los_Angeles'
+//                 console.log('running a attendance Logout notifier');
+//                 var query = 'call wm_get_attendanceLogoutusers("' + DBSecretKey + '")';
+//                 db.query(query, function (err, result) {
+//                     if (err) {
+//                         console.log('error:wm_get_attendanceLogoutusers', err);
+//                     }
+//                     else if(result && result[0] && result[0][0]) {
+//                         notifyMessages.getMessagesNeedToNotify();
+//                     }
+//                 });
+//             },
+//             start: false,
+//             timeZone: 'America/Los_Angeles'
 
-        });
-        logout.start();
-    }
-}
+//         });
+//         logout.start();
+//     }
+// }
 
 module.exports = router;

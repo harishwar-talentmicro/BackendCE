@@ -10,8 +10,12 @@ var fs = require('fs');
 var http = require('https');
 var path = require('path');
 var EZEIDEmail = 'noreply@talentmicro.com';
-const accountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
-const authToken = '3abf04f536ede7f6964919936a35e614';
+var appConfig = require('../../../ezeone-config.json');
+
+const accountSid = 'ACdc7d20f3e7be56555e65fc0b20ef2c22';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'ACdc7d20f3e7be56555e65fc0b20ef2c22';
+const authToken = '5451d20c01f47a0d10c4e5b34807ca6d';   //'3abf04f536ede7f6964919936a35e614';  //'5451d20c01f47a0d10c4e5b34807ca6d';//
+const FromNumber = appConfig.DB.FromNumber || '+18647547021';  
+
 const client = require('twilio')(accountSid, authToken);
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
 var Readable = require('stream').Readable;
@@ -25,7 +29,6 @@ var Notification_aws = require('../../modules/notification/aws-sns-push');
 
 var _Notification_aws = new Notification_aws();
 
-var appConfig = require('../../../ezeone-config.json');
 var DBSecretKey = appConfig.DB.secretKey;
 
 var qs = require("querystring");
@@ -784,7 +787,9 @@ UserCtrl.login = function (req, res, next) {
                     req.st.generateToken(ip, userAgent, ezeoneId, isWhatMate, APNS_Id, GCM_Id, function (err, tokenResult) {
 
                         if ((!err) && tokenResult) {
-                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ',' + req.st.db.escape(DBSecretKey) + ')';
+                            var APNSID= req.query.APNSID ? req.query.APNSID :'';
+                            var GCMID=req.query.GCMID ? req.query.GCMID :''; 
+                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ',' + req.st.db.escape(DBSecretKey) +',' + st.db.escape(APNSID) +',' + st.db.escape(GCMID) + ')';
                             console.log(procQuery);
                             req.db.query(procQuery, function (err, UserDetailsResult) {
                                 console.log(UserDetailsResult);
@@ -1251,7 +1256,7 @@ UserCtrl.sendPasswordResetOTP = function (req, res, next) {
                                 {
                                     body: message,
                                     to: otpResult[0][0].isd + otpResult[0][0].mobile,
-                                    from: '+14434322305'
+                                    from: FromNumber
                                 },
                                 function (error, response) {
                                     if (error) {
@@ -1592,7 +1597,7 @@ UserCtrl.sendPasswordResetOtpPhone = function (req, res, next) {
                                 .create({
                                     url: fileName,
                                     to: isdMobile + mobileNo,
-                                    from: '+14434322305',
+                                    from: FromNumber,
                                     method: 'GET'
                                 },
                                     function (error, response) {
@@ -1791,7 +1796,7 @@ UserCtrl.invitePublicProfile = function (req, res, next) {
                                             {
                                                 body: message,
                                                 to: userResult[0][0].isd + userResult[0][0].mobile,
-                                                from: '+14434322305'
+                                                from: FromNumber
                                             },
                                             function (error, response) {
                                                 if (error) {

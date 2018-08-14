@@ -41,24 +41,44 @@ wmAdminManagerCtrl.saveWhatMate = function(req, res, next){
             req.body.type = req.body.type ? req.body.type : 1;
             req.body.eventId = req.body.eventId ? req.body.eventId : 0;
             req.body.tileStyle = req.body.tileStyle ? req.body.tileStyle : 0;
+            req.body.hideSearchPage = req.body.hideSearchPage ? req.body.hideSearchPage : 0;
+            req.body.hideChatPage = req.body.hideChatPage ? req.body.hideChatPage : 0;
+            req.body.hideProfilePage = req.body.hideProfilePage ? req.body.hideProfilePage : 0;
+            req.body.isTopScroll = req.body.isTopScroll ? req.body.isTopScroll : 0;
+            req.body.isChatBotHide = req.body.isChatBotHide ? req.body.isChatBotHide : 0;
+            req.body.isFormGroupHide = req.body.isFormGroupHide ? req.body.isFormGroupHide : 0;
 
+            
             var procParams = [
                 req.st.db.escape(req.body.WMId),
                 req.st.db.escape(req.body.masterId),
-                req.st.db.escape(req.body.title),
-                req.st.db.escape(req.body.type),
-                req.st.db.escape(req.body.sequence),
-                req.st.db.escape(req.body.latitude),
-                req.st.db.escape(req.body.longitude),
-                req.st.db.escape(req.body.proximity),
-                req.st.db.escape(req.body.homePageBanner),
-                req.st.db.escape(req.body.status),
-                req.st.db.escape(req.body.landingPage),
-                req.st.db.escape(req.body.about),
-                req.st.db.escape(req.body.keywords),
-                req.st.db.escape(req.body.topBannerId),
-                req.st.db.escape(req.body.address),
-                req.st.db.escape(req.body.tileStyle)
+                req.st.db.escape(req.body.title || ''),
+                req.st.db.escape(req.body.type || 0),
+                req.st.db.escape(req.body.sequence || 0),
+                req.st.db.escape(req.body.latitude || 0.0),
+                req.st.db.escape(req.body.longitude || 0.0),
+                req.st.db.escape(req.body.proximity || 0),
+                req.st.db.escape(req.body.homePageBanner || ''),
+                req.st.db.escape(req.body.status || 0),
+                req.st.db.escape(req.body.landingPage || 0),
+                req.st.db.escape(req.body.about || ''),
+                req.st.db.escape(req.body.keywords || ''),
+                req.st.db.escape(req.body.topBannerId || 0),
+                req.st.db.escape(req.body.address || ''),
+                req.st.db.escape(req.body.tileStyle || 0),
+                req.st.db.escape(req.body.isHideSearchPage || 0),
+                req.st.db.escape(req.body.hideChatPage || 0),
+                req.st.db.escape(req.body.hideProfilePage || 0),
+                req.st.db.escape(req.body.isTopScroll || 0),
+                req.st.db.escape(req.body.isChatBotHide || 0),
+                req.st.db.escape(req.body.isFormGroupHide || 0),
+                req.st.db.escape(req.body.brandingPage || ''),
+                req.st.db.escape(req.body.isHideTransactionPage || 0),
+                req.st.db.escape(req.body.enableHomePageScroll || 0),
+                req.st.db.escape(req.body.showFormsOnHomePage || 0),
+                req.st.db.escape(req.body.homePageTutorialBanner || ''),
+                req.st.db.escape(req.body.isHideDashboard || 0)
+              
             ];
 
             var procQuery = 'CALL wm_save_whatmateList( ' + procParams.join(',') + ')';
@@ -207,7 +227,22 @@ wmAdminManagerCtrl.getWhatMateDetails = function(req, res, next){
                         keywords : whatMateResult[0][0].keywords,
                         topBannerId : whatMateResult[0][0].topBannerId,
                         address : whatMateResult[0][0].address,
-                        tileStyle : whatMateResult[0][0].tileStyle
+                        tileStyle : whatMateResult[0][0].tileStyle,
+
+                        hideChatPage : whatMateResult[0][0].hideChatPage,
+                        hideProfilePage : whatMateResult[0][0].hideProfilePage,
+                        brandingPage : whatMateResult[0][0].brandingPage,
+                        isTopScroll : whatMateResult[0][0].isTopScroll, 
+                        isChatBotHide : whatMateResult[0][0].isChatBotHide,
+                        isFormGroupHide : whatMateResult[0][0].isFormGroupHide,
+                        isHideTransactionPage : whatMateResult[0][0].isHideTransactionPage,
+                        enableHomePageScroll : whatMateResult[0][0].enableHomePageScroll,
+                        showFormsOnHomePage : whatMateResult[0][0].showFormsOnHomePage,
+                        homePageTutorialBanner : whatMateResult[0][0].homePageTutorialBanner,
+                        isHideDashboard : whatMateResult[0][0].isHideDashboard,
+                        isHideSearchPage : whatMateResult[0][0].isHideSearchPage,
+                        isHideDashboard : whatMateResult[0][0].isHideDashboard
+
                     };
                     res.status(200).json(response);
                 }

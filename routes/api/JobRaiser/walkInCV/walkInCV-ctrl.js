@@ -30,13 +30,15 @@ var http = require('https');
 // var Readable = require('stream').Readable;
 var bcrypt = null;
 var EZEIDEmail = 'noreply@talentmicro.com';
-const accountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
-const authToken = '3abf04f536ede7f6964919936a35e614';
-const client = require('twilio')(accountSid, authToken);
 // const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
 var CONFIG = require('../../../../ezeone-config.json');
 var DBSecretKey = CONFIG.DB.secretKey;
+const accountSid = 'ACdc7d20f3e7be56555e65fc0b20ef2c22';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'ACdc7d20f3e7be56555e65fc0b20ef2c22';
+const authToken = '5451d20c01f47a0d10c4e5b34807ca6d';   //'3abf04f536ede7f6964919936a35e614';  //'5451d20c01f47a0d10c4e5b34807ca6d';//
+const FromNumber = CONFIG.DB.FromNumber ||'+18647547021' ;  
+
+const client = require('twilio')(accountSid, authToken);
 
 var uuid = require('node-uuid');
 const fs = require('fs');
@@ -870,7 +872,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                         {
                                             body: message,
                                             to: isdMobile + mobileNo,
-                                            from: '+14434322305'
+                                            from: FromNumber
                                         },
                                         function (error6, response6) {
                                             if (error6) {
@@ -1033,7 +1035,7 @@ walkInCvCtrl.sendOtp = function (req, res, next) {
                             {
                                 body: message,
                                 to: isdMobile + mobileNo,
-                                from: '+14434322305'
+                                from: FromNumber//'+14434322305' //+18647547021
                             },
                             function (error, response) {
                                 if (error) {
@@ -1873,9 +1875,10 @@ walkInCvCtrl.saveWalkInJobs = function (req, res, next) {
                 req.body.IDRequired = req.body.IDRequired ? req.body.IDRequired : 0;
                 req.body.IDType = req.body.IDType ? req.body.IDType : "";
                 req.body.DOBType = req.body.DOBType ? req.body.DOBType : "";
+                req.body.profilePic = req.body.profilePic ? req.body.profilePic : 1;
 
                 var walkinJobCode = req.body.jobCode.replace(/<(.*)>/g, '');
-
+                
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.walkInJobId),
@@ -1890,7 +1893,9 @@ walkInCvCtrl.saveWalkInJobs = function (req, res, next) {
                     req.st.db.escape(req.body.IDRequired),
                     req.st.db.escape(req.body.IDType),
                     req.st.db.escape(req.body.DOBType),
-                    req.st.db.escape(walkinJobCode)
+                    req.st.db.escape(walkinJobCode),
+                    req.st.db.escape(req.body.profilePic)
+                
                 ];
 
                 var procQuery = 'CALL wm_save_walkinJobs( ' + inputs.join(',') + ')';
@@ -2160,6 +2165,7 @@ walkInCvCtrl.saveVisitorCheckIn = function (req, res, next) {
                     req.body.emailId = req.body.emailId ? req.body.emailId : '';
                     req.body.visitorBadgeNumber = req.body.visitorBadgeNumber ? req.body.visitorBadgeNumber : '';
                     req.body.signInHere = req.body.signInHere ? req.body.signInHere : '';
+                    req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
 
                     var procParams = [
                         req.st.db.escape(req.query.token),
@@ -2191,7 +2197,9 @@ walkInCvCtrl.saveVisitorCheckIn = function (req, res, next) {
                         req.st.db.escape(req.body.visitorBadgeNumber),
                         req.st.db.escape(JSON.stringify(toMeetWhom)),
                         req.st.db.escape(req.body.signInHere),
-                        req.st.db.escape(req.query.heMasterId)
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.body.timestamp),
+                        req.st.db.escape(req.body.createdTimeStamp)
                     ];
 
                     /**
@@ -2949,8 +2957,9 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 req.body.walkInWelcomeMessage = req.body.walkInWelcomeMessage ? req.body.walkInWelcomeMessage : '';
                 req.body.acceptTnCFlag = req.body.acceptTnCFlag ? req.body.acceptTnCFlag : 0;
                 req.body.acceptTnCMsgFormat = req.body.acceptTnCMsgFormat ? req.body.acceptTnCMsgFormat : '';
+                req.body.profilePic = req.body.profilePic ? req.body.profilePic : 1;
 
-
+                
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -2981,7 +2990,9 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(req.body.walkinFormMessage),
                     req.st.db.escape(req.body.walkInWelcomeMessage),
                     req.st.db.escape(req.body.acceptTnCFlag),
-                    req.st.db.escape(req.body.acceptTnCMsgFormat)
+                    req.st.db.escape(req.body.acceptTnCMsgFormat),
+                    req.st.db.escape(req.body.profilePic)
+             
                 ];
 
                 var procQuery = 'CALL wm_save_walkWebConfig( ' + inputs.join(',') + ')';
@@ -3109,9 +3120,15 @@ walkInCvCtrl.walkInUploadLinkFlag = function (req, res, next) {
             console.log(err);
 
             if (!err && result && result[0] && result[0][0]) {
-                result[0][0].validateLinkFlag = (result[0][0].validateLinkFlag === result[0][0].validateLinkFlag);  //indicator strict
 
-                response.status = (result[0] && result[0][0]) ? result[0][0].validateLinkFlag : false;
+                if(result[0][0].validateLinkFlag=='true'){
+                    result[0][0].validateLinkFlag= true;
+                }
+                else{
+                    result[0][0].validateLinkFlag=false;
+                }
+
+                response.status = result[0][0].validateLinkFlag;
                 response.message = "Validate upload link";
                 response.error = null;
                 response.data = null;

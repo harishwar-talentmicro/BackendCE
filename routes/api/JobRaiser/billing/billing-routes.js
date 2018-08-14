@@ -13,4 +13,10 @@ router.post('/invoiceTemplate',billingCtrl.billInvoiceTemplate);
 
 router.post('/invoicePreview',billingCtrl.invoiceMailerPreview);
 
+router.get('/generateInvoiceNumber',billingCtrl.InoviceNumberGeneration);
+
+router.post('/applyTax',billingCtrl.invoiceApplyTax);
+
+router.get('/invoiceBillGenerate',billingCtrl.invoiceBillGenerate);
+
 module.exports = router;

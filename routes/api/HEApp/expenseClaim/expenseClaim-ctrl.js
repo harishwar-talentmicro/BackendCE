@@ -106,6 +106,7 @@ expenseClaimCtrl.saveExpenseClaim = function(req,res,next){
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
                         req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
         
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -125,7 +126,10 @@ expenseClaimCtrl.saveExpenseClaim = function(req,res,next){
                             req.st.db.escape(JSON.stringify(expenseList)),
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
-                            req.st.db.escape(DBSecretKey)                                                                    
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)
+                                                                                          
                         ];
 
                         var expenseFormId=1005;

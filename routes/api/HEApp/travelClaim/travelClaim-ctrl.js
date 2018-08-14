@@ -107,6 +107,7 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
 
                         req.body.title = req.body.title ? req.body.title : ""; // for expense
                         req.body.amountSettled = req.body.amountSettled ? req.body.amountSettled : 0;
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
 
                         var procParams = [  // for travel claim
                             req.st.db.escape(req.query.token),
@@ -131,7 +132,9 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(req.body.travelRequestData),
-                            req.st.db.escape(DBSecretKey)
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.createdTimeStamp)    
                    ];
 
                         var travelClaimFormId=1007;

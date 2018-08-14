@@ -5142,4 +5142,261 @@ User.prototype.getAlumniEducations = function (req, res, next) {
 };
 
 
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.getUserDetailsLatest = function (req, res, next) {
+    /**
+     * @todo FnGetUserDetails
+     */
+
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var rtnMessage = {
+        versionStatus: 0,
+        versionMessage: "Your application is up to date"
+    };
+
+    // switch(req.platform){
+    //     case 'ios':
+    //         /**
+    //          * If IOS version is not supported
+    //          */
+    //         if(req.CONFIG.VERSION_LIST.IOS[0].indexOf(parseInt(req.query.versionCode)) == -1 && req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1 ){
+    //             rtnMessage.versionStatus = 2;
+    //             rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //             res.send([rtnMessage]);
+    //             return;
+    //         }
+    //         else if(req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1){
+    //
+    //             rtnMessage.versionStatus = 1;
+    //             rtnMessage.versionMessage = "New update available. Please update your application to latest version";
+    //             //res.send([rtnMessage]);
+    //             //return;
+    //         }
+    //         else{
+    //             rtnMessage.versionStatus = 0;
+    //             rtnMessage.versionMessage = "Applications is up to date";
+    //             //res.send([rtnMessage]);
+    //             //return;
+    //         }
+    //         break;
+    //     case 'android':
+    //         /**
+    //          * If Android version is not supported
+    //          */
+    //         if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
+    //             console.log("===========coming to -1 block=============");
+    //             rtnMessage.versionStatus = 2;
+    //             rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //             res.send([rtnMessage]);
+    //             return;
+    //         }
+    //         else{
+    //             console.log("===========coming to +1 block=============");
+    //             rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
+    //             (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+    //             rtnMessage.versionMessage = (rtnMessage.versionStatus)
+    //                 ? "New update available. Please update your application to latest version" : rtnMessage.versionMessage;
+    //         }
+    //         break;
+    //     case 'web':
+    //         /**
+    //          * If Web version is not supported
+    //          */
+    //         if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
+    //             rtnMessage.versionStatus = 2;
+    //             rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //             res.send([rtnMessage]);
+    //             return;
+    //         }
+    //         else{
+    //             rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
+    //             (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
+    //             rtnMessage.versionMessage = (rtnMessage.versionStatus)
+    //                 ? "New update available. Please update your application to latest version" : rtnMessage.versionMessage;
+    //         }
+    //         break;
+    //     default:
+    //         rtnMessage.versionStatus = 2;
+    //         rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
+    //         res.send([rtnMessage]);
+    //         return;
+    //         break;
+    // }
+
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.token;
+        var APNSID= req.body.apnsId;
+        var GCMID=req.body.gcmId;
+        if (Token) {
+            st.validateToken(Token, function (err, tokenResult) {
+                console.log(err);
+                //console.log(Result);
+                if (!err) {
+                    if (tokenResult) {
+                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ',' +  st.db.escape(APNSID) + ',' +  st.db.escape(GCMID) + ')', function (err, UserDetailsResult) {
+                            if (!err) {
+                                //console.log('UserDetailsResult',UserDetailsResult);
+                                if (UserDetailsResult[0]) {
+                                    if (UserDetailsResult[0].length > 0) {
+                                        UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
+                                            (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
+                                        
+                                        UserDetailsResult[0][0].versionStatus = rtnMessage.versionStatus;
+                                        UserDetailsResult[0][0].versionMessage = rtnMessage.versionMessage;
+
+                                        for (var i=0 ; i<UserDetailsResult[1].length ; i++){
+                                            UserDetailsResult[1][i].trackTemplateDetails = UserDetailsResult[1][i] && UserDetailsResult[1][i].trackTemplateDetails ?  JSON.parse(UserDetailsResult[1][i].trackTemplateDetails):[];
+                                        }
+                                      
+                                        if (UserDetailsResult[1] && UserDetailsResult[1][0] && UserDetailsResult[1][0].isFormGroupHide !=undefined){
+
+                                            if(UserDetailsResult[1][0].isFormGroupHide !=0 || UserDetailsResult[3][0].count !=0){
+                                                UserDetailsResult[1][0].homePageBanner='';
+                                            }
+    
+                                        }
+
+                                        // UserDetailsResult[0][0].companyDetails = UserDetailsResult[1][0] ? UserDetailsResult[1][0]:{}
+                                       
+                                        // var output = 
+                                        // {
+                                           
+                                        //    isHideSearchPage : UserDetailsResult[0][0].isHideSearchPage ? UserDetailsResult[0][0].isHideSearchPage : 0,
+                                        //    isHideChatPage : UserDetailsResult[0][0].isHideChatPage ? UserDetailsResult[0][0].isHideChatPage : 0,
+                                        //   isHideProfilePage : UserDetailsResult[0][0].isHideProfilePage ? UserDetailsResult[0][0].isHideProfilePage : 0,
+                                        //    brandingPageUrl : UserDetailsResult[0][0].brandingPageUrl ? UserDetailsResult[0][0].brandingPageUrl : ''
+                                           
+                                            
+                                        // }
+
+                                        
+                                          response.status = true;
+                                        response.message = "User details loaded successfully";
+                                        response.error = null;
+                                        response.data = {
+                                            isdMobile:UserDetailsResult[0][0].ISDMobileNumber,
+                                            mobileNo:UserDetailsResult[0][0].MobileNumber,
+                                            profilePictureUrl:UserDetailsResult[0][0].Picture,
+                                            ezeId:UserDetailsResult[0][0].EZEID,
+                                            displayName:UserDetailsResult[0][0].displayName,
+                                            emailId:UserDetailsResult[0][0].EMailID,
+                                            masterId:UserDetailsResult[0][0].MasterID,
+                                            headerImageFlag:UserDetailsResult[0][0].headerImageFlag,
+                                            attachmentCount:UserDetailsResult[0][0].attachmentCount,
+                                            isNewUser:UserDetailsResult[0][0].isNewUser,
+                                            isConfigManager:UserDetailsResult[0][0].isConfigManager,
+                                            groupId:UserDetailsResult[0][0].groupId,
+                                            
+                                           companyDetails : UserDetailsResult[1][0] ? (UserDetailsResult[1][0]):null
+                                        }
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        });
+                                        console.log('FnGetUserDetails : tmaster: User details sent successfully');
+                                    
+                                    }
+                                    else{
+
+                                     response.status = true;
+                                    response.message = "User details sent successfully";
+                                    response.error = null;
+                                    response.data = null;
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+                                }   
+                                }
+                                else {
+                                   
+                                 
+                                   console.log('FnGetUserDetails : tmaster: No User details found');
+                                   response.status = true;
+                                   response.message = "tmaster: No User details found";
+                                   response.error = null;
+                                   response.data = null;
+                                   var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                   zlib.gzip(buf, function (_, result) {
+                                       response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                       res.status(200).json(response);
+                                   });
+                                 
+                               
+                                }
+
+                            }
+                            else {
+                                // res.json(null);
+                                // res.statusCode = 500;
+                                // console.log('FnGetUserDetails : tmaster:' + err);
+
+                                response.status = false;
+                                   response.message = "FnGetUserDetails : tmaster:" + err;
+                                   response.error = null;
+                                   response.data = null;
+
+                                   res.status(500).json(response);
+                            }
+                        });
+                    }
+                    else {
+                        // console.log('FnGetUserDetails: Invalid token');
+                        // res.statusCode = 401;
+                        // res.json(null);
+                        response.status = false;
+                        response.message = "Invalid Token";
+                        response.error = null;
+                        response.data = null;
+
+                        res.status(401).json(response);
+                    }
+                }
+                else {
+                    response.status = false;
+                    response.message = "FnGetUserDetails : tmaster:" + err;
+                    response.error = null;
+                    response.data = null;
+
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else {
+            response.status = false;
+            response.message = "token is empty";
+            response.error = null;
+            response.data = null;
+
+            res.status(400).json(response);
+            // console.log('FnGetUserDetails :  token is empty');
+        }
+    }
+    catch (ex) {
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log('FnGetUserDetails error:' + ex);
+
+    }
+};
+
+
+
 module.exports = User;

@@ -102,6 +102,13 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                 req.body.defId = (req.body.defId) ? req.body.defId : 0;
                 req.body.purpose = (req.body.purpose) ? req.body.purpose : 0;
                 req.body.logoFile = (req.body.logoFile) ? req.body.logoFile : '';
+                req.body.checkboxTimeOut = (req.body.checkboxTimeOut) ? req.body.checkboxTimeOut : 0;
+                req.body.merge = (req.body.merge) ? req.body.merge : 0;
+                req.body.timeOutValue = (req.body.timeOutValue) ? req.body.timeOutValue : null;
+                req.body.invoicePrefix = (req.body.invoicePrefix) ? req.body.invoicePrefix : '';
+                req.body.invoiceSuffix  = (req.body.invoiceSuffix ) ? req.body.invoiceSuffix  : '';
+                req.body.lastInsertedInvoiceNo  = (req.body.lastInsertedInvoiceNo ) ? req.body.lastInsertedInvoiceNo  : '';
+                req.body.invoiceNumberLength  = (req.body.invoiceNumberLength ) ? req.body.invoiceNumberLength  : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -115,7 +122,14 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(country)),
                     req.st.db.escape(JSON.stringify(heDepartment)),
                     req.st.db.escape(JSON.stringify(defaultClient)),
-                    req.st.db.escape(req.body.logoFile)
+                    req.st.db.escape(req.body.logoFile),
+                    req.st.db.escape(req.body.checkboxTimeOut),
+                    req.st.db.escape(req.body.merge),
+                    req.st.db.escape(req.body.timeOutValue),
+                    req.st.db.escape(req.body.invoicePrefix),
+                    req.st.db.escape(req.body.invoiceSuffix),
+                    req.st.db.escape(req.body.lastInsertedInvoiceNo),
+                    req.st.db.escape(req.body.invoiceNumberLength)               
                 ];
                 var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -1278,6 +1292,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                         req.body.expectedJoining = (req.body.expectedJoining) ? req.body.expectedJoining : 0;
                         req.body.jdTemplateId = (req.body.jdTemplateId) ? req.body.jdTemplateId : 0;
                         req.body.jdAttachment = (req.body.jdAttachment) ? req.body.jdAttachment : '';
+                        req.body.timestamp = (req.body.timestamp) ? req.body.timestamp : '';
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -1327,7 +1342,10 @@ jobCtrl.saveRequirement = function (req, res, next) {
                             req.st.db.escape(req.body.jdTemplateId),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.jdAttachment),
-                            req.st.db.escape(JSON.stringify(industry))
+                            req.st.db.escape(JSON.stringify(industry)),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.currentTimeStamp)
+
                         ];
 
                         var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
@@ -1619,6 +1637,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                             req.body.expectedJoining = (req.body.expectedJoining) ? req.body.expectedJoining : 0;
                             req.body.jdTemplateId = (req.body.jdTemplateId) ? req.body.jdTemplateId : 0;
                             req.body.jdAttachment = (req.body.jdAttachment) ? req.body.jdAttachment : '';
+                            req.body.timestamp = (req.body.timestamp) ? req.body.timestamp : '';
 
                             var procParams = [
                                 req.st.db.escape(req.query.token),
@@ -1667,8 +1686,11 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 req.st.db.escape(req.body.jdTemplateFlag),
                                 req.st.db.escape(req.body.jdTemplateId),
                                 req.st.db.escape(DBSecretKey),
-                                req.st.db.escape(req.body.jdAttachment)
-                            ];
+                                req.st.db.escape(req.body.jdAttachment),
+                                req.st.db.escape(JSON.stringify(req.body.industry || [])),
+                                req.st.db.escape(req.body.timestamp),
+                                req.st.db.escape(req.body.currentTimeStamp)
+         ];
 
                             var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
                             console.log(procQuery);
@@ -2075,7 +2097,7 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                         response.message = "Requirement Details loaded successfully";
                         response.error = null;
 
-                        result[2][0].branchList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].branchList):[];
+                        result[2][0].branchList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].branchList):{};
                         result[2][0].contactList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].contactList):[];
                         result[2][0].currency = (result[2] && result[2][0]) ? JSON.parse(result[2][0].currency):{};
                         result[2][0].duration = (result[2] && result[2][0]) ? JSON.parse(result[2][0].duration):{};
