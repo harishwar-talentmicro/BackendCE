@@ -727,6 +727,8 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
 
                     console.log(backGround);
                     req.db.query(backGround, function (err, results) {
+                        console.log('err',err);
+                        console.log('results',results);
 
                         if (results[0].templateType == 1) {
 
@@ -795,11 +797,11 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                                                         var name = title = type = title1 = title2 = '';
                                                         var name = "";
 
-                                                        var name = rewardRecognition[0].UserName;
-                                                        var title = rewardRecognition[0].SubTitle;
-                                                        var type = rewardRecognition[0].TitleoftheAward;
-                                                        var title1 = rewardRecognition[0].Content;
-                                                        var title2 = rewardRecognition[0].ContentTitle;
+                                                        var name = rewardRecognition[0].UserName;    //name on card
+                                                        var title = rewardRecognition[0].SubTitle;  // subtitle below main title
+                                                        var type = rewardRecognition[0].TitleoftheAward;   //mainTitle
+                                                        var title1 = rewardRecognition[0].Content;    //  below contentTitle
+                                                        var title2 = rewardRecognition[0].ContentTitle;  //below name
 
                                                         var nameLength = (((name.length / 2)));
                                                         var TypeLength = (((type.length / 2)));

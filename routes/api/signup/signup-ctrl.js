@@ -12,8 +12,11 @@ var Readable = require('stream').Readable;
 var signupCtrl = {};
 var bcrypt = null;
 var EZEIDEmail = 'noreply@talentmicro.com';
-const accountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
-const authToken = '3abf04f536ede7f6964919936a35e614';
+var CONFIG = require('../../../ezeone-config.json');
+
+const accountSid = 'ACdc7d20f3e7be56555e65fc0b20ef2c22';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'ACdc7d20f3e7be56555e65fc0b20ef2c22';
+const authToken = '5451d20c01f47a0d10c4e5b34807ca6d';   //'3abf04f536ede7f6964919936a35e614';  //'5451d20c01f47a0d10c4e5b34807ca6d';//
+const FromNumber = CONFIG.DB.FromNumber || '+18647547021'; 
 const client = require('twilio')(accountSid, authToken);
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
@@ -21,7 +24,6 @@ var zlib = require('zlib');
 var AES_256_encryption = require('../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 
-var CONFIG = require('../../../ezeone-config.json');
 var DBSecretKey = CONFIG.DB.secretKey;
 
 var qs = require("querystring");
@@ -176,7 +178,7 @@ signupCtrl.sendOtp = function (req, res, next) {
                             {
                                 body: message,
                                 to: isdMobile + mobileNo,
-                                from: '+14434322305'
+                                from: FromNumber
                             },
                             function (error, response) {
                                 if (error) {
@@ -759,7 +761,7 @@ signupCtrl.verifyOTP = function (req, res, next) {
                                         {
                                             body: message,
                                             to: isdMobile + mobileNo,
-                                            from: '+14434322305'
+                                            from: FromNumber
                                         },
                                         function (error, response) {
                                             if (error) {
@@ -1061,7 +1063,7 @@ signupCtrl.testOtp = function (req, res, next) {
                         .create({
                             url: fileName,
                             to: '+919743883221',
-                            from: '+14434322305',
+                            from: FromNumber,
                             method: 'GET'
                         },
                             function (error, response) {
@@ -1168,7 +1170,7 @@ signupCtrl.sendOtpPhone = function (req, res, next) {
                                 .create({
                                     url: fileName,
                                     to: isdMobile + mobileNo,
-                                    from: '+14434322305',
+                                    from: FromNumber,
                                     method: 'GET'
                                 },
                                     function (error, response) {

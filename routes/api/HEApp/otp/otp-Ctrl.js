@@ -15,8 +15,11 @@ var http = require('https');
 // var Readable = require('stream').Readable;
 var bcrypt = null;
 var EZEIDEmail = 'noreply@talentmicro.com';
-const accountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
-const authToken = '3abf04f536ede7f6964919936a35e614';
+
+var appConfig = require('../../../../ezeone-config.json');
+const accountSid = 'ACdc7d20f3e7be56555e65fc0b20ef2c22';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'ACdc7d20f3e7be56555e65fc0b20ef2c22';
+const authToken = '5451d20c01f47a0d10c4e5b34807ca6d';   //'3abf04f536ede7f6964919936a35e614';  //'5451d20c01f47a0d10c4e5b34807ca6d';//
+const FromNumber = appConfig.DB.FromNumber || '+18647547021';
 const client = require('twilio')(accountSid, authToken);
 
 
@@ -172,7 +175,7 @@ otpCtrl.sendOtp = function (req, res, next) {
                             {
                                 body: message,
                                 to: isdMobile + mobileNo,
-                                from: '+14434322305'
+                                from: FromNumber
                             },
                             function (error, response) {
                                 if (error) {

@@ -2832,7 +2832,7 @@ sendMessageCtrl.getBulkEmployeeAnnouncementTitle = function (req, res, next) {
             if ((!err) && tokenResult) {
                 req.query.isweb = req.query.isweb ? req.query.isweb : 0;
                 //req.query.status = req.query.status ? req.query.status : 0;
-                req.body.isDraft = req.body.isDraft ? req.body.isDraft : 1;
+                req.body.isDraft = req.body.isDraft!=undefined ? req.body.isDraft : 1;
                 req.body.announcementBatchTitleId = req.body.announcementBatchTitleId ? req.body.announcementBatchTitleId : 0;
 
                 var procParams = [

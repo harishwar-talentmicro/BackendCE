@@ -330,6 +330,7 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                 req.body.taskDateTime = req.body.taskDateTime ? req.body.taskDateTime : null;
                 req.body.taskEndDate = req.body.taskEndDate ? req.body.taskEndDate : null;
                 req.body.status = req.body.status ? req.body.status : 0;  // 0 pending ,1- completed
+                req.body.eventAttachment = req.body.eventAttachment ? req.body.eventAttachment : '';
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -343,7 +344,8 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                     req.st.db.escape(req.body.taskEndDate),
                     req.st.db.escape(JSON.stringify(venue)),
                     req.st.db.escape(JSON.stringify(anchor)),
-                    req.st.db.escape(req.body.status)
+                    req.st.db.escape(req.body.status),
+                    req.st.db.escape(req.body.eventAttachment)
 
                 ];
 

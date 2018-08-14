@@ -13,6 +13,23 @@ var router = express.Router();
 var DbHelper = require('./../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
 
+
+    //to initialize credentials globally and use everywhere
+    var proquery='call wm_get_twilioCredentials()';
+    db.query(proquery,function (err, result) {
+        if(!err && result[0] && result[0][0]){
+          global.twilioDetails;
+          global.twilioDetails = {
+            accountSid : result[0][0].accountSid,
+            authToken : result[0][0].authToken,
+            FromNumber : result[0][0].FromNumber,
+            twilioApiKey : result[0][0].twilioApiKey,
+            twilioApiSecret : result[0][0].twilioApiSecret
+           }
+        }
+    });
+
+
 var StdLib = require('./modules/std-lib.js');
 var stdLib = new StdLib(db);
 

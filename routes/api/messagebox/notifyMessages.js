@@ -72,4 +72,18 @@ Messages.prototype.getMessagesNeedToNotify = function() {
     });
 };
 
+
+// Messages.prototype.authTokenFromDatabase=function(){
+//     var proquery='call wm_get_twilioCredentials()';
+//     db.query(proquery,function (err, result) {
+//         if(!err && result[0] && result[0][0]){
+//            return {
+//             accountSid : result[0][0].accountSid,
+//             authToken : result[0][0].authToken,
+//             FromNumber : result[0][0].FromNumber
+//            }
+//         }
+//     });
+// }
+
 module.exports = Messages;

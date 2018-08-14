@@ -30,13 +30,15 @@ var http = require('https');
 // var Readable = require('stream').Readable;
 var bcrypt = null;
 var EZEIDEmail = 'noreply@talentmicro.com';
-const accountSid = 'ACdc7d20f3e7be56555e65fc0b20ef2c22';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'ACdc7d20f3e7be56555e65fc0b20ef2c22';
-const authToken = '5451d20c01f47a0d10c4e5b34807ca6d';   //'3abf04f536ede7f6964919936a35e614';  //'5451d20c01f47a0d10c4e5b34807ca6d';//
-const client = require('twilio')(accountSid, authToken);
 // const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
 var CONFIG = require('../../../../ezeone-config.json');
 var DBSecretKey = CONFIG.DB.secretKey;
+const accountSid = 'ACdc7d20f3e7be56555e65fc0b20ef2c22';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'ACdc7d20f3e7be56555e65fc0b20ef2c22';
+const authToken = '5451d20c01f47a0d10c4e5b34807ca6d';   //'3abf04f536ede7f6964919936a35e614';  //'5451d20c01f47a0d10c4e5b34807ca6d';//
+const FromNumber = CONFIG.DB.FromNumber ||'+18647547021' ;  
+
+const client = require('twilio')(accountSid, authToken);
 
 var uuid = require('node-uuid');
 const fs = require('fs');
@@ -870,7 +872,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                         {
                                             body: message,
                                             to: isdMobile + mobileNo,
-                                            from: '+14434322305'
+                                            from: FromNumber
                                         },
                                         function (error6, response6) {
                                             if (error6) {
@@ -1033,7 +1035,7 @@ walkInCvCtrl.sendOtp = function (req, res, next) {
                             {
                                 body: message,
                                 to: isdMobile + mobileNo,
-                                from: '+18647547021'//'+14434322305' //+18647547021
+                                from: FromNumber//'+14434322305' //+18647547021
                             },
                             function (error, response) {
                                 if (error) {

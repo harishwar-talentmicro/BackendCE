@@ -321,7 +321,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(prefLocations)),
                             req.st.db.escape(JSON.stringify(industry)),
                             req.st.db.escape(JSON.stringify(nationality)),
-                            req.st.db.escape(cvKeywords),
+                            req.st.db.escape(req.body.cvKeywords),
                             req.st.db.escape(req.body.requirementId),
                             req.st.db.escape(req.body.imageUrl),
                             req.st.db.escape(req.body.htmlText),
@@ -514,7 +514,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             faceSheetTemplates: result[41] ? result[41]:[],
                             reportingToList : result[42] ? result[42]:[],
                             jdTemplateList : result[43] ? result[43]:[],
-                            cvStatus : result[44] ? result[44]:[]
+                            cvStatus : result[44] ? result[44]:[],
+                            visaTravelStatus :result[45] ? result[45]:[]
                         };
 
                         if (req.query.isWeb == 0) {
@@ -580,7 +581,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             faceSheetTemplates:[],
                             reportingToList: [],
                             jdTemplateList:[],
-                            cvStatus: []
+                            cvStatus: [],
+                            visaTravelStatus :[]
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

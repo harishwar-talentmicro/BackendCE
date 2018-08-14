@@ -20,9 +20,13 @@ var archiver = require('archiver');
 var request = require('request');
 var xlsx = require('node-xlsx');  // for xls file generation
 
+var CONFIG = require('../../../../ezeone-config.json');
+var DBSecretKey = CONFIG.DB.secretKey;
+
 var EZEIDEmail = 'noreply@talentmicro.com';
-const accountSid = 'ACcf64b25bcacbac0b6f77b28770852ec9';
-const authToken = '3abf04f536ede7f6964919936a35e614';
+const accountSid = 'ACdc7d20f3e7be56555e65fc0b20ef2c22';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'ACdc7d20f3e7be56555e65fc0b20ef2c22';
+const authToken = '5451d20c01f47a0d10c4e5b34807ca6d';   //'3abf04f536ede7f6964919936a35e614';  //'5451d20c01f47a0d10c4e5b34807ca6d';//
+const FromNumber = CONFIG.DB.FromNumber || '+18647547021';
 const client = require('twilio')(accountSid, authToken);
 
 var qs = require("querystring");
@@ -757,7 +761,7 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                                             {
                                                 body: message,
                                                 to: isdMobile + mobileNo,
-                                                from: '+14434322305'
+                                                from: FromNumber
                                             },
                                             function (error, response) {
                                                 if (error) {
@@ -1524,7 +1528,7 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                             {
                                                 body: message,
                                                 to: isdMobile + mobileNo,
-                                                from: '+14434322305'
+                                                from: FromNumber
                                             },
                                             function (error, response) {
                                                 if (error) {
@@ -2332,7 +2336,7 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                             {
                                                 body: message,
                                                 to: isdMobile + mobileNo,
-                                                from: '+14434322305'
+                                                from: FromNumber
                                             },
                                             function (error, response) {
                                                 if (error) {
@@ -2914,7 +2918,7 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                                             {
                                                 body: message,
                                                 to: isdMobile + mobileNo,
-                                                from: '+14434322305'
+                                                from: FromNumber
                                             },
                                             function (error, response) {
                                                 if (error) {
@@ -3816,7 +3820,7 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                             {
                                                 body: message,
                                                 to: isdMobile + mobileNo,
-                                                from: '+14434322305'
+                                                from: FromNumber
                                             },
                                             function (error, response) {
                                                 if (error) {

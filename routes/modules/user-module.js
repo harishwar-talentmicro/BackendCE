@@ -5263,8 +5263,12 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
                                             UserDetailsResult[1][i].trackTemplateDetails = UserDetailsResult[1][i] && UserDetailsResult[1][i].trackTemplateDetails ?  JSON.parse(UserDetailsResult[1][i].trackTemplateDetails):[];
                                         }
                                       
-                                        if(UserDetailsResult[1][0].isFormGroupHide !=0 || UserDetailsResult[3][0].count !=0){
-                                            UserDetailsResult[1][0].homePageBanner='';
+                                        if (UserDetailsResult[1] && UserDetailsResult[1][0] && UserDetailsResult[1][0].isFormGroupHide !=undefined){
+
+                                            if(UserDetailsResult[1][0].isFormGroupHide !=0 || UserDetailsResult[3][0].count !=0){
+                                                UserDetailsResult[1][0].homePageBanner='';
+                                            }
+    
                                         }
 
                                         // UserDetailsResult[0][0].companyDetails = UserDetailsResult[1][0] ? UserDetailsResult[1][0]:{}
@@ -5298,7 +5302,7 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
                                             isConfigManager:UserDetailsResult[0][0].isConfigManager,
                                             groupId:UserDetailsResult[0][0].groupId,
                                             
-                                           companyDetails : UserDetailsResult[1][0] ? (UserDetailsResult[1][0]):{}
+                                           companyDetails : UserDetailsResult[1][0] ? (UserDetailsResult[1][0]):null
                                         }
                                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                         zlib.gzip(buf, function (_, result) {

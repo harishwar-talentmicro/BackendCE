@@ -1292,6 +1292,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                         req.body.expectedJoining = (req.body.expectedJoining) ? req.body.expectedJoining : 0;
                         req.body.jdTemplateId = (req.body.jdTemplateId) ? req.body.jdTemplateId : 0;
                         req.body.jdAttachment = (req.body.jdAttachment) ? req.body.jdAttachment : '';
+                        req.body.timestamp = (req.body.timestamp) ? req.body.timestamp : '';
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -1341,7 +1342,10 @@ jobCtrl.saveRequirement = function (req, res, next) {
                             req.st.db.escape(req.body.jdTemplateId),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.jdAttachment),
-                            req.st.db.escape(JSON.stringify(industry))
+                            req.st.db.escape(JSON.stringify(industry)),
+                            req.st.db.escape(req.body.timestamp),
+                            req.st.db.escape(req.body.currentTimeStamp)
+
                         ];
 
                         var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
@@ -1633,6 +1637,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                             req.body.expectedJoining = (req.body.expectedJoining) ? req.body.expectedJoining : 0;
                             req.body.jdTemplateId = (req.body.jdTemplateId) ? req.body.jdTemplateId : 0;
                             req.body.jdAttachment = (req.body.jdAttachment) ? req.body.jdAttachment : '';
+                            req.body.timestamp = (req.body.timestamp) ? req.body.timestamp : '';
 
                             var procParams = [
                                 req.st.db.escape(req.query.token),
@@ -1681,8 +1686,11 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 req.st.db.escape(req.body.jdTemplateFlag),
                                 req.st.db.escape(req.body.jdTemplateId),
                                 req.st.db.escape(DBSecretKey),
-                                req.st.db.escape(req.body.jdAttachment)
-                            ];
+                                req.st.db.escape(req.body.jdAttachment),
+                                req.st.db.escape(JSON.stringify(req.body.industry || [])),
+                                req.st.db.escape(req.body.timestamp),
+                                req.st.db.escape(req.body.currentTimeStamp)
+         ];
 
                             var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
                             console.log(procQuery);

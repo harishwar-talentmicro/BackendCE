@@ -67,7 +67,15 @@ onboardingctrl.onBoardingDynamicForm = function (req, res, next) {
                         response.data = {
                             formId :results[0][0].formId,
                             totalScreenWidth:results[0][0].totalScreenWidth,
-                            controlFields : (results[0] && results[0][0]) ? JSON.parse(results[0][0].dynamicFormFields).controlDetails:[]
+                            controlFields : (results[0] && results[0][0]) ? JSON.parse(results[0][0].dynamicFormFields).controlDetails:[],
+
+                            masterData:{
+                                jobType : results[1] ? results[1] :[],
+                                currency :results[2] ? results[2] :[],
+                                scale : results[3] ? results[3] :[],
+                                duration : results[4] ? results[4] :[],
+                                designation : results[5] ? results[5] :[]
+                            }
                         }
                         res.status(200).json(response);
                     }

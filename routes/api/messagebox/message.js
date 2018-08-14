@@ -1048,6 +1048,333 @@ router.post('/sync', function (req, res, next) {
     }
 });
 
+
+
+router.get('/loadAllMessages', function (req, res, next) {
+    /**
+     * pageNo and limit is for pagination
+     * flag: if flag is 0 then latest message will come according to pagination
+     * and if not 0 then older messages will come
+     * */
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+    req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+    req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
+    req.query.flag = (req.query.flag) ? (req.query.flag) : 0;
+
+    // if (req.query.lastSyncTimeStamp) {
+    //     if (moment(req.query.lastSyncTimeStamp, 'YYYY-MM-DD HH:mm:ss').isValid()) {
+    //         req.query.lastSyncTimeStamp = moment(req.query.lastSyncTimeStamp, 'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+    //     }
+    //     else {
+    //         error.lastSyncTimeStamp = 'Invalid timeStamp';
+    //         validationFlag *= false;
+    //     }
+    // }
+    // else {
+    //     req.query.lastSyncTimeStamp = null;
+
+    // }
+
+    // if (req.query.currentTimeStamp) {
+    //     if (moment(req.query.currentTimeStamp, 'YYYY-MM-DD HH:mm:ss').isValid()) {
+    //         req.query.currentTimeStamp = moment(req.query.currentTimeStamp, 'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+    //     }
+    //     else {
+    //         error.currentTimeStamp = 'Invalid timeStamp';
+    //         validationFlag *= false;
+    //     }
+    // }
+    // else {
+    //     error.currentTimeStamp = 'Invalid timeStamp';
+    //     validationFlag *= false;
+
+    // }
+
+
+    // if (isNaN(parseInt(req.query.groupId)) || (req.query.groupId) < 0) {
+    //     error.groupId = 'Invalid group id';
+    //     validationFlag *= false;
+    // }
+
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    var message;
+                    if (tokenResult) {
+                        console.log("req.body.data", req.body.data);
+
+                        // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                            var messageList = [];
+                            // if (typeof (messageList) == "string") {
+                            //     messageList = JSON.parse(messageList);
+                            // }
+                            // if (!messageList) {
+                            //     messageList = [];
+                            // }
+
+                            if (!validationFlag) {
+                                responseMessage.error = error;
+                                responseMessage.message = 'Please check the errors';
+                                res.status(400).json(responseMessage);
+                                console.log(responseMessage);
+                            }
+                            else {
+                                var procParams = [
+                                    req.db.escape(req.query.groupId || 0),
+                                    req.db.escape(req.query.token),
+                                    req.db.escape(req.query.pageNo),
+                                    req.db.escape(req.query.limit),
+                                    req.db.escape(DBSecretKey)
+                                ];
+                                var procQuery = 'CALL p_v1_LoadMessages_transofGroup(' + procParams.join(',') + ')';
+                                console.log(procQuery);
+                                req.db.query(procQuery, function (err, results) {
+                                    if (!err) {
+
+                                        // var keywords_list = [];
+                                        //     if(results[5]){
+                                        //         for(var i = 0; i < results[5].length; i++){
+                                        //             keywords_list[i] = {};
+                                        //             keywords_list[i].formId = results[5][i].formID;
+
+                                        //             keywords_list[i].keywordList = (results[5][i] && results[5][i].keywords) ? results[5][i].keywords.split(' ') :[];
+                                        //         }
+                                        //     }
+
+                                        //     var output1 = [];
+                                        //   if(results[6]){
+                                        //     for (var i=0; i<results[6].length; i++){
+                                        //         output1.push({
+                                        //             transId: results[6][i].transId ? results[6][i].transId : 0,
+                                        //             currentTransId:results[6][i].currentTransId ? results[6][i].currentTransId : 0,
+                                        //             heUserId: results[6][i].heUserId ? results[6][i].heUserId : 0,
+                                        //             formId: results[6][i].formId ? results[6][i].formId : 0,
+                                        //             parentId: results[6][i].parentId ? results[6][i].parentId : 0,
+
+                                        //             likeCount : results[6][i].likeCount ? results[6][i].likeCount : 0,
+                                        //             commentCount : results[6][i].commentCount ? results[6][i].commentCount : 0,
+                                        //             shareCount : results[6][i].shareCount ? results[6][i].shareCount : 0,
+                                        //             likeStatus : results[6][i].likeStatus ? results[6][i].likeStatus : 0
+                                        //         });
+                                        //     }
+                                        //   }
+                                            
+                                        console.log(results[0],"results[0]");
+                                        
+                                        if (results && results[0] && results[0].length > 0) {
+
+                                            for (var mainIndex=0; mainIndex<results[0].length; mainIndex++){
+                                                results[0][mainIndex].groupMessageList= (results[0] && results[0][mainIndex]) ? JSON.parse(results[0][mainIndex].groupMessageList) :[];
+                                            
+                                            var messageObj;
+                                            for (var messageCounter = 0; messageCounter < results[0][mainIndex].groupMessageList.length; messageCounter++) {
+                                                switch (results[0][mainIndex].groupMessageList[messageCounter].messageType) {
+                                                    case 0:
+                                                        message = results[0][mainIndex].groupMessageList[messageCounter].message;
+                                                        break;
+
+                                                    case 2:
+                                                        message = results[0][mainIndex].groupMessageList[messageCounter].message;
+                                                        messageObj = JSON.parse(message);
+                                                        messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                            req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
+                                                        messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                            req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
+                                                        results[0][mainIndex].groupMessageList[messageCounter].message = messageObj;
+                                                        break;
+                                                    case 3:
+                                                        message = results[0][mainIndex].groupMessageList[messageCounter].message;
+                                                        console.log("-----------------------------------------------------------");
+                                                        console.log(message);
+                                                        console.log("-----------------------------------------------------------");
+                                                        messageObj = JSON.parse(message);
+
+                                                        messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                            req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
+                                                        messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                                            req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
+                                                        results[0][mainIndex].groupMessageList[messageCounter].message = messageObj;
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                }
+
+                                            }
+                                        }
+                                            //console.log(results[0],"results[0]");
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Messages of group loaded successfully';
+                                            // responseMessage.totalCount = (results[1] && results[1][0] && results[1][0].count) ? results[1][0].count : 0;
+                                            // var output = [];
+                                            for (var i = 0; i < results[0].length; i++) {
+                                                if (typeof(results[0][i].groupMessageList)=="string"){
+                                                    results[0][i].groupMessageList= (results[0] && results[0][i]) ? JSON.parse(results[0][i].groupMessageList) :[];
+
+                                                }
+                                                for (var k=0; k<results[0][i].groupMessageList.length ; k++){
+                                                    results[0][i].groupMessageList[k].formDataJSON = results[0][i].groupMessageList[k].formDataJSON ? JSON.parse(results[0][i].groupMessageList[k].formDataJSON):null
+                                                }
+                                                
+                                                // output.push({
+                                                //     messageId: results[0][i].messageId,
+                                                //     message: results[0][i].message,
+                                                //     messageLink: results[0][i].messageLink,
+                                                //     createdDate: results[0][i].createdDate,
+                                                //     messageType: results[0][i].messageType,
+                                                //     messageStatus: results[0][i].messageStatus,
+                                                //     priority: results[0][i].priority,
+                                                //     senderName: results[0][i].senderName,
+                                                //     // senderId: results[0][i].senderId,
+                                                //     receiverId: results[0][i].receiverId,
+                                                //     expiryDate: results[0][i].expiryDate,
+                                                //     transId: results[0][i].transId ? results[0][i].transId : 0,
+                                                //     formId: results[0][i].formId ? results[0][i].formId : 0,
+                                                //     readStatus: results[0][i].readStatus ? results[0][i].readStatus : 0,
+                                                //     readSyncStatus: results[0][i].readSyncStatus ? results[0][i].readSyncStatus : 0,
+                                                //     readDateTime: results[0][i].readDateTime ? results[0][i].readDateTime : null,
+                                                //     currentStatus: results[0][i].currentStatus ? results[0][i].currentStatus : 0,
+                                                //     currentTransId: results[0][i].currentTransId ? results[0][i].currentTransId : 0,
+                                                //     parentId: results[0][i].parentId ? results[0][i].parentId : 0,
+                                                //     accessUserType: results[0][i].accessUserType ? results[0][i].accessUserType : 0,
+                                                //     heUserId: results[0][i].heUserId ? results[0][i].heUserId : 0,
+                                                //     formData: results[0][i].formDataJSON ? JSON.parse(results[0][i].formDataJSON) : null ,
+
+                                                //     likeCount: results[0][i].likeCount ? results[0][i].likeCount : 0,
+                                                //     commentCount: results[0][i].commentCount ? results[0][i].commentCount : 0,
+                                                //     shareCount: results[0][i].shareCount ? results[0][i].shareCount : 0,
+                                                //     likeStatus: results[0][i].likeStatus ? results[0][i].likeStatus : 0,
+                                                //     isTopScroll: results[0][i].isTopScroll ? results[0][i].isTopScroll : 0,
+                                                //     isChatBotHide: results[0][i].isChatBotHide ? results[0][i].isChatBotHide : 0,
+                                                //     isFormGroupHide: results[0][i].isFormGroupHide ? results[0][i].isFormGroupHide : 0,
+                                                //     enableHomePageScroll: results[0][i].enableHomePageScroll ? results[0][i].enableHomePageScroll : 0,
+                                                //     showFormsOnHomePage: results[0][i].showFormsOnHomePage ? results[0][i].showFormsOnHomePage : 0,
+
+                                                //     homePageBanner: results[0][i].homePageBanner ? results[0][i].homePageBanner : '',
+                                                //     hideDashboard: results[0][i].hideDashboard ? results[0][i].hideDashboard : 0
+                                                    
+                                                // });
+                                            }
+
+
+                                            
+                                            // console.log("results[5][0].GCM_Id",results[5][0].GCM_Id);
+                                            responseMessage.data = {
+                                                messageList: results[0] ? results[0] :[],
+                                                deleteMessageIdList: []
+
+                                                // feedback: (results[2]) ? results[2] : []
+                                                // APNSId: (results[3] && results[3][0]) ? JSON.parse(results[3][0].APNS_Id) : [],
+                                                // GCMId: (results[4] && results[4][0]) ? JSON.parse(results[4][0].GCM_Id) : []
+                                                // supportFeedback : (results[4]) ? results[4] : [],
+                                                // learnMessageList : (keywords_list) ? keywords_list : [],
+                                                // likeShareCommentCount: output1 ? output1:[]
+                                            };
+
+                                            var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                responseMessage.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(responseMessage);
+                                            });
+
+                                        }
+                                        else {
+
+                                            // console.log("else part",output1);
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.totalCount = 0;
+                                            responseMessage.message = 'Messages of group not available';
+                                            // console.log("results[5][0].GCM_Id",results[5][0].GCM_Id);
+                                            responseMessage.data = {
+                                                messageList: [],
+                                                deleteMessageIdList: []
+                                                // APNSId: (results[3] && results[3][0]) ? JSON.parse(results[3][0].APNS_Id) : [],
+                                                // GCMId: (results[4] && results[4][0]) ? JSON.parse(results[4][0].GCM_Id) : [],
+                                                // learnMessageList: keywords_list ? keywords_list : [],
+                                                // likeShareCommentCount: output1 ? output1:[]
+                                            };
+                                         
+                                            var buf = new Buffer(JSON.stringify(responseMessage.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                responseMessage.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(responseMessage);
+                                            });
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.error = {
+                                            server: 'Internal Server Error'
+                                        };
+                                        responseMessage.message = 'An error occurred !';
+                                        res.status(500).json(responseMessage);
+                                        console.log('Error : p_v1_LoadMessagesofGroup ', err);
+                                        var errorDate = new Date();
+                                        console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                                    }
+                                });
+                            }
+                        // });
+
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('Invalid token');
+                    }
+
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error :', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error p_v1_LoadMessagesofGroup : ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+});
+
+
+
+
 /**
  * Method : GET
  * @param req
