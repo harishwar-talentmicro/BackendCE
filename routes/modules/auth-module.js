@@ -870,7 +870,9 @@ Auth.prototype.login = function (req, res, next) {
                                     if (comparePassword(password, loginDetails[0].Password)) {
                                         st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, APNS_Id, GCM_Id, secretKey, function (err, tokenResult) {
                                             if ((!err) && tokenResult && loginDetails[0]) {
-                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ')', function (err, UserDetailsResult) {
+                                                var APNSID= req.query.APNSID ? req.query.APNSID :'';
+                                                var GCMID=req.query.GCMID ? req.query.GCMID :''; 
+                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) +',' + st.db.escape(APNSID) +',' + st.db.escape(GCMID) + ')', function (err, UserDetailsResult) {
                                                     if (!err) {
                                                         var procParams = [
                                                             req.db.escape(tokenResult),
@@ -1765,7 +1767,9 @@ Auth.prototype.loginNew = function (req, res, next) {
                                                 if (comparePassword(password, loginDetails[0].Password)) {
                                                     st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, APNS_Id, GCM_Id, secretKey, function (err, tokenResult) {
                                                         if ((!err) && tokenResult && loginDetails[0]) {
-                                                            st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ')', function (err, UserDetailsResult) {
+                                                            var APNSID= req.query.APNSID ? req.query.APNSID :'';
+                                                            var GCMID=req.query.GCMID ? req.query.GCMID :''; 
+                                                            st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) +',' + st.db.escape(APNSID) +',' + st.db.escape(GCMID) + ')', function (err, UserDetailsResult) {
                                                                 if (!err) {
                                                                     var procParams = [
                                                                         req.db.escape(tokenResult),

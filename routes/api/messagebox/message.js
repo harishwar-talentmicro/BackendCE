@@ -934,6 +934,9 @@ router.post('/sync', function (req, res, next) {
                                                     parentId: results[0][i].parentId ? results[0][i].parentId : 0,
                                                     accessUserType: results[0][i].accessUserType ? results[0][i].accessUserType : 0,
                                                     heUserId: results[0][i].heUserId ? results[0][i].heUserId : 0,
+                                                    isFormGroupHide: results[0][i].isFormGroupHide ? results[0][i].isFormGroupHide : 0,
+                                                    isChatBotHide: results[0][i].isChatBotHide ? results[0][i].isChatBotHide : 0,
+                                                    isTopScroll: results[0][i].isTopScroll ? results[0][i].isTopScroll : 0,
                                                     formData: results[0][i].formDataJSON ? JSON.parse(results[0][i].formDataJSON) : null
                                                     
                                                 });
