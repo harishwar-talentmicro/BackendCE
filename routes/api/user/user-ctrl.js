@@ -12,8 +12,8 @@ var path = require('path');
 var EZEIDEmail = 'noreply@talentmicro.com';
 var appConfig = require('../../../ezeone-config.json');
 
-const accountSid = 'ACdc7d20f3e7be56555e65fc0b20ef2c22';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'ACdc7d20f3e7be56555e65fc0b20ef2c22';
-const authToken = '5451d20c01f47a0d10c4e5b34807ca6d';   //'3abf04f536ede7f6964919936a35e614';  //'5451d20c01f47a0d10c4e5b34807ca6d';//
+const accountSid = 'AC3765f2ec587b6b5b893566f1393a00f4';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'AC3765f2ec587b6b5b893566f1393a00f4';
+const authToken = 'b36eba6376b5939cebe146f06d33ec57';   //'3abf04f536ede7f6964919936a35e614';  //'b36eba6376b5939cebe146f06d33ec57';//
 const FromNumber = appConfig.DB.FromNumber || '+18647547021';  
 
 const client = require('twilio')(accountSid, authToken);
