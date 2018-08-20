@@ -231,8 +231,13 @@ applicantCtrl.saveApplicant = function (req, res, next) {
             if ((!err) && tokenResult) {
                 // req.body.cvPath = (req.body.cvPath) ? req.body.cvPath : "";
                 var cvKeywords;
+
+                if(req.body.cvKeywords){
+                    req.body.cvKeywords = req.body.cvKeywords.replace(/\\(x)(.{2})\\/g,'');
+                }
+
                 req.query.isWeb = (req.body.isWeb) ? req.body.isWeb : 0;
-                if (attachmentList.length) {
+                if (attachmentList.length && req.body.cvKeywords == ('' || undefined || null || ' ')) {
                     cv = attachmentList[0].CDNPath;
                 }
                 gs_url = req.CONFIG.CONSTANT.GS_URL;
@@ -244,8 +249,12 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                     if (1) {
 
                        cvKeywords = text;
+                       if(cvKeywords){
+                           cvKeywords = cvKeywords.replace(/\\(x)(.{2})\\/g,'');
+                       }
+
                        console.log('text from promise',resp);
-                       console.log('text',text);
+                       console.log('text data from promise ',text);
 
                         req.body.applicantId = (req.body.applicantId) ? req.body.applicantId : 0;
 
