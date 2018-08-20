@@ -522,7 +522,7 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             jdTemplateList : result[43] ? result[43]:[],
                             cvStatus : result[44] ? result[44]:[],
                             visaTravelStatus :result[45] ? result[45]:[],
-                            teamUsers :  result[46][0].teamUsers,
+                            teamUsers :  result[46][0].teamUsers ? result[46][0].teamUsers : [],
                             paceUserDetails : (result[47] && result[47][0]) ? result[47][0] :{}
                         };
 
@@ -2151,7 +2151,7 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                             res2.heDepartmentName = result[2][i].heDepartmentName ? result[2][i].heDepartmentName : "";
                             res2.heParentId = result[2][i].heParentId ? result[2][i].heParentId : 0;
                             res2.interviewRoundId = result[2][i].interviewRoundId ? result[2][i].interviewRoundId : 0;
-                            res2.reportingDateTime = result[2][i].reportingDateTime ? result[2][i].reportingDateTime : "0000-00-00 00:00:00";
+                            res2.reportingDateTime = result[2][i].reportingDateTime ? result[2][i].reportingDateTime : null;
                             res2.interviewDuration = result[2][i].interviewDuration ? result[2][i].interviewDuration : 0;
                             res2.notes = result[2][i].notes ? result[2][i].notes : "";
                             res2.assessmentTemplateId = result[2][i].assessmentTemplateId ? result[2][i].assessmentTemplateId : 0;
@@ -4467,12 +4467,12 @@ applicantCtrl.saveApplicantForImporter = function (req, res, next) {
                          req.body.latitude = 0.0;
                          req.body.IDadhaarNumber = (req.body.IDadhaarNumber) ? req.body.IDadhaarNumber : "";
                          req.body.passportNumber = (req.body.passportNumber) ? req.body.passportNumber : "";
-                         req.body.ppExpiryDate = (req.body.ppExpiryDate) ? req.body.ppExpiryDate : "0000-00-00 00:00:00";
+                         req.body.ppExpiryDate = (req.body.ppExpiryDate) ? req.body.ppExpiryDate : null;
                          req.body.experience = (req.body.experience) ? req.body.experience : 0;
                          req.body.employer = (req.body.employer) ? req.body.employer : "";
                          req.body.noticePeriod = (req.body.noticePeriod) ? req.body.noticePeriod : 0;
                          req.body.notes = (req.body.notes) ? req.body.notes : "";
-                         req.body.DOB = (req.body.DOB) ? req.body.DOB : "0000-00-00";
+                         req.body.DOB = (req.body.DOB) ? req.body.DOB :null;
                          //req.body.originalCvId = (req.body.originalCvId) ? req.body.originalCvId : 0;
                          req.body.status = (req.body.status) ? req.body.status : 0;
                          req.body.blockingPeriod = (req.body.blockingPeriod) ? req.body.blockingPeriod : 0;
