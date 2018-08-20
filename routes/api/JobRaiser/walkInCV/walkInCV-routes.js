@@ -38,5 +38,7 @@ router.get('/validateLink',walkInCvCtrl.walkInUploadLinkFlag);
 router.get('/masterDataCVUpdate',walkInCvCtrl.masterDataofCVUpdate);
 router.post('/cvSourcingUpdate',walkInCvCtrl.saveCVUpdatedData);
 
+router.post('/walkInPdfGeneration',walkInCvCtrl.walkInPDfGeneration);
+
 
 module.exports = router;

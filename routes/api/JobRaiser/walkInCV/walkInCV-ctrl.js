@@ -34,9 +34,9 @@ var EZEIDEmail = 'noreply@talentmicro.com';
 
 var CONFIG = require('../../../../ezeone-config.json');
 var DBSecretKey = CONFIG.DB.secretKey;
-const accountSid = 'ACdc7d20f3e7be56555e65fc0b20ef2c22';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'ACdc7d20f3e7be56555e65fc0b20ef2c22';
-const authToken = '5451d20c01f47a0d10c4e5b34807ca6d';   //'3abf04f536ede7f6964919936a35e614';  //'5451d20c01f47a0d10c4e5b34807ca6d';//
-const FromNumber = CONFIG.DB.FromNumber ||'+18647547021' ;  
+const accountSid = 'AC3765f2ec587b6b5b893566f1393a00f4';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'AC3765f2ec587b6b5b893566f1393a00f4';
+const authToken = 'b36eba6376b5939cebe146f06d33ec57';   //'3abf04f536ede7f6964919936a35e614';  //'b36eba6376b5939cebe146f06d33ec57';//
+const FromNumber = CONFIG.DB.FromNumber || '+18647547021';
 
 const client = require('twilio')(accountSid, authToken);
 
@@ -546,6 +546,9 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
+                var mailSent = 0;
+                var msgSent = 0;
+                var referrerMailSent = 0;
                 var isWeb = req.query.isWeb;
                 req.body.heParentId = (req.body.heParentId) ? req.body.heParentId : 0;
                 req.body.fresherExperience = (req.body.fresherExperience) ? req.body.fresherExperience : 0;
@@ -556,7 +559,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.status = (req.body.status) ? req.body.status : 1;
                 req.body.experience = (req.body.experience) ? req.body.experience : '0.0';
                 req.body.presentSalary = (req.body.presentSalary) ? req.body.presentSalary : '0.0';
-                req.body.walkinType = (req.body.walkinType) ? req.body.walkinType : 0;
+                req.body.walkinType = req.body.walkinType ? req.body.walkinType : 0;
                 req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
                 req.body.IDNumber = (req.body.IDNumber) ? req.body.IDNumber : '';
                 req.body.profilePicture = (req.body.profilePicture) ? req.body.profilePicture : '';
@@ -584,15 +587,15 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.presentSalary),
                     req.st.db.escape(JSON.stringify(scale)),
                     req.st.db.escape(JSON.stringify(period)),
-                    req.st.db.escape(req.body.senderNotes),
-                    req.st.db.escape(req.body.approverNotes),
-                    req.st.db.escape(req.body.receiverNotes),
-                    req.st.db.escape(req.body.changeLog),
-                    req.st.db.escape(req.body.groupId),
-                    req.st.db.escape(req.body.learnMessageId),
-                    req.st.db.escape(req.body.accessUserType),
-                    req.st.db.escape(req.body.approverCount),
-                    req.st.db.escape(req.body.receiverCount),
+                    req.st.db.escape(req.body.senderNotes || ''),
+                    req.st.db.escape(req.body.approverNotes || ''),
+                    req.st.db.escape(req.body.receiverNotes || ''),
+                    req.st.db.escape(req.body.changeLog || ''),
+                    req.st.db.escape(req.body.groupId || ''),
+                    req.st.db.escape(req.body.learnMessageId || 0),
+                    req.st.db.escape(req.body.accessUserType || ''),
+                    req.st.db.escape(req.body.approverCount || 0),
+                    req.st.db.escape(req.body.receiverCount || 0),
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(req.body.walkInType),
                     req.st.db.escape(JSON.stringify(details)),
@@ -612,8 +615,6 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
 
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
-
-
 
                     // if (!err && results && results[0][0]) {
                     //     senderGroupId = results[0][0].senderId;
@@ -738,7 +739,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
 
                                 var parentId = (results[6] && results[6][0]) ? results[6][0].walkInApplicantId : undefined;
                                 walkInApplicantId = Date.now().toString().concat(parentId);
-                                var webLinkTo = 'http://23.236.49.140/whatmate/cv-upload/' + walkInApplicantId;
+                                var webLinkTo = results[5][0].whatmateWebTestOrLive + walkInApplicantId;
                                 webLinkTo = webLinkTo.replace('"', '');
                                 webLinkTo = webLinkTo.replace('"', '');
 
@@ -767,6 +768,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     console.log("Failed to send to candidate", err11);
                                 }
                                 else {
+                                    mailSent = 1;
                                     console.log("mail sent successfully to candidate", result11);
                                 }
                             });
@@ -784,7 +786,14 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                         console.log("Failed to send to referrer", err1);
                                     }
                                     else {
+                                        req.db.query('update 1039_trans set mailSent=1 where tid=' + results[6][0].walkInTransId, function (err, mailsentResults) {
+                                            if (!err) {
+                                                console.log('mail sent status is updated successfully');
+                                            }
+                                        });
+                                        referrerMailSent = 1;
                                         console.log("mail sent successfully to referrer", result1);
+
                                     }
                                 });
                             }
@@ -837,6 +846,13 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                         }
                                         else {
                                             console.log("SUCCESS", "SMS response with ISD");
+                                            msgSent = 1;
+
+                                            req.db.query('update 1039_trans set msgSent=1 where tid=' + results[6][0].walkInTransId, function (msgerr, msgsentResults) {
+                                                if (!msgerr) {
+                                                    console.log('msg sent status is updated successfully');
+                                                }
+                                            });
                                         }
                                     });
 
@@ -845,6 +861,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
 
                                         res5.on("data", function (chunk) {
                                             chunks.push(chunk);
+                                            console.log('sms fateway type 2 sent the sms');
                                         });
 
                                         res5.on("end", function () {
@@ -866,6 +883,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                     }));
                                     console.log('sms type 2 gateway worked');
                                     req5.end();
+                                    msgSent = 1;
                                 }
                                 else if (isdMobile != "") {
                                     client.messages.create(
@@ -879,12 +897,37 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                                 console.log(error6, "SMS");
                                             }
                                             else {
+                                                msgSent = 1;
+                                                req.db.query('update 1039_trans set msgSent=1 where tid=' + results[6][0].walkInTransId, function (msgerr, msgsentResults) {
+                                                    if (!msgerr) {
+                                                        console.log('msg sent status is updated successfully');
+                                                    }
+                                                });
                                                 console.log("SUCCESS", "SMS response with empty isd");
                                             }
-                                        }
-                                    );
+                                        });
                                 }
                             }
+                        }
+
+                        // if (referrerMailSent==0){
+                        //     referrerMailSent=1;
+                        // }
+                        // if (mailSent == 0){
+                        //     mailSent=1;
+                        // }
+                        // if(msgSent = 0){
+                        //     msgSent=1;
+                        // }
+                        if (referrerMailSent && mailSent && msgSent) {
+                            var updateQuery = 'CALL wm_afterWalkRegConfMsgMailSent( ' + results[6][0].walkInTransId + ',' + mailSent + ',' + msgSent + ',' + referrerMailSent + ',' + results[3][0].token + ')';
+                            console.log(updateQuery);
+
+                            req.db.query(updateQuery, function (err, afterResults) {
+                                if (!err && afterResults[0] && afterResults[0][0]) {
+                                    console.log("registration mailsent or msg sent respectively");
+                                }
+                            });
                         }
 
                         response.status = true;
@@ -1575,28 +1618,28 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                 var name = candidateDetails.CVFileName;
 
                                 var attachFile = new Promise(function (resolve, reject) {
-                                  
-                                    
-                                
+
+
+
                                     // new Buffer(b64, 'base64').toString();
                                     var buff = new Buffer(b64, 'base64');
                                     fs.writeFileSync('stack-abuse-logo-out.docx', buff);
-                                
+
                                     // console.log('Base64 image data converted to file: stack-abuse-logo-out.txt');
-                                
+
                                     fs.readFile('stack-abuse-logo-out.docx', 'utf8', function (err, data) {
                                         if (err) {
                                             return console.log(err);
                                         }
                                         console.log("-hbjkliu-", data);
                                     });
-                                
+
                                     var attachment = {
                                         path: 'stack-abuse-logo-out.docx',
                                         extension: extensionType,
                                         fileName: name
                                     };
-                                
+
                                     var uniqueId = uuid.v4();
                                     var filetype = (attachment.extension) ? attachment.extension : '';
                                     //    console.log(filetype);
@@ -1605,21 +1648,21 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                     aFilename = attachment.fileName;
                                     //    console.log("aFilenameaFilename",aFilename);
                                     //    console.log("req.files.attachment.path",attachment.path);
-                                
+
                                     var readStream = fs.createReadStream(attachment.path);
-                                
-                                
+
+
                                     uploadDocumentToCloud(aUrl, readStream, function (err) {
                                         if (!err) {
                                             console.log(aUrl)
                                         }
                                         else {
-                                
+
                                             console.log('FnSaveServiceAttachment:attachment not upload');
                                         }
                                     });
                                     fs.unlinkSync('stack-abuse-logo-out.docx');
-                                
+
                                 });
 
                                 attachFile.then(function (result) {
@@ -1631,7 +1674,7 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
 
 
 
-                                  candidateDetails.cvFile=aUrl;
+                                candidateDetails.cvFile = aUrl;
 
                                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                                 req.body.parentId = req.body.parentId ? req.body.parentId : 0;
@@ -1878,7 +1921,7 @@ walkInCvCtrl.saveWalkInJobs = function (req, res, next) {
                 req.body.profilePic = req.body.profilePic ? req.body.profilePic : 1;
 
                 var walkinJobCode = req.body.jobCode.replace(/<(.*)>/g, '');
-                
+
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.walkInJobId),
@@ -1895,7 +1938,7 @@ walkInCvCtrl.saveWalkInJobs = function (req, res, next) {
                     req.st.db.escape(req.body.DOBType),
                     req.st.db.escape(walkinJobCode),
                     req.st.db.escape(req.body.profilePic)
-                
+
                 ];
 
                 var procQuery = 'CALL wm_save_walkinJobs( ' + inputs.join(',') + ')';
@@ -2959,7 +3002,7 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 req.body.acceptTnCMsgFormat = req.body.acceptTnCMsgFormat ? req.body.acceptTnCMsgFormat : '';
                 req.body.profilePic = req.body.profilePic ? req.body.profilePic : 1;
 
-                
+
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -2992,7 +3035,7 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(req.body.acceptTnCFlag),
                     req.st.db.escape(req.body.acceptTnCMsgFormat),
                     req.st.db.escape(req.body.profilePic)
-             
+
                 ];
 
                 var procQuery = 'CALL wm_save_walkWebConfig( ' + inputs.join(',') + ')';
@@ -3121,11 +3164,11 @@ walkInCvCtrl.walkInUploadLinkFlag = function (req, res, next) {
 
             if (!err && result && result[0] && result[0][0]) {
 
-                if(result[0][0].validateLinkFlag=='true'){
-                    result[0][0].validateLinkFlag= true;
+                if (result[0][0].validateLinkFlag == 'true') {
+                    result[0][0].validateLinkFlag = true;
                 }
-                else{
-                    result[0][0].validateLinkFlag=false;
+                else {
+                    result[0][0].validateLinkFlag = false;
                 }
 
                 response.status = result[0][0].validateLinkFlag;
@@ -3542,6 +3585,160 @@ walkInCvCtrl.saveCVUpdatedData = function (req, res, next) {
             }
         });
     }
+};
+
+
+walkInCvCtrl.walkInPDfGeneration = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.body.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    var toMailId = req.body.toMailId;
+    if (typeof (toMailId) == "string") {
+        toMailId = JSON.parse(toMailId);
+    }
+    if (!toMailId) {
+        toMailId = []
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.heMasterId),
+                    req.st.db.escape(req.body.startDate),
+                    req.st.db.escape(req.body.endDate)
+                ];
+
+                var procQuery = 'CALL wm_get_walkInPdfGeneration( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+
+                    htmlContent = "";
+                    if (result[1].length) {
+
+                        htmlContent += "<!DOCTYPE html><html><head lang='en'><meta charset='UTF-8'><title></title><body><h1 style='text-align:center;margin-bottom: 0px;'>";
+                        htmlContent += result[0][0].companyName;
+                        htmlContent += "</h1>";
+                        htmlContent += "<h3 style='text-align:center;margin-top:0px'>WalkIn Registration from " + result[2][0].startDate + " to " + result[2][0].endDate;
+                        htmlContent += "</h3>";
+                        htmlContent += '<center><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;">';
+                        htmlContent += "<thead><th>SL No.</th>";
+
+                        for (var i = 0; i < Object.keys(result[1][0]).length; i++) {
+                            htmlContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + Object.keys(result[1][0])[i] + '</th>';
+                        }
+                        htmlContent += "</thead>";
+
+                        for (var j = 0; j < result[1].length; j++) {
+                            htmlContent += '<tr><td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + (j + 1) + '</td>';
+                            for (var i = 0; i < Object.keys(result[1][0]).length; i++) {
+                                htmlContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[1][j][Object.keys(result[1][0])[i]] + '</td>';
+                            }
+                            htmlContent += "</tr>";
+                        }
+                        htmlContent += "<table></center></body></html>";
+                    }
+
+                    // for (var k = 0; k < toMailId.length; k++) {
+
+                    var options = { format: 'A4', width: '8in', height: '10.5in', border: '0', timeout: 30000, "zoomFactor": "1" };
+
+                    var myBuffer = [];
+                    var buffer = new Buffer(htmlContent, 'utf16le');
+                    for (var i = 0; i < buffer.length; i++) {
+                        myBuffer.push(buffer[i]);
+                    }
+
+                    var attachmentObjectsList = [];
+                    htmlpdf.create(htmlContent, options).toBuffer(function (err, buffer) {
+                        attachmentObjectsList = [{
+                            filename: "WalkIn-Registration" + '.pdf',
+                            content: buffer
+
+                        }];
+
+                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                        var email = new sendgrid.Email();
+                        email.from = "noreply@talentMicro.com";
+                        email.to = toMailId;
+                        email.subject = "Walk-In Registration from " + result[2][0].startDate + " to " + result[2][0].endDate;
+                        email.html = "Please find the WalkIn Registration for the period from " + result[2][0].startDate + " to " + result[2][0].endDate + " attached herewith. <br><br><br><br>Whatmate Team.<br><br> This email is intended only for the person to whom it is addressed and/or otherwise authorized personnel. The information contained herein and attached is confidential TalentMicro Innovations and the property of TalentMicro Innovations Pvt. Ltd. If you are not the intended recipient, please be advised that viewing this message and any attachments, as well as copying, forwarding, printing, and disseminating any information related to this email is prohibited, and that you should not take any action based on the content of this email and/or its attachments. If you received this message in error, please contact the sender and destroy all copies of this email and any attachment. Please note that the views and opinions expressed herein are solely those of the author and do not necessarily reflect those of the company. While antivirus protection tools have been employed, you should check this email and attachments for the presence of viruses. No warranties or assurances are made in relation to the safety and content of this email and ttachments. TalentMicro Innovations Pvt. Ltd. accepts no liability for any damage caused by any virus transmitted by or contained in this email and attachments. No liability is accepted for any consequences arising from this email";
+                        // email.cc = mailOptions.cc;
+                        // email.bcc = mailOptions.bcc;
+                        // email.html = mailOptions.html;
+                        //if 1 or more attachments are present
+
+                        email.addFile({
+                            filename: attachmentObjectsList[0].filename,
+                            content: attachmentObjectsList[0].content,
+                            contentType: "application/pdf"
+                        });
+
+                        sendgrid.send(email, function (err, results) {
+                            if (err) {
+                                console.log("mail not sent", err);
+                            }
+                            else {
+                                console.log("mail sent successfully", results);
+                                if (!err && result && result[0] && result[1]) {
+                                    response.status = true;
+                                    response.message = "WalkIn Registration pdf mailed successfully";
+                                    response.error = null;
+                                    response.data = {
+                                        companyDetails: (result && result[0]) ? result[0][0] : {},
+                                        visitorList: (result && result[1]) ? result[1] : []
+                                    };
+                                    res.status(200).json(response);
+                                }
+                                else if (!err) {
+                                    response.status = true;
+                                    response.message = "No result found";
+                                    response.error = null;
+                                    response.data = {
+                                        companyDetails: {},
+                                        visitorList: []
+                                    };
+                                    res.status(200).json(response);
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while sending mail";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            }
+                        });
+                    });
+                    // }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
 };
 
 module.exports = walkInCvCtrl;
