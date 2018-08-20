@@ -110,6 +110,11 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                 req.body.lastInsertedInvoiceNo  = (req.body.lastInsertedInvoiceNo ) ? req.body.lastInsertedInvoiceNo  : '';
                 req.body.invoiceNumberLength  = (req.body.invoiceNumberLength ) ? req.body.invoiceNumberLength  : 0;
 
+                req.body.jobcodePrefix  = (req.body.jobcodePrefix ) ? req.body.jobcodePrefix  : '';
+                req.body.jobcodeSuffix  = (req.body.jobcodeSuffix ) ? req.body.jobcodeSuffix  : '';
+                req.body.lastInsertedJobcodeNo  = (req.body.lastInsertedJobcodeNo ) ? req.body.lastInsertedJobcodeNo  : '';
+                req.body.invoiceNumberLength  = (req.body.invoiceNumberLength ) ? req.body.invoiceNumberLength  : 0;
+
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.defId),
@@ -129,7 +134,11 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                     req.st.db.escape(req.body.invoicePrefix),
                     req.st.db.escape(req.body.invoiceSuffix),
                     req.st.db.escape(req.body.lastInsertedInvoiceNo),
-                    req.st.db.escape(req.body.invoiceNumberLength)               
+                    req.st.db.escape(req.body.invoiceNumberLength),
+                    req.st.db.escape(req.body.jobcodePrefix),
+                    req.st.db.escape(req.body.jobcodeSuffix),
+                    req.st.db.escape(req.body.lastInsertedJobcodeNo),
+                    req.st.db.escape(req.body.jobcodeLength)
                 ];
                 var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
                 console.log(procQuery);

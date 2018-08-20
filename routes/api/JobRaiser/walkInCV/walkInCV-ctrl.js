@@ -738,7 +738,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
 
                                 var parentId = (results[6] && results[6][0]) ? results[6][0].walkInApplicantId : undefined;
                                 walkInApplicantId = Date.now().toString().concat(parentId);
-                                var webLinkTo = 'http://23.236.49.140/whatmate/cv-upload/' + walkInApplicantId;
+                                var webLinkTo = results[5][0].whatmateWebTestOrLive + walkInApplicantId;
                                 webLinkTo = webLinkTo.replace('"', '');
                                 webLinkTo = webLinkTo.replace('"', '');
 
@@ -3123,13 +3123,15 @@ walkInCvCtrl.walkInUploadLinkFlag = function (req, res, next) {
 
                 if(result[0][0].validateLinkFlag=='true'){
                     result[0][0].validateLinkFlag= true;
+                    response.message = "Please upload your resume";
                 }
                 else{
                     result[0][0].validateLinkFlag=false;
+                    response.message = "Link has expired";
+               
                 }
 
                 response.status = result[0][0].validateLinkFlag;
-                response.message = "Validate upload link";
                 response.error = null;
                 response.data = null;
                 res.status(200).json(response);
@@ -3543,5 +3545,161 @@ walkInCvCtrl.saveCVUpdatedData = function (req, res, next) {
         });
     }
 };
+
+
+
+walkInCvCtrl.walkInPDfGeneration = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.body.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    var toMailId = req.body.toMailId;
+    if (typeof (toMailId) == "string") {
+        toMailId = JSON.parse(toMailId);
+    }
+    if (!toMailId) {
+        toMailId = []
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.heMasterId),
+                    req.st.db.escape(req.body.startDate),
+                    req.st.db.escape(req.body.endDate)
+                ];
+
+                var procQuery = 'CALL wm_get_walkInPdfGeneration( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+
+                    htmlContent = "";
+                    if (result[1].length) {
+
+                        htmlContent += "<!DOCTYPE html><html><head lang='en'><meta charset='UTF-8'><title></title><body><h1 style='text-align:center;margin-bottom: 0px;'>";
+                        htmlContent += result[0][0].companyName;
+                        htmlContent += "</h1>";
+                        htmlContent += "<h3 style='text-align:center;margin-top:0px'>WalkIn Registration from " + result[2][0].startDate + " to " + result[2][0].endDate;
+                        htmlContent += "</h3>";
+                        htmlContent += '<center><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;">';
+                        htmlContent += "<thead><th>SL No.</th>";
+
+                        for (var i = 0; i < Object.keys(result[1][0]).length; i++) {
+                            htmlContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + Object.keys(result[1][0])[i] + '</th>';
+                        }
+                        htmlContent += "</thead>";
+
+                        for (var j = 0; j < result[1].length; j++) {
+                            htmlContent += '<tr><td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + (j + 1) + '</td>';
+                            for (var i = 0; i < Object.keys(result[1][0]).length; i++) {
+                                htmlContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[1][j][Object.keys(result[1][0])[i]] + '</td>';
+                            }
+                            htmlContent += "</tr>";
+                        }
+                        htmlContent += "<table></center></body></html>";
+                    }
+
+                    // for (var k = 0; k < toMailId.length; k++) {
+
+                    var options = { format: 'A4', width: '8in', height: '10.5in', border: '0', timeout: 30000, "zoomFactor": "1" };
+
+                    var myBuffer = [];
+                    var buffer = new Buffer(htmlContent, 'utf16le');
+                    for (var i = 0; i < buffer.length; i++) {
+                        myBuffer.push(buffer[i]);
+                    }
+
+                    var attachmentObjectsList = [];
+                    htmlpdf.create(htmlContent, options).toBuffer(function (err, buffer) {
+                        attachmentObjectsList = [{
+                            filename: "WalkIn-Registration" + '.pdf',
+                            content: buffer
+
+                        }];
+
+                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                        var email = new sendgrid.Email();
+                        email.from = "noreply@talentMicro.com";
+                        email.to = toMailId;
+                        email.subject = "Walk-In Registration from " + result[2][0].startDate + " to " + result[2][0].endDate;
+                        email.html = "Please find the WalkIn Registration for the period from " + result[2][0].startDate + " to " + result[2][0].endDate + " attached herewith. <br><br><br><br>Whatmate Team.<br><br> This email is intended only for the person to whom it is addressed and/or otherwise authorized personnel. The information contained herein and attached is confidential TalentMicro Innovations and the property of TalentMicro Innovations Pvt. Ltd. If you are not the intended recipient, please be advised that viewing this message and any attachments, as well as copying, forwarding, printing, and disseminating any information related to this email is prohibited, and that you should not take any action based on the content of this email and/or its attachments. If you received this message in error, please contact the sender and destroy all copies of this email and any attachment. Please note that the views and opinions expressed herein are solely those of the author and do not necessarily reflect those of the company. While antivirus protection tools have been employed, you should check this email and attachments for the presence of viruses. No warranties or assurances are made in relation to the safety and content of this email and ttachments. TalentMicro Innovations Pvt. Ltd. accepts no liability for any damage caused by any virus transmitted by or contained in this email and attachments. No liability is accepted for any consequences arising from this email";
+                        // email.cc = mailOptions.cc;
+                        // email.bcc = mailOptions.bcc;
+                        // email.html = mailOptions.html;
+                        //if 1 or more attachments are present
+
+                        email.addFile({
+                            filename: attachmentObjectsList[0].filename,
+                            content: attachmentObjectsList[0].content,
+                            contentType: "application/pdf"
+                        });
+
+                        sendgrid.send(email, function (err, results) {
+                            if (err) {
+                                console.log("mail not sent", err);
+                            }
+                            else {
+                                console.log("mail sent successfully", results);
+                                if (!err && result && result[0] && result[1]) {
+                                    response.status = true;
+                                    response.message = "WalkIn Registration pdf mailed successfully";
+                                    response.error = null;
+                                    response.data = {
+                                        companyDetails: (result && result[0]) ? result[0][0] : {},
+                                        visitorList: (result && result[1]) ? result[1] : []
+                                    };
+                                    res.status(200).json(response);
+                                }
+                                else if (!err) {
+                                    response.status = true;
+                                    response.message = "No result found";
+                                    response.error = null;
+                                    response.data = {
+                                        companyDetails: {},
+                                        visitorList: []
+                                    };
+                                    res.status(200).json(response);
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while sending mail";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            }
+                        });
+                    });
+                    // }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 
 module.exports = walkInCvCtrl;

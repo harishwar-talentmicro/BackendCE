@@ -508,7 +508,7 @@ billingCtrl.billInvoiceTemplate = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(attachment)),
                     req.st.db.escape(req.body.replyMailId),
                     req.st.db.escape(req.body.updateFlag),
-                    req.st.db.escape(req.body.tableTemplate)
+                    req.st.db.escape(JSON.stringify(tableTemplate))
 
                 ];
 
@@ -1049,7 +1049,7 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
                             myBuffer.push(buffer[i]);
                         }
 
-                        var attachmentObjectsList = [];
+                        // var attachmentObjectsList = [];
                         // htmlpdf.create(invoiceBody, options).toBuffer(function (err, buffer) {
                             // attachment = {
                             //     filename: "INVOICE" + req.query.invoiceNumber+'.pdf',
@@ -1061,54 +1061,36 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
                             var attachmentObjectsList = [];
                             htmlpdf.create(invoiceBody, options).toBuffer(function (err, buffer) {
                                 attachmentObjectsList = [{
-                                    filename: "invoice" + '.pdf',
+                                    filename: "INVOICE" + req.query.invoiceNumber+'.pdf',
                                     content: buffer
 
                                 }];
 
-                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                var email = new sendgrid.Email();
-                                email.from = "noreply@talentMicro.com";
-                                email.to = 'sundar@talentmicro.com';
-                                email.subject = "Invoice generated";
-                                email.html = '<h1>asfasdasdasdasdasds</h1>';
+                                // var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                // var email = new sendgrid.Email();
+                                // email.from = "noreply@talentMicro.com";
+                                // email.to = 'sundar@talentmicro.com';
+                                // email.subject = "Invoice generated";
+                                // email.html = '<h1>asfasdasdasdasdasds</h1>';
                                 // email.cc = mailOptions.cc;
                                 // email.bcc = mailOptions.bcc;
                                 // email.html = mailOptions.html;
                                 //if 1 or more attachments are present
 
-                                email.addFile({
-                                    filename: attachmentObjectsList[0].filename,
-                                    content: attachmentObjectsList[0].content,
-                                    contentType: "application/pdf"
-                                });
+                                // email.addFile({
+                                //     filename: attachmentObjectsList[0].filename,
+                                //     content: attachmentObjectsList[0].content,
+                                //     contentType: "application/pdf"
+                                // });
 
-                                sendgrid.send(email, function (err, result) {
-                                    if(!err) console.log(err);
-                                    console.log(result);
-                                });
+                                // sendgrid.send(email, function (err, result) {
+                                //     if(!err) console.log(err);
+                                //     console.log(result);
+                                // });
                                 //     console.log('buffer',buffer);
                                 //     var wstream = fs.createWriteStream('invoiceGen');
                                 //     wstream.write(buffer);
                                 //     wstream.end();
-
-
-                                //     var filetype = (attachment.extension) ? attachment.extension : '';
-                                //     var uniqueId = uuid.v4();
-                                //     // consol.log()
-                                //     aUrl = uniqueId + '.' + filetype;
-                                //     console.log(uniqueId);
-                                //     aFilename = attachment.fileName;
-
-                                //   var readStream = fs.createReadStream(attachment.content);
-                                //     uploadDocumentToCloud(aUrl, readStream, function (err) {
-                                //         if (!err) {
-                                //             console.log('Invoice Uploaded successfully');
-                                //         }
-                                //         else {
-                                //             console.log('FnSaveServiceAttachment:attachment not upload',err);
-                                //         }
-                                //     });
 
                                 response.data = {
                                     invoiceBody: invoiceBody,
@@ -1116,8 +1098,8 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
                                     invoiceDetails: (result[0] && result[0][0]) ? result[0][0] : {},
                                     clientDetails: (result[1] && result[1][0]) ? result[1] : {},
                                     applicantDetails: (result[2] && result[2][0]) ? result[2] : [],
-                                    taxData: (result[3] && result[3][0]) ? result[3] : []
-                                    // bufferPdf: attachment.content
+                                    taxData: (result[3] && result[3][0]) ? result[3] : [],
+                                    bufferPdf: attachmentObjectsList[0].content
                                 }
                                 res.status(200).json(response);
 

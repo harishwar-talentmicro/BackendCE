@@ -86,5 +86,7 @@ router.post('/referFriend',applicantCtrl.referFriend);
 
 router.post('/importApplicants',applicantCtrl.saveApplicantForImporter);
 
+router.get('/resumeSearchedResults',applicantCtrl.resumeSearchResultsByPage);
+
 module.exports = router;
 

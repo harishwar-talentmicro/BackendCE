@@ -2261,10 +2261,18 @@ masterCtrl.saveUserManager = function (req, res, next) {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if (!err && results) {
+                    if (!err && results && results[0] && results[0][0].message) {
                         response.status = true;
                         response.message = "User data saved sucessfully";
                         response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err && results && results[0] && results[0][0].error) {
+                        response.status = false;
+                        response.message = results[0][0].error;
+                        response.error = results[0][0].error;
                         response.data = null;
                         res.status(200).json(response);
                     }
@@ -2426,6 +2434,79 @@ masterCtrl.saveAssessmentGroupType = function (req, res, next) {
                     }
                 });
 
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+masterCtrl.jobCodeGeneration = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL wm_paceJobCode_generation( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Invoice number generated sucessfully";
+                        response.error = null;
+
+                        response.data = result[0][0];
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while generating invoice number";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
             }
             else {
                 res.status(401).json(response);

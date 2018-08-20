@@ -46,5 +46,7 @@ router.post('/userManager',masterCtrl.saveUserManager);
 router.get('/assessmentGroupType',masterCtrl.getAssessmentGroupType);
 router.post('/saveAssessmentGroupType',masterCtrl.saveAssessmentGroupType);
 
+router.get('/generateJobCode',masterCtrl.jobCodeGeneration);
+
 module.exports = router;
 

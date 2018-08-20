@@ -787,7 +787,7 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                                                 .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function () {
                                                     console.log('imposing profile picture over dummy');
                                                     Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function (err, penna) {
-                                                        penna.resize(160, 160);
+                                                        penna.resize(160, 160);   //resizeX,resizeY
                                                         console.log('reading edited profile picture');
                                                         console.log('reading background image');
                                                         if (err) throw err;
@@ -808,20 +808,20 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                                                         var titleLength = (((title.length / 2)));
                                                         lenna.quality(100)
                                                         Jimp.loadFont(Jimp.FONT_SANS_64_BLACK).then(function (font) {
-                                                            lenna.print(font, 50, 490, name)
+                                                            lenna.print(font, 50, 490, name)    //font->fontSize,  50 -X,490 -Y ,  nameX,nameY
                                                             Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                                                lenna.print(font, 50, 270, type)
+                                                                lenna.print(font, 50, 270, type)      // type // typeX ,typeY
                                                                 Jimp.loadFont(Jimp.FONT_SANS_32_WHITE).then(function (font) {
-                                                                    lenna.print(font, 50, 330, title)
+                                                                    lenna.print(font, 50, 330, title)    // titleX,titleY
                                                                     Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                                                        lenna.print(font, 50, 610, title2)
+                                                                        lenna.print(font, 50, 610, title2)    // title2X,title2Y
                                                                         Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                                                            lenna.print(font, 50, 660, title1, 700)
+                                                                            lenna.print(font, 50, 660, title1, 700)   // title1X,title1Y,700- title1MaxWidth
                                                                             console.log("image processed");
 
                                                                             lenna.composite(penna, 562, 338)
                                                                                 .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + timestamp + ".png", function () {
-                                                                                    console.log('writing final image');
+                                                                                    console.log('writing final image');   // profile picture positing,profilePictureX,profilePictureY
                                                                                     // console.log("response after promise", resp);
                                                                                     // setTimeout(function () {
                                                                                     var attachment = {
