@@ -2484,7 +2484,7 @@ masterCtrl.jobCodeGeneration = function (req, res, next) {
 
                     if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
-                        response.message = "Invoice number generated sucessfully";
+                        response.message = "New Jobcode is generated ";
                         response.error = null;
 
                         response.data = result[0][0];
@@ -2501,7 +2501,7 @@ masterCtrl.jobCodeGeneration = function (req, res, next) {
 
                     else {
                         response.status = false;
-                        response.message = "Error while generating invoice number";
+                        response.message = "Error while generating Jobcode";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

@@ -47,7 +47,7 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
     if (typeof (heDepartment) == "string") {
         heDepartment = JSON.parse(heDepartment);
     }
-    if (!heDepartment){
+    if (!heDepartment) {
         heDepartment = [];
     }
 
@@ -88,6 +88,14 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
         defaultClient = {};
     }
 
+    var stageStatusList = req.body.stageStatusList;
+    if (typeof (stageStatusList) == "string") {
+        stageStatusList = JSON.parse(stageStatusList);
+    }
+    if (!stageStatusList) {
+        stageStatusList = [];
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
@@ -106,14 +114,15 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                 req.body.merge = (req.body.merge) ? req.body.merge : 0;
                 req.body.timeOutValue = (req.body.timeOutValue) ? req.body.timeOutValue : null;
                 req.body.invoicePrefix = (req.body.invoicePrefix) ? req.body.invoicePrefix : '';
-                req.body.invoiceSuffix  = (req.body.invoiceSuffix ) ? req.body.invoiceSuffix  : '';
-                req.body.lastInsertedInvoiceNo  = (req.body.lastInsertedInvoiceNo ) ? req.body.lastInsertedInvoiceNo  : '';
-                req.body.invoiceNumberLength  = (req.body.invoiceNumberLength ) ? req.body.invoiceNumberLength  : 0;
+                req.body.invoiceSuffix = (req.body.invoiceSuffix) ? req.body.invoiceSuffix : '';
+                req.body.lastInsertedInvoiceNo = (req.body.lastInsertedInvoiceNo) ? req.body.lastInsertedInvoiceNo : '';
+                req.body.invoiceNumberLength = (req.body.invoiceNumberLength) ? req.body.invoiceNumberLength : 0;
 
-                req.body.jobcodePrefix  = (req.body.jobcodePrefix ) ? req.body.jobcodePrefix  : '';
-                req.body.jobcodeSuffix  = (req.body.jobcodeSuffix ) ? req.body.jobcodeSuffix  : '';
-                req.body.lastInsertedJobcodeNo  = (req.body.lastInsertedJobcodeNo ) ? req.body.lastInsertedJobcodeNo  : '';
-                req.body.invoiceNumberLength  = (req.body.invoiceNumberLength ) ? req.body.invoiceNumberLength  : 0;
+                req.body.jobcodePrefix = (req.body.jobcodePrefix) ? req.body.jobcodePrefix : '';
+                req.body.jobcodeSuffix = (req.body.jobcodeSuffix) ? req.body.jobcodeSuffix : '';
+                req.body.lastInsertedJobcodeNo = (req.body.lastInsertedJobcodeNo) ? req.body.lastInsertedJobcodeNo : '';
+                req.body.invoiceNumberLength = (req.body.invoiceNumberLength) ? req.body.invoiceNumberLength : 0;
+                req.body.isAutoMovement = (req.body.isAutoMovement) ? req.body.isAutoMovement : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -138,7 +147,9 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                     req.st.db.escape(req.body.jobcodePrefix),
                     req.st.db.escape(req.body.jobcodeSuffix),
                     req.st.db.escape(req.body.lastInsertedJobcodeNo),
-                    req.st.db.escape(req.body.jobcodeLength)
+                    req.st.db.escape(req.body.jobcodeLength),
+                    req.st.db.escape(req.body.isAutoMovement),
+                    req.st.db.escape(JSON.stringify(stageStatusList))
                 ];
                 var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -867,11 +878,11 @@ jobCtrl.saveEducation = function (req, res, next) {
     }
 
     var education = req.body.education;
-    if(typeof(education)=='string'){
+    if (typeof (education) == 'string') {
         education = JSON.parse(education);
     }
-    if(!education){
-        education=[];
+    if (!education) {
+        education = [];
     }
     if (!validationFlag) {
         response.error = error;
@@ -1152,8 +1163,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                         contactList = JSON.parse(contactList);
                     }
 
-                    if(!contactList){
-                        contactList=[];
+                    if (!contactList) {
+                        contactList = [];
                     }
 
                     var branchList = req.body.branchList;
@@ -1161,16 +1172,16 @@ jobCtrl.saveRequirement = function (req, res, next) {
                         branchList = JSON.parse(branchList);
                     }
 
-                    if(!branchList){
-                        branchList=[];
+                    if (!branchList) {
+                        branchList = [];
                     }
 
                     var jobTitle = req.body.jobTitle;
                     if (typeof (jobTitle) == "string") {
                         jobTitle = JSON.parse(jobTitle);
                     }
-                    if(!jobTitle){
-                        jobTitle=[];
+                    if (!jobTitle) {
+                        jobTitle = [];
                     }
 
                     if (!req.body.jobCode) {
@@ -1262,10 +1273,10 @@ jobCtrl.saveRequirement = function (req, res, next) {
 
                     var industry = req.body.industry;
                     if (typeof (industry) == "string") {
-                   industry = JSON.parse(industry);
+                        industry = JSON.parse(industry);
                     }
                     if (!industry) {
-                    industry = [];
+                        industry = [];
                     }
 
                     if (!validationFlag) {
@@ -1364,76 +1375,72 @@ jobCtrl.saveRequirement = function (req, res, next) {
                             console.log(err);
 
                             if (!err && results && results[0]) {
-                                senderGroupId = results[0][0].senderId;
-                                notificationTemplaterRes = notificationTemplater.parse('compose_message', {
-                                    senderName: results[0][0].senderName
-                                });
 
-                                for (var i = 0; i < results[1].length; i++) {
-                                    if (notificationTemplaterRes.parsedTpl) {
-                                        notification.publish(
-                                            results[1][i].receiverId,
-                                            (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                            (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                            results[0][0].senderId,
-                                            notificationTemplaterRes.parsedTpl,
-                                            31,
-                                            0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                            (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                            0,
-                                            0,
-                                            0,
-                                            0,
-                                            1,
-                                            moment().format("YYYY-MM-DD HH:mm:ss"),
-                                            '',
-                                            0,
-                                            0,
-                                            null,
-                                            '',
-                                            /** Data object property to be sent with notification **/
-                                            {
-                                                messageList: {
-                                                    messageId: results[1][i].messageId,
-                                                    message: results[1][i].message,
-                                                    messageLink: results[1][i].messageLink,
-                                                    createdDate: results[1][i].createdDate,
-                                                    messageType: results[1][i].messageType,
-                                                    messageStatus: results[1][i].messageStatus,
-                                                    priority: results[1][i].priority,
-                                                    senderName: results[1][i].senderName,
-                                                    senderId: results[1][i].senderId,
-                                                    receiverId: results[1][i].receiverId,
-                                                    groupId: results[1][i].senderId,
-                                                    groupType: 2,
-                                                    transId: results[1][i].transId,
-                                                    formId: results[1][i].formId,
-                                                    currentStatus: results[1][i].currentStatus,
-                                                    currentTransId: results[1][i].currentTransId,
-                                                    parentId: results[1][i].parentId,
-                                                    accessUserType: results[1][i].accessUserType,
-                                                    heUserId: results[1][i].heUserId,
-                                                    formData: JSON.parse(results[1][i].formDataJSON)
+                                // for (var i = 0; i < results[1].length; i++) {
+                                //     if (notificationTemplaterRes.parsedTpl) {
+                                //         notification.publish(
+                                //             results[1][i].receiverId,
+                                //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                //             results[0][0].senderId,
+                                //             notificationTemplaterRes.parsedTpl,
+                                //             31,
+                                //             0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                //             (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                //             0,
+                                //             0,
+                                //             0,
+                                //             0,
+                                //             1,
+                                //             moment().format("YYYY-MM-DD HH:mm:ss"),
+                                //             '',
+                                //             0,
+                                //             0,
+                                //             null,
+                                //             '',
+                                //             /** Data object property to be sent with notification **/
+                                //             {
+                                //                 messageList: {
+                                //                     messageId: results[1][i].messageId,
+                                //                     message: results[1][i].message,
+                                //                     messageLink: results[1][i].messageLink,
+                                //                     createdDate: results[1][i].createdDate,
+                                //                     messageType: results[1][i].messageType,
+                                //                     messageStatus: results[1][i].messageStatus,
+                                //                     priority: results[1][i].priority,
+                                //                     senderName: results[1][i].senderName,
+                                //                     senderId: results[1][i].senderId,
+                                //                     receiverId: results[1][i].receiverId,
+                                //                     groupId: results[1][i].senderId,
+                                //                     groupType: 2,
+                                //                     transId: results[1][i].transId,
+                                //                     formId: results[1][i].formId,
+                                //                     currentStatus: results[1][i].currentStatus,
+                                //                     currentTransId: results[1][i].currentTransId,
+                                //                     parentId: results[1][i].parentId,
+                                //                     accessUserType: results[1][i].accessUserType,
+                                //                     heUserId: results[1][i].heUserId,
+                                //                     formData: (results[1] && results[1][i] && results[1][i].formDataJSON) ? JSON.parse(results[1][i].formDataJSON) : {}
 
-                                                }
-                                            },
-                                            null,
-                                            tokenResult[0].isWhatMate,
-                                            results[1][i].secretKey);
-                                        console.log('postNotification : notification for compose_message is sent successfully');
-                                    }
-                                    else {
-                                        console.log('Error in parsing notification compose_message template - ',
-                                            notificationTemplaterRes.error);
-                                        console.log('postNotification : notification for compose_message is not sent successfully');
-                                    }
-                                }
+                                //                 }
+                                //             },
+                                //             null,
+                                //             tokenResult[0].isWhatMate,
+                                //             results[1][i].secretKey);
+                                //         console.log('postNotification : notification for compose_message is sent successfully');
+                                //     }
+                                //     else {
+                                //         console.log('Error in parsing notification compose_message template - ',
+                                //             notificationTemplaterRes.error);
+                                //         console.log('postNotification : notification for compose_message is not sent successfully');
+                                //     }
+                                // }
 
                                 response.status = true;
-                                if (req.body.jdTemplateFlag==1){
-                                    response.message = "Requirement template saved successfully";    
+                                if (req.body.jdTemplateFlag == 1) {
+                                    response.message = "Requirement template saved successfully";
                                 }
-                                else{
+                                else {
                                     response.message = "Requirement saved successfully";
                                 }
 
@@ -1459,22 +1466,13 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                         parentId: results[0][0].parentId,
                                         accessUserType: results[0][0].accessUserType,
                                         heUserId: results[0][0].heUserId,
-                                        formData: JSON.parse(results[0][0].formDataJSON),
+                                        formData: (results[0] && results[0][0] && results[0][0].formDataJSON) ? JSON.parse(results[0][0].formDataJSON) : {},
                                         requirementList: (results && results[2] && results[2][0]) ? results[2] : [],
                                         jdTemplateList: (results && results[3] && results[3][0]) ? results[3] : [],
-                                        requirementJobTitle:(results && results[4] && results[4][0]) ? results[4] : []
+                                        requirementJobTitle: (results && results[4] && results[4][0]) ? results[4] : []
                                     }
-                            };
-                                if (isWeb == 0) {
-                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                    zlib.gzip(buf, function (_, result) {
-                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                        res.status(200).json(response);
-                                    });
-                                }
-                                else {
-                                    res.status(200).json(response);
-                                }
+                                };
+                                res.status(200).json(response);
                             }
                             else {
                                 response.status = false;
@@ -1513,7 +1511,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                             branchList = JSON.parse(branchList);
                         }
 
-                        if(!branchList){
+                        if (!branchList) {
                             branchList = [];
                         }
 
@@ -1522,7 +1520,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                             jobTitle = JSON.parse(jobTitle);
                         }
 
-                        if(!jobTitle){
+                        if (!jobTitle) {
                             jobTitle = {};
                         }
 
@@ -1699,7 +1697,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 req.st.db.escape(JSON.stringify(req.body.industry || [])),
                                 req.st.db.escape(req.body.timestamp),
                                 req.st.db.escape(req.body.currentTimeStamp)
-         ];
+                            ];
 
                             var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
                             console.log(procQuery);
@@ -1757,7 +1755,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                                         parentId: results[1][i].parentId,
                                                         accessUserType: results[1][i].accessUserType,
                                                         heUserId: results[1][i].heUserId,
-                                                        formData: JSON.parse(results[1][i].formDataJSON)
+                                                        formData: (results[1] && results[1][i] && results[1][i].formDataJSON) ? JSON.parse(results[1][i].formDataJSON) : {}
 
                                                     }
                                                 },
@@ -1774,10 +1772,10 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                     }
 
                                     response.status = true;
-                                    if (req.body.jdTemplateFlag==1){
-                                        response.message = "Requirement template saved successfully";    
+                                    if (req.body.jdTemplateFlag == 1) {
+                                        response.message = "Requirement template saved successfully";
                                     }
-                                    else{
+                                    else {
                                         response.message = "Requirement saved successfully";
                                     }
 
@@ -1803,7 +1801,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                             parentId: results[0][0].parentId,
                                             accessUserType: results[0][0].accessUserType,
                                             heUserId: results[0][0].heUserId,
-                                            formData: JSON.parse(results[0][0].formDataJSON)
+                                            formData: (results[0] && results[0][0] && results[0][0].formDataJSON) ? JSON.parse(results[0][0].formDataJSON) : {}
                                         },
                                         requirementList: results[2]
                                     };
@@ -2106,27 +2104,27 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                         response.message = "Requirement Details loaded successfully";
                         response.error = null;
 
-                        result[2][0].branchList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].branchList):{};
-                        result[2][0].contactList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].contactList):[];
-                        result[2][0].currency = (result[2] && result[2][0]) ? JSON.parse(result[2][0].currency):{};
-                        result[2][0].duration = (result[2] && result[2][0]) ? JSON.parse(result[2][0].duration):{};
-                        result[2][0].educationSpecialization = (result[2] && result[2][0]) ? JSON.parse(result[2][0].educationSpecialization):[];
-                        result[2][0].heDepartment = (result[2] && result[2][0]) ? JSON.parse(result[2][0].heDepartment):{};
-                        result[2][0].jobTitle = (result[2] && result[2][0]) ? JSON.parse(result[2][0].jobTitle):{};
-                        result[2][0].jobType = (result[2] && result[2][0]) ? JSON.parse(result[2][0].jobType):{};
-                        result[2][0].locationlist = (result[2] && result[2][0]) ? JSON.parse(result[2][0].locationlist):[];
-                        result[2][0].memberInterviewRound = (result[2] && result[2][0]) ? JSON.parse(result[2][0].memberInterviewRound):[]; 
-                        result[2][0].members = (result[2] && result[2][0]) ? JSON.parse(result[2][0].members):[];
-                        result[2][0].primarySkills = (result[2] && result[2][0]) ? JSON.parse(result[2][0].primarySkills):[];
-                        result[2][0].scale = (result[2] && result[2][0]) ? JSON.parse(result[2][0].scale):{};
-                        result[2][0].secondarySkills = (result[2] && result[2][0]) ? JSON.parse(result[2][0].secondarySkills):[];
-                        result[2][0].industry = (result[2] && result[2][0]) ? JSON.parse(result[2][0].industry):[];
-                        result[2][0].attachmentList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].attachmentList):[];
+                        result[2][0].branchList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].branchList) : {};
+                        result[2][0].contactList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].contactList) : [];
+                        result[2][0].currency = (result[2] && result[2][0]) ? JSON.parse(result[2][0].currency) : {};
+                        result[2][0].duration = (result[2] && result[2][0]) ? JSON.parse(result[2][0].duration) : {};
+                        result[2][0].educationSpecialization = (result[2] && result[2][0]) ? JSON.parse(result[2][0].educationSpecialization) : [];
+                        result[2][0].heDepartment = (result[2] && result[2][0]) ? JSON.parse(result[2][0].heDepartment) : {};
+                        result[2][0].jobTitle = (result[2] && result[2][0]) ? JSON.parse(result[2][0].jobTitle) : {};
+                        result[2][0].jobType = (result[2] && result[2][0]) ? JSON.parse(result[2][0].jobType) : {};
+                        result[2][0].locationlist = (result[2] && result[2][0]) ? JSON.parse(result[2][0].locationlist) : [];
+                        result[2][0].memberInterviewRound = (result[2] && result[2][0]) ? JSON.parse(result[2][0].memberInterviewRound) : [];
+                        result[2][0].members = (result[2] && result[2][0]) ? JSON.parse(result[2][0].members) : [];
+                        result[2][0].primarySkills = (result[2] && result[2][0]) ? JSON.parse(result[2][0].primarySkills) : [];
+                        result[2][0].scale = (result[2] && result[2][0]) ? JSON.parse(result[2][0].scale) : {};
+                        result[2][0].secondarySkills = (result[2] && result[2][0]) ? JSON.parse(result[2][0].secondarySkills) : [];
+                        result[2][0].industry = (result[2] && result[2][0]) ? JSON.parse(result[2][0].industry) : [];
+                        result[2][0].attachmentList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].attachmentList) : [];
 
                         response.data = {
                             requirementDetails: result[0][0] ? result[0][0] : [],
                             //  requirementCompleteDetails: (result[1][0].reqJsonData) ? JSON.parse(result[1][0].reqJsonData) : {},
-                             requirementCompleteDetails: (result[2] && result[2][0]) ? result[2][0]: {}
+                            requirementCompleteDetails: (result[2] && result[2][0]) ? result[2][0] : {}
                         };
 
                         if (isWeb == 1) {
@@ -2320,25 +2318,25 @@ jobCtrl.getJdTemplateDetails = function (req, res, next) {
                         response.message = "Jd Template Details  loaded successfully";
                         response.error = null;
 
-                        result[0][0].branchList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].branchList):[];
-                        result[0][0].contactList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].contactList):[];
-                        result[0][0].currency = (result[0] && result[0][0]) ? JSON.parse(result[0][0].currency):{};
-                        result[0][0].duration = (result[0] && result[0][0]) ? JSON.parse(result[0][0].duration):{};
-                        result[0][0].educationSpecialization = (result[0] && result[0][0]) ? JSON.parse(result[0][0].educationSpecialization):[];
-                        result[0][0].heDepartment = (result[0] && result[0][0]) ? JSON.parse(result[0][0].heDepartment):{};
-                        result[0][0].jobTitle = (result[0] && result[0][0]) ? JSON.parse(result[0][0].jobTitle):{};
-                        result[0][0].jobType = (result[0] && result[0][0]) ? JSON.parse(result[0][0].jobType):{};
-                        result[0][0].locationlist = (result[0] && result[0][0]) ? JSON.parse(result[0][0].locationlist):[];
-                        result[0][0].memberInterviewRound = (result[0] && result[0][0]) ? JSON.parse(result[0][0].memberInterviewRound):[]; 
-                        result[0][0].members = (result[0] && result[0][0]) ? JSON.parse(result[0][0].members):[];
-                        result[0][0].primarySkills = (result[0] && result[0][0]) ? JSON.parse(result[0][0].primarySkills):[];
-                        result[0][0].scale = (result[0] && result[0][0]) ? JSON.parse(result[0][0].scale):{};
-                        result[0][0].secondarySkills = (result[0] && result[0][0]) ? JSON.parse(result[0][0].secondarySkills):[];
-                        result[0][0].industry = (result[0] && result[0][0]) ? JSON.parse(result[0][0].industry):[];
-                        result[0][0].attachmentList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].attachmentList):[];
+                        result[0][0].branchList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].branchList) : [];
+                        result[0][0].contactList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].contactList) : [];
+                        result[0][0].currency = (result[0] && result[0][0]) ? JSON.parse(result[0][0].currency) : {};
+                        result[0][0].duration = (result[0] && result[0][0]) ? JSON.parse(result[0][0].duration) : {};
+                        result[0][0].educationSpecialization = (result[0] && result[0][0]) ? JSON.parse(result[0][0].educationSpecialization) : [];
+                        result[0][0].heDepartment = (result[0] && result[0][0]) ? JSON.parse(result[0][0].heDepartment) : {};
+                        result[0][0].jobTitle = (result[0] && result[0][0]) ? JSON.parse(result[0][0].jobTitle) : {};
+                        result[0][0].jobType = (result[0] && result[0][0]) ? JSON.parse(result[0][0].jobType) : {};
+                        result[0][0].locationlist = (result[0] && result[0][0]) ? JSON.parse(result[0][0].locationlist) : [];
+                        result[0][0].memberInterviewRound = (result[0] && result[0][0]) ? JSON.parse(result[0][0].memberInterviewRound) : [];
+                        result[0][0].members = (result[0] && result[0][0]) ? JSON.parse(result[0][0].members) : [];
+                        result[0][0].primarySkills = (result[0] && result[0][0]) ? JSON.parse(result[0][0].primarySkills) : [];
+                        result[0][0].scale = (result[0] && result[0][0]) ? JSON.parse(result[0][0].scale) : {};
+                        result[0][0].secondarySkills = (result[0] && result[0][0]) ? JSON.parse(result[0][0].secondarySkills) : [];
+                        result[0][0].industry = (result[0] && result[0][0]) ? JSON.parse(result[0][0].industry) : [];
+                        result[0][0].attachmentList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].attachmentList) : [];
 
                         response.data = {
-                            jdTemplateDetails:(result[0] && result[0][0]) ? result[0][0] : []
+                            jdTemplateDetails: (result[0] && result[0][0]) ? result[0][0] : []
                         };
 
                         if (isWeb == 0) {
