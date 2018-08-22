@@ -565,6 +565,10 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.profilePicture = (req.body.profilePicture) ? req.body.profilePicture : '';
                 req.body.middleName = (req.body.middleName) ? req.body.middleName : '';
                 req.body.registrationType = req.body.registrationType ? req.body.registrationType : 0;
+                req.body.IDNumberNew = (req.body.IDNumberNew) ? req.body.IDNumberNew : '';
+                req.body.localId = (req.body.localId) ? req.body.localId : 0;
+                req.body.token = (req.body.token) ? req.body.token : 0;
+
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -593,7 +597,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.changeLog || ''),
                     req.st.db.escape(req.body.groupId || ''),
                     req.st.db.escape(req.body.learnMessageId || 0),
-                    req.st.db.escape(req.body.accessUserType || ''),
+                    req.st.db.escape(req.body.accessUserType || 0),
                     req.st.db.escape(req.body.approverCount || 0),
                     req.st.db.escape(req.body.receiverCount || 0),
                     req.st.db.escape(req.body.status),
@@ -606,7 +610,9 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.DOB),
                     req.st.db.escape(req.body.IDNumber),
                     req.st.db.escape(req.body.middleName),
-                    req.st.db.escape(req.body.registrationType)
+                    req.st.db.escape(req.body.registrationType),
+                    req.st.db.escape(req.body.IDNumberNew),
+                    req.st.db.escape(req.body.token)
                 ];
 
 
@@ -935,7 +941,8 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             walkinMessage: results[2][0],
-                            token: results[3][0].token
+                            token: results[3][0].token,
+                            localId : req.body.localId ? req.body.localId: 0
                         };
                         res.status(200).json(response);
                     }
@@ -1276,7 +1283,9 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
                 response.data = {
                     message: (result[0] && result[0][0]) ? result[0][0].message : '',
                     existsMessage: (result[1] && result[1][0]) ? result[1][0]._error : '',
-                    applicantDetails: (result[2] && result[2][0]) ? result[2][0] : {}
+                    applicantDetails: (result[2] && result[2][0]) ? result[2][0] : {},
+                    walkinMessage: results[3][0],
+                    token: (results[4] && results[4][0] && results[4][0].token) ? results[4][0].token: '',
                 };
                 res.status(200).json(response);
             }
@@ -1286,9 +1295,9 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
                 response.message = result[0][0].message;
                 response.error = false;
                 response.data = {
-                    message: result[0][0].message
-                    // existsMessage:'',
-                    // applicantDetails:{}
+                    message: result[0][0].message,
+                    walkinMessage: results[1][0],
+                    token: (results[2] && results[2][0] && results[2][0].token) ? results[2][0].token: ''
                 };
                 res.status(200).json(response);
             }
@@ -1403,6 +1412,12 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             IDType: result[14][0].IDType,  // field Name
                             isIDNumberOrString: (result[14] && result[14][0]) ? result[14][0].isIDNumberOrString : 1,
                             maxIDLength: (result[14] && result[14][0]) ? result[14][0].maxIDLength : 0,
+
+                            isIDRequiredNew: result[14][0].isIDRequiredNew,
+                            IDTypeNew: result[14][0].IDTypeNew,  // field Name
+                            isIDNumberOrStringNew: (result[14] && result[14][0]) ? result[14][0].isIDNumberOrStringNew : 1,
+                            maxIDLengthNew: (result[14] && result[14][0]) ? result[14][0].maxIDLengthNew : 0,
+
                             DOBType: result[13][0].DOBType,
                             isVisitorCheckIn: result[14][0].isVisitorCheckIn,
                             isWalkIn: result[14][0].isWalkIn,
@@ -1450,6 +1465,10 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             IDType: 0,
                             isIDNumberOrString: 1,
                             maxIDLength: 0,
+                            isIDRequiredNew: 0,
+                            IDTypeNew: 0,
+                            isIDNumberOrStringNew: 1,
+                            maxIDLengthNew: 0,
                             DOBType: '',
                             isVisitorCheckIn: 0,
                             isWalkIn: 0,
@@ -3002,6 +3021,11 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 req.body.acceptTnCMsgFormat = req.body.acceptTnCMsgFormat ? req.body.acceptTnCMsgFormat : '';
                 req.body.profilePic = req.body.profilePic ? req.body.profilePic : 1;
 
+                req.body.IDRequiredNew = req.body.IDRequiredNew ? req.body.IDRequiredNew : 0;
+                req.body.IDTypeNew = req.body.IDTypeNew ? req.body.IDTypeNew : '';
+                req.body.maxIDLengthNew = req.body.maxIDLengthNew ? req.body.maxIDLengthNew : 0;
+                req.body.isIDNumberOrStringNew = req.body.isIDNumberOrStringNew ? req.body.isIDNumberOrStringNew : 0;
+
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -3034,7 +3058,12 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(req.body.walkInWelcomeMessage),
                     req.st.db.escape(req.body.acceptTnCFlag),
                     req.st.db.escape(req.body.acceptTnCMsgFormat),
-                    req.st.db.escape(req.body.profilePic)
+                    req.st.db.escape(req.body.profilePic),
+
+                    req.st.db.escape(req.body.IDRequiredNew),
+                    req.st.db.escape(req.body.IDTypeNew),
+                    req.st.db.escape(req.body.maxIDLengthNew),
+                    req.st.db.escape(req.body.isIDNumberOrStringNew)
 
                 ];
 
