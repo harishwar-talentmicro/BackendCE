@@ -3001,6 +3001,8 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 req.body.acceptTnCFlag = req.body.acceptTnCFlag ? req.body.acceptTnCFlag : 0;
                 req.body.acceptTnCMsgFormat = req.body.acceptTnCMsgFormat ? req.body.acceptTnCMsgFormat : '';
                 req.body.profilePic = req.body.profilePic ? req.body.profilePic : 1;
+                req.body.showJobcode = req.body.showJobcode ? req.body.showJobcode : 0;
+                req.body.syncInBackground = req.body.syncInBackground ? req.body.syncInBackground : 0;
 
 
                 var inputs = [
@@ -3034,8 +3036,9 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(req.body.walkInWelcomeMessage),
                     req.st.db.escape(req.body.acceptTnCFlag),
                     req.st.db.escape(req.body.acceptTnCMsgFormat),
-                    req.st.db.escape(req.body.profilePic)
-
+                    req.st.db.escape(req.body.profilePic),
+                    req.st.db.escape(req.body.showJobcode),
+                    req.st.db.escape(req.body.syncInBackground)
                 ];
 
                 var procQuery = 'CALL wm_save_walkWebConfig( ' + inputs.join(',') + ')';
