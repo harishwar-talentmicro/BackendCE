@@ -336,6 +336,10 @@ masterCtrl.saveClients = function (req, res, next) {
                         // client contact parsing
                         results[4][0].contactList = (results && results[4] && results[4][0]) ? JSON.parse(results[4][0].contactList) :[];
 
+                        if(results[7] && results[7][0] && typeof(results[7][0].newClient)=='string'){
+                            results[7][0].newClient = JSON.parse(results[7][0].newClient);
+                        }
+
                         response.data = {
                             heDepartmentId: results[0][0].heDepartmentId,
                            // department: (results[1] && results[1][0]) ? results[1] : [],
@@ -346,7 +350,8 @@ masterCtrl.saveClients = function (req, res, next) {
                             contracts: contracts,//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
                             contactList : results[4][0].contactList,
                             roles: results[5] ? results[5] : [],
-                            group: results[6] ? results[6] : [] 
+                            group: results[6] ? results[6] : [],
+                            newClient : results[7] ? results[7][0].newClient: {}
                         };
                         res.status(200).json(response);
                     }
@@ -1367,11 +1372,13 @@ masterCtrl.getRequirementView = function (req, res, next) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
                 req.query.status = (req.query.status) ? req.query.status : 0;
+                req.query.type = (req.query.type) ? req.query.type : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.status),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.type)
                 ];
                 var procQuery = 'CALL wm_get_requirementView( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -1405,7 +1412,8 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                 res2.createdDate = results[0][i].createdDate,
                                 res2.branchList = JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
                                 res2.contactList = JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
-                                res2.stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : []
+                                res2.stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
+                                res2.newRequirement = results[0][i].newRequirement ? results[0][i].newRequirement:0 
                             output.push(res2);
                         }
                         

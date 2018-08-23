@@ -123,6 +123,7 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                 req.body.lastInsertedJobcodeNo = (req.body.lastInsertedJobcodeNo) ? req.body.lastInsertedJobcodeNo : '';
                 req.body.invoiceNumberLength = (req.body.invoiceNumberLength) ? req.body.invoiceNumberLength : 0;
                 req.body.isAutoMovement = (req.body.isAutoMovement) ? req.body.isAutoMovement : 0;
+                req.body.isStrict = (req.body.isStrict) ? req.body.isStrict : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -149,7 +150,9 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                     req.st.db.escape(req.body.lastInsertedJobcodeNo),
                     req.st.db.escape(req.body.jobcodeLength),
                     req.st.db.escape(req.body.isAutoMovement),
-                    req.st.db.escape(JSON.stringify(stageStatusList))
+                    req.st.db.escape(JSON.stringify(stageStatusList)),
+                    req.st.db.escape(req.body.isStrict)
+
                 ];
                 var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -914,7 +917,31 @@ jobCtrl.saveEducation = function (req, res, next) {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
                     var isWeb = req.query.isWeb;
-                    if (!err && results && results[0] && results[0][0]) {
+                    if (!err && results && results[0] && results[0][0].message) {
+                        response.status = true;
+                        response.message = results[0][0].message;
+                        response.error = null;
+
+                        for (var j = 0; j < results[1].length; j++) {
+                            results[1][j].educationId = results[1][j].educationId;
+                            results[1][j].educationTitle = results[1][j].EducationTitle;
+                            results[1][j].specialization = results[1][j].specialization ? JSON.parse(results[1][j].specialization) : [];
+                        }
+                        response.data = {
+                            educationList: results[1] ? results[1] :[]
+                        };
+                        if (isWeb == 0) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
+                            res.status(200).json(response);
+                        }
+                    }
+                    else if (!err && results && results[0] && results[0][0]) {
                         response.status = true;
                         response.message = "Education and Specialization saved sucessfully";
                         response.error = null;
@@ -1374,67 +1401,15 @@ jobCtrl.saveRequirement = function (req, res, next) {
                         req.db.query(procQuery, function (err, results) {
                             console.log(err);
 
-                            if (!err && results && results[0]) {
+                            if (!err && results && results[0] && results[0][0] && results[0][0].error){
+                                response.status = false;
+                                response.message = "Jobcode already exists! Please Change Jobcode";
+                                response.error = null;
+                                response.data = null;
+                                res.status(200).json(response);
 
-                                // for (var i = 0; i < results[1].length; i++) {
-                                //     if (notificationTemplaterRes.parsedTpl) {
-                                //         notification.publish(
-                                //             results[1][i].receiverId,
-                                //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                //             results[0][0].senderId,
-                                //             notificationTemplaterRes.parsedTpl,
-                                //             31,
-                                //             0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                //             (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                //             0,
-                                //             0,
-                                //             0,
-                                //             0,
-                                //             1,
-                                //             moment().format("YYYY-MM-DD HH:mm:ss"),
-                                //             '',
-                                //             0,
-                                //             0,
-                                //             null,
-                                //             '',
-                                //             /** Data object property to be sent with notification **/
-                                //             {
-                                //                 messageList: {
-                                //                     messageId: results[1][i].messageId,
-                                //                     message: results[1][i].message,
-                                //                     messageLink: results[1][i].messageLink,
-                                //                     createdDate: results[1][i].createdDate,
-                                //                     messageType: results[1][i].messageType,
-                                //                     messageStatus: results[1][i].messageStatus,
-                                //                     priority: results[1][i].priority,
-                                //                     senderName: results[1][i].senderName,
-                                //                     senderId: results[1][i].senderId,
-                                //                     receiverId: results[1][i].receiverId,
-                                //                     groupId: results[1][i].senderId,
-                                //                     groupType: 2,
-                                //                     transId: results[1][i].transId,
-                                //                     formId: results[1][i].formId,
-                                //                     currentStatus: results[1][i].currentStatus,
-                                //                     currentTransId: results[1][i].currentTransId,
-                                //                     parentId: results[1][i].parentId,
-                                //                     accessUserType: results[1][i].accessUserType,
-                                //                     heUserId: results[1][i].heUserId,
-                                //                     formData: (results[1] && results[1][i] && results[1][i].formDataJSON) ? JSON.parse(results[1][i].formDataJSON) : {}
-
-                                //                 }
-                                //             },
-                                //             null,
-                                //             tokenResult[0].isWhatMate,
-                                //             results[1][i].secretKey);
-                                //         console.log('postNotification : notification for compose_message is sent successfully');
-                                //     }
-                                //     else {
-                                //         console.log('Error in parsing notification compose_message template - ',
-                                //             notificationTemplaterRes.error);
-                                //         console.log('postNotification : notification for compose_message is not sent successfully');
-                                //     }
-                                // }
+                            }
+                            else if (!err && results && results[0]) {
 
                                 response.status = true;
                                 if (req.body.jdTemplateFlag == 1) {

@@ -239,7 +239,8 @@ applicantCtrl.saveApplicant = function (req, res, next) {
 
                 req.query.isWeb = (req.body.isWeb) ? req.body.isWeb : 0;
                 console.log("cvPath from attacment", req.body.cvKeywords);
-                if (attachmentList.length && (req.body.cvKeywords == '') && req.body.cvKeywords == undefined && req.body.cvKeywords == null &&  req.body.cvKeywords == ' ') {
+                if (attachmentList.length ) //&& (req.body.cvKeywords == '') && req.body.cvKeywords == undefined && req.body.cvKeywords == null &&  req.body.cvKeywords == ' ') 
+                {
                     cv = attachmentList[0].CDNPath;
                 }
                 gs_url = req.CONFIG.CONSTANT.GS_URL;
@@ -334,7 +335,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(prefLocations)),
                             req.st.db.escape(JSON.stringify(industry)),
                             req.st.db.escape(JSON.stringify(nationality)),
-                            req.st.db.escape(req.body.cvKeywords || cvKeywords),
+                            req.st.db.escape(cvKeywords || ''),
                             req.st.db.escape(req.body.requirementId),
                             req.st.db.escape(req.body.imageUrl),
                             req.st.db.escape(req.body.htmlText),
@@ -3620,8 +3621,8 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                 req.body.jobTitle = req.body.jobTitle ? req.body.jobTitle : '';
                 req.body.contactId = req.body.contactId ? req.body.contactId : 0;
                 req.body.managerId = req.body.managerId ? req.body.managerId : 0;
-                req.body.offerJoiningDate = req.body.offerJoiningDate ? req.body.offerJoiningDate : '';
-                req.body.plannedJoiningDate = req.body.plannedJoiningDate ? req.body.plannedJoiningDate : '';
+                req.body.offerJoiningDate = req.body.offerJoiningDate ? req.body.offerJoiningDate : null;
+                req.body.plannedJoiningDate = req.body.plannedJoiningDate ? req.body.plannedJoiningDate : null;
                 req.body.offerCTCCurrId = req.body.offerCTCCurrId ? req.body.offerCTCCurrId : 0;
                 req.body.offerCTCSalary = req.body.offerCTCSalary ? req.body.offerCTCSalary : 0;
                 req.body.offerCTCScaleId = req.body.offerCTCScaleId ? req.body.offerCTCScaleId : 0;
@@ -3633,6 +3634,7 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                 req.body.notes = req.body.notes ? req.body.notes : '';
                 req.body.workInMentionedShifts = req.body.workInMentionedShifts ? req.body.workInMentionedShifts : 0;
                 req.body.grade = req.body.grade ? req.body.grade : '';
+                req.body.actualJoiningDate = req.body.actualJoiningDate ? req.body.actualJoiningDate : null;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),

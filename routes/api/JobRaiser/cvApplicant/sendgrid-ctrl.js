@@ -3912,7 +3912,7 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                 }
 
                                 var buffer;
-                                if (trackerTemplate) {
+                                if (trackerTemplate.trackerId) {
                                     var ws_data = '[[';
                                     // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
                                     for (var i = 0; i < trackerTags.length; i++) {
@@ -4028,7 +4028,7 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                     });
                                 }
 
-                                if (trackerTemplate) {
+                                if (trackerTemplate.trackerId) {
                                     email.addFile({
                                         filename: trackerTemplate.templateName + '.xlsx',
                                         content: new Buffer(new Buffer(buffer).toString("base64"), 'base64'),
@@ -4513,5 +4513,97 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
 //     }
 // };
 
+sendgridCtrl.MailTransactionsOfCandidate = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.applicantId) {
+        error.applicantId = 'Invalid applicantId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.applicantId)
+                ];
+
+                var procQuery = 'CALL wm_get_senMailHistoryOfCandidate( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Applicant mail transactions loaded successfully";
+                        response.error = null;
+
+                        if (typeof(result[0][0].cc)=='string'){
+                            result[0][0].cc = JSON.parse(result[0][0].cc)
+                        }
+
+                        
+                        if (typeof(result[0][0].bcc)=='string'){
+                            result[0][0].bcc = JSON.parse(result[0][0].bcc)
+                        }
+
+                        
+                        if (typeof(result[0][0].attachment)=='string'){
+                            result[0][0].attachment = JSON.parse(result[0][0].attachment)
+                        }
+
+                        response.data =result[0] ? result[0] :[]
+                           
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = {
+                            applicantList: []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting applicant mail history";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
 
 module.exports = sendgridCtrl;
