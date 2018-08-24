@@ -44,6 +44,7 @@ router.post('/walkInPdfGeneration',walkInCvCtrl.walkInPDfGeneration);
 
 router.get('/publicWalkInMasterData',walkInCvCtrl.publicWalkinMaster);
 
+router.get('/companyConfig',walkInCvCtrl.getCompanySearch);
 
 
 module.exports = router;
