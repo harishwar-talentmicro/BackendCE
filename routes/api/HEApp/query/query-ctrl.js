@@ -1073,7 +1073,9 @@ queryCtrl.saveQueryCategory = function (req, res, next) {
                             // delete(result[0][i].queryType);
                             
                         }
-                        response.data = result[0];
+                        response.data = {
+                        queryDetails:result[0]
+                        }
 
                         res.status(200).json(response);
                     }

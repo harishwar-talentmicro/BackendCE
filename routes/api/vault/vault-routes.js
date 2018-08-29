@@ -19,6 +19,7 @@ router.get('/item',vaultCtrl.getVaultItem);
 
 router.post('/saveBulkVault',vaultCtrl.saveBulkVaultTitleList);
 router.get('/getBulkVault',vaultCtrl.getvaultBulkList);
+router.get('/archive',vaultCtrl.archiveItem);
 
 
 module.exports = router;
