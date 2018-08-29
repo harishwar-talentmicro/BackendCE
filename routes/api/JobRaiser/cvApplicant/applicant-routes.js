@@ -74,7 +74,6 @@ router.post('/sendClientMailer',sendgridCtrl.clientMailer);
 router.post('/interviewMailer',sendgridCtrl.interviewMailerPreview);
 router.post('/sendInterviewMailer',sendgridCtrl.interviewMailer);
 
-router.post('/MailTransactionsOfCandidate',sendgridCtrl.MailTransactionsOfCandidate);
 
 router.post('/saveFacesheet',applicantCtrl.faceSheetTemplate);
 
@@ -83,7 +82,7 @@ router.post('/faceSheetDetails',applicantCtrl.faceSheetReplaceDetails);
 router.post('/referFriend',applicantCtrl.referFriend);
 
 
-// router.post('/saveMailSentByGmail',sendgridCtrl.saveMailSentByGmail);
+router.post('/saveMailSentByGmail',sendgridCtrl.saveMailSentByGmail);
 
 
 router.post('/importApplicants',applicantCtrl.saveApplicantForImporter);

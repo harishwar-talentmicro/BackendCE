@@ -20,34 +20,30 @@ var CONFIG = require('../../../../ezeone-config.json');
 var DBSecretKey = CONFIG.DB.secretKey;
 
 
-var cv = '';
-var text = '';
-var gs_url = '';
-var storage_bucket = '';
 
-var attachFile = new Promise(function (resolve, reject) {
-    console.log('attachement cv', cv);
-    if (cv != '') {
-        cv = gs_url + storage_bucket + '/' + cv;
+// var attachFile = return new Promise(function (resolve, reject) {
+//     console.log('attachement cvasdfasdfasdf asaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasdfasdf asdfasdfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf');
+//     if (cv != '') {
+//         cv = gs_url + storage_bucket + '/' + cv;
 
-        http.get(cv, function (fileResponse) {
-            var bufs = [];
+//         http.get(cv, function (fileResponse) {
+//             var bufs = [];
 
-            fileResponse.on('data', function (d) { bufs.push(d); });
-            fileResponse.on('end', function () {
-                var buf = Buffer.concat(bufs);
-                textract.fromBufferWithName(cv, buf, function (error, txt) {
-                    text = txt;
-                    resolve(text);
-                });
-            });
-        });
+//             fileResponse.on('data', function (d) { bufs.push(d); });
+//             fileResponse.on('end', function () {
+//                 var buf = Buffer.concat(bufs);
+//                 textract.fromBufferWithName(cv, buf, function (error, txt) {
+//                     text = txt;
+//                     resolve(text);
+//                 });
+//             });
+//         });
 
-    }
-    else {
-        resolve('');
-    }
-})
+//     }
+//     else {
+//         resolve('');
+//     }
+// })
 //var createPromise = defer.denodeify(attachFile);
 //var attachFilePromise = attachFile;
 
@@ -232,14 +228,19 @@ applicantCtrl.saveApplicant = function (req, res, next) {
             if ((!err) && tokenResult) {
                 // req.body.cvPath = (req.body.cvPath) ? req.body.cvPath : "";
                 var cvKeywords;
+                var cv = '';
+                var text = '';
+                var gs_url = '';
+                var storage_bucket = '';
+
 
                 if (req.body.cvKeywords && req.body.cvKeywords != '') {
                     req.body.cvKeywords = req.body.cvKeywords.replace(/\\(x)(.{2})\\/g, '');
                 }
 
                 req.query.isWeb = (req.body.isWeb) ? req.body.isWeb : 0;
-                console.log("cvPath from attacment", req.body.cvKeywords);
-                if (attachmentList.length ) //&& (req.body.cvKeywords == '') && req.body.cvKeywords == undefined && req.body.cvKeywords == null &&  req.body.cvKeywords == ' ') 
+                // console.log("cvPath from attacment", req.body.cvKeywords);
+                if (attachmentList.length) //&& (req.body.cvKeywords == '') && req.body.cvKeywords == undefined && req.body.cvKeywords == null &&  req.body.cvKeywords == ' ') 
                 {
                     cv = attachmentList[0].CDNPath;
                 }
@@ -247,8 +248,43 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                 storage_bucket = req.CONFIG.CONSTANT.STORAGE_BUCKET;
 
                 console.log("cvPath from attacment", cv);
-                attachFile.then(function (resp) {
-                    console.log("response after promise", resp);
+                return new Promise(function (resolve, reject) {
+                    if (cv != '') {
+                        cv = gs_url + storage_bucket + '/' + cv;
+                        console.log('cvPath complete', cv);
+                        http.get(cv, function (fileResponse) {
+                            var bufs = [];
+
+                            fileResponse.on('data', function (d) { bufs.push(d); });
+                            fileResponse.on('end', function () {
+                                var buf = Buffer.concat(bufs);
+                                textract.fromBufferWithName(cv, buf, function (error, txt) {
+                                    if (error) {
+                                        // var tempCVPath = cv.replace('docx', 'doc');
+                                        textract.fromBufferWithName(tempCVPath, buf, function (error, txt) {
+                                            text = txt;
+                                            console.log('error', error);
+                                            console.log('text inside', text);
+                                            resolve(text);
+                                        });
+                                    }
+                                    else {
+                                        text = txt;
+                                        console.log('error', error);
+                                        console.log('text inside', text);
+                                        resolve(text);
+
+                                    }
+                                });
+                            });
+                        });
+
+                    }
+                    else {
+                        resolve('');
+                    }
+                }).then(function (resp) {
+                    // console.log("response after promise", resp);
                     if (1) {
 
                         cvKeywords = text;
@@ -256,8 +292,8 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             cvKeywords = cvKeywords.replace(/\\(x)(.{2})\\/g, '');
                         }
 
-                        console.log('text from promise', resp);
-                        console.log('text data from promise ', text);
+                        // console.log('text from promise', resp);
+                        // console.log('text data from promise ', text);
 
                         req.body.applicantId = (req.body.applicantId) ? req.body.applicantId : 0;
 
@@ -537,6 +573,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             teamUsers: result[46][0].teamUsers ? result[46][0].teamUsers : [],
                             paceUserDetails: (result[47] && result[47][0]) ? result[47][0] : {},
                             stageStatusMapList: result[48] ? result[48] : [],
+                            interviewModeList: result[49] ? result[49] : [],
+                            billTo: result[50] ? result[50] : []
 
                         };
 
@@ -607,7 +645,9 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             visaTravelStatus: [],
                             teamUsers: [],
                             paceUserDetails: {},
-                            stageStatusMapList:[]
+                            stageStatusMapList: [],
+                            interviewModeList : [],
+                            billTo : []
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1047,11 +1087,24 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
                 req.db.query(statusQuery, function (err, statusResult) {
                     console.log(err);
 
-                    if (!err && statusResult && statusResult[0]) {
-                        response.status = true;
-                        response.message = "Stage and status changed successfully";
+                    if (!err && statusResult && statusResult[0] && statusResult[0][0]) {
+                       
+                        
+                        if(statusResult[1] && statusResult[1][0] && statusResult[1][0].count !=0){
+                            response.status = false;
+                            response.message = statusResult[1][0].countMessage;
+                        }
+                        else{
+                            response.status = true;
+                            response.message = "Stage and status changed successfully";
+
+                        }
                         response.error = null;
-                        response.data = statusResult[0][0];
+
+                        // if (typeof (statusResult[0][0].message) == 'string') {
+                        //     statusResult[0][0].message = JSON.parse(statusResult[0][0].message);
+                        // }
+                        response.data = statusResult[0][0] ? statusResult[0][0] : {};
                         res.status(200).json(response);
                     }
                     else {
@@ -1587,6 +1640,20 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         temp_result.functionalAreas = JSON.parse(temp_result.functionalAreas);
                         temp_result.presentLocation = JSON.parse(temp_result.presentLocation);
 
+                        if (typeof (result[5] && result[5][0] && result[5][0].cc) == 'string') {
+                            result[5][0].cc = JSON.parse(result[5][0].cc)
+                        }
+
+
+                        if (typeof (result[5] && result[5][0] && result[5][0].bcc) == 'string') {
+                            result[5][0].bcc = JSON.parse(result[5][0].bcc)
+                        }
+
+
+                        if (typeof (result[5] && result[5][0] && result[5][0].attachment) == 'string') {
+                            result[5][0].attachment = JSON.parse(result[5][0].attachment)
+                        }
+
                         response.status = true;
                         response.message = "Applicant data loaded successfully";
                         response.error = null;
@@ -1598,7 +1665,8 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                                 applicantTransaction: result[1] ? result[1] : [],
                                 clientCvPath: (result[2] && result[2][0]) ? result[2][0].clientCvPath : "",
                                 previousClientCvPath: (result[3] && result[3][0]) ? result[3][0].previousClientCvPath : "",
-                                faceSheet: (result[4] && result[4][0]) ? JSON.parse(result[4][0].faceSheet) : {}
+                                faceSheet: (result[4] && result[4][0]) ? JSON.parse(result[4][0].faceSheet) : {},
+                                mailTransactions: result[5] ? result[5] : []
                             };
                         res.status(200).json(response);
                     }
@@ -1610,7 +1678,9 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                             applicantDetails: [],
                             applicantTransaction: [],
                             clientCvPath: "",
-                            previousClientCvPath: ""
+                            previousClientCvPath: "",
+                            faceSheet: {},
+                            mailTransactions: []
                         };
                         res.status(200).json(response);
                     }
@@ -2174,6 +2244,7 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                             res2.applicant = JSON.parse(result[2][i].applicant) ? JSON.parse(result[2][i].applicant) : [];
                             res2.panelMembers = JSON.parse(result[2][i].panelMembers) ? JSON.parse(result[2][i].panelMembers) : [];
                             res2.address = result[2][i].address ? result[2][i].address : '';
+                            res2.interviewType = JSON.parse(result[2][i].interviewType).interviewModeId ? JSON.parse(result[2][i].interviewType) : {};
 
                             output.push(res2);
                         }
@@ -2511,6 +2582,14 @@ applicantCtrl.saveInterviewSchedulerNew = function (req, res, next) {
         heDepartment = {};
     }
 
+    var interviewType = req.body.interviewType;
+    if (typeof (interviewType) == "string") {
+        interviewType = JSON.parse(interviewType);
+    }
+    if (!interviewType) {
+        interviewType = {};
+    }
+
     var senderGroupId;
     if (!validationFlag) {
         response.error = error;
@@ -2564,7 +2643,8 @@ applicantCtrl.saveInterviewSchedulerNew = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(interviewLocation)),
                     req.st.db.escape(JSON.stringify(heDepartment)),
                     req.st.db.escape(DBSecretKey),
-                    req.st.db.escape(req.body.address)
+                    req.st.db.escape(req.body.address),
+                    req.st.db.escape(JSON.stringify(interviewType))
                 ];
 
                 var procQuery = 'CALL wm_save_interviewSchedular_new1( ' + procParams.join(',') + ')';

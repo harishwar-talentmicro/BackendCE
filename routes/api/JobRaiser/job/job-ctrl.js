@@ -151,9 +151,33 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                     req.st.db.escape(req.body.jobcodeLength),
                     req.st.db.escape(req.body.isAutoMovement),
                     req.st.db.escape(JSON.stringify(stageStatusList)),
-                    req.st.db.escape(req.body.isStrict)
+                    req.st.db.escape(req.body.isStrict),
 
+                    req.st.db.escape(req.body.autoScreeningSms || ''),
+                    req.st.db.escape(JSON.stringify(req.body.autoScreeningStageStatus || [])),
+                    req.st.db.escape(JSON.stringify(req.body.autoScreeningStages || {})),
+                    req.st.db.escape(JSON.stringify(req.body.autoSourcerList || [])),
+                    req.st.db.escape(req.body.autoSourcingSms || ''),
+                    req.st.db.escape(JSON.stringify(req.body.autoSubmissionStageStatus || [])),
+                    req.st.db.escape(req.body.isAttachResume || 0),
+                    req.st.db.escape(req.body.isAutoScreening || 0),
+                    req.st.db.escape(req.body.isAutoSourcing || 0),
+                    req.st.db.escape(req.body.isDeleteMail || 0),
+                    req.st.db.escape(req.body.isSendAutoScreeningMail || 0),
+                    req.st.db.escape(req.body.isSendAutoScreeningSms || 0),
+                    req.st.db.escape(req.body.isSendAutoSourceMailer || 0),
+                    req.st.db.escape(req.body.isSendAutoSourceSms || 0),
+                    req.st.db.escape(req.body.autoScreenPercentage || 0.0),
+                    req.st.db.escape(req.body.screeningMailerLimit || 0),
+                    req.st.db.escape(JSON.stringify(req.body.sourcingStageStatus || {})),
+                    req.st.db.escape(req.body.submissionMailerLimit || 0),
+                    req.st.db.escape(JSON.stringify(req.body.updateScreeningStageStatus || {})),
+                    req.st.db.escape(JSON.stringify(req.body.updateSubmissionStageStatus || {})),
+                    req.st.db.escape(req.body.autoSourcingMail || ''),
+                    req.st.db.escape(req.body.autoScreeningMail || '')
+                    
                 ];
+
                 var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {

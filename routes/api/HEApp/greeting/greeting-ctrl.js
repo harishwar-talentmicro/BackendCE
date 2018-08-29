@@ -666,7 +666,6 @@ greetingCtrl.getRRTemplateMaster = function (req, res, next) {
 };
 
 
-
 greetingCtrl.saverewardAndrecognition = function (req, res, next) {
     var response = {
         status: false,
@@ -674,6 +673,39 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
         data: null,
         error: null
     };
+
+    var resizeX = 160;
+    var resizeY = 160;
+    var nameX = 50;
+    var nameY = 490;
+    var typeX = 50;
+    var typeY = 270;
+    var titleX = 50;
+    var titleY = 330;
+    var title2X = 50;
+    var title2Y = 610;
+    var title1X = 50;
+    var title1Y = 660;
+    var title1MaxWidth = 700;
+    var profilePictureX = 562;
+    var profilePictureY = 338;
+
+
+    var nameFunction = Jimp.FONT_SANS_64_BLACK;
+    var typeFunction = Jimp.FONT_SANS_32_BLACK;
+    var titleFunction = Jimp.FONT_SANS_32_WHITE;
+    var title2Function = Jimp.FONT_SANS_32_BLACK;
+    var title1Function = Jimp.FONT_SANS_32_BLACK;
+
+    var nameMaxWidth = 1000;
+    var titleMaxWidth = 1000;
+    var firstName = '';
+    var lastName = '';
+
+    var lastNameMaxWidth = 1000;
+    var lastNameX = 300;
+    var lastNameY =300;
+
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -723,103 +755,149 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                     var timestamp = Date.now();
                     console.log(template.templateId);
                     console.log(req.body.heMasterId);
-                    var backGround = 'select templateType,templateImage from mRewardsRecognition where  tId=' + template.templateId + '  and heMasterId=' + req.body.heMasterId;
+                    var backGround = 'call wm_get_rrTemplateImageForProcessing(' + template.templateId + ',' + req.body.heMasterId + ')';
 
                     console.log(backGround);
                     req.db.query(backGround, function (err, results) {
-                        console.log('err',err);
-                        console.log('results',results);
+                        console.log('err', err);
+                        console.log('results', results);
 
-                        if (results[0].templateType == 1) {
+                        if (!err && results[0] && results[0][0]) {
+                            backGroundImage = results[0][0].templateImage;
+                            console.log("--=", backGroundImage);
+                            resizeX = results[0][0].resizeX;
+                            resizeY = results[0][0].resizeY;
+                            nameX = results[0][0].nameX;
+                            nameY = results[0][0].nameY;
+                            typeX = results[0][0].typeX;
+                            typeY = results[0][0].typeY;
+                            titleX = results[0][0].titleX;
+                            titleY = results[0][0].titleY;
+                            title2X = results[0][0].title2X;
+                            title2Y = results[0][0].title2Y;
+                            title1X = results[0][0].title1X;
+                            title1Y = results[0][0].title1Y;
+                            title1MaxWidth = results[0][0].title1MaxWidth;
+                            profilePictureX = results[0][0].profilePictureX;
+                            profilePictureY = results[0][0].profilePictureY;
+                            nameMaxWidth = results[0][0].nameMaxWidth;
+                            titleMaxWidth = results[0][0].titleMaxWidth;
 
-                            if (!err && results[0]) {
-                                backGroundImage = results[0].templateImage;
-                                console.log("--=", backGroundImage);
-                            }
-                            else if (!err) {
-                                backGroundImage = '783f44a0-0ba3-45d3-af79-64be754b497d.png';
-                                console.log(backGroundImage);
+                            lastNameX = results[0][0].lastNameX;
+                            lastNameY = results[0][0].lastNameY;
+                            lastNameMaxWidth = results[0][0].lastNameMaxWidth;
 
+                            if (results[0][0].templateType == 1) {
+                                nameFunction = Jimp.FONT_SANS_64_BLACK;     // rewardee full userName taken from req.body.employeeCode
+                                typeFunction = Jimp.FONT_SANS_32_BLACK;     // 0f (req.body.TitleoftheAward(MAIN TITLE) /type variable)
+                                titleFunction = Jimp.FONT_SANS_32_WHITE;    // of(req.body.SubTitle (comes above name) /title variable)
+                                title2Function = Jimp.FONT_SANS_32_BLACK;   // Of (req.body.ContentTitle/title2 variable)
+                                title1Function = Jimp.FONT_SANS_32_BLACK;   //Of (req.body.content /title1 variable)
+                                lastNameFunction = Jimp.FONT_SANS_64_BLACK;
                             }
                             else {
-                                backGroundImage = '783f44a0-0ba3-45d3-af79-64be754b497d.png';
-                                console.log(backGroundImage);
-                            };
+                                nameFunction = Jimp.FONT_SANS_64_WHITE;        // rewardee full userName taken from req.body.employeeCode
+                                typeFunction = Jimp.FONT_SANS_32_WHITE;      // 0f (req.body.TitleoftheAward(MAIN TITLE) /type variable)
+                                titleFunction = Jimp.FONT_SANS_16_WHITE;    // of(req.body.SubTitle (comes above name) /title variable)
+                                title2Function = Jimp.FONT_SANS_32_WHITE;  // Of (req.body.ContentTitle/title2 variable)
+                                title1Function = Jimp.FONT_SANS_32_WHITE;   //Of (req.body.content /title1 variable)
+                                lastNameFunction = Jimp.FONT_SANS_64_WHITE;
+                            }
+                        }
+                        // else if (!err) {
+                        //     backGroundImage = '783f44a0-0ba3-45d3-af79-64be754b497d.png';
+                        //     console.log(backGroundImage);
 
-                            var proc = "select a.picture from tmaster a,theusers b where  a.tId=b.userMasterId and b.employeeCode= '" + rewardRecognition[0].EmployeeCode + "' and b.heMasterId=" + req.body.heMasterId;
-                            console.log(proc);
-                            req.db.query(proc, function (err, results) {
-                                if (req.body.imageMandatory == 1) {
+                        // }
+                        else {
+                            backGroundImage = '783f44a0-0ba3-45d3-af79-64be754b497d.png';
+                            console.log(backGroundImage);
+                        };
 
-                                    if (!err && results[0]) {
-                                        imageUrl = results[0].picture;
-                                        console.log("--=", imageUrl);
-                                    }
-                                    else if (!err) {
-                                        imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
-                                        console.log("dummy", imageUrl);
+                        var proc = "select a.picture from tmaster a,theusers b where  a.tId=b.userMasterId and b.employeeCode= '" + rewardRecognition[0].EmployeeCode + "' and b.heMasterId=" + req.body.heMasterId;
+                        console.log(proc);
+                        req.db.query(proc, function (err, results) {
+                            if (req.body.imageMandatory == 1) {
 
-                                    }
-                                    else {
-                                        imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
-                                        console.log(imageUrl);
+                                if (!err && results[0]) {
+                                    imageUrl = results[0].picture;
+                                    console.log("--=", imageUrl);
+                                }
+                                else if (!err) {
+                                    imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
+                                    console.log("dummy", imageUrl);
 
-                                    };
                                 }
                                 else {
                                     imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
-                                    console.log("no mandatory image", imageUrl);
-                                }
-                                Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png").then(function (image2) {
-                                    Jimp.read("https://storage.googleapis.com/ezeone/" + backGroundImage, function (err, lenna) {
+                                    console.log(imageUrl);
 
-                                        var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + imageUrl).then(function (image1) {
+                                };
+                            }
+                            else {
+                                imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
+                                console.log("no mandatory image", imageUrl);
+                            }
+                            Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png").then(function (image2) {
+                                Jimp.read("https://storage.googleapis.com/ezeone/" + backGroundImage, function (err, lenna) {
 
-                                            var profile = image1;
-                                            var mask = image2;
-                                            var w = mask.bitmap.width; // the width of the image
-                                            var h = mask.bitmap.height;
-                                            // console.log(w, h);
-                                            profile.resize(w, h);
-                                            // console.log(h);
+                                    var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + imageUrl).then(function (image1) {
 
-                                            profile.mask(mask, 0, 0)
-                                                .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function () {
-                                                    console.log('imposing profile picture over dummy');
-                                                    Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function (err, penna) {
-                                                        penna.resize(160, 160);   //resizeX,resizeY
-                                                        console.log('reading edited profile picture');
-                                                        console.log('reading background image');
-                                                        if (err) throw err;
+                                        var profile = image1;
+                                        var mask = image2;
+                                        var w = mask.bitmap.width; // the width of the image
+                                        var h = mask.bitmap.height;
+                                        // console.log(w, h);
+                                        profile.resize(w, h);
+                                        // console.log(h);
 
-                                                        var w = (lenna.bitmap.width); // the width of the image
-                                                        var h = lenna.bitmap.height;
-                                                        var name = title = type = title1 = title2 = '';
-                                                        var name = "";
+                                        profile.mask(mask, 0, 0)
+                                            .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function () {
+                                                console.log('imposing profile picture over dummy');
+                                                Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function (err, penna) {
+                                                    penna.resize(resizeX, resizeY);   //resizeX,resizeY
+                                                    console.log('reading edited profile picture');
+                                                    console.log('reading background image');
+                                                    if (err) throw err;
 
-                                                        var name = rewardRecognition[0].UserName;    //name on card
-                                                        var title = rewardRecognition[0].SubTitle;  // subtitle below main title
-                                                        var type = rewardRecognition[0].TitleoftheAward;   //mainTitle
-                                                        var title1 = rewardRecognition[0].Content;    //  below contentTitle
-                                                        var title2 = rewardRecognition[0].ContentTitle;  //below name
+                                                    var w = (lenna.bitmap.width); // the width of the image
+                                                    var h = lenna.bitmap.height;
+                                                    var name = title = type = title1 = title2 = '';
+                                                    var name = "";
 
-                                                        var nameLength = (((name.length / 2)));
-                                                        var TypeLength = (((type.length / 2)));
-                                                        var titleLength = (((title.length / 2)));
-                                                        lenna.quality(100)
-                                                        Jimp.loadFont(Jimp.FONT_SANS_64_BLACK).then(function (font) {
-                                                            lenna.print(font, 50, 490, name)    //font->fontSize,  50 -X,490 -Y ,  nameX,nameY
-                                                            Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                                                lenna.print(font, 50, 270, type)      // type // typeX ,typeY
-                                                                Jimp.loadFont(Jimp.FONT_SANS_32_WHITE).then(function (font) {
-                                                                    lenna.print(font, 50, 330, title)    // titleX,titleY
-                                                                    Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                                                        lenna.print(font, 50, 610, title2)    // title2X,title2Y
-                                                                        Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                                                            lenna.print(font, 50, 660, title1, 700)   // title1X,title1Y,700- title1MaxWidth
+                                                    var name = rewardRecognition[0].UserName;    //name on card
+                                                    
+                                                    if (name && name.split(' ')[0])
+                                                        firstName = name.split(' ')[0];
+                                                    if (name && name.split(' ')[1])
+                                                        lastName = name.split(' ')[1];
+
+                                                    var title = rewardRecognition[0].SubTitle;  // subtitle below main title
+                                                    var type = rewardRecognition[0].TitleoftheAward;   //mainTitle
+                                                    var title1 = rewardRecognition[0].Content;    //  below contentTitle
+                                                    var title2 = rewardRecognition[0].ContentTitle;  //below name
+
+                                                    var nameLength = (((name.length / 2)));
+                                                    var TypeLength = (((type.length / 2)));
+                                                    var titleLength = (((title.length / 2)));
+
+                                                    lenna.quality(100)
+                                                    Jimp.loadFont(nameFunction).then(function (font) {
+                                                        lenna.print(font, nameX, nameY, name, nameMaxWidth)    //font->fontSize,  50 -X,490 -Y ,  nameX,nameY
+                                                        // Jimp.loadFont(lastNameFunction).then(function (font) {
+                                                            // lenna.print(font, lastNameX, lastNameY, lastName, lastNameMaxWidth)    //font->fontSize,  50 -X,490 -Y ,  lastNameX,lastNameX
+                                                            Jimp.loadFont(typeFunction).then(function (font) {
+                                                                lenna.print(font, typeX, typeY, type)      // type // typeX ,typeY
+                                                                Jimp.loadFont(titleFunction).then(function (font) {
+                                                                    lenna.print(font, titleX, titleY, title, titleMaxWidth)    // titleX,titleY
+                                                                    Jimp.loadFont(title2Function).then(function (font) {
+                                                                        lenna.print(font, title2X, title2Y, title2)    // title2X,title2Y
+                                                                        Jimp.loadFont(title1Function).then(function (font) {
+                                                                            lenna.print(font, title1X, title1Y, title1, title1MaxWidth)   // title1X,title1Y,700- title1MaxWidth
                                                                             console.log("image processed");
+                                                                            console.log('profilePicture', profilePictureX, profilePictureY);
 
-                                                                            lenna.composite(penna, 562, 338)
+                                                                            lenna.composite(penna, profilePictureX, profilePictureY)
                                                                                 .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + timestamp + ".png", function () {
                                                                                     console.log('writing final image');   // profile picture positing,profilePictureX,profilePictureY
                                                                                     // console.log("response after promise", resp);
@@ -894,16 +972,13 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                                                                                         req.st.db.escape(DBSecretKey),
                                                                                         req.st.db.escape(JSON.stringify(template)),
                                                                                         req.st.db.escape(req.body.timestamp),
-                                                                                        req.st.db.escape(req.body.createdTimeStamp)                                                            
+                                                                                        req.st.db.escape(req.body.createdTimeStamp)
 
                                                                                     ];
-
-
                                                                                     /**
                                                                                      * Calling procedure to save form template
                                                                                      * @type {string}
                                                                                      */
-
 
                                                                                     var procQuery = 'CALL wm_save_rewardsandRecognition( ' + procParams.join(',') + ');';
                                                                                     console.log(procQuery);
@@ -955,135 +1030,32 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                                                                                             res.status(500).json(response);
                                                                                         }
                                                                                     });
-
-                                                                                    // }
-                                                                                    // resolve(rewardRecognition);
-                                                                                    // console.log("=-=-=-==-==-=-=", rewardRecognition);
-                                                                                    // })
-                                                                                    // promise.then(function () {
-
-                                                                                    // });
-                                                                                    //  }
                                                                                 });
                                                                         });
                                                                     });
                                                                 });
                                                             });
-                                                        });
-
+                                                        // });
                                                     });
+
                                                 });
+                                            });
+                                    })
+                                        .catch(function () {
+                                            response.status = false;
+                                            response.message = "Something went wrong! Please try again";
+                                            response.error = null;
+                                            response.data = null;
+                                            res.status(500).json(response);
+                                            console.log('error');
                                         })
-                                            .catch(function () {
-                                                console.log('error');
-                                            })
-                                    });
-                                    // });
-
-                                    // var attachFile = new Promise(function (resolve, reject) {
-                                    //     var p1 = 0;
-                                    //     var p2 = 0;
-
-                                    //     var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + imageUrl);
-                                    //     console.log(p1);
-                                    //     // var p1 = Jimp.read("https://storage.googleapis.com/ezeone/c7eb1b98-cb0d-4f82-8c9d-ef9067994617.png");
-                                    //     var p2 = Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png");
-                                    //     var guna;
-                                    //     Promise.all([p1, p2]).then(function (images) {
-                                    //         var circleImage = new Promise(function (resolve, reject) {
-                                    //             var profile = images[0];
-                                    //             var mask = images[1];
-                                    //             var w = mask.bitmap.width; // the width of the image
-                                    //             var h = mask.bitmap.height;
-                                    //             console.log(w, h);
-                                    //             profile.resize(w, h);
-                                    //             console.log(h);
-
-                                    //             profile.mask(mask, 0, 0)
-                                    //                 .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/" + rewardRecognition[0].UserName + ".png");
-
-                                    //             resolve(profile.mask(mask, 0, 0).write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/" + rewardRecognition[0].UserName + ".png"));
-                                    //             //  resolve("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle.png");
-                                    //         })
-                                    //         circleImage.then(function (resp) {
-                                    //             setTimeout(function () {
-                                    //                 console.log("lenna-circle.png written", resp)
-                                    //                 Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/" + rewardRecognition[0].UserName + ".png", function (err, penna) {
-                                    //                     penna.resize(160, 160);
-
-                                    //                     Jimp.read("https://storage.googleapis.com/ezeone/"+backGroundImage, function (err, lenna) {
-                                    //                         console.log("hi how r u")
-                                    //                         if (err) throw err;
-
-                                    //                         var w = (lenna.bitmap.width); // the width of the image
-                                    //                         var h = lenna.bitmap.height;
-                                    //                         var name = title = type = title1 = title2 = '';
-                                    //                         var name = "";
-                                    //                         if (rewardRecognition.length > 0) {
-
-                                    //                             var name = rewardRecognition[0].UserName;
-                                    //                             var title = rewardRecognition[0].SubTitle;
-                                    //                             var type = rewardRecognition[0].TitleoftheAward;
-                                    //                             var title2 = rewardRecognition[0].Content;
-                                    //                             var title1 = rewardRecognition[0].ContentTitle;
-
-                                    //                             // console.log(name);
-
-                                    //                             console.log(w);
-                                    //                             console.log(name);
-                                    //                             var nameLength = (((name.length / 2)));
-                                    //                             var TypeLength = (((type.length / 2)));
-                                    //                             var titleLength = (((title.length / 2)));
-                                    //                         };
-
-
-                                    //                         lenna.quality(100)
-                                    //                         Jimp.loadFont(Jimp.FONT_SANS_64_BLACK).then(function (font) {
-                                    //                             lenna.print(font, 50, 490, name)
-                                    //                             Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                    //                                 lenna.print(font, 50, 270, type)
-                                    //                                 Jimp.loadFont(Jimp.FONT_SANS_32_WHITE).then(function (font) {
-                                    //                                     lenna.print(font, 50, 330, title)
-                                    //                                     Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                    //                                         lenna.print(font, 50, 610, title1)
-                                    //                                         Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(function (font) {
-                                    //                                             lenna.print(font, 50, 660, title2, 700)
-                                    //                                             console.log("image processed");
-
-                                    //                                             lenna.composite(penna, 562, 338)
-                                    //                                                 .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + rewardRecognition[0].UserName + ".png");
-                                    //                                             setTimeout(function () {
-                                    //                                                 resolve(lenna.write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lena-small-bw" + rewardRecognition[0].UserName + ".png"));
-                                    //                                             }, 2000);
-
-                                    //                                         });
-
-                                    //                                     });
-
-                                    //                                 });
-
-                                    //                             });
-
-                                    //                         });
-
-                                    //                     });
-
-                                    //                 });
-                                    //             }, 1000);
-
-                                    //         });
-                                    //     });
-
-                                }).then(function (resp) {
-
                                 });
-                            })
-                        }   
-                        // else if(results[0].templateType == 2){
 
-                        // }
+                            }).then(function (resp) {
 
-                    })
+                            });
+                        });
+                    });
                 }
                 else {
                     res.status(401).json(response);

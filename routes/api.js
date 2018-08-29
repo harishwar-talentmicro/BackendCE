@@ -526,6 +526,9 @@ router.get('/joined_community',serviceModule.getJoinedCommunity);
 router.delete('/community_member',serviceModule.deleteCommunityMember);
 router.post('/service_pic',serviceModule.saveServicePic);
 router.post('/service_attachment',serviceModule.saveServiceAttachment);
+router.post('/service_attachment_pacehcm',serviceModule.saveServiceAttachmentForPacehcm);
+
+
 router.post('/service_video',serviceModule.saveServiceVideo);
 
 

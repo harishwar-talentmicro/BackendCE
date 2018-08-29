@@ -81,7 +81,7 @@ onboardingctrl.onBoardingDynamicForm = function (req, res, next) {
                                 scale : results[3] ? results[3] :[],
                                 duration : results[4] ? results[4] :[],
                                 designation : results[5] ? results[5] :[],
-                                YesNo : results[6] ? results[5][0]:{},
+                                YesNo : results[6] ? results[6][0]:{},
                                 sampleSegment :output
                             }
                         }

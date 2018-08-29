@@ -813,7 +813,7 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                                                 req.st.db.escape(message),    // sms message
                                                 req.st.db.escape(whatmateMessage),
                                                 req.st.db.escape(applicants[0]),   // in procedure only reAppId is stored
-                                                req.st.db.escape(transactions[0] ? transactions[0] : 0)
+                                                req.st.db.escape(JSON.stringify(transactions ? transactions : []))
                                             ];
     
                                             //saving the mail after sending it
@@ -1654,7 +1654,7 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                                 req.st.db.escape(message),    // sms message
                                                 req.st.db.escape(whatmateMessage),
                                                 req.st.db.escape(reqApplicants[0]),
-                                                req.st.db.escape(transactions[0] ? transactions[0] : 0)
+                                                req.st.db.escape(JSON.stringify(transactions ? transactions : []))
                                             ];
 
                                             //saving the mail after sending it
@@ -2052,7 +2052,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
 
                     else if (!err) {
                         response.status = false;
-                        response.message = "No result found";
+                        response.message = "No receipiants found";
                         response.error = null;
                         response.data = {
                             tagsPreview: [],
@@ -2518,7 +2518,7 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                             var saveMails = [
                                                 req.st.db.escape(req.query.token),
                                                 req.st.db.escape(req.query.heMasterId),
-                                                req.st.db.escape(req.body.heDepartmentId),
+                                                req.st.db.escape(req.body.heDepartmentId || 0),
                                                 req.st.db.escape(userId),
                                                 req.st.db.escape(mailerType),
                                                 req.st.db.escape(mailOptions.from),
@@ -2529,13 +2529,13 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                                 req.st.db.escape(JSON.stringify(bcc)),
                                                 req.st.db.escape(JSON.stringify(attachment)),
                                                 req.st.db.escape(req.body.replyMailId),
-                                                req.st.db.escape(req.body.priority),
-                                                req.st.db.escape(req.body.stageId),
-                                                req.st.db.escape(req.body.statusId),
+                                                req.st.db.escape(req.body.priority || 0),
+                                                req.st.db.escape(req.body.stageId || 0),
+                                                req.st.db.escape(req.body.statusId || 0),
                                                 req.st.db.escape(message),    // sms message
                                                 req.st.db.escape(whatmateMessage),
-                                                req.st.db.escape(reqApplicants[0]),
-                                                req.st.db.escape(transactions[0] ? transactions[0] : 0)
+                                                req.st.db.escape(clientContacts[0]),   // submission mailer save client contactid
+                                                req.st.db.escape(JSON.stringify(transactions ? transactions : []))
                                             ];
     
                                             //saving the mail after sending it
@@ -2807,6 +2807,17 @@ sendgridCtrl.clientMailerPreview = function (req, res, next) {
                                 }
                             }
 
+                            for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+                                if (result[0][clientIndex][tags.client[tagIndex].tagName] && result[0][clientIndex][tags.client[tagIndex].tagName] != null && result[0][clientIndex][tags.client[tagIndex].tagName] != 'null' && result[0][clientIndex][tags.client[tagIndex].tagName] != '') {
+
+                                    mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+
+                                    subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+
+                                    smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+                                }
+                            }
+
                             clientData.push(result[0][clientIndex].EmailId);
                             mailbody_array.push(mailBody);
                             subject_array.push(subject);
@@ -2965,6 +2976,7 @@ sendgridCtrl.clientMailer = function (req, res, next) {
 
     //check for mail type and assign the recipients
     emailReceivers = clientContacts;
+    transactions = clientContacts; // for saving in mailer history
     // emailReceivers.sort(function(a,b){return a-b});
 
     if (!validationFlag) {
@@ -3184,12 +3196,12 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                                                 req.st.db.escape(JSON.stringify(attachment)),
                                                 req.st.db.escape(req.body.replyMailId),
                                                 req.st.db.escape(req.body.priority),
-                                                req.st.db.escape(req.body.stageId),
-                                                req.st.db.escape(req.body.statusId),
+                                                req.st.db.escape(req.body.stageId || 0),
+                                                req.st.db.escape(req.body.statusId || 0),
                                                 req.st.db.escape(message),    // sms message
                                                 req.st.db.escape(whatmateMessage),
                                                 req.st.db.escape(reqApplicants[0]),
-                                                req.st.db.escape(transactions[0] ? transactions[0] : 0)
+                                                req.st.db.escape(JSON.stringify(transactions ? transactions : []))
                                             ];
     
                                             //saving the mail after sending it
@@ -3471,6 +3483,7 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                         var applicantData = [];
 
                         if (interviewerFlag) {
+                            console.log("interviewer mailer",interviewerFlag);
                             for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
                                 for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
 
@@ -3563,6 +3576,7 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
 
                         }
                         else {
+                            console.log('applicants interview mail',interviewerFlag);
                             for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
 
                                 for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
@@ -3601,14 +3615,16 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                     }
                                 }
                                 applicantData.push(result[0][applicantIndex].EmailId);
+                            
+                                mailbody_array.push(mailBody);
+                                subject_array.push(subject);
+                                smsMsg_array.push(smsMsg);
+                                mailBody = temp;
+                                subject = temp1;
+                                smsMsg = temp2;
                             }
 
-                            mailbody_array.push(mailBody);
-                            subject_array.push(subject);
-                            smsMsg_array.push(smsMsg);
-                            mailBody = temp;
-                            subject = temp1;
-                            smsMsg = temp2;
+                            
                         }
                         // console.log(mailbody_array);
 
@@ -4160,8 +4176,8 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                                 req.st.db.escape(req.body.statusId),
                                                 req.st.db.escape(message),    // sms message
                                                 req.st.db.escape(whatmateMessage),
-                                                req.st.db.escape(reqApplicants[0]),
-                                                req.st.db.escape(transactions[0] ? transactions[0] : 0)
+                                                req.st.db.escape(clientContacts[0]),
+                                                req.st.db.escape(JSON.stringify(transactions ? transactions : []))
                                             ];
     
                                             //saving the mail after sending it
@@ -4344,176 +4360,7 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
 };
 
 
-// sendgridCtrl.saveMailSentByGmail = function (req, res, next) {
-//     var response = {
-//         status: false,
-//         message: "Invalid token",
-//         data: null,
-//         error: null
-//     };
-//     var validationFlag = true;
-//     var sendMailFlag = 1;
-//     var emailReceivers;                //emailReceivers to store the recipients
-//     var mailbody_array = [];    //array to store all mailbody after replacing tags
-//     var subject_array = [];
-//     var smsMsg_array = [];
-
-//     var transactions =[];
-
-//     var emailId = [];
-//     var fromEmailID;
-//     var toEmailID = [];
-//     var MobileISD = [];
-//     var MobileNumber = [];
-//     var isdMobile = '';
-//     var mobileNo = '';
-//     var message = '';
-//     //request parameters
-//     var updateFlag = req.body.updateFlag || 0;
-//     var overWrite = req.body.overWrite || 0;
-//     var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
-//     var templateId = req.body.template ? req.body.template.templateId : undefined;
-//     var trackerTemplate = req.body.trackerTemplate || {};
-//     var tags = req.body.tags || {};
-//     var cc = req.body.cc || [];
-//     var toMail = req.body.toMail || [];
-//     var bcc = req.body.bcc || [];
-//     var stage = req.body.stage || [];
-//     var attachment = req.body.attachment || [];
-//     var reqApplicants = req.body.reqApplicants || [];
-//     var applicants = req.body.applicantId || [];
-//     var client = req.body.clientId || [];
-//     var tableTags = req.body.tableTags || {};
-//     var clientContacts = req.body.clientContacts || [];
-//     var subject = req.body.subject || '';
-//     var mailBody = req.body.mailBody || '';
-
-//     var whatmateMessage = req.body.whatmateMessage || '';
-//     var smsMsg = req.body.smsMsg || '';
-//     var smsFlag = req.body.smsFlag || 0;
-
-//     var isWeb = req.query.isWeb || 0;
-//     var mailerType = req.body.mailerType || 0;
-//     var userId = req.query.userId || 0;
-
-//     //html styling for table in submission mailer
-
-//     if (!req.query.heMasterId) {
-//         error.heMasterId = 'Invalid tenant';
-//         validationFlag *= false;
-//     }
-
-//     if (!req.query.token) {
-//         error.token = 'Invalid token';
-//         validationFlag *= false;
-//     }
-
-
-//     if (typeof (tags) == "string") {
-//         tags = JSON.parse(tags);
-//     }
-
-//     if (typeof (cc) == "string") {
-//         cc = JSON.parse(cc);
-//     }
-
-//     if (typeof (toMail) == "string") {
-//         toMail = JSON.parse(toMail);
-//     }
-
-//     if (typeof (bcc) == "string") {
-//         bcc = JSON.parse(bcc);
-//     }
-
-//     if (typeof (stage) == "string") {
-//         stage = JSON.parse(stage);
-//     }
-
-//     if (typeof (attachment) == "string") {
-//         attachment = JSON.parse(attachment);
-//     }
-
-//     if (typeof (client) == "string") {
-//         client = JSON.parse(client);
-//     }
-
-//     if (typeof (clientContacts) == "string") {
-//         clientContacts = JSON.parse(clientContacts);
-//     }
-
-//     if (typeof (tableTags) == "string") {
-//         tableTags = JSON.parse(tableTags);
-//     }
-
-//     if (typeof (reqApplicants) == "string") {
-//         reqApplicants = JSON.parse(reqApplicants);
-//     }
-
-//     if (!validationFlag) {
-//         response.error = error;
-//         response.message = 'Please check the error';
-//         res.status(400).json(response);
-//         console.log(response);
-//     }
-//     else {
-//         req.st.validateToken(req.query.token, function (err, tokenResult) {
-//             if ((!err) && tokenResult) {
-//                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-//                 req.body.templateId = req.body.templateId ? req.body.templateId :0;
-
-//                 var inputs = [
-//                     req.st.db.escape(req.query.token),
-//                     req.st.db.escape(req.query.heMasterId),
-//                     req.st.db.escape(req.body.heDepartmentId),
-//                     req.st.db.escape(userId),
-//                     req.st.db.escape(mailerType),
-//                     req.st.db.escape(mailOptions.from),
-//                     req.st.db.escape(mailOptions.to),
-//                     req.st.db.escape(mailOptions.subject),
-//                     req.st.db.escape(mailOptions.html),    // contains mail body
-//                     req.st.db.escape(JSON.stringify(cc)),
-//                     req.st.db.escape(JSON.stringify(bcc)),
-//                     req.st.db.escape(JSON.stringify(attachment)),
-//                     req.st.db.escape(req.body.replyMailId),
-//                     req.st.db.escape(req.body.priority),
-//                     req.st.db.escape(req.body.stageId),
-//                     req.st.db.escape(req.body.statusId),
-//                     req.st.db.escape(message),    // sms message
-//                     req.st.db.escape(whatmateMessage),
-//                     req.st.db.escape(reqApplicants[0]),
-//                     req.st.db.escape(transactions[0] ? transactions[0]:0)  
-//                 ];
-
-//                 var procQuery = 'CALL wm_save_sentByGMailerHistory( ' + inputs.join(',') + ')';
-//                 console.log(procQuery);
-//                 req.db.query(procQuery, function (err, result) {
-//                     console.log(err);
-
-//                     if (!err && result && result[0][0]) {
-//                         response.status = true;
-//                         response.message = "mails saved sucessfully";
-//                         response.error = null;
-//                         response.data =result[0][0];
-//                         res.status(200).json(response);
-//                     }
-
-//                     else {
-//                         response.status = false;
-//                         response.message = "Error while saving mails";
-//                         response.error = null;
-//                         response.data = null;
-//                         res.status(500).json(response);
-//                     }
-//                 });
-//             }
-//             else {
-//                 res.status(401).json(response);
-//             }
-//         });
-//     }
-// };
-
-sendgridCtrl.MailTransactionsOfCandidate = function (req, res, next) {
+sendgridCtrl.saveMailSentByGmail = function (req, res, next) {
     var response = {
         status: false,
         message: "Invalid token",
@@ -4521,25 +4368,102 @@ sendgridCtrl.MailTransactionsOfCandidate = function (req, res, next) {
         error: null
     };
     var validationFlag = true;
+    //request parameters
+    var tags = req.body.tags || {};
+    var cc = req.body.cc || [];
+    var toMail = req.body.toMail || [];
+    var bcc = req.body.bcc || [];
+    var stage = req.body.stage || [];
+    var attachment = req.body.attachment || [];
+    var reqApplicants = req.body.reqApplicants || [];
+    var applicants = req.body.applicantId || [];
+    var client = req.body.clientId || [];
+    var tableTags = req.body.tableTags || {};
+    var clientContacts = req.body.clientContacts || [];
+    var subject = req.body.subject || '';
+    var mailBody = req.body.mailBody || '';
+
+    var whatmateMessage = req.body.whatmateMessage || '';
+    var smsMsg = req.body.smsMsg || '';
+    var smsFlag = req.body.smsFlag || 0;
+
+    var isWeb = req.query.isWeb || 0;
+    var mailerType = req.body.mailerType || 0;
+    var userId = req.query.userId || 0;
+
+    var receipients =[];
+    //html styling for table in submission mailer
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid tenant';
+        validationFlag *= false;
+    }
+
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
 
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid heMasterId';
-        validationFlag *= false;
+
+    if (typeof (tags) == "string") {
+        tags = JSON.parse(tags);
     }
 
-    if (!req.query.applicantId) {
-        error.applicantId = 'Invalid applicantId';
-        validationFlag *= false;
+    if (typeof (cc) == "string") {
+        cc = JSON.parse(cc);
     }
 
+    if (typeof (toMail) == "string") {
+        toMail = JSON.parse(toMail);
+    }
+
+    if (typeof (bcc) == "string") {
+        bcc = JSON.parse(bcc);
+    }
+
+    if (typeof (stage) == "string") {
+        stage = JSON.parse(stage);
+    }
+
+    if (typeof (attachment) == "string") {
+        attachment = JSON.parse(attachment);
+    }
+
+    if (typeof (client) == "string") {
+        client = JSON.parse(client);
+    }
+
+    if (typeof (clientContacts) == "string") {
+        clientContacts = JSON.parse(clientContacts);
+    }
+
+    if (typeof (tableTags) == "string") {
+        tableTags = JSON.parse(tableTags);
+    }
+
+    if (typeof (reqApplicants) == "string") {
+        reqApplicants = JSON.parse(reqApplicants);
+    }
+
+    if(mailerType == 1){   //screening
+        receipients = reqApplicants;
+    }
+    else if(mailerType == 2){  // submission
+        receipients = clientContacts;
+    }
+    else if(mailerType == 3){  // // jobseeker
+        receipients = applicants;
+    }
+    else if(mailerType == 4){   // client
+        receipients = clientContacts;
+    }
+    else if(mailerType == 5){   //interview
+        receipients = clientContacts;
+    }
 
     if (!validationFlag) {
         response.error = error;
-        response.message = 'Please check the errors';
+        response.message = 'Please check the error';
         res.status(400).json(response);
         console.log(response);
     }
@@ -4547,52 +4471,45 @@ sendgridCtrl.MailTransactionsOfCandidate = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.body.templateId = req.body.templateId ? req.body.templateId :0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.applicantId)
+                    req.st.db.escape(req.body.heDepartmentId || 0),
+                    req.st.db.escape(mailerType),
+                    req.st.db.escape(req.body.fromMailId),
+                    req.st.db.escape(req.body.toMailId),
+                    req.st.db.escape(req.body.subject),
+                    req.st.db.escape(req.body.html),    // contains mail body
+                    req.st.db.escape(JSON.stringify(cc)),
+                    req.st.db.escape(JSON.stringify(bcc)),
+                    req.st.db.escape(JSON.stringify(attachment)),
+                    req.st.db.escape(req.body.replyMailId),
+                    req.st.db.escape(req.body.priority),
+                    req.st.db.escape(smsMsg),    // sms message
+                    req.st.db.escape(whatmateMessage),
+                    req.st.db.escape(JSON.stringify(receipients)),
+                    req.st.db.escape(JSON.stringify(reqApplicants)),
+                    req.st.db.escape(req.body.interviewerFlag || 0)
                 ];
 
-                var procQuery = 'CALL wm_get_senMailHistoryOfCandidate( ' + inputs.join(',') + ')';
+                var procQuery = 'CALL wm_save_sentByGMailerHistory( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
+
+                    if (!err && result && result[0][0]) {
                         response.status = true;
-                        response.message = "Applicant mail transactions loaded successfully";
+                        response.message = "mails saved sucessfully";
                         response.error = null;
-
-                        if (typeof(result[0][0].cc)=='string'){
-                            result[0][0].cc = JSON.parse(result[0][0].cc)
-                        }
-
-                        
-                        if (typeof(result[0][0].bcc)=='string'){
-                            result[0][0].bcc = JSON.parse(result[0][0].bcc)
-                        }
-
-                        
-                        if (typeof(result[0][0].attachment)=='string'){
-                            result[0][0].attachment = JSON.parse(result[0][0].attachment)
-                        }
-
-                        response.data =result[0] ? result[0] :[]
-                           
+                        response.data =result[0][0];
                         res.status(200).json(response);
                     }
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "No results found";
-                        response.error = null;
-                        response.data = {
-                            applicantList: []
-                        };
-                        res.status(200).json(response);
-                    }
+
                     else {
                         response.status = false;
-                        response.message = "Error while getting applicant mail history";
+                        response.message = "Error while saving mails";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

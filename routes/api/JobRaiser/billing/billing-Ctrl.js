@@ -182,7 +182,8 @@ billingCtrl.billingFilter = function (req, res, next) {
                         }
 
                         response.data = {
-                            billingData: (result[0] && result[0][0]) ? result[0] : []
+                            billingData: (result[0] && result[0][0]) ? result[0] : [],
+                            count : (result[1] && result[1][0]) ? result[1][0].count : 0,
                         };
                         res.status(200).json(response);
                     }
@@ -1122,5 +1123,199 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
         });
     }
 };
+
+
+billingCtrl.savePaceReqAppBilling = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.body.stageId) {
+        error.stageId = 'Invalid stageId';
+        validationFlag *= false;
+    }
+
+    var reqApplicants = req.body.reqApplicants;
+    if (typeof (reqApplicants) == "string") {
+        reqApplicants = JSON.parse(reqApplicants);
+    }
+    if (!reqApplicants) {
+        reqApplicants = []
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                req.body.billTo = req.body.billTo ? req.body.billTo : 0;
+                req.body.amountCurrencyId = req.body.amountCurrencyId ? req.body.amountCurrencyId : 0;
+                req.body.amountScaleId = req.body.amountScaleId ? req.body.amountScaleId : 0;
+                req.body.amountDurationId = req.body.amountDurationId ? req.body.amountDurationId : 0;
+                req.body.amount = req.body.amount ? req.body.amount : 0;
+                req.body.description = req.body.description ? req.body.description : '';
+
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(reqApplicants)),
+                    req.st.db.escape(req.body.stageId),
+                    req.st.db.escape(JSON.stringify(req.body.billTo || {})),
+                    req.st.db.escape(JSON.stringify(req.body.amountCurrency || {})),
+                    req.st.db.escape(JSON.stringify(req.body.amountScale || {})),
+                    req.st.db.escape(JSON.stringify(req.body.amountDuration || {})),
+                    req.st.db.escape(req.body.amount),
+                    req.st.db.escape(req.body.description)
+                ];
+
+                var procQuery = 'CALL wm_save_pacehcmAllBillingAmount( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Billing Data saved sucessfully";
+                        response.error = null;
+                        response.data = result[0] && result[0][0] ? result[0] : [];
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "Bill Data could not be saved sucessfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving bill data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+billingCtrl.getPaceReqAppBilling = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.stageId) {
+        error.stageId = 'Invalid stageId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.reqAppId) {
+        error.reqAppId = 'Invalid reqAppId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.reqAppId),
+                    req.st.db.escape(req.query.stageId)
+                ];
+
+                var procQuery = 'CALL wm_get_pacehcmReqAppBillingList( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0]) {
+                        
+                        for(var i=0; i< result[0].length; i++){
+                            result[0][i].billTo = (result[0] && result[0][i] && JSON.parse(result[0][i].billTo).id) ? JSON.parse(result[0][i].billTo) : {};
+
+                            result[0][i].amountCurrency = (result[0] && result[0][i] && JSON.parse(result[0][i].amountCurrency).currencyId) ? JSON.parse(result[0][i].amountCurrency) : {};
+
+                            result[0][i].amountScale = (result[0] && result[0][i] && JSON.parse(result[0][i].amountScale).scaleId) ? JSON.parse(result[0][i].amountScale) : {};
+
+                            result[0][i].amountDuration = (result[0] && result[0][i] && JSON.parse(result[0][i].amountDuration).durationId) ? JSON.parse(result[0][i].amountDuration) : {};
+
+                        }
+                        
+                        response.status = true;
+                        response.message = "Billing data loaded sucessfully";
+                        response.error = null;
+                        response.data = (result[0] && result[0][0]) ? result[0] : [];
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "Bill Data could not be loaded sucessfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading bill data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
 
 module.exports = billingCtrl;

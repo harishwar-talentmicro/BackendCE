@@ -27,6 +27,8 @@ var zlib = require('zlib');
 var AES_256_encryption = require('../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 
+var error ={};
+
 function FnEncryptPassword(Password) {
     try {
         console.log('encrypt...........');
@@ -677,6 +679,7 @@ User.prototype.changePassword = function (req, res, next) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var TokenNo = req.query.token;   // token is now query  //token was in body  T was caps before
 
+        
         var RtnMessage = {
             status: true,
             error:null,

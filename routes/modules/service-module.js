@@ -781,6 +781,99 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
     }
 };
 
+Service.prototype.saveServiceAttachmentForPacehcm = function(req,res,next) {
+
+    var aUrl='',aFilename='';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    try{
+        if(req.files) {
+            if(req.files.attachment) {
+                var uniqueId = uuid.v4();
+                var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
+                var mimeType = req.files.attachment.mimetype;
+                if(mimeType){
+                    if(mimeType.indexOf('png') > 0|| mimeType.indexOf('jpg') > 0 ){
+                        filetype = "png";
+                    }
+                    else if(mimeType.indexOf('jpeg') > 0 ){
+                        filetype = "jpeg";
+                    }
+                    else if(mimeType.indexOf('jpg') > 0 ){
+                        filetype = "jpg"
+                    }
+                    else if(mimeType.indexOf('doc') > 0 ){
+                        filetype = "docx"
+                    }
+                    else if(mimeType.indexOf('docx') > 0 ){
+                        filetype = "docx"
+                    }
+                    else if(mimeType.indexOf('rtf') > 0 ){
+                        filetype = "rtf"
+                    }
+                    else if(mimeType.indexOf('pdf') > 0 ){
+                        filetype = "pdf"
+                    }
+                    else if(mimeType.indexOf('application/msword') > -1 ){
+                        filetype = "docx"
+                    }
+                }
+                aUrl = uniqueId + '.' + filetype;
+                aFilename = req.files.attachment.originalname;
+                console.log("aFilenameaFilename",aFilename);
+                console.log("aFilenameaFilename",req.files.attachment);
+                
+                console.log("req.files.attachment.path",req.files.attachment.path);
+
+                var readStream = fs.createReadStream(req.files.attachment.path);
+
+                uploadDocumentToCloud(aUrl, readStream, function (err) {
+                    if (!err) {
+                        responseMessage.status = true;
+                        responseMessage.message = 'attachment Uploaded successfully';
+                        responseMessage.data = {
+                            a_url : aUrl,
+                            a_fn :aFilename
+                        };
+                        console.log("responseMessage",responseMessage);
+
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                    }
+                    else {
+                        responseMessage.message = 'attachment not upload';
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveServiceAttachment:attachment not upload');
+                    }
+                });
+            }
+        }
+        else{
+            responseMessage.message = 'file is required';
+            res.status(200).json(responseMessage);
+            console.log('file is required');
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server error'
+        };
+        responseMessage.message = 'An error occurred !';
+        console.log('FnSaveServiceAttachment:error ' + ex);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};
+
+
 /**
  * @todo FnSaveServiceVideo
  * Method : POST
