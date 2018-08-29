@@ -64,6 +64,12 @@ onboardingctrl.onBoardingDynamicForm = function (req, res, next) {
                         response.status = true;
                         response.message = "OnBoarding fields loaded successfully";
                         response.error = null;
+
+                        var output = {};
+                        for (var i = 0; i < results[7].length; i++) {
+                            output[results[7][i].queryTitle] = results[7][i].queryTypeList ? JSON.parse(results[7][i].queryTypeList) : []
+                        }
+
                         response.data = {
                             formId :results[0][0].formId,
                             totalScreenWidth:results[0][0].totalScreenWidth,
@@ -74,7 +80,9 @@ onboardingctrl.onBoardingDynamicForm = function (req, res, next) {
                                 currency :results[2] ? results[2] :[],
                                 scale : results[3] ? results[3] :[],
                                 duration : results[4] ? results[4] :[],
-                                designation : results[5] ? results[5] :[]
+                                designation : results[5] ? results[5] :[],
+                                YesNo : results[6] ? results[5][0]:{},
+                                sampleSegment :output
                             }
                         }
                         res.status(200).json(response);

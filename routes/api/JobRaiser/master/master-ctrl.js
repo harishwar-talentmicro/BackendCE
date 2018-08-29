@@ -336,6 +336,10 @@ masterCtrl.saveClients = function (req, res, next) {
                         // client contact parsing
                         results[4][0].contactList = (results && results[4] && results[4][0]) ? JSON.parse(results[4][0].contactList) :[];
 
+                        if(results[7] && results[7][0] && typeof(results[7][0].newClient)=='string'){
+                            results[7][0].newClient = JSON.parse(results[7][0].newClient);
+                        }
+
                         response.data = {
                             heDepartmentId: results[0][0].heDepartmentId,
                            // department: (results[1] && results[1][0]) ? results[1] : [],
@@ -346,7 +350,8 @@ masterCtrl.saveClients = function (req, res, next) {
                             contracts: contracts,//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
                             contactList : results[4][0].contactList,
                             roles: results[5] ? results[5] : [],
-                            group: results[6] ? results[6] : [] 
+                            group: results[6] ? results[6] : [],
+                            newClient : results[7] ? results[7][0].newClient: {}
                         };
                         res.status(200).json(response);
                     }
@@ -1367,11 +1372,13 @@ masterCtrl.getRequirementView = function (req, res, next) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
                 req.query.status = (req.query.status) ? req.query.status : 0;
+                req.query.type = (req.query.type) ? req.query.type : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.status),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.type)
                 ];
                 var procQuery = 'CALL wm_get_requirementView( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -1405,7 +1412,8 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                 res2.createdDate = results[0][i].createdDate,
                                 res2.branchList = JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
                                 res2.contactList = JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
-                                res2.stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : []
+                                res2.stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
+                                res2.newRequirement = results[0][i].newRequirement ? results[0][i].newRequirement:0 
                             output.push(res2);
                         }
                         
@@ -2221,7 +2229,7 @@ masterCtrl.saveUserManager = function (req, res, next) {
                 req.body.gradeId = req.body.gradeId ? req.body.gradeId : 0;
                 req.body.workGroupId = req.body.workGroupId ? req.body.workGroupId : 0;
                 req.body.RMId = req.body.RMId ? req.body.RMId : 0;
-                req.body.exitDate = req.body.exitDate ? req.body.exitDate : 0;
+                req.body.exitDate = req.body.exitDate ? req.body.exitDate : null;
                 req.body.password = req.body.password ? req.body.password : '';
                 var encryptPwd = req.st.hashPassword(req.body.password);
                 req.body.mailer = req.body.mailer ? req.body.mailer : 2;
@@ -2261,10 +2269,18 @@ masterCtrl.saveUserManager = function (req, res, next) {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if (!err && results) {
+                    if (!err && results && results[0] && results[0][0].message) {
                         response.status = true;
                         response.message = "User data saved sucessfully";
                         response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err && results && results[0] && results[0][0].error) {
+                        response.status = false;
+                        response.message = results[0][0].error;
+                        response.error = results[0][0].error;
                         response.data = null;
                         res.status(200).json(response);
                     }
@@ -2426,6 +2442,79 @@ masterCtrl.saveAssessmentGroupType = function (req, res, next) {
                     }
                 });
 
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+masterCtrl.jobCodeGeneration = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL wm_paceJobCode_generation( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "New Jobcode is generated ";
+                        response.error = null;
+
+                        response.data = result[0][0];
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while generating Jobcode";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
             }
             else {
                 res.status(401).json(response);

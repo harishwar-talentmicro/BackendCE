@@ -26,6 +26,7 @@ var gs_url = '';
 var storage_bucket = '';
 
 var attachFile = new Promise(function (resolve, reject) {
+    console.log('attachement cv', cv);
     if (cv != '') {
         cv = gs_url + storage_bucket + '/' + cv;
 
@@ -52,7 +53,7 @@ var attachFile = new Promise(function (resolve, reject) {
 
 // For saving resume or updating resume   * mandatory fields token,heMasterId,firstName,mobileNumber,emailId
 applicantCtrl.saveApplicant = function (req, res, next) {
-   // var cvKeywords = '';
+    // var cvKeywords = '';
 
 
     var response = {
@@ -230,20 +231,33 @@ applicantCtrl.saveApplicant = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 // req.body.cvPath = (req.body.cvPath) ? req.body.cvPath : "";
+                var cvKeywords;
+
+                if (req.body.cvKeywords && req.body.cvKeywords != '') {
+                    req.body.cvKeywords = req.body.cvKeywords.replace(/\\(x)(.{2})\\/g, '');
+                }
+
                 req.query.isWeb = (req.body.isWeb) ? req.body.isWeb : 0;
-                if (attachmentList.length) {
+                console.log("cvPath from attacment", req.body.cvKeywords);
+                if (attachmentList.length ) //&& (req.body.cvKeywords == '') && req.body.cvKeywords == undefined && req.body.cvKeywords == null &&  req.body.cvKeywords == ' ') 
+                {
                     cv = attachmentList[0].CDNPath;
                 }
                 gs_url = req.CONFIG.CONSTANT.GS_URL;
                 storage_bucket = req.CONFIG.CONSTANT.STORAGE_BUCKET;
 
-                console.log(cv);
+                console.log("cvPath from attacment", cv);
                 attachFile.then(function (resp) {
-                    console.log("response after promise",resp);
+                    console.log("response after promise", resp);
                     if (1) {
 
-                       cvKeywords = text;
-                       console.log('text from promise',resp);
+                        cvKeywords = text;
+                        if (cvKeywords) {
+                            cvKeywords = cvKeywords.replace(/\\(x)(.{2})\\/g, '');
+                        }
+
+                        console.log('text from promise', resp);
+                        console.log('text data from promise ', text);
 
                         req.body.applicantId = (req.body.applicantId) ? req.body.applicantId : 0;
 
@@ -258,12 +272,12 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         req.body.latitude = 0.0;
                         req.body.IDadhaarNumber = (req.body.IDadhaarNumber) ? req.body.IDadhaarNumber : "";
                         req.body.passportNumber = (req.body.passportNumber) ? req.body.passportNumber : "";
-                        req.body.ppExpiryDate = (req.body.ppExpiryDate) ? req.body.ppExpiryDate : "0000-00-00 00:00:00";
+                        req.body.ppExpiryDate = (req.body.ppExpiryDate) ? req.body.ppExpiryDate : null;
                         req.body.experience = (req.body.experience) ? req.body.experience : 0;
                         req.body.employer = (req.body.employer) ? req.body.employer : "";
                         req.body.noticePeriod = (req.body.noticePeriod) ? req.body.noticePeriod : 0;
                         req.body.notes = (req.body.notes) ? req.body.notes : "";
-                        req.body.DOB = (req.body.DOB) ? req.body.DOB : "0000-00-00";
+                        req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
                         //req.body.originalCvId = (req.body.originalCvId) ? req.body.originalCvId : 0;
                         req.body.status = (req.body.status) ? req.body.status : 0;
                         req.body.blockingPeriod = (req.body.blockingPeriod) ? req.body.blockingPeriod : 0;
@@ -275,7 +289,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
                         req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 0;
                         req.body.referredBy = req.body.referredBy ? req.body.referredBy : "";
-                        req.body.gender = (req.body.gender && req.body.gender  !='null')  ? req.body.gender : undefined;
+                        req.body.gender = (req.body.gender && req.body.gender != 'null') ? req.body.gender : undefined;
 
                         var inputs = [
                             req.st.db.escape(req.query.token),
@@ -321,7 +335,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(prefLocations)),
                             req.st.db.escape(JSON.stringify(industry)),
                             req.st.db.escape(JSON.stringify(nationality)),
-                            req.st.db.escape(req.body.cvKeywords),
+                            req.st.db.escape(cvKeywords || ''),
                             req.st.db.escape(req.body.requirementId),
                             req.st.db.escape(req.body.imageUrl),
                             req.st.db.escape(req.body.htmlText),
@@ -333,7 +347,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(req.body.referredBy),
                             req.st.db.escape(JSON.stringify(faceSheet)),
                             req.st.db.escape(JSON.stringify(presentLocation))
-                      
+
                         ];
 
                         var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -448,14 +462,14 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             output.push(res2);
                         }
 
-                        if (result[35].length){
+                        if (result[35].length) {
                             for (var p = 0; p < result[35].length; p++) {
                                 result[35][p].templateData = (result[35] && result[35][p]) ? JSON.parse(result[35][p].templateData) : {};
                             }
                             var templateData = {};
                             for (var i = 0; i < result[35][0].templateData.length; i++) {
                                 templateData[result[35][0].templateData[i].formId] = result[35][0].templateData[i];
-                                if(i==100){
+                                if (i == 100) {
                                     break;
                                 }
                             }
@@ -464,9 +478,13 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
 
                         for (var i = 0; i < result[41].length; i++) {
                             result[41][i].questions = (result[41] && result[41][i]) ? JSON.parse(result[41][i].questions) : [];
-                        }        
-                        
-                    
+                        }
+
+                        if (typeof (result[46][0].teamUsers) == 'string') {
+                            result[46][0].teamUsers = (result[46] && result[46][0] && result[46][0].teamUsers) ? JSON.parse(result[46][0].teamUsers) : []
+                        }
+
+
                         response.data = {
                             jobType: result[0] ? result[0] : [],
                             currency: result[1] ? result[1] : [],
@@ -486,8 +504,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                 general: result[27] ? result[27] : [],
                                 clientContact: result[30] ? result[30] : [],
                                 interview: result[33] ? result[33] : [],
-                                billing : result[38] ? result[38]:[],
-                                billingTable: result[40] ? result[40]: []
+                                billing: result[38] ? result[38] : [],
+                                billingTable: result[40] ? result[40] : []
                             },
                             educationList: output1,
                             Stage: result[15] ? result[15] : [],
@@ -508,14 +526,18 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             reportingTo: result[32] ? result[32] : [],
                             functionalAreas: result[34] ? result[34] : [],
                             accessRightsTemplateDetails: result[35] ? result[35] : [],
-                            layout : (result && result[36] && result[36][0]) ? JSON.parse(result[36][0].layout):{},
-                            clientStatus: result[37] ? result[37]:[],
-                            group : result[39] ? result[39]: [],
-                            faceSheetTemplates: result[41] ? result[41]:[],
-                            reportingToList : result[42] ? result[42]:[],
-                            jdTemplateList : result[43] ? result[43]:[],
-                            cvStatus : result[44] ? result[44]:[],
-                            visaTravelStatus :result[45] ? result[45]:[]
+                            layout: (result && result[36] && result[36][0]) ? JSON.parse(result[36][0].layout) : {},
+                            clientStatus: result[37] ? result[37] : [],
+                            group: result[39] ? result[39] : [],
+                            faceSheetTemplates: result[41] ? result[41] : [],
+                            reportingToList: result[42] ? result[42] : [],
+                            jdTemplateList: result[43] ? result[43] : [],
+                            cvStatus: result[44] ? result[44] : [],
+                            visaTravelStatus: result[45] ? result[45] : [],
+                            teamUsers: result[46][0].teamUsers ? result[46][0].teamUsers : [],
+                            paceUserDetails: (result[47] && result[47][0]) ? result[47][0] : {},
+                            stageStatusMapList: result[48] ? result[48] : [],
+
                         };
 
                         if (req.query.isWeb == 0) {
@@ -575,14 +597,17 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             reportingTo: [],
                             functionalAreas: [],
                             accessRightsTemplateDetails: [],
-                            layout:{},
-                            clientStatus:[],
-                            group:[],
-                            faceSheetTemplates:[],
+                            layout: {},
+                            clientStatus: [],
+                            group: [],
+                            faceSheetTemplates: [],
                             reportingToList: [],
-                            jdTemplateList:[],
+                            jdTemplateList: [],
                             cvStatus: [],
-                            visaTravelStatus :[]
+                            visaTravelStatus: [],
+                            teamUsers: [],
+                            paceUserDetails: {},
+                            stageStatusMapList:[]
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -873,8 +898,8 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                     req.st.db.escape(req.body.limit),
                     req.st.db.escape(req.body.requirementId),
                     req.st.db.escape(DBSecretKey),
-                    req.st.db.escape( req.body.type),
-                    req.st.db.escape( req.body.name)
+                    req.st.db.escape(req.body.type),
+                    req.st.db.escape(req.body.name)
                 ];
 
                 var procQuery = 'CALL wm_get_applicants( ' + getStatus.join(',') + ')';
@@ -1227,7 +1252,7 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                 req.body.parentId = (req.body.parentId) ? req.body.parentId : 0;
                 req.body.expFrom = (req.body.expFrom) ? req.body.expFrom : -1;
                 req.body.expTo = (req.body.expTo) ? req.body.expTo : -1;
-                req.body.resumeDaysFreshness = (req.body.resumeDaysFreshness) ? req.body.resumeDaysFreshness : 99000;
+                req.body.resumeDaysFreshness = (req.body.resumeDaysFreshness) ? req.body.resumeDaysFreshness : 1;
                 req.body.currency = (req.body.currency) ? req.body.currency : 0;
                 req.body.salaryFrom = (req.body.salaryFrom) ? req.body.salaryFrom : 0;
                 req.body.salaryTo = (req.body.salaryTo) ? req.body.salaryTo : 0;
@@ -1237,11 +1262,14 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                 req.body.noticePeriodTo = (req.body.noticePeriodTo) ? req.body.noticePeriodTo : 0;
                 req.body.workLocation = (req.body.workLocation) ? req.body.workLocation : '';
                 req.body.cvRating = req.body.cvRating ? req.body.cvRating : 0;
-                                
+                req.body.cvKeywords = req.body.cvKeywords ? req.body.cvKeywords : '';
+                req.body.searchResultsLimit = req.body.searchResultsLimit ? req.body.searchResultsLimit : 100;
+                req.body.includeJd = req.body.includeJd ? req.body.includeJd : 0;
+
                 req.body.start = req.body.start ? req.body.start : 1;
                 req.body.limit = (req.body.limit) ? req.body.limit : 50;
-                
-                req.body.start = ((((req.body.start) * req.body.limit) + 1) - req.body.limit)-1;
+
+                req.body.start = ((((req.body.start) * req.body.limit) + 1) - req.body.limit) - 1;
 
 
                 var inputs = [
@@ -1271,11 +1299,13 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(DOB)),
                     req.st.db.escape(req.body.start),
                     req.st.db.escape(req.body.limit),
-                    req.st.db.escape(req.body.cvRating)
+                    req.st.db.escape(req.body.cvRating),
+                    req.st.db.escape(req.body.searchResultsLimit),
+                    req.st.db.escape(req.body.includeJd)
 
                 ];
 
-                var procQuery = 'CALL wd_resume_search_new2( ' + inputs.join(',') + ')';  // call procedure to save requirement data
+                var procQuery = 'CALL wd_resume_search_newAlgorithm( ' + inputs.join(',') + ')';  // call procedure to save requirement data
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
@@ -1285,9 +1315,16 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                         response.error = null;
 
                         for (var i = 0; i < result[0].length; i++) {
-                            result[0][i].education = JSON.parse(result[0][i].education) ? JSON.parse(result[0][i].education) : [];
-                            result[0][i].keySkills = JSON.parse(result[0][i].keySkills) ? JSON.parse(result[0][i].keySkills) : [];
-                            result[0][i].location = JSON.parse(result[0][i].location) ? JSON.parse(result[0][i].location) : [];
+                            if (result[0][i] && result[0][i].education) {
+                                result[0][i].education = JSON.parse(result[0][i].education) ? JSON.parse(result[0][i].education) : [];
+                            }
+                            if (result[0][i] && result[0][i].keySkills) {
+                                result[0][i].keySkills = JSON.parse(result[0][i].keySkills) ? JSON.parse(result[0][i].keySkills) : [];
+
+                            }
+                            if (result[0][i] && result[0][i].location) {
+                                result[0][i].location = JSON.parse(result[0][i].location) ? JSON.parse(result[0][i].location) : [];
+                            }
                             result[0][i].requirementApplicantCount = result[0][i].requirementApplicantCount ? result[0][i].requirementApplicantCount : 0;
                         }
                         response.data = {
@@ -1416,11 +1453,11 @@ applicantCtrl.saveReqAppMapResult = function (req, res, next) {
         validationFlag *= false;
     }
     var applicant = req.body.applicant;
-    if(typeof(applicant) == 'string'){
+    if (typeof (applicant) == 'string') {
         applicant = JSON.parse(applicant);
     }
-    if(!applicant){
-        applicant =[];
+    if (!applicant) {
+        applicant = [];
     }
 
     if (!validationFlag) {
@@ -1531,7 +1568,7 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                     console.log(err);
                     if (!err && result && result[0] && result[1]) {
                         //parsing the result
-                        var temp_result = result[0][0] ? result[0][0] : [];
+                        var temp_result = result[0][0] ? result[0][0] : {};
                         temp_result.education = JSON.parse(temp_result.education);
                         temp_result.cvSource = JSON.parse(temp_result.cvSource);
                         temp_result.expectedSalaryCurr = JSON.parse(temp_result.expectedSalaryCurr);
@@ -1557,11 +1594,11 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
 
                         response.data =
                             {
-                                applicantDetails: temp_result ? temp_result : [],
+                                applicantDetails: temp_result ? temp_result : {},
                                 applicantTransaction: result[1] ? result[1] : [],
                                 clientCvPath: (result[2] && result[2][0]) ? result[2][0].clientCvPath : "",
                                 previousClientCvPath: (result[3] && result[3][0]) ? result[3][0].previousClientCvPath : "",
-                                faceSheet: (result[4] && result[4][0]) ? JSON.parse(result[4][0].faceSheet) :{}
+                                faceSheet: (result[4] && result[4][0]) ? JSON.parse(result[4][0].faceSheet) : {}
                             };
                         res.status(200).json(response);
                     }
@@ -1572,8 +1609,8 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         response.data = {
                             applicantDetails: [],
                             applicantTransaction: [],
-                            clientCvPath:"",
-                            previousClientCvPath:""  
+                            clientCvPath: "",
+                            previousClientCvPath: ""
                         };
                         res.status(200).json(response);
                     }
@@ -1972,7 +2009,7 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             offerManagerId: result[0][0].offerManagerId,
-                            transactionHistory: (result[1] && result[1][0]) ? result[1] :[]
+                            transactionHistory: (result[1] && result[1][0]) ? result[1] : []
                         };
                         res.status(200).json(response);
                     }
@@ -2032,7 +2069,7 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[0][0] && result[0][0].offerManagerId !=0) {
+                    if (!err && result && result[0] && result[0][0] && result[0][0].offerManagerId != 0) {
                         response.status = true;
                         response.message = "Offer manager list loaded successfully";
                         response.error = null;
@@ -2129,7 +2166,7 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                             res2.heDepartmentName = result[2][i].heDepartmentName ? result[2][i].heDepartmentName : "";
                             res2.heParentId = result[2][i].heParentId ? result[2][i].heParentId : 0;
                             res2.interviewRoundId = result[2][i].interviewRoundId ? result[2][i].interviewRoundId : 0;
-                            res2.reportingDateTime = result[2][i].reportingDateTime ? result[2][i].reportingDateTime : "0000-00-00 00:00:00";
+                            res2.reportingDateTime = result[2][i].reportingDateTime ? result[2][i].reportingDateTime : null;
                             res2.interviewDuration = result[2][i].interviewDuration ? result[2][i].interviewDuration : 0;
                             res2.notes = result[2][i].notes ? result[2][i].notes : "";
                             res2.assessmentTemplateId = result[2][i].assessmentTemplateId ? result[2][i].assessmentTemplateId : 0;
@@ -2137,7 +2174,7 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                             res2.applicant = JSON.parse(result[2][i].applicant) ? JSON.parse(result[2][i].applicant) : [];
                             res2.panelMembers = JSON.parse(result[2][i].panelMembers) ? JSON.parse(result[2][i].panelMembers) : [];
                             res2.address = result[2][i].address ? result[2][i].address : '';
-                            
+
                             output.push(res2);
                         }
                         response.data =
@@ -2149,8 +2186,8 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                                 assessmentDetail: JSON.stringify(result[4][0].assessment) ? JSON.stringify(result[4][0].assessment) : [],
                                 skillAssessment: JSON.parse(result[5][0].skillAssessment) ? JSON.parse(result[5][0].skillAssessment) : [],
                                 clientLocations: result[6][0] ? result[6][0] : {},
-                                interviewMailerTemplate: (result[7] && result[7][0]) ? JSON.parse(result[7][0].formDataJson): [],
-                                address: (result[8] && result[8][0]) ? result[8][0].address :'' 
+                                interviewMailerTemplate: (result[7] && result[7][0]) ? JSON.parse(result[7][0].formDataJson) : [],
+                                address: (result[8] && result[8][0]) ? result[8][0].address : ''
                             };
 
                         if (req.query.isWeb == 0) {
@@ -2173,11 +2210,11 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                             AssessmentTemplateList: [],
                             interviewScheduler: [],
                             interviewStageRounds: [],
-                            assessmentDetail:[],
-                            skillAssessment:[],
-                            clientLocations:{},
-                            interviewMailerTemplate:{},
-                            address:''
+                            assessmentDetail: [],
+                            skillAssessment: [],
+                            clientLocations: {},
+                            interviewMailerTemplate: {},
+                            address: ''
 
                         };
                         if (req.query.isWeb == 0) {
@@ -2337,11 +2374,11 @@ applicantCtrl.getReferralResumeMaster = function (req, res, next) {
                             skills: result[1] ? result[1] : [],
                             requirementList: result[2] ? result[2] : [],
                             stageStatus: output,
-                            knownPeriodList:result[4] ? result[4] : [],
-                            relationWithReferral:result[5] ? result[5] : [],
-                            companyLocations:result[6] ? result[6]:[],
-                            genderList:result[7] ? result[7]:[]
-                                        };
+                            knownPeriodList: result[4] ? result[4] : [],
+                            relationWithReferral: result[5] ? result[5] : [],
+                            companyLocations: result[6] ? result[6] : [],
+                            genderList: result[7] ? result[7] : []
+                        };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                             zlib.gzip(buf, function (_, result) {
@@ -2364,9 +2401,9 @@ applicantCtrl.getReferralResumeMaster = function (req, res, next) {
                             requirementList: [],
                             knownPeriodList: [],
                             relationWithReferral: [],
-                            companyLocations:[],
-                            genderList:[]     
-                       };
+                            companyLocations: [],
+                            genderList: []
+                        };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                             zlib.gzip(buf, function (_, result) {
@@ -2402,7 +2439,7 @@ applicantCtrl.saveInterviewSchedulerNew = function (req, res, next) {
         data: null,
         error: null
     };
-    
+
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -3351,28 +3388,28 @@ applicantCtrl.saveInterviewSchedulerForApplicant = function (req, res, next) {
                                 response.data = {
 
                                     messageList:
-                                        {
-                                            messageId: results[0][0].messageId,
-                                            message: results[0][0].message,
-                                            messageLink: results[0][0].messageLink,
-                                            createdDate: results[0][0].createdDate,
-                                            messageType: results[0][0].messageType,
-                                            messageStatus: results[0][0].messageStatus,
-                                            priority: results[0][0].priority,
-                                            senderName: results[0][0].senderName,
-                                            senderId: results[0][0].senderId,
-                                            receiverId: results[0][0].receiverId,
-                                            transId: results[0][0].transId,
-                                            formId: results[0][0].formId,
-                                            groupId: req.body.groupId,
-                                            currentStatus: results[0][0].currentStatus,
-                                            currentTransId: results[0][0].currentTransId,
-                                            localMessageId: req.body.localMessageId,
-                                            parentId: results[0][0].parentId,
-                                            accessUserType: results[0][0].accessUserType,
-                                            heUserId: results[0][0].heUserId,
-                                            formData: JSON.parse(results[0][0].formDataJSON)
-                                        }
+                                    {
+                                        messageId: results[0][0].messageId,
+                                        message: results[0][0].message,
+                                        messageLink: results[0][0].messageLink,
+                                        createdDate: results[0][0].createdDate,
+                                        messageType: results[0][0].messageType,
+                                        messageStatus: results[0][0].messageStatus,
+                                        priority: results[0][0].priority,
+                                        senderName: results[0][0].senderName,
+                                        senderId: results[0][0].senderId,
+                                        receiverId: results[0][0].receiverId,
+                                        transId: results[0][0].transId,
+                                        formId: results[0][0].formId,
+                                        groupId: req.body.groupId,
+                                        currentStatus: results[0][0].currentStatus,
+                                        currentTransId: results[0][0].currentTransId,
+                                        localMessageId: req.body.localMessageId,
+                                        parentId: results[0][0].parentId,
+                                        accessUserType: results[0][0].accessUserType,
+                                        heUserId: results[0][0].heUserId,
+                                        formData: JSON.parse(results[0][0].formDataJSON)
+                                    }
                                 };
                                 if (isWeb == 0) {
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -3494,7 +3531,7 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
     if (!salaryScale) {
         salaryScale = {};
     }
-    
+
     var salaryPeriod = [];
     salaryPeriod = req.body.salaryPeriod;
     if (typeof (salaryPeriod) == "string") {
@@ -3584,8 +3621,8 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                 req.body.jobTitle = req.body.jobTitle ? req.body.jobTitle : '';
                 req.body.contactId = req.body.contactId ? req.body.contactId : 0;
                 req.body.managerId = req.body.managerId ? req.body.managerId : 0;
-                req.body.offerJoiningDate = req.body.offerJoiningDate ? req.body.offerJoiningDate : '';
-                req.body.plannedJoiningDate = req.body.plannedJoiningDate ? req.body.plannedJoiningDate : '';
+                req.body.offerJoiningDate = req.body.offerJoiningDate ? req.body.offerJoiningDate : null;
+                req.body.plannedJoiningDate = req.body.plannedJoiningDate ? req.body.plannedJoiningDate : null;
                 req.body.offerCTCCurrId = req.body.offerCTCCurrId ? req.body.offerCTCCurrId : 0;
                 req.body.offerCTCSalary = req.body.offerCTCSalary ? req.body.offerCTCSalary : 0;
                 req.body.offerCTCScaleId = req.body.offerCTCScaleId ? req.body.offerCTCScaleId : 0;
@@ -3597,6 +3634,7 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                 req.body.notes = req.body.notes ? req.body.notes : '';
                 req.body.workInMentionedShifts = req.body.workInMentionedShifts ? req.body.workInMentionedShifts : 0;
                 req.body.grade = req.body.grade ? req.body.grade : '';
+                req.body.actualJoiningDate = req.body.actualJoiningDate ? req.body.actualJoiningDate : null;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -3634,7 +3672,7 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                     req.st.db.escape(req.body.vendorAmount),
                     req.st.db.escape(JSON.stringify(vendorScale)),
                     req.st.db.escape(JSON.stringify(vendorDuration))
-                    ];
+                ];
 
                 var procQuery = 'CALL wm_save_onBoarding( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -3645,8 +3683,8 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                         response.message = "OnBoarding data saved successfully";
                         response.error = null;
                         response.data = {
-                            onBoardingId: (result[0] && result[0][0]) ? result[0][0].onBoardingId :0,
-                            transactionHistory: (result[1] && result[1][0]) ? result[1] :[]
+                            onBoardingId: (result[0] && result[0][0]) ? result[0][0].onBoardingId : 0,
+                            transactionHistory: (result[1] && result[1][0]) ? result[1] : []
                         };
                         res.status(200).json(response);
                     }
@@ -3711,36 +3749,36 @@ applicantCtrl.getOnBoarding = function (req, res, next) {
                         response.message = "onBoarding details loaded successfully";
                         response.error = null;
 
-                        if(result[0][0]){
-                            result[0][0].documentAttachment = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].documentAttachment):[];
-                            result[0][0].offerLocation = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerLocation):[];
-    
-                            result[0][0].offerCTCCurr = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCCurr):{};
-                            result[0][0].offerCTCScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCScale):{};
-                            result[0][0].offerCTCPeriod = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCPeriod):{};
-                            result[0][0].salaryCurr = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryCurr):{};
-                            result[0][0].salaryScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryScale):{};
-                            result[0][0].salaryPeriod = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryPeriod):{};
-                            
-                            result[0][0].billableCurrency = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableCurrency):{};
-                            result[0][0].billableScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableScale):{};
-                            result[0][0].billableDuration = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableDuration):{};
-    
-                            result[0][0].vendorCurrency = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorCurrency):{};
-                            result[0][0].vendorScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorScale):{};
-                            result[0][0].vendorDuration = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorDuration):{};
-    
-                            result[0][0].designation = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].designation):{};
+                        if (result[0][0]) {
+                            result[0][0].documentAttachment = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].documentAttachment) : [];
+                            result[0][0].offerLocation = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerLocation) : [];
+
+                            result[0][0].offerCTCCurr = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCCurr) : {};
+                            result[0][0].offerCTCScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCScale) : {};
+                            result[0][0].offerCTCPeriod = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCPeriod) : {};
+                            result[0][0].salaryCurr = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryCurr) : {};
+                            result[0][0].salaryScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryScale) : {};
+                            result[0][0].salaryPeriod = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryPeriod) : {};
+
+                            result[0][0].billableCurrency = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableCurrency) : {};
+                            result[0][0].billableScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableScale) : {};
+                            result[0][0].billableDuration = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableDuration) : {};
+
+                            result[0][0].vendorCurrency = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorCurrency) : {};
+                            result[0][0].vendorScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorScale) : {};
+                            result[0][0].vendorDuration = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorDuration) : {};
+
+                            result[0][0].designation = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].designation) : {};
                         }
-                        
-                        if(result[1][0]){
-                            result[1][0].offerDate = (result[1] && result[1][0]) ? result[1][0].offerDate :null;
-                            result[1][0].plannedJoiningDate = (result[1] && result[1][0]) ? result[1][0].plannedJoiningDate :null;    
+
+                        if (result[1][0]) {
+                            result[1][0].offerDate = (result[1] && result[1][0]) ? result[1][0].offerDate : null;
+                            result[1][0].plannedJoiningDate = (result[1] && result[1][0]) ? result[1][0].plannedJoiningDate : null;
                         }
-                        
-                        response.data ={
-                            onBoarding : (result[0] && result[0][0]) ? result[0][0]:{},
-                            offer : (result[1] && result[1][0]) ? result[1][0] : {}
+
+                        response.data = {
+                            onBoarding: (result[0] && result[0][0]) ? result[0][0] : {},
+                            offer: (result[1] && result[1][0]) ? result[1][0] : {}
                         };
                         res.status(200).json(response);
                     }
@@ -3748,9 +3786,9 @@ applicantCtrl.getOnBoarding = function (req, res, next) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
-                        response.data ={
-                            onBoarding :{},
-                            offer :{}
+                        response.data = {
+                            onBoarding: {},
+                            offer: {}
                         };
                         res.status(200).json(response);
                     }
@@ -3884,10 +3922,10 @@ applicantCtrl.faceSheetTemplate = function (req, res, next) {
     }
 
     var questions = req.body.questions;
-    if(typeof(questions) == "string"){
+    if (typeof (questions) == "string") {
         questions = JSON.parse(questions);
     }
-    if(!questions){
+    if (!questions) {
         questions = []
     }
 
@@ -3901,14 +3939,14 @@ applicantCtrl.faceSheetTemplate = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                req.body.templateId = req.body.templateId ? req.body.templateId :0;
+                req.body.templateId = req.body.templateId ? req.body.templateId : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.body.templateId),                   
-                    req.st.db.escape(req.body.templateName),                            
-                    req.st.db.escape(JSON.stringify(questions))                   
+                    req.st.db.escape(req.body.templateId),
+                    req.st.db.escape(req.body.templateName),
+                    req.st.db.escape(JSON.stringify(questions))
                 ];
 
                 var procQuery = 'CALL wm_save_paceFacesheetTemplate( ' + inputs.join(',') + ')';
@@ -3921,11 +3959,11 @@ applicantCtrl.faceSheetTemplate = function (req, res, next) {
                         response.message = "Facesheet Template saved sucessfully";
                         response.error = null;
                         response.data = {
-                            templateId : result[0][0] ?  result[0][0].templateId : 0
+                            templateId: result[0][0] ? result[0][0].templateId : 0
                         };
                         res.status(200).json(response);
                     }
-                   
+
                     else {
                         response.status = false;
                         response.message = "Error while saving Facesheet";
@@ -3967,10 +4005,10 @@ applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
     }
 
     var faceSheet = req.body.faceSheet;
-    if(typeof(faceSheet) == "string"){
+    if (typeof (faceSheet) == "string") {
         faceSheet = JSON.parse(faceSheet);
     }
-    if(!faceSheet){
+    if (!faceSheet) {
         faceSheet = []
     }
 
@@ -3988,7 +4026,7 @@ applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.applicantId)                   
+                    req.st.db.escape(req.query.applicantId)
                 ];
 
                 var procQuery = 'CALL wm_get_fillFaceSheet( ' + inputs.join(',') + ')';
@@ -4000,17 +4038,17 @@ applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
                         response.status = true;
                         response.message = "Facesheet Template loaded sucessfully";
                         response.error = null;
-                        if(faceSheet.questions)
-                        for(var i=0; i<faceSheet.questions.length; i++){
-                            faceSheet.questions[i].answer = result[0][0][faceSheet.questions[i].type.tagName];
-                        }
-                        
+                        if (faceSheet.questions)
+                            for (var i = 0; i < faceSheet.questions.length; i++) {
+                                faceSheet.questions[i].answer = result[0][0][faceSheet.questions[i].type.tagName];
+                            }
+
                         response.data = {
-                            faceSheet : faceSheet ? faceSheet : {}
+                            faceSheet: faceSheet ? faceSheet : {}
                         };
                         res.status(200).json(response);
                     }
-                   
+
                     else {
                         response.status = false;
                         response.message = "Error while loading Facesheet";
@@ -4027,13 +4065,13 @@ applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
     }
 };
 
-applicantCtrl.referFriend = function(req,res,next){
+applicantCtrl.referFriend = function (req, res, next) {
     //console.log('body data',req.body.data);
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
@@ -4041,54 +4079,54 @@ applicantCtrl.referFriend = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
     }
-    else{
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                    
-                    var attachmentList =req.body.attachmentList;
-                    if(typeof(attachmentList) == "string") {
+
+                    var attachmentList = req.body.attachmentList;
+                    if (typeof (attachmentList) == "string") {
                         attachmentList = JSON.parse(attachmentList);
                     }
-                    if(!attachmentList){
-                        attachmentList = {} ;
+                    if (!attachmentList) {
+                        attachmentList = {};
                     }
-                    var preferredLocation =req.body.preferredLocation;
-                    if(typeof(preferredLocation) == "string") {
+                    var preferredLocation = req.body.preferredLocation;
+                    if (typeof (preferredLocation) == "string") {
                         preferredLocation = JSON.parse(preferredLocation);
                     }
-                    if(!preferredLocation){
-                        preferredLocation = {} ;
+                    if (!preferredLocation) {
+                        preferredLocation = {};
                     }
-                
+
                     var senderGroupId;
-                
-                    if (!validationFlag){
+
+                    if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
                         res.status(400).json(response);
                     }
-                    else{
+                    else {
                         req.body.parentId = req.body.parentId ? req.body.parentId : 0;
                         req.body.status = req.body.status ? req.body.status : 1;
                         req.body.profileSummary = req.body.profileSummary ? req.body.profileSummary : '';
-                        req.body.receiverNotes  = req.body.receiverNotes ? req.body.receiverNotes : '';
-                        req.body.changeLog      = req.body.changeLog ? req.body.changeLog : '';
+                        req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
+                        req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
                         req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
-                        req.body.accessUserType = req.body.accessUserType  ? req.body.accessUserType  : 0;
+                        req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
-                        req.body.approverCount  = req.body.approverCount ? req.body.approverCount : 0;
-                        req.body.receiverCount  = req.body.receiverCount ? req.body.receiverCount : 0;
+                        req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
+                        req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
                         req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
-                        
-        
+
+
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.parentId),
@@ -4103,7 +4141,7 @@ applicantCtrl.referFriend = function(req,res,next){
                             req.st.db.escape(req.body.relationWithReferalId),
                             req.st.db.escape(req.body.DOB),
                             req.st.db.escape(req.body.gender),
-                           //  req.st.db.escape(req.body.referredBy),
+                            //  req.st.db.escape(req.body.referredBy),
                             req.st.db.escape(req.body.status),
                             req.st.db.escape(req.body.receiverNotes),
                             req.st.db.escape(JSON.stringify(attachmentList)),
@@ -4115,14 +4153,14 @@ applicantCtrl.referFriend = function(req,res,next){
                             req.st.db.escape(req.body.approverCount),
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp) 
+                            req.st.db.escape(req.body.createdTimeStamp)
                         ];
-        
+
                         var procQuery = 'CALL HE_save_referCV_new1( ' + procParams.join(',') + ')';
                         console.log(procQuery);
-                        req.db.query(procQuery,function(err,results){
+                        req.db.query(procQuery, function (err, results) {
                             console.log(results);
-                            if(!err && results && results[0] ){
+                            if (!err && results && results[0]) {
                                 senderGroupId = results[0][0].senderId;
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                 //     senderName : results[0][0].message
@@ -4203,25 +4241,25 @@ applicantCtrl.referFriend = function(req,res,next){
                                         senderName: results[0][0].senderName,
                                         senderId: results[0][0].senderId,
                                         receiverId: results[0][0].receiverId,
-                                        transId : results[0][0].transId,
-                                        formId : results[0][0].formId,
+                                        transId: results[0][0].transId,
+                                        formId: results[0][0].formId,
                                         groupId: req.body.groupId,
-                                        currentStatus : results[0][0].currentStatus,
-                                        currentTransId : results[0][0].currentTransId,
-                                        localMessageId : req.body.localMessageId,
-                                        parentId : results[0][0].parentId,
-                                        accessUserType : results[0][0].accessUserType,
-                                        heUserId : results[0][0].heUserId,
-                                        formData : JSON.parse(results[0][0].formDataJSON)
+                                        currentStatus: results[0][0].currentStatus,
+                                        currentTransId: results[0][0].currentTransId,
+                                        localMessageId: req.body.localMessageId,
+                                        parentId: results[0][0].parentId,
+                                        accessUserType: results[0][0].accessUserType,
+                                        heUserId: results[0][0].heUserId,
+                                        formData: JSON.parse(results[0][0].formDataJSON)
                                     }
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(response);
-                                 });
+                                });
                             }
-                            else{
+                            else {
                                 response.status = false;
                                 response.message = "Error while referred";
                                 response.error = null;
@@ -4232,7 +4270,7 @@ applicantCtrl.referFriend = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -4242,334 +4280,431 @@ applicantCtrl.referFriend = function(req,res,next){
 
 applicantCtrl.saveApplicantForImporter = function (req, res, next) {
     // var cvKeywords = '';
- 
-     var response = {
-         status: false,
-         message: "Invalid token",
-         data: null,
-         error: null
-     };
-     var validationFlag = true;
-     if (!req.query.token) {
-         error.token = 'Invalid token';
-         validationFlag *= false;
-     }
-     if (!req.body.heMasterId) {
-         error.heMasterId = 'Invalid Company';
-         validationFlag *= false;
-     }
-     if (!req.body.firstName) {
-         error.firstName = 'First Name is Mandatory';
-         validationFlag *= false;
-     }
-     if (!req.body.emailId || !req.body.mobileNumber) {   // any one is mandatory
-         error.emailId = 'EMail ID or Mobile Number is mandatory';
-         validationFlag *= false;
-     }
- 
-     // if (!req.body.mobileNumber) {
-     //     error.mobileNumber = 'Mobile Number is Mandatory';
-     //     validationFlag *= false;
-     // }
-     var education = req.body.education;
-     if (typeof (education) == "string") {
-         education = JSON.parse(education);
-     }
-     if (!education) {
-         education = [];
-     }
-     var jobTitle = req.body.jobTitle;
-     if (typeof (jobTitle) == "string") {
-         jobTitle = JSON.parse(jobTitle);
-     }
-     if (!jobTitle) {
-         jobTitle = {};
-     }
-     var primarySkills = req.body.primarySkills;
-     if (typeof (primarySkills) == "string") {
-         primarySkills = JSON.parse(primarySkills);
-     }
-     if (!primarySkills) {
-         primarySkills = [];
-     }
-     var secondarySkills = req.body.secondarySkills;
-     if (typeof (secondarySkills) == "string") {
-         secondarySkills = JSON.parse(secondarySkills);
-     }
-     if (!secondarySkills) {
-         secondarySkills = [];
-     }
-     var cvSource = req.body.cvSource;
-     if (typeof (cvSource) == "string") {
-         cvSource = JSON.parse(cvSource);
-     }
-     if (!cvSource) {
-         cvSource = {};
-     }
-     var prefLocations = req.body.prefLocations;
-     if (typeof (prefLocations) == "string") {
-         prefLocations = JSON.parse(prefLocations);
-     }
-     if (!prefLocations) {
-         prefLocations = [];
-     }
-     var industry = req.body.industry;
-     if (typeof (industry) == "string") {
-         industry = JSON.parse(industry);
-     }
-     if (!industry) {
-         industry = [];
-     }
-     var nationality = req.body.nationality;
-     if (typeof (nationality) == "string") {
-         nationality = JSON.parse(nationality);
-     }
-     if (!nationality) {
-         nationality = {};
-     }
-     var expectedSalaryCurr = req.body.expectedSalaryCurr;
-     if (typeof (expectedSalaryCurr) == "string") {
-         expectedSalaryCurr = JSON.parse(expectedSalaryCurr);
-     }
-     if (!expectedSalaryCurr) {
-         expectedSalaryCurr = {};
-     }
- 
-     var expectedSalaryScale = req.body.expectedSalaryScale;
-     if (typeof (expectedSalaryScale) == "string") {
-         expectedSalaryScale = JSON.parse(expectedSalaryScale);
-     }
-     if (!expectedSalaryScale) {
-         expectedSalaryScale = {};
-     }
-     var expectedSalaryPeriod = req.body.expectedSalaryPeriod;
-     if (typeof (expectedSalaryPeriod) == "string") {
-         expectedSalaryPeriod = JSON.parse(expectedSalaryPeriod);
-     }
-     if (!expectedSalaryPeriod) {
-         expectedSalaryPeriod = {};
-     }
-     var presentSalaryCurr = req.body.presentSalaryCurr;
-     if (typeof (presentSalaryCurr) == "string") {
-         presentSalaryCurr = JSON.parse(presentSalaryCurr);
-     }
-     if (!presentSalaryCurr) {
-         presentSalaryCurr = {};
-     }
-     var presentSalaryScale = req.body.presentSalaryScale;
-     if (typeof (presentSalaryScale) == "string") {
-         presentSalaryScale = JSON.parse(presentSalaryScale);
-     }
-     if (!presentSalaryScale) {
-         presentSalaryScale = {};
-     }
-     var presentSalaryPeriod = req.body.presentSalaryPeriod;
-     if (typeof (presentSalaryPeriod) == "string") {
-         presentSalaryPeriod = JSON.parse(presentSalaryPeriod);
-     }
-     if (!presentSalaryPeriod) {
-         presentSalaryPeriod = {};
-     }
-     var attachmentList = req.body.attachmentList;
-     if (typeof (attachmentList) == "string") {
-         attachmentList = JSON.parse(attachmentList);
-     }
-     if (!attachmentList) {
-         attachmentList = [];
-     }
-     var functionalAreas = req.body.functionalAreas;
-     if (typeof (functionalAreas) == "string") {
-         functionalAreas = JSON.parse(functionalAreas);
-     }
-     if (!functionalAreas) {
-         functionalAreas = [];
-     }
-     var requirementArray = req.body.requirementArray;
-     if (typeof (requirementArray) == "string") {
-         requirementArray = JSON.parse(requirementArray);
-     }
-     if (!requirementArray) {
-         requirementArray = [];
-     }
- 
-     var faceSheet = req.body.faceSheet;
-     if (typeof (faceSheet) == "string") {
-         faceSheet = JSON.parse(faceSheet);
-     }
-     if (!faceSheet) {
-         faceSheet = {};
-     }
- 
-     var presentLocation = req.body.presentLocation;
-     if (typeof (presentLocation) == "string") {
-         presentLocation = JSON.parse(presentLocation);
-     }
-     if (!presentLocation) {
-         presentLocation = {};
-     }
- 
-     if (!validationFlag) {
-         response.error = error;
-         response.message = 'Please Check the Errors';
-         res.status(400).json(response);
-         console.log(response);
-     }
-     else {
-         req.st.validateToken(req.query.token, function (err, tokenResult) {
-             if ((!err) && tokenResult) {
-                 // req.body.cvPath = (req.body.cvPath) ? req.body.cvPath : "";
-                 req.query.isWeb = (req.body.isWeb) ? req.body.isWeb : 0;
-                 if (attachmentList.length) {
-                     cv = attachmentList[0].CDNPath;
-                 }
-                 gs_url = req.CONFIG.CONSTANT.GS_URL;
-                 storage_bucket = req.CONFIG.CONSTANT.STORAGE_BUCKET;
- 
-                 // console.log(cv);
-                 attachFile.then(function (resp) {
-                     console.log("response after promise",resp);
-                     if (1) {
- 
-                      //   cvKeywords = text;
- 
-                         req.body.applicantId = (req.body.applicantId) ? req.body.applicantId : 0;
- 
-                         req.body.lastName = (req.body.lastName) ? req.body.lastName : "";
-                         req.body.phoneISD = (req.body.phoneISD) ? req.body.phoneISD : "";
-                         req.body.phoneNumber = (req.body.phoneNumber) ? req.body.phoneNumber : "";
-                         req.body.mobileISD = (req.body.mobileISD) ? req.body.mobileISD : "";
-                         req.body.address = (req.body.address) ? req.body.address : "";
-                         // req.body.latitude = (req.body.latitude) ? req.body.latitude : 0.0;
-                         // req.body.longitude = (req.body.longitude) ? req.body.longitude : 0.0;
-                         req.body.longitude = 0.0;
-                         req.body.latitude = 0.0;
-                         req.body.IDadhaarNumber = (req.body.IDadhaarNumber) ? req.body.IDadhaarNumber : "";
-                         req.body.passportNumber = (req.body.passportNumber) ? req.body.passportNumber : "";
-                         req.body.ppExpiryDate = (req.body.ppExpiryDate) ? req.body.ppExpiryDate : "0000-00-00 00:00:00";
-                         req.body.experience = (req.body.experience) ? req.body.experience : 0;
-                         req.body.employer = (req.body.employer) ? req.body.employer : "";
-                         req.body.noticePeriod = (req.body.noticePeriod) ? req.body.noticePeriod : 0;
-                         req.body.notes = (req.body.notes) ? req.body.notes : "";
-                         req.body.DOB = (req.body.DOB) ? req.body.DOB : "0000-00-00";
-                         //req.body.originalCvId = (req.body.originalCvId) ? req.body.originalCvId : 0;
-                         req.body.status = (req.body.status) ? req.body.status : 0;
-                         req.body.blockingPeriod = (req.body.blockingPeriod) ? req.body.blockingPeriod : 0;
-                         req.body.affirmitive = (req.body.affirmitive) ? req.body.affirmitive : '';
-                         req.body.transactions = (req.body.transactions) ? req.body.transactions : '';
-                         req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
-                         req.body.imageUrl = req.body.imageUrl ? req.body.imageUrl : '';
-                         req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0;
-                         req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
-                         req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 1;
-                         req.body.referredBy = req.body.referredBy ? req.body.referredBy : "";
-                         req.body.gender = (req.body.gender && req.body.gender  !='null')  ? req.body.gender : undefined;
- 
-                         var inputs = [
-                             req.st.db.escape(req.query.token),
-                             req.st.db.escape(req.body.heMasterId),
-                             req.st.db.escape(req.body.applicantId),
-                             req.st.db.escape(req.body.firstName),
-                             req.st.db.escape(req.body.lastName),
-                             req.st.db.escape(req.body.phoneISD),
-                             req.st.db.escape(req.body.phoneNumber),
-                             req.st.db.escape(req.body.mobileISD),
-                             req.st.db.escape(req.body.mobileNumber),
-                             req.st.db.escape(req.body.emailId),
-                             req.st.db.escape(JSON.stringify(education)),
-                             req.st.db.escape(req.body.address),
-                             req.st.db.escape(req.body.latitude),
-                             req.st.db.escape(req.body.longitude),
-                             req.st.db.escape(req.body.IDadhaarNumber),
-                             req.st.db.escape(req.body.passportNumber),
-                             req.st.db.escape(req.body.ppExpiryDate),
-                             req.st.db.escape(req.body.experience),
-                             req.st.db.escape(req.body.employer),
-                             req.st.db.escape(JSON.stringify(jobTitle[0])),
-                             req.st.db.escape(req.body.noticePeriod),
-                             req.st.db.escape(JSON.stringify(expectedSalaryCurr)),
-                             req.st.db.escape(req.body.expectedSalary),
-                             req.st.db.escape(JSON.stringify(expectedSalaryScale)),
-                             req.st.db.escape(JSON.stringify(expectedSalaryPeriod)),
-                             req.st.db.escape(JSON.stringify(presentSalaryCurr)),
-                             req.st.db.escape(req.body.presentSalary),
-                             req.st.db.escape(JSON.stringify(presentSalaryScale)),
-                             req.st.db.escape(JSON.stringify(presentSalaryPeriod)),
-                             req.st.db.escape(JSON.stringify(primarySkills)),
-                             req.st.db.escape(JSON.stringify(secondarySkills)),
-                             req.st.db.escape(req.body.notes),
-                             req.st.db.escape(req.body.cvRating),
-                             req.st.db.escape(JSON.stringify(attachmentList)),
-                             req.st.db.escape(JSON.stringify(cvSource)),
-                             req.st.db.escape(req.body.gender),
-                             req.st.db.escape(req.body.DOB),
-                             //req.st.db.escape(req.body.originalCvId),
-                             req.st.db.escape(req.body.blockingPeriod),
-                             req.st.db.escape(req.body.status),
-                             req.st.db.escape(JSON.stringify(prefLocations)),
-                             req.st.db.escape(JSON.stringify(industry)),
-                             req.st.db.escape(JSON.stringify(nationality)),
-                             req.st.db.escape(req.body.cvKeywords),
-                             req.st.db.escape(req.body.requirementId),
-                             req.st.db.escape(req.body.imageUrl),
-                             req.st.db.escape(req.body.htmlText),
-                             req.st.db.escape(req.body.reqAppId),
-                             req.st.db.escape(req.body.clientCvPath),
-                             req.st.db.escape(JSON.stringify(functionalAreas)),
-                             req.st.db.escape(req.body.importerFlag || 1),
-                             req.st.db.escape(JSON.stringify(requirementArray)),
-                             req.st.db.escape(req.body.referredBy),
-                             req.st.db.escape(JSON.stringify(faceSheet)),
-                             req.st.db.escape(JSON.stringify(presentLocation))
-                       
-                         ];
- 
-                         var procQuery = 'CALL wm_save_applicantForImporter( ' + inputs.join(',') + ')';  // call procedure to save requirement data
-                         console.log(procQuery);
- 
-                         req.db.query(procQuery, function (err, result) {
-                             console.log(err);
- 
-                             if (!err && result && result[0] && result[0][0].applicantId) {
- 
-                                 response.status = true;
-                                 response.message = "Resume Saved Successfully";
-                                 response.error = null;
-                                 response.data = {
-                                     applicantId: result[0][0].applicantId
-                                 };
-                                 res.status(200).json(response);
- 
-                             }
-                             else if (!err && result && result[0] && result[0][0]._applicantExists) {
- 
-                                 response.status = false;
-                                 response.message = "Resume already exists";
-                                 response.error = null;
-                                 response.data = {
-                                     applicantId: result[0][0]._applicantExists
-                                 };
-                                 response.duplicate = 1;
-                                 res.status(200).json(response);
- 
-                             }
-                             else {
-                                 response.status = false;
-                                 response.message = "Error While Saving Resume";
-                                 response.error = 1;
-                                 console.log(err);
-                                 res.status(500).json(response);
-                             }
-                         });
-                     }
-                 });
- 
-             }
-             else {
-                 res.status(401).json(response);
-             }
-         });
-     }
- };
- 
+
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.body.heMasterId) {
+        error.heMasterId = 'Invalid Company';
+        validationFlag *= false;
+    }
+    if (!req.body.firstName) {
+        error.firstName = 'First Name is Mandatory';
+        validationFlag *= false;
+    }
+    if (!req.body.emailId || !req.body.mobileNumber) {   // any one is mandatory
+        error.emailId = 'EMail ID or Mobile Number is mandatory';
+        validationFlag *= false;
+    }
+
+    // if (!req.body.mobileNumber) {
+    //     error.mobileNumber = 'Mobile Number is Mandatory';
+    //     validationFlag *= false;
+    // }
+    var education = req.body.education;
+    if (typeof (education) == "string") {
+        education = JSON.parse(education);
+    }
+    if (!education) {
+        education = [];
+    }
+    var jobTitle = req.body.jobTitle;
+    if (typeof (jobTitle) == "string") {
+        jobTitle = JSON.parse(jobTitle);
+    }
+    if (!jobTitle) {
+        jobTitle = {};
+    }
+    var primarySkills = req.body.primarySkills;
+    if (typeof (primarySkills) == "string") {
+        primarySkills = JSON.parse(primarySkills);
+    }
+    if (!primarySkills) {
+        primarySkills = [];
+    }
+    var secondarySkills = req.body.secondarySkills;
+    if (typeof (secondarySkills) == "string") {
+        secondarySkills = JSON.parse(secondarySkills);
+    }
+    if (!secondarySkills) {
+        secondarySkills = [];
+    }
+    var cvSource = req.body.cvSource;
+    if (typeof (cvSource) == "string") {
+        cvSource = JSON.parse(cvSource);
+    }
+    if (!cvSource) {
+        cvSource = {};
+    }
+    var prefLocations = req.body.prefLocations;
+    if (typeof (prefLocations) == "string") {
+        prefLocations = JSON.parse(prefLocations);
+    }
+    if (!prefLocations) {
+        prefLocations = [];
+    }
+    var industry = req.body.industry;
+    if (typeof (industry) == "string") {
+        industry = JSON.parse(industry);
+    }
+    if (!industry) {
+        industry = [];
+    }
+    var nationality = req.body.nationality;
+    if (typeof (nationality) == "string") {
+        nationality = JSON.parse(nationality);
+    }
+    if (!nationality) {
+        nationality = {};
+    }
+    var expectedSalaryCurr = req.body.expectedSalaryCurr;
+    if (typeof (expectedSalaryCurr) == "string") {
+        expectedSalaryCurr = JSON.parse(expectedSalaryCurr);
+    }
+    if (!expectedSalaryCurr) {
+        expectedSalaryCurr = {};
+    }
+
+    var expectedSalaryScale = req.body.expectedSalaryScale;
+    if (typeof (expectedSalaryScale) == "string") {
+        expectedSalaryScale = JSON.parse(expectedSalaryScale);
+    }
+    if (!expectedSalaryScale) {
+        expectedSalaryScale = {};
+    }
+    var expectedSalaryPeriod = req.body.expectedSalaryPeriod;
+    if (typeof (expectedSalaryPeriod) == "string") {
+        expectedSalaryPeriod = JSON.parse(expectedSalaryPeriod);
+    }
+    if (!expectedSalaryPeriod) {
+        expectedSalaryPeriod = {};
+    }
+    var presentSalaryCurr = req.body.presentSalaryCurr;
+    if (typeof (presentSalaryCurr) == "string") {
+        presentSalaryCurr = JSON.parse(presentSalaryCurr);
+    }
+    if (!presentSalaryCurr) {
+        presentSalaryCurr = {};
+    }
+    var presentSalaryScale = req.body.presentSalaryScale;
+    if (typeof (presentSalaryScale) == "string") {
+        presentSalaryScale = JSON.parse(presentSalaryScale);
+    }
+    if (!presentSalaryScale) {
+        presentSalaryScale = {};
+    }
+    var presentSalaryPeriod = req.body.presentSalaryPeriod;
+    if (typeof (presentSalaryPeriod) == "string") {
+        presentSalaryPeriod = JSON.parse(presentSalaryPeriod);
+    }
+    if (!presentSalaryPeriod) {
+        presentSalaryPeriod = {};
+    }
+    var attachmentList = req.body.attachmentList;
+    if (typeof (attachmentList) == "string") {
+        attachmentList = JSON.parse(attachmentList);
+    }
+    if (!attachmentList) {
+        attachmentList = [];
+    }
+    var functionalAreas = req.body.functionalAreas;
+    if (typeof (functionalAreas) == "string") {
+        functionalAreas = JSON.parse(functionalAreas);
+    }
+    if (!functionalAreas) {
+        functionalAreas = [];
+    }
+    var requirementArray = req.body.requirementArray;
+    if (typeof (requirementArray) == "string") {
+        requirementArray = JSON.parse(requirementArray);
+    }
+    if (!requirementArray) {
+        requirementArray = [];
+    }
+
+    var faceSheet = req.body.faceSheet;
+    if (typeof (faceSheet) == "string") {
+        faceSheet = JSON.parse(faceSheet);
+    }
+    if (!faceSheet) {
+        faceSheet = {};
+    }
+
+    var presentLocation = req.body.presentLocation;
+    if (typeof (presentLocation) == "string") {
+        presentLocation = JSON.parse(presentLocation);
+    }
+    if (!presentLocation) {
+        presentLocation = {};
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please Check the Errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // req.body.cvPath = (req.body.cvPath) ? req.body.cvPath : "";
+                req.query.isWeb = (req.body.isWeb) ? req.body.isWeb : 0;
+                if (attachmentList.length) {
+                    cv = attachmentList[0].CDNPath;
+                }
+                gs_url = req.CONFIG.CONSTANT.GS_URL;
+                storage_bucket = req.CONFIG.CONSTANT.STORAGE_BUCKET;
+
+                // console.log(cv);
+                attachFile.then(function (resp) {
+                    console.log("response after promise", resp);
+                    if (1) {
+
+                        //   cvKeywords = text;
+
+                        req.body.applicantId = (req.body.applicantId) ? req.body.applicantId : 0;
+
+                        req.body.lastName = (req.body.lastName) ? req.body.lastName : "";
+                        req.body.phoneISD = (req.body.phoneISD) ? req.body.phoneISD : "";
+                        req.body.phoneNumber = (req.body.phoneNumber) ? req.body.phoneNumber : "";
+                        req.body.mobileISD = (req.body.mobileISD) ? req.body.mobileISD : "";
+                        req.body.address = (req.body.address) ? req.body.address : "";
+                        // req.body.latitude = (req.body.latitude) ? req.body.latitude : 0.0;
+                        // req.body.longitude = (req.body.longitude) ? req.body.longitude : 0.0;
+                        req.body.longitude = 0.0;
+                        req.body.latitude = 0.0;
+                        req.body.IDadhaarNumber = (req.body.IDadhaarNumber) ? req.body.IDadhaarNumber : "";
+                        req.body.passportNumber = (req.body.passportNumber) ? req.body.passportNumber : "";
+                        req.body.ppExpiryDate = (req.body.ppExpiryDate) ? req.body.ppExpiryDate : null;
+                        req.body.experience = (req.body.experience) ? req.body.experience : 0;
+                        req.body.employer = (req.body.employer) ? req.body.employer : "";
+                        req.body.noticePeriod = (req.body.noticePeriod) ? req.body.noticePeriod : 0;
+                        req.body.notes = (req.body.notes) ? req.body.notes : "";
+                        req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
+                        //req.body.originalCvId = (req.body.originalCvId) ? req.body.originalCvId : 0;
+                        req.body.status = (req.body.status) ? req.body.status : 0;
+                        req.body.blockingPeriod = (req.body.blockingPeriod) ? req.body.blockingPeriod : 0;
+                        req.body.affirmitive = (req.body.affirmitive) ? req.body.affirmitive : '';
+                        req.body.transactions = (req.body.transactions) ? req.body.transactions : '';
+                        req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
+                        req.body.imageUrl = req.body.imageUrl ? req.body.imageUrl : '';
+                        req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0;
+                        req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
+                        req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 1;
+                        req.body.referredBy = req.body.referredBy ? req.body.referredBy : "";
+                        req.body.gender = (req.body.gender && req.body.gender != 'null') ? req.body.gender : undefined;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.heMasterId),
+                            req.st.db.escape(req.body.applicantId),
+                            req.st.db.escape(req.body.firstName),
+                            req.st.db.escape(req.body.lastName),
+                            req.st.db.escape(req.body.phoneISD),
+                            req.st.db.escape(req.body.phoneNumber),
+                            req.st.db.escape(req.body.mobileISD),
+                            req.st.db.escape(req.body.mobileNumber),
+                            req.st.db.escape(req.body.emailId),
+                            req.st.db.escape(JSON.stringify(education)),
+                            req.st.db.escape(req.body.address),
+                            req.st.db.escape(req.body.latitude),
+                            req.st.db.escape(req.body.longitude),
+                            req.st.db.escape(req.body.IDadhaarNumber),
+                            req.st.db.escape(req.body.passportNumber),
+                            req.st.db.escape(req.body.ppExpiryDate),
+                            req.st.db.escape(req.body.experience),
+                            req.st.db.escape(req.body.employer),
+                            req.st.db.escape(JSON.stringify(jobTitle[0])),
+                            req.st.db.escape(req.body.noticePeriod),
+                            req.st.db.escape(JSON.stringify(expectedSalaryCurr)),
+                            req.st.db.escape(req.body.expectedSalary),
+                            req.st.db.escape(JSON.stringify(expectedSalaryScale)),
+                            req.st.db.escape(JSON.stringify(expectedSalaryPeriod)),
+                            req.st.db.escape(JSON.stringify(presentSalaryCurr)),
+                            req.st.db.escape(req.body.presentSalary),
+                            req.st.db.escape(JSON.stringify(presentSalaryScale)),
+                            req.st.db.escape(JSON.stringify(presentSalaryPeriod)),
+                            req.st.db.escape(JSON.stringify(primarySkills)),
+                            req.st.db.escape(JSON.stringify(secondarySkills)),
+                            req.st.db.escape(req.body.notes),
+                            req.st.db.escape(req.body.cvRating),
+                            req.st.db.escape(JSON.stringify(attachmentList)),
+                            req.st.db.escape(JSON.stringify(cvSource)),
+                            req.st.db.escape(req.body.gender),
+                            req.st.db.escape(req.body.DOB),
+                            //req.st.db.escape(req.body.originalCvId),
+                            req.st.db.escape(req.body.blockingPeriod),
+                            req.st.db.escape(req.body.status),
+                            req.st.db.escape(JSON.stringify(prefLocations)),
+                            req.st.db.escape(JSON.stringify(industry)),
+                            req.st.db.escape(JSON.stringify(nationality)),
+                            req.st.db.escape(req.body.cvKeywords),
+                            req.st.db.escape(req.body.requirementId),
+                            req.st.db.escape(req.body.imageUrl),
+                            req.st.db.escape(req.body.htmlText),
+                            req.st.db.escape(req.body.reqAppId),
+                            req.st.db.escape(req.body.clientCvPath),
+                            req.st.db.escape(JSON.stringify(functionalAreas)),
+                            req.st.db.escape(req.body.importerFlag || 1),
+                            req.st.db.escape(JSON.stringify(requirementArray)),
+                            req.st.db.escape(req.body.referredBy),
+                            req.st.db.escape(JSON.stringify(faceSheet)),
+                            req.st.db.escape(JSON.stringify(presentLocation))
+
+                        ];
+
+                        var procQuery = 'CALL wm_save_applicantForImporter( ' + inputs.join(',') + ')';  // call procedure to save requirement data
+                        console.log(procQuery);
+
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+
+                            if (!err && result && result[0] && result[0][0].applicantId) {
+
+                                response.status = true;
+                                response.message = "Resume Saved Successfully";
+                                response.error = null;
+                                response.data = {
+                                    applicantId: result[0][0].applicantId
+                                };
+                                res.status(200).json(response);
+
+                            }
+                            else if (!err && result && result[0] && result[0][0]._applicantExists) {
+
+                                response.status = false;
+                                response.message = "Resume already exists";
+                                response.error = null;
+                                response.data = {
+                                    applicantId: result[0][0]._applicantExists
+                                };
+                                response.duplicate = 1;
+                                res.status(200).json(response);
+
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error While Saving Resume";
+                                response.error = 1;
+                                console.log(err);
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                });
+
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+applicantCtrl.resumeSearchResultsByPage = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                req.query.start = req.query.start ? req.query.start : 1;
+                req.query.limit = (req.query.limit) ? req.query.limit : 0;
+
+                req.query.start = ((((req.query.start) * req.query.limit) + 1) - req.query.limit) - 1;
+
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.start),
+                    req.st.db.escape(req.query.limit)
+                ];
+
+                var procQuery = 'CALL wm_get_paceResumeSearchResults( ' + inputs.join(',') + ')';  // call procedure to save requirement data
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Applicants list loaded successfully";
+                        response.error = null;
+
+                        for (var i = 0; i < result[0].length; i++) {
+                            if (result[0][i] && result[0][i].education) {
+                                result[0][i].education = JSON.parse(result[0][i].education) ? JSON.parse(result[0][i].education) : [];
+                            }
+                            if (result[0][i] && result[0][i].keySkills) {
+                                result[0][i].keySkills = JSON.parse(result[0][i].keySkills) ? JSON.parse(result[0][i].keySkills) : [];
+
+                            }
+                            if (result[0][i] && result[0][i].location) {
+                                result[0][i].location = JSON.parse(result[0][i].location) ? JSON.parse(result[0][i].location) : [];
+                            }
+
+                        }
+                        response.data = {
+                            applicantList: result[0] ? result[0] : [],
+                            count: result[1][0].count
+                        };
+                        res.status(200).json(response);
+
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Applicants not found";
+                        response.error = null;
+                        response.data = {
+                            applicantList: [],
+                            count: 0
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading applicants list";
+                        response.error = null;
+                        console.log(err);
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+
+        });
+    }
+};
 
 module.exports = applicantCtrl;

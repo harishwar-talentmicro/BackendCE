@@ -333,6 +333,7 @@ var walkInCvModule = require('./JobRaiser/walkInCV.js');
 var gulfModule = require('./JobRaiser/gulf.js');
 var settings = require('./JobRaiser/settings.js');
 var billing = require('./JobRaiser/billing.js');
+var portal = require('./JobRaiser/portalImporter.js');
 
 
 router.use('/WM', jobModule);
@@ -344,7 +345,7 @@ router.use('/WM', walkInCvModule);
 router.use('/WM', gulfModule);
 router.use('/WM', settings);
 router.use('/WM', billing);
-
+router.use('/WM', portal);
 // cron
 // var taskScheduler = require('../api/HEApp/task/task-ctrl');
 cron.schedule('*/15 * * * *', function () {
@@ -502,6 +503,7 @@ if (cluster.isWorker) {
 // });
 
 
+
 var cluster = require('cluster');
 
 if (cluster.isWorker) {
@@ -516,7 +518,7 @@ if (cluster.isWorker) {
 
 
         var cronJobWalkIn = new CronJob({
-            cronTime: '*/5 * * * *',
+            cronTime: '*/3 * * * *',
             onTick: function () {
                 var counter=1;
                 var query = "call wm_integrationUrlwalkIn()";

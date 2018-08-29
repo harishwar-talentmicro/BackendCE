@@ -1175,7 +1175,7 @@ router.get('/loadAllMessages', function (req, res, next) {
                                         //     }
                                         //   }
                                             
-                                        console.log(results[0],"results[0]");
+                                        // console.log(results[0],"results[0]");
                                         
                                         if (results && results[0] && results[0].length > 0) {
 
@@ -1201,7 +1201,7 @@ router.get('/loadAllMessages', function (req, res, next) {
                                                     case 3:
                                                         message = results[0][mainIndex].groupMessageList[messageCounter].message;
                                                         console.log("-----------------------------------------------------------");
-                                                        console.log(message);
+                                                        // console.log(message);
                                                         console.log("-----------------------------------------------------------");
                                                         messageObj = JSON.parse(message);
 

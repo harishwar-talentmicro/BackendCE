@@ -487,6 +487,10 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
     };
 
     var sentMailFlag = 1;
+
+    var isSendgrid;
+    var isSMS;
+
     var emailReceivers;                //emailReceivers to store the recipients
     var mailbody_array = [];    //array to store all mailbody after replacing tags
     var subject_array = [];
@@ -607,7 +611,14 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, result) {
                         console.log(err);
-                        if (!err && result) {
+
+                        if (result[2] && result[2][0]) {
+                            isSendgrid = result[2][0].isSendgrid ? result[2][0].isSendgrid : 0,
+                            isSMS = result[2][0].isSMS ? result[2][0].isSMS : 0
+                        }
+
+                        if (!err && result && result[0] && result[0][0]) {
+
                             var temp = mailBody;
                             var temp1 = subject;
                             var temp2 = smsMsg;
@@ -682,148 +693,199 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                                 message = smsMsg_array[receiverIndex];
 
                                 // to send normal sms
-                                if (smsFlag) {
-                                    if (isdMobile == "+977") {
-                                        request({
-                                            url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                            qs: {
-                                                token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                                to: mobileNo,
-                                                message: message,
-                                                sender: 'Techingen'
-                                            },
-                                            method: 'GET'
-
-                                        }, function (error, response, body) {
-                                            if (error) {
-                                                console.log(error, "SMS");
-                                            }
-                                            else {
-                                                console.log("SUCCESS", "SMS response");
-                                            }
-
-                                        });
-                                    }
-                                    else if (isdMobile == "+91") {
-                                        console.log('inside send sms');
-                                        console.log(isdMobile, ' ', mobileNo);
-                                        request({
-                                            url: 'https://aikonsms.co.in/control/smsapi.php',
-                                            qs: {
-                                                user_name: 'janardana@hirecraft.com',
-                                                password: 'Ezeid2015',
-                                                sender_id: 'WtMate',
-                                                service: 'TRANS',
-                                                mobile_no: mobileNo,
-                                                message: message,
-                                                method: 'send_sms'
-                                            },
-                                            method: 'GET'
-
-                                        }, function (error, response, body) {
-                                            if (error) {
-                                                console.log(error, "SMS");
-                                            }
-                                            else {
-                                                console.log("SUCCESS", "SMS response");
-                                            }
-                                        });
-
-                                        var req1 = http.request(options, function (res1) {
-                                            var chunks = [];
-
-                                            res1.on("data", function (chunk) {
-                                                chunks.push(chunk);
-                                            });
-
-                                            res1.on("end", function () {
-                                                var body = Buffer.concat(chunks);
-                                                console.log(body.toString());
-                                            });
-                                        });
-
-                                        req1.write(qs.stringify({
-                                            userId: 'talentmicro',
-                                            password: 'TalentMicro@123',
-                                            senderId: 'WTMATE',
-                                            sendMethod: 'simpleMsg',
-                                            msgType: 'text',
-                                            mobile: isdMobile.replace("+", "") + mobileNo,
-                                            msg: message,
-                                            duplicateCheck: 'true',
-                                            format: 'json'
-                                        }));
-                                        req1.end();
-                                    }
-                                    else if (isdMobile != "") {
-                                        console.log('inside without isd', isdMobile, ' ', mobileNo);
-                                        client.messages.create(
-                                            {
-                                                body: message,
-                                                to: isdMobile + mobileNo,
-                                                from: FromNumber
-                                            },
-                                            function (error, response) {
+                                if(isSMS){
+                                    if (smsFlag) {
+                                        if (isdMobile == "+977") {
+                                            request({
+                                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                qs: {
+                                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                    to: mobileNo,
+                                                    message: message,
+                                                    sender: 'Techingen'
+                                                },
+                                                method: 'GET'
+    
+                                            }, function (error, response, body) {
                                                 if (error) {
                                                     console.log(error, "SMS");
                                                 }
                                                 else {
                                                     console.log("SUCCESS", "SMS response");
                                                 }
-                                            }
-                                        );
+    
+                                            });
+                                        }
+                                        else if (isdMobile == "+91") {
+                                            console.log('inside send sms');
+                                            console.log(isdMobile, ' ', mobileNo);
+                                            request({
+                                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                qs: {
+                                                    user_name: 'janardana@hirecraft.com',
+                                                    password: 'Ezeid2015',
+                                                    sender_id: 'WtMate',
+                                                    service: 'TRANS',
+                                                    mobile_no: mobileNo,
+                                                    message: message,
+                                                    method: 'send_sms'
+                                                },
+                                                method: 'GET'
+    
+                                            }, function (error, response, body) {
+                                                if (error) {
+                                                    console.log(error, "SMS");
+                                                }
+                                                else {
+                                                    console.log("SUCCESS", "SMS response");
+                                                }
+                                            });
+    
+                                            var req1 = http.request(options, function (res1) {
+                                                var chunks = [];
+    
+                                                res1.on("data", function (chunk) {
+                                                    chunks.push(chunk);
+                                                });
+    
+                                                res1.on("end", function () {
+                                                    var body = Buffer.concat(chunks);
+                                                    console.log(body.toString());
+                                                });
+                                            });
+    
+                                            req1.write(qs.stringify({
+                                                userId: 'talentmicro',
+                                                password: 'TalentMicro@123',
+                                                senderId: 'WTMATE',
+                                                sendMethod: 'simpleMsg',
+                                                msgType: 'text',
+                                                mobile: isdMobile.replace("+", "") + mobileNo,
+                                                msg: message,
+                                                duplicateCheck: 'true',
+                                                format: 'json'
+                                            }));
+                                            req1.end();
+                                        }
+                                        else if (isdMobile != "") {
+                                            console.log('inside without isd', isdMobile, ' ', mobileNo);
+                                            client.messages.create(
+                                                {
+                                                    body: message,
+                                                    to: isdMobile + mobileNo,
+                                                    from: FromNumber
+                                                },
+                                                function (error, response) {
+                                                    if (error) {
+                                                        console.log(error, "SMS");
+                                                    }
+                                                    else {
+                                                        console.log("SUCCESS", "SMS response");
+                                                    }
+                                                }
+                                            );
+                                        }
                                     }
                                 }
-                                sendgrid.send(email, function (err, result) {
-                                    if (!err) {
+                                
 
-                                        var saveMails = [
-                                            req.st.db.escape(req.query.token),
-                                            req.st.db.escape(req.query.heMasterId),
-                                            req.st.db.escape(req.body.heDepartmentId),
-                                            req.st.db.escape(userId),
-                                            req.st.db.escape(mailerType),
-                                            req.st.db.escape(mailOptions.from),
-                                            req.st.db.escape(mailOptions.to),
-                                            req.st.db.escape(mailOptions.subject),
-                                            req.st.db.escape(mailOptions.html),    // contains mail body
-                                            req.st.db.escape(JSON.stringify(cc)),
-                                            req.st.db.escape(JSON.stringify(bcc)),
-                                            req.st.db.escape(JSON.stringify(attachment)),
-                                            req.st.db.escape(req.body.replyMailId),
-                                            req.st.db.escape(req.body.priority),
-                                            req.st.db.escape(req.body.stageId),
-                                            req.st.db.escape(req.body.statusId),
-                                            req.st.db.escape(message),    // sms message
-                                            req.st.db.escape(whatmateMessage),
-                                            req.st.db.escape(applicants[0]),   // in procedure only reAppId is stored
-                                            req.st.db.escape(transactions[0] ? transactions[0] : 0)
-                                        ];
-
-                                        //saving the mail after sending it
-                                        var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
-                                        console.log(saveMailHistory);
-                                        req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
-                                            console.log(mailHistoryErr);
-                                            console.log(mailHistoryResult);
-                                            if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
-                                                console.log('sent mails saved successfully');
-                                            }
-                                            else {
-                                                console.log('mails could not be saved');
-                                            }
-                                        });
-                                        console.log('Mail sent now save sent history');
-                                    } //end of if(sendgrid sent mail successfully)
-                                    //if mail is not sent
-                                    else {
-                                        console.log('Mail not Sent Successfully' + err);
-                                    }
-                                });
+                                if (isSendgrid && email.subject != '') {
+                                    sendgrid.send(email, function (err, result) {
+                                        if (!err) {
+    
+                                            var saveMails = [
+                                                req.st.db.escape(req.query.token),
+                                                req.st.db.escape(req.query.heMasterId),
+                                                req.st.db.escape(req.body.heDepartmentId),
+                                                req.st.db.escape(userId),
+                                                req.st.db.escape(mailerType),
+                                                req.st.db.escape(mailOptions.from),
+                                                req.st.db.escape(mailOptions.to),
+                                                req.st.db.escape(mailOptions.subject),
+                                                req.st.db.escape(mailOptions.html),    // contains mail body
+                                                req.st.db.escape(JSON.stringify(cc)),
+                                                req.st.db.escape(JSON.stringify(bcc)),
+                                                req.st.db.escape(JSON.stringify(attachment)),
+                                                req.st.db.escape(req.body.replyMailId),
+                                                req.st.db.escape(req.body.priority),
+                                                req.st.db.escape(req.body.stageId),
+                                                req.st.db.escape(req.body.statusId),
+                                                req.st.db.escape(message),    // sms message
+                                                req.st.db.escape(whatmateMessage),
+                                                req.st.db.escape(applicants[0]),   // in procedure only reAppId is stored
+                                                req.st.db.escape(transactions[0] ? transactions[0] : 0)
+                                            ];
+    
+                                            //saving the mail after sending it
+                                            var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                            console.log(saveMailHistory);
+                                            req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                console.log(mailHistoryErr);
+                                                console.log(mailHistoryResult);
+                                                if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
+                                                    console.log('sent mails saved successfully');
+                                                }
+                                                else {
+                                                    console.log('mails could not be saved');
+                                                }
+                                            });
+                                            console.log('Mail sent now save sent history');
+                                        } //end of if(sendgrid sent mail successfully)
+                                        //if mail is not sent
+                                        else {
+                                            console.log('Mail not Sent Successfully' + err);
+                                        }
+                                    });
+                                }
+                                
                             }
                             if (!(templateId == 0 || overWrite)) {
                                 response.status = true;
-                                response.message = "mail sent successfully";
+                                
+                                if (isSendgrid && isSMS) {  // making changes here reminder
+                                    if (subject != '' && smsMsg != '') {
+                                        response.message = "Mail and SMS sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject != '' && smsMsg == '') {
+                                        response.message = "Mail sent successfully. Message field is empty,SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject == '' && smsMsg != '') {
+                                        response.message = "SMS sent successfully. Mail subject is empty,mail cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else {
+                                        response.message = "Mail subject and SMS fields are empty,Mail and SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else if (isSendgrid && !isSMS) {
+
+                                    if (subject != '') {
+                                        response.message = "Mail sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject == '') {
+                                        response.message = "Mail subject is empty,mail cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else if (isSMS && !isSendgrid) {
+                                    if (isSMS != '') {
+                                        response.message = "SMS sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (isSMS == '') {
+                                        response.message = "SMS field is empty,SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else {
+                                    response.message = "Sendgrid or SMS is not configured. Please contact the admin";
+                                    response.data = null;
+                                }
+                                
                                 response.error = null;
                                 res.status(200).json(response);
                             }
@@ -898,11 +960,24 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                             console.log(tempSaveResult);
                             response.status = true;
                             //check if there are any receivers, if yes sent and saved
-                            if (emailReceivers.length != 0)
-                                response.message = "Mail is Sent and Template Saved successfully";
+                            if (emailReceivers.length != 0 && (isSendgrid || isSMS)){
+                                if (isSendgrid && isSMS) {
+                                    response.message = "Mail and SMS Sent and Template Saved successfully";
+                                }
+                                else if (!isSendgrid && isSMS) {
+                                    response.message = "SMS is Sent and Template Saved successfully";
+                                }
+                                else if (isSendgrid && !isSMS) {
+                                    response.message = "Mail is Sent and Template Saved successfully";
+                                }
+                                else {
+                                    response.message = "Template saved successfully";
+                                }                                
+                            }
                             //else saved
-                            else
+                            else{
                                 response.message = "Template saved successfully";
+                            }
                             response.error = null;
                             response.data = null;
                             res.status(200).json(response);
@@ -1237,6 +1312,8 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
     var subject_array = [];
     var smsMsg_array = [];
 
+    var isSendgrid;
+    var isSMS;
 
     var transactions = [];
 
@@ -1358,9 +1435,17 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                     req.db.query(procQuery, function (err, result) {
                         console.log(err);
 
+
                         if (result[2] && result[2][0] && result[2][0].transactions) {
                             transactions = JSON.parse(result[2][0].transactions);
                         }
+
+
+                        if (result[3] && result[3][0]) {
+                            isSendgrid = result[3][0].isSendgrid ? result[3][0].isSendgrid : 0,
+                                isSMS = result[3][0].isSMS ? result[3][0].isSMS : 0
+                        }
+                        console.log('isSendgrid and isSMS', isSendgrid, isSMS);
 
                         if (!err && result && result[0] && result[0][0]) {
                             var temp = mailBody;
@@ -1450,148 +1535,197 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                 message = smsMsg_array[receiverIndex];
 
                                 // to send normal sms
-                                if (smsFlag) {
-                                    if (isdMobile == "+977") {
-                                        request({
-                                            url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                            qs: {
-                                                token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                                to: mobileNo,
-                                                message: message,
-                                                sender: 'Techingen'
-                                            },
-                                            method: 'GET'
+                                if (isSMS) {
+                                    if (smsFlag) {
+                                        if (isdMobile == "+977") {
+                                            request({
+                                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                qs: {
+                                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                    to: mobileNo,
+                                                    message: message,
+                                                    sender: 'Techingen'
+                                                },
+                                                method: 'GET'
 
-                                        }, function (error, response, body) {
-                                            if (error) {
-                                                console.log(error, "SMS");
-                                            }
-                                            else {
-                                                console.log("SUCCESS", "SMS response");
-                                            }
-
-                                        });
-                                    }
-                                    else if (isdMobile == "+91") {
-                                        console.log('inside send sms');
-                                        console.log(isdMobile, ' ', mobileNo);
-                                        request({
-                                            url: 'https://aikonsms.co.in/control/smsapi.php',
-                                            qs: {
-                                                user_name: 'janardana@hirecraft.com',
-                                                password: 'Ezeid2015',
-                                                sender_id: 'WtMate',
-                                                service: 'TRANS',
-                                                mobile_no: mobileNo,
-                                                message: message,
-                                                method: 'send_sms'
-                                            },
-                                            method: 'GET'
-
-                                        }, function (error, response, body) {
-                                            if (error) {
-                                                console.log(error, "SMS");
-                                            }
-                                            else {
-                                                console.log("SUCCESS", "SMS response");
-                                            }
-                                        });
-
-                                        var req1 = http.request(options, function (res1) {
-                                            var chunks = [];
-
-                                            res1.on("data", function (chunk) {
-                                                chunks.push(chunk);
-                                            });
-
-                                            res1.on("end", function () {
-                                                var body = Buffer.concat(chunks);
-                                                console.log(body.toString());
-                                            });
-                                        });
-
-                                        req1.write(qs.stringify({
-                                            userId: 'talentmicro',
-                                            password: 'TalentMicro@123',
-                                            senderId: 'WTMATE',
-                                            sendMethod: 'simpleMsg',
-                                            msgType: 'text',
-                                            mobile: isdMobile.replace("+", "") + mobileNo,
-                                            msg: message,
-                                            duplicateCheck: 'true',
-                                            format: 'json'
-                                        }));
-                                        req1.end();
-                                    }
-                                    else if (isdMobile != "") {
-                                        client.messages.create(
-                                            {
-                                                body: message,
-                                                to: isdMobile + mobileNo,
-                                                from: FromNumber
-                                            },
-                                            function (error, response) {
+                                            }, function (error, response, body) {
                                                 if (error) {
                                                     console.log(error, "SMS");
                                                 }
                                                 else {
                                                     console.log("SUCCESS", "SMS response");
                                                 }
-                                            }
-                                        );
+
+                                            });
+                                        }
+                                        else if (isdMobile == "+91") {
+                                            console.log('inside send sms');
+                                            console.log(isdMobile, ' ', mobileNo);
+                                            request({
+                                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                qs: {
+                                                    user_name: 'janardana@hirecraft.com',
+                                                    password: 'Ezeid2015',
+                                                    sender_id: 'WtMate',
+                                                    service: 'TRANS',
+                                                    mobile_no: mobileNo,
+                                                    message: message,
+                                                    method: 'send_sms'
+                                                },
+                                                method: 'GET'
+
+                                            }, function (error, response, body) {
+                                                if (error) {
+                                                    console.log(error, "SMS");
+                                                }
+                                                else {
+                                                    console.log("SUCCESS", "SMS response");
+                                                }
+                                            });
+
+                                            var req1 = http.request(options, function (res1) {
+                                                var chunks = [];
+
+                                                res1.on("data", function (chunk) {
+                                                    chunks.push(chunk);
+                                                });
+
+                                                res1.on("end", function () {
+                                                    var body = Buffer.concat(chunks);
+                                                    console.log(body.toString());
+                                                });
+                                            });
+
+                                            req1.write(qs.stringify({
+                                                userId: 'talentmicro',
+                                                password: 'TalentMicro@123',
+                                                senderId: 'WTMATE',
+                                                sendMethod: 'simpleMsg',
+                                                msgType: 'text',
+                                                mobile: isdMobile.replace("+", "") + mobileNo,
+                                                msg: message,
+                                                duplicateCheck: 'true',
+                                                format: 'json'
+                                            }));
+                                            req1.end();
+                                        }
+                                        else if (isdMobile != "") {
+                                            client.messages.create(
+                                                {
+                                                    body: message,
+                                                    to: isdMobile + mobileNo,
+                                                    from: FromNumber
+                                                },
+                                                function (error, response) {
+                                                    if (error) {
+                                                        console.log(error, "SMS");
+                                                    }
+                                                    else {
+                                                        console.log("SUCCESS", "SMS response");
+                                                    }
+                                                }
+                                            );
+                                        }
                                     }
                                 }
-                                sendgrid.send(email, function (err, sendGridResult) {
-                                    if (!err) {
 
-                                        var saveMails = [
-                                            req.st.db.escape(req.query.token),
-                                            req.st.db.escape(req.query.heMasterId),
-                                            req.st.db.escape(req.body.heDepartmentId),
-                                            req.st.db.escape(userId),
-                                            req.st.db.escape(mailerType),
-                                            req.st.db.escape(mailOptions.from),
-                                            req.st.db.escape(mailOptions.to),
-                                            req.st.db.escape(mailOptions.subject),
-                                            req.st.db.escape(mailOptions.html),    // contains mail body
-                                            req.st.db.escape(JSON.stringify(cc)),
-                                            req.st.db.escape(JSON.stringify(bcc)),
-                                            req.st.db.escape(JSON.stringify(attachment)),
-                                            req.st.db.escape(req.body.replyMailId),
-                                            req.st.db.escape(req.body.priority),
-                                            req.st.db.escape(req.body.stageId),
-                                            req.st.db.escape(req.body.statusId),
-                                            req.st.db.escape(message),    // sms message
-                                            req.st.db.escape(whatmateMessage),
-                                            req.st.db.escape(reqApplicants[0]),
-                                            req.st.db.escape(transactions[0] ? transactions[0] : 0)
-                                        ];
 
-                                        //saving the mail after sending it
-                                        var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
-                                        console.log(saveMailHistory);
-                                        req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
-                                            console.log("error of save mail", mailHistoryErr);
-                                            console.log("result of mail save", mailHistoryResult[0]);
-                                            if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
-                                                console.log('Sent mails saved successfully');
-                                            }
-                                            else {
-                                                console.log('Mails could not be saved');
-                                            }
-                                        });
-                                        console.log('Mail sent now save sent history');
-                                    } //end of if(sendgrid sent mail successfully)
-                                    //if mail is not sent
-                                    else {
-                                        console.log('Mail not Sent Successfully' + err);
-                                    }
-                                });
+                                if (isSendgrid && email.subject != '') {
+                                    sendgrid.send(email, function (err, sendGridResult) {
+                                        if (!err) {
+
+                                            var saveMails = [
+                                                req.st.db.escape(req.query.token),
+                                                req.st.db.escape(req.query.heMasterId),
+                                                req.st.db.escape(req.body.heDepartmentId),
+                                                req.st.db.escape(userId),
+                                                req.st.db.escape(mailerType),
+                                                req.st.db.escape(mailOptions.from),
+                                                req.st.db.escape(mailOptions.to),
+                                                req.st.db.escape(mailOptions.subject),
+                                                req.st.db.escape(mailOptions.html),    // contains mail body
+                                                req.st.db.escape(JSON.stringify(cc)),
+                                                req.st.db.escape(JSON.stringify(bcc)),
+                                                req.st.db.escape(JSON.stringify(attachment)),
+                                                req.st.db.escape(req.body.replyMailId),
+                                                req.st.db.escape(req.body.priority),
+                                                req.st.db.escape(req.body.stageId),
+                                                req.st.db.escape(req.body.statusId),
+                                                req.st.db.escape(message),    // sms message
+                                                req.st.db.escape(whatmateMessage),
+                                                req.st.db.escape(reqApplicants[0]),
+                                                req.st.db.escape(transactions[0] ? transactions[0] : 0)
+                                            ];
+
+                                            //saving the mail after sending it
+                                            var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                            console.log(saveMailHistory);
+                                            req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                console.log("error of save mail", mailHistoryErr);
+                                                console.log("result of mail save", mailHistoryResult[0]);
+                                                if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
+                                                    console.log('Sent mails saved successfully');
+                                                }
+                                                else {
+                                                    console.log('Mails could not be saved');
+                                                }
+                                            });
+                                            console.log('Mail sent now save sent history');
+                                        } //end of if(sendgrid sent mail successfully)
+                                        //if mail is not sent
+                                        else {
+                                            console.log('Mail not Sent Successfully' + err);
+                                        }
+                                    });
+                                }
+
                             }
                             if (!(templateId == 0 || overWrite)) {
                                 response.status = true;
-                                response.message = "Mail sent successfully";
-                                response.data = transactions[0];
+
+                                if (isSendgrid && isSMS) {  // making changes here reminder
+                                    if (subject != '' && smsMsg != '') {
+                                        response.message = "Mail and SMS sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject != '' && smsMsg == '') {
+                                        response.message = "Mail sent successfully. Message field is empty,SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject == '' && smsMsg != '') {
+                                        response.message = "SMS sent successfully. Mail subject is empty,mail cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else {
+                                        response.message = "Mail subject and SMS fields are empty,Mail and SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else if (isSendgrid && !isSMS) {
+
+                                    if (subject != '') {
+                                        response.message = "Mail sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject == '') {
+                                        response.message = "Mail subject is empty,mail cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else if (isSMS && !isSendgrid) {
+                                    if (isSMS != '') {
+                                        response.message = "SMS sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (isSMS == '') {
+                                        response.message = "SMS field is empty,SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else {
+                                    response.message = "Sendgrid or SMS is not configured. Please contact the admin";
+                                    response.data = null;
+                                }
                                 response.error = null;
                                 res.status(200).json(response);
                             }
@@ -1617,7 +1751,7 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
 
                 else if (templateId && !overWrite && !emailReceivers.length) {
                     response.status = false;
-                    response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
+                    response.message = "To mail is empty. Mail not sent. TemplateId exists, Please set overwrite to update template";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
@@ -1665,8 +1799,19 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                             console.log(tempSaveResult);
                             response.status = true;
                             //check if there are any receivers, if yes sent and saved
-                            if (emailReceivers.length != 0) {
-                                response.message = "Mail is Sent and Template Saved successfully";
+                            if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
+                                if (isSendgrid && isSMS) {
+                                    response.message = "Mail and SMS Sent and Template Saved successfully";
+                                }
+                                else if (!isSendgrid && isSMS) {
+                                    response.message = "SMS is Sent and Template Saved successfully";
+                                }
+                                else if (isSendgrid && !isSMS) {
+                                    response.message = "Mail is Sent and Template Saved successfully";
+                                }
+                                else {
+                                    response.message = "Template saved successfully";
+                                }
                             }
                             //else saved
                             else {
@@ -1814,7 +1959,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                                         subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
 
                                         smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                    
+
                                         tempFileName = tempFileName.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
 
                                     }
@@ -1900,7 +2045,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                             clientData: clientData,
                             originalCVArray: originalCVArray,
                             clientCVArray: clientCVArray,
-                            resumeFileName : resumeFileNameArray
+                            resumeFileName: resumeFileNameArray
                         };
                         res.status(200).json(response);
                     }
@@ -1916,7 +2061,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                             clientData: [],
                             originalCVArray: [],
                             clientCVArray: [],
-                            resumeFileName :[]
+                            resumeFileName: []
                         };
                         res.status(200).json(response);
                     }
@@ -1948,6 +2093,9 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
         error: null
     };
     var sendMailFlag = 1;
+    var isSendgrid;
+    var isSMS;
+
     var emailReceivers;                //emailReceivers to store the recipients
     var mailbody_array = [];    //array to store all mailbody after replacing tags
     var subject_array = [];
@@ -2081,6 +2229,17 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, result) {
                         console.log(err);
+
+                        if (result[2] && result[2][0] && result[2][0].transactions) {
+                            transactions = JSON.parse(result[2][0].transactions);
+                        }
+
+
+                        if (result[3] && result[3][0]) {
+                            isSendgrid = result[3][0].isSendgrid ? result[3][0].isSendgrid : 0,
+                                isSMS = result[3][0].isSMS ? result[3][0].isSMS : 0
+                        }
+
                         if (!err && result && result[0] && result[0][0]) {
                             var temp = mailBody;
                             var temp1 = subject;
@@ -2257,149 +2416,199 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                 message = smsMsg_array[receiverIndex];
 
                                 // to send normal sms
-                                if (smsFlag) {
-                                    if (isdMobile == "+977") {
-                                        request({
-                                            url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                            qs: {
-                                                token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                                to: mobileNo,
-                                                message: message,
-                                                sender: 'Techingen'
-                                            },
-                                            method: 'GET'
-
-                                        }, function (error, response, body) {
-                                            if (error) {
-                                                console.log(error, "SMS");
-                                            }
-                                            else {
-                                                console.log("SUCCESS", "SMS response");
-                                            }
-
-                                        });
-                                    }
-                                    else if (isdMobile == "+91") {
-                                        console.log('inside send sms');
-                                        console.log(isdMobile, ' ', mobileNo);
-                                        request({
-                                            url: 'https://aikonsms.co.in/control/smsapi.php',
-                                            qs: {
-                                                user_name: 'janardana@hirecraft.com',
-                                                password: 'Ezeid2015',
-                                                sender_id: 'WtMate',
-                                                service: 'TRANS',
-                                                mobile_no: mobileNo,
-                                                message: message,
-                                                method: 'send_sms'
-                                            },
-                                            method: 'GET'
-
-                                        }, function (error, response, body) {
-                                            if (error) {
-                                                console.log(error, "SMS");
-                                            }
-                                            else {
-                                                console.log("SUCCESS", "SMS response");
-                                            }
-                                        });
-
-                                        var req1 = http.request(options, function (res1) {
-                                            var chunks = [];
-
-                                            res1.on("data", function (chunk) {
-                                                chunks.push(chunk);
-                                            });
-
-                                            res1.on("end", function () {
-                                                var body = Buffer.concat(chunks);
-                                                console.log(body.toString());
-                                            });
-                                        });
-
-                                        req1.write(qs.stringify({
-                                            userId: 'talentmicro',
-                                            password: 'TalentMicro@123',
-                                            senderId: 'WTMATE',
-                                            sendMethod: 'simpleMsg',
-                                            msgType: 'text',
-                                            mobile: isdMobile.replace("+", "") + mobileNo,
-                                            msg: message,
-                                            duplicateCheck: 'true',
-                                            format: 'json'
-                                        }));
-                                        req1.end();
-                                    }
-                                    else if (isdMobile != "") {
-                                        console.log('inside without isd', isdMobile, ' ', mobileNo);
-                                        client.messages.create(
-                                            {
-                                                body: message,
-                                                to: isdMobile + mobileNo,
-                                                from: FromNumber
-                                            },
-                                            function (error, response) {
+                                if (isSMS) {
+                                    if (smsFlag) {
+                                        if (isdMobile == "+977") {
+                                            request({
+                                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                qs: {
+                                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                    to: mobileNo,
+                                                    message: message,
+                                                    sender: 'Techingen'
+                                                },
+                                                method: 'GET'
+    
+                                            }, function (error, response, body) {
                                                 if (error) {
                                                     console.log(error, "SMS");
                                                 }
                                                 else {
                                                     console.log("SUCCESS", "SMS response");
                                                 }
-                                            }
-                                        );
+    
+                                            });
+                                        }
+                                        else if (isdMobile == "+91") {
+                                            console.log('inside send sms');
+                                            console.log(isdMobile, ' ', mobileNo);
+                                            request({
+                                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                qs: {
+                                                    user_name: 'janardana@hirecraft.com',
+                                                    password: 'Ezeid2015',
+                                                    sender_id: 'WtMate',
+                                                    service: 'TRANS',
+                                                    mobile_no: mobileNo,
+                                                    message: message,
+                                                    method: 'send_sms'
+                                                },
+                                                method: 'GET'
+    
+                                            }, function (error, response, body) {
+                                                if (error) {
+                                                    console.log(error, "SMS");
+                                                }
+                                                else {
+                                                    console.log("SUCCESS", "SMS response");
+                                                }
+                                            });
+    
+                                            var req1 = http.request(options, function (res1) {
+                                                var chunks = [];
+    
+                                                res1.on("data", function (chunk) {
+                                                    chunks.push(chunk);
+                                                });
+    
+                                                res1.on("end", function () {
+                                                    var body = Buffer.concat(chunks);
+                                                    console.log(body.toString());
+                                                });
+                                            });
+    
+                                            req1.write(qs.stringify({
+                                                userId: 'talentmicro',
+                                                password: 'TalentMicro@123',
+                                                senderId: 'WTMATE',
+                                                sendMethod: 'simpleMsg',
+                                                msgType: 'text',
+                                                mobile: isdMobile.replace("+", "") + mobileNo,
+                                                msg: message,
+                                                duplicateCheck: 'true',
+                                                format: 'json'
+                                            }));
+                                            req1.end();
+                                        }
+                                        else if (isdMobile != "") {
+                                            console.log('inside without isd', isdMobile, ' ', mobileNo);
+                                            client.messages.create(
+                                                {
+                                                    body: message,
+                                                    to: isdMobile + mobileNo,
+                                                    from: FromNumber
+                                                },
+                                                function (error, response) {
+                                                    if (error) {
+                                                        console.log(error, "SMS");
+                                                    }
+                                                    else {
+                                                        console.log("SUCCESS", "SMS response");
+                                                    }
+                                                }
+                                            );
+                                        }
                                     }
                                 }
-                                sendgrid.send(email, function (err, result) {
-                                    if (!err) {
 
-                                        var saveMails = [
-                                            req.st.db.escape(req.query.token),
-                                            req.st.db.escape(req.query.heMasterId),
-                                            req.st.db.escape(req.body.heDepartmentId),
-                                            req.st.db.escape(userId),
-                                            req.st.db.escape(mailerType),
-                                            req.st.db.escape(mailOptions.from),
-                                            req.st.db.escape(mailOptions.to),
-                                            req.st.db.escape(mailOptions.subject),
-                                            req.st.db.escape(mailOptions.html),    // contains mail body
-                                            req.st.db.escape(JSON.stringify(cc)),
-                                            req.st.db.escape(JSON.stringify(bcc)),
-                                            req.st.db.escape(JSON.stringify(attachment)),
-                                            req.st.db.escape(req.body.replyMailId),
-                                            req.st.db.escape(req.body.priority),
-                                            req.st.db.escape(req.body.stageId),
-                                            req.st.db.escape(req.body.statusId),
-                                            req.st.db.escape(message),    // sms message
-                                            req.st.db.escape(whatmateMessage),
-                                            req.st.db.escape(reqApplicants[0]),
-                                            req.st.db.escape(transactions[0] ? transactions[0] : 0)
-                                        ];
-
-                                        //saving the mail after sending it
-                                        var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
-                                        console.log(saveMailHistory);
-                                        req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
-                                            console.log(mailHistoryErr);
-                                            console.log(mailHistoryResult);
-                                            if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
-                                                console.log('sent mails saved successfully');
-                                            }
-                                            else {
-                                                console.log('mails could not be saved');
-                                            }
-                                        });
-                                        console.log('Mail sent now save sent history');
-                                    } //end of if(sendgrid sent mail successfully)
-                                    //if mail is not sent
-                                    else {
-                                        console.log('Mail not Sent Successfully' + err);
-                                    }
-                                });
+                                if(isSendgrid){
+                                    sendgrid.send(email, function (err, result) {
+                                        if (!err) {
+    
+                                            var saveMails = [
+                                                req.st.db.escape(req.query.token),
+                                                req.st.db.escape(req.query.heMasterId),
+                                                req.st.db.escape(req.body.heDepartmentId),
+                                                req.st.db.escape(userId),
+                                                req.st.db.escape(mailerType),
+                                                req.st.db.escape(mailOptions.from),
+                                                req.st.db.escape(mailOptions.to),
+                                                req.st.db.escape(mailOptions.subject),
+                                                req.st.db.escape(mailOptions.html),    // contains mail body
+                                                req.st.db.escape(JSON.stringify(cc)),
+                                                req.st.db.escape(JSON.stringify(bcc)),
+                                                req.st.db.escape(JSON.stringify(attachment)),
+                                                req.st.db.escape(req.body.replyMailId),
+                                                req.st.db.escape(req.body.priority),
+                                                req.st.db.escape(req.body.stageId),
+                                                req.st.db.escape(req.body.statusId),
+                                                req.st.db.escape(message),    // sms message
+                                                req.st.db.escape(whatmateMessage),
+                                                req.st.db.escape(reqApplicants[0]),
+                                                req.st.db.escape(transactions[0] ? transactions[0] : 0)
+                                            ];
+    
+                                            //saving the mail after sending it
+                                            var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                            console.log(saveMailHistory);
+                                            req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                console.log(mailHistoryErr);
+                                                console.log(mailHistoryResult);
+                                                if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
+                                                    console.log('sent mails saved successfully');
+                                                }
+                                                else {
+                                                    console.log('mails could not be saved');
+                                                }
+                                            });
+                                            console.log('Mail sent now save sent history');
+                                        } //end of if(sendgrid sent mail successfully)
+                                        //if mail is not sent
+                                        else {
+                                            console.log('Mail not Sent Successfully' + err);
+                                        }
+                                    });
+                                }
+                             
                             }
 
                             if (!(templateId == 0 || overWrite)) {
                                 response.status = true;
-                                response.message = "Mail sent successfully";
+
+                                if (isSendgrid && isSMS) {  // making changes here reminder
+                                    if (subject != '' && smsMsg != '') {
+                                        response.message = "Mail and SMS sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject != '' && smsMsg == '') {
+                                        response.message = "Mail sent successfully. Message field is empty,SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject == '' && smsMsg != '') {
+                                        response.message = "SMS sent successfully. Mail subject is empty,mail cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else {
+                                        response.message = "Mail subject and SMS fields are empty,Mail and SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else if (isSendgrid && !isSMS) {
+
+                                    if (subject != '') {
+                                        response.message = "Mail sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject == '') {
+                                        response.message = "Mail subject is empty,mail cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else if (isSMS && !isSendgrid) {
+                                    if (isSMS != '') {
+                                        response.message = "SMS sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (isSMS == '') {
+                                        response.message = "SMS field is empty,SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else {
+                                    response.message = "Sendgrid or SMS is not configured. Please contact the admin";
+                                    response.data = null;
+                                }
+
                                 response.error = null;
                                 res.status(200).json(response);
                             }
@@ -2474,11 +2683,24 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                             console.log(tempSaveResult);
                             response.status = true;
                             //check if there are any receivers, if yes sent and saved
-                            if (emailReceivers.length != 0)
-                                response.message = "Mail is Sent and Template Saved successfully";
+                            if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
+                                if (isSendgrid && isSMS) {
+                                    response.message = "Mail and SMS Sent and Template Saved successfully";
+                                }
+                                else if (!isSendgrid && isSMS) {
+                                    response.message = "SMS is Sent and Template Saved successfully";
+                                }
+                                else if (isSendgrid && !isSMS) {
+                                    response.message = "Mail is Sent and Template Saved successfully";
+                                }
+                                else {
+                                    response.message = "Template saved successfully";
+                                }
+                            }
                             //else saved
-                            else
+                            else {
                                 response.message = "Template saved successfully";
+                            }
                             response.error = null;
                             response.data = null;
                             res.status(200).json(response);
@@ -2646,6 +2868,9 @@ sendgridCtrl.clientMailer = function (req, res, next) {
         error: null
     };
 
+    var isSendgrid;
+    var isSMS;
+
     var emailReceivers;                //emailReceivers to store the recipients
     var mailbody_array = [];    //array to store all mailbody after replacing tags
     var subject_array = [];
@@ -2764,7 +2989,13 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, result) {
                         console.log(err);
-                        if (!err && result) {
+
+                        if (result[2] && result[2][0]) {
+                            isSendgrid = result[2][0].isSendgrid ? result[2][0].isSendgrid : 0,
+                            isSMS = result[2][0].isSMS ? result[2][0].isSMS : 0
+                        }
+
+                        if (!err && result && result[0]) {
                             var temp = mailBody;
                             var temp1 = subject;
                             var temp2 = smsMsg;
@@ -2839,149 +3070,199 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                                 message = smsMsg_array[receiverIndex];
 
                                 // to send normal sms
-                                if (smsFlag) {
-                                    if (isdMobile == "+977") {
-                                        request({
-                                            url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                            qs: {
-                                                token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                                to: mobileNo,
-                                                message: message,
-                                                sender: 'Techingen'
-                                            },
-                                            method: 'GET'
-
-                                        }, function (error, response, body) {
-                                            if (error) {
-                                                console.log(error, "SMS");
-                                            }
-                                            else {
-                                                console.log("SUCCESS", "SMS response");
-                                            }
-
-                                        });
-                                    }
-                                    else if (isdMobile == "+91") {
-                                        console.log('inside send sms');
-                                        console.log(isdMobile, ' ', mobileNo);
-                                        request({
-                                            url: 'https://aikonsms.co.in/control/smsapi.php',
-                                            qs: {
-                                                user_name: 'janardana@hirecraft.com',
-                                                password: 'Ezeid2015',
-                                                sender_id: 'WtMate',
-                                                service: 'TRANS',
-                                                mobile_no: mobileNo,
-                                                message: message,
-                                                method: 'send_sms'
-                                            },
-                                            method: 'GET'
-
-                                        }, function (error, response, body) {
-                                            if (error) {
-                                                console.log(error, "SMS");
-                                            }
-                                            else {
-                                                console.log("SUCCESS", "SMS response");
-                                            }
-                                        });
-
-                                        var req1 = http.request(options, function (res1) {
-                                            var chunks = [];
-
-                                            res1.on("data", function (chunk) {
-                                                chunks.push(chunk);
-                                            });
-
-                                            res1.on("end", function () {
-                                                var body = Buffer.concat(chunks);
-                                                console.log(body.toString());
-                                            });
-                                        });
-
-                                        req1.write(qs.stringify({
-                                            userId: 'talentmicro',
-                                            password: 'TalentMicro@123',
-                                            senderId: 'WTMATE',
-                                            sendMethod: 'simpleMsg',
-                                            msgType: 'text',
-                                            mobile: isdMobile.replace("+", "") + mobileNo,
-                                            msg: message,
-                                            duplicateCheck: 'true',
-                                            format: 'json'
-                                        }));
-                                        req1.end();
-                                    }
-                                    else if (isdMobile != "") {
-                                        console.log('inside without isd', isdMobile, ' ', mobileNo);
-                                        client.messages.create(
-                                            {
-                                                body: message,
-                                                to: isdMobile + mobileNo,
-                                                from: FromNumber
-                                            },
-                                            function (error, response) {
+                                if(isSMS){
+                                    if (smsFlag) {
+                                        if (isdMobile == "+977") {
+                                            request({
+                                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                qs: {
+                                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                    to: mobileNo,
+                                                    message: message,
+                                                    sender: 'Techingen'
+                                                },
+                                                method: 'GET'
+    
+                                            }, function (error, response, body) {
                                                 if (error) {
                                                     console.log(error, "SMS");
                                                 }
                                                 else {
                                                     console.log("SUCCESS", "SMS response");
                                                 }
-                                            }
-                                        );
+    
+                                            });
+                                        }
+                                        else if (isdMobile == "+91") {
+                                            console.log('inside send sms');
+                                            console.log(isdMobile, ' ', mobileNo);
+                                            request({
+                                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                qs: {
+                                                    user_name: 'janardana@hirecraft.com',
+                                                    password: 'Ezeid2015',
+                                                    sender_id: 'WtMate',
+                                                    service: 'TRANS',
+                                                    mobile_no: mobileNo,
+                                                    message: message,
+                                                    method: 'send_sms'
+                                                },
+                                                method: 'GET'
+    
+                                            }, function (error, response, body) {
+                                                if (error) {
+                                                    console.log(error, "SMS");
+                                                }
+                                                else {
+                                                    console.log("SUCCESS", "SMS response");
+                                                }
+                                            });
+    
+                                            var req1 = http.request(options, function (res1) {
+                                                var chunks = [];
+    
+                                                res1.on("data", function (chunk) {
+                                                    chunks.push(chunk);
+                                                });
+    
+                                                res1.on("end", function () {
+                                                    var body = Buffer.concat(chunks);
+                                                    console.log(body.toString());
+                                                });
+                                            });
+    
+                                            req1.write(qs.stringify({
+                                                userId: 'talentmicro',
+                                                password: 'TalentMicro@123',
+                                                senderId: 'WTMATE',
+                                                sendMethod: 'simpleMsg',
+                                                msgType: 'text',
+                                                mobile: isdMobile.replace("+", "") + mobileNo,
+                                                msg: message,
+                                                duplicateCheck: 'true',
+                                                format: 'json'
+                                            }));
+                                            req1.end();
+                                        }
+                                        else if (isdMobile != "") {
+                                            console.log('inside without isd', isdMobile, ' ', mobileNo);
+                                            client.messages.create(
+                                                {
+                                                    body: message,
+                                                    to: isdMobile + mobileNo,
+                                                    from: FromNumber
+                                                },
+                                                function (error, response) {
+                                                    if (error) {
+                                                        console.log(error, "SMS");
+                                                    }
+                                                    else {
+                                                        console.log("SUCCESS", "SMS response");
+                                                    }
+                                                }
+                                            );
+                                        }
                                     }
                                 }
-                                sendgrid.send(email, function (err, result) {
-                                    if (!err) {
-
-                                        var saveMails = [
-                                            req.st.db.escape(req.query.token),
-                                            req.st.db.escape(req.query.heMasterId),
-                                            req.st.db.escape(req.body.heDepartmentId),
-                                            req.st.db.escape(userId),
-                                            req.st.db.escape(mailerType),
-                                            req.st.db.escape(mailOptions.from),
-                                            req.st.db.escape(mailOptions.to),
-                                            req.st.db.escape(mailOptions.subject),
-                                            req.st.db.escape(mailOptions.html),    // contains mail body
-                                            req.st.db.escape(JSON.stringify(cc)),
-                                            req.st.db.escape(JSON.stringify(bcc)),
-                                            req.st.db.escape(JSON.stringify(attachment)),
-                                            req.st.db.escape(req.body.replyMailId),
-                                            req.st.db.escape(req.body.priority),
-                                            req.st.db.escape(req.body.stageId),
-                                            req.st.db.escape(req.body.statusId),
-                                            req.st.db.escape(message),    // sms message
-                                            req.st.db.escape(whatmateMessage),
-                                            req.st.db.escape(reqApplicants[0]),
-                                            req.st.db.escape(transactions[0] ? transactions[0] : 0)
-                                        ];
-
-                                        //saving the mail after sending it
-                                        var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
-                                        console.log(saveMailHistory);
-                                        req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
-                                            console.log(mailHistoryErr);
-                                            console.log(mailHistoryResult);
-                                            if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
-                                                console.log('sent mails saved successfully');
-                                            }
-                                            else {
-                                                console.log('mails could not be saved');
-                                            }
-                                        });
-                                        console.log('Mail sent now save sent history');
-                                    } //end of if(sendgrid sent mail successfully)
-                                    //if mail is not sent
-                                    else {
-                                        console.log('Mail not Sent Successfully' + err);
-                                    }
-                                });
+                                
+                                if(isSendgrid){
+                                    sendgrid.send(email, function (err, result) {
+                                        if (!err) {
+    
+                                            var saveMails = [
+                                                req.st.db.escape(req.query.token),
+                                                req.st.db.escape(req.query.heMasterId),
+                                                req.st.db.escape(req.body.heDepartmentId),
+                                                req.st.db.escape(userId),
+                                                req.st.db.escape(mailerType),
+                                                req.st.db.escape(mailOptions.from),
+                                                req.st.db.escape(mailOptions.to),
+                                                req.st.db.escape(mailOptions.subject),
+                                                req.st.db.escape(mailOptions.html),    // contains mail body
+                                                req.st.db.escape(JSON.stringify(cc)),
+                                                req.st.db.escape(JSON.stringify(bcc)),
+                                                req.st.db.escape(JSON.stringify(attachment)),
+                                                req.st.db.escape(req.body.replyMailId),
+                                                req.st.db.escape(req.body.priority),
+                                                req.st.db.escape(req.body.stageId),
+                                                req.st.db.escape(req.body.statusId),
+                                                req.st.db.escape(message),    // sms message
+                                                req.st.db.escape(whatmateMessage),
+                                                req.st.db.escape(reqApplicants[0]),
+                                                req.st.db.escape(transactions[0] ? transactions[0] : 0)
+                                            ];
+    
+                                            //saving the mail after sending it
+                                            var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                            console.log(saveMailHistory);
+                                            req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                console.log(mailHistoryErr);
+                                                console.log(mailHistoryResult);
+                                                if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
+                                                    console.log('sent mails saved successfully');
+                                                }
+                                                else {
+                                                    console.log('mails could not be saved');
+                                                }
+                                            });
+                                            console.log('Mail sent now save sent history');
+                                        } //end of if(sendgrid sent mail successfully)
+                                        //if mail is not sent
+                                        else {
+                                            console.log('Mail not Sent Successfully' + err);
+                                        }
+                                    });
+                                }
+                               
                             }
 
                             if (!(templateId == 0 || overWrite)) {
                                 response.status = true;
-                                response.message = "Mail sent successfully";
+                                
+                                if (isSendgrid && isSMS) {  // making changes here reminder
+                                    if (subject != '' && smsMsg != '') {
+                                        response.message = "Mail and SMS sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject != '' && smsMsg == '') {
+                                        response.message = "Mail sent successfully. Message field is empty,SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject == '' && smsMsg != '') {
+                                        response.message = "SMS sent successfully. Mail subject is empty,mail cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else {
+                                        response.message = "Mail subject and SMS fields are empty,Mail and SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else if (isSendgrid && !isSMS) {
+
+                                    if (subject != '') {
+                                        response.message = "Mail sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject == '') {
+                                        response.message = "Mail subject is empty,mail cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else if (isSMS && !isSendgrid) {
+                                    if (isSMS != '') {
+                                        response.message = "SMS sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (isSMS == '') {
+                                        response.message = "SMS field is empty,SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else {
+                                    response.message = "Sendgrid or SMS is not configured. Please contact the admin";
+                                    response.data = null;
+                                }
+                                
                                 response.error = null;
                                 res.status(200).json(response);
                             }
@@ -3056,11 +3337,24 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                             // console.log(tempSaveResult);
                             response.status = true;
                             //check if there are any receivers, if yes sent and saved
-                            if (emailReceivers.length != 0)
-                                response.message = "Mail is Sent and Template Saved successfully";
+                            if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
+                                if (isSendgrid && isSMS) {
+                                    response.message = "Mail and SMS Sent and Template Saved successfully";
+                                }
+                                else if (!isSendgrid && isSMS) {
+                                    response.message = "SMS is Sent and Template Saved successfully";
+                                }
+                                else if (isSendgrid && !isSMS) {
+                                    response.message = "Mail is Sent and Template Saved successfully";
+                                }
+                                else {
+                                    response.message = "Template saved successfully";
+                                }
+                            }
                             //else saved
-                            else
+                            else {
                                 response.message = "Template saved successfully";
+                            }
                             response.error = null;
                             response.data = null;
                             res.status(200).json(response);
@@ -3381,6 +3675,9 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
 
     var transactions = [];
 
+    var isSendgrid;
+    var isSMS;
+
     var emailReceivers;                //emailReceivers to store the recipients
     var mailbody_array = [];    //array to store all mailbody after replacing tags
     var subject_array = [];
@@ -3514,6 +3811,10 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                             transactions = JSON.parse(result[3][0].transactions);
                         }
 
+                        if (result[4] && result[4][0]) {
+                            isSendgrid = result[4][0].isSendgrid ? result[4][0].isSendgrid : 0,
+                                isSMS = result[4][0].isSMS ? result[4][0].isSMS : 0
+                        }
 
                         if (!err && result && result[0] && result[0][0]) {
                             var temp = mailBody;
@@ -3611,7 +3912,7 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                 }
 
                                 var buffer;
-                                if (trackerTemplate) {
+                                if (trackerTemplate.trackerId) {
                                     var ws_data = '[[';
                                     // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
                                     for (var i = 0; i < trackerTags.length; i++) {
@@ -3727,7 +4028,7 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                     });
                                 }
 
-                                if (trackerTemplate) {
+                                if (trackerTemplate.trackerId) {
                                     email.addFile({
                                         filename: trackerTemplate.templateName + '.xlsx',
                                         content: new Buffer(new Buffer(buffer).toString("base64"), 'base64'),
@@ -3741,148 +4042,198 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                 message = smsMsg_array[receiverIndex];
 
                                 // to send normal sms
-                                if (smsFlag) {
-                                    if (isdMobile == "+977") {
-                                        request({
-                                            url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                            qs: {
-                                                token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                                to: mobileNo,
-                                                message: message,
-                                                sender: 'Techingen'
-                                            },
-                                            method: 'GET'
-
-                                        }, function (error, response, body) {
-                                            if (error) {
-                                                console.log(error, "SMS");
-                                            }
-                                            else {
-                                                console.log("SUCCESS", "SMS response");
-                                            }
-
-                                        });
-                                    }
-                                    else if (isdMobile == "+91") {
-                                        console.log('inside send sms');
-                                        console.log(isdMobile, ' ', mobileNo);
-                                        request({
-                                            url: 'https://aikonsms.co.in/control/smsapi.php',
-                                            qs: {
-                                                user_name: 'janardana@hirecraft.com',
-                                                password: 'Ezeid2015',
-                                                sender_id: 'WtMate',
-                                                service: 'TRANS',
-                                                mobile_no: mobileNo,
-                                                message: message,
-                                                method: 'send_sms'
-                                            },
-                                            method: 'GET'
-
-                                        }, function (error, response, body) {
-                                            if (error) {
-                                                console.log(error, "SMS");
-                                            }
-                                            else {
-                                                console.log("SUCCESS", "SMS response");
-                                            }
-                                        });
-
-                                        var req1 = http.request(options, function (res1) {
-                                            var chunks = [];
-
-                                            res1.on("data", function (chunk) {
-                                                chunks.push(chunk);
-                                            });
-
-                                            res1.on("end", function () {
-                                                var body = Buffer.concat(chunks);
-                                                console.log(body.toString());
-                                            });
-                                        });
-
-                                        req1.write(qs.stringify({
-                                            userId: 'talentmicro',
-                                            password: 'TalentMicro@123',
-                                            senderId: 'WTMATE',
-                                            sendMethod: 'simpleMsg',
-                                            msgType: 'text',
-                                            mobile: isdMobile.replace("+", "") + mobileNo,
-                                            msg: message,
-                                            duplicateCheck: 'true',
-                                            format: 'json'
-                                        }));
-                                        req1.end();
-                                    }
-                                    else if (isdMobile != "") {
-                                        console.log('inside without isd', isdMobile, ' ', mobileNo);
-                                        client.messages.create(
-                                            {
-                                                body: message,
-                                                to: isdMobile + mobileNo,
-                                                from: FromNumber
-                                            },
-                                            function (error, response) {
+                                if(isSMS){
+                                    if (smsFlag) {
+                                        if (isdMobile == "+977") {
+                                            request({
+                                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                qs: {
+                                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                    to: mobileNo,
+                                                    message: message,
+                                                    sender: 'Techingen'
+                                                },
+                                                method: 'GET'
+    
+                                            }, function (error, response, body) {
                                                 if (error) {
                                                     console.log(error, "SMS");
                                                 }
                                                 else {
                                                     console.log("SUCCESS", "SMS response");
                                                 }
-                                            }
-                                        );
+    
+                                            });
+                                        }
+                                        else if (isdMobile == "+91") {
+                                            console.log('inside send sms');
+                                            console.log(isdMobile, ' ', mobileNo);
+                                            request({
+                                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                qs: {
+                                                    user_name: 'janardana@hirecraft.com',
+                                                    password: 'Ezeid2015',
+                                                    sender_id: 'WtMate',
+                                                    service: 'TRANS',
+                                                    mobile_no: mobileNo,
+                                                    message: message,
+                                                    method: 'send_sms'
+                                                },
+                                                method: 'GET'
+    
+                                            }, function (error, response, body) {
+                                                if (error) {
+                                                    console.log(error, "SMS");
+                                                }
+                                                else {
+                                                    console.log("SUCCESS", "SMS response");
+                                                }
+                                            });
+    
+                                            var req1 = http.request(options, function (res1) {
+                                                var chunks = [];
+    
+                                                res1.on("data", function (chunk) {
+                                                    chunks.push(chunk);
+                                                });
+    
+                                                res1.on("end", function () {
+                                                    var body = Buffer.concat(chunks);
+                                                    console.log(body.toString());
+                                                });
+                                            });
+    
+                                            req1.write(qs.stringify({
+                                                userId: 'talentmicro',
+                                                password: 'TalentMicro@123',
+                                                senderId: 'WTMATE',
+                                                sendMethod: 'simpleMsg',
+                                                msgType: 'text',
+                                                mobile: isdMobile.replace("+", "") + mobileNo,
+                                                msg: message,
+                                                duplicateCheck: 'true',
+                                                format: 'json'
+                                            }));
+                                            req1.end();
+                                        }
+                                        else if (isdMobile != "") {
+                                            console.log('inside without isd', isdMobile, ' ', mobileNo);
+                                            client.messages.create(
+                                                {
+                                                    body: message,
+                                                    to: isdMobile + mobileNo,
+                                                    from: FromNumber
+                                                },
+                                                function (error, response) {
+                                                    if (error) {
+                                                        console.log(error, "SMS");
+                                                    }
+                                                    else {
+                                                        console.log("SUCCESS", "SMS response");
+                                                    }
+                                                }
+                                            );
+                                        }
                                     }
                                 }
-                                sendgrid.send(email, function (err, result) {
-                                    if (!err) {
-
-                                        var saveMails = [
-                                            req.st.db.escape(req.query.token),
-                                            req.st.db.escape(req.query.heMasterId),
-                                            req.st.db.escape(req.body.heDepartmentId),
-                                            req.st.db.escape(userId),
-                                            req.st.db.escape(mailerType),
-                                            req.st.db.escape(mailOptions.from),
-                                            req.st.db.escape(mailOptions.to),
-                                            req.st.db.escape(mailOptions.subject),
-                                            req.st.db.escape(mailOptions.html),    // contains mail body
-                                            req.st.db.escape(JSON.stringify(cc)),
-                                            req.st.db.escape(JSON.stringify(bcc)),
-                                            req.st.db.escape(JSON.stringify(attachment)),
-                                            req.st.db.escape(req.body.replyMailId),
-                                            req.st.db.escape(req.body.priority),
-                                            req.st.db.escape(req.body.stageId),
-                                            req.st.db.escape(req.body.statusId),
-                                            req.st.db.escape(message),    // sms message
-                                            req.st.db.escape(whatmateMessage),
-                                            req.st.db.escape(reqApplicants[0]),
-                                            req.st.db.escape(transactions[0] ? transactions[0] : 0)
-                                        ];
-
-                                        //saving the mail after sending it
-                                        var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
-                                        console.log(saveMailHistory);
-                                        req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
-                                            console.log(mailHistoryErr);
-                                            // console.log(mailHistoryResult);
-                                            if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
-                                                console.log('sent mails saved successfully');
-                                            }
-                                            else {
-                                                console.log('mails could not be saved');
-                                            }
-                                        });
-                                        console.log('Mail sent now save sent history');
-                                    } //end of if(sendgrid sent mail successfully)
-                                    //if mail is not sent
-                                    else {
-                                        console.log('Mail not Sent Successfully' + err);
-                                    }
-                                });
+                                
+                                if(isSendgrid){
+                                    sendgrid.send(email, function (err, result) {
+                                        if (!err) {
+    
+                                            var saveMails = [
+                                                req.st.db.escape(req.query.token),
+                                                req.st.db.escape(req.query.heMasterId),
+                                                req.st.db.escape(req.body.heDepartmentId),
+                                                req.st.db.escape(userId),
+                                                req.st.db.escape(mailerType),
+                                                req.st.db.escape(mailOptions.from),
+                                                req.st.db.escape(mailOptions.to),
+                                                req.st.db.escape(mailOptions.subject),
+                                                req.st.db.escape(mailOptions.html),    // contains mail body
+                                                req.st.db.escape(JSON.stringify(cc)),
+                                                req.st.db.escape(JSON.stringify(bcc)),
+                                                req.st.db.escape(JSON.stringify(attachment)),
+                                                req.st.db.escape(req.body.replyMailId),
+                                                req.st.db.escape(req.body.priority),
+                                                req.st.db.escape(req.body.stageId),
+                                                req.st.db.escape(req.body.statusId),
+                                                req.st.db.escape(message),    // sms message
+                                                req.st.db.escape(whatmateMessage),
+                                                req.st.db.escape(reqApplicants[0]),
+                                                req.st.db.escape(transactions[0] ? transactions[0] : 0)
+                                            ];
+    
+                                            //saving the mail after sending it
+                                            var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                            console.log(saveMailHistory);
+                                            req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                console.log(mailHistoryErr);
+                                                // console.log(mailHistoryResult);
+                                                if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
+                                                    console.log('sent mails saved successfully');
+                                                }
+                                                else {
+                                                    console.log('mails could not be saved');
+                                                }
+                                            });
+                                            console.log('Mail sent now save sent history');
+                                        } //end of if(sendgrid sent mail successfully)
+                                        //if mail is not sent
+                                        else {
+                                            console.log('Mail not Sent Successfully' + err);
+                                        }
+                                    });
+                                }
                             }
+
                             if (!(templateId == 0 || overWrite)) {
                                 response.status = true;
-                                response.message = "Mail sent successfully";
+
+                                if (isSendgrid && isSMS) {  // making changes here reminder
+                                    if (subject != '' && smsMsg != '') {
+                                        response.message = "Mail and SMS sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject != '' && smsMsg == '') {
+                                        response.message = "Mail sent successfully. Message field is empty,SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject == '' && smsMsg != '') {
+                                        response.message = "SMS sent successfully. Mail subject is empty,mail cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else {
+                                        response.message = "Mail subject and SMS fields are empty,Mail and SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else if (isSendgrid && !isSMS) {
+
+                                    if (subject != '') {
+                                        response.message = "Mail sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (subject == '') {
+                                        response.message = "Mail subject is empty,mail cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else if (isSMS && !isSendgrid) {
+                                    if (isSMS != '') {
+                                        response.message = "SMS sent successfully";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else if (isSMS == '') {
+                                        response.message = "SMS field is empty,SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                }
+                                else {
+                                    response.message = "Sendgrid or SMS is not configured. Please contact the admin";
+                                    response.data = null;
+                                }
+                                
                                 response.error = null;
                                 res.status(200).json(response);
                             }
@@ -3957,11 +4308,24 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                             // console.log(tempSaveResult);
                             response.status = true;
                             //check if there are any receivers, if yes sent and saved
-                            if (emailReceivers.length != 0)
-                                response.message = "Mail is Sent and Template Saved successfully";
+                            if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
+                                if (isSendgrid && isSMS) {
+                                    response.message = "Mail and SMS Sent and Template Saved successfully";
+                                }
+                                else if (!isSendgrid && isSMS) {
+                                    response.message = "SMS is Sent and Template Saved successfully";
+                                }
+                                else if (isSendgrid && !isSMS) {
+                                    response.message = "Mail is Sent and Template Saved successfully";
+                                }
+                                else {
+                                    response.message = "Template saved successfully";
+                                }
+                            }
                             //else saved
-                            else
+                            else {
                                 response.message = "Template saved successfully";
+                            }
                             response.error = null;
                             response.data = null;
                             res.status(200).json(response);
@@ -4149,5 +4513,97 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
 //     }
 // };
 
+sendgridCtrl.MailTransactionsOfCandidate = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.applicantId) {
+        error.applicantId = 'Invalid applicantId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.applicantId)
+                ];
+
+                var procQuery = 'CALL wm_get_senMailHistoryOfCandidate( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Applicant mail transactions loaded successfully";
+                        response.error = null;
+
+                        if (typeof(result[0][0].cc)=='string'){
+                            result[0][0].cc = JSON.parse(result[0][0].cc)
+                        }
+
+                        
+                        if (typeof(result[0][0].bcc)=='string'){
+                            result[0][0].bcc = JSON.parse(result[0][0].bcc)
+                        }
+
+                        
+                        if (typeof(result[0][0].attachment)=='string'){
+                            result[0][0].attachment = JSON.parse(result[0][0].attachment)
+                        }
+
+                        response.data =result[0] ? result[0] :[]
+                           
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = {
+                            applicantList: []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting applicant mail history";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
 
 module.exports = sendgridCtrl;

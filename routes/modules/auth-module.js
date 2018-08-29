@@ -872,6 +872,7 @@ Auth.prototype.login = function (req, res, next) {
                                             if ((!err) && tokenResult && loginDetails[0]) {
                                                 var APNSID = req.query.APNSID ? req.query.APNSID : '';
                                                 var GCMID = req.query.GCMID ? req.query.GCMID : '';
+                                                console.log('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ')');
                                                 st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ')', function (err, UserDetailsResult) {
                                                     if (!err) {
                                                         var procParams = [
@@ -2628,47 +2629,61 @@ Auth.prototype.portalLogin = function (req, res, next) {
                             if (loginResult[0].length > 0) {
                                 var loginDetails = loginResult[0];
                                 if (!token) {
-                                    if (comparePassword(password, loginDetails[0].Password)) {
-                                        st.generateToken(ip, userAgent, loginDetails[0].ezeid, isWhatMate, apnsId, gcmId, secretKey, function (err, tokenResult) {
-                                            if ((!err) && tokenResult && loginDetails[0]) {
-
-                                                response.status = true;
-                                                response.message = "Logged in successfully";
-                                                response.error = null;
-
-                                                response.data = {
-                                                    token: tokenResult,
-                                                    isAuthenticate: true,
-                                                    userMasterId: loginDetails[0].userMasterId,
-                                                    ezeoneId: loginDetails[0].ezeid,
-                                                    displayName: loginDetails[0].displayName,
-                                                    groupId: loginDetails[0].groupId
-                                                }
-                                                res.status(200).json(response);
-
-                                            }
-
-                                            else {
-                                                response.status = false;
-                                                response.message = "failed to generate a token";
-                                                response.error = null;
-                                                response.data = null;
-                                                res.status(500).json(response);
-
-                                                console.log('FnLogin:failed to generate a token ');
-                                                console.log('FnLogin:' + err);
-                                            }
-                                        });
-                                    }
-                                    else {
+                                    if(loginDetails[0].message){
                                         response.status = false;
-                                        response.message = "Invalid credentials";
+                                        response.message = loginDetails[0].message;
                                         response.error = null;
-                                        response.data = null;
-                                        res.status(500).json(response);
-
-                                        console.log('FnLogin:password not matched ');
+                                        response.data =null;
+                                        res.status(200).json(response);
                                     }
+                                    else{
+
+                                        if (comparePassword(password, loginDetails[0].Password)) {
+                                            st.generateToken(ip, userAgent, loginDetails[0].ezeid, isWhatMate, apnsId, gcmId, secretKey, function (err, tokenResult) {
+                                                if ((!err) && tokenResult && loginDetails[0].userMasterId) {
+    
+                                                    response.status = true;
+                                                    response.message = "Logged in successfully";
+                                                    response.error = null;
+    
+                                                    response.data = {
+                                                        token: tokenResult,
+                                                        isAuthenticate: true,
+                                                        userMasterId: loginDetails[0].userMasterId,
+                                                        ezeoneId: loginDetails[0].ezeid,
+                                                        displayName: loginDetails[0].displayName,
+                                                        groupId: loginDetails[0].groupId,
+                                                        applicantId : loginDetails[0].applicantId,
+                                                        imageUrl : loginDetails[0].imageUrl
+
+                                                    }
+                                                    res.status(200).json(response);
+    
+                                                }
+    
+                                                else {
+                                                    response.status = false;
+                                                    response.message = "failed to generate a token";
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(500).json(response);
+    
+                                                    console.log('FnLogin:failed to generate a token ');
+                                                    console.log('FnLogin:' + err);
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            response.status = false;
+                                            response.message = "Invalid credentials";
+                                            response.error = null;
+                                            response.data = null;
+                                            res.status(500).json(response);
+    
+                                            console.log('FnLogin:password not matched ');
+                                        }
+                                    }
+                                    
                                 }
                                 else {
 
@@ -2683,7 +2698,9 @@ Auth.prototype.portalLogin = function (req, res, next) {
                                         userMasterId: loginDetails[0].userMasterId,
                                         ezeoneId: loginDetails[0].ezeid,
                                         displayName: loginDetails[0].displayName,
-                                        groupId: loginDetails[0].groupId
+                                        groupId: loginDetails[0].groupId,
+                                        applicantId : loginDetails[0].applicantId
+
                                     }
                                     res.status(200).json(response);
                                 }

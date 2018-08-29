@@ -55,6 +55,30 @@ gulfCtrl.saveMedical = function (req, res, next) {
     if (!scale) {
         scale = {};
     }
+
+    var gamcaMedicalCentre = req.body.gamcaMedicalCentre;
+    if (typeof (gamcaMedicalCentre) == "string") {
+        gamcaMedicalCentre = JSON.parse(gamcaMedicalCentre);
+    }
+    if (!gamcaMedicalCentre) {
+        gamcaMedicalCentre = {};
+    }
+
+    var cdnFilePath = req.body.cdnFilePath;
+    if (typeof (cdnFilePath) == "string") {
+        cdnFilePath = JSON.parse(cdnFilePath);
+    }
+    if (!cdnFilePath) {
+        cdnFilePath = [];
+    }
+
+    var medicalNotes = req.body.medicalNotes;
+    if (typeof (medicalNotes) == "string") {
+        medicalNotes = JSON.parse(medicalNotes);
+    }
+    if (!medicalNotes) {
+        medicalNotes = {};
+    }
     
     if (!validationFlag) {
         response.error = error;
@@ -70,10 +94,11 @@ gulfCtrl.saveMedical = function (req, res, next) {
                 req.body.currencyId = (req.body.currencyId) ? req.body.currencyId : 1;
                 req.body.scaleId = (req.body.scaleId) ? req.body.scaleId : 1;
                 req.body.tokenNumber = (req.body.tokenNumber) ? req.body.tokenNumber : 0;
-                req.body.medicalNotes = (req.body.medicalNotes) ? req.body.medicalNotes : "";
+                // req.body.medicalNotes = (req.body.medicalNotes) ? req.body.medicalNotes : "";
                 req.body.notes = (req.body.notes) ? req.body.notes : "";
                 req.body.medicalStatus = (req.body.medicalStatus) ? req.body.medicalStatus : 0;
                 req.body.medicalStage = (req.body.medicalStage) ? req.body.medicalStage : 0;
+                req.body.isGamca = (req.body.isGamca) ? req.body.isGamca : 0;
                 
 
                 var getStatus = [
@@ -93,10 +118,14 @@ gulfCtrl.saveMedical = function (req, res, next) {
                     req.st.db.escape(req.body.tokenNumber),
                     req.st.db.escape(req.body.MOFANumber),
                     req.st.db.escape(req.body.medicalStatus),
-                    req.st.db.escape(req.body.medicalNotes),
+                    req.st.db.escape(JSON.stringify(medicalNotes)),
                     req.st.db.escape(req.body.notes),
                     req.st.db.escape(req.body.reMedical),
-                    req.st.db.escape(req.body.medicalStage)
+                    req.st.db.escape(req.body.medicalStage),
+                    req.st.db.escape(JSON.stringify(gamcaMedicalCentre)),
+                    req.st.db.escape(JSON.stringify(cdnFilePath)),
+                    req.st.db.escape(req.body.isGamca)
+                    
                 ];
             
                 var procQuery = 'CALL wm_save_1010_medical( ' + getStatus.join(',') + ')';
@@ -176,17 +205,37 @@ gulfCtrl.getMedical = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, Result) {
                     console.log(err);
-                    if (!err && Result[0] && Result[0][0]) {
+                    if (!err && Result[0] || Result[1] || Result[2]) {
                         response.status = true;
                         response.message = "Medical data loaded successfully";
                         response.error = null;
+                        
+                        if (Result[0][0]) {
+                            Result[0][0].currency=(Result[0] && Result[0][0] && JSON.parse(Result[0][0].currency).currencyId) ? JSON.parse(Result[0][0].currency):{};
 
-                        Result[0][0].currency=(Result[0] && Result[0][0]) ? JSON.parse(Result[0][0].currency):{};
-                        Result[0][0].scale=(Result[0] && Result[0][0]) ? JSON.parse(Result[0][0].scale):{};
+                            Result[0][0].scale=(Result[0] && Result[0][0] && JSON.parse(Result[0][0].scale).scaleId) ? JSON.parse(Result[0][0].scale):{};    
+
+                            Result[0][0].gamcaMedicalCentre=(Result[0] && Result[0][0] && JSON.parse(Result[0][0].gamcaMedicalCentre).medicalCentreId) ? JSON.parse(Result[0][0].gamcaMedicalCentre):{};    
+
+                            Result[0][0].cdnFilePath=(Result[0] && Result[0][0] && Result[0] && Result[0][0].cdnFilePath) ? JSON.parse(Result[0][0].cdnFilePath):[];    
+                           
+                            Result[0][0].medicalNotes=(Result[0] && Result[0][0] && Result[0] && Result[0][0].medicalNotes) ? JSON.parse(Result[0][0].medicalNotes):{};    
+                            
+                        } 
+
+                        for (var i=0;i<Result[2].length;i++){
+                            Result[2][i].stateWiseList = (Result[2][i] && Result[1][i]) ? JSON.parse(Result[2][i].stateWiseList):[];
+
+                            for(var j=0;j<Result[2][i].stateWiseList.length;j++){
+                                Result[2][i].stateWiseList[j].medicalCentreList = (Result[2][i].stateWiseList[j]) ? JSON.parse(Result[2][i].stateWiseList[j].medicalCentreList) :[];
+                            }
+                        
+                        }
 
                         response.data = {   
                             medicalDetails: Result[0][0],
-                            medicalNotes : Result[1]
+                            medicalNotes : Result[1],
+                            allMedicalCentreList : Result[2] ? Result[2]:[]
                         };
                         res.status(200).json(response);
                     }
@@ -197,7 +246,8 @@ gulfCtrl.getMedical = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             medicalDetails: {},
-                            medicalNotes:[]
+                            medicalNotes:[],
+                            allMedicalCentreList:[]
 
                         };
                         res.status(200).json(response);
@@ -472,6 +522,14 @@ gulfCtrl.saveVisa = function (req, res, next) {
     if (!country) {
         country = {};
     }
+    
+    var cdnFilePath = req.body.cdnFilePath;
+    if (typeof (cdnFilePath) == "string") {
+        cdnFilePath = JSON.parse(cdnFilePath);
+    }
+    if (!cdnFilePath) {
+        cdnFilePath = {};
+    }
 
     if (!validationFlag) {
         response.error = error;
@@ -511,6 +569,7 @@ gulfCtrl.saveVisa = function (req, res, next) {
                 req.body.passportNumber = req.body.passportNumber ? req.body.passportNumber : '';
                 req.body.stageId = req.body.stageId ? req.body.stageId : 0;
                 req.body.statusId = req.body.statusId ? req.body.statusId : 0;
+                req.body.ecr = req.body.ecr ? req.body.ecr : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -546,7 +605,9 @@ gulfCtrl.saveVisa = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(visaScale)),
                     req.st.db.escape(req.body.visaAmount),
                     req.st.db.escape(req.body.stageId),
-                    req.st.db.escape(req.body.statusId)
+                    req.st.db.escape(req.body.statusId),
+                    req.st.db.escape(req.body.ecr),
+                    req.st.db.escape(JSON.stringify(cdnFilePath))
                 
                 ];
                 var procQuery = 'CALL wm_save_paceVisa( ' + inputs.join(',') + ')';
@@ -560,7 +621,8 @@ gulfCtrl.saveVisa = function (req, res, next) {
                         response.error = null;
                         result[0][0].visaCurrency=result[0][0].visaCurrency ? JSON.parse(result[0][0].visaCurrency):{};
                         result[0][0].country=result[0][0].country ? JSON.parse(result[0][0].country):{};
-                        result[0][0].visaScale=result[0][0].visaScale ? JSON.parse(result[0][0].visaScale):{};
+                        result[0][0].visaScale=result[0][0].visaScale ? JSON.parse(result[0][0].visaScale):{};                    
+                        result[0][0].cdnFilePath=result[0][0].cdnFilePath ? JSON.parse(result[0][0].cdnFilePath):{};
                         
                         response.data = {
                             visaDetails: (result[0] && result[0][0]) ? result[0][0]:{},
@@ -637,7 +699,9 @@ gulfCtrl.getVisa = function (req, res, next) {
                         response.error = null;
                         result[0][0].visaCurrency=result[0][0].visaCurrency ? JSON.parse(result[0][0].visaCurrency):{};
                         result[0][0].country=result[0][0].country ? JSON.parse(result[0][0].country):{};
-                        result[0][0].visaScale=result[0][0].visaScale ? JSON.parse(result[0][0].visaScale):{};                                                                        
+                        result[0][0].visaScale=result[0][0].visaScale ? JSON.parse(result[0][0].visaScale):{}; 
+                        result[0][0].cdnFilePath=result[0][0].cdnFilePath ? JSON.parse(result[0][0].cdnFilePath):{};
+
                         response.data = (result && result[0] && result[0][0]) ? result[0][0] : {};
                         res.status(200).json(response);
                     }

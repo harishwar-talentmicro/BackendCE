@@ -33,5 +33,6 @@ router.delete('/probabiltiy',salesCtrl.deleteprobability );
 router.delete('/timeline',salesCtrl.deletetimeline);
 
 router.get('/userstats',salesCtrl.getUserstats);
+router.post('/report',salesCtrl.formTransaction);
 
 module.exports = router;

@@ -31,6 +31,8 @@ router.post('/vendorDetails',walkInCvCtrl.vendorDetails);
 
 router.post('/walkInConfig',walkInCvCtrl.walkInWebConfig);
 
+router.post('/publicWalkInConfig',walkInCvCtrl.publicWalkInConfig);
+
 router.post('/walkincvupload',walkInCvCtrl.walkInCVUpload);
 
 router.get('/validateLink',walkInCvCtrl.walkInUploadLinkFlag);
@@ -39,6 +41,10 @@ router.get('/masterDataCVUpdate',walkInCvCtrl.masterDataofCVUpdate);
 router.post('/cvSourcingUpdate',walkInCvCtrl.saveCVUpdatedData);
 
 router.post('/walkInPdfGeneration',walkInCvCtrl.walkInPDfGeneration);
+
+router.get('/publicWalkInMasterData',walkInCvCtrl.publicWalkinMaster);
+
+router.get('/companyConfig',walkInCvCtrl.getCompanySearch);
 
 
 module.exports = router;

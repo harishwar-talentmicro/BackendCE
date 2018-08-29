@@ -565,6 +565,11 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                 req.body.profilePicture = (req.body.profilePicture) ? req.body.profilePicture : '';
                 req.body.middleName = (req.body.middleName) ? req.body.middleName : '';
                 req.body.registrationType = req.body.registrationType ? req.body.registrationType : 0;
+                req.body.IDNumberNew = (req.body.IDNumberNew) ? req.body.IDNumberNew : '';
+                req.body.localId = (req.body.localId) ? req.body.localId : 0;
+                req.body.token = (req.body.token) ? req.body.token : 0;
+                req.body.userType = (req.body.userType) ? req.body.userType : 0;
+
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -593,7 +598,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.changeLog || ''),
                     req.st.db.escape(req.body.groupId || ''),
                     req.st.db.escape(req.body.learnMessageId || 0),
-                    req.st.db.escape(req.body.accessUserType || ''),
+                    req.st.db.escape(req.body.accessUserType || 0),
                     req.st.db.escape(req.body.approverCount || 0),
                     req.st.db.escape(req.body.receiverCount || 0),
                     req.st.db.escape(req.body.status),
@@ -606,7 +611,9 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     req.st.db.escape(req.body.DOB),
                     req.st.db.escape(req.body.IDNumber),
                     req.st.db.escape(req.body.middleName),
-                    req.st.db.escape(req.body.registrationType)
+                    req.st.db.escape(req.body.registrationType),
+                    req.st.db.escape(req.body.IDNumberNew),
+                    req.st.db.escape(req.body.userType)
                 ];
 
 
@@ -725,21 +732,21 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                     // }
                     if (!err && (results[1] || results[2] && results[2][0] && results[3] && results[3][0])) {    // walkInForm Message with token
                         console.log('Result with walk-In Message and Token');
-                        if (results[4] && results[4][0] || results[5] || results[5][0]) {
+                        if (results[2] && results[2][0] || results[3] || results[3][0]) {
 
-                            var mailContent = (results[5] && results[5][0]) ? results[5][0].mailBody : "Dear [FirstName] <br>Thank you for registering your profile.  We will revert to you once we find your Resume match one of the requirements we have.In the mean time, please [ClickHere] to upload your latest CV that will help us with more detailed information about your profile.Wishing you all the best<br><br>[WalkINSignature]<br>[Disclaimer]";
+                            var mailContent = (results[3] && results[3][0]) ? results[3][0].mailBody : "Dear [FirstName] <br>Thank you for registering your profile.  We will revert to you once we find your Resume match one of the requirements we have.In the mean time, please [ClickHere] to upload your latest CV that will help us with more detailed information about your profile.Wishing you all the best<br><br>[WalkINSignature]<br>[Disclaimer]";
 
                             if (mailContent) {
                                 mailContent = mailContent.replace("[FirstName]", req.body.firstName);
                                 mailContent = mailContent.replace("[FullName]", (req.body.firstName + ' ' + req.body.middleName + ' ' + req.body.lastName));
 
-                                var webLink = (results[5] && results[5][0]) ? results[5][0].webLink : "";
+                                var webLink = (results[3] && results[3][0]) ? results[3][0].webLink : "";
 
                                 // For updating resume though url link after registering for walkIn
 
-                                var parentId = (results[6] && results[6][0]) ? results[6][0].walkInApplicantId : undefined;
+                                var parentId = (results[4] && results[4][0]) ? results[4][0].walkInApplicantId : undefined;
                                 walkInApplicantId = Date.now().toString().concat(parentId);
-                                var webLinkTo = results[5][0].whatmateWebTestOrLive + walkInApplicantId;
+                                var webLinkTo = results[3][0].whatmateWebTestOrLive + walkInApplicantId;
                                 webLinkTo = webLinkTo.replace('"', '');
                                 webLinkTo = webLinkTo.replace('"', '');
 
@@ -748,17 +755,17 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
 
                                 // mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
 
-                                var walkInSignature = (results[5] && results[5][0]) ? results[5][0].walkInSignature : "";
-                                var disclaimer = (results[5] && results[5][0]) ? results[5][0].disclaimer : "";
+                                var walkInSignature = (results[3] && results[3][0]) ? results[3][0].walkInSignature : "";
+                                var disclaimer = (results[3] && results[3][0]) ? results[3][0].disclaimer : "";
 
                                 mailContent = mailContent.replace("[WalkINSignature]", walkInSignature);
                                 mailContent = mailContent.replace("[Disclaimer]", disclaimer);
                             }
 
-                            var subject = results[5][0].mailSubject ? results[5][0].mailSubject : 'Registration Completed Successfully';
+                            var subject = results[3][0].mailSubject ? results[3][0].mailSubject : 'Registration Completed Successfully';
                             // send mail to candidate
                             var email = new sendgrid.Email();
-                            email.from = results[4][0].fromEmailId ? results[4][0].fromEmailId : 'noreply@talentmicro.com';
+                            email.from = results[2][0].fromEmailId ? results[2][0].fromEmailId : 'noreply@talentmicro.com';
                             email.to = req.body.emailId;
                             email.subject = subject;
                             email.html = mailContent;
@@ -774,19 +781,19 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             });
 
                             // To send mail to refered person
-                            if (results[4] && results[6] && results[6][0]) {
+                            if (results[2] && results[4] && results[4][0]) {
                                 var refererEmail = new sendgrid.Email();
-                                refererEmail.from = results[4][0].fromEmailId ? results[4][0].fromEmailId : 'noreply@talentmicro.com';
-                                refererEmail.to = results[6][0].refererMailId;
-                                refererEmail.subject = results[6][0].message;
-                                refererEmail.html = results[6][0].message;
+                                refererEmail.from = results[2][0].fromEmailId ? results[2][0].fromEmailId : 'noreply@talentmicro.com';
+                                refererEmail.to = results[4][0].refererMailId;
+                                refererEmail.subject = results[4][0].message;
+                                refererEmail.html = results[4][0].message;
 
                                 sendgrid.send(refererEmail, function (err1, result1) {
                                     if (err1) {
                                         console.log("Failed to send to referrer", err1);
                                     }
                                     else {
-                                        req.db.query('update 1039_trans set mailSent=1 where tid=' + results[6][0].walkInTransId, function (err, mailsentResults) {
+                                        req.db.query('update 1039_trans set mailSent=1 where tid=' + results[4][0].walkInTransId, function (err, mailsentResults) {
                                             if (!err) {
                                                 console.log('mail sent status is updated successfully');
                                             }
@@ -799,9 +806,9 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             }
 
                             // to send sms to candidate
-                            if (results[5][0].sendCandidateSms) {
-                                message = results[5][0].candidateSmsFormat ? results[5][0].candidateSmsFormat : message;
-                                message = message.replace('[token]', results[3][0].token);
+                            if (results[3][0].sendCandidateSms) {
+                                message = results[3][0].candidateSmsFormat ? results[3][0].candidateSmsFormat : message;
+                                message = message.replace('[token]', results[1][0].token);
 
                                 if (isdMobile == "+977") {
                                     request({
@@ -848,7 +855,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                             console.log("SUCCESS", "SMS response with ISD");
                                             msgSent = 1;
 
-                                            req.db.query('update 1039_trans set msgSent=1 where tid=' + results[6][0].walkInTransId, function (msgerr, msgsentResults) {
+                                            req.db.query('update 1039_trans set msgSent=1 where tid=' + results[4][0].walkInTransId, function (msgerr, msgsentResults) {
                                                 if (!msgerr) {
                                                     console.log('msg sent status is updated successfully');
                                                 }
@@ -898,7 +905,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                             }
                                             else {
                                                 msgSent = 1;
-                                                req.db.query('update 1039_trans set msgSent=1 where tid=' + results[6][0].walkInTransId, function (msgerr, msgsentResults) {
+                                                req.db.query('update 1039_trans set msgSent=1 where tid=' + results[4][0].walkInTransId, function (msgerr, msgsentResults) {
                                                     if (!msgerr) {
                                                         console.log('msg sent status is updated successfully');
                                                     }
@@ -920,7 +927,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                         //     msgSent=1;
                         // }
                         if (referrerMailSent && mailSent && msgSent) {
-                            var updateQuery = 'CALL wm_afterWalkRegConfMsgMailSent( ' + results[6][0].walkInTransId + ',' + mailSent + ',' + msgSent + ',' + referrerMailSent + ',' + results[3][0].token + ')';
+                            var updateQuery = 'CALL wm_afterWalkRegConfMsgMailSent( ' + results[4][0].walkInTransId + ',' + mailSent + ',' + msgSent + ',' + referrerMailSent + ',' + results[1][0].token + ')';
                             console.log(updateQuery);
 
                             req.db.query(updateQuery, function (err, afterResults) {
@@ -934,8 +941,9 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                         response.message = "Walkin Form saved successfully";
                         response.error = null;
                         response.data = {
-                            walkinMessage: results[2][0],
-                            token: results[3][0].token
+                            walkinMessage: results[0][0],
+                            token: results[1][0].token,
+                            localId : req.body.localId ? req.body.localId: 0
                         };
                         res.status(200).json(response);
                     }
@@ -1277,6 +1285,7 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
                     message: (result[0] && result[0][0]) ? result[0][0].message : '',
                     existsMessage: (result[1] && result[1][0]) ? result[1][0]._error : '',
                     applicantDetails: (result[2] && result[2][0]) ? result[2][0] : {}
+                   
                 };
                 res.status(200).json(response);
             }
@@ -1287,8 +1296,6 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
                 response.error = false;
                 response.data = {
                     message: result[0][0].message
-                    // existsMessage:'',
-                    // applicantDetails:{}
                 };
                 res.status(200).json(response);
             }
@@ -1403,6 +1410,12 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             IDType: result[14][0].IDType,  // field Name
                             isIDNumberOrString: (result[14] && result[14][0]) ? result[14][0].isIDNumberOrString : 1,
                             maxIDLength: (result[14] && result[14][0]) ? result[14][0].maxIDLength : 0,
+
+                            isIDRequiredNew: result[14][0].isIDRequiredNew,
+                            IDTypeNew: result[14][0].IDTypeNew,  // field Name
+                            isIDNumberOrStringNew: (result[14] && result[14][0]) ? result[14][0].isIDNumberOrStringNew : 1,
+                            maxIDLengthNew: (result[14] && result[14][0]) ? result[14][0].maxIDLengthNew : 0,
+
                             DOBType: result[13][0].DOBType,
                             isVisitorCheckIn: result[14][0].isVisitorCheckIn,
                             isWalkIn: result[14][0].isWalkIn,
@@ -1412,7 +1425,11 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             referredByEmployeeList: result[14][0].referredByEmployeeList,
                             referredByName: result[14][0].referredByName,
                             vendors: result[14][0].vendors,
-                            isProfileMandatory: (result[16] && result[16][0] && result[16][0].isProfileMandatory) ? result[16][0].isProfileMandatory : 0
+                            isProfileMandatory: (result[16] && result[16][0] && result[16][0].isProfileMandatory) ? result[16][0].isProfileMandatory : 0,
+                            showJobCode: (result[17] && result[17][0] && result[17][0].showJobCode) ? result[17][0].showJobCode : 0,
+                            syncInBackground: (result[17] && result[17][0] && result[17][0].syncInBackground) ? result[17][0].syncInBackground : 0,
+                            completionMessage: result[18][0].completionMessage
+
 
                         };
                         if (isWeb == 1) {
@@ -1450,6 +1467,10 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             IDType: 0,
                             isIDNumberOrString: 1,
                             maxIDLength: 0,
+                            isIDRequiredNew: 0,
+                            IDTypeNew: 0,
+                            isIDNumberOrStringNew: 1,
+                            maxIDLengthNew: 0,
                             DOBType: '',
                             isVisitorCheckIn: 0,
                             isWalkIn: 0,
@@ -1458,7 +1479,11 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             directWalkIn: 0,
                             referredByEmployeeList: 0,
                             referredByName: 0,
-                            vendors: 0
+                            vendors: 0,
+                            showJobCode: 0,
+                            syncInBackground:0,
+                            completionMessage:''
+                            
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -3001,6 +3026,14 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 req.body.acceptTnCFlag = req.body.acceptTnCFlag ? req.body.acceptTnCFlag : 0;
                 req.body.acceptTnCMsgFormat = req.body.acceptTnCMsgFormat ? req.body.acceptTnCMsgFormat : '';
                 req.body.profilePic = req.body.profilePic ? req.body.profilePic : 1;
+                req.body.showJobCode = req.body.showJobCode ? req.body.showJobCode : 0;
+                req.body.syncInBackground = req.body.syncInBackground ? req.body.syncInBackground : 0;
+
+                req.body.IDRequiredNew = req.body.IDRequiredNew ? req.body.IDRequiredNew : 0;
+                req.body.IDTypeNew = req.body.IDTypeNew ? req.body.IDTypeNew : '';
+                req.body.maxIDLengthNew = req.body.maxIDLengthNew ? req.body.maxIDLengthNew : 0;
+                req.body.isIDNumberOrStringNew = req.body.isIDNumberOrStringNew ? req.body.isIDNumberOrStringNew : 0;
+                req.body.walkinRegistrationType = req.body.walkinRegistrationType ? req.body.walkinRegistrationType : 0;
 
 
                 var inputs = [
@@ -3034,7 +3067,13 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(req.body.walkInWelcomeMessage),
                     req.st.db.escape(req.body.acceptTnCFlag),
                     req.st.db.escape(req.body.acceptTnCMsgFormat),
-                    req.st.db.escape(req.body.profilePic)
+                    req.st.db.escape(req.body.profilePic),
+                    req.st.db.escape(req.body.IDRequiredNew),
+                    req.st.db.escape(req.body.IDTypeNew),
+                    req.st.db.escape(req.body.maxIDLengthNew),
+                    req.st.db.escape(req.body.isIDNumberOrStringNew),
+                    req.st.db.escape(req.body.showJobCode),
+                    req.st.db.escape(req.body.syncBackground)
 
                 ];
 
@@ -3164,15 +3203,17 @@ walkInCvCtrl.walkInUploadLinkFlag = function (req, res, next) {
 
             if (!err && result && result[0] && result[0][0]) {
 
-                if (result[0][0].validateLinkFlag == 'true') {
-                    result[0][0].validateLinkFlag = true;
+                if(result[0][0].validateLinkFlag=='true'){
+                    result[0][0].validateLinkFlag= true;
+                    response.message = "Please upload your resume";
                 }
-                else {
-                    result[0][0].validateLinkFlag = false;
+                else{
+                    result[0][0].validateLinkFlag=false;
+                    response.message = "Link has expired";
+               
                 }
 
                 response.status = result[0][0].validateLinkFlag;
-                response.message = "Validate upload link";
                 response.error = null;
                 response.data = null;
                 res.status(200).json(response);
@@ -3731,6 +3772,378 @@ walkInCvCtrl.walkInPDfGeneration = function (req, res, next) {
                         });
                     });
                     // }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+walkInCvCtrl.publicWalkInConfig = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.body.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.body.tid = req.body.tid ? req.body.tid : 0;
+                
+                req.body.IDRequired = req.body.IDRequired ? req.body.IDRequired : 0;
+                req.body.IDType = req.body.IDType ? req.body.IDType : '';
+                req.body.maxIDLength = req.body.maxIDLength ? req.body.maxIDLength : 0;
+                req.body.isIDNumberOrString = req.body.isIDNumberOrString ? req.body.isIDNumberOrString : 1;
+                req.body.sendCandidateSms = req.body.sendCandidateSms ? req.body.sendCandidateSms : 0;
+                req.body.candidateSmsFormat = req.body.candidateSmsFormat ? req.body.candidateSmsFormat : "";
+                
+                req.body.showJobCode = req.body.showJobCode ? req.body.showJobCode : 0;
+                req.body.syncInBackground = req.body.syncInBackground ? req.body.syncInBackground : 0;
+
+                req.body.IDRequiredNew = req.body.IDRequiredNew ? req.body.IDRequiredNew : 0;
+                req.body.IDTypeNew = req.body.IDTypeNew ? req.body.IDTypeNew : '';
+                req.body.maxIDLengthNew = req.body.maxIDLengthNew ? req.body.maxIDLengthNew : 0;
+                req.body.isIDNumberOrStringNew = req.body.isIDNumberOrStringNew ? req.body.isIDNumberOrStringNew : 0;
+                req.body.walkinFormMessage = req.body.walkinFormMessage ? req.body.walkinFormMessage : "";
+                req.body.walkinRegistrationType = req.body.walkinRegistrationType ? req.body.walkinRegistrationType : 0;
+
+                req.body.referredByEmployeeList = req.body.referredByEmployeeList ? req.body.referredByEmployeeList : 0;
+                req.body.vendors = req.body.vendors ? req.body.vendors : 0;
+                req.body.profilePic = req.body.profilePic ? req.body.profilePic : 0;
+
+
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.heMasterId),
+                    req.st.db.escape(req.body.directWalkIn),
+                    req.st.db.escape(req.body.referredByEmployeeList),
+                    req.st.db.escape(req.body.referredByName),
+                    req.st.db.escape(req.body.vendors),
+                    req.st.db.escape(req.body.IDRequired),
+                    req.st.db.escape(req.body.IDType),
+                    req.st.db.escape(req.body.maxIDLength),
+                    req.st.db.escape(req.body.isIDNumberOrString),
+                    req.st.db.escape(req.body.sendCandidateSms),
+                    req.st.db.escape(req.body.candidateSmsFormat),            
+                    req.st.db.escape(req.body.profilePic),
+                    req.st.db.escape(req.body.IDRequiredNew),
+                    req.st.db.escape(req.body.IDTypeNew),
+                    req.st.db.escape(req.body.maxIDLengthNew),
+                    req.st.db.escape(req.body.isIDNumberOrStringNew),
+                    req.st.db.escape(req.body.showJobCode),
+                    req.st.db.escape(req.body.syncInBackground),
+                    req.st.db.escape(req.body.walkinRegistrationType),
+                    req.st.db.escape(req.body.walkinTokenGeneration),
+                    req.st.db.escape(req.body.walkinFormMessage)
+
+                ];
+
+                var procQuery = 'CALL wm_save_publicWalkinConfig( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err) {
+                        response.status = true;
+                        response.message = "Walk-In configuration details saved successfully";
+                        response.error = null;
+                        response.data = {
+                            companyList:result[0]
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while  saving walk-In configuration details";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+
+walkInCvCtrl.publicWalkinMaster = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL wm_get_publicWalkInMaster( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    console.log(req.query.isWeb);
+                    var output = [];
+                    for (var i = 0; i < result[11].length; i++) {
+                        var res2 = {};
+                        res2.educationId = result[11][i].educationId;
+                        res2.educationTitle = result[11][i].EducationTitle;
+                        res2.specialization = result[11][i].specialization ? JSON.parse(result[11][i].specialization) : [];
+                        output.push(res2);
+                    }
+
+                    var output1 = [];
+                    for (var j = 0; j < result[12].length; j++) {
+                        var res3 = {};
+                        res3.educationId = result[12][j].educationId;
+                        res3.educationTitle = result[12][j].EducationTitle;
+                        res3.specialization = result[12][j].specialization ? JSON.parse(result[12][j].specialization) : [];
+                        output1.push(res3);
+                    }
+
+
+                    var isWeb = req.query.isWeb;
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Banner List loaded successfully";
+                        response.error = null;
+                        response.data = {
+                           // bannerList: result[0],
+                            companyLogo: result[1][0].companyLogo,
+                            registrationType: result[6][0].walkinRegistrationType,  // need to come from backend, will be done later.
+                            tokenGeneration: result[6][0].walkinTokenGeneration,
+                            walkInWelcomeMessage: result[6][0].walkInWelcomeMessage,
+
+
+                            industryList: result[2] ? result[2] : [],
+                            skillList: result[3] ? result[3] : [],// need to come from backend, will be done later.
+                            locationList: result[4] ? result[4] : [],
+                            referedNameList: result[5] ? result[5] : [],
+                            walkInJobs: (result[7] && result[7][0]) ? result[7] : [],
+                            currency: (result && result[8]) ? result[8] : [],
+                            scale: (result && result[9]) ? result[9] : [],
+                            duration: (result && result[10]) ? result[10] : [],
+                            ugEducationList: output ? output : [],
+                            pgEducationList: output1 ? output1 : [],
+                            isDOBRequired: result[13][0].isDOBRequired,
+                            acceptTnCFlag: result[13][0].acceptTnCFlag,
+                            acceptTnCMsgFormat: result[13][0].acceptTnCMsgFormat,
+                            isIDRequired: result[14][0].isIDRequired,
+                            IDType: result[14][0].IDType,  // field Name
+                            isIDNumberOrString: (result[14] && result[14][0]) ? result[14][0].isIDNumberOrString : 1,
+                            maxIDLength: (result[14] && result[14][0]) ? result[14][0].maxIDLength : 0,
+
+                            isIDRequiredNew: result[14][0].isIDRequiredNew,
+                            IDTypeNew: result[14][0].IDTypeNew,  // field Name
+                            isIDNumberOrStringNew: (result[14] && result[14][0]) ? result[14][0].isIDNumberOrStringNew : 1,
+                            maxIDLengthNew: (result[14] && result[14][0]) ? result[14][0].maxIDLengthNew : 0,
+
+                            DOBType: result[13][0].DOBType,
+                            // isVisitorCheckIn: result[14][0].isVisitorCheckIn,
+                            // isWalkIn: result[14][0].isWalkIn,
+                            // isVisitorCheckOut: result[14][0].isVisitorCheckOut,
+                            vendorDetails: (result && result[15]) ? result[15] : [],
+                            directWalkIn: result[14][0].directWalkIn,
+                            referredByEmployeeList: result[14][0].referredByEmployeeList,
+                            referredByName: result[14][0].referredByName,
+                            vendors: result[14][0].vendors,
+                            isProfileMandatory: (result[16] && result[16][0] && result[16][0].isProfileMandatory) ? result[16][0].isProfileMandatory : 0,
+                            showJobCode: (result[17] && result[17][0] && result[17][0].showJobCode) ? result[17][0].showJobCode : 0,
+                            syncInBackground: (result[17] && result[17][0] && result[17][0].syncInBackground) ? result[17][0].syncInBackground : 0,
+                            completionMessage: result[18][0].completionMessage
+
+
+                        };
+                        if (isWeb == 1) {
+                            res.status(200).json(response);
+                        }
+                        else {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = {
+                            bannerList: [],
+                            companyLogo: "",
+                            registrationType: 0,  // need to come from backend, will be done later.
+                            tokenGeneration: 0,
+                            walkInWelcomeMessage: '',
+                            industryList: [],
+                            skillList: [],
+                            currency: [],
+                            scale: [],
+                            duration: [],
+                            ugEducationList: [],
+                            pgEducationList: [],
+                            isDOBRequired: 0,
+                            acceptTnCFlag: 0,
+                            acceptTnCMsgFormat: '',
+                            isIDRequired: 0,
+                            IDType: 0,
+                            isIDNumberOrString: 1,
+                            maxIDLength: 0,
+                            isIDRequiredNew: 0,
+                            IDTypeNew: 0,
+                            isIDNumberOrStringNew: 1,
+                            maxIDLengthNew: 0,
+                            DOBType: '',
+                            isVisitorCheckIn: 0,
+                            isWalkIn: 0,
+                            isVisitorCheckOut: 0,
+                            vendorDetails: [],
+                            directWalkIn: 0,
+                            referredByEmployeeList: 0,
+                            referredByName: 0,
+                            vendors: 0,
+                            showJobCode: 0,
+                            syncInBackground:0,
+                            completionMessage:''
+                            
+                        };
+                        if (isWeb == 1) {
+                            res.status(200).json(response);
+                        }
+                        else {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting bannerList";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+walkInCvCtrl.getCompanySearch = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL wm_get_walkinCompanyConfig( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0]) {
+                        response.status = true;
+                        response.message = "company loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            companyConfigDetails: (result[0] && result[0][0]) ? result[0][0] : {}
+                        };
+                        res.status(200).json(response);
+                    }
+
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = {
+                            companyConfigDetails: {},
+                            
+                        };
+                        res.status(200).json(response);
+
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting user data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
                 });
             }
             else {

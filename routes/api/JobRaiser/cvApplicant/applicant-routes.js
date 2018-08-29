@@ -74,6 +74,8 @@ router.post('/sendClientMailer',sendgridCtrl.clientMailer);
 router.post('/interviewMailer',sendgridCtrl.interviewMailerPreview);
 router.post('/sendInterviewMailer',sendgridCtrl.interviewMailer);
 
+router.post('/MailTransactionsOfCandidate',sendgridCtrl.MailTransactionsOfCandidate);
+
 router.post('/saveFacesheet',applicantCtrl.faceSheetTemplate);
 
 router.post('/faceSheetDetails',applicantCtrl.faceSheetReplaceDetails);
@@ -85,6 +87,8 @@ router.post('/referFriend',applicantCtrl.referFriend);
 
 
 router.post('/importApplicants',applicantCtrl.saveApplicantForImporter);
+
+router.get('/resumeSearchedResults',applicantCtrl.resumeSearchResultsByPage);
 
 module.exports = router;
 

@@ -1670,5 +1670,94 @@ salesCtrl.getUserstats = function(req,res,next){
 
 };
 
+salesCtrl.formTransaction = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.body.HEMasterId)
+    {
+        error.HEMasterId = 'Invalid HEMasterId';
+        validationFlag *= false;
+    }
+    var forms = req.body.formId;
+    if (typeof (forms) == "string") {
+        forms = JSON.parse(forms);
+    }
+    if (!forms) {
+        forms = [];
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.HEMasterId),
+                    req.st.db.escape(req.body.fromDate),
+                    req.st.db.escape(req.body.toDate),
+                    req.st.db.escape(JSON.stringify(forms)),
+                    req.st.db.escape(req.body.userId)
+                   
+                ];
+                /**
+                 * Calling procedure to save form sales items
+                 */
+                var procQuery = 'CALL he_get_formAdoptionReport( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,result){
+                    if(!err && result && result[0]){
+
+                        response.status = true;
+                        response.message = "Form Transaction Data loaded successfully";
+
+                        response.data = {
+                            formTransactionData : result[0]
+                        };
+
+                        response.error = null;
+
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                        // });
+
+                    }
+
+                    else{
+                        response.status = false;
+                        response.message = "Error while loading Form Transaction data ";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 
 module.exports = salesCtrl;

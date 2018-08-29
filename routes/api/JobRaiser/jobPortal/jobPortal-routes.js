@@ -22,5 +22,7 @@ router.post('/portalverifyotp',jobPortalCtrl.portalverifyotp);
 
 router.post('/portalsignup',jobPortalCtrl.portalsignup);
 
+router.get('/genericmaster',jobPortalCtrl.generalMasterNoToken);
+
 module.exports = router;
 

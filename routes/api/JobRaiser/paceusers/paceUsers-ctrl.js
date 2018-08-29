@@ -315,6 +315,15 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
         anchor = {};
     }
 
+    var attachmentList = req.body.attachmentList;
+    if (typeof (attachmentList) == "string") {
+        attachmentList = JSON.parse(attachmentList);
+    }
+    if (!attachmentList) {
+        attachmentList = [];
+    }
+
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -330,7 +339,7 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                 req.body.taskDateTime = req.body.taskDateTime ? req.body.taskDateTime : null;
                 req.body.taskEndDate = req.body.taskEndDate ? req.body.taskEndDate : null;
                 req.body.status = req.body.status ? req.body.status : 0;  // 0 pending ,1- completed
-                req.body.eventAttachment = req.body.eventAttachment ? req.body.eventAttachment : '';
+                // req.body.eventAttachment = req.body.eventAttachment ? req.body.eventAttachment : '';
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -345,7 +354,7 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(venue)),
                     req.st.db.escape(JSON.stringify(anchor)),
                     req.st.db.escape(req.body.status),
-                    req.st.db.escape(req.body.eventAttachment)
+                    req.st.db.escape(JSON.stringify(attachmentList))
 
                 ];
 
@@ -360,11 +369,15 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                         for (var i = 0; i < result[0].length; i++) {
                             result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
                             result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
+                            result[0][i].attachmentList = result[0][i].attachmentList ? JSON.parse(result[0][i].attachmentList) : [];
+                            
                         }
 
                         for (var i = 0; i < result[1].length; i++) {
                             result[1][i].anchor = result[1][i].anchor ? JSON.parse(result[1][i].anchor) : {};
                             result[1][i].venue = result[1][i].venue ? JSON.parse(result[1][i].venue) : {};
+                            result[1][i].attachmentList = result[1][i].attachmentList ? JSON.parse(result[1][i].attachmentList) : [];
+                        
                         }
                         response.data = {
                             pendingTasks: result[0],
@@ -433,11 +446,15 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
                         for (var i = 0; i < result[0].length; i++) {
                             result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
                             result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
+                            result[0][i].attachmentList = result[0][i].attachmentList ? JSON.parse(result[0][i].attachmentList) : [];
+                            
                         }
 
                         for (var i = 0; i < result[1].length; i++) {
                             result[1][i].anchor = result[1][i].anchor ? JSON.parse(result[1][i].anchor) : {};
                             result[1][i].venue = result[1][i].venue ? JSON.parse(result[1][i].venue) : {};
+                            result[1][i].attachmentList = result[1][i].attachmentList ? JSON.parse(result[1][i].attachmentList) : [];
+                        
                         }
                         response.data =
                             {
@@ -786,6 +803,17 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
             console.log(err);
             // console.log(result);
             if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].error == "user already exist") {
+                response.status = false;
+                response.message = result[0][0].message;
+                response.code = 100;
+                response.error = false;
+                response.data = {
+                    message: result[1][0].error
+                };
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].error == "user exists but inactive") {
                 response.status = false;
                 response.message = result[0][0].message;
                 response.code = 100;

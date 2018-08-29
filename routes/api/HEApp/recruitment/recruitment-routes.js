@@ -27,6 +27,8 @@ router.get('/messageDetails',recruitmentCtrl.getmessageDetails);
 router.get('/form16',recruitmentCtrl.getForm16);
 
 router.post('/ProcessUpdate/feedback',recruitmentCtrl.saveProcessUpdateFeedback);
+router.get('/feedback',recruitmentCtrl.getProcessUpdateFeedback);
+
 
 
 module.exports = router;

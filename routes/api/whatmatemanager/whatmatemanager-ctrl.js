@@ -123,7 +123,11 @@ managerCtrl.saveUsers = function(req,res,next){
                     req.st.db.escape(req.body.userManager),
                     req.st.db.escape(req.body.masterConfiguration),
                     req.st.db.escape(code),
-                    req.st.db.escape(JSON.stringify(formList))
+                    req.st.db.escape(JSON.stringify(formList)),
+                    req.st.db.escape(req.body.adoptionReport),
+                    req.st.db.escape(req.body.empDocuments),
+                    req.st.db.escape(req.body.eventManager)
+
                 ];
                 /**
                  * Calling procedure to save deal
@@ -206,6 +210,10 @@ managerCtrl.getUserDetails = function(req,res,next){
                             displayName : result[1][0].displayName,
                             userManager : result[1][0].userManager,
                             masterConfiguration : result[1][0].masterConfiguration,
+                            adoptionReport : result[1][0].adoptionReport,
+                            empDocuments : result[1][0].empDocuments,
+                            eventManager : result[1][0].eventManager,
+
                             formList : result[0][0].formList ? JSON.parse(result[0][0].formList) : null
                         };
                         res.status(200).json(response);
@@ -486,7 +494,7 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                         response.data = null;
                         res.status(200).json(response);
                     }
-                    else if(!err && result && result[0] && result[0][0]){
+                    else if(!err && result && result[0] && result[0][0]&& result[2]&&result[2][0]){
                         var output = [];
                         var dashboard = JSON.parse(result[0][0].data) ;
                         for(var i = 0; i < dashboard.length; i++) {
@@ -503,7 +511,11 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                             userManager : result[1][0].userManager,
                             masterConfiguration : result[1][0].masterConfiguration,
                             attendanceRequest : result[1][0].attendanceRequest,
-                            formList : output
+                            adoptionReport : result[1][0].adoptionReport,
+                            empDocuments : result[1][0].empDocuments,
+                            eventManager : result[1][0].eventManager,
+                            formList : output,
+                            accessableFormList : result[2][0].formList ? JSON.parse(result[2][0].formList) : null
                         };
                         res.status(200).json(response);
                     }
@@ -515,7 +527,11 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                             userManager : result[1][0].userManager,
                             masterConfiguration : result[1][0].masterConfiguration,
                             attendanceRequest : result[1][0].attendanceRequest,
-                            formList : []
+                            adoptionReport : result[1][0].adoptionReport,
+                            empDocuments : result[1][0].empDocuments,
+                            eventManager : result[1][0].eventManager,
+                            formList : [],
+                           accessableFormList : []
                         };
                         res.status(200).json(response);
                     }
