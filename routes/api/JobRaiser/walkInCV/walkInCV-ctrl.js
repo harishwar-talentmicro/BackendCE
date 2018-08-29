@@ -3828,6 +3828,10 @@ walkInCvCtrl.publicWalkInConfig = function (req, res, next) {
                 req.body.walkinFormMessage = req.body.walkinFormMessage ? req.body.walkinFormMessage : "";
                 req.body.walkinRegistrationType = req.body.walkinRegistrationType ? req.body.walkinRegistrationType : 0;
 
+                req.body.referredByEmployeeList = req.body.referredByEmployeeList ? req.body.referredByEmployeeList : 0;
+                req.body.vendors = req.body.vendors ? req.body.vendors : 0;
+                req.body.profilePic = req.body.profilePic ? req.body.profilePic : 0;
+
 
 
                 var inputs = [

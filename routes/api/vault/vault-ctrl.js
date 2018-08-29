@@ -8,6 +8,9 @@ var error = {};
 var zlib = require('zlib');
 var AES_256_encryption = require('../../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
+var tesseract = require('node-tesseract');
+
+var jimp=require('jimp');
 
 var notifyMessages = require('../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
@@ -42,10 +45,12 @@ vaultCtrl.getVaultList = function (req, res, next) {
         try {
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if ((!err) && tokenResult) {
+                    req.query.keywords = req.query.keywords ? req.query.keywords : '';
 
                     var procParams = [
-                        req.st.db.escape(req.query.token)
-
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.type),
+                        req.st.db.escape(req.query.keywords) 
                     ];
                     var procQuery = 'CALL  he_get_vaultList( ' + procParams.join(',') + ')';
                     console.log(procQuery);
@@ -446,8 +451,8 @@ vaultCtrl.saveVaultItem = function (req, res, next) {
                             details = JSON.parse(details);
                         }
                         if (!details) {
-                            error.details = 'Invalid details';
-                            validationFlag *= false;
+                            details = '';
+                           
                         }
 
                         var attachments = req.body.attachments;
@@ -468,6 +473,47 @@ vaultCtrl.saveVaultItem = function (req, res, next) {
                         else {
                             req.body.itemId = req.body.itemId ? req.body.itemId : 0;
                             req.body.folderId = req.body.folderId ? req.body.folderId : 0;
+                            req.body.billDate = req.body.billDate ? req.body.billDate : null;
+                            req.body.expiryDate = req.body.expiryDate ? req.body.expiryDate : null; 
+                            req.body.information = req.body.information ? req.body.information : '';
+                            req.body.notes = req.body.notes ? req.body.notes : '';
+                            req.body.keywords = req.body.keywords ? req.body.keywords : '';
+                            req.body.currencyId = req.body.currencyId ? req.body.currencyId : 0;
+                            req.body.amount = req.body.amount ? req.body.amount : 0.0;
+
+                            var extractedKeywords='';
+
+                        
+                             for (i=0;i<attachments.length;i++)
+                             {
+                                 var imageUrl=attachments[i].CDNPath
+                                 var memeType = attachments[i].CDNPath.split(".");
+                                 console.log(memeType);
+                                 console.log(memeType[1]);
+                                 if(memeType[1]=='png' ||memeType[1]=='jpg'){
+                                    var imageRead = new Promise(function (resolve, reject) {
+                                        jimp.read('https://storage.googleapis.com/ezeone/'+imageUrl, function (err, imagefile) {
+                                            imagefile.write("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/walkInCV/attachment.png", function(){
+                                            var testImage = 'attachment.png';
+                                            console.log(testImage);
+                                              resolve(testImage);
+                                            
+                                            });    
+                                        })
+                                        });
+                                        imageRead.then (function(response){
+                                            tesseract.process(response, function(err, text) {
+                                                        if(err)
+                                                        console.error(err);
+                                                    else{    
+                                                        extractedKeywords = extractedKeywords + text;
+                                                        console.log(extractedKeywords);
+                                                    }
+                                                }); 
+                                        });
+                                    }
+                                }
+                                 req.body.keywords=extractedKeywords;
 
                             var procParams = [
                                 req.st.db.escape(req.query.token),
@@ -475,7 +521,17 @@ vaultCtrl.saveVaultItem = function (req, res, next) {
                                 req.st.db.escape(req.body.tagId),
                                 req.st.db.escape(JSON.stringify(details)),
                                 req.st.db.escape(JSON.stringify(attachments)),
-                                req.st.db.escape(req.body.folderId)
+                                req.st.db.escape(req.body.folderId),
+                                req.st.db.escape(req.body.title),
+                                req.st.db.escape(req.body.billDate),
+                                req.st.db.escape(req.body.expiryDate),
+                                req.st.db.escape(req.body.information),
+                                req.st.db.escape(req.body.notes),
+                                req.st.db.escape(req.body.keywords),
+                                req.st.db.escape(req.body.amount),
+                                req.st.db.escape(req.body.currencyId)
+
+                               
                             ];
 
                             var procQuery = 'CALL he_save_vaultItem( ' + procParams.join(',') + ')';
@@ -564,7 +620,15 @@ vaultCtrl.getVaultItem = function (req, res, next) {
                                 details: (vaultResult[0] && vaultResult[0][0] && vaultResult[0][0].details) ? JSON.parse(vaultResult[0][0].details) : null,
                                 tagList: vaultResult[1] ? vaultResult[1] : [],
                                 folderList: vaultResult[2] ? vaultResult[2] : [],
-                                currencyList: vaultResult[3] ? vaultResult[3] : []
+                                currencyList: vaultResult[3] ? vaultResult[3] : [],
+                                title: (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].title : '',
+                                information: (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].information : '',
+                                billDate: (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].billDate : null,
+                                expiryDate: (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].expiryDate : null,
+                                notes: (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].notes : '',
+                                amount: (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].amount : 0.0,
+                                currencyId: (vaultResult[0] && vaultResult[0][0]) ? vaultResult[0][0].currencyId : 0,
+                                
                             };
                             res.status(200).json(response);
                         }
