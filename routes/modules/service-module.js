@@ -706,7 +706,7 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
                 var uniqueId = uuid.v4();
                 var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
                 var mimeType = req.files.attachment.mimetype;
-                if(mimeType){
+                if(mimeType && filetype==''){
                     if(mimeType.indexOf('png') > 0|| mimeType.indexOf('jpg') > 0 ){
                         filetype = "png";
                     }
