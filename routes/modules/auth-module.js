@@ -657,7 +657,7 @@ Auth.prototype.login = function (req, res, next) {
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
     var ezeoneId = req.st.alterEzeoneId(req.body.UserName);
-
+    var isDialer= req.query.isDialer ? req.query.isDialer :0;
     var password = req.body.Password;
     var isIphone = req.body.device ? parseInt(req.body.device) : 0;
     var deviceToken = req.body.device_token ? req.body.device_token : '';
@@ -855,7 +855,7 @@ Auth.prototype.login = function (req, res, next) {
 
         if (ezeoneId && password) {
 
-            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey);
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(isDialer);
             var query = 'CALL PLoginNew(' + queryParams + ')';
             console.log('query', query);
             st.db.query(query, function (err, loginResult) {
@@ -868,17 +868,18 @@ Auth.prototype.login = function (req, res, next) {
                                 var loginDetails = loginResult[0];
                                 if (!token) {
                                     if (comparePassword(password, loginDetails[0].Password)) {
-                                        st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, APNS_Id, GCM_Id, secretKey, function (err, tokenResult) {
+                                        st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, APNS_Id, GCM_Id, secretKey, isDialer, function (err, tokenResult) {
                                             if ((!err) && tokenResult && loginDetails[0]) {
                                                 var APNSID = req.query.APNSID ? req.query.APNSID : '';
                                                 var GCMID = req.query.GCMID ? req.query.GCMID : '';
-                                                console.log('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ')');
-                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ')', function (err, UserDetailsResult) {
+                                                console.log('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(APNSID) +  ')');
+                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(isDialer) + ')', function (err, UserDetailsResult) {
                                                     if (!err) {
                                                         var procParams = [
                                                             req.db.escape(tokenResult),
                                                             req.db.escape(null),
-                                                            req.db.escape(DBSecretKey)
+                                                            req.db.escape(DBSecretKey),
+                                                            req.db.escape(isDialer)
 
                                                         ];
                                                         var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(' ,') + ')';
@@ -1096,6 +1097,7 @@ Auth.prototype.logout = function (req, res, next) {
 
         var token = req.query.Token;
         var isIphone = req.query.device ? parseInt(req.query.device) : 0;
+        var isDialer = req.query.isDialer ? (req.query.isDialer) : 0;
 
         var responseMessage = {
             Token: '',
@@ -1122,7 +1124,7 @@ Auth.prototype.logout = function (req, res, next) {
                                 st.db.query(query, function (err, result) {
                                     if (!err) {
                                         console.log('FnDeleteIphoneID:IphoneDeviceID deleted successfully');
-                                        var query1 = 'CALL pLogout(' + st.db.escape(token) + ')';
+                                        var query1 = 'CALL pLogout(' + st.db.escape(token) +')';
                                         st.db.query(query1, function (err, result) {
                                             if (!err) {
                                                 if (result) {
@@ -1749,11 +1751,12 @@ Auth.prototype.loginNew = function (req, res, next) {
         var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
         var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
         var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
+        var isDialer= req.query.isDialer ? req.query.isDialer :0;
         console.log("secretKey", secretKey);
 
         if (ezeoneId && password) {
 
-            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey);
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(isDialer);
             var query = 'CALL PLoginNew(' + queryParams + ')';
             console.log('query', query);
             st.db.query(query, function (err, loginResult) {
@@ -1766,16 +1769,17 @@ Auth.prototype.loginNew = function (req, res, next) {
                                 var loginDetails = loginResult[0];
                                 if (!token) {
                                     if (comparePassword(password, loginDetails[0].Password)) {
-                                        st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, APNS_Id, GCM_Id, secretKey, function (err, tokenResult) {
+                                        st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, APNS_Id, GCM_Id, secretKey, isDialer, function (err, tokenResult) {
                                             if ((!err) && tokenResult && loginDetails[0]) {
                                                 var APNSID = req.query.APNSID ? req.query.APNSID : '';
                                                 var GCMID = req.query.GCMID ? req.query.GCMID : '';
-                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ')', function (err, UserDetailsResult) {
+                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(isDialer) + ')', function (err, UserDetailsResult) {
                                                     if (!err) {
                                                         var procParams = [
                                                             req.db.escape(tokenResult),
                                                             req.db.escape(null),
-                                                            req.db.escape(DBSecretKey)
+                                                            req.db.escape(DBSecretKey),
+                                                            req.db.escape(isDialer)
 
                                                         ];
                                                         var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(' ,') + ')';
@@ -2276,11 +2280,12 @@ Auth.prototype.loginLatest = function (req, res, next) {
         var apnsId = (req.body.apnsId) ? (req.body.apnsId) : "";
         var gcmId = (req.body.gcmId) ? (req.body.gcmId) : "";
         var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
+        var isDialer= req.query.isDialer ? req.query.isDialer :0;
         console.log("secretKey", secretKey);
 
         if (ezeoneId && password) {
 
-            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey);
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(isDialer);
             var query = 'CALL PLoginNew(' + queryParams + ')';
             console.log('query', query);
             st.db.query(query, function (err, loginResult) {
@@ -2293,7 +2298,7 @@ Auth.prototype.loginLatest = function (req, res, next) {
                                 var loginDetails = loginResult[0];
                                 if (!token) {
                                     if (comparePassword(password, loginDetails[0].Password)) {
-                                        st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, apnsId, gcmId, secretKey, function (err, tokenResult) {
+                                        st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, apnsId, gcmId, secretKey, isDialer, function (err, tokenResult) {
                                             if ((!err) && tokenResult && loginDetails[0]) {
 
                                                 responseMessage.token = tokenResult,
