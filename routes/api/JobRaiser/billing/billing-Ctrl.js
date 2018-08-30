@@ -1166,11 +1166,6 @@ billingCtrl.savePaceReqAppBilling = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-
-                req.body.billTo = req.body.billTo ? req.body.billTo : 0;
-                req.body.amountCurrencyId = req.body.amountCurrencyId ? req.body.amountCurrencyId : 0;
-                req.body.amountScaleId = req.body.amountScaleId ? req.body.amountScaleId : 0;
-                req.body.amountDurationId = req.body.amountDurationId ? req.body.amountDurationId : 0;
                 req.body.amount = req.body.amount ? req.body.amount : 0;
                 req.body.description = req.body.description ? req.body.description : '';
 
@@ -1180,12 +1175,7 @@ billingCtrl.savePaceReqAppBilling = function (req, res, next) {
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(JSON.stringify(reqApplicants)),
                     req.st.db.escape(req.body.stageId),
-                    req.st.db.escape(JSON.stringify(req.body.billTo || {})),
-                    req.st.db.escape(JSON.stringify(req.body.amountCurrency || {})),
-                    req.st.db.escape(JSON.stringify(req.body.amountScale || {})),
-                    req.st.db.escape(JSON.stringify(req.body.amountDuration || {})),
-                    req.st.db.escape(req.body.amount),
-                    req.st.db.escape(req.body.description)
+                    req.st.db.escape(JSON.stringify(req.body.billData || []))
                 ];
 
                 var procQuery = 'CALL wm_save_pacehcmAllBillingAmount( ' + inputs.join(',') + ')';
@@ -1194,6 +1184,24 @@ billingCtrl.savePaceReqAppBilling = function (req, res, next) {
                     console.log(err);
 
                     if (!err && result && result[0] && result[0][0]) {
+
+                        if(result[0][0].billData && JSON.parse(result[0][0].billData).length){
+                            result[0][0].billData = result[0][0].billData ? JSON.parse(result[0][0].billData):[];
+
+                            for(var i=0; i< result[0][0].billData[i].length; i++){
+
+                                result[0][0].billData[i].billTo = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].billTo && JSON.parse(result[0][0].billData[i].billTo).id) ? JSON.parse(result[0][0].billData[i].billTo) : {};
+    
+                                result[0][0].billData[i].amountCurrency = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].amountCurrency && JSON.parse(result[0][0].billData[i].amountCurrency).currencyId) ? JSON.parse(result[0][0].billData[i].amountCurrency) : {};
+    
+                                result[0][0].billData[i].amountScale = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].amountScale && JSON.parse(result[0][0].billData[i].amountScale).scaleId) ? JSON.parse(result[0][0].billData[i].amountScale) : {};
+    
+                                result[0][0].billData[i].amountDuration = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].amountDuration && JSON.parse(result[0][0].billData[i].amountDuration).durationId) ? JSON.parse(result[0][0].billData[i].amountDuration) : {};
+    
+                              
+                            }
+                        }
+
                         response.status = true;
                         response.message = "Billing Data saved sucessfully";
                         response.error = null;
@@ -1201,10 +1209,10 @@ billingCtrl.savePaceReqAppBilling = function (req, res, next) {
                         res.status(200).json(response);
                     }
                     else if (!err) {
-                        response.status = false;
-                        response.message = "Bill Data could not be saved sucessfully";
+                        response.status = true;
+                        response.message = "Bill Data saved sucessfully";
                         response.error = null;
-                        response.data = null;
+                        response.data = [];
                         res.status(200).json(response);
                     }
                     else {
@@ -1277,17 +1285,21 @@ billingCtrl.getPaceReqAppBilling = function (req, res, next) {
 
                     if (!err && result && result[0] && result[0][0]) {
                         
-                        for(var i=0; i< result[0].length; i++){
-                            result[0][i].billTo = (result[0] && result[0][i] && JSON.parse(result[0][i].billTo).id) ? JSON.parse(result[0][i].billTo) : {};
+                        if(result[0][0].billData && JSON.parse(result[0][0].billData).length){
+                            result[0][0].billData = result[0][0].billData ? JSON.parse(result[0][0].billData):[];
+                            for(var i=0; i< result[0][0].billData[i].length; i++){
 
-                            result[0][i].amountCurrency = (result[0] && result[0][i] && JSON.parse(result[0][i].amountCurrency).currencyId) ? JSON.parse(result[0][i].amountCurrency) : {};
-
-                            result[0][i].amountScale = (result[0] && result[0][i] && JSON.parse(result[0][i].amountScale).scaleId) ? JSON.parse(result[0][i].amountScale) : {};
-
-                            result[0][i].amountDuration = (result[0] && result[0][i] && JSON.parse(result[0][i].amountDuration).durationId) ? JSON.parse(result[0][i].amountDuration) : {};
-
+                                result[0][0].billData[i].billTo = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].billTo && JSON.parse(result[0][0].billData[i].billTo).id) ? JSON.parse(result[0][0].billData[i].billTo) : {};
+    
+                                result[0][0].billData[i].amountCurrency = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].amountCurrency && JSON.parse(result[0][0].billData[i].amountCurrency).currencyId) ? JSON.parse(result[0][0].billData[i].amountCurrency) : {};
+    
+                                result[0][0].billData[i].amountScale = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].amountScale && JSON.parse(result[0][0].billData[i].amountScale).scaleId) ? JSON.parse(result[0][0].billData[i].amountScale) : {};
+    
+                                result[0][0].billData[i].amountDuration = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].amountDuration && JSON.parse(result[0][0].billData[i].amountDuration).durationId) ? JSON.parse(result[0][0].billData[i].amountDuration) : {};
+                              
+                            }
                         }
-                        
+                     
                         response.status = true;
                         response.message = "Billing data loaded sucessfully";
                         response.error = null;
@@ -1298,7 +1310,7 @@ billingCtrl.getPaceReqAppBilling = function (req, res, next) {
                         response.status = false;
                         response.message = "Bill Data could not be loaded sucessfully";
                         response.error = null;
-                        response.data = null;
+                        response.data = [];
                         res.status(200).json(response);
                     }
                     else {

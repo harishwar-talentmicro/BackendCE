@@ -789,7 +789,9 @@ UserCtrl.login = function (req, res, next) {
                         if ((!err) && tokenResult) {
                             var APNSID= req.query.APNSID ? req.query.APNSID :'';
                             var GCMID=req.query.GCMID ? req.query.GCMID :''; 
-                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ',' + req.st.db.escape(DBSecretKey) +',' + st.db.escape(APNSID) +',' + st.db.escape(GCMID) + ')';
+                            var isDialer=req.query.isDialer ? req.query.isDialer :0;
+
+                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ',' + req.st.db.escape(DBSecretKey) +',' + st.db.escape(APNSID) +',' + st.db.escape(GCMID)+',' + st.db.escape(isDialer) + ')';
                             console.log(procQuery);
                             req.db.query(procQuery, function (err, UserDetailsResult) {
                                 console.log(UserDetailsResult);
@@ -1689,6 +1691,9 @@ UserCtrl.invitePublicProfile = function (req, res, next) {
 
                     var encryptPwd = req.st.hashPassword(password);
 
+                req.query.isDialer = req.query.isDialer ? req.query.isDialer:0;
+
+
                     var procParams = [
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.body.isdmobile),
@@ -1697,7 +1702,8 @@ UserCtrl.invitePublicProfile = function (req, res, next) {
                         req.st.db.escape(req.body.email),
                         req.st.db.escape(req.body.meetingId),
                         req.st.db.escape(encryptPwd),
-                        req.st.db.escape(DBSecretKey)
+                        req.st.db.escape(DBSecretKey),
+                        req.st.db.escape(req.query.isDialer)
                     ];
 
                     //CompanyName

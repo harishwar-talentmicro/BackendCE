@@ -1969,7 +1969,7 @@ recruitmentCtrl.getProcessUpdateFeedback = function(req,res,next){
                     }
                     else{
                         response.status = false;
-                        response.message = "Error while getting Data loaded";
+                        response.message = "Error while getting Data";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

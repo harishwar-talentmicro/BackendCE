@@ -91,6 +91,7 @@ zoomCtrl.saveZoomMeeting = function(req,res,next){
                         req.body.callType = req.body.callType!=undefined ? req.body.callType : 0;
                         req.body.callMethod = req.body.callMethod!=undefined ? req.body.callMethod : 0;
                         req.body.callDateTime = req.body.callDateTime!=undefined ? req.body.callDateTime : null;
+                        req.query.isDialer = req.query.isDialer ? req.query.isDialer:0;
         
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -102,7 +103,8 @@ zoomCtrl.saveZoomMeeting = function(req,res,next){
                             req.st.db.escape(req.body.callType),
                             req.st.db.escape(req.body.callMethod),
                             req.st.db.escape(req.body.callDateTime),
-                            req.st.db.escape(DBSecretKey)                                                                                                                        
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.query.isDialer)                                                                                                                        
                         ];
         
                         var procQuery = 'CALL HE_save_zoomMeeting( ' + procParams.join(',') + ')';
@@ -194,10 +196,14 @@ zoomCtrl.stopMeeting = function(req,res,next){
                         console.log(response);
                     }
                     else {
+
+                req.query.isDialer = req.query.isDialer ? req.query.isDialer:0;
+
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.meetingId),
-                            req.st.db.escape(DBSecretKey)                                                                                                                        
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.query.isDialer)                                                                                                                        
                         ];
         
                         var procQuery = 'CALL HE_stop_zoomMeeting( ' + procParams.join(',') + ')';
@@ -341,6 +347,8 @@ zoomCtrl.getAccessTokenVideo = function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+
+    req.query.isDialer = req.query.isDialer ? req.query.isDialer:0;
 
     if (!validationFlag){
         response.error = error;
@@ -573,11 +581,15 @@ zoomCtrl.stopMeetingForSingleUser = function(req,res,next){
                         console.log(response);
                     }
                     else {
+
+                        req.query.isDialer =  req.query.isDialer  ? req.query.isDialer :0;
+
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.meetingId),
                             req.st.db.escape(req.body.ezeoneId),
-                            req.st.db.escape(DBSecretKey)                                                                                                                        
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.query.isDialer)                                                                                                                        
                         ];
         
                         var procQuery = 'CALL HE_stop_zoomMeeting_user( ' + procParams.join(',') + ')';
@@ -651,9 +663,12 @@ zoomCtrl.getLatestMeetingOfUser = function(req,res,next){
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
+                req.query.isDialer = req.query.isDialer ? req.query.isDialer:0;
+
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(DBSecretKey)                                                                                                                        
+                    req.st.db.escape(DBSecretKey),                                                                                                                   
+                    req.st.db.escape(req.query.isDialer)
                 ];
 
                 var procQuery = 'CALL he_get_latestMeeting( ' + procParams.join(',') + ')';

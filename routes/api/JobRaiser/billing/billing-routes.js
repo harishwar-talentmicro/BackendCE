@@ -20,6 +20,6 @@ router.post('/applyTax',billingCtrl.invoiceApplyTax);
 router.get('/invoiceBillGenerate',billingCtrl.invoiceBillGenerate);
 
 router.post('/againstReqAppBilling',billingCtrl.savePaceReqAppBilling);
-router.post('/getReqAppBilling',billingCtrl.getPaceReqAppBilling);
+router.get('/getReqAppBilling',billingCtrl.getPaceReqAppBilling);
 
 module.exports = router;

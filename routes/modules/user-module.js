@@ -503,13 +503,15 @@ User.prototype.getUserDetails = function (req, res, next) {
         var Token = req.query.Token;
         var APNSID= req.query.APNSID ? req.query.APNSID :'';
         var GCMID=req.query.GCMID ? req.query.GCMID :'';
+        var isDialer=req.query.isDialer ? req.query.isDialer :0;
+
         if (Token) {
             st.validateToken(Token, function (err, tokenResult) {
                 console.log(err);
                 //console.log(Result);
                 if (!err) {
                     if (tokenResult) {
-                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ',' +  st.db.escape(APNSID) + ',' +  st.db.escape(GCMID) + ')', function (err, UserDetailsResult) {
+                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ',' +  st.db.escape(APNSID) + ',' +  st.db.escape(GCMID) + ',' +  st.db.escape(isDialer) + ')', function (err, UserDetailsResult) {
                             if (!err) {
                                 //console.log('UserDetailsResult',UserDetailsResult);
                                 if (UserDetailsResult[0]) {
@@ -5245,13 +5247,15 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
         var Token = req.query.token;
         var APNSID= req.body.apnsId;
         var GCMID=req.body.gcmId;
+        var isDialer=req.query.isDialer ? req.query.isDialer :0;
+
         if (Token) {
             st.validateToken(Token, function (err, tokenResult) {
                 console.log(err);
                 //console.log(Result);
                 if (!err) {
                     if (tokenResult) {
-                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ',' +  st.db.escape(APNSID) + ',' +  st.db.escape(GCMID) + ')', function (err, UserDetailsResult) {
+                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ',' +  st.db.escape(APNSID) + ',' +  st.db.escape(GCMID)+ ',' +  st.db.escape(isDialer) + ')', function (err, UserDetailsResult) {
                             if (!err) {
                                 //console.log('UserDetailsResult',UserDetailsResult);
                                 if (UserDetailsResult[0]) {
