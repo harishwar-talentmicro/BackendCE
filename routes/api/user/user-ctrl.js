@@ -690,7 +690,7 @@ UserCtrl.login = function (req, res, next) {
         req.connection.remoteAddress ||
         req.socket.remoteAddress ||
         req.connection.socket.remoteAddress;
-
+    var isDialer= req.query.isDialer ? req.query.isDialer :0;
     var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
     var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
     var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
@@ -784,14 +784,12 @@ UserCtrl.login = function (req, res, next) {
                     }
                 }
                 if (passwordMatchStatus) {
-                    req.st.generateToken(ip, userAgent, ezeoneId, isWhatMate, APNS_Id, GCM_Id, function (err, tokenResult) {
+                    req.st.generateToken(ip, userAgent, ezeoneId, isWhatMate, APNS_Id, GCM_Id, isDialer, function (err, tokenResult) {
 
                         if ((!err) && tokenResult) {
                             var APNSID= req.query.APNSID ? req.query.APNSID :'';
                             var GCMID=req.query.GCMID ? req.query.GCMID :''; 
-                            var isDialer=req.query.isDialer ? req.query.isDialer :0;
-
-                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ',' + req.st.db.escape(DBSecretKey) +',' + st.db.escape(APNSID) +',' + st.db.escape(GCMID)+',' + st.db.escape(isDialer) + ')';
+                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ',' + req.st.db.escape(DBSecretKey) +',' + st.db.escape(APNSID) +',' + st.db.escape(GCMID) + ',' + st.db.escape(isDialer) + ')';
                             console.log(procQuery);
                             req.db.query(procQuery, function (err, UserDetailsResult) {
                                 console.log(UserDetailsResult);

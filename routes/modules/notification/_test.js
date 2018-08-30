@@ -1387,7 +1387,7 @@ Auth.prototype.login = function(req,res,next){
 
             //console.log('findarray: ' + FindArray.length);
 
-            var Query = st.db.escape(UserName) + ',' + st.db.escape(code)+ ',' + st.db.escape(token)+','+st.db.escape(DBSecretKey);
+            var Query = st.db.escape(UserName) + ',' + st.db.escape(code)+ ',' + st.db.escape(token)+','+st.db.escape(DBSecretKey) + ',' + st.db.escape(isDialer);
             console.log(Query);
             st.db.query('CALL PLoginNew(' + Query + ')', function (err, loginResult) {
                 //console.log(loginResult);

@@ -84,6 +84,7 @@ router.get('/query', function(req,res,next){
                     }
                     req.query.isWhatMate = req.query.isWhatMate ? req.query.isWhatMate : 0;
                     req.query.searchType = req.query.searchType ? req.query.searchType : 0;
+                    req.query.isDialer = req.query.isDialer ? req.query.isDialer : 0;
 
                     // searchType = 0 then internal user 1=Public user
                     var procParams = [
@@ -92,7 +93,9 @@ router.get('/query', function(req,res,next){
                         req.db.escape(req.query.token),
                         req.db.escape(req.query.isWhatMate),
                         req.st.db.escape(DBSecretKey),
-                        req.db.escape(req.query.searchType)
+                        req.db.escape(req.query.searchType),
+                        req.db.escape(req.query.isDialer)
+
                     ];
                     var procQuery = 'CALL get_v1_messagebox_contact(' + procParams.join(',') + ')';
                     console.log(procQuery);
@@ -223,10 +226,12 @@ router.get('/', function(req,res,next){
 
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if ((!err) && tokenResult) {
+                    req.query.isDialer = req.query.isDialer ? req.query.isDialer : 0;
                     var procParams = [
                         req.db.escape(req.query.token),
                         req.db.escape(req.query.dateTime),
-                        req.db.escape(DBSecretKey)
+                        req.db.escape(DBSecretKey),
+                        req.db.escape(req.query.isDialer)
                     ];
                     var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(' ,') + ')';
                     console.log(procQuery);

@@ -55,7 +55,7 @@ function StdLib(db){
  * @param ezeoneId
  * @param callBack function (err,token)
  */
-StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,isWhatMate,APNS_Id,GCM_Id,secretKey,callBack){
+StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,isWhatMate,APNS_Id,GCM_Id,secretKey, isDialer,callBack){
     var _this = this;
     /////////////////////////////////////////////////////////////////////
 
@@ -85,7 +85,7 @@ StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,isWhatMate,APNS_
 
     var tokenGenQueryParams = _this.db.escape(ip) + ',' + _this.db.escape(userAgent)
         + ',' + _this.db.escape(ezeoneId) + ',' + _this.db.escape(deviceType) + ',' +
-        _this.db.escape(isWhatMate) + ',' + _this.db.escape(APNS_Id) + ',' + _this.db.escape(GCM_Id) + ',' + _this.db.escape(secretKey) ;
+        _this.db.escape(isWhatMate) + ',' + _this.db.escape(APNS_Id) + ',' + _this.db.escape(GCM_Id) + ',' + _this.db.escape(secretKey) + ',' + _this.db.escape(isDialer) ;
     var tokenGenQuery = 'CALL pGenerateTokenNew('+tokenGenQueryParams + ')';
 
     console.log(tokenGenQuery);
@@ -201,7 +201,7 @@ StdLib.prototype.validateToken = function(token, CallBack){
             /**
              * @info : Token is now queried from session table i.e. tloginout
              */
-            var queryParams = _this.db.escape(token)  + ',' + _this.db.escape(DBSecretKey);
+            var queryParams = _this.db.escape(token)  + ',' + _this.db.escape(DBSecretKey) ;
             var validateTokenQuery = 'CALL pvalidate_token(' + queryParams + ')';
            _this.db.query(validateTokenQuery, function (err, sessionResult) {
                 if (!err) {
@@ -550,7 +550,7 @@ StdLib.prototype.validateHEToken = function(APIKey , EZEOneId , password,token, 
             });
         }
         else if (token != ""){
-            var queryParams = _this.db.escape(token)  + ',' + _this.db.escape(DBSecretKey);
+            var queryParams = _this.db.escape(token)  + ',' + _this.db.escape(DBSecretKey) ;
             var validateTokenQuery = 'CALL pvalidate_token(' + queryParams + ')';
             _this.db.query(validateTokenQuery, function (err, sessionResult) {
                 if (!err) {
