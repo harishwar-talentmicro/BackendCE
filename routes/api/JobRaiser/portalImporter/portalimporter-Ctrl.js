@@ -164,7 +164,7 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
                                 if (name.split(' ')[1])
                                     last_name = name.split(' ')[1];
                             }
-                            applicants.push({ firstName: first_name, lastName: last_name, portalId: 2, index: i });
+                            applicants.push({ firstName: first_name, lastName: last_name, portalId: 2, index: selected_candidates[i] });
 
                         }
                 }
@@ -311,7 +311,7 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
                     var tempDetails = document.getElementsByClassName('skinfo hg_mtch');
                     if (tempDetails && tempDetails[0] && tempDetails[0].innerHTML) {
                         var emailid = tempDetails[0].innerHTML;
-                        var regularExp = /[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}/;   // include /s in the end
+                        var regularExp = /[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}/s;   // include /s in the end
                         console.log(emailid);
                         // console.log("using match all",matchAll(emailid,regularExp).toArray());
                         console.log('match all here', regularExp.exec(emailid));
@@ -366,9 +366,9 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
                         req.st.db.escape(details.address || ""),
                         req.st.db.escape(details.experience || 0),
                         req.st.db.escape(JSON.stringify(details.primarySkills || [])),
-                        req.st.db.escape(JSON.stringify(details.presentSalaryCurr || {}) ),
-                        req.st.db.escape(JSON.stringify(details.presentSalaryScale || {}) ),
-                        req.st.db.escape(JSON.stringify(details.presentSalaryPeriod || {}) ),
+                        req.st.db.escape(JSON.stringify(details.presentSalaryCurr || {})),
+                        req.st.db.escape(JSON.stringify(details.presentSalaryScale || {})),
+                        req.st.db.escape(JSON.stringify(details.presentSalaryPeriod || {})),
                         req.st.db.escape(details.presentSalary || 0)
 
                     ];
@@ -462,10 +462,10 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                 var document = new JSDOM(xml_string).window.document;
                 var applicants = [];
                 var selected_candidates = req.body.selected_candidates;
-                var importFlag = req.body.importFlag;
+                var is_select_all = req.body.is_select_all;
 
                 console.log(document.getElementsByClassName('tuple').length)
-                if (importFlag == 1) {
+                if (is_select_all == 1) {
                     if (document.getElementsByClassName('tuple'))
                         for (var i = 0; i < 1; i++) {
                             if (document.getElementsByClassName('tuple')[i].getAttribute('class').indexOf('viewed') == -1) {
@@ -485,24 +485,23 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                         }
                 }
 
-                else if (importFlag == 2) {
+                else {
                     console.log(document.getElementsByClassName('userChk')[0].checked);
                     if (document.getElementsByClassName('tuple'))
-                        for (var i = 0; i < document.getElementsByClassName('tuple').length; i++) {
-                            if (document.getElementsByClassName('tuple')[i].getAttribute('class').indexOf('viewed') == -1 && document.getElementsByClassName('userChk')[i].checked) {
-                                var name = document.getElementsByClassName('tuple')[i].getElementsByClassName('tupCmtWrap')[0].getElementsByClassName('tupData')[0].getElementsByClassName('tupLeft')[0].getElementsByClassName('clFx')[0].getElementsByClassName('userName name')[0].innerHTML;
-                                console.log(name);
-                                var first_name = "";
-                                var last_name = "";
+                        for (var i = 0; i < selected_candidates.length; i++) {
 
-                                if (name.split(' ')) {
-                                    if (name.split(' ')[0])
-                                        first_name = name.split(' ')[0];
-                                    if (name.split(' ')[1])
-                                        last_name = name.split(' ')[1];
-                                }
-                                applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: i });
+                            var name = document.getElementsByClassName('tuple')[i].getElementsByClassName('tupCmtWrap')[0].getElementsByClassName('tupData')[0].getElementsByClassName('tupLeft')[0].getElementsByClassName('clFx')[0].getElementsByClassName('userName name')[0].innerHTML;
+                            console.log(name);
+                            var first_name = "";
+                            var last_name = "";
+
+                            if (name.split(' ')) {
+                                if (name.split(' ')[0])
+                                    first_name = name.split(' ')[0];
+                                if (name.split(' ')[1])
+                                    last_name = name.split(' ')[1];
                             }
+                            applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: selected_candidates[i] });
                         }
                 }
 
@@ -742,10 +741,10 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
 
                         req.st.db.escape(details.address || ""),
                         req.st.db.escape(details.experience || ""),
-                        req.st.db.escape(JSON.stringify(details.primarySkills || []) ),
-                        req.st.db.escape(JSON.stringify(details.presentSalaryCurr || {}) ),
-                        req.st.db.escape(JSON.stringify(details.presentSalaryScale || {}) ),
-                        req.st.db.escape(JSON.stringify(details.presentSalaryPeriod || {}) ),
+                        req.st.db.escape(JSON.stringify(details.primarySkills || [])),
+                        req.st.db.escape(JSON.stringify(details.presentSalaryCurr || {})),
+                        req.st.db.escape(JSON.stringify(details.presentSalaryScale || {})),
+                        req.st.db.escape(JSON.stringify(details.presentSalaryPeriod || {})),
                         req.st.db.escape(details.presentSalary || 0)
                     ];
 
@@ -760,7 +759,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                             response.error = null;
                             response.data = (result[0] && result[0][0]) ? result[0][0] : {};
                             res.status(200).json(response);
-                           
+
                         }
 
                         else {
@@ -769,7 +768,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                             response.error = null;
                             response.data = null;
                             res.status(500).json(response);
-                            
+
                         }
                     });
                 })
