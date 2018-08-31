@@ -1654,6 +1654,10 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                             result[5][0].attachment = JSON.parse(result[5][0].attachment)
                         }
 
+                        for(var i=0; i<result[6].length; i++){
+                            result[6][i].followUpNotes = (result[6] && result[6][i]) ? JSON.parse(result[6][i].followUpNotes) :[];
+                          }
+
                         response.status = true;
                         response.message = "Applicant data loaded successfully";
                         response.error = null;
@@ -1666,7 +1670,8 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                                 clientCvPath: (result[2] && result[2][0]) ? result[2][0].clientCvPath : "",
                                 previousClientCvPath: (result[3] && result[3][0]) ? result[3][0].previousClientCvPath : "",
                                 faceSheet: (result[4] && result[4][0]) ? JSON.parse(result[4][0].faceSheet) : {},
-                                mailTransactions: result[5] ? result[5] : []
+                                mailTransactions: result[5] ? result[5] : [],
+                                followUpNotes : result[6] && result[6][0] ? result[6] : []
                             };
                         res.status(200).json(response);
                     }
@@ -1680,7 +1685,8 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                             clientCvPath: "",
                             previousClientCvPath: "",
                             faceSheet: {},
-                            mailTransactions: []
+                            mailTransactions: [],
+                            followUpNotes :[]
                         };
                         res.status(200).json(response);
                     }
