@@ -9,4 +9,6 @@ router.post('/LSComment/likecommentusers',likesharecommentCtrl.getlikecommentuse
 
 router.get('/LSComment/commentmaster',likesharecommentCtrl.getcommentmaster);
 
+router.post('/Archive',likesharecommentCtrl.saveArchive);
+
 module.exports = router;

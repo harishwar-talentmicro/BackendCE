@@ -82,6 +82,15 @@ module.exports = function(favoriteBook,done) {
             notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                 senderName : results[i].message ? results[i].message : ""
             });
+            var msgId=results[i].messageId;
+           
+            
+                var procQuery = 'ifnull((select isArchive from tmmessageusers where messageId='+ msgId +' limit 1),0);'
+                req.db.query(procQuery,function(err,results){
+                    if(!err ){
+                    archiveFlag:result[0][0].isArchive
+                    }
+                });
             var data ={
                 messageList: {
                     messageId: results[i].messageId,
@@ -103,7 +112,8 @@ module.exports = function(favoriteBook,done) {
                     parentId: results[i].parentId,
                     accessUserType: results[i].accessUserType,
                     heUserId: results[i].heUserId,
-                    formData: JSON.parse(results[i].formDataJSON)
+                    formData: JSON.parse(results[i].formDataJSON),
+                    isArchive: archiveFlag
                 },
                 contactList: results[i].contactData ? JSON.parse(results[i].contactData) : null
             } ;
@@ -137,7 +147,13 @@ module.exports = function(favoriteBook,done) {
 
 
                 var iphoneId =(results[i].iphoneId) ? (results[i].iphoneId) : '' ;
+                var isDialer= (results[i].isDialer) ? (results[i].isDialer) :0;
+                var dialerGCM_Id=(results[i].DialerGCM_Id) ? (results[i].DialerGCM_Id) :'';
                 var GCM_Id = (results[i].GCM_Id) ? (results[i].GCM_Id) : '';
+
+                if(isDialer==1){
+                    GCM_Id=dialerGCM_Id;
+                }
 
 
                 if(iphoneId != ""){

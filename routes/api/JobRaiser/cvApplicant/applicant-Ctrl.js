@@ -4787,4 +4787,143 @@ applicantCtrl.resumeSearchResultsByPage = function (req, res, next) {
     }
 };
 
+
+applicantCtrl.getMailerApplicants = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag = false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag = false;
+    }
+    
+    var stageStatusId = req.body.stageStatusId;
+    if (!stageStatusId) {
+        stageStatusId = [];
+    }
+    else if (typeof (stageStatusId) == "string") {
+        stageStatusId = JSON.parse(stageStatusId);
+    }
+    
+    var reqApplicants = req.body.reqApp;
+    if (!reqApplicants) {
+        reqApplicants = [];
+    }
+    else if (typeof (reqApplicants) == "string") {
+        reqApplicants = JSON.parse(reqApplicants);
+    }
+
+    
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+             req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
+             req.body.startPage = (req.body.startPage) ? req.body.startPage : 0;
+             req.body.limit = (req.body.limit) ? req.body.limit : 100;
+              
+
+
+                var getStatus = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),                   
+                    req.st.db.escape(JSON.stringify(stageStatusId)),
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(JSON.stringify(reqApplicants)),
+                    req.st.db.escape(req.body.startPage),
+                    req.st.db.escape(req.body.limit),
+                ];
+
+                var procQuery = 'CALL wm_get_mailerApplicants( ' + getStatus.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, Result) {
+                    console.log(err);
+                    if (!err && Result && Result[0] && Result[0][0]) {
+                        response.status = true;
+                        response.message = "Applicants loaded successfully";
+                        response.error = null;
+                        var output = [];
+                        for (var i = 0; i < Result[0].length; i++) {
+                            var res2 = {};
+                            res2.reqApplicantId = Result[0][i].reqAppId;
+                            res2.applicantId = Result[0][i].applicantId;
+                            res2.imageUrl = Result[0][i].imageUrl;
+                            res2.createdDate = Result[0][i].createdDate;
+                            res2.lastUpdatedDate = Result[0][i].lastUpdatedDate;
+                            res2.reqCvCreatedUserId = Result[0][i].reqCvCreatedUserId;
+                            res2.reqCvCreatedUserName = Result[0][i].reqCvCreatedUserName;
+                            res2.reqCvUpdatedUserId = Result[0][i].reqCvUpdatedUserId;
+                            res2.reqCvUpdatedUserName = Result[0][i].reqCvUpdatedUserName;
+                            res2.cvCreatedDate = Result[0][i].cvCreatedDate;
+                            res2.cvCreatedUSerId = Result[0][i].cvCreatedUSerId;
+                            res2.cvCreatedUserName = Result[0][i].cvCreatedUserName;
+                            res2.cvUpdatedDate = Result[0][i].cvUpdatedDate;
+                            res2.cvUpdatedUserId = Result[0][i].cvUpdatedUserId;
+                            res2.cvUpdatedUserName = Result[0][i].cvUpdatedUserName;
+                            res2.requirementId = Result[0][i].requirementId;
+                            res2.name = Result[0][i].name;
+                            res2.emailId = Result[0][i].emailId;
+                            res2.clientId = Result[0][i].clientId;
+                            res2.clientName = Result[0][i].clientname;
+                            res2.jobCode = Result[0][i].jobCode;
+                            res2.jobTitleId = Result[0][i].jobTitleId;
+                            res2.jobTitle = Result[0][i].title;
+                            res2.stageId = Result[0][i].stageId;
+                            res2.stage = Result[0][i].stageTitle;
+                            res2.stageTypeId = Result[0][i].stageTypeId;
+                            res2.colorCode = Result[0][i].colorCode;
+                            res2.statusId = Result[0][i].statusId;
+                            res2.status = Result[0][i].statusTitle;
+                            res2.statusTypeId = Result[0][i].statusTypeId;
+                            res2.clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
+                            output.push(res2);
+                        }
+                        response.data = {
+                            applicantlist: output,
+                        };
+                        // console.log(response.data);
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Applicants not found";
+                        response.error = null;
+                        response.data = {
+                            applicantlist: [],
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading applicants";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 module.exports = applicantCtrl;
