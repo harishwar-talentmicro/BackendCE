@@ -89,5 +89,7 @@ router.post('/importApplicants',applicantCtrl.saveApplicantForImporter);
 
 router.get('/resumeSearchedResults',applicantCtrl.resumeSearchResultsByPage);
 
+router.post('/mailerApplicants',applicantCtrl.getMailerApplicants);
+
 module.exports = router;
 
