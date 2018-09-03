@@ -366,7 +366,10 @@ likesharecommentCtrl.saveArchive=function(req,res,next){
                 req.db.query(procQuery,function(err,results){
                     if(!err ){
                         response.status = true;
-                        response.message = "data saved successfully";
+                        if(req.body.isArchive)
+                        response.message = "Transaction archived successfully";
+                        else
+                        response.message = "Transaction restored successfully";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
@@ -375,7 +378,7 @@ likesharecommentCtrl.saveArchive=function(req,res,next){
                     
                     else{
                         response.status = false;
-                        response.message = "Error while loading data";
+                        response.message = "Error while updating transaction";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

@@ -22,4 +22,9 @@ router.get('/invoiceBillGenerate',billingCtrl.invoiceBillGenerate);
 router.post('/againstReqAppBilling',billingCtrl.savePaceReqAppBilling);
 router.get('/getReqAppBilling',billingCtrl.getPaceReqAppBilling);
 
+router.post('/savePaceFollowUpNotes',billingCtrl.savePaceFollowUpNotes);
+router.get('/getPaceFollowUpNotes',billingCtrl.getPaceFollowUpNotes);
+
+router.post('/billingFilterNew',billingCtrl.billingFilterNew);  
+
 module.exports = router;

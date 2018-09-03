@@ -183,7 +183,7 @@ billingCtrl.billingFilter = function (req, res, next) {
 
                         response.data = {
                             billingData: (result[0] && result[0][0]) ? result[0] : [],
-                            count : (result[1] && result[1][0]) ? result[1][0].count : 0,
+                            count: (result[1] && result[1][0]) ? result[1][0].count : 0,
                         };
                         res.status(200).json(response);
                     }
@@ -696,16 +696,16 @@ billingCtrl.invoiceMailerPreview = function (req, res, next) {
                                 var position = mailBody.indexOf('@table');
                                 var tableContent = '';
                                 mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
-                                tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
+                                tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;border-spacing: 0;border-collapse: collapse;font-size: 8px;"><tr>'
                                 console.log(tableContent, 'mailbody');
                                 for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;font-family: Verdana,sans-serif;font-size: 8px !important;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
                                 }
                                 tableContent += "</tr>";
                                 for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
                                     tableContent += "<tr>";
                                     for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                        tableContent += '<td style="border: 1px solid #ddd;vertical-align: top;border-top: 1px solid #ddd;font-size:8px !important;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
                                     }
                                     tableContent += "</tr>";
                                 }
@@ -899,7 +899,8 @@ billingCtrl.invoiceApplyTax = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(codes)),
                     req.st.db.escape(req.body.invoiceDate),
                     req.st.db.escape(req.body.invoiceNumber),
-                    req.st.db.escape(JSON.stringify(reqApplicants))
+                    req.st.db.escape(JSON.stringify(reqApplicants)),
+                    req.st.db.escape(JSON.stringify(req.body.billId || []))
                 ];
 
                 var procQuery = 'CALL wm_save_billingTax( ' + inputs.join(',') + ')';
@@ -995,63 +996,91 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
                         response.message = "Invoice generated sucessfully";
                         response.error = null;
 
-                        var taxTemplate = JSON.parse(result[0][0].taxTemplate);
-                        var tags = JSON.parse(result[0][0].tags);
-                        var tableTags = JSON.parse(result[0][0].tableTags);
-                        var attachment = (result[0][0] && result[0][0].attachment) ? JSON.parse(result[0][0].attachment) : [];
+                        fs.readFile('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/billing/paceinvoice.html', 'utf-8', function (err, data) {
+                            console.log('error from reading', err);
+                            console.log('data from reading', data);
+                            var taxTemplate = JSON.parse(result[0][0].taxTemplate);
+                            var tags = JSON.parse(result[0][0].tags);
+                            var tableTags = JSON.parse(result[0][0].tableTags);
+                            var attachment = (result[0][0] && result[0][0].attachment) ? JSON.parse(result[0][0].attachment) : [];
 
 
-                        var tableContent = '';
+                            var tableContent = '';
 
-                        var invoiceBody = result[0][0].invoiceBody || '';
-                        if (tags) {
-                            for (var tagIndex = 0; tagIndex < tags.length; tagIndex++) {
-                                if (tags[tagIndex]) {
-
-                                    var reg = '[invoice.' + tags[tagIndex].tagName+']';
-                                    var regExp = new RegExp(reg, 'g');
-                                    console.log('regExp', regExp);
-                                    if (result[1] && result[1][0][tags[tagIndex].tagName]) {
-                                        invoiceBody = invoiceBody.replace(regExp, result[1][0][tags[tagIndex].tagName]);
+                            var invoiceBody = result[0][0].invoiceBody || '';
+                            if (tags) {
+                                for (var tagIndex = 0; tagIndex < tags.length; tagIndex++) {
+                                    if (tags[tagIndex]) {
+                                        // var reg = '[invoice.' + tags[tagIndex].tagName+']';
+                                        // var regExp = new RegExp(reg, 'g');
+                                        // console.log('regExp', regExp);
+                                        if (result[1] && result[1][0] && result[1][0][tags[tagIndex].tagName]) {
+                                            invoiceBody = invoiceBody.replace('[invoice.' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        if (tableTags) {
-
-                            tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>';
-
-                            for (var tableTagIndex = 0; tableTagIndex < tableTags.length; tableTagIndex++) {
-
-                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags[tableTagIndex].displayTagAs + "</th>";
+                            if (taxTemplate) {
+                                for (var tagIndex = 0; tagIndex < taxTemplate.length; tagIndex++) {
+                                    if (taxTemplate[tagIndex]) {
+                                        // var reg = '[invoice.' + tags[tagIndex].tagName+']';
+                                        // var regExp = new RegExp(reg, 'g');
+                                        // console.log('regExp', regExp);
+                                        if (result[1] && result[1][0] && result[1][0][taxTemplate[tagIndex].tagName]) {
+                                            invoiceBody = invoiceBody.replace('[invoice.' + taxTemplate[tagIndex].tagName + ']', result[1][0][taxTemplate[tagIndex].tagName]);
+                                        }
+                                    }
+                                }
                             }
-                            tableContent += "</tr>";
 
-                            for (var candidateCount = 0; candidateCount < result[2].length; candidateCount++) {
-                                tableContent += "<tr>";
+
+
+                            if (tableTags) {
+
+                                tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;border-spacing: 0;border-collapse: collapse;font-size: 8px;"><tr>';
+
                                 for (var tableTagIndex = 0; tableTagIndex < tableTags.length; tableTagIndex++) {
-                                    tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[2][candidateCount][tableTags[tableTagIndex].tagName] + "</td>";
+
+                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;font-family: Verdana,sans-serif;font-size: 8px !important;">' + tableTags[tableTagIndex].tagName.split('.')[1] + "</th>";
                                 }
                                 tableContent += "</tr>";
+
+                                for (var candidateCount = 0; candidateCount < result[2].length; candidateCount++) {
+                                    tableContent += "<tr>";
+                                    for (var tableTagIndex = 0; tableTagIndex < tableTags.length; tableTagIndex++) {
+                                        if (tableTagIndex != 0)
+                                            tableContent += '<td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;">' + result[2][candidateCount][tableTags[tableTagIndex].tagName.split('.')[1]] + "</td>";
+                                        else
+                                            tableContent += '<td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;">' + i + 1 + "</td>";
+                                    }
+                                    tableContent += "</tr>";
+                                }
+
+                                //tax template for loop. run forloop on tax tags length
+                                for (var taxCount = 0; taxCount < 3; taxCount++) {
+                                    tableContent += '<tr><td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;" colspan="4">CGST</td>';
+                                    tableContent += '<td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;" colspan="1">100</td></tr>';
+                                }
+                                tableContent += '<tr><td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;" colspan="4">Total</td>';
+                                tableContent += '<td colspan="1">10000</td></tr>'
+                                tableContent += "</table>";
+
                             }
 
-                            tableContent += "</table>";
+                            invoiceBody = invoiceBody.replace('[table]', tableContent);
+                            data = data.replace('[Content]', invoiceBody);
 
-                        }
+                            var options = { format: 'A4', width: '8in', height: '10.5in', border: '0', timeout: 30000, "zoomFactor": "1" };
 
-                        invoiceBody = invoiceBody.replace('[table]', tableContent);
+                            var myBuffer = [];
+                            var buffer = new Buffer(data, 'utf16le');
+                            for (var i = 0; i < buffer.length; i++) {
+                                myBuffer.push(buffer[i]);
+                            }
 
-                        var options = { format: 'A4', width: '8in', height: '10.5in', border: '0', timeout: 30000, "zoomFactor": "1" };
-
-                        var myBuffer = [];
-                        var buffer = new Buffer(invoiceBody, 'utf16le');
-                        for (var i = 0; i < buffer.length; i++) {
-                            myBuffer.push(buffer[i]);
-                        }
-
-                        // var attachmentObjectsList = [];
-                        // htmlpdf.create(invoiceBody, options).toBuffer(function (err, buffer) {
+                            // var attachmentObjectsList = [];
+                            // htmlpdf.create(invoiceBody, options).toBuffer(function (err, buffer) {
                             // attachment = {
                             //     filename: "INVOICE" + req.query.invoiceNumber+'.pdf',
                             //     extension:'pdf',
@@ -1060,9 +1089,9 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
 
 
                             var attachmentObjectsList = [];
-                            htmlpdf.create(invoiceBody, options).toBuffer(function (err, buffer) {
+                            htmlpdf.create(data, options).toBuffer(function (err, buffer) {
                                 attachmentObjectsList = [{
-                                    filename: "INVOICE" + req.query.invoiceNumber+'.pdf',
+                                    filename: "INVOICE" + req.query.invoiceNumber + '.pdf',
                                     content: buffer
 
                                 }];
@@ -1105,7 +1134,9 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
                                 res.status(200).json(response);
 
                             });
-                    // });
+                        })
+
+                        // });
                     }
 
                     else {
@@ -1185,20 +1216,20 @@ billingCtrl.savePaceReqAppBilling = function (req, res, next) {
 
                     if (!err && result && result[0] && result[0][0]) {
 
-                        if(result[0][0].billData && JSON.parse(result[0][0].billData).length){
-                            result[0][0].billData = result[0][0].billData ? JSON.parse(result[0][0].billData):[];
+                        if (result[0][0].billData && JSON.parse(result[0][0].billData).length) {
+                            result[0][0].billData = result[0][0].billData ? JSON.parse(result[0][0].billData) : [];
 
-                            for(var i=0; i< result[0][0].billData[i].length; i++){
+                            for (var i = 0; i < result[0][0].billData[i].length; i++) {
 
-                                result[0][0].billData[i].billTo = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].billTo && JSON.parse(result[0][0].billData[i].billTo).id) ? JSON.parse(result[0][0].billData[i].billTo) : {};
-    
-                                result[0][0].billData[i].amountCurrency = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].amountCurrency && JSON.parse(result[0][0].billData[i].amountCurrency).currencyId) ? JSON.parse(result[0][0].billData[i].amountCurrency) : {};
-    
-                                result[0][0].billData[i].amountScale = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].amountScale && JSON.parse(result[0][0].billData[i].amountScale).scaleId) ? JSON.parse(result[0][0].billData[i].amountScale) : {};
-    
-                                result[0][0].billData[i].amountDuration = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].amountDuration && JSON.parse(result[0][0].billData[i].amountDuration).durationId) ? JSON.parse(result[0][0].billData[i].amountDuration) : {};
-    
-                              
+                                result[0][0].billData[i].billTo = (result[0] && result[0][0] && result[0][0].billData[i] && result[0][0].billData[i].billTo && JSON.parse(result[0][0].billData[i].billTo).id) ? JSON.parse(result[0][0].billData[i].billTo) : {};
+
+                                result[0][0].billData[i].amountCurrency = (result[0] && result[0][0] && result[0][0].billData[i] && result[0][0].billData[i].amountCurrency && JSON.parse(result[0][0].billData[i].amountCurrency).currencyId) ? JSON.parse(result[0][0].billData[i].amountCurrency) : {};
+
+                                result[0][0].billData[i].amountScale = (result[0] && result[0][0] && result[0][0].billData[i] && result[0][0].billData[i].amountScale && JSON.parse(result[0][0].billData[i].amountScale).scaleId) ? JSON.parse(result[0][0].billData[i].amountScale) : {};
+
+                                result[0][0].billData[i].amountDuration = (result[0] && result[0][0] && result[0][0].billData[i] && result[0][0].billData[i].amountDuration && JSON.parse(result[0][0].billData[i].amountDuration).durationId) ? JSON.parse(result[0][0].billData[i].amountDuration) : {};
+
+
                             }
                         }
 
@@ -1284,22 +1315,22 @@ billingCtrl.getPaceReqAppBilling = function (req, res, next) {
                     console.log(err);
 
                     if (!err && result && result[0] && result[0][0]) {
-                        
-                        if(result[0][0].billData && JSON.parse(result[0][0].billData).length){
-                            result[0][0].billData = result[0][0].billData ? JSON.parse(result[0][0].billData):[];
-                            for(var i=0; i< result[0][0].billData[i].length; i++){
 
-                                result[0][0].billData[i].billTo = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].billTo && JSON.parse(result[0][0].billData[i].billTo).id) ? JSON.parse(result[0][0].billData[i].billTo) : {};
-    
-                                result[0][0].billData[i].amountCurrency = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].amountCurrency && JSON.parse(result[0][0].billData[i].amountCurrency).currencyId) ? JSON.parse(result[0][0].billData[i].amountCurrency) : {};
-    
-                                result[0][0].billData[i].amountScale = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].amountScale && JSON.parse(result[0][0].billData[i].amountScale).scaleId) ? JSON.parse(result[0][0].billData[i].amountScale) : {};
-    
-                                result[0][0].billData[i].amountDuration = (result[0] && result[0][0]  && result[0][0].billData[i] && result[0][0].billData[i].amountDuration && JSON.parse(result[0][0].billData[i].amountDuration).durationId) ? JSON.parse(result[0][0].billData[i].amountDuration) : {};
-                              
+                        if (result[0][0].billData && JSON.parse(result[0][0].billData).length) {
+                            result[0][0].billData = result[0][0].billData ? JSON.parse(result[0][0].billData) : [];
+                            for (var i = 0; i < result[0][0].billData[i].length; i++) {
+
+                                result[0][0].billData[i].billTo = (result[0] && result[0][0] && result[0][0].billData[i] && result[0][0].billData[i].billTo && JSON.parse(result[0][0].billData[i].billTo).id) ? JSON.parse(result[0][0].billData[i].billTo) : {};
+
+                                result[0][0].billData[i].amountCurrency = (result[0] && result[0][0] && result[0][0].billData[i] && result[0][0].billData[i].amountCurrency && JSON.parse(result[0][0].billData[i].amountCurrency).currencyId) ? JSON.parse(result[0][0].billData[i].amountCurrency) : {};
+
+                                result[0][0].billData[i].amountScale = (result[0] && result[0][0] && result[0][0].billData[i] && result[0][0].billData[i].amountScale && JSON.parse(result[0][0].billData[i].amountScale).scaleId) ? JSON.parse(result[0][0].billData[i].amountScale) : {};
+
+                                result[0][0].billData[i].amountDuration = (result[0] && result[0][0] && result[0][0].billData[i] && result[0][0].billData[i].amountDuration && JSON.parse(result[0][0].billData[i].amountDuration).durationId) ? JSON.parse(result[0][0].billData[i].amountDuration) : {};
+
                             }
                         }
-                     
+
                         response.status = true;
                         response.message = "Billing data loaded sucessfully";
                         response.error = null;
@@ -1316,6 +1347,338 @@ billingCtrl.getPaceReqAppBilling = function (req, res, next) {
                     else {
                         response.status = false;
                         response.message = "Error while loading bill data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+billingCtrl.savePaceFollowUpNotes = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.body.type) {
+        error.type = 'Invalid type';
+        validationFlag *= false;
+    }
+
+    var followUpNotes = req.body.followUpNotes;
+    if (typeof (followUpNotes) == "string") {
+        followUpNotes = JSON.parse(followUpNotes);
+    }
+    if (!followUpNotes) {
+        followUpNotes = []
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                if (req.body.type == 1)
+                    clientorReqorResumeId = req.body.clientId || 0;
+                else if (req.body.type == 2)
+                    clientorReqorResumeId = req.body.requirementId || 0;
+                else if (req.body.type == 3)
+                    clientorReqorResumeId = req.body.requirementId || 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.type),
+                    req.st.db.escape(clientorReqorResumeId),
+                    req.st.db.escape(JSON.stringify(followUpNotes))
+                ];
+
+                var procQuery = 'CALL wm_save_paceFollowUpNotes( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0]) {
+
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].followUpNotes = (result[0] && result[0][i]) ? JSON.parse(result[0][i].followUpNotes) : [];
+                        }
+
+                        response.status = true;
+                        response.message = "followUp Data saved sucessfully";
+                        response.error = null;
+                        response.data = result[0] && result[0][0] ? result[0] : [];
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "followUp Data saved sucessfully";
+                        response.error = null;
+                        response.data = [];
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving followUp data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+billingCtrl.getPaceFollowUpNotes = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.type) {
+        error.type = 'Invalid type';
+        validationFlag *= false;
+    }
+
+    if (req.query.type == 1) {
+        if (!req.query.clientId) {
+            error.clientId = 'Invalid clientId';
+            validationFlag *= false;
+        }
+    }
+    else if (req.query.type == 2) {
+        if (!req.query.requirementId) {
+            error.requirementId = 'Invalid requirementId';
+            validationFlag *= false;
+        }
+    }
+    else {
+        if (!req.query.applicantId) {
+            error.applicantId = 'Invalid applicantId';
+            validationFlag *= false;
+        }
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                if (req.query.type == 1)
+                    clientorReqorResumeId = req.query.clientId || 0;
+                else if (req.query.type == 2)
+                    clientorReqorResumeId = req.query.requirementId || 0;
+                else if (req.query.type == 3)
+                    clientorReqorResumeId = req.query.requirementId || 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.type),
+                    req.st.db.escape(clientorReqorResumeId)
+                ];
+
+                var procQuery = 'CALL wm_get_paceFollowUpNotes( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0]) {
+
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].followUpNotes = (result[0] && result[0][i]) ? result[0][i].followUpNotes : [];
+                        }
+
+                        response.status = true;
+                        response.message = "followUp data loaded sucessfully";
+                        response.error = null;
+                        response.data = (result[0] && result[0][0]) ? result[0] : [];
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "followUp Data could not be loaded";
+                        response.error = null;
+                        response.data = [];
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading followUp data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+billingCtrl.billingFilterNew = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    var billStage = req.body.billStage;
+    if (typeof (billStage) == "string") {
+        billStage = JSON.parse(billStage);
+    }
+    if (!billStage) {
+        billStage = [];
+    }
+
+    var billStatus = req.body.billStatus;
+    if (typeof (billStatus) == "string") {
+        billStatus = JSON.parse(billStatus);
+    }
+    if (!billStatus) {
+        billStatus = [];
+    }
+
+    var billBranch = req.body.billBranch;
+    if (typeof (billBranch) == "string") {
+        billBranch = JSON.parse(billBranch);
+    }
+    if (!billBranch) {
+        billBranch = [];
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.body.heDepartmentId = req.body.heDepartmentId ? req.body.heDepartmentId : 0;
+                req.body.billUnbill = req.body.billUnbill ? req.body.billUnbill : 0;
+                req.body.invoiceNumber = req.body.invoiceNumber ? req.body.invoiceNumber : '';
+                req.body.name = req.body.name ? req.body.name : '';
+
+                req.body.start = req.body.start ? req.body.start : 1;
+                req.body.limit = (req.body.limit) ? req.body.limit : 50;
+
+                req.body.start = ((((req.body.start) * req.body.limit) + 1) - req.body.limit) - 1;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(billStage)),
+                    req.st.db.escape(JSON.stringify(billBranch)),
+                    req.st.db.escape(req.body.heDepartmentId),
+                    req.st.db.escape(req.body.billUnbill),
+                    req.st.db.escape(req.body.billTo),
+                    req.st.db.escape(req.body.start),
+                    req.st.db.escape(req.body.limit),
+                    req.st.db.escape(req.body.invoiceNumber),
+                    req.st.db.escape(req.body.name)
+                ];
+                var procQuery = 'CALL wm_get_PacebillingFilterNew( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0][0]) {
+                        response.status = true;
+                        response.message = "Billing Data loaded sucessfully";
+                        response.error = null;
+
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].amountCurrency = (result[0][i].amountCurrency && JSON.parse(result[0][i].amountCurrency).currencyId) ? JSON.parse(result[0][i].amountCurrency) : {};
+
+                            result[0][i].amountScale = (result[0][i].amountScale && JSON.parse(result[0][i].amountScale).scaleId) ? JSON.parse(result[0][i].amountScale) : {};
+
+                            result[0][i].amountDuration = (result[0][i].amountDuration && JSON.parse(result[0][i].amountDuration).durationId) ? JSON.parse(result[0][i].amountDuration) : {};
+
+                        }
+
+                        response.data = {
+                            billingData: (result[0] && result[0][0]) ? result[0] : [],
+                            count: (result[1] && result[1][0]) ? result[1][0].count : 0,
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = {
+                            billingData: []
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading billing data";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

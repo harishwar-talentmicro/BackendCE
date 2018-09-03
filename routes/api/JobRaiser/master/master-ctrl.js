@@ -1305,19 +1305,11 @@ masterCtrl.saveMasterStageStatus = function (req, res, next) {
                         response.status = true;
                         response.message = "Stage and status saved sucessfully";
                         response.error = null;
-                        var output = [];
                         for (var i = 0; i < results[0].length; i++) {
-                            var res2 = {};
-                            res2.stageId = results[0][i].stageId;
-                            res2.stageName = results[0][i].stageName;
-                            res2.stageTypeId = results[0][i].stageTypeId;
-                            res2.stageTypeName = results[0][i].stageTypeName;
-                            res2.colorCode = results[0][i].colorCode;
-                            res2.status = JSON.parse(results[0][i].status) ? JSON.parse(results[0][i].status) : [];
-                            output.push(res2);
+                            results[0][i].status = JSON.parse(results[0][i].status) ? JSON.parse(results[0][i].status) : [];
                         }
                         response.data = {
-                            stage: output
+                            stage: results[0] ? results[0] :[]
                         };
                         res.status(200).json(response);
                     }
@@ -1504,10 +1496,14 @@ masterCtrl.getClientView = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+                req.query.type = (req.query.type) ? req.query.type : 3;
+               
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(DBSecretKey)
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.query.type)
+                    
                 ];
                 var procQuery = 'CALL wm_get_clientView( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -1898,6 +1894,10 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                             }
                         }
 
+                        for(var i=0; i<result[4].length; i++){
+                            result[4][i].followUpNotes = (result[4] && result[4][i]) ? JSON.parse(result[4][i].followUpNotes) :[];
+                          }
+
                         result[0][0].managers = JSON.parse(result[0][0].managers);
                         result[0][0].department = JSON.parse(result[0][0].department);
                         result[0][0].clientStatus = JSON.parse(result[0][0].clientStatus);
@@ -1920,7 +1920,8 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                             heDepartment: result[0][0],
                             businessLocation: result[1],
                             contracts: contracts,//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
-                            contactList : result[3][0].contactList
+                            contactList : result[3][0].contactList,
+                            followUpNotes : result[4] && result[4][0] ? result[4] :[]
                         };
 
 

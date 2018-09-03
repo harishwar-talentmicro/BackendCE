@@ -124,6 +124,7 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                 req.body.invoiceNumberLength = (req.body.invoiceNumberLength) ? req.body.invoiceNumberLength : 0;
                 req.body.isAutoMovement = (req.body.isAutoMovement) ? req.body.isAutoMovement : 0;
                 req.body.isStrict = (req.body.isStrict) ? req.body.isStrict : 0;
+                req.body.isGulf = (req.body.isGulf) ? req.body.isGulf : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -174,7 +175,8 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(req.body.updateScreeningStageStatus || {})),
                     req.st.db.escape(JSON.stringify(req.body.updateSubmissionStageStatus || {})),
                     req.st.db.escape(req.body.autoSourcingMail || ''),
-                    req.st.db.escape(req.body.autoScreeningMail || '')
+                    req.st.db.escape(req.body.autoScreeningMail || ''),
+                    req.st.db.escape(req.body.isGulf)
                     
                 ];
 
@@ -2120,10 +2122,14 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                         result[2][0].industry = (result[2] && result[2][0]) ? JSON.parse(result[2][0].industry) : [];
                         result[2][0].attachmentList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].attachmentList) : [];
 
+                        for(var i=0; i<result[3].length; i++){
+                            result[3][i].followUpNotes = (result[3] && result[3][i]) ? JSON.parse(result[3][i].followUpNotes) :[];
+                          }
                         response.data = {
                             requirementDetails: result[0][0] ? result[0][0] : [],
                             //  requirementCompleteDetails: (result[1][0].reqJsonData) ? JSON.parse(result[1][0].reqJsonData) : {},
-                            requirementCompleteDetails: (result[2] && result[2][0]) ? result[2][0] : {}
+                            requirementCompleteDetails: (result[2] && result[2][0]) ? result[2][0] : {},
+                            followUpNotes : (result[3] && result[3][0]) ? result[3] : []
                         };
 
                         if (isWeb == 1) {
@@ -2145,7 +2151,8 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                         response.data = {
                             requirementDetails: {},
                             requirementCompleteDetails: {},
-                            requirementNew: {}
+                            requirementNew: {},
+                            followUpNotes:[]
                         };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

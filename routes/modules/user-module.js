@@ -891,16 +891,15 @@ User.prototype.forgetPassword = function (req, res, next) {
                     if (ForgetPasswordResult) {
                         if (ForgetPasswordResult.affectedRows > 0) {
                             RtnMessage.IsChanged = true;
-                            var UserQuery = 'Select TID, ifnull(FirstName,"") as FirstName,ifnull(LastName,"") as LastName,' +
-                                'ifnull(AdminEMailID,"") as EMailID from tmaster where EZEID=' + st.db.escape(EZEID);
+                            var UserQuery = 'call wm_get_EWTForgotPassword(' + st.db.escape(EZEID) + ',' + st.db.escape(DBSecretKey)+')';
                             //console.log(UserQuery);
                             st.db.query(UserQuery, function (err, UserResult) {
                                 if (!err) {
                                     if (UserResult) {
-                                        if (UserResult[0]) {
-                                            if (UserResult[0].EMailID) {
-                                                UserResult[0].FirstName = (UserResult[0].FirstName) ? UserResult[0].FirstName : 'Anonymous';
-                                                UserResult[0].LastName = (UserResult[0].LastName) ? UserResult[0].LastName : ' ';
+                                        if (UserResult[0] && UserResult[0][0]) {
+                                            if (UserResult[0][0].EMailID) {
+                                                UserResult[0][0].FirstName = (UserResult[0][0].FirstName) ? UserResult[0][0].FirstName : 'Anonymous';
+                                                UserResult[0][0].LastName = (UserResult[0][0].LastName) ? UserResult[0][0].LastName : ' ';
                                                 var fs = require('fs');
                                                 var path = require('path');
                                                 var file = path.join(__dirname, '../../mail/templates/password_reset_req.html');
@@ -910,8 +909,8 @@ User.prototype.forgetPassword = function (req, res, next) {
                                                     if (!err) {
                                                         var passwordResetLink = req.CONFIG.SCHEME + "://" + req.CONFIG.DOMAIN + "/" +
                                                             req.CONFIG.PASS_RESET_PAGE_LINK + "/" + EZEID + "/" + resetCode
-                                                        data = data.replace("[Firstname]", UserResult[0].FirstName);
-                                                        data = data.replace("[Lastname]", UserResult[0].LastName);
+                                                        data = data.replace("[Firstname]", UserResult[0][0].FirstName);
+                                                        data = data.replace("[Lastname]", UserResult[0][0].LastName);
                                                         data = data.replace("[reset link]", passwordResetLink);
                                                         data = data.replace("[resetlink]", passwordResetLink);
 
@@ -919,7 +918,7 @@ User.prototype.forgetPassword = function (req, res, next) {
                                                         //console.log('Body:' + data);
                                                         var mailOptions = {
                                                             from: EZEIDEmail,
-                                                            to: UserResult[0].EMailID,
+                                                            to: UserResult[0][0].EMailID,
                                                             subject: 'EZEOne : Password reset request',
                                                             html: data // html body
                                                         };
@@ -943,7 +942,7 @@ User.prototype.forgetPassword = function (req, res, next) {
                                                                         ToMailID: mailOptions.to,
                                                                         Subject: mailOptions.subject,
                                                                         Body: mailOptions.html,
-                                                                        SentbyMasterID: UserResult[0].TID,
+                                                                        SentbyMasterID: UserResult[0][0].TID,
                                                                         SentStatus: 1
                                                                     };
                                                                     //console.log(post);
@@ -962,12 +961,12 @@ User.prototype.forgetPassword = function (req, res, next) {
                                                                     });
                                                                 }
                                                                 else {
-                                                                    console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+                                                                    console.log('FnForgetPassword: Mail not Sent Successfully' + err);
                                                                     res.send(RtnMessage);
                                                                 }
                                                             }
                                                             else {
-                                                                console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+                                                                console.log('FnForgetPassword: Mail not Sent Successfully' + err);
                                                                 res.send(RtnMessage);
                                                             }
                                                         });
@@ -5402,6 +5401,189 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetUserDetails error:' + ex);
+
+    }
+};
+
+
+User.prototype.paceChangePassword = function (req, res, next) {
+    /**
+     * @todo FnChangePassword
+     */
+
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var TokenNo = req.query.token;   // token is now query  //token was in body  T was caps before
+
+        
+        var RtnMessage = {
+            status: true,
+            error:null,
+            message: "Invalid token",
+            IsChanged: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+        var validationFlag = true;
+
+    if (!TokenNo) {
+        error.TokenNo = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+        if (!validationFlag){
+            RtnMessage.error = error;
+            RtnMessage.message = 'Please check the errors';
+            res.status(400).json(RtnMessage);
+            console.log(RtnMessage);
+        }
+        else{
+            // if (OldPassword && NewPassword && TokenNo ) {
+            st.validateToken(TokenNo, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+
+                        // var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                        // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                        
+                            var OldPassword = req.body.OldPassword;
+                            // console.log("OldPassword input",req.body.OldPassword,"hashed output",OldPassword);
+                            // console.log("req.body",req.body);
+                            var NewPassword = req.body.NewPassword;
+    
+                            var oldPassQueryParams = st.db.escape(TokenNo);
+
+                            var oldPassQuery = 'CALL pgetoldpassword(' + oldPassQueryParams + ')';
+                            console.log(oldPassQuery);
+                            st.db.query(oldPassQuery, function (err, oldPassResult) {
+                                if (err) {
+                                    console.log('Error : FnChangePassword - During old password retrieval; Procedure: pgetoldpassword');
+                                    console.log(err);
+                                    RtnMessage.status = false;
+                                    RtnMessage.message = "Something went wrong";
+                                    res.status(400).json(RtnMessage);
+                                }
+                                else {
+                                    console.log("oldPassResult",oldPassResult);
+                                    if (oldPassResult) {
+                                        if (oldPassResult[0]) {
+                                            if (oldPassResult[0][0]) {
+                                                if (oldPassResult[0][0].Password) {
+    
+                                                    if (comparePassword(OldPassword, oldPassResult[0][0].Password)) {
+                                                        var ip = req.headers['x-forwarded-for'] ||
+                                                            req.connection.remoteAddress ||
+                                                            req.socket.remoteAddress ||
+                                                            req.connection.socket.remoteAddress;
+                                                        var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+    
+                                                        var newPassword = hashPassword(NewPassword);
+                                                        var passChangeQueryParams = st.db.escape(TokenNo) + ',' +
+                                                            st.db.escape(newPassword) + ',' + st.db.escape(ip) + ',' + st.db.escape(userAgent);
+    
+                                                        var passChangeQuery = 'CALL pChangePassword(' + passChangeQueryParams + ')';
+                                                        console.log(passChangeQuery);
+    
+    
+                                                        st.db.query(passChangeQuery, function (err, passChangeResult) {
+                                                            if (err) {
+                                                                console.log('Error FnChangePassword :  procedure pChangePassword');
+                                                                console.log(err);
+                                                                RtnMessage.status = false;
+                                                                RtnMessage.message = "Something went wrong";
+                                                                res.status(500).json(RtnMessage);
+                                                            }
+                                                            else {
+                                                                if (passChangeResult) {
+                                                                    RtnMessage.IsChanged = true;
+                                                                    RtnMessage.status = true;
+                                                                    RtnMessage.message = "Password changed ..";
+                                                                    res.status(200).json(RtnMessage);
+                                                                }
+                                                                else {
+                                                                    RtnMessage.status = true;
+                                                                    RtnMessage.message = "Password changed ..";
+                                                                    res.status(200).status(RtnMessage);
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                    else {
+                                                        RtnMessage.status = false;
+                                                        RtnMessage.message = "Old password does not match. Please re-enter password..";
+                                                        res.status(200).json(RtnMessage);
+                                                    }
+                                                }
+                                                else {
+                                                    RtnMessage.status = false;
+                                                    RtnMessage.message = "Unable to fetch old password ..";
+                                                    res.status(401).json(RtnMessage);
+                                                }
+                                            }
+                                            else {
+                                                RtnMessage.status = false;
+                                                RtnMessage.message = "Unable to fetch old password ..";
+                                                res.status(401).json(RtnMessage);
+                                            }
+                                        }
+                                        else {
+                                            RtnMessage.status = false;
+                                            RtnMessage.message = "Unable to fetch old password ..";
+                                            res.status(401).json(RtnMessage);
+                                        }
+                                    }
+                                    else {
+                                        RtnMessage.status = false;
+                                        RtnMessage.message = "Unable to fetch old password ..";
+                                        res.status(401).json(RtnMessage);
+                                    }
+                                }
+                            });
+                        // });
+
+                    } else {
+                        RtnMessage.status = false;
+                        RtnMessage.message = "Invalid token..";
+                        res.status(401).json(RtnMessage);
+                        console.log('FnChangePassword:pChangePassword: Invalid Token');
+                    }
+                } else {
+                    RtnMessage.status = false;
+                    RtnMessage.message = "Something went wrong..";
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                    console.log('FnChangePassword:pChangePassword: Error in validating token:  ' + err);
+                }
+            });
+            // }
+            // else {
+            //     if (!OldPassword) {
+            //         console.log('FnChangePassword: OldPassword is empty');
+            //     }
+            //     else if (!NewPassword) {
+            //         console.log('FnChangePassword: NewPassword is empty');
+            //     }
+            //     else if (!TokenNo) {
+            //         console.log('FnChangePassword: TokenNo is empty');
+            //     }
+            //     RtnMessage.status = false;
+            //     RtnMessage.message = "Fill all required fields..";
+            //     res.statusCode = 400;
+            //     res.send(RtnMessage);
+            // }
+        }
+    }
+    catch (ex) {
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log('FnChangePassword error:' + ex);
+        RtnMessage.status = false;
+        RtnMessage.message = "Something went wrong..";
+        res.status(400).json(RtnMessage);
 
     }
 };

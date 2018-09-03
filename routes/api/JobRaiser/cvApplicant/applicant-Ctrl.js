@@ -71,10 +71,11 @@ applicantCtrl.saveApplicant = function (req, res, next) {
         error.firstName = 'First Name is Mandatory';
         validationFlag *= false;
     }
-    if (!req.body.emailId || !req.body.mobileNumber) {   // any one is mandatory
-        error.emailId = 'EMail ID or Mobile Number is mandatory';
-        validationFlag *= false;
-    }
+
+    // if (!req.body.emailId || !req.body.mobileNumber) {   // any one is mandatory
+    //     error.emailId = 'EMail ID or Mobile Number is mandatory';
+    //     validationFlag *= false;
+    // }
 
     // if (!req.body.mobileNumber) {
     //     error.mobileNumber = 'Mobile Number is Mandatory';
@@ -235,7 +236,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
 
 
                 if (req.body.cvKeywords && req.body.cvKeywords != '') {
-                    req.body.cvKeywords = req.body.cvKeywords.replace(/\\(x)(.{2})\\/g, '');
+                    req.body.cvKeywords = req.body.cvKeywords.replace(/[^\x00-\x7F]/g, "");
                 }
 
                 req.query.isWeb = (req.body.isWeb) ? req.body.isWeb : 0;
@@ -248,6 +249,14 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                 storage_bucket = req.CONFIG.CONSTANT.STORAGE_BUCKET;
 
                 console.log("cvPath from attacment", cv);
+
+                // var exec = require('child_process').exec;
+                // var environment = process.env;
+                // environment.ANTIWORDHOME = '/usr/share/antiword';
+                // exec(command, { env: environment }, function (err, stdout, stderr) {
+                //     console.log(stdout);
+                // });
+
                 return new Promise(function (resolve, reject) {
                     if (cv != '') {
                         cv = gs_url + storage_bucket + '/' + cv;
@@ -261,12 +270,12 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                                 textract.fromBufferWithName(cv, buf, function (error, txt) {
                                     if (error) {
                                         // var tempCVPath = cv.replace('docx', 'doc');
-                                        textract.fromBufferWithName(tempCVPath, buf, function (error, txt) {
-                                            text = txt;
-                                            console.log('error', error);
-                                            console.log('text inside', text);
-                                            resolve(text);
-                                        });
+                                        // textract.fromBufferWithName(tempCVPath, buf, function (error, txt) {
+                                        // text = txt;
+                                        console.log('error', error);
+                                        // console.log('text inside', text);
+                                        resolve(text);
+                                        // });
                                     }
                                     else {
                                         text = txt;
@@ -289,7 +298,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
 
                         cvKeywords = text;
                         if (cvKeywords) {
-                            cvKeywords = cvKeywords.replace(/\\(x)(.{2})\\/g, '');
+                            cvKeywords = cvKeywords.replace(/[^\x00-\x7F]/g, "");
                         }
 
                         // console.log('text from promise', resp);
@@ -325,6 +334,9 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
                         req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 0;
                         req.body.referredBy = req.body.referredBy ? req.body.referredBy : "";
+                        req.body.emailId = req.body.emailId ? req.body.emailId : "";
+                        req.body.mobileNumber = req.body.mobileNumber ? req.body.mobileNumber : "";
+
                         req.body.gender = (req.body.gender && req.body.gender != 'null') ? req.body.gender : undefined;
 
                         var inputs = [
@@ -371,7 +383,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(prefLocations)),
                             req.st.db.escape(JSON.stringify(industry)),
                             req.st.db.escape(JSON.stringify(nationality)),
-                            req.st.db.escape(cvKeywords || ''),
+                            req.st.db.escape(req.body.cvKeywords || cvKeywords || ''),
                             req.st.db.escape(req.body.requirementId),
                             req.st.db.escape(req.body.imageUrl),
                             req.st.db.escape(req.body.htmlText),
@@ -486,16 +498,9 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             output1.push(res1);
                         }
 
-                        var output = [];
+
                         for (var i = 0; i < result[10].length; i++) {
-                            var res2 = {};
-                            res2.stageId = result[10][i].stageId;
-                            res2.stageName = result[10][i].stageName;
-                            res2.stageTypeId = result[10][i].stageTypeId;
-                            res2.stageTypeName = result[10][i].stageTypeName;
-                            res2.colorCode = result[10][i].colorCode;
-                            res2.status = JSON.parse(result[10][i].status) ? JSON.parse(result[10][i].status) : [];
-                            output.push(res2);
+                            result[10][i].status = JSON.parse(result[10][i].status) ? JSON.parse(result[10][i].status) : [];
                         }
 
                         if (result[35].length) {
@@ -532,7 +537,7 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             cvSources: result[7] ? result[7] : [],
                             nationList: result[8] ? result[8] : [],
                             skills: result[9] ? result[9] : [],
-                            mStageStatus: output,
+                            mStageStatus: result[10] ? result[10] : [],
                             tags: {
                                 candidate: result[11] ? result[11] : [],
                                 requirement: result[12] ? result[12] : [],
@@ -646,8 +651,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             teamUsers: [],
                             paceUserDetails: {},
                             stageStatusMapList: [],
-                            interviewModeList : [],
-                            billTo : []
+                            interviewModeList: [],
+                            billTo: []
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -983,6 +988,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                             res2.statusId = Result[0][i].statusId;
                             res2.status = Result[0][i].statusTitle;
                             res2.statusTypeId = Result[0][i].statusTypeId;
+                            res2.reqCreatedUserId = Result[0][i].reqCreatedUserId;
                             res2.clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
                             output.push(res2);
                         }
@@ -1088,13 +1094,13 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
                     console.log(err);
 
                     if (!err && statusResult && statusResult[0] && statusResult[0][0]) {
-                       
-                        
-                        if(statusResult[1] && statusResult[1][0] && statusResult[1][0].count !=0){
+
+
+                        if (statusResult[1] && statusResult[1][0] && statusResult[1][0].count != 0) {
                             response.status = false;
                             response.message = statusResult[1][0].countMessage;
                         }
-                        else{
+                        else {
                             response.status = true;
                             response.message = "Stage and status changed successfully";
 
@@ -1654,9 +1660,9 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                             result[5][0].attachment = JSON.parse(result[5][0].attachment)
                         }
 
-                        for(var i=0; i<result[6].length; i++){
-                            result[6][i].followUpNotes = (result[6] && result[6][i]) ? JSON.parse(result[6][i].followUpNotes) :[];
-                          }
+                        for (var i = 0; i < result[6].length; i++) {
+                            result[6][i].followUpNotes = (result[6] && result[6][i]) ? JSON.parse(result[6][i].followUpNotes) : [];
+                        }
 
                         response.status = true;
                         response.message = "Applicant data loaded successfully";
@@ -1671,7 +1677,7 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                                 previousClientCvPath: (result[3] && result[3][0]) ? result[3][0].previousClientCvPath : "",
                                 faceSheet: (result[4] && result[4][0]) ? JSON.parse(result[4][0].faceSheet) : {},
                                 mailTransactions: result[5] ? result[5] : [],
-                                followUpNotes : result[6] && result[6][0] ? result[6] : []
+                                followUpNotes: result[6] && result[6][0] ? result[6] : []
                             };
                         res.status(200).json(response);
                     }
@@ -1686,7 +1692,7 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                             previousClientCvPath: "",
                             faceSheet: {},
                             mailTransactions: [],
-                            followUpNotes :[]
+                            followUpNotes: []
                         };
                         res.status(200).json(response);
                     }
@@ -4811,7 +4817,7 @@ applicantCtrl.getMailerApplicants = function (req, res, next) {
         error.heMasterId = 'Invalid company';
         validationFlag = false;
     }
-    
+
     var stageStatusId = req.body.stageStatusId;
     if (!stageStatusId) {
         stageStatusId = [];
@@ -4819,7 +4825,7 @@ applicantCtrl.getMailerApplicants = function (req, res, next) {
     else if (typeof (stageStatusId) == "string") {
         stageStatusId = JSON.parse(stageStatusId);
     }
-    
+
     var reqApplicants = req.body.reqApp;
     if (!reqApplicants) {
         reqApplicants = [];
@@ -4828,7 +4834,7 @@ applicantCtrl.getMailerApplicants = function (req, res, next) {
         reqApplicants = JSON.parse(reqApplicants);
     }
 
-    
+
 
 
     if (!validationFlag) {
@@ -4840,15 +4846,15 @@ applicantCtrl.getMailerApplicants = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-             req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
-             req.body.startPage = (req.body.startPage) ? req.body.startPage : 0;
-             req.body.limit = (req.body.limit) ? req.body.limit : 100;
-              
+                req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
+                req.body.startPage = (req.body.startPage) ? req.body.startPage : 0;
+                req.body.limit = (req.body.limit) ? req.body.limit : 100;
+
 
 
                 var getStatus = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),                   
+                    req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(JSON.stringify(stageStatusId)),
                     req.st.db.escape(DBSecretKey),
                     req.st.db.escape(JSON.stringify(reqApplicants)),

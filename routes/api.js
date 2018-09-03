@@ -129,6 +129,9 @@ router.get('/ewtGetUserDetails', userModule.getUserDetails);
 router.post('/getUserDetailsNew', userModule.getUserDetailsLatest);
 router.get('/ewGetEZEID', userModule.checkEzeid);
 router.post('/ewtChangePassword', userModule.changePassword);
+router.post('/paceChangePassword', userModule.paceChangePassword);
+
+
 router.post('/ewtForgetPassword', userModule.forgetPassword);
 router.get('/ewtDecryptPassword', userModule.decryptPassword);
 router.get('/ewtCompanyProfile', userModule.getCompanyProfile);

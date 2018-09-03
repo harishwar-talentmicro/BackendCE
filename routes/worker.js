@@ -55,7 +55,7 @@ module.exports = function(favoriteBook,done) {
     var startPage = favoriteBook.increment ;
     var limit = favoriteBook.limitValues ;
     results = favoriteBook.messageList ;
-
+    var data={};
     var initialValue = (startPage * limit) ;
 
 
@@ -86,12 +86,10 @@ module.exports = function(favoriteBook,done) {
            
             
                 var procQuery = 'ifnull((select isArchive from tmmessageusers where messageId='+ msgId +' limit 1),0);'
-                req.db.query(procQuery,function(err,results){
+                db.query(procQuery,function(err,archiveresults){
                     if(!err ){
-                    archiveFlag:result[0][0].isArchive
-                    }
-                });
-            var data ={
+                    archiveFlag:archiveresults[0].isArchive ? archiveresults[0].isArchive:0; 
+            data ={
                 messageList: {
                     messageId: results[i].messageId,
                     message: results[i].message,
@@ -117,6 +115,9 @@ module.exports = function(favoriteBook,done) {
                 },
                 contactList: results[i].contactData ? JSON.parse(results[i].contactData) : null
             } ;
+        }
+    });
+
 
             var buf = new Buffer(JSON.stringify(data), 'utf-8');
 
