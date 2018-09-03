@@ -11,4 +11,6 @@ router.get('/LSComment/commentmaster',likesharecommentCtrl.getcommentmaster);
 
 router.post('/Archive',likesharecommentCtrl.saveArchive);
 
+router.get('/list',likesharecommentCtrl.getArchiveTransList);
+
 module.exports = router;

@@ -344,8 +344,8 @@ likesharecommentCtrl.saveArchive=function(req,res,next){
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
 
-                // req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
-                // req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.body.minMessageId = (req.body.minMessageId) ? (req.body.minMessageId) : 0;
+                req.body.maxMessageId = (req.body.maxMessageId) ? (req.body.maxMessageId) : 0;
                 // req.query.searchKeywords = (req.query.searchKeywords) ? (req.query.searchKeywords) : '';
                 // var startPage = 0;
 
@@ -355,7 +355,9 @@ likesharecommentCtrl.saveArchive=function(req,res,next){
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.messageId) ,
                     req.st.db.escape(req.body.groupId) ,
-                    req.st.db.escape(req.body.isArchive)   
+                    req.st.db.escape(req.body.isArchive),
+                    req.st.db.escape(req.body.minMessageId) ,
+                    req.st.db.escape(req.body.maxMessageId)    
                 ];
                 /**
                  * Calling procedure to get form template
@@ -364,7 +366,21 @@ likesharecommentCtrl.saveArchive=function(req,res,next){
                 var procQuery = 'CALL wm_save_achiveMessages( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
-                    if(!err ){
+                    if(!err && results[0] && results[0][0] ){
+                        results[0][0].formDataJSON = results[0][0].formDataJSON ? JSON.parse(results[0][0].formDataJSON):{};
+                        response.status = true;
+                        response.message = "data saved successfully";
+                        response.error = null;
+                        
+                        response.data = results[0][0];
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
+                    }
+                    else if(!err ){
                         response.status = true;
                         if(req.body.isArchive)
                         response.message = "Transaction archived successfully";
@@ -392,5 +408,94 @@ likesharecommentCtrl.saveArchive=function(req,res,next){
     }
 };
 
+
+likesharecommentCtrl.getArchiveTransList=function(req,res,next){
+    var response = {
+        status : false,
+        message : "Error while loading comment list",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.groupId) {
+        error.messageId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                 req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                // / req.query.searchKeywords = (req.query.searchKeywords) ? (req.query.searchKeywords) : '';
+                 var startPage = 0;
+
+                  startPage = ((((parseInt(req.query.pageNo)) * req.query.limit) + 1) - req.query.limit) - 1;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.groupId) ,
+                    req.st.db.escape(req.query.startPage),   
+                    req.st.db.escape(req.query.limit)   
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_get_archivedTransactions( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,results){
+                    if(!err && results[0] && results[0][0] ){
+                       
+                        response.status = true;
+                        response.message = "data loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            archiveList:results[0]
+                        }
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
+                    }
+                    else if(!err ){
+                        response.status = true;
+                        response.message = "data loaded successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+
+                    }
+                    
+                    else{
+                        response.status = false;
+                        response.message = "Error while loading data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
 
 module.exports = likesharecommentCtrl;

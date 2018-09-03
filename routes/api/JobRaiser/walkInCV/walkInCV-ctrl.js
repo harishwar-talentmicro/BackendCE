@@ -3032,7 +3032,7 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                 req.body.IDRequiredNew = req.body.IDRequiredNew ? req.body.IDRequiredNew : 0;
                 req.body.IDTypeNew = req.body.IDTypeNew ? req.body.IDTypeNew : '';
                 req.body.maxIDLengthNew = req.body.maxIDLengthNew ? req.body.maxIDLengthNew : 0;
-                req.body.isIDNumberOrStringNew = req.body.isIDNumberOrStringNew ? req.body.isIDNumberOrStringNew : 0;
+                req.body.isIDNumberOrStringNew = req.body.isIDNumberOrStringNew ? req.body.isIDNumberOrStringNew : 1;
                 req.body.walkinRegistrationType = req.body.walkinRegistrationType ? req.body.walkinRegistrationType : 0;
 
 
