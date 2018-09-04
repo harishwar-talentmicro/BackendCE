@@ -12,8 +12,6 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 var uuid = require('node-uuid');
 
-var matchAll = require("match-all");
-
 
 var CONFIG = require('../../../../ezeone-config.json');
 var appConfig = require('../../../../ezeone-config.json');
