@@ -122,6 +122,75 @@ StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,isWhatMate,APNS_
 
 };
 
+
+
+StdLib.prototype.generateTokenPace = function(ip,userAgent,ezeoneId,isWhatMate,APNS_Id,GCM_Id,secretKey, isDialer,callBack){
+    var _this = this;
+    /////////////////////////////////////////////////////////////////////
+
+    var deviceType = 1;
+    var deviceMapping = {
+        web : 1,
+        android : 2,
+        ios : 3,
+        windowsPhone : 4,
+        windowsApp :  5
+    };
+
+    var preUserAgents = {
+        android : '$__EZEONE_|_2015_|_ANDROID_|_APP__$',
+        ios : 'E-Z-E-O-N-E-!0s-APP-2015',
+        windowsPhone : '|eZeOnE_wInDoWs_pHoNe_2O!5|',
+        windowsApp : '$_wiNDowS_pcAPp_2015_$'
+    };
+
+    for(var agent in preUserAgents){
+        if(preUserAgents.hasOwnProperty(agent) && preUserAgents[agent] === userAgent){
+            deviceType = deviceMapping[agent];
+            break;
+        }
+    }
+
+
+    var tokenGenQueryParams = _this.db.escape(ip) + ',' + _this.db.escape(userAgent)
+        + ',' + _this.db.escape(ezeoneId) + ',' + _this.db.escape(deviceType) + ',' +
+        _this.db.escape(isWhatMate) + ',' + _this.db.escape(APNS_Id) + ',' + _this.db.escape(GCM_Id) + ',' + _this.db.escape(secretKey) + ',' + _this.db.escape(isDialer) ;
+    var tokenGenQuery = 'CALL pGenerateTokenNewPace('+tokenGenQueryParams + ')';
+
+    console.log(tokenGenQuery);
+
+    _this.db.query(tokenGenQuery,function(err,results){
+       if(err){
+           callBack(err,null);
+       }
+        else{
+           if(results){
+                if(results[0]){
+                    if(results[0][0]){
+                        if(results[0][0].token){
+                            callBack(null,results[0][0].token);
+                        }
+                        else{
+                            callBack(null,null);
+                        }
+                    }
+                    else{
+                        callBack(null,null);
+                    }
+                }
+                else{
+                    callBack(null,null);
+                }
+           }
+           else{
+               callBack(null,null);
+           }
+       }
+    });
+
+
+};
+
 /**
  * List of groupTids and their respected EZEID(GroupName) from tmGroups table
  * @param masterIdList [Array]
