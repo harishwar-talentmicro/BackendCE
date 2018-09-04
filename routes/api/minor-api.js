@@ -504,16 +504,16 @@ if (cluster.isWorker) {
 
 
 
-var cluster = require('cluster');
+// var cluster = require('cluster');
 
-if (cluster.isWorker) {
-    console.log('walkIn cluster', cluster.worker.id);
+// if (cluster.isWorker) {
+//     console.log('walkIn cluster', cluster.worker.id);
 
-    if (cluster.worker.id == 1) {
-        // run job
+//     if (cluster.worker.id == 1) {
+//         // run job
 
-        console.log("bye take care");
-        // cron.schedule('*/2 * * * *', function () {
+//         console.log("bye take care");
+//         // cron.schedule('*/2 * * * *', function () {
 
 
 
@@ -523,7 +523,7 @@ if (cluster.isWorker) {
                 var counter=1;
                 var query = "call wm_integrationUrlwalkIn()";
                 db.query(query, function (err, result) {
-                    console.log('Running walkin cron job for Hexaware Walk-In');
+                    console.log('Walkin Hexaware');
                     if (err) {
                         console.log('error: integrationUrl For walkIn Hircraft', err);
                     }
@@ -581,8 +581,8 @@ if (cluster.isWorker) {
         cronJobWalkIn.start();
 
         // });
-    }
-}
+//     }
+// }
 
 // });
 

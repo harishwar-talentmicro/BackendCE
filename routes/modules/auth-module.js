@@ -2776,4 +2776,222 @@ Auth.prototype.portalLogin = function (req, res, next) {
 };
 
 
+Auth.prototype.pacehcmLogin = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+    
+    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+    var ip = req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress;
+
+    var token = req.query.token ? req.query.token : ''; // token in query now
+    
+
+    var responseMessage = {
+        token: '',
+        tId: '',
+        isAuthenticate: false,
+        ezeoneId: '',
+        displayName: '',
+        groupId: '',
+        pendingViewCount: '',
+        attachmentCount: '',
+        isNewUser: '',
+        brandingPageUrl: '',
+        masterId: ''
+
+    };
+
+    try {
+
+        var ezeoneId = req.st.alterEzeoneId(req.body.userName);
+
+        var password = req.body.password;
+        var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+        var deviceToken = req.body.device_token ? req.body.device_token : '';
+        var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
+        var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+        var apnsId = (req.body.apnsId) ? (req.body.apnsId) : "";
+        var gcmId = (req.body.gcmId) ? (req.body.gcmId) : "";
+        var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
+        var isDialer= req.query.isDialer ? req.query.isDialer :0;
+        console.log("secretKey", secretKey);
+
+        if (ezeoneId && password) {
+
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(isDialer);
+            var query = 'CALL PLoginNewPace(' + queryParams + ')';
+            console.log('query', query);
+            st.db.query(query, function (err, loginResult) {
+                // console.log(loginResult);
+                if (!err) {
+                    if (loginResult && password) {
+                        //console.log('loginDetails',loginDetails);
+                        if (loginResult[0]) {
+                            if (loginResult[0].length > 0) {
+                                var loginDetails = loginResult[0];
+                                if (!token) {
+                                    if (comparePassword(password, loginDetails[0].Password)) {
+                                        st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, apnsId, gcmId, secretKey, isDialer, function (err, tokenResult) {
+                                            if ((!err) && tokenResult && loginDetails[0]) {
+
+                                                responseMessage.token = tokenResult,
+                                                    responseMessage.isAuthenticate = true;
+                                                responseMessage.tId = loginDetails[0].TID;
+                                                responseMessage.ezeoneId = loginDetails[0].EZEID;
+                                                responseMessage.displayName = loginDetails[0].displayName;
+                                              
+                                                if (loginDetails[0].ParentMasterID == 0) {
+                                                    responseMessage.masterId = loginDetails[0].TID;
+                                                }
+                                                else {
+                                                    responseMessage.masterId = loginDetails[0].ParentMasterID;
+                                                }
+                                                responseMessage.groupId = loginDetails[0].group_id;
+                                                responseMessage.isNewUser = loginDetails[0].isNewUser;
+                                                responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
+                                                responseMessage.attachmentCount = loginDetails[0].attachmentCount;
+                                                responseMessage.brandingPageUrl = loginDetails[0].brandingPageUrl;
+
+                                                response.status = true;
+                                                response.message = "Logged in successfully";
+                                                response.error = null;
+                                                response.data = responseMessage;
+                                                res.status(200).json(response);
+
+                                            }
+
+                                            else {
+
+                                                response.status = false;
+                                                response.message = "failed to generate a token";
+                                                response.error = null;
+                                                response.data = responseMessage;
+                                                res.status(500).json(response);
+
+                                                console.log('FnLogin:failed to generate a token ');
+                                                console.log('FnLogin:' + err);
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        response.status = false;
+                                        response.message = "Invalid credentials";
+                                        response.error = null;
+                                        response.data = responseMessage;
+                                        res.status(200).json(response);
+                                        console.log('FnLogin:password not matched ');
+                                    }
+                                }
+                                else {
+
+                                    for (var i = 0; i < loginResult[1].length; i++) {
+                                        loginResult[1][i].trackTemplateDetails = loginResult[1][i] && loginResult[1][i].trackTemplateDetails ? JSON.parse(loginResult[1][i].trackTemplateDetails) : [];
+                                    }
+                                    console.log("login company details with existing token", loginResult[1][0]);
+
+                                    responseMessage.token = tokenResult;
+                                    responseMessage.isAuthenticate = true;
+                                    responseMessage.tId = loginDetails[0].TID;
+                                    responseMessage.ezeoneId = loginDetails[0].EZEID;
+                                    responseMessage.displayName = loginDetails[0].displayName;
+                                    if (loginDetails[0].ParentMasterID == 0) {
+                                        responseMessage.masterId = loginDetails[0].TID;
+                                    }
+                                    else {
+                                        responseMessage.masterId = loginDetails[0].ParentMasterID;
+                                    }
+                                    responseMessage.groupId = loginDetails[0].group_id;
+                                    responseMessage.isNewUser = loginDetails[0].isNewUser;
+                                    responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
+                                    responseMessage.attachmentCount = loginDetails[0].attachmentCount;
+                                    responseMessage.brandingPageUrl = loginDetails[0].brandingPageUrl;
+
+                                    response.status = true;
+                                    response.message = "Logged in successfully";
+                                    response.error = null;
+                                    response.data = responseMessage;
+                                    res.status(200).json(response);
+
+                                }
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Invalid credentials";
+                                response.error = null;
+                                response.data =responseMessage;
+                                res.status(200).json(response);
+                                console.log('FnLogin:login result not found');
+                            }
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Invalid credentials";
+                            response.error = null;
+                            response.data = responseMessage;
+                            res.status(200).json(response);
+
+                            console.log('FnLogin:login result not found');
+                        }
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Invalid credentials";
+                        response.error = null;
+                            response.data = responseMessage;
+                            res.status(200).json(response);
+
+                        console.log('FnLogin: Invalid login credentials');
+                    }
+                }
+                else {
+                    response.status = false;
+                    response.message = "Internal server error..";
+                    response.error = null;
+                    response.data = responseMessage;
+                    res.status(500).json(response);
+                    console.log('FnLogin:' + err);
+                }
+            });
+        }
+        else {
+            if (!ezeoneId) {
+                console.log('FnLogin: EZEOneId is mandatory');
+            }
+            else if (!password) {
+                console.log('FnLogin: password is mandatory');
+            }
+
+            response.status = false;
+            response.message = "Please fill mandatory fields";
+            response.error = null;
+            response.data = responseMessage;
+            res.status(400).json(response);
+
+        }
+
+        //close here
+    }
+    catch (ex) {
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log(ex);
+        console.log('FnLogin:: error:' + ex);
+        response.message = "Internal server error";
+        res.status(500).json(response);
+    }
+};
+
+
 module.exports = Auth;
