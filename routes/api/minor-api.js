@@ -12,6 +12,12 @@ var appConfig = require('../../ezeone-config.json');
 
 var DBSecretKey = appConfig.DB.secretKey;
 
+var htmlpdf = require('html-pdf');
+var Mailer = require('../../mail/mailer.js');
+var mailerApi = new Mailer();
+
+var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+
 var request = require('request');
 // var Client = require('node-rest-client').Client;   // for interview scheduler hirecraft
 // var client = new Client();
@@ -789,5 +795,87 @@ if (cluster.isWorker) {
 //         logout.start();
 //     }
 // }
+
+var cluster = require('cluster');
+
+// query reNotifier
+if (cluster.isWorker) {
+
+    if (cluster.worker.id == 1) {
+        var walkinMailreminder = new CronJob({
+            cronTime: '*/3 * * * *',
+            onTick: function () {
+var procQuery = 'CALL wm_remainder_walkinMail( "' + DBSecretKey + '")';
+                console.log(procQuery);
+                console.log("remainder mail for walkin cvupload");
+
+               db.query(procQuery, function (err, results) {
+                    console.log(err);
+
+                    if (results[2] && results[2][0]){
+                    for (var i=0; i<results[2].length;i++)
+                    {
+                    if (results[0] && results[0][0] || results[1] || results[1][0] ) {
+                    var mailContent = (results[1] && results[1][0]) ? results[1][0].mailBody : "Dear [FirstName] <br>Thank you for registering your profile.  We will revert to you once we find your Resume match one of the requirements we have.In the mean time, please [ClickHere] to upload your latest CV that will help us with more detailed information about your profile.Wishing you all the best<br><br>[WalkINSignature]<br>[Disclaimer]";
+
+                    if (mailContent) {
+                        mailContent = mailContent.replace("[FirstName]",( results[2][i].firstName?results[2][i].firstName:''));
+                        mailContent = mailContent.replace("[FullName]", (results[2][i].firstName?results[2][i].firstName:''));
+
+                        var webLink = (results[1] && results[1][0]) ? results[1][0].webLink : "";
+
+                        // For updating resume though url link after registering for walkIn
+
+                        var parentId = (results[2] && results[2][i]) ? results[2][i].applicantId : undefined;
+                        walkInApplicantId = Date.now().toString().concat(parentId);
+                        var webLinkTo = results[1][0].whatmateWebTestOrLive + walkInApplicantId;
+                        webLinkTo = webLinkTo.replace('"', '');
+                        webLinkTo = webLinkTo.replace('"', '');
+
+                        mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
+                        // ------------------------------------------------
+
+                        // mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
+
+                        var walkInSignature = (results[1] && results[1][0]) ? results[1][0].walkInSignature : "";
+                        var disclaimer = (results[1] && results[1][0]) ? results[1][0].disclaimer : "";
+
+                        mailContent = mailContent.replace("[WalkINSignature]", walkInSignature);
+                        mailContent = mailContent.replace("[Disclaimer]", disclaimer);
+                    }
+
+                    var subject = results[1][0].mailSubject ? results[1][0].mailSubject : 'Registration Completed Successfully';
+                    var bccmail=results[1][0].bccMailId ? JSON.parse(results[1][0].bccMailId):'';
+                    var bccmailId=bccmail[0];
+                    console.log("bcc ------------------------- mail",bccmailId);
+                    // send mail to candidate
+                    var email = new sendgrid.Email();
+                    email.from = results[1][0].fromEmailId ? results[1][0].fromEmailId : 'noreply@talentmicro.com';
+                    email.to = results[2][i].emailId ? results[2][i].emailId:'';
+                    email.bcc= bccmail;
+                    email.subject = subject;
+                    email.html = mailContent;
+
+                    sendgrid.send(email, function (err11, result11) {
+                        if (err11) {
+                            console.log("Failed to send to candidate", err11);
+                        }
+                        else {
+                            mailSent = 1;
+                            console.log("mail sent successfully to candidate", result11);
+                        }
+                    });
+                }
+            }
+        }
+
+
+
+                });
+            }
+        });
+        walkinMailreminder.start();
+    }
+}
 
 module.exports = router;

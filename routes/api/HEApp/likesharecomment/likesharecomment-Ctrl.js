@@ -367,7 +367,7 @@ likesharecommentCtrl.saveArchive=function(req,res,next){
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     if(!err && results[0] && results[0][0] ){
-                        results[0][0].formDataJSON = results[0][0].formDataJSON ? JSON.parse(results[0][0].formDataJSON):{};
+                        results[0][0].formData = results[0][0].formData ? JSON.parse(results[0][0].formData):{};
                         response.status = true;
                         response.message = "data saved successfully";
                         response.error = null;
