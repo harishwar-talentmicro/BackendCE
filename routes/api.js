@@ -116,6 +116,7 @@ router.post('/otp', authModule.sendOtp);
 
 //job portal login
 router.post('/portalLogin', authModule.portalLogin);
+router.post('/pacehcmlogin', authModule.pacehcmLogin);
 
 
 //User module methods

@@ -12,8 +12,6 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 var uuid = require('node-uuid');
 
-var matchAll = require("match-all");
-
 
 var CONFIG = require('../../../../ezeone-config.json');
 var appConfig = require('../../../../ezeone-config.json');
@@ -467,7 +465,7 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                 console.log(document.getElementsByClassName('tuple').length)
                 if (is_select_all == 1) {
                     if (document.getElementsByClassName('tuple'))
-                        for (var i = 0; i < 1; i++) {
+                        for (var i = 0; i < document.getElementsByClassName('tuple').length; i++) {
                             if (document.getElementsByClassName('tuple')[i].getAttribute('class').indexOf('viewed') == -1) {
                                 var name = document.getElementsByClassName('tuple')[i].getElementsByClassName('tupCmtWrap')[0].getElementsByClassName('tupData')[0].getElementsByClassName('tupLeft')[0].getElementsByClassName('clFx')[0].getElementsByClassName('userName name')[0].innerHTML;
                                 console.log(name);
@@ -480,7 +478,18 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                                     if (name.split(' ')[1])
                                         last_name = name.split(' ')[1];
                                 }
-                                applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: i });
+
+                                if(document.getElementsByClassName('ftRight') && document.getElementsByClassName('ftRight')[i] && document.getElementsByClassName('ftRight')[i].innerHTML && document.getElementsByClassName('ftRight')[i].innerHTML.split('Modified: ') && document.getElementsByClassName('ftRight')[i].innerHTML.split('Modified: ')[1] && document.getElementsByClassName('ftRight')[i].innerHTML.split('Modified: ')[1].split('</span>') && document.getElementsByClassName('ftRight')[i].innerHTML.split('Modified: ')[1].split('</span>')[0]){
+                                    var dateStr = document.getElementsByClassName('ftRight')[i].innerHTML.split('Modified: ')[1].split('</span>')[0];
+                                    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                                    var arr = dateStr.split(' ');
+                                    if(arr && arr[1]){
+                                        arr[1] = months.indexOf(arr[1]) + 1;
+                                        arr = arr.reverse();
+                                        var lastModifiedDate = arr.join('-');        
+                                    }
+                                }
+                                applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: i, lastModifiedDate: lastModifiedDate});
                             }
                         }
                 }
@@ -490,7 +499,7 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                     if (document.getElementsByClassName('tuple'))
                         for (var i = 0; i < selected_candidates.length; i++) {
 
-                            var name = document.getElementsByClassName('tuple')[i].getElementsByClassName('tupCmtWrap')[0].getElementsByClassName('tupData')[0].getElementsByClassName('tupLeft')[0].getElementsByClassName('clFx')[0].getElementsByClassName('userName name')[0].innerHTML;
+                            var name = document.getElementsByClassName('tuple')[selected_candidates[i]].getElementsByClassName('tupCmtWrap')[0].getElementsByClassName('tupData')[0].getElementsByClassName('tupLeft')[0].getElementsByClassName('clFx')[0].getElementsByClassName('userName name')[0].innerHTML;
                             console.log(name);
                             var first_name = "";
                             var last_name = "";

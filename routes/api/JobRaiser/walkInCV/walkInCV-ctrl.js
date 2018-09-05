@@ -763,12 +763,18 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             }
 
                             var subject = results[3][0].mailSubject ? results[3][0].mailSubject : 'Registration Completed Successfully';
+                            var bcc=[];
+                            if(results[3][0] && results[3][0].bccMailId && typeof(results[3][0].bccMailId) =='string'){
+                                bcc = results[3][0].bccMailId ? JSON.parse(results[3][0].bccMailId) : [];
+                            }
+
                             // send mail to candidate
                             var email = new sendgrid.Email();
                             email.from = results[2][0].fromEmailId ? results[2][0].fromEmailId : 'noreply@talentmicro.com';
                             email.to = req.body.emailId;
                             email.subject = subject;
                             email.html = mailContent;
+                            email.bcc = bcc;
 
                             sendgrid.send(email, function (err11, result11) {
                                 if (err11) {
@@ -2046,6 +2052,9 @@ walkInCvCtrl.getWalkinJoblist = function (req, res, next) {
                         }
 
                         result[1][0].userList = (result[1] && result[1][0]) ? JSON.parse(result[1][0].userList) : [];
+                        if(result[1][0] && result[1][0].bccMailId && typeof(result[1][0].bccMailId)=='string')
+                        result[1][0].bccMailId = (result[1] && result[1][0]) ? JSON.parse(result[1][0].bccMailId) : [];
+                        
 
                         response.data = {
                             jobList: (result[0] && result[0][0]) ? result[0] : [],
@@ -3073,8 +3082,11 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(req.body.maxIDLengthNew),
                     req.st.db.escape(req.body.isIDNumberOrStringNew),
                     req.st.db.escape(req.body.showJobCode),
-                    req.st.db.escape(req.body.syncBackground)
-
+                    req.st.db.escape(req.body.syncBackground),
+                    req.st.db.escape(JSON.stringify(req.body.bccMailId || []) ),
+                    req.st.db.escape(req.body.reminderMailSubject || ''),
+                    req.st.db.escape(req.body.reminderMailBody || '' ),
+                    req.st.db.escape(req.body.empListBasedOnLocation || 0)
                 ];
 
                 var procQuery = 'CALL wm_save_walkWebConfig( ' + inputs.join(',') + ')';

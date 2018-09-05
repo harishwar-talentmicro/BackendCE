@@ -68,6 +68,7 @@ settingsCtrl.getAccessrightsMaster = function (req, res, next) {
                             for (var j = 0; j < result[2].length; j++) {
                                 var res3 = {};
                                 res3.templateId = result[2][j].templateId;
+                                res3.isAdmin = result[2][j].isAdmin;
                                 res3.templateName = result[2][j].templateName;
                                 res3.templateData = result[2][j].templateData ? JSON.parse(result[2][j].templateData) : [];
                                 output1.push(res3);
@@ -191,13 +192,15 @@ settingsCtrl.saveAccessrightsTemplate = function (req, res, next) {
             if ((!err) && tokenResult) {
 
                 req.body.templateId = req.body.templateId ? req.body.templateId : 0;
+                req.body.isAdmin = req.body.isAdmin ? req.body.isAdmin : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.heMasterId),
                     req.st.db.escape(req.body.templateId),
                     req.st.db.escape(req.body.templateName),
-                    req.st.db.escape(JSON.stringify(moduleRights))
+                    req.st.db.escape(JSON.stringify(moduleRights)),
+                    req.st.db.escape(req.body.isAdmin)
 
                 ];
 
