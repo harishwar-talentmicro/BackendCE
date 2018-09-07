@@ -465,7 +465,7 @@ likesharecommentCtrl.getArchiveTransList=function(req,res,next){
                         response.error = null;
                         response.data = {
                             archiveList:results[0],
-                            count:results[1][0]
+                            count:results[1][0].count
                         }
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
