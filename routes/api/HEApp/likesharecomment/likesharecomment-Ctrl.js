@@ -318,7 +318,7 @@ likesharecommentCtrl.getcommentmaster=function(req,res,next){
 likesharecommentCtrl.saveArchive=function(req,res,next){
     var response = {
         status : false,
-        message : "Error while loading comment list",
+        message : "Error while saving archive",
         data : null,
         error : null
     };
@@ -464,7 +464,8 @@ likesharecommentCtrl.getArchiveTransList=function(req,res,next){
                         response.message = "data loaded successfully";
                         response.error = null;
                         response.data = {
-                            archiveList:results[0]
+                            archiveList:results[0],
+                            count:results[1][0]
                         }
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
