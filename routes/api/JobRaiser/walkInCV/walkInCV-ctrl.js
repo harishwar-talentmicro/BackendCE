@@ -768,7 +768,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                                 bcc = results[3][0].bccMailId ? JSON.parse(results[3][0].bccMailId) : [];
                                 bccMailId=bcc[0];
                             }
-
+                           console.log(mailContent);
                             // send mail to candidate
                             var email = new sendgrid.Email();
                             email.from = results[2][0].fromEmailId ? results[2][0].fromEmailId : 'noreply@talentmicro.com';

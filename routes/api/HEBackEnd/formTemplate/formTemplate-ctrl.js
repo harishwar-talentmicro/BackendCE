@@ -1,7 +1,8 @@
 /**
  * Created by vedha on 06-03-2017.
  */
-
+var Notification_aws = require('../../../modules/notification/aws-sns-push.js');
+var _Notification_aws = new Notification_aws();
 
 var formTemplateCtrl = {};
 var error = {};
@@ -112,11 +113,11 @@ formTemplateCtrl.saveFormTemplate = function(req,res,next){
                         };
 
                        
-                            if (formTemplateResult && formTemplateResult[1] && formTemplateResult[1][0] && workgroupresult[1][0].APNS_Id) {
+                            if (formTemplateResult && formTemplateResult[1] && formTemplateResult[1][0] && formTemplateResult[1][0].APNS_Id) {
                                 _Notification_aws.publish_IOS(formTemplateResult[1][0].APNS_Id, messagePayload, 0);
                             }
 
-                            if (formTemplateResult && formTemplateResult[2] && formTemplateResult[2][0] && workgroupresult[2][0].GCM_Id) {
+                            if (formTemplateResult && formTemplateResult[2] && formTemplateResult[2][0] && formTemplateResult[2][0].GCM_Id) {
                                 _Notification_aws.publish_Android(formTemplateResult[2][0].GCM_Id, messagePayload);
                             }
 
@@ -260,11 +261,12 @@ formTemplateCtrl.updateFormTemplate = function(req,res,next){
                         };
 
                        
-                            if (formTemplateResult && formTemplateResult[1] && formTemplateResult[1][0] && workgroupresult[1][0].APNS_Id) {
+                            if (formTemplateResult && formTemplateResult[1] && formTemplateResult[1][0] && formTemplateResult[1][0].APNS_Id) {
+                                console.log(formTemplateResult[1][0].APNS_Id);
                                 _Notification_aws.publish_IOS(formTemplateResult[1][0].APNS_Id, messagePayload, 0);
                             }
 
-                            if (formTemplateResult && formTemplateResult[2] && formTemplateResult[2][0] && workgroupresult[2][0].GCM_Id) {
+                            if (formTemplateResult && formTemplateResult[2] && formTemplateResult[2][0] && formTemplateResult[2][0].GCM_Id) {
                                 _Notification_aws.publish_Android(formTemplateResult[2][0].GCM_Id, messagePayload);
                             }
 
