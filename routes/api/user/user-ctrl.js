@@ -14,7 +14,7 @@ var appConfig = require('../../../ezeone-config.json');
 
 const accountSid = 'AC3765f2ec587b6b5b893566f1393a00f4';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'AC3765f2ec587b6b5b893566f1393a00f4';
 const authToken = 'b36eba6376b5939cebe146f06d33ec57';   //'3abf04f536ede7f6964919936a35e614';  //'b36eba6376b5939cebe146f06d33ec57';//
-const FromNumber = appConfig.DB.FromNumber || '+18647547021';  
+const FromNumber = appConfig.DB.FromNumber || '+18647547021';
 
 const client = require('twilio')(accountSid, authToken);
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
@@ -145,9 +145,13 @@ UserCtrl.signup = function (req, res, next) {
                 var ip = req.headers['x-forwarded-for'] ||
                     req.connection.remoteAddress ||
                     req.socket.remoteAddress;
+                var apnsId = '';
+                var gcmId = '';
+                var secretKey = '';
+                var isDialer = 0;
                 var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
                 if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].masterId) {
-                    req.st.generateToken(ip, userAgent, userResult[0][0].ezeoneId, req.body.isWhatMate, function (err, token) {
+                    req.st.generateToken(ip, userAgent, userResult[0][0].ezeoneId, req.body.isWhatMate,apnsId, gcmId, secretKey,isDialer, function (err, token) {
                         if (err) {
                             console.log('Error while generating token' + err);
                             response.status = false;
@@ -690,7 +694,7 @@ UserCtrl.login = function (req, res, next) {
         req.connection.remoteAddress ||
         req.socket.remoteAddress ||
         req.connection.socket.remoteAddress;
-    var isDialer= req.query.isDialer ? req.query.isDialer :0;
+    var isDialer = req.query.isDialer ? req.query.isDialer : 0;
     var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
     var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
     var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
@@ -787,9 +791,9 @@ UserCtrl.login = function (req, res, next) {
                     req.st.generateToken(ip, userAgent, ezeoneId, isWhatMate, APNS_Id, GCM_Id, isDialer, function (err, tokenResult) {
 
                         if ((!err) && tokenResult) {
-                            var APNSID= req.query.APNSID ? req.query.APNSID :'';
-                            var GCMID=req.query.GCMID ? req.query.GCMID :''; 
-                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ',' + req.st.db.escape(DBSecretKey) +',' + st.db.escape(APNSID) +',' + st.db.escape(GCMID) + ',' + st.db.escape(isDialer) + ')';
+                            var APNSID = req.query.APNSID ? req.query.APNSID : '';
+                            var GCMID = req.query.GCMID ? req.query.GCMID : '';
+                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ',' + req.st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(isDialer) + ')';
                             console.log(procQuery);
                             req.db.query(procQuery, function (err, UserDetailsResult) {
                                 console.log(UserDetailsResult);
@@ -1689,7 +1693,7 @@ UserCtrl.invitePublicProfile = function (req, res, next) {
 
                     var encryptPwd = req.st.hashPassword(password);
 
-                req.query.isDialer = req.query.isDialer ? req.query.isDialer:0;
+                    req.query.isDialer = req.query.isDialer ? req.query.isDialer : 0;
 
 
                     var procParams = [
@@ -2128,7 +2132,7 @@ UserCtrl.getUserDetails = function (req, res, next) {
                                             response.status = true;
                                             response.message = "FnGetUserDetails : tmaster: No User details found";
                                             response.error = null;
-                                            response.data =null;
+                                            response.data = null;
                                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                             zlib.gzip(buf, function (_, result) {
                                                 response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -2142,7 +2146,7 @@ UserCtrl.getUserDetails = function (req, res, next) {
                                         response.status = true;
                                         response.message = "FnGetUserDetails : tmaster: No User details found";
                                         response.error = null;
-                                        response.data =null;
+                                        response.data = null;
                                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                         zlib.gzip(buf, function (_, result) {
                                             response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -2155,7 +2159,7 @@ UserCtrl.getUserDetails = function (req, res, next) {
                                 }
                                 else {
                                     response.status = false;
-                                    response.message = "FnGetUserDetails : tmaster:"+ err;
+                                    response.message = "FnGetUserDetails : tmaster:" + err;
                                     response.error = null;
                                     response.data = null;
                                     res.status(500).json(response);
