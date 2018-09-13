@@ -145,9 +145,13 @@ UserCtrl.signup = function (req, res, next) {
                 var ip = req.headers['x-forwarded-for'] ||
                     req.connection.remoteAddress ||
                     req.socket.remoteAddress;
+                var apnsId='';
+                var gcmId='';
+                var secretKey='';
+                var isDialer=0;
                 var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
                 if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].masterId) {
-                    req.st.generateToken(ip, userAgent, userResult[0][0].ezeoneId, req.body.isWhatMate, function (err, token) {
+                    req.st.generateToken(ip, userAgent, userResult[0][0].ezeoneId, req.body.isWhatMate,apnsId, gcmId, secretKey,isDialer, function (err, token) {
                         if (err) {
                             console.log('Error while generating token' + err);
                             response.status = false;
@@ -1142,7 +1146,10 @@ UserCtrl.sendPasswordResetOTP = function (req, res, next) {
                 req.st.db.escape(DBSecretKey)
             ];
 
+            console.log('CALL pvalidateEZEOne(' + query + ')');
             req.st.db.query('CALL pvalidateEZEOne(' + query + ')', function (err, otpResult) {
+                
+                console.log("error",err);
 
                 if (!err && otpResult && otpResult[0] && otpResult[0][0].otp) {
                     console.log("otpResult[0][0].name", otpResult[0][0].name);
@@ -1296,6 +1303,12 @@ UserCtrl.sendPasswordResetOTP = function (req, res, next) {
                     respMsg.data = null;
                     res.status(200).json(respMsg);
 
+                }
+                else if(!err && otpResult && otpResult[0] && otpResult[0][0].messageError){
+                    respMsg.status = true;
+                    respMsg.message = otpResult[0][0].messageError;
+                    respMsg.data = null;
+                    res.status(200).json(respMsg);
                 }
                 else {
                     respMsg.status = false;

@@ -27,5 +27,8 @@ router.get('/getJobPortalUsers',paceUsersCtrl.getJobPortalUsers);
 router.get('/freeJobPortalUsers',paceUsersCtrl.freeJobPortalUsers);
 
 router.post('/checkPortalApplicants',paceUsersCtrl.checkApplicantExists);
+router.post('/deleteJobPortalUsers',paceUsersCtrl.deleteJobPortalUsers);
+
+router.get('/pacehcmTips',paceUsersCtrl.pacehcmTips);
 
 module.exports = router;

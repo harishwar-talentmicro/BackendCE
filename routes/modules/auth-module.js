@@ -872,14 +872,14 @@ Auth.prototype.login = function (req, res, next) {
                                             if ((!err) && tokenResult && loginDetails[0]) {
                                                 var APNSID = req.query.APNSID ? req.query.APNSID : '';
                                                 var GCMID = req.query.GCMID ? req.query.GCMID : '';
-                                                console.log('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(APNSID) +  ')');
-                                                st.db.query('CALL pGetEZEIDDetailsPace(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(isDialer) + ')', function (err, UserDetailsResult) {
+                                                console.log('CALL pGetEZEIDDetailsPace(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(req.query.isDialer || 0) + ')');
+                                                st.db.query('CALL pGetEZEIDDetailsPace(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(req.query.isDialer || 0) + ')', function (err, UserDetailsResult) {
                                                     if (!err) {
                                                         var procParams = [
                                                             req.db.escape(tokenResult),
                                                             req.db.escape(null),
                                                             req.db.escape(DBSecretKey),
-                                                            req.db.escape(isDialer)
+                                                            req.db.escape(req.query.isDialer || 0)
 
                                                         ];
                                                         var procQuery = 'CALL pGetGroupAndIndividuals_newPace(' + procParams.join(' ,') + ')';
@@ -2642,9 +2642,9 @@ Auth.prototype.portalLogin = function (req, res, next) {
                                         res.status(200).json(response);
                                     }
                                     else{
-
+                                        var isDialer = 0;
                                         if (comparePassword(password, loginDetails[0].Password)) {
-                                            st.generateToken(ip, userAgent, loginDetails[0].ezeid, isWhatMate, apnsId, gcmId, secretKey, function (err, tokenResult) {
+                                            st.generateToken(ip, userAgent, loginDetails[0].ezeid, isWhatMate, apnsId, gcmId, secretKey,isDialer, function (err, tokenResult) {
                                                 if ((!err) && tokenResult && loginDetails[0].userMasterId) {
     
                                                     response.status = true;
@@ -2683,7 +2683,7 @@ Auth.prototype.portalLogin = function (req, res, next) {
                                             response.message = "Invalid credentials";
                                             response.error = null;
                                             response.data = null;
-                                            res.status(500).json(response);
+                                            res.status(200).json(response);
     
                                             console.log('FnLogin:password not matched ');
                                         }
@@ -2715,7 +2715,7 @@ Auth.prototype.portalLogin = function (req, res, next) {
                                 response.message = "Invalid credentials";
                                 response.error = null;
                                 response.data = null;
-                                res.status(500).json(response);
+                                res.status(200).json(response);
 
                                 console.log('FnLogin:login result not found');
                             }
@@ -2725,7 +2725,7 @@ Auth.prototype.portalLogin = function (req, res, next) {
                             response.message = "Invalid credentials";
                             response.error = null;
                             response.data = null;
-                            res.status(500).json(response);
+                            res.status(200).json(response);
                             console.log('FnLogin:login result not found');
                         }
                     }
@@ -2734,7 +2734,7 @@ Auth.prototype.portalLogin = function (req, res, next) {
                         response.message = "Invalid credentials";
                         response.error = null;
                         response.data = null;
-                        res.status(500).json(response);
+                        res.status(200).json(response);
 
                         console.log('FnLogin: Invalid login credentials');
                     }

@@ -267,6 +267,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             fileResponse.on('data', function (d) { bufs.push(d); });
                             fileResponse.on('end', function () {
                                 var buf = Buffer.concat(bufs);
+                                process.env.ANTIWORDHOME = '/usr/share/antiword';
                                 textract.fromBufferWithName(cv, buf, function (error, txt) {
                                     if (error) {
                                         // var tempCVPath = cv.replace('docx', 'doc');
@@ -546,7 +547,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                 clientContact: result[30] ? result[30] : [],
                                 interview: result[33] ? result[33] : [],
                                 billing: result[38] ? result[38] : [],
-                                billingTable: result[40] ? result[40] : []
+                                billingTable: result[40] ? result[40] : [],
+                                offer: result[51] ? result[51] : []
                             },
                             educationList: output1,
                             Stage: result[15] ? result[15] : [],
@@ -1388,7 +1390,8 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                         }
                         response.data = {
                             applicantList: result[0],
-                            count: result[1][0].count
+                            count: result[1][0].count,
+                            applicantIdArray : (result[2] && result[2][0] && JSON.parse(result[2][0].applicantIdArray)) ? JSON.parse(result[2][0].applicantIdArray) :[]
                         };
                         res.status(200).json(response);
 
@@ -4730,10 +4733,10 @@ applicantCtrl.resumeSearchResultsByPage = function (req, res, next) {
 
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                req.query.start = req.query.start ? req.query.start : 1;
-                req.query.limit = (req.query.limit) ? req.query.limit : 0;
+                req.query.start = req.query.start ? req.query.start : 0;
+                req.query.limit = (req.query.limit) ? req.query.limit : 10;
 
-                req.query.start = ((((req.query.start) * req.query.limit) + 1) - req.query.limit) - 1;
+                // req.query.start = ((((req.query.start) * req.query.limit) + 1) - req.query.limit) - 1;
 
 
                 var inputs = [

@@ -7,6 +7,9 @@ var settingsCtrl = require('./settings-ctrl');
 router.get('/master',settingsCtrl.getAccessrightsMaster);
 
 router.post('/template',settingsCtrl.saveAccessrightsTemplate);
+router.post('/saveoffertemplate',settingsCtrl.saveofferTemplate);
+
+router.get('/getOfferTemplateMaster',settingsCtrl.getOfferTemplateMaster);
 
 // router.get('/mailExtract',settingsCtrl.mailExtract);
 
@@ -16,5 +19,7 @@ router.post('/template',settingsCtrl.saveAccessrightsTemplate);
 
 
 router.get('/temporary',settingsCtrl.temporary);
+// router.get('/imapFinally',settingsCtrl.imapFinally);
+
 
 module.exports = router;

@@ -113,8 +113,13 @@ var onboardingctrl = require('./HEApp/onBoarding/onboarding-routes.js');
 
 var likeShareComment = require('./HEApp/likesharecomment.js');
 
+var nk = require('./nearkart/nearkart-routes');
+
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
+
+router.use('/nk', nk);
+
 
 router.use('/configuration', configurationV1);
 router.use('/recruitment', recruitmentV1);
@@ -445,7 +450,6 @@ if (cluster.isWorker) {
 
                             if (typeof (response_server.assessment) == 'string') {
                                 response_server.assessment = JSON.parse(response_server.assessment);
-                                response_server.skillAssessment = JSON.parse(response_server.skillAssessment);
                             }
 
 
