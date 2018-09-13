@@ -369,7 +369,12 @@ likesharecommentCtrl.saveArchive=function(req,res,next){
                     if(!err && results[0] && results[0][0] ){
                         results[0][0].formData = results[0][0].formData ? JSON.parse(results[0][0].formData):{};
                         response.status = true;
-                        response.message = "data saved successfully";
+                        if(req.body.isArchive==1){
+                        response.message = "Transaction archived successfully";
+                        }
+                        else if(req.body.isArchive==0) {
+                            response.message = "Transaction restored successfully";
+                        }
                         response.error = null;
                         
                         response.data = results[0][0];
@@ -448,7 +453,7 @@ likesharecommentCtrl.getArchiveTransList=function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.groupId) ,
-                    req.st.db.escape(req.query.startPage),   
+                    req.st.db.escape(startPage),   
                     req.st.db.escape(req.query.limit)   
                 ];
                 /**

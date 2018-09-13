@@ -5,40 +5,38 @@
 var LoginCtrl = {};
 var error = {};
 var appConfig = require('../../../../ezeone-config.json');
-var DBSecretKey=appConfig.DB.secretKey;
+var DBSecretKey = appConfig.DB.secretKey;
 
-LoginCtrl.login = function(req,res,next){
+LoginCtrl.login = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.query.EZEOneId)
-    {
+    if (!req.query.EZEOneId) {
         error.token = 'Invalid EZEOneId';
         validationFlag *= false;
     }
-    if (!req.query.password)
-    {
+    if (!req.query.password) {
         error.token = 'Invalid password';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
-    req.st.validateHEToken(req.query.token,req.query.EZEOneId,req.query.password,function(err,tokenResult){
-        if((!err) && tokenResult){
-            console.log(tokenResult[0].heUserId, "heuserId") ;
+    req.st.validateHEToken(req.query.token, req.query.EZEOneId, req.query.password, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
+            console.log(tokenResult[0].heUserId, "heuserId");
 
             var procParams = [
                 req.st.db.escape(tokenResult[0].heUserId)
@@ -49,16 +47,16 @@ LoginCtrl.login = function(req,res,next){
              */
             var procQuery = 'CALL HE_get_formList( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,formList){
+            req.db.query(procQuery, function (err, formList) {
                 console.log(err);
-                if(!err && formList && formList[0] && formList[0][0]){
+                if (!err && formList && formList[0] && formList[0][0]) {
                     response.status = true;
                     response.message = "Form list loaded successfully";
                     response.error = null;
                     response.data = formList[0];
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting formlist";
                     response.error = null;
@@ -67,53 +65,50 @@ LoginCtrl.login = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-LoginCtrl.getHelloEZEUsers = function(req,res,next){
+LoginCtrl.getHelloEZEUsers = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.query.EZEOneId)
-    {
+    if (!req.query.EZEOneId) {
         error.token = 'Invalid EZEOneId';
         validationFlag *= false;
     }
-    if (!req.query.password)
-    {
+    if (!req.query.password) {
         error.token = 'Invalid password';
         validationFlag *= false;
     }
-    if (!req.query.userFormMapId)
-    {
+    if (!req.query.userFormMapId) {
         error.userFormMapId = 'Invalid userFormMapId';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
 
-    req.st.validateHEToken(req.query.token,req.query.EZEOneId,req.query.password,function(err,tokenResult){
-        if((!err) && tokenResult){
+    req.st.validateHEToken(req.query.token, req.query.EZEOneId, req.query.password, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
 
             var procParams = [
                 req.st.db.escape(req.query.userFormMapId),
-                req.st.db.escape(DBSecretKey)                                            
+                req.st.db.escape(DBSecretKey)
             ];
             /**
              * Calling procedure to save form template
@@ -121,16 +116,16 @@ LoginCtrl.getHelloEZEUsers = function(req,res,next){
              */
             var procQuery = 'CALL HE_get_accessUsersList( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,userList){
+            req.db.query(procQuery, function (err, userList) {
                 console.log(err);
-                if(!err && userList && userList[0]){
+                if (!err && userList && userList[0]) {
                     response.status = true;
                     response.message = "Access user list loaded successfully";
                     response.error = null;
                     response.data = userList[0];
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting user list";
                     response.error = null;
@@ -139,18 +134,19 @@ LoginCtrl.getHelloEZEUsers = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-LoginCtrl.getFormStatus = function(req,res,next){
+LoginCtrl.getFormStatus = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null,
+        filter: null
     };
     var validationFlag = true;
 
@@ -159,21 +155,20 @@ LoginCtrl.getFormStatus = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 var procParams = [
                     req.st.db.escape(req.query.formTypeId),
                     req.st.db.escape(req.query.token),
@@ -186,16 +181,24 @@ LoginCtrl.getFormStatus = function(req,res,next){
                  */
                 var procQuery = 'CALL WhatMate_get_StatusList( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,taskList){
+                req.db.query(procQuery, function (err, taskList) {
                     console.log(err);
-                    if(!err && taskList && taskList[0]){
+                    if (!err && taskList && taskList[0]) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
+                        if ((req.query.formTypeId) == '0000') {
+                            for(var i=0;i< taskList[0].length;i++)
+                            {
+                            taskList[0][i].statusDetails=taskList[0][i].statusDetails?JSON.parse(taskList[0][i].statusDetails):'[]';
+                            }
+                       
+                        //     }
+                        }
                         response.data = taskList[0];
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -204,7 +207,7 @@ LoginCtrl.getFormStatus = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -213,12 +216,12 @@ LoginCtrl.getFormStatus = function(req,res,next){
 
 };
 
-LoginCtrl.getTasks = function(req,res,next){
+LoginCtrl.getTasks = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -227,28 +230,27 @@ LoginCtrl.getTasks = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
-                req.query.companyMasterId  = (req.query.companyMasterId) ? (req.query.companyMasterId):0;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
+                req.query.companyMasterId = (req.query.companyMasterId) ? (req.query.companyMasterId) : 0;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -266,26 +268,26 @@ LoginCtrl.getTasks = function(req,res,next){
                  */
                 var procQuery = 'CALL WhatMate_get_taskList( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,taskList){
+                req.db.query(procQuery, function (err, taskList) {
                     console.log(err);
-                    if(!err && taskList && taskList[0]){
+                    if (!err && taskList && taskList[0]) {
                         response.status = true;
                         response.message = "Task list loaded successfully";
                         response.error = null;
                         response.data = {
-                            taskList : taskList[0],
-                            count : taskList[1][0].count
+                            taskList: taskList[0],
+                            count: taskList[1][0].count
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Task list loaded successfully";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting task list";
                         response.error = null;
@@ -294,7 +296,7 @@ LoginCtrl.getTasks = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -303,12 +305,12 @@ LoginCtrl.getTasks = function(req,res,next){
 
 };
 
-LoginCtrl.getMeeting = function(req,res,next){
+LoginCtrl.getMeeting = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -317,27 +319,26 @@ LoginCtrl.getMeeting = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -355,26 +356,26 @@ LoginCtrl.getMeeting = function(req,res,next){
                  */
                 var procQuery = 'CALL WhatMate_get_MeetingList( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,taskList){
+                req.db.query(procQuery, function (err, taskList) {
                     console.log(err);
-                    if(!err && taskList && taskList[0]){
+                    if (!err && taskList && taskList[0]) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            meetingList : taskList[0],
-                            count : taskList[1][0].count
+                            meetingList: taskList[0],
+                            count: taskList[1][0].count
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -383,7 +384,7 @@ LoginCtrl.getMeeting = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -391,12 +392,12 @@ LoginCtrl.getMeeting = function(req,res,next){
 
 };
 
-LoginCtrl.getExpenseList = function(req,res,next){
+LoginCtrl.getExpenseList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -405,27 +406,26 @@ LoginCtrl.getExpenseList = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -443,9 +443,9 @@ LoginCtrl.getExpenseList = function(req,res,next){
                  */
                 var procQuery = 'CALL WhatMate_get_ExpenseClaim( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,expenseList){
+                req.db.query(procQuery, function (err, expenseList) {
                     console.log(err);
-                    if(!err && expenseList && expenseList[0]){
+                    if (!err && expenseList && expenseList[0]) {
                         // var output = [];
                         // for(var i = 0; i < expenseList[0].length; i++) {
                         //     var res1 = {};
@@ -487,19 +487,19 @@ LoginCtrl.getExpenseList = function(req,res,next){
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            expenseList : expenseList[0],
-                            count : expenseList[1][0].count
+                            expenseList: expenseList[0],
+                            count: expenseList[1][0].count
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -508,7 +508,7 @@ LoginCtrl.getExpenseList = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -516,12 +516,12 @@ LoginCtrl.getExpenseList = function(req,res,next){
 
 };
 
-LoginCtrl.getExpenseDetails = function(req,res,next){
+LoginCtrl.getExpenseDetails = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -530,21 +530,20 @@ LoginCtrl.getExpenseDetails = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.APIKey),
@@ -557,41 +556,41 @@ LoginCtrl.getExpenseDetails = function(req,res,next){
                  */
                 var procQuery = 'CALL WhatMate_get_ExpenseDetails( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,expenseList){
+                req.db.query(procQuery, function (err, expenseList) {
 
-                    if(!err && expenseList && expenseList[0]){
+                    if (!err && expenseList && expenseList[0]) {
                         var output = [];
-                        var expenseJSON = (expenseList[0][0].expenses) ? JSON.parse(expenseList[0][0].expenses) : "" ;
+                        var expenseJSON = (expenseList[0][0].expenses) ? JSON.parse(expenseList[0][0].expenses) : "";
 
-                        for(var i = 0; i < expenseJSON.length; i++) {
-                                var expenseRes = {};
-                                console.log("expenseList[0][i].amount",expenseJSON[i].amount);
-                                expenseRes.amount = expenseJSON[i].amount;
-                                expenseRes.expDate = expenseJSON[i].expDate;
-                                expenseRes.currencyId = expenseJSON[i].currencyId;
-                                expenseRes.particulars = expenseJSON[i].particulars;
-                                expenseRes.expenseTypeId = expenseJSON[i].expenseTypeId;
-                                expenseRes.currencySymbol = expenseJSON[i].currencySymbol;
-                                expenseRes.expenseTypeTitle = expenseJSON[i].expenseTypeTitle;
-                                expenseRes.attachment = (expenseJSON[i].attachment) ? JSON.parse(expenseJSON[i].attachment) : "" ;
+                        for (var i = 0; i < expenseJSON.length; i++) {
+                            var expenseRes = {};
+                            console.log("expenseList[0][i].amount", expenseJSON[i].amount);
+                            expenseRes.amount = expenseJSON[i].amount;
+                            expenseRes.expDate = expenseJSON[i].expDate;
+                            expenseRes.currencyId = expenseJSON[i].currencyId;
+                            expenseRes.particulars = expenseJSON[i].particulars;
+                            expenseRes.expenseTypeId = expenseJSON[i].expenseTypeId;
+                            expenseRes.currencySymbol = expenseJSON[i].currencySymbol;
+                            expenseRes.expenseTypeTitle = expenseJSON[i].expenseTypeTitle;
+                            expenseRes.attachment = (expenseJSON[i].attachment) ? JSON.parse(expenseJSON[i].attachment) : "";
                             output.push(expenseRes);
                         }
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            expenseList : output
+                            expenseList: output
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -600,7 +599,7 @@ LoginCtrl.getExpenseDetails = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -608,12 +607,12 @@ LoginCtrl.getExpenseDetails = function(req,res,next){
 
 };
 
-LoginCtrl.getAttendanceRequestList = function(req,res,next){
+LoginCtrl.getAttendanceRequestList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -622,27 +621,26 @@ LoginCtrl.getAttendanceRequestList = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -661,25 +659,25 @@ LoginCtrl.getAttendanceRequestList = function(req,res,next){
                  */
                 var procQuery = 'CALL WhatMate_get_AttendanceRequests( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,attendanceList){
-                    if(!err && attendanceList && attendanceList[0]){
+                req.db.query(procQuery, function (err, attendanceList) {
+                    if (!err && attendanceList && attendanceList[0]) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            attendanceList : attendanceList[0],
-                            count : attendanceList[1][0].count
+                            attendanceList: attendanceList[0],
+                            count: attendanceList[1][0].count
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -688,7 +686,7 @@ LoginCtrl.getAttendanceRequestList = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -696,12 +694,12 @@ LoginCtrl.getAttendanceRequestList = function(req,res,next){
 
 };
 
-LoginCtrl.getLeaveRegister = function(req,res,next){
+LoginCtrl.getLeaveRegister = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -710,27 +708,26 @@ LoginCtrl.getLeaveRegister = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -748,25 +745,25 @@ LoginCtrl.getLeaveRegister = function(req,res,next){
                  */
                 var procQuery = 'CALL WhatMate_get_leaves( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,leaveRegister){
-                    if(!err && leaveRegister && leaveRegister[0]){
+                req.db.query(procQuery, function (err, leaveRegister) {
+                    if (!err && leaveRegister && leaveRegister[0]) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            leaveRegister : leaveRegister[0],
-                            count : leaveRegister[1][0].count
+                            leaveRegister: leaveRegister[0],
+                            count: leaveRegister[1][0].count
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -775,7 +772,7 @@ LoginCtrl.getLeaveRegister = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -783,12 +780,12 @@ LoginCtrl.getLeaveRegister = function(req,res,next){
 
 };
 
-LoginCtrl.getTravelRequest = function(req,res,next){
+LoginCtrl.getTravelRequest = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -797,27 +794,26 @@ LoginCtrl.getTravelRequest = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -835,25 +831,25 @@ LoginCtrl.getTravelRequest = function(req,res,next){
                  */
                 var procQuery = 'CALL WhatMate_get_TravelRequest( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,travelRequest){
-                    if(!err && travelRequest && travelRequest[0]){
+                req.db.query(procQuery, function (err, travelRequest) {
+                    if (!err && travelRequest && travelRequest[0]) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            travelRequest : travelRequest[0],
-                            count : travelRequest[1][0].count
+                            travelRequest: travelRequest[0],
+                            count: travelRequest[1][0].count
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -862,7 +858,7 @@ LoginCtrl.getTravelRequest = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -870,12 +866,12 @@ LoginCtrl.getTravelRequest = function(req,res,next){
 
 };
 
-LoginCtrl.getTravelClaim = function(req,res,next){
+LoginCtrl.getTravelClaim = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -884,27 +880,26 @@ LoginCtrl.getTravelClaim = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -922,25 +917,25 @@ LoginCtrl.getTravelClaim = function(req,res,next){
                  */
                 var procQuery = 'CALL WhatMate_get_TravelClaim( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,travelClaim){
-                    if(!err && travelClaim && travelClaim[0]){
+                req.db.query(procQuery, function (err, travelClaim) {
+                    if (!err && travelClaim && travelClaim[0]) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            travelClaim : travelClaim[0],
-                            count : travelClaim[1][0].count
+                            travelClaim: travelClaim[0],
+                            count: travelClaim[1][0].count
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -949,7 +944,7 @@ LoginCtrl.getTravelClaim = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -957,12 +952,12 @@ LoginCtrl.getTravelClaim = function(req,res,next){
 
 };
 
-LoginCtrl.getSalesMaster = function(req,res,next){
+LoginCtrl.getSalesMaster = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -971,21 +966,20 @@ LoginCtrl.getSalesMaster = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.APIKey)
@@ -997,18 +991,18 @@ LoginCtrl.getSalesMaster = function(req,res,next){
                  */
                 var procQuery = 'CALL WhatMate_get_salesMaster( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,salesMasterResult){
-                    if(!err && salesMasterResult && salesMasterResult[0]){
+                req.db.query(procQuery, function (err, salesMasterResult) {
+                    if (!err && salesMasterResult && salesMasterResult[0]) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                          stageList : salesMasterResult[0],
-                          probabilityList : JSON.parse(salesMasterResult[1][0].probabilityList)
+                            stageList: salesMasterResult[0],
+                            probabilityList: JSON.parse(salesMasterResult[1][0].probabilityList)
                         };
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -1017,7 +1011,7 @@ LoginCtrl.getSalesMaster = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1026,12 +1020,12 @@ LoginCtrl.getSalesMaster = function(req,res,next){
 
 };
 
-LoginCtrl.getSalesList = function(req,res,next){
+LoginCtrl.getSalesList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -1040,34 +1034,33 @@ LoginCtrl.getSalesList = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
-    var stageList =req.query.stageList;
-    if(typeof(stageList) == "string") {
+    var stageList = req.query.stageList;
+    if (typeof (stageList) == "string") {
         stageList = JSON.parse(stageList);
     }
-    if(!stageList){
-        stageList = [] ;
+    if (!stageList) {
+        stageList = [];
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.probabilities = req.query.probabilities ? req.query.probabilities : "";
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(JSON.stringify(stageList)),
@@ -1086,26 +1079,26 @@ LoginCtrl.getSalesList = function(req,res,next){
                  */
                 var procQuery = 'CALL WhatMate_get_sales( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,salesList){
+                req.db.query(procQuery, function (err, salesList) {
                     console.log(err);
-                    if(!err && salesList && salesList[0]){
+                    if (!err && salesList && salesList[0]) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            salesList : salesList[0],
-                            count : salesList[1][0].count
+                            salesList: salesList[0],
+                            count: salesList[1][0].count
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -1114,7 +1107,7 @@ LoginCtrl.getSalesList = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1122,12 +1115,12 @@ LoginCtrl.getSalesList = function(req,res,next){
 
 };
 
-LoginCtrl.getAttendanceRegister = function(req,res,next){
+LoginCtrl.getAttendanceRegister = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -1136,30 +1129,29 @@ LoginCtrl.getAttendanceRegister = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
-                req.query.gradeIds = (req.query.gradeIds) ? (req.query.gradeIds):"";
-                req.query.departmentIds = (req.query.departmentIds) ? (req.query.departmentIds):"";
-                req.query.workLocationIds = (req.query.workLocationIds) ? (req.query.workLocationIds):"";
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
+                req.query.gradeIds = (req.query.gradeIds) ? (req.query.gradeIds) : "";
+                req.query.departmentIds = (req.query.departmentIds) ? (req.query.departmentIds) : "";
+                req.query.workLocationIds = (req.query.workLocationIds) ? (req.query.workLocationIds) : "";
 
                 var procParams = [
                     req.st.db.escape(tokenResult[0].masterid),
@@ -1176,26 +1168,26 @@ LoginCtrl.getAttendanceRegister = function(req,res,next){
 
                 var procQuery = 'CALL WhatMate_get_attendanceRegister( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,attendanceRegister){
+                req.db.query(procQuery, function (err, attendanceRegister) {
                     console.log(err);
-                    if(!err && attendanceRegister && attendanceRegister[0]){
+                    if (!err && attendanceRegister && attendanceRegister[0]) {
                         response.status = true;
                         response.message = "attendance register loaded successfully";
                         response.error = null;
                         response.data = {
-                            attendanceRegister : attendanceRegister[0],
-                            count : attendanceRegister[1][0].count
+                            attendanceRegister: attendanceRegister[0],
+                            count: attendanceRegister[1][0].count
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -1204,7 +1196,7 @@ LoginCtrl.getAttendanceRegister = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1212,12 +1204,12 @@ LoginCtrl.getAttendanceRegister = function(req,res,next){
 
 };
 
-LoginCtrl.getAttendanceRegisterDetails = function(req,res,next){
+LoginCtrl.getAttendanceRegisterDetails = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -1226,41 +1218,36 @@ LoginCtrl.getAttendanceRegisterDetails = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
-    if (!req.query.HEUserId)
-    {
+    if (!req.query.HEUserId) {
         error.HEUserId = 'Invalid HEUserId';
         validationFlag *= false;
     }
-    if (!req.query.day)
-    {
+    if (!req.query.day) {
         error.day = 'Invalid day';
         validationFlag *= false;
     }
-    if (!req.query.month)
-    {
+    if (!req.query.month) {
         error.month = 'Invalid month';
         validationFlag *= false;
     }
-    if (!req.query.year)
-    {
+    if (!req.query.year) {
         error.year = 'Invalid year';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(tokenResult[0].masterid),
@@ -1273,27 +1260,27 @@ LoginCtrl.getAttendanceRegisterDetails = function(req,res,next){
 
                 var procQuery = 'CALL WhatMate_get_attendanceRegister_Details( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,attendanceRegister){
+                req.db.query(procQuery, function (err, attendanceRegister) {
                     console.log(err);
-                    if(!err && attendanceRegister){
+                    if (!err && attendanceRegister) {
                         response.status = true;
                         response.message = "attendance register loaded successfully";
                         response.error = null;
                         response.data = {
-                            TITO : attendanceRegister[0] ? attendanceRegister[0] : [],
-                            attendanceRequest : attendanceRegister[1] ? attendanceRegister[1] : [],
-                            leaveRequest : attendanceRegister[2] ? attendanceRegister[2] : []
+                            TITO: attendanceRegister[0] ? attendanceRegister[0] : [],
+                            attendanceRequest: attendanceRegister[1] ? attendanceRegister[1] : [],
+                            leaveRequest: attendanceRegister[2] ? attendanceRegister[2] : []
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -1302,7 +1289,7 @@ LoginCtrl.getAttendanceRegisterDetails = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1310,12 +1297,12 @@ LoginCtrl.getAttendanceRegisterDetails = function(req,res,next){
 
 };
 
-LoginCtrl.getStationaryList = function(req,res,next){
+LoginCtrl.getStationaryList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -1324,27 +1311,26 @@ LoginCtrl.getStationaryList = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -1362,27 +1348,27 @@ LoginCtrl.getStationaryList = function(req,res,next){
                  */
                 var procQuery = 'CALL whatmate_get_stationaryRequests( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,stationaryList){
+                req.db.query(procQuery, function (err, stationaryList) {
                     console.log(err);
-                    if(!err && stationaryList && stationaryList[0]){
+                    if (!err && stationaryList && stationaryList[0]) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            stationaryList : stationaryList[0],
-                            count : stationaryList[1][0].count,
-                            itemSummary : stationaryList[2]
+                            stationaryList: stationaryList[0],
+                            count: stationaryList[1][0].count,
+                            itemSummary: stationaryList[2]
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -1391,7 +1377,7 @@ LoginCtrl.getStationaryList = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1399,12 +1385,12 @@ LoginCtrl.getStationaryList = function(req,res,next){
 
 };
 
-LoginCtrl.getPantryList = function(req,res,next){
+LoginCtrl.getPantryList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -1413,27 +1399,26 @@ LoginCtrl.getPantryList = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -1451,27 +1436,27 @@ LoginCtrl.getPantryList = function(req,res,next){
                  */
                 var procQuery = 'CALL whatmate_get_pantryRequests( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,pantryList){
+                req.db.query(procQuery, function (err, pantryList) {
                     console.log(err);
-                    if(!err && pantryList && pantryList[0]){
+                    if (!err && pantryList && pantryList[0]) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            pantryList : pantryList[0],
-                            count : pantryList[1][0].count,
-                            itemSummary : pantryList[2]
+                            pantryList: pantryList[0],
+                            count: pantryList[1][0].count,
+                            itemSummary: pantryList[2]
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -1480,7 +1465,7 @@ LoginCtrl.getPantryList = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1488,12 +1473,12 @@ LoginCtrl.getPantryList = function(req,res,next){
 
 };
 
-LoginCtrl.getAssetList = function(req,res,next){
+LoginCtrl.getAssetList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -1502,27 +1487,26 @@ LoginCtrl.getAssetList = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -1540,27 +1524,27 @@ LoginCtrl.getAssetList = function(req,res,next){
                  */
                 var procQuery = 'CALL whatmate_get_assetRequests( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,assetList){
+                req.db.query(procQuery, function (err, assetList) {
                     console.log(err);
-                    if(!err && assetList && assetList[0]){
+                    if (!err && assetList && assetList[0]) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            assetList : assetList[0],
-                            count : assetList[1][0].count,
-                            itemSummary : assetList[2]
+                            assetList: assetList[0],
+                            count: assetList[1][0].count,
+                            itemSummary: assetList[2]
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -1569,7 +1553,7 @@ LoginCtrl.getAssetList = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1577,12 +1561,12 @@ LoginCtrl.getAssetList = function(req,res,next){
 
 };
 
-LoginCtrl.getManpowerList = function(req,res,next){
+LoginCtrl.getManpowerList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -1591,27 +1575,26 @@ LoginCtrl.getManpowerList = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -1629,12 +1612,12 @@ LoginCtrl.getManpowerList = function(req,res,next){
                  */
                 var procQuery = 'CALL whatmate_get_manpower( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,manpowerList){
+                req.db.query(procQuery, function (err, manpowerList) {
                     console.log(err);
-                    if(!err && manpowerList && manpowerList[0]){
+                    if (!err && manpowerList && manpowerList[0]) {
 
                         var output = [];
-                        for(var i = 0; i < manpowerList[0].length; i++) {
+                        for (var i = 0; i < manpowerList[0].length; i++) {
                             var res1 = {};
                             res1.parentId = manpowerList[0][i].parentId;
                             res1.transId = manpowerList[0][i].transId;
@@ -1674,19 +1657,19 @@ LoginCtrl.getManpowerList = function(req,res,next){
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            manpowerList : output ,
-                            count : manpowerList[1][0].count
+                            manpowerList: output,
+                            count: manpowerList[1][0].count
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -1695,7 +1678,7 @@ LoginCtrl.getManpowerList = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1703,12 +1686,12 @@ LoginCtrl.getManpowerList = function(req,res,next){
 
 };
 
-LoginCtrl.getReferredCVs = function(req,res,next){
+LoginCtrl.getReferredCVs = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -1717,27 +1700,26 @@ LoginCtrl.getReferredCVs = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -1752,25 +1734,25 @@ LoginCtrl.getReferredCVs = function(req,res,next){
 
                 var procQuery = 'CALL whatmate_get_cvReferal( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,CVList){
-                    if(!err && CVList && CVList[0]){
+                req.db.query(procQuery, function (err, CVList) {
+                    if (!err && CVList && CVList[0]) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            CVList : CVList[0],
-                            count : CVList[1][0].count
+                            CVList: CVList[0],
+                            count: CVList[1][0].count
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -1779,7 +1761,7 @@ LoginCtrl.getReferredCVs = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1787,12 +1769,12 @@ LoginCtrl.getReferredCVs = function(req,res,next){
 
 };
 
-LoginCtrl.getInterviewScheduler = function(req,res,next){
+LoginCtrl.getInterviewScheduler = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -1801,27 +1783,26 @@ LoginCtrl.getInterviewScheduler = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -1836,10 +1817,10 @@ LoginCtrl.getInterviewScheduler = function(req,res,next){
 
                 var procQuery = 'CALL whatmate_get_InterviewSchedule( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,interviewScheduledList){
-                    if(!err && interviewScheduledList && interviewScheduledList[0]){
+                req.db.query(procQuery, function (err, interviewScheduledList) {
+                    if (!err && interviewScheduledList && interviewScheduledList[0]) {
                         var output = [];
-                        for(var i = 0; i < interviewScheduledList[0].length; i++) {
+                        for (var i = 0; i < interviewScheduledList[0].length; i++) {
                             var res1 = {};
                             res1.parentId = interviewScheduledList[0][i].parentId;
                             res1.transId = interviewScheduledList[0][i].transId;
@@ -1871,19 +1852,19 @@ LoginCtrl.getInterviewScheduler = function(req,res,next){
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            interviewScheduledList : output,
-                            count : interviewScheduledList[1][0].count
+                            interviewScheduledList: output,
+                            count: interviewScheduledList[1][0].count
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -1892,7 +1873,7 @@ LoginCtrl.getInterviewScheduler = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1900,12 +1881,12 @@ LoginCtrl.getInterviewScheduler = function(req,res,next){
 
 };
 
-LoginCtrl.getDocumentRequestList = function(req,res,next){
+LoginCtrl.getDocumentRequestList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid credentials",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid credentials",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -1914,27 +1895,26 @@ LoginCtrl.getDocumentRequestList = function(req,res,next){
     req.query.password = req.query.password ? req.query.password : "";
     req.query.token = req.query.token ? req.query.token : "";
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateHEToken(req.query.APIKey,req.query.EZEOneId,req.query.password,req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
-                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo):1;
-                req.query.limit = (req.query.limit) ? (req.query.limit):100;
+                req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
                     req.st.db.escape(req.query.status),
@@ -1949,10 +1929,10 @@ LoginCtrl.getDocumentRequestList = function(req,res,next){
 
                 var procQuery = 'CALL whatmate_get_DocumentsRequested( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,DocumentsRequestList){
-                    if(!err && DocumentsRequestList && DocumentsRequestList[0]){
+                req.db.query(procQuery, function (err, DocumentsRequestList) {
+                    if (!err && DocumentsRequestList && DocumentsRequestList[0]) {
                         var output = [];
-                        for(var i = 0; i < DocumentsRequestList[0].length; i++) {
+                        for (var i = 0; i < DocumentsRequestList[0].length; i++) {
                             var res1 = {};
                             res1.parentId = DocumentsRequestList[0][i].parentId;
                             res1.transId = DocumentsRequestList[0][i].transId;
@@ -1977,19 +1957,19 @@ LoginCtrl.getDocumentRequestList = function(req,res,next){
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            documentsRequestList : output,
-                            count : DocumentsRequestList[1][0].count
+                            documentsRequestList: output,
+                            count: DocumentsRequestList[1][0].count
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
-                        response.data = null ;
+                        response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting data list";
                         response.error = null;
@@ -1998,7 +1978,7 @@ LoginCtrl.getDocumentRequestList = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });

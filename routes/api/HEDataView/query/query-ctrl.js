@@ -27,6 +27,11 @@ queryCtrl.getHRQueryList = function(req,res,next){
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
+    if (!req.query.formTypeId)
+    {
+        error.formTypeId = 'Invalid formTypeId';
+        validationFlag *= false;
+    }
 
     if (!validationFlag){
         response.error = error;
@@ -52,7 +57,9 @@ queryCtrl.getHRQueryList = function(req,res,next){
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
                     req.st.db.escape(tokenResult[0].masterid),
-                    req.st.db.escape(DBSecretKey)
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.query.formTypeId)
+
                 ];
 
                 var procQuery = 'CALL whatmate_get_HRQueryList( ' + procParams.join(',') + ')';

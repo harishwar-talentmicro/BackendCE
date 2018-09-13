@@ -1,7 +1,8 @@
 /**
  * Created by vedha on 06-03-2017.
  */
-
+var Notification_aws = require('../../../modules/notification/aws-sns-push.js');
+var _Notification_aws = new Notification_aws();
 
 var formTemplateCtrl = {};
 var error = {};
@@ -81,7 +82,12 @@ formTemplateCtrl.saveFormTemplate = function(req,res,next){
                     req.st.db.escape(req.body.receiverAllocation),
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.body.helpTitle),
-                    req.st.db.escape(req.body.keywords)
+                    req.st.db.escape(req.body.keywords),
+                    req.st.db.escape(req.body.like),
+                    req.st.db.escape(req.body.share),
+                    req.st.db.escape(req.body.comment),
+                    req.st.db.escape(req.body.archive)
+
                 ];
                 /**
                  * Calling procedure to save form template
@@ -92,7 +98,35 @@ formTemplateCtrl.saveFormTemplate = function(req,res,next){
                 req.db.query(procQuery,function(err,formTemplateResult){
                     console.log(err);
 
-                    if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0] && formTemplateResult[0][0].formTemplateId){
+                    if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0] && formTemplateResult[0][0].formTemplateId && formTemplateResult[1] && formTemplateResult[1][0]){
+                        response.status = true;
+                        response.message = "Form Template saved successfully";
+                        response.error = null;
+                        var messagePayload = {
+                            message: "Changes in form group",
+                            type: 201,
+                            alarmType: 4,
+                            data :{
+                                groupId : formTemplateResult[3][0].companyGroupId
+
+                            }
+                        };
+
+                       
+                            if (formTemplateResult && formTemplateResult[1] && formTemplateResult[1][0] && formTemplateResult[1][0].APNS_Id) {
+                                _Notification_aws.publish_IOS(formTemplateResult[1][0].APNS_Id, messagePayload, 0);
+                            }
+
+                            if (formTemplateResult && formTemplateResult[2] && formTemplateResult[2][0] && formTemplateResult[2][0].GCM_Id) {
+                                _Notification_aws.publish_Android(formTemplateResult[2][0].GCM_Id, messagePayload);
+                            }
+
+                        response.formTemplateId = formTemplateResult[0][0].formTemplateId;
+                        res.status(200).json(response);
+
+                    }
+
+                    else if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0] && formTemplateResult[0][0].formTemplateId){
                         response.status = true;
                         response.message = "Form Template saved successfully";
                         response.error = null;
@@ -173,6 +207,10 @@ formTemplateCtrl.updateFormTemplate = function(req,res,next){
                 req.body.receiverAllocation = (req.body.receiverAllocation) ? req.body.receiverAllocation : 0 ;
                 req.body.helpTitle = (req.body.helpTitle) ? req.body.helpTitle : "" ;
                 req.body.keywords = (req.body.keywords) ? req.body.keywords : "" ;
+                req.body.like = (req.body.like) ? req.body.like : 0;
+                req.body.share = (req.body.share) ? req.body.share : 0 ;
+                req.body.comment = (req.body.comment) ? req.body.comment : 0 ;
+                req.body.archive = (req.body.archive) ? req.body.archive : 0 ;
 
 
                 var procParams = [
@@ -193,7 +231,12 @@ formTemplateCtrl.updateFormTemplate = function(req,res,next){
                     req.st.db.escape(req.body.receiverAllocation),
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.body.helpTitle),
-                    req.st.db.escape(req.body.keywords)
+                    req.st.db.escape(req.body.keywords),
+                    req.st.db.escape(req.body.like),
+                    req.st.db.escape(req.body.share),
+                    req.st.db.escape(req.body.comment),
+                    req.st.db.escape(req.body.archive)
+
 
                 ];
                 /**
@@ -203,7 +246,36 @@ formTemplateCtrl.updateFormTemplate = function(req,res,next){
                 var procQuery = 'CALL save_HEformTemplates( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,formTemplateResult){
-                    if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0] && formTemplateResult[0][0].formTemplateId){
+                    if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0] && formTemplateResult[0][0].formTemplateId && formTemplateResult[1] && formTemplateResult[1][0]){
+                        response.status = true;
+                        response.message = "Form Template saved successfully";
+                        response.error = null;
+                        var messagePayload = {
+                            message: "Changes in form ",
+                            type: 201,
+                            alarmType: 4,
+                            data :{
+                                groupId : formTemplateResult[3][0].companyGroupId
+
+                            }
+                        };
+
+                       
+                            if (formTemplateResult && formTemplateResult[1] && formTemplateResult[1][0] && formTemplateResult[1][0].APNS_Id) {
+                                console.log(formTemplateResult[1][0].APNS_Id);
+                                _Notification_aws.publish_IOS(formTemplateResult[1][0].APNS_Id, messagePayload, 0);
+                            }
+
+                            if (formTemplateResult && formTemplateResult[2] && formTemplateResult[2][0] && formTemplateResult[2][0].GCM_Id) {
+                                _Notification_aws.publish_Android(formTemplateResult[2][0].GCM_Id, messagePayload);
+                            }
+
+                        response.formTemplateId = formTemplateResult[0][0].formTemplateId;
+                        res.status(200).json(response);
+
+                    }
+
+                    else if(!err && formTemplateResult && formTemplateResult[0] && formTemplateResult[0][0] && formTemplateResult[0][0].formTemplateId){
                         response.status = true;
                         response.message = "Form Template saved successfully";
                         response.error = null;

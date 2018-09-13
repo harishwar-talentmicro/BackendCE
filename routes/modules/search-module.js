@@ -553,7 +553,7 @@ Search.prototype.searchInformation = function(req,res,next){
                 }
             }
             var SearchParameter = st.db.escape(Token) + ',' + st.db.escape(WorkingDate) + ',' + st.db.escape(IPAddress)
-                + ',' + st.db.escape(EZEID) + ',' + st.db.escape(Pin)+ ',' + st.db.escape(latitude) + ',' + st.db.escape(longitude);
+                + ',' + st.db.escape(EZEID) + ',' + st.db.escape(Pin)+ ',' + st.db.escape(latitude) + ',' + st.db.escape(longitude)+','+st.db.escape(DBSecretKey);
 
             var feedbackParam = st.db.escape(EZEID) + ',' + st.db.escape(5) + ',' + st.db.escape(0)
                 + ',' + st.db.escape(0) + ',' + st.db.escape(1)+ ',' + st.db.escape(0)+','+st.db.escape(DBSecretKey);

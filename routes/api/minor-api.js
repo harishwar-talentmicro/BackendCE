@@ -12,9 +12,82 @@ var appConfig = require('../../ezeone-config.json');
 
 var DBSecretKey = appConfig.DB.secretKey;
 
+var htmlpdf = require('html-pdf');
+var Mailer = require('../../mail/mailer.js');
+var mailerApi = new Mailer();
+
+var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+
 var request = require('request');
 // var Client = require('node-rest-client').Client;   // for interview scheduler hirecraft
 // var client = new Client();
+var fs=require('fs')
+var Jimp=require('jimp');
+var gcloud = require('gcloud');
+var timestamp = Date.now();
+var uuid = require('node-uuid');
+
+var gcloud = require('gcloud');
+var fs = require('fs');
+
+// var appConfig = require('../../ezeone-config.json');
+
+var gcs = gcloud.storage({
+    projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
+    keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+});
+
+// Reference an existing bucket.
+var bucket = gcs.bucket(appConfig.CONSTANT.STORAGE_BUCKET);
+
+bucket.acl.default.add({
+    entity: 'allUsers',
+    role: gcs.acl.READER_ROLE
+}, function (err, aclObject) {
+});
+
+/**
+ * image uploading to cloud server
+ * @param uniqueName
+ * @param readStream
+ * @param callback
+ */
+var uploadDocumentToCloud = function (uniqueName, readStream, callback) {
+    var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
+    readStream.pipe(remoteWriteStream);
+
+    remoteWriteStream.on('finish', function () {
+        console.log('done');
+        if (callback) {
+            if (typeof (callback) == 'function') {
+                callback(null);
+            }
+            else {
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else {
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+
+    remoteWriteStream.on('error', function (err) {
+        if (callback) {
+            if (typeof (callback) == 'function') {
+                console.log(err);
+                callback(err);
+            }
+            else {
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else {
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+};
+
+ 
 
 var configurationV1 = require('./configuration.js');
 var recruitmentV1 = require('./recruitment/recruitment-master.js');
@@ -521,15 +594,92 @@ if (cluster.isWorker) {
 
 
 
-        var cronJobWalkIn = new CronJob({
+var cronJobWalkIn = new CronJob({
+    cronTime: '*/3 * * * *',
+    onTick: function () {
+        var counter = 1;
+        var query = "call wm_integrationUrlwalkIn()";
+        db.query(query, function (err, result) {
+            console.log('Walkin Hexaware');
+            if (err) {
+                console.log('error: integrationUrl For walkIn Hircraft', err);
+            }
+            else if ((result[0].length != 0) && (result[1].length != 0)) {
+                var heMasterId;
+                var transId;
+                var formData = {};
+                var DBUrl;
+                if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
+                    heMasterId = result[0][0].heMasterId;
+                    DBUrl = result[0][0].url;
+                    transId = result[1][0].transId;
+                    if (typeof (result[1][0].formData) == 'string') {
+                        formData = result[1][0].formData ? JSON.parse(result[1][0].formData) : {};
+                    }
+                    else {
+                        formData = result[1][0].formData;
+                    }
+
+                    // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
+                    var count = 0;
+                    request({
+                        url: DBUrl,
+                        method: "POST",
+                        json: true,   // <--Very important!!!
+                        body: formData
+                    }, function (error, response, body) {
+                        console.log(error);
+                        console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
+                        if (body && body.Code && ((body.Code == "SAVED") || body.Rid || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "INFO_03") || (body.Code == "ERR_07") || (body.Code == "ERR_08"))) {
+                            var updateQuery = "update 1039_trans set sync=1, Rid=" + body.Rid + " where heParentId=" + transId;
+                            console.log("walkIn", updateQuery);
+                            db.query(updateQuery, function (err, results) {
+                                if (err) {
+                                    console.log("update sync query throws error");
+                                }
+                                else {
+                                    console.log("sync is updated to 1 successfully of transId", transId);
+                                }
+                            });
+                        }
+                        count++;
+                    });
+                    console.log('tallint walkIn hit for ', count, ' times');
+                }
+            }
+        });
+        console.log("counter", counter++);
+
+
+    },
+    start: false,
+    timeZone: 'America/Los_Angeles'
+});
+cronJobWalkIn.start();
+
+// });
+//     }
+// }
+
+// });
+
+var cluster = require('cluster');
+
+if (cluster.isWorker) {
+    console.log('quess walkIn cluster', cluster.worker.id);
+
+    if (cluster.worker.id == 1) {
+
+        // cron.schedule('*/15 * * * *', function () {
+
+        var cronJobWalkInQuessCorp = new CronJob({
             cronTime: '*/3 * * * *',
             onTick: function () {
-                var counter=1;
-                var query = "call wm_integrationUrlwalkIn()";
+                var query = "call wm_integrationUrlwalkInForQuessCorp()";
                 db.query(query, function (err, result) {
-                    console.log('Walkin Hexaware');
+                    console.log('Running walkin cron job For Quess Corp ', query);
                     if (err) {
-                        console.log('error: integrationUrl For walkIn Hircraft', err);
+                        console.log('error: integrationUrl For Quess Corp');
                     }
                     else if ((result[0].length != 0) && (result[1].length != 0)) {
                         var heMasterId;
@@ -547,6 +697,7 @@ if (cluster.isWorker) {
                                 formData = result[1][0].formData;
                             }
 
+
                             // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
                             var count = 0;
                             request({
@@ -559,7 +710,6 @@ if (cluster.isWorker) {
                                 console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
                                 if (body && body.Code && ((body.Code == "SAVED") || body.Rid || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "INFO_03") || (body.Code == "ERR_07") || (body.Code == "ERR_08"))) {
                                     var updateQuery = "update 1039_trans set sync=1, Rid=" + body.Rid + " where heParentId=" + transId;
-                                    console.log("walkIn", updateQuery);
                                     db.query(updateQuery, function (err, results) {
                                         if (err) {
                                             console.log("update sync query throws error");
@@ -571,92 +721,15 @@ if (cluster.isWorker) {
                                 }
                                 count++;
                             });
-                            console.log('tallint walkIn hit for ', count, ' times');
+                            console.log('Quess Corp walkIn hit for ', count, ' times');
                         }
                     }
                 });
-                console.log("counter",counter++);
-
-
             },
             start: false,
             timeZone: 'America/Los_Angeles'
         });
-        cronJobWalkIn.start();
-
-        // });
-//     }
-// }
-
-// });
-
-var cluster = require('cluster');
-
-if (cluster.isWorker) {
-    console.log('quess walkIn cluster', cluster.worker.id);
-
-    if (cluster.worker.id == 1) {
-
-        // cron.schedule('*/15 * * * *', function () {
-
-            var cronJobWalkInQuessCorp = new CronJob({
-                cronTime: '*/3 * * * *',
-                onTick: function () {
-            var query = "call wm_integrationUrlwalkInForQuessCorp()";
-            db.query(query, function (err, result) {
-                console.log('Running walkin cron job For Quess Corp ', query);
-                if (err) {
-                    console.log('error: integrationUrl For Quess Corp');
-                }
-                else if ((result[0].length != 0) && (result[1].length != 0)) {
-                    var heMasterId;
-                    var transId;
-                    var formData = {};
-                    var DBUrl;
-                    if (result && result[0] && result[0][0] && result[1] && result[1][0]) {
-                        heMasterId = result[0][0].heMasterId;
-                        DBUrl = result[0][0].url;
-                        transId = result[1][0].transId;
-                        if (typeof (result[1][0].formData) == 'string') {
-                            formData = result[1][0].formData ? JSON.parse(result[1][0].formData) : {};
-                        }
-                        else {
-                            formData = result[1][0].formData;
-                        }
-
-
-                        // NEED TO PARSE FORMDATA AND SEND TO BODY OF REQUEST
-                        var count = 0;
-                        request({
-                            url: DBUrl,
-                            method: "POST",
-                            json: true,   // <--Very important!!!
-                            body: formData
-                        }, function (error, response, body) {
-                            console.log(error);
-                            console.log(body);  // ERR_07: Duplicate Email. ERR_08: Duplicate Mobile (If duplicate then also update our database)
-                            if (body && body.Code && ((body.Code == "SAVED") || body.Rid || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "INFO_03") || (body.Code == "ERR_07") || (body.Code == "ERR_08"))) {
-                                var updateQuery = "update 1039_trans set sync=1, Rid=" + body.Rid + " where heParentId=" + transId;
-                                db.query(updateQuery, function (err, results) {
-                                    if (err) {
-                                        console.log("update sync query throws error");
-                                    }
-                                    else {
-                                        console.log("sync is updated to 1 successfully of transId", transId);
-                                    }
-                                });
-                            }
-                            count++;
-                        });
-                        console.log('Quess Corp walkIn hit for ', count, ' times');
-                    }
-                }
-            });
-                },
-                start: false,
-                timeZone: 'America/Los_Angeles'
-            });
-            cronJobWalkInQuessCorp.start();
+        cronJobWalkInQuessCorp.start();
         // });
     }
 }
@@ -669,13 +742,14 @@ if (cluster.isWorker) {
 
     if (cluster.worker.id == 1) {
         var cronJobgreeting = new CronJob({
-            cronTime: '00 08 * * *',     // to run in seconds 30 * * * * *
+            cronTime: '00 14 * * *',     // to run in seconds 30 * * * * *
             onTick: function () {
 
                 // console.log('running a notify messages');
                 // notifyMessages.getMessagesNeedToNotify();
                 cronjob = function (req, res, next) {
-                    console.log("greeting cron");
+                    console.log("====================================greeting cron");
+                    console.log("==================================== starts greeting cron");
 
                     var response = {
                         status: false,
@@ -688,10 +762,102 @@ if (cluster.isWorker) {
                     console.log(procQuery);
                     db.query(procQuery, function (err, results) {
 
-                        if (!err && results && results[0]) {
-                            senderGroupId = results[0][0].senderId;
+                        
+
+                        if (!err && results && results[0] && results[1] && results[1][0]) {
+                            console.log("--------entered to loop" )
+
+                            for (var i = 0; i<results[1].length; i++) {
+                                console.log()
+                                results[1][i].formDataJSON = results[1][i].formDataJSON ? JSON.parse(results[1][i].formDataJSON) : {};
+                                console.log(results[1][i].formDataJSON)
+                                var imageUrl = results[1][i].formDataJSON.CDNPath;
+                                var displayImage = results[1][i].imageURL;
+                                var displayName = results[1][i].displayName;
+                                console.log(imageUrl);
+                                console.log(displayImage);
+                                console.log(displayName);
+
+                                   console.log("image imposing started")
+                                // var imageUrl=results[1][i].formDataJSON.CDNPath;
+                                Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png").then(function (image2) {
+                                    Jimp.read("https://storage.googleapis.com/ezeone/" + imageUrl, function (err, lenna) {
+
+                                        var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + displayImage).then(function (image1) {
+
+                                            var profile = image1;
+                                            var mask = image2;
+                                            var w = mask.bitmap.width; // the width of the image
+                                            var h = mask.bitmap.height;
+                                            // console.log(w, h);
+                                            profile.resize(w, h);
+                                            // console.log(h);
+
+                                            profile.mask(mask, 0, 0)
+                                                .write("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png", function () {
+
+                                                    Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png", function (err, bdayImage) {
+                                                        bdayImage.resize(180, 180);
+
+                                                        if (err) throw err;
+                                                        bdayImage.quality(100)
+                                                        Jimp.loadFont(Jimp.FONT_SANS_64_BLACK).then(function (font) {
+                                                            lenna.print(font, 68, 850, displayName, 800);
+
+                                                            lenna.composite(bdayImage, 105, 104)
+                                                                .write("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png", function () {
+                                                                    console.log('writing final image');
+                                                                    var attachment = {
+                                                                        path: "/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png",
+                                                                        extension: 'png',
+                                                                        fileName: 'gunasheel'
+                                                                    };
+
+                                                                    console.log("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png")
+
+                                                                    var filetype = (attachment.extension) ? attachment.extension : '';
+                                                                    var uniqueId = uuid.v4();
+                                                                    // consol.log()
+                                                                    aUrl = uniqueId + '.' + filetype;
+                                                                    console.log(uniqueId);
+                                                                    aFilename = attachment.fileName;
+                                                                    // console.log("aFilenameaFilename", aFilename);
+                                                                    // console.log("req.files.attachment.path", attachment.path);
+
+                                                                    var readStream = fs.createReadStream(attachment.path);
+
+                                                                    // console.log(readStream);
+                                                                    uploadDocumentToCloud(aUrl, readStream, function (err) {
+                                                                        if (!err) {
+                                                                            console.log(aUrl);
+                                                                            // results[1][i].formDataJSON.CDNPath=aUrl
+                                                                            fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png");
+                                                                            fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png");
+
+
+                                                                        }
+                                                                        else {
+
+                                                                            console.log('FnSaveServiceAttachment:greetings not uploaded');
+                                                                        }
+                                                                    });
+
+
+                                                                });
+                                                        });
+                                                    });
+                                                });
+                                        })
+                                    });
+
+                                    senderGroupId = results[0][0].senderId;
                             notifyMessages.getMessagesNeedToNotify();
                             console.log("Greetings sent successfully")
+                                });
+
+                            }
+                           
+                            
                         }
 
                         else {
@@ -705,7 +871,7 @@ if (cluster.isWorker) {
             timeZone: 'America/Los_Angeles'
 
         });
-        cronJobgreeting.start();
+        // cronJobgreeting.start();
     }
 }
 
@@ -793,5 +959,86 @@ if (cluster.isWorker) {
 //         logout.start();
 //     }
 // }
+
+var cluster = require('cluster');
+
+// query reNotifier
+if (cluster.isWorker) {
+
+    if (cluster.worker.id == 1) {
+        var walkinMailreminder = new CronJob({
+            cronTime: '00 14 * * *',
+            onTick: function () {
+                var procQuery = 'CALL wm_remainder_walkinMail( "' + DBSecretKey + '")';
+                console.log(procQuery);
+                console.log("remainder mail for walkin cvupload");
+
+                db.query(procQuery, function (err, results) {
+                    console.log(err);
+
+                    if (results[2] && results[2][0]) {
+                        for (var i = 0; i < results[2].length; i++) {
+                            if (results[0] && results[0][0] || results[1] || results[1][0]) {
+                                var mailContent = (results[1] && results[1][0]) ? results[1][0].mailBody : "Dear [FirstName] <br>Thank you for registering your profile.  We will revert to you once we find your Resume match one of the requirements we have.In the mean time, please [ClickHere] to upload your latest CV that will help us with more detailed information about your profile.Wishing you all the best<br><br>[WalkINSignature]<br>[Disclaimer]";
+
+                                if (mailContent) {
+                                    mailContent = mailContent.replace("[FirstName]", (results[2][i].firstName ? results[2][i].firstName : ''));
+                                    mailContent = mailContent.replace("[FullName]", (results[2][i].firstName ? results[2][i].firstName : ''));
+
+                                    var webLink = (results[1] && results[1][0]) ? results[1][0].webLink : "";
+
+                                    // For updating resume though url link after registering for walkIn
+
+                                    var parentId = (results[2] && results[2][i]) ? results[2][i].applicantId : undefined;
+                                    walkInApplicantId = Date.now().toString().concat(parentId);
+                                    var webLinkTo = results[1][0].whatmateWebTestOrLive + walkInApplicantId;
+                                    webLinkTo = webLinkTo.replace('"', '');
+                                    webLinkTo = webLinkTo.replace('"', '');
+
+                                    mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
+                                    // ------------------------------------------------
+
+                                    // mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
+
+                                    var walkInSignature = (results[1] && results[1][0]) ? results[1][0].walkInSignature : "";
+                                    var disclaimer = (results[1] && results[1][0]) ? results[1][0].disclaimer : "";
+
+                                    mailContent = mailContent.replace("[WalkINSignature]", walkInSignature);
+                                    mailContent = mailContent.replace("[Disclaimer]", disclaimer);
+                                }
+
+                                var subject = results[1][0].mailSubject ? results[1][0].mailSubject : 'Registration Completed Successfully';
+                                var bccmail = results[1][0].bccMailId ? JSON.parse(results[1][0].bccMailId) : '';
+                                var bccmailId = bccmail[0];
+                                console.log("bcc ------------------------- mail", bccmailId);
+                                // send mail to candidate
+                                var email = new sendgrid.Email();
+                                email.from = results[1][0].fromEmailId ? results[1][0].fromEmailId : 'noreply@talentmicro.com';
+                                email.to = results[2][i].emailId ? results[2][i].emailId : '';
+                                email.bcc = bccmail;
+                                email.subject = subject;
+                                email.html = mailContent;
+
+                                sendgrid.send(email, function (err11, result11) {
+                                    if (err11) {
+                                        console.log("Failed to send to candidate", err11);
+                                    }
+                                    else {
+                                        mailSent = 1;
+                                        console.log("mail sent successfully to candidate", result11);
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+
+
+                });
+            }
+        });
+        walkinMailreminder.start();
+    }
+}
 
 module.exports = router;

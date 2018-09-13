@@ -16,5 +16,6 @@ router.get('/relatedDocument/find',contentManagerCtrl.findRelatedDocument);
 router.get('/relatedDocuments',contentManagerCtrl.getRelatedDocument);
 router.post('/relatedDocument',contentManagerCtrl.saveRelatedDocument);
 router.delete('/relatedDocument',contentManagerCtrl.deleteRelatedDocument);
-
+router.post('/docFeedback',contentManagerCtrl.savedocumentFeedback);
+router.get('/docFeedback',contentManagerCtrl.getdocumentUpdateFeedback);
 module.exports = router;

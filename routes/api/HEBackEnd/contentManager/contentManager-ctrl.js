@@ -12,6 +12,10 @@ var _Notification_aws = new  Notification_aws();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
 
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../encryption/encryption.js');
+var encryption = new  AES_256_encryption();
+
 
 contentManagerCtrl.saveContent = function(req,res,next){
     var response = {
@@ -688,6 +692,168 @@ contentManagerCtrl.deleteRelatedDocument = function(req,res,next){
                     else{
                         response.status = false;
                         response.message = "Error while deleting document";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+contentManagerCtrl.savedocumentFeedback = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    var isTrue = false;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+                // var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    
+                    if (!req.body.docId)
+                    {
+                        error.docId = 'Invalid docId';
+                        validationFlag *= false;
+                    }
+                
+                    if (!validationFlag){
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.docId),
+                            req.st.db.escape(req.body.transId),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(req.body.readStatus),
+                            req.st.db.escape(req.body.rating),
+                            req.st.db.escape(req.body.comments),
+                            req.st.db.escape(req.body.signature)
+                        ];
+                        /**
+                         * Calling procedure to save feedback
+                         * @type {string}
+                         */
+                        var procQuery = 'CALL he_save_documentFeedback( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery,function(err,informationResult){
+                            if(!err){
+                                var filePath = "";
+                                response.status = true;
+                                response.message = "Feedback saved successfully";
+                                response.error = null;
+                                response.data =  null;
+                                res.status(200).json(response);
+                            }
+                            else{
+                                response.status = false;
+                                response.message = "Error while saving feedback";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                // });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+contentManagerCtrl.getdocumentUpdateFeedback = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.groupId)
+    {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.parentId),
+                    req.st.db.escape(req.query.transId),
+                    req.st.db.escape(req.query.groupId)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL he_get_documentFeedback( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,result){
+                    if(!err && result && result[0] && result[0][0]){
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data =  
+                        result[0][0];
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else if(!err){
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while getting Data";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
