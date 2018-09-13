@@ -766,15 +766,16 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             var bcc=[];
                             if(results[3][0] && results[3][0].bccMailId && typeof(results[3][0].bccMailId) =='string'){
                                 bcc = results[3][0].bccMailId ? JSON.parse(results[3][0].bccMailId) : [];
+                                bccMailId=bcc[0];
                             }
-
+                           console.log(mailContent);
                             // send mail to candidate
                             var email = new sendgrid.Email();
                             email.from = results[2][0].fromEmailId ? results[2][0].fromEmailId : 'noreply@talentmicro.com';
                             email.to = req.body.emailId;
                             email.subject = subject;
                             email.html = mailContent;
-                            email.bcc = bcc;
+                            email.bcc = bccMailId;
 
                             sendgrid.send(email, function (err11, result11) {
                                 if (err11) {
@@ -1192,6 +1193,10 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
     };
 
     var validationFlag = true;
+    // if (!req.query.token) {
+    //     error.token = "invalid token";
+    //     validationFlag = false;
+    // }
 
     if (!req.query.mobileNo) {
         error.mobileNo = "Mobile number is mandatory";
@@ -1218,6 +1223,7 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
         req.body.emailId = req.body.emailId ? req.body.emailId : '';
         req.body.firstName = req.body.firstName ? req.body.firstName : '';
         req.body.heMasterId = req.body.heMasterId ? req.body.heMasterId : 0;
+        req.query.token = req.query.token ? req.query.token : '';
 
 
         var inputs = [
@@ -1229,7 +1235,8 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
             req.st.db.escape(req.body.mobileISD),
             req.st.db.escape(req.body.IDNumber),
             req.st.db.escape(req.body.emailId),
-            req.st.db.escape(req.body.heMasterId)
+            req.st.db.escape(req.body.heMasterId),
+            req.st.db.escape(req.query.token)
         ];
 
         var procQuery = 'CALL wm_walkIn_verifyOtp( ' + inputs.join(',') + ')';
@@ -3086,7 +3093,10 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(req.body.bccMailId || []) ),
                     req.st.db.escape(req.body.reminderMailSubject || ''),
                     req.st.db.escape(req.body.reminderMailBody || '' ),
-                    req.st.db.escape(req.body.empListBasedOnLocation || 0)
+                    req.st.db.escape(req.body.empListBasedOnLocation || 0),
+                    req.st.db.escape(req.body.masterOTPLength || 4 ),
+                    req.st.db.escape(req.body.masterOTP || 1111)
+
                 ];
 
                 var procQuery = 'CALL wm_save_walkWebConfig( ' + inputs.join(',') + ')';
@@ -3844,6 +3854,8 @@ walkInCvCtrl.publicWalkInConfig = function (req, res, next) {
                 req.body.vendors = req.body.vendors ? req.body.vendors : 0;
                 req.body.profilePic = req.body.profilePic ? req.body.profilePic : 0;
 
+                req.body.fromMailId = req.body.fromMailId ? req.body.fromMailId : 0;
+
 
 
                 var inputs = [
@@ -3868,7 +3880,9 @@ walkInCvCtrl.publicWalkInConfig = function (req, res, next) {
                     req.st.db.escape(req.body.syncInBackground),
                     req.st.db.escape(req.body.walkinRegistrationType),
                     req.st.db.escape(req.body.walkinTokenGeneration),
-                    req.st.db.escape(req.body.walkinFormMessage)
+                    req.st.db.escape(req.body.walkinFormMessage),
+                    req.st.db.escape(req.body.fromMailId)
+
 
                 ];
 

@@ -26,5 +26,6 @@ router.post('/savePaceFollowUpNotes',billingCtrl.savePaceFollowUpNotes);
 router.get('/getPaceFollowUpNotes',billingCtrl.getPaceFollowUpNotes);
 
 router.post('/billingFilterNew',billingCtrl.billingFilterNew);  
+router.get('/imapFinally',billingCtrl.imapFinally);  
 
 module.exports = router;

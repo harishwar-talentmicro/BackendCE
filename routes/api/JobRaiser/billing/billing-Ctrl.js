@@ -17,7 +17,8 @@ var DBSecretKey = CONFIG.DB.secretKey;
 var billingCtrl = {};
 var error = {};
 
-
+var convert = require('xml-js');
+var request = require('request');
 var gcloud = require('gcloud');
 var uuid = require('node-uuid');
 
@@ -900,7 +901,8 @@ billingCtrl.invoiceApplyTax = function (req, res, next) {
                     req.st.db.escape(req.body.invoiceDate),
                     req.st.db.escape(req.body.invoiceNumber),
                     req.st.db.escape(JSON.stringify(reqApplicants)),
-                    req.st.db.escape(JSON.stringify(req.body.billId || []))
+                    req.st.db.escape(JSON.stringify(req.body.billId || [])),
+                    req.st.db.escape(req.body.invoiceDueDate)
                 ];
 
                 var procQuery = 'CALL wm_save_billingTax( ' + inputs.join(',') + ')';
@@ -995,10 +997,10 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
                         response.status = true;
                         response.message = "Invoice generated sucessfully";
                         response.error = null;
-
+                        var subTotalAmount = 0;
+                        var totalAmount = 0;
                         fs.readFile('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/billing/paceinvoice.html', 'utf-8', function (err, data) {
                             console.log('error from reading', err);
-                            console.log('data from reading', data);
                             var taxTemplate = JSON.parse(result[0][0].taxTemplate);
                             var tags = JSON.parse(result[0][0].tags);
                             var tableTags = JSON.parse(result[0][0].tableTags);
@@ -1014,6 +1016,10 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
                                         // var reg = '[invoice.' + tags[tagIndex].tagName+']';
                                         // var regExp = new RegExp(reg, 'g');
                                         // console.log('regExp', regExp);
+                                        if (result[2] && result[2][0] && result[2][0][tags[tagIndex].tagName]) {
+                                            invoiceBody = invoiceBody.replace('[invoice.' + tags[tagIndex].tagName + ']', result[2][0][tags[tagIndex].tagName]);
+                                        }
+
                                         if (result[1] && result[1][0] && result[1][0][tags[tagIndex].tagName]) {
                                             invoiceBody = invoiceBody.replace('[invoice.' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
                                         }
@@ -1021,18 +1027,7 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
                                 }
                             }
 
-                            if (taxTemplate) {
-                                for (var tagIndex = 0; tagIndex < taxTemplate.length; tagIndex++) {
-                                    if (taxTemplate[tagIndex]) {
-                                        // var reg = '[invoice.' + tags[tagIndex].tagName+']';
-                                        // var regExp = new RegExp(reg, 'g');
-                                        // console.log('regExp', regExp);
-                                        if (result[1] && result[1][0] && result[1][0][taxTemplate[tagIndex].tagName]) {
-                                            invoiceBody = invoiceBody.replace('[invoice.' + taxTemplate[tagIndex].tagName + ']', result[1][0][taxTemplate[tagIndex].tagName]);
-                                        }
-                                    }
-                                }
-                            }
+
 
 
 
@@ -1042,34 +1037,65 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
 
                                 for (var tableTagIndex = 0; tableTagIndex < tableTags.length; tableTagIndex++) {
 
-                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;font-family: Verdana,sans-serif;font-size: 8px !important;">' + tableTags[tableTagIndex].tagName.split('.')[1] + "</th>";
+                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;font-family: Verdana,sans-serif;font-size: 8px !important;padding:3px;">' + tableTags[tableTagIndex].displayTagAs + "</th>";
                                 }
                                 tableContent += "</tr>";
 
                                 for (var candidateCount = 0; candidateCount < result[2].length; candidateCount++) {
                                     tableContent += "<tr>";
                                     for (var tableTagIndex = 0; tableTagIndex < tableTags.length; tableTagIndex++) {
-                                        if (tableTagIndex != 0)
-                                            tableContent += '<td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;">' + result[2][candidateCount][tableTags[tableTagIndex].tagName.split('.')[1]] + "</td>";
+                                        if (tableTagIndex != 0) {
+
+                                            if (tableTagIndex == tableTags.length - 1) {
+                                                subTotalAmount += result[2][candidateCount][tableTags[tableTagIndex].tagName.split('.')[1]];
+                                                if (result[2][candidateCount][tableTags[tableTagIndex].tagName.split('.')[1]])
+                                                    tableContent += '<td style="text-align:right;border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;">' + result[2][candidateCount][tableTags[tableTagIndex].tagName.split('.')[1]] + "</td>";
+                                                else
+                                                    tableContent += '<td style="text-align:center;border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;">' + '-' + "</td>";
+                                            }
+                                            else
+                                                if (result[2][candidateCount][tableTags[tableTagIndex].tagName.split('.')[1]])
+                                                    tableContent += '<td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;">' + (result[2][candidateCount][tableTags[tableTagIndex].tagName.split('.')[1]]) + "</td>";
+                                                else
+                                                    tableContent += '<td style="text-align:center;border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;">' + '-' + "</td>";
+                                        }
                                         else
-                                            tableContent += '<td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;">' + i + 1 + "</td>";
+                                            tableContent += '<td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;">' + (candidateCount + 1) + "</td>";
                                     }
                                     tableContent += "</tr>";
                                 }
+                                totalAmount = subTotalAmount;
 
                                 //tax template for loop. run forloop on tax tags length
-                                for (var taxCount = 0; taxCount < 3; taxCount++) {
-                                    tableContent += '<tr><td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;" colspan="4">CGST</td>';
-                                    tableContent += '<td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;" colspan="1">100</td></tr>';
+                                if (taxTemplate && taxTemplate.taxCodes) {
+                                    for (var taxCount = 0; taxCount < taxTemplate.taxCodes.length; taxCount++) {
+                                        if (taxTemplate.taxCodes[taxCount]) {
+                                            // var reg = '[invoice.' + tags[tagIndex].tagName+']';
+                                            // var regExp = new RegExp(reg, 'g');
+                                            // console.log('regExp', regExp);
+                                            var taxAmt = (subTotalAmount * taxTemplate.taxCodes[taxCount].percentage) / 100;
+                                            totalAmount += taxAmt;
+                                            tableContent += '<tr><td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;" colspan="4">' + taxTemplate.taxCodes[taxCount].code + '</td>';
+                                            tableContent += '<td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;text-align:right;" colspan="1">' + taxAmt + '</td></tr>';
+
+                                        }
+                                    }
                                 }
+                                // for (var taxCount = 0; taxCount < 3; taxCount++) {
+                                //     tableContent += '<tr><td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;" colspan="4">' + result[1][0][taxTemplate[tagIndex].tagName] + '</td>';
+                                //     tableContent += '<td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;" colspan="1">100</td></tr>';
+                                // }
                                 tableContent += '<tr><td style="border: 1px solid #ddd;padding: 3px;vertical-align: top;border-top: 1px solid #ddd;" colspan="4">Total</td>';
-                                tableContent += '<td colspan="1">10000</td></tr>'
+                                tableContent += '<td colspan="1" style="text-align:right;padding:3px;">' + totalAmount + '</td></tr>'
                                 tableContent += "</table>";
 
                             }
 
-                            invoiceBody = invoiceBody.replace('[table]', tableContent);
+                            invoiceBody = invoiceBody.replace('[invoice.BillingTable]', tableContent);
                             data = data.replace('[Content]', invoiceBody);
+                            data = data.replace(/(<p>&nbsp;<\/p><p>&nbsp;<\/p>)+/g, '<p>&nbsp;<\/p>');
+                            // data = data.replace(/\n/g, '<br>');
+                            // console.log(data);
 
                             var options = { format: 'A4', width: '8in', height: '10.5in', border: '0', timeout: 30000, "zoomFactor": "1" };
 
@@ -1090,49 +1116,60 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
 
                             var attachmentObjectsList = [];
                             htmlpdf.create(data, options).toBuffer(function (err, buffer) {
+                                console.log(err);
                                 attachmentObjectsList = [{
                                     filename: "INVOICE" + req.query.invoiceNumber + '.pdf',
                                     content: buffer
 
                                 }];
 
-                                // var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                // var email = new sendgrid.Email();
-                                // email.from = "noreply@talentMicro.com";
-                                // email.to = 'sundar@talentmicro.com';
-                                // email.subject = "Invoice generated";
-                                // email.html = '<h1>asfasdasdasdasdasds</h1>';
-                                // email.cc = mailOptions.cc;
-                                // email.bcc = mailOptions.bcc;
-                                // email.html = mailOptions.html;
-                                //if 1 or more attachments are present
+                                var uniqueId = uuid.v4();
+                                var timestamp = Date.now();
+                                aUrl = uniqueId + '.pdf';
 
-                                // email.addFile({
-                                //     filename: attachmentObjectsList[0].filename,
-                                //     content: attachmentObjectsList[0].content,
-                                //     contentType: "application/pdf"
-                                // });
+                                console.log("buffer content", attachmentObjectsList[0].content);
 
-                                // sendgrid.send(email, function (err, result) {
-                                //     if(!err) console.log(err);
-                                //     console.log(result);
-                                // });
-                                //     console.log('buffer',buffer);
-                                //     var wstream = fs.createWriteStream('invoiceGen');
-                                //     wstream.write(buffer);
-                                //     wstream.end();
+                                fs.writeFile("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/billing/invoice" + timestamp + ".pdf", buffer, function (err) {
+                                    if (!err) {
+                                        console.log("file written");
+                                        var readStream = fs.createReadStream('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/billing/invoice' + timestamp + '.pdf');
 
-                                response.data = {
-                                    invoiceBody: invoiceBody,
-                                    tableContent: tableContent,
-                                    invoiceDetails: (result[0] && result[0][0]) ? result[0][0] : {},
-                                    clientDetails: (result[1] && result[1][0]) ? result[1] : {},
-                                    applicantDetails: (result[2] && result[2][0]) ? result[2] : [],
-                                    taxData: (result[3] && result[3][0]) ? result[3] : [],
-                                    bufferPdf: attachmentObjectsList[0].content
-                                }
-                                res.status(200).json(response);
+                                        uploadDocumentToCloud(aUrl, readStream, function (err) {
+                                            if (!err) {
 
+                                                var invoiceQuery = "call wm_save_PaceGeneratedInvoice(" + req.st.db.escape(req.query.invoiceNumber) + ",'" + aUrl + "')";
+                                                console.log(invoiceQuery);
+                                                req.db.query(invoiceQuery, function (err, invoiceresult) {
+                                                    if (!err && invoiceresult && invoiceresult[0] && invoiceresult[0][0]) {
+                                                        console.log("Invoice generated saved successfully");
+
+                                                        response.data = {
+                                                            invoiceBody: data,
+                                                            tableContent: tableContent,
+                                                            invoiceDetails: (result[0] && result[0][0]) ? result[0][0] : {},
+                                                            clientDetails: (result[1] && result[1][0]) ? result[1] : {},
+                                                            applicantDetails: (result[2] && result[2][0]) ? result[2] : [],
+                                                            taxData: (result[3] && result[3][0]) ? result[3] : [],
+                                                            bufferPdf: attachmentObjectsList[0].content,
+                                                            invoicePdfCdnPath: aUrl
+                                                        }
+                                                        res.status(200).json(response);
+
+                                                    }
+                                                });
+                                                console.log("err", err);
+                                                console.log('FnSaveServiceAttachment: attachment Uploaded successfully', aUrl);
+                                                fs.unlink('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/billing/invoice' + timestamp + '.pdf', function (err) {
+                                                    if (!err) {
+                                                        console.log('File Deleted');
+                                                    }
+                                                });
+
+
+                                            }
+                                        });
+                                    }
+                                });
                             });
                         })
 
@@ -1692,5 +1729,260 @@ billingCtrl.billingFilterNew = function (req, res, next) {
     }
 };
 
+
+billingCtrl.imapFinally = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var imaps = require('imap-simple');
+    var config = {
+        imap: {
+            user: 'arun@jobraiser.com',
+            password: 'arun@007',
+            host: 'imap.gmail.com',
+            port: 993,
+            tls: true,
+            authTimeout: 3000
+        }
+    };
+
+    imaps.connect(config).then(function (connection) {
+
+        connection.openBox('INBOX').then(function () {
+
+            // Fetch emails from the last 24h
+            var delay = 24 * 3600 * 1000;
+            var yesterday = new Date();
+            yesterday.setTime(Date.now() - delay);
+            yesterday = yesterday.toISOString();
+            var searchCriteria = ['UNSEEN', ['SUBJECT', 'testing'], ['SINCE', yesterday]];
+            var fetchOptions = { 
+                bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'], 
+                struct: true, 
+                markSeen: true 
+            };
+
+            // retrieve only the headers of the messages
+            return connection.search(searchCriteria, fetchOptions);
+        }).then(function (messages) {
+
+            var attachments = [];
+
+            messages.forEach(function (message) {
+                var parts = imaps.getParts(message.attributes.struct);
+                attachments = attachments.concat(parts.filter(function (part) {
+                    return part.disposition && part.disposition.type.toUpperCase() === 'ATTACHMENT';
+                }).map(function (part) {
+                    // retrieve the attachments only of the messages with attachments
+                    return connection.getPartData(message, part)
+                        .then(function (partData) {
+                            return {
+                                filename: part.disposition.params.filename,
+                                data: partData
+                            };
+                        });
+                }));
+            });
+
+            return Promise.all(attachments);
+        }).then(function (attachments) {
+            console.log('attachments', attachments);
+            response.data = attachments;
+
+            // =>
+            //    [ { filename: 'cats.jpg', data: Buffer() },
+            //      { filename: 'pay-stub.pdf', data: Buffer() } ]
+            for (var i = 0; i < attachments.length; i++) {
+
+                return new Promise(function (resolve, reject) {
+
+                var uniqueId = uuid.v4();
+                var timestamp = Date.now();
+                var filetype = attachments[i].filename ? attachments[i].filename.split('.')[1] : '';
+                // var filetype = (attachments[i].filename && attachments[i].filename && attachments[i].filename.extension) ? attachments[i].filename.extension : '';
+
+                aUrl = uniqueId + '.' + filetype;
+                ///home/ezeonetalent/ezeone1/api/routes/api/JobRaiser
+                console.log('aUrl', aUrl);
+                console.log("req.files.attachment.path", attachments[i].filename);
+                // C:\Users\TM2\Documents\gitproject\routes\api\JobRaiser\settings\imap.js
+                fs.writeFile("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/billing/imap" + timestamp + "." + filetype, attachments[i].data, function (err) {
+                    if (!err) {
+                        console.log("file written");
+                        var readStream = fs.createReadStream('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/billing/imap' + timestamp + '.' + filetype);
+                        console.log('file read', readStream);
+                        uploadDocumentToCloud(aUrl, readStream, function (err) {
+                            if (!err) {
+                                console.log('FnSaveServiceAttachment: attachment Uploaded successfully', aUrl);
+
+                                fs.unlink("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/billing/imap" + timestamp + "." + filetype, function (err) {
+                                    if (!err) {
+                                        console.log('File Deleted');
+                                    }
+                                });
+
+                                //take attachment one by one and parse and save
+                                var formData = {
+                                    file: {
+                                        value: 'https://storage.googleapis.com/ezeone/' + aUrl,   // put full path
+                                        options: {
+                                            filename: 'https://storage.googleapis.com/ezeone/' + aUrl,
+                                            contentType: 'application/*'
+                                        }
+                                    }
+                                };
+
+                                request.post({
+                                    url: 'https://dms.tallint.com/parsing/jobraiser/parsing/?IsEmployment=false',
+                                    //   headers : {
+                                    //         "Authorization" : auth,
+                                    //     "X-Atlassian-Token" : "nocheck"
+                                    //       }, 
+                                    formData: formData
+                                }, function optionalCallback(err, httpResponse, body) {
+                                    if (err) {
+                                        return console.error('upload failed:', err);
+                                    }
+                                    else {
+
+                                        var body = body.replace(/^"(.*)"$/, '$1');
+
+                                        var options = {
+                                            trim: true,
+                                            compact: true,
+                                            ignoreComment: true,
+                                            alwaysChildren: true,
+                                            instructionHasAttributes: true,
+                                            ignoreText: false,
+                                            ignoreAttributes: true
+                                        };
+                                        var jsonResult = convert.xml2json(body, options);
+
+                                        var jsonResponse = JSON.parse(jsonResult);
+                                        var Document = jsonResponse.Document;
+                                        console.log(jsonResponse);
+                                        console.log(typeof (Document));
+
+                                        var Name = Document.Name._text;
+                                        // var firstName = Name.split(' ')[0];
+                                        // var lastName = Name.split(' ')[1];
+
+                                        var DOB = Document.DOB._text ? Document.DOB._text : undefined;
+                                        var gender = Document.Gender._text ? Document.Gender._text : undefined;
+                                        var mobileNumber = Document.Mobile._text ? Document.Mobile._text : '';
+                                        var emailId = Document.EMail._text ? Document.EMail._text : '';
+                                        var SkillText = Document.SkillText._text ? Document.SkillText._text : '';
+                                        var skills = SkillText.split(',');  // splits skills and forms array of skills
+
+                                        var applicantId = 0;
+                                        var heMasterId = 2;
+                                        var mobileISD = '+91';
+                                        var cvPath = aUrl ? aUrl : '';
+
+                                        // var inputs = [
+                                        //     req.st.db.escape(heMasterId),
+                                        //     req.st.db.escape(applicantId),
+                                        //     req.st.db.escape(firstName),
+                                        //     req.st.db.escape(lastName),
+                                        //     // req.st.db.escape(DOB),
+                                        //     // req.st.db.escape(gender),
+                                        //     req.st.db.escape(mobileISD),
+                                        //     req.st.db.escape(mobileNumber),
+                                        //     // req.st.db.escape(passportNumber),
+                                        //     // req.st.db.escape(passportExpiryDate),
+                                        //     req.st.db.escape(emailId),
+                                        //     req.st.db.escape(JSON.stringify(skills)),
+                                        //     req.st.db.escape(cvPath)
+                                        // ];
+
+                                        // var procQuery = 'CALL wm_save_cvSouringApplicant( ' + inputs.join(',') + ')';
+                                        // console.log(procQuery);
+
+                                        // req.db.query(procQuery, function (cvErr, cvResult) {
+                                        //     console.log(cvErr);
+
+                                        //     if (!cvErr && cvResult && cvResult[0] && cvResult[0][0].applicantId) {
+
+
+                                        //         var mailContent = (cvResult[3] && cvResult[3][0]) ? cvResult[3][0].mailBody : "Dear [FirstName] <br>Thank you for registering your profile.  We will revert to you once we find your Resume match one of the requirements we have.In the mean time, please [ClickHere] to upload your latest CV that will help us with more detailed information about your profile.Wishing you all the best<br><br>[WalkINSignature]<br>[Disclaimer]";
+
+                                        //         if (mailContent) {
+                                        //             mailContent = mailContent.replace("[FirstName]", req.body.firstName);
+                                        //             mailContent = mailContent.replace("[FullName]", (req.body.firstName + ' ' + req.body.middleName + ' ' + req.body.lastName));
+                    
+                                        //             var webLink = (cvResult[3] && cvResult[3][0]) ? cvResult[3][0].webLink : "";
+                    
+                                        //             // For updating resume though url link after registering for walkIn
+                    
+                                        //             var applicantId = (cvResult[4] && cvResult[4][0]) ? cvResult[4][0].applicantId : undefined;
+                                        //             applicantId = Date.now().toString().concat(applicantId);
+                                        //             var webLinkTo = cvResult[3][0].whatmateWebTestOrLive + applicantId;
+                                        //             webLinkTo = webLinkTo.replace('"', '');
+                                        //             webLinkTo = webLinkTo.replace('"', '');
+                    
+                                        //             mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
+                                        //             // ------------------------------------------------
+                    
+                                        //             // mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLink + ">Click Here</a>");
+                    
+                                        //             var walkInSignature = (cvResult[3] && cvResult[3][0]) ? cvResult[3][0].walkInSignature : "";
+                                        //             var disclaimer = (cvResult[3] && cvResult[3][0]) ? cvResult[3][0].disclaimer : "";
+                    
+                                        //             mailContent = mailContent.replace("[WalkINSignature]", walkInSignature);
+                                        //             mailContent = mailContent.replace("[Disclaimer]", disclaimer);
+                                        //         }
+                    
+                                        //         var subject = cvResult[3][0].mailSubject ? cvResult[3][0].mailSubject : 'Registration Completed Successfully';
+                                        //         var bcc=[];
+                                        //         if(cvResult[3][0] && cvResult[3][0].bccMailId && typeof(cvResult[3][0].bccMailId) =='string'){
+                                        //             bcc = cvResult[3][0].bccMailId ? JSON.parse(cvResult[3][0].bccMailId) : [];
+                                        //         }
+                    
+                                        //         // send mail to candidate
+                                        //         var email = new sendgrid.Email();
+                                        //         email.from = cvResult[2][0].fromEmailId ? cvResult[2][0].fromEmailId : 'noreply@talentmicro.com';
+                                        //         email.to = req.body.emailId;
+                                        //         email.subject = subject;
+                                        //         email.html = mailContent;
+                                        //         email.bcc = bcc;
+                    
+                                        //         sendgrid.send(email, function (err11, result11) {
+                                        //             if (err11) {
+                                        //                 console.log("Failed to send to candidate", err11);
+                                        //             }
+                                        //             else {
+                                        //                 mailSent = 1;
+                                        //                 console.log("mail sent successfully to candidate", result11);
+                                        //             }
+                                        //         });  // sendgrid
+
+
+
+                                        //     }
+                                        // }); // db query
+
+                                    }  
+                                });  // tallint parse
+
+                            }
+                        }); //upload to cloud
+
+                    }
+                });
+                // var readStream = fs.createReadStream(attachments[i].data);
+            
+                resolve('');
+            });
+            }
+        });
+    });
+    // response.data = attachments;
+    res.status(200).json(response);
+
+};
 
 module.exports = billingCtrl;

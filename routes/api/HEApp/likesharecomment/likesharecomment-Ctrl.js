@@ -318,7 +318,7 @@ likesharecommentCtrl.getcommentmaster=function(req,res,next){
 likesharecommentCtrl.saveArchive=function(req,res,next){
     var response = {
         status : false,
-        message : "Error while loading comment list",
+        message : "Error while saving archive",
         data : null,
         error : null
     };
@@ -367,9 +367,14 @@ likesharecommentCtrl.saveArchive=function(req,res,next){
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,results){
                     if(!err && results[0] && results[0][0] ){
-                        results[0][0].formDataJSON = results[0][0].formDataJSON ? JSON.parse(results[0][0].formDataJSON):{};
+                        results[0][0].formData = results[0][0].formData ? JSON.parse(results[0][0].formData):{};
                         response.status = true;
-                        response.message = "data saved successfully";
+                        if(req.body.isArchive==1){
+                        response.message = "Transaction archived successfully";
+                        }
+                        else if(req.body.isArchive==0) {
+                            response.message = "Transaction restored successfully";
+                        }
                         response.error = null;
                         
                         response.data = results[0][0];
@@ -448,7 +453,7 @@ likesharecommentCtrl.getArchiveTransList=function(req,res,next){
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.groupId) ,
-                    req.st.db.escape(req.query.startPage),   
+                    req.st.db.escape(startPage),   
                     req.st.db.escape(req.query.limit)   
                 ];
                 /**
@@ -464,7 +469,8 @@ likesharecommentCtrl.getArchiveTransList=function(req,res,next){
                         response.message = "data loaded successfully";
                         response.error = null;
                         response.data = {
-                            archiveList:results[0]
+                            archiveList:results[0],
+                            count:results[1][0].count
                         }
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {

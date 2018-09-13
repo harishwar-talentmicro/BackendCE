@@ -1237,9 +1237,11 @@ jobCtrl.saveRequirement = function (req, res, next) {
                         jobTitle = [];
                     }
 
-                    if (!req.body.jobCode) {
-                        error.jobCode = 'Invalid jobCode';
-                        validationFlag *= false;
+                    if(req.body.jdTemplateFlag!=1){
+                        if (!req.body.jobCode) {
+                            error.jobCode = 'Invalid jobCode';
+                            validationFlag *= false;
+                        }    
                     }
                     if (!req.body.positions) {
                         error.positions = 'Positions is not specified';
@@ -1525,9 +1527,11 @@ jobCtrl.saveRequirement = function (req, res, next) {
                             jobTitle = {};
                         }
 
-                        if (!req.body.jobCode) {
-                            error.jobCode = 'Invalid jobCode';
-                            validationFlag *= false;
+                        if(req.body.jdTemplateFlag!=1){
+                            if (!req.body.jobCode) {
+                                error.jobCode = 'Invalid jobCode';
+                                validationFlag *= false;
+                            }    
                         }
                         if (!req.body.positions) {
                             error.positions = 'Positions is not specified';

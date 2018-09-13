@@ -1243,6 +1243,7 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
                             for(var j = 0; j < docs.length; j++) {
                                     var res1 = {};
                                     res1.docTitle = docs[j].docTitle;
+                                    res1.docId = docs[j].docId;
                                     res1.docDetailId = docs[j].docDetailId;
                                     res1.contentType = docs[j].contentType;
                                     res1.versionDate = docs[j].versionDate;

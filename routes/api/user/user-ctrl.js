@@ -1146,7 +1146,10 @@ UserCtrl.sendPasswordResetOTP = function (req, res, next) {
                 req.st.db.escape(DBSecretKey)
             ];
 
+            console.log('CALL pvalidateEZEOne(' + query + ')');
             req.st.db.query('CALL pvalidateEZEOne(' + query + ')', function (err, otpResult) {
+                
+                console.log("error",err);
 
                 if (!err && otpResult && otpResult[0] && otpResult[0][0].otp) {
                     console.log("otpResult[0][0].name", otpResult[0][0].name);
@@ -1300,6 +1303,12 @@ UserCtrl.sendPasswordResetOTP = function (req, res, next) {
                     respMsg.data = null;
                     res.status(200).json(respMsg);
 
+                }
+                else if(!err && otpResult && otpResult[0] && otpResult[0][0].messageError){
+                    respMsg.status = true;
+                    respMsg.message = otpResult[0][0].messageError;
+                    respMsg.data = null;
+                    res.status(200).json(respMsg);
                 }
                 else {
                     respMsg.status = false;
