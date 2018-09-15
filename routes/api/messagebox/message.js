@@ -1230,7 +1230,7 @@ router.get('/loadAllMessages', function (req, res, next) {
 
                                                 }
                                                 for (var k=0; k<results[0][i].groupMessageList.length ; k++){
-                                                    results[0][i].groupMessageList[k].formDataJSON = results[0][i].groupMessageList[k].formDataJSON ? JSON.parse(results[0][i].groupMessageList[k].formDataJSON):null
+                                                    results[0][i].groupMessageList[k].formData = results[0][i].groupMessageList[k].formData ? JSON.parse(results[0][i].groupMessageList[k].formData):null
                                                 }
                                                 
                                                 // output.push({
@@ -1277,7 +1277,7 @@ router.get('/loadAllMessages', function (req, res, next) {
                                             
                                             // console.log("results[5][0].GCM_Id",results[5][0].GCM_Id);
                                             responseMessage.data = {
-                                                messageList: results[0] ? results[0] :[],
+                                                messageList: [],//results[0] ? results[0] :[],
                                                 deleteMessageIdList: []
 
                                                 // feedback: (results[2]) ? results[2] : []
