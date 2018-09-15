@@ -795,8 +795,9 @@ signupCtrl.verifyOTP = function (req, res, next) {
                         req.connection.remoteAddress ||
                         req.socket.remoteAddress;
                     var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
-
-                    req.st.generateToken(ip, userAgent, EZEOneId, isWhatMate, APNS_Id, GCM_Id, secretKey, function (err, token) {
+                    var isDialer=0;
+                    
+                    req.st.generateToken(ip, userAgent, EZEOneId, isWhatMate, APNS_Id, GCM_Id, secretKey,isDialer, function (err, token) {
                         if (err) {
                             respMsg.status = false;
                             respMsg.message = "Error while generating token";
