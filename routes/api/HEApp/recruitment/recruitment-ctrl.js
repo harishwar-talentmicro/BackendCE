@@ -1882,8 +1882,10 @@ recruitmentCtrl.saveProcessUpdateFeedback = function(req,res,next){
                         var procQuery = 'CALL he_save_processUpdateFeedback( ' + procParams.join(',') + ')';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,informationResult){
+                            console.log(err);
                             if(!err){
                                 var filePath = "";
+                                notifyMessages.getMessagesNeedToNotify();                                
                                 response.status = true;
                                 response.message = "Feedback saved successfully";
                                 response.error = null;
