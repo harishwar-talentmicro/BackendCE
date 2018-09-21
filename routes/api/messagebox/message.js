@@ -1230,7 +1230,7 @@ router.get('/loadAllMessages', function (req, res, next) {
 
                                                 }
                                                 for (var k=0; k<results[0][i].groupMessageList.length ; k++){
-                                                    results[0][i].groupMessageList[k].formDataJSON = results[0][i].groupMessageList[k].formDataJSON ? JSON.parse(results[0][i].groupMessageList[k].formDataJSON):null
+                                                    results[0][i].groupMessageList[k].formData = results[0][i].groupMessageList[k].formData ? JSON.parse(results[0][i].groupMessageList[k].formData):null
                                                 }
                                                 
                                                 // output.push({

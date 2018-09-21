@@ -505,10 +505,12 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                             output.push(res1);
                         }
                       
+                        if(result[3][0].helpDeskDEtails){
                         var help = JSON.parse(result[3][0].helpDeskDEtails) ;
                         console.log(help);
                             help.statusList = JSON.parse(help.statusList);
                             output.push(help);
+                        }
                         
                         // console.log("----------",output);
 
