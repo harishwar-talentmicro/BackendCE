@@ -56,6 +56,7 @@ module.exports = function(favoriteBook,done) {
     var limit = favoriteBook.limitValues ;
     results = favoriteBook.messageList ;
     var data={};
+    var archiveFlag = 0;
     var initialValue = (startPage * limit) ;
 
 
@@ -90,7 +91,9 @@ module.exports = function(favoriteBook,done) {
                     console.log('archiveresults',archiveresults[0]);
                     console.log('err',err);
                     if(!err ){
-                     var archiveFlag = archiveresults[0].isArchive ? archiveresults[0].isArchive:0; 
+                     archiveFlag = archiveresults[0].isArchive ? archiveresults[0].isArchive:0; 
+                    }
+                });
             data ={
                 messageList: {
                     messageId: results[i].messageId,
@@ -117,8 +120,8 @@ module.exports = function(favoriteBook,done) {
                 },
                 contactList: results[i].contactData ? JSON.parse(results[i].contactData) : null
             } ;
-        }
-    });
+      
+      
 
 
             var buf = new Buffer(JSON.stringify(data), 'utf-8');

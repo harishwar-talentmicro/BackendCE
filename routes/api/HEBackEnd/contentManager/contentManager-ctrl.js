@@ -766,6 +766,8 @@ contentManagerCtrl.savedocumentFeedback = function(req,res,next){
                         req.db.query(procQuery,function(err,informationResult){
                             if(!err){
                                 var filePath = "";
+                                notifyMessages.getMessagesNeedToNotify();
+                                
                                 response.status = true;
                                 response.message = "Feedback saved successfully";
                                 response.error = null;
