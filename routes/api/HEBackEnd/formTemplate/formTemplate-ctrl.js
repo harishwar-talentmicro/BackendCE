@@ -63,6 +63,10 @@ formTemplateCtrl.saveFormTemplate = function(req,res,next){
                 req.body.receiverAllocation = (req.body.receiverAllocation) ? req.body.receiverAllocation : 0 ;
                 req.body.helpTitle = (req.body.helpTitle) ? req.body.helpTitle : "" ;
                 req.body.keywords = (req.body.keywords) ? req.body.keywords : "" ;
+                req.body.like = (req.body.like) ? req.body.like : 0;
+                req.body.share = (req.body.share) ? req.body.share : 0 ;
+                req.body.comment = (req.body.comment) ? req.body.comment : 0 ;
+                req.body.archive = (req.body.archive) ? req.body.archive : 0 ;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -251,7 +255,7 @@ formTemplateCtrl.updateFormTemplate = function(req,res,next){
                         response.message = "Form Template saved successfully";
                         response.error = null;
                         var messagePayload = {
-                            message: "Changes in form ",
+                            message: "",
                             type: 201,
                             alarmType: 4,
                             data :{
