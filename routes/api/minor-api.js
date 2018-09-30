@@ -177,6 +177,7 @@ var appGeneralRequest = require('./HEApp/generalRequest.js');
 var WGRM = require('./HEBackEnd/WGRMTemplates.js');
 var eSurvey = require('./HEBackEnd/employeeSurvey.js');
 // var likeShareComment=require('./HEApp/likeShareComment.js');
+var attendanceroaster = require('./HEBackEnd/attendance.js');
 
 var hospitalTokenManagement = require('./HEApp/hospitalTokenManagement.js');
 
@@ -193,6 +194,7 @@ var nk = require('./nearkart/nearkart-routes');
 
 router.use('/nk', nk);
 
+router.use('/helloEZE', attendanceroaster);
 
 router.use('/configuration', configurationV1);
 router.use('/recruitment', recruitmentV1);
@@ -770,7 +772,7 @@ if (cluster.isWorker) {
                             for (var i = 0; i<results[1].length; i++) {
                                 console.log()
                                 results[1][i].formDataJSON = results[1][i].formDataJSON ? JSON.parse(results[1][i].formDataJSON) : {};
-                                console.log(results[1][i].formDataJSON)
+                                // console.log(results[1][i].formDataJSON)
                                 var imageUrl = results[1][i].formDataJSON.CDNPath;
                                 var displayImage = results[1][i].imageURL;
                                 var displayName = results[1][i].displayName;

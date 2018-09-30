@@ -985,7 +985,7 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.query.invoiceTemplateId),
-                    req.st.db.escape(req.query.invoiceNumber),
+                    req.st.db.escape(req.query.invoiceNumber)
                 ];
 
                 var procQuery = 'CALL wm_paceInvoiceGeneration( ' + inputs.join(',') + ')';
@@ -1445,7 +1445,7 @@ billingCtrl.savePaceFollowUpNotes = function (req, res, next) {
                 else if (req.body.type == 2)
                     clientorReqorResumeId = req.body.requirementId || 0;
                 else if (req.body.type == 3)
-                    clientorReqorResumeId = req.body.requirementId || 0;
+                    clientorReqorResumeId = req.body.applicantId || 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),

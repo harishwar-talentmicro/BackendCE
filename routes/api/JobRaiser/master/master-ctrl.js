@@ -63,6 +63,14 @@ masterCtrl.getReqMasterData = function (req, res, next) {
                         response.status = true;
                         response.message = "Master data loaded successfully";
                         response.error = null;
+                        var intRoundList = [];
+                        if(isWeb){
+                            intRoundList= result[8] ? result[8] : [];
+                        }
+                        else{
+                            intRoundList= result[13] ? result[13] : [];
+                        }
+
                         response.data = {
                             heDepartment: (result && result[0]) ? result[0] : [],
                             jobType: (result && result[1]) ? result[1] : [],
@@ -72,9 +80,11 @@ masterCtrl.getReqMasterData = function (req, res, next) {
                             country: (result && result[5]) ? result[5] : [],
                             jobTitle: (result && result[6]) ? result[6] : [],
                             roleList: result[7] ? result[7] : [],
-                            interviewRoundList: result[8] ? result[8] : [],
+                            interviewRoundList : intRoundList,
                             status: result[9] ? result[9] : [],
-                            requirementList: result[10] ? result[10] : []
+                            requirementList: result[10] ? result[10] : [],
+                            portalList: result[11] ? result[11] : [],
+                            reasons : result[12] ? result[12] : []
 
                         };
                         if (isWeb == 1) {
@@ -1412,13 +1422,19 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                 res2.branchList = JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
                                 res2.contactList = JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
                                 res2.stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
-                                res2.newRequirement = results[0][i].newRequirement ? results[0][i].newRequirement : 0
+                                res2.newRequirement = results[0][i].newRequirement ? results[0][i].newRequirement : 0,
+                                res2.billAmount = results[0][i].billAmount ? results[0][i].billAmount : 0
                             output.push(res2);
+                        }
+
+                        for (var i = 0; i < results[2].length; i++) {
+                            results[2][i].status =results[2] && results[2][i] && JSON.parse(results[2][i].status) ? JSON.parse(results[2][i].status) : [];
                         }
 
                         response.data = {
                             requirementView: output,
-                            stageList: (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList) : []
+                            // stageStatusList: (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList) : [],
+                            stageList: results[2] && results[2][0] ? results[2]: []
                         };
 
                         if (req.query.isWeb == 0) {
@@ -1521,23 +1537,12 @@ masterCtrl.getClientView = function (req, res, next) {
                         response.status = true;
                         response.message = " Client View loaded sucessfully";
                         response.error = null;
-                        var output = [];
                         for (var i = 0; i < results[0].length; i++) {
-                            var res2 = {};
-                            res2.stageDetail = results[0][i].stageDetail ? JSON.parse(results[0][i].stageDetail) : [],
-                                res2.heDepartmentId = results[0][i].departmentId ? results[0][i].departmentId : 0;
-                            res2.clientName = results[0][i].clientName ? results[0][i].clientName : '';
-                            res2.requirementCount = results[0][i].count ? results[0][i].count : 0;
-                            res2.notes = results[0][i].notes ? results[0][i].notes : '';
-                            res2.createdDate = results[0][i].createdDate ? results[0][i].createdDate : null;
-                            res2.updateDate = results[0][i].updateDate ? results[0][i].updateDate : null;
-                            res2.createdUserName = results[0][i].createdUserName ? results[0][i].createdUserName : '';
-                            res2.updatedUserName = results[0][i].updatedUserName ? results[0][i].updatedUserName : '';
-                            res2.clientContacts = results[0][i].contacts ? JSON.parse(results[0][i].contacts) : [];
-                            output.push(res2);
+                            results[0][i].stageDetail = results[0][i].stageDetail ? JSON.parse(results[0][i].stageDetail) : [],
+                            results[0][i].clientContacts = results[0][i].contacts ? JSON.parse(results[0][i].contacts) : [];
                         }
                         response.data = {
-                            clientView: output
+                            clientView: results[0] ? results[0] : []
                         };
                         res.status(200).json(response);
                     }
@@ -2177,6 +2182,7 @@ masterCtrl.getAssessmentTemplates = function (req, res, next) {
 
 
 masterCtrl.saveUserManager = function (req, res, next) {
+    console.log('inside user manager');
     var response = {
         status: false,
         message: "Invalid token",
@@ -2199,14 +2205,39 @@ masterCtrl.saveUserManager = function (req, res, next) {
         accessRights = JSON.parse(accessRights);
     }
     if (!accessRights) {
-        accessRights = [];
+        accessRights = {};
     }
+
     var reportingTo = req.body.reportingTo;
     if (typeof (reportingTo) == "string") {
         reportingTo = JSON.parse(reportingTo);
     }
     if (!reportingTo) {
         reportingTo = [];
+    }
+
+    var branch = req.body.branch;
+    if (typeof (branch) == "string") {
+        branch = JSON.parse(branch);
+    }
+    if (!branch) {
+        branch = {};
+    }
+
+    var department = req.body.department;
+    if (typeof (department) == "string" && department != "") {
+        department = JSON.parse(department);
+    }
+    if (!department || department == "") {
+        department = {};
+    }
+    console.log('department',department);
+    var grade = req.body.grade;
+    if (typeof (grade) == "string") {
+        grade = JSON.parse(grade);
+    }
+    if (!grade) {
+        grade = {};
     }
 
     if (!validationFlag) {
@@ -2261,16 +2292,17 @@ masterCtrl.saveUserManager = function (req, res, next) {
                     req.st.db.escape(req.body.mobileISD),
                     req.st.db.escape(req.body.mobileNumber),
                     req.st.db.escape(req.body.emailId),
-                    req.st.db.escape(req.body.heDepartmentId),
+                    req.st.db.escape(JSON.stringify(department)),
                     req.st.db.escape(req.body.location),
-                    req.st.db.escape(req.body.gradeId),
+                    req.st.db.escape(JSON.stringify(grade)),
                     req.st.db.escape(req.body.workGroupId),
                     req.st.db.escape(req.body.RMId),
                     req.st.db.escape(req.body.exitDate),
                     req.st.db.escape(req.body.joiningDate),
                     req.st.db.escape(DBSecretKey),
                     req.st.db.escape(encryptPwd),
-                    req.st.db.escape(req.body.mailer)
+                    req.st.db.escape(req.body.mailer),
+                    req.st.db.escape(JSON.stringify(branch))                
                 ];
                 var procQuery = 'CALL save_Pace_User( ' + inputs.join(',') + ')';
                 console.log(procQuery);
