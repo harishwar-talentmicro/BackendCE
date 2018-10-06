@@ -2124,6 +2124,7 @@ masterCtrl.getAssessmentTemplates = function (req, res, next) {
                             res2.groupTypeId = result[1][i].groupTypeId ? result[1][i].groupTypeId : 0;
                             res2.groupTypeName = result[1][i].groupTypeName ? result[1][i].groupTypeName : "";
                             res2.options = result[1][i].options ? JSON.parse(result[1][i].options) : [];
+                            res2.questionType = result[1][i].questionType ? JSON.parse(result[1][i].questionType) : {};
                             output.push(res2);
                         }
                         response.data = {
@@ -2391,7 +2392,7 @@ masterCtrl.getAssessmentGroupType = function (req, res, next) {
                         response.message = "Assessment groupType loaded successfully";
                         response.error = null;
                         response.data = {
-                            groupType: result[0]
+                            groupTypes: result[0]
                         };
                         res.status(200).json(response);
                     }
@@ -2450,14 +2451,11 @@ masterCtrl.saveAssessmentGroupType = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
-                req.body.deleteFlag = req.body.deleteFlag ? req.body.deleteFlag : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.body.groupTypeId),
-                    req.st.db.escape(req.body.groupTypeName),
-                    req.st.db.escape(req.body.deleteFlag)
+                    req.st.db.escape(JSON.stringify(req.body.groupTypes || []))
                 ];
                 var procQuery = 'CALL wm_Save_AssessmentgroupType( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -2469,7 +2467,7 @@ masterCtrl.saveAssessmentGroupType = function (req, res, next) {
                         response.message = "GroupType saved sucessfully";
                         response.error = null;
                         response.data = {
-                            groupType: results[0][0]
+                            groupTypes: results[0]
                         };
                         res.status(200).json(response);
                     }

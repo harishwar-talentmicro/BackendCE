@@ -506,19 +506,35 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
         var token = req.query.token;
         var heMasterId = req.query.heMasterId;
         // var portalId = 2;
-        var formData = {
-            applicants: applicants
+        // var formData = {
+        //     applicants: applicants
+        // };
+        
+        var a = {
+            FirstName: details.firstName,
+            EmailID: details.emailId,
+            MobileNo: details.mobileNumber,
+            FileData: req.body.attachment
         };
 
+        if (req.body.attachment.indexOf('pdf') > 0) {
+            a.FileName = "asdf.pdf"
+        }
+        else if (req.body.attachment.indexOf('application/msword') > -1) {
+            a.FileName = "asdf.docx"
+        }
+
         request({
-            url: "tallint url to come here",
+            url: req.body.tallint_url,
             method: "POST",
             json: true,
-            body: formData
+            body: a
         }, function (error, response, body) {
-            if (!err && body) {
-                console.log('tallint response here');
-            }
+            // if (!err && body) {
+            // console.log('tallint response here');
+            // }
+            console.log(response);
+            console.log(error);
         });
     }
 
@@ -682,7 +698,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
     var tempExperience = document.getElementsByClassName('exp-sal-loc-box');
     if (tempExperience && tempExperience[0] && tempExperience[0].getElementsByClassName('expInfo') && tempExperience[0].getElementsByClassName('expInfo')[0] && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>") && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1] && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr') && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr')[0]) {
         console.log('Entered exp');
-            details.experience = tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr')[0].trim();
+        details.experience = tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr')[0].trim();
         console.log(details.experience);
         if (typeof (details.experience) == 'string') {
             details.experience = 0;

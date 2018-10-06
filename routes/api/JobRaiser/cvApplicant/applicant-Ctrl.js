@@ -587,7 +587,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                 organizationDepartments: result[53] && result[53][0] ? result[53] : [],
                                 organizationGrades: result[54] && result[54][0] ? result[54] : [],
                                 organizationJobTitles: result[55] && result[55][0] ? result[55] : []
-                            }
+                            },
+                            typeView : result[56] ? result[56] : []
 
                         };
 
