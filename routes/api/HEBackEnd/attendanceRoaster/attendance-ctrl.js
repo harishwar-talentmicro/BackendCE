@@ -11,8 +11,11 @@ var notifyMessages = new notifyMessages();
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
+<<<<<<< HEAD
 var appConfig = require('../../../../ezeone-config.json');
 var DBSecretKey = appConfig.DB.secretKey;
+=======
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
 
 attendanceCtrl.saveAttendanceShifts = function (req, res, next) {
     var response = {
@@ -66,7 +69,11 @@ attendanceCtrl.saveAttendanceShifts = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.hemasterId),
                     req.st.db.escape(req.body.shiftId),
+<<<<<<< HEAD
                     req.st.db.escape(req.body.shiftName),
+=======
+                    req.st.db.escape(req.body.title),
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                     req.st.db.escape(req.body.code),
                     req.st.db.escape(req.body.startTime),
                     req.st.db.escape(req.body.duration),
@@ -148,9 +155,15 @@ attendanceCtrl.saveWeekEndMaster = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.hemasterId),
                     req.st.db.escape(req.body.WEMasterId),
+<<<<<<< HEAD
                     req.st.db.escape(req.body.WEMasterName),
                     req.st.db.escape(req.body.code),
                     req.st.db.escape(JSON.stringify(dayList))
+=======
+                    req.st.db.escape(req.body.title),
+                    req.st.db.escape(req.body.code),
+                    req.st.db.escape(JSON.parse(dayList))
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                 ];
 
                 var procQuery = 'CALL wm_save_WEmaster( ' + procParams.join(',') + ')';
@@ -223,7 +236,11 @@ attendanceCtrl.saveroaster = function (req, res, next) {
                     req.st.db.escape(req.body.roasterId),
                     req.st.db.escape(req.body.title),
                     req.st.db.escape(req.body.roasterCode),
+<<<<<<< HEAD
                     req.st.db.escape(JSON.stringify(roasterList))
+=======
+                    req.st.db.escape(JSON.parse(roasterList))
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                 ];
 
                 var procQuery = 'CALL wm_save_roaster( ' + procParams.join(',') + ')';
@@ -287,7 +304,11 @@ attendanceCtrl.getWeekDays = function (req, res, next) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
+<<<<<<< HEAD
                     req.st.db.escape(req.query.hemasterId),
+=======
+                    req.st.db.escape(req.body.hemasterId),
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                    
                 ];
 
@@ -295,6 +316,7 @@ attendanceCtrl.getWeekDays = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
+<<<<<<< HEAD
                     if (!err && results) {
                         response.status = true;
                         response.message = "Data loaded successfully";
@@ -525,6 +547,13 @@ attendanceCtrl.getroaster = function (req, res, next) {
                             response.data = results[0];
                         }
                         
+=======
+                    if (!err && results ) {
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data = results[0];
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                         res.status(200).json(response);
                     }
 

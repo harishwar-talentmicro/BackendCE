@@ -12,4 +12,11 @@ router.post('/checkPortalApplicantsNaukri',portalimporter.checkApplicantExistsFr
 
 router.post('/savePortalApplicantsNaukri',portalimporter.saveApplicantsFromNaukri);
 
+router.post('/checkPortalApplicantsShine',portalimporter.checkApplicantExistsFromShinePortal);
+
+router.post('/checkPortalApplicantsTimesJobs',portalimporter.checkApplicantExistsFromTimesJobsPortal);
+
+router.post('/savePortalApplicantsShine',portalimporter.saveApplicantsFromShine);
+router.post('/savePortalApplicantsTimesJobs',portalimporter.saveApplicantsFromTimesjobs);
+
 module.exports = router;

@@ -9,6 +9,9 @@ var notificationTemplater = new NotificationTemplater();
 var Notification = require('../../../modules/notification/notification-master.js');
 var notification = new Notification();
 var fs = require('fs');
+var path = require('path');
+var request = require('request');
+
 var bodyParser = require('body-parser');
 var textract = require('textract');
 var http = require('https');
@@ -18,6 +21,26 @@ var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 var CONFIG = require('../../../../ezeone-config.json');
 var DBSecretKey = CONFIG.DB.secretKey;
+var appConfig = require('../../../../ezeone-config.json');
+
+const accountSid = 'AC3765f2ec587b6b5b893566f1393a00f4';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'AC3765f2ec587b6b5b893566f1393a00f4';
+const authToken = 'b36eba6376b5939cebe146f06d33ec57';   //'3abf04f536ede7f6964919936a35e614';  //'b36eba6376b5939cebe146f06d33ec57';//
+const FromNumber = appConfig.DB.FromNumber || '+18647547021';
+const client = require('twilio')(accountSid, authToken);
+
+
+var qs = require("querystring");
+var options = {
+    "method": "POST",
+    "hostname": "www.smsgateway.center",
+    "port": null,
+    "path": "/SMSApi/rest/send",
+    "headers": {
+        "content-type": "application/x-www-form-urlencoded",
+        "cache-control": "no-cache"
+    }
+};
+
 
 var jobPortalCtrl = {};
 var error = {};
@@ -810,18 +833,18 @@ jobPortalCtrl.getPortalApplicantDetails = function (req, res, next) {
 
                         var temp_result = result[0][0] ? result[0][0] : {};
                         temp_result.education = JSON.parse(temp_result.education);
-                        temp_result.cvSource = JSON.parse(temp_result.cvSource);
-                        temp_result.expectedSalaryCurr = JSON.parse(temp_result.expectedSalaryCurr);
-                        temp_result.expectedSalaryPeriod = JSON.parse(temp_result.expectedSalaryPeriod);
-                        temp_result.expectedSalaryScale = JSON.parse(temp_result.expectedSalaryScale);
+                        temp_result.cvSource = JSON.parse(temp_result.cvSource).cvSourceId ? JSON.parse(temp_result.cvSource) : {};
+                        temp_result.expectedSalaryCurr = JSON.parse(temp_result.expectedSalaryCurr).currencyId ?  JSON.parse(temp_result.expectedSalaryCurr) : {};
+                        temp_result.expectedSalaryPeriod = JSON.parse(temp_result.expectedSalaryPeriod).durationId ? JSON.parse(temp_result.expectedSalaryPeriod) : {};
+                        temp_result.expectedSalaryScale =JSON.parse(temp_result.expectedSalaryScale).scaleId ?  JSON.parse(temp_result.expectedSalaryScale) : {};
                         temp_result.industry = JSON.parse(temp_result.industry);
-                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle);
+                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle).jobTitleId ?  JSON.parse(temp_result.jobTitle) : {};
                         //  temp_result.jobTitle = temp_result.jobTitle.titleId != null ? temp_result.jobTitle : undefined;
-                        temp_result.nationality = JSON.parse(temp_result.nationality);
+                        temp_result.nationality = JSON.parse(temp_result.nationality).nationalityId ? JSON.parse(temp_result.nationality) : {};
                         temp_result.prefLocations = JSON.parse(temp_result.prefLocations);
-                        temp_result.presentSalaryCurr = JSON.parse(temp_result.presentSalaryCurr);
-                        temp_result.presentSalaryPeriod = JSON.parse(temp_result.presentSalaryPeriod);
-                        temp_result.presentSalaryScale = JSON.parse(temp_result.presentSalaryScale);
+                        temp_result.presentSalaryCurr = JSON.parse(temp_result.presentSalaryCurr).currencyId ?  JSON.parse(temp_result.presentSalaryCurr) : {};
+                        temp_result.presentSalaryPeriod = JSON.parse(temp_result.presentSalaryPeriod).durationId ? JSON.parse(temp_result.presentSalaryPeriod) : {};
+                        temp_result.presentSalaryScale = JSON.parse(temp_result.presentSalaryScale).scaleId ?  JSON.parse(temp_result.presentSalaryScale) : {};
                         temp_result.primarySkills = JSON.parse(temp_result.primarySkills);
                         temp_result.secondarySkills = JSON.parse(temp_result.secondarySkills);
                         temp_result.functionalAreas = JSON.parse(temp_result.functionalAreas);
@@ -1309,8 +1332,8 @@ jobPortalCtrl.portalsignup = function (req, res, next) {
             req.st.db.escape(req.body.mobileISD),
             req.st.db.escape(req.body.emailId),
             req.st.db.escape(DBSecretKey),
-            req.st.db.escape(encryptPwd)
-
+            req.st.db.escape(encryptPwd),
+            req.st.db.escape(req.body.heMasterId || 0)
         ];
 
         var procQuery = 'CALL portal_save_signUp( ' + getStatus.join(',') + ')';
@@ -1318,7 +1341,15 @@ jobPortalCtrl.portalsignup = function (req, res, next) {
         req.db.query(procQuery, function (err, result) {
             console.log(err);
 
-            if (!err && result && result[0] && result[0][0]) {
+            if (!err && result && result[0] && result[0][0] && result[0][0].message) {
+                response.status = true;
+                response.message = result[0][0].message;
+                response.error = null;
+                response.data = null;
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0] && result[0][0] && result[0][0].masterId) {
                 response.status = true;
                 response.message = "Sign up successfull";
                 response.error = null;
@@ -1681,5 +1712,415 @@ jobPortalCtrl.portalApplicantHistory = function (req, res, next) {
     }
 };
 
+
+jobPortalCtrl.portalPasswordResetOTP = function (req, res, next) {
+
+    var status = true, error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+
+    if (!req.body.loginId) {
+        error['loginId'] = 'loginId is mandatory';
+        status *= false;
+    }
+
+    if (status) {
+        try {
+            var message = "";
+
+            //generate otp 6 digit random number
+            var code = "";
+            var possible = "1234567890";
+
+            for (var i = 0; i <= 3; i++) {
+
+                code += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+
+            var query = [
+                req.st.db.escape(req.body.loginId),
+                req.st.db.escape(code),
+                req.st.db.escape(DBSecretKey),
+                req.st.db.escape(req.body.mobileIsd || "")
+            ];
+
+            console.log('CALL portal_validateportaluser(' + query + ')');
+            req.st.db.query('CALL portal_validateportaluser(' + query + ')', function (err, userResult) {
+                
+                console.log("error",err);
+
+                if (!err && userResult && userResult[0] && userResult[0][0].applicantId) {
+                    // code = userResult[0][0].otp;
+
+                    message = 'Your career portal password reset OTP is ' + code + ' .';
+                    
+                    if (userResult[0][0].emailId) {
+                        var file = path.join(__dirname, '../../../../mail/templates/passwordResetOTP.html');
+
+                        fs.readFile(file, "utf8", function (err, data) {
+
+                            if (!err) {
+                                data = data.replace("[name]", userResult[0][0].firstName);
+                                data = data.replace("[OTP]", code);
+
+                                var mailOptions = {
+                                    from: "noreply@talentmicro.com",
+                                    to: userResult[0][0].emailId,
+                                    subject: 'Password Reset Request',
+                                    html: data // html body
+                                };
+
+                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                var email = new sendgrid.Email();
+                                email.from = mailOptions.from;
+                                email.to = mailOptions.to;
+                                email.subject = mailOptions.subject;
+                                email.html = mailOptions.html;
+
+                                sendgrid.send(email, function (err, result) {
+                                    if(!err){
+                                        console.log('message sent successfully');
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    if (userResult[0][0].isd && userResult[0][0].mobile) {
+                        if (userResult[0][0].isd == "+977") {
+                            request({
+                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                qs: {
+                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                    to: userResult[0][0].mobile,
+                                    message: message,
+                                    sender: 'Techingen'
+                                },
+                                method: 'GET'
+
+                            }, function (error, response, body) {
+                                if (error) {
+                                    console.log(error, "SMS");
+                                }
+                                else {
+                                    console.log("SUCCESS", "SMS response");
+                                }
+
+                            });
+                        }
+                        else if (userResult[0][0].isd == "+91") {
+                            request({
+                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                qs: {
+                                    user_name: 'janardana@hirecraft.com',
+                                    password: 'Ezeid2015',
+                                    sender_id: 'WtMate',
+                                    service: 'TRANS',
+                                    mobile_no: userResult[0][0].mobile,
+                                    message: message,
+                                    method: 'send_sms'
+                                },
+                                method: 'GET'
+
+                            }, function (error, response, body) {
+                                if (error) {
+                                    console.log(error, "SMS");
+                                }
+                                else {
+                                    console.log("SUCCESS", "SMS response");
+                                }
+                            });
+
+                            var req = http.request(options, function (res) {
+                                var chunks = [];
+
+                                res.on("data", function (chunk) {
+                                    chunks.push(chunk);
+                                });
+
+                                res.on("end", function () {
+                                    var body = Buffer.concat(chunks);
+                                    console.log(body.toString());
+                                });
+                            });
+
+                            req.write(qs.stringify({
+                                userId: 'talentmicro',
+                                password: 'TalentMicro@123',
+                                senderId: 'WTMATE',
+                                sendMethod: 'simpleMsg',
+                                msgType: 'text',
+                                mobile: userResult[0][0].isd.replace("+", "") + userResult[0][0].mobile,
+                                msg: message,
+                                duplicateCheck: 'true',
+                                format: 'json'
+                            }));
+                            req.end();
+
+
+                        }
+                        else if (userResult[0][0].isd != "") {
+                            client.messages.create(
+                                {
+                                    body: message,
+                                    to: userResult[0][0].isd + userResult[0][0].mobile,
+                                    from: FromNumber
+                                },
+                                function (error, response) {
+                                    if (error) {
+                                        console.log(error, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+                                }
+                            );
+                        }
+                    }
+                    respMsg.status = true;
+                    respMsg.message = 'OTP Sent Successfully';
+                    respMsg.data = null;
+                    res.status(200).json(respMsg);
+
+                }
+                else if(!err && userResult && userResult[0] && userResult[0][0].messageError){
+                    respMsg.status = true;
+                    respMsg.message = userResult[0][0].messageError;
+                    respMsg.data = null;
+                    res.status(200).json(respMsg);
+                }
+                else if(!err && userResult && userResult[0] && userResult[0][0]._error){
+                    respMsg.status = true;
+                    respMsg.message = userResult[0][0]._error;
+                    respMsg.data = null;
+                    res.status(200).json(respMsg);
+                }
+                else {
+                    respMsg.status = false;
+                    respMsg.message = 'Something went wrong';
+                    res.status(500).json(respMsg);
+                }
+            });
+        }
+        catch (ex) {
+            console.log('Error : FnSendOtp ' + ex);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = { server: 'Internal Server Error' };
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
+    }
+};
+
+
+jobPortalCtrl.portalpasswordResetVerifyOtp = function (req, res, next) {
+    console.log("inside otp");
+    var response = {
+        status: false,
+        message: "Invalid otp",
+        data: null,
+        error: null
+    };
+   
+    var otp = req.body.otp;
+    var loginId = req.body.loginId;
+
+    var validationFlag = true;
+    if (!loginId) {
+        error.loginId = "Invalid loginId";
+        validationFlag = false;
+    }
+
+    if (!otp) {
+        error.otp = "Please enter OTP";
+        validationFlag = false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        var inputs = [
+            req.st.db.escape(loginId),
+            req.st.db.escape(otp),
+            req.st.db.escape(DBSecretKey),
+            req.st.db.escape(req.body.mobileIsd || "")
+        ];
+
+        var procQuery = 'CALL portal_resetverifyOtp( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+
+        req.db.query(procQuery, function (err, result) {
+            console.log(err);
+            console.log(result);
+            if (!err && result && result[0] && result[0][0] && result[0][0].message) {
+                response.status = true;
+                response.message = result[0][0].message;
+                response.error = false;
+                response.data = {
+                    message: result[0][0].message
+                };
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0] && result[0][0] && result[0][0].messageError) {
+                response.status = false;
+                response.message = result[0][0].messageError;
+                response.error = false;
+                response.data = {
+                    message: result[0][0].messageError
+                };
+                res.status(200).json(response);
+            }
+            else if (!err && result && result[0] && result[0][0] && result[0][0]._error) {
+                response.status = false;
+                response.message = result[0][0]._error;
+                response.error = false;
+                response.data = {
+                    message: result[0][0]._error
+                };
+                res.status(200).json(response);
+            }
+            else if (!err && result && result[0] && result[0][0] && result[0][0]._uerror) {
+                response.status = false;
+                response.message = result[0][0]._uerror;
+                response.error = false;
+                response.data = {
+                    message: result[0][0]._uerror
+                };
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while verifying OTP";
+                response.error = true;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+    }
+};
+
+
+jobPortalCtrl.portalresetPassword = function (req, res, next) {
+    console.log("inside otp");
+    var response = {
+        status: false,
+        message: "Invalid mobile number",
+        data: null,
+        error: null
+    };
+    
+    var otp = req.body.otp;
+    var loginId = req.body.loginId;
+    var newPassword = req.body.newPassword;
+
+    var validationFlag = true;
+    if (!loginId) {
+        error.loginId = "loginId is mandatory";
+        validationFlag = false;
+    }
+    if (!otp) {
+        error.otp = "otp is mandatory";
+        validationFlag = false;
+    }
+
+    if (!newPassword) {
+        error.newPassword = "Please enter New Password";
+        validationFlag = false;
+    }
+
+    if (!req.body.otp) {
+        error.otp = "Enter otp";
+        validationFlag = false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+
+        var encryptPwd = req.st.hashPassword(newPassword);
+        console.log(encryptPwd);
+
+        var inputs = [
+            req.st.db.escape(loginId),
+            req.st.db.escape(encryptPwd),
+            req.st.db.escape(DBSecretKey),
+            req.st.db.escape(otp),
+            req.st.db.escape(req.body.mobileIsd || "")
+        ];
+
+        var procQuery = 'CALL portal_resetPassword( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+
+        req.db.query(procQuery, function (err, result) {
+            console.log(err);
+            console.log(result);
+            if (!err && result && result[0] && result[0][0] && result[0][0].message) {
+                response.status = true;
+                response.message = result[0][0].message;                
+                response.error = false;
+                response.data = {
+                    message: result[0][0].message
+                };
+                res.status(200).json(response);
+            }
+
+            else if(!err && result && result[0] && result[0][0] && result[0][0].messageError){
+                response.status = false;
+                response.message = result[0][0].messageError;                
+                response.error = false;
+                response.data = {
+                    message: result[0][0].messageError
+                };
+                res.status(200).json(response);
+            }
+            else if(!err && result && result[0] && result[0][0] && result[0][0]._error){
+                response.status = false;
+                response.message = result[0][0]._error;                
+                response.error = false;
+                response.data = {
+                    message: result[0][0]._error
+                };
+                res.status(200).json(response);
+            }
+
+            else if(!err && result && result[0] && result[0][0] && result[0][0]._uerror){
+                response.status = false;
+                response.message = result[0][0]._uerror;                
+                response.error = false;
+                response.data = {
+                    message: result[0][0]._uerror
+                };
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while updating password";
+                response.error = true;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+    }
+};
 
 module.exports = jobPortalCtrl;

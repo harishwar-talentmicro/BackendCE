@@ -1277,7 +1277,7 @@ router.get('/loadAllMessages', function (req, res, next) {
                                             
                                             // console.log("results[5][0].GCM_Id",results[5][0].GCM_Id);
                                             responseMessage.data = {
-                                                messageList: [],//results[0] ? results[0] :[],
+                                                messageList: results[0] ? results[0] :[],
                                                 deleteMessageIdList: []
 
                                                 // feedback: (results[2]) ? results[2] : []

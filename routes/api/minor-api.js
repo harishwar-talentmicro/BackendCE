@@ -178,8 +178,11 @@ var WGRM = require('./HEBackEnd/WGRMTemplates.js');
 var eSurvey = require('./HEBackEnd/employeeSurvey.js');
 // var likeShareComment=require('./HEApp/likeShareComment.js');
 var attendanceroaster = require('./HEBackEnd/attendance.js');
+<<<<<<< HEAD
 
 var quiz = require('./HEBackEnd/quiz.js');
+=======
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
 
 var hospitalTokenManagement = require('./HEApp/hospitalTokenManagement.js');
 
@@ -197,8 +200,11 @@ var nk = require('./nearkart/nearkart-routes');
 router.use('/nk', nk);
 
 router.use('/helloEZE', attendanceroaster);
+<<<<<<< HEAD
 router.use('/helloEZE', quiz);
 
+=======
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
 
 router.use('/configuration', configurationV1);
 router.use('/recruitment', recruitmentV1);
