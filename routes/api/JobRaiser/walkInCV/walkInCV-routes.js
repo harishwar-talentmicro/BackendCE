@@ -46,5 +46,8 @@ router.get('/publicWalkInMasterData',walkInCvCtrl.publicWalkinMaster);
 
 router.get('/companyConfig',walkInCvCtrl.getCompanySearch);
 
+router.post('/options',walkInCvCtrl.saveOptionMaster);
+
+router.get('/options',walkInCvCtrl.getoptions);
 
 module.exports = router;

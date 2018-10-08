@@ -161,6 +161,7 @@ sendMessageCtrl.sendMessage = function (req, res, next) {
                         req.body.status = req.body.status != undefined ? req.body.status : 0;
                         req.body.approverNotes = req.body.approverNotes != undefined ? req.body.approverNotes : '';
                         req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+                        req.body.textmsg = req.body.textmsg ? req.body.textmsg : '';
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -190,7 +191,8 @@ sendMessageCtrl.sendMessage = function (req, res, next) {
                             req.st.db.escape(req.body.status),
                             req.st.db.escape(req.body.approverNotes),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp) 
+                            req.st.db.escape(req.body.createdTimeStamp),
+                            req.st.db.escape(req.body.textmsg) 
 
                         ];
 
@@ -740,6 +742,7 @@ sendMessageCtrl.GetMsgMapUsersData = function (req, res, next) {
                             res2.HEUserId = userResult[0][i].HEUserId;
                             res2.isNormal = userResult[0][i].isNormal;
                             res2.isTaxSaving = userResult[0][i].isTaxSaving;
+                            res2.isSMSEnabled = userResult[0][i].isSMSEnabled;
                             res2.name = userResult[0][i].name;
                             res2.branches = userResult[0][i].branch ? JSON.parse(userResult[0][i].branch) : [];
                             res2.departments = userResult[0][i].department ? JSON.parse(userResult[0][i].department) : [];
@@ -864,6 +867,7 @@ sendMessageCtrl.saveMsgMapUsersData = function (req, res, next) {
                         req.query.keywords = req.query.keywords ? req.query.keywords : '';
                         req.query.isNormal = req.query.isNormal != undefined ? req.query.isNormal : 0;
                         req.query.isTaxSaving = req.query.isTaxSaving != undefined ? req.query.isTaxSaving : 0;
+                        req.body.isSMSEnabled = req.body.isSMSEnabled != undefined ? req.body.isSMSEnabled : 0;
 
 
                         var procParams = [
@@ -875,7 +879,8 @@ sendMessageCtrl.saveMsgMapUsersData = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(grades)),
                             req.st.db.escape(JSON.stringify(RMGroups)),
                             req.st.db.escape(req.body.isNormal),
-                            req.st.db.escape(req.body.isTaxSaving)
+                            req.st.db.escape(req.body.isTaxSaving),
+                            req.st.db.escape(req.body.isSMSEnabled)
                         ];
 
                         var procQuery = 'CALL he_save_msgMapDetails( ' + procParams.join(',') + ')';
@@ -1017,6 +1022,7 @@ sendMessageCtrl.GetAnnouncementType = function (req, res, next) {
                         response.data = {
                             isNormal: (userResult[0] && userResult[0][0] && userResult[0][0].isNormal) ? userResult[0][0].isNormal : 0,
                             isTaxSaving: (userResult[0] && userResult[0][0] && userResult[0][0].isTaxSaving) ? userResult[0][0].isTaxSaving : 0,
+                            isSMSEnabled: (userResult[0] && userResult[0][0] && userResult[0][0].isSMSEnabled) ? userResult[0][0].isSMSEnabled : 0,
                             fStartDate: (userResult[1] && userResult[1][0] && userResult[1][0].startDate) ? userResult[1][0].startDate : null,
                             fEndDate: (userResult[1] && userResult[1][0] && userResult[1][0].startDate) ? userResult[1][0].endDate : null
                         };
@@ -1382,6 +1388,7 @@ sendMessageCtrl.saveAsDraft = function (req, res, next) {
                         req.body.endDate = req.body.endDate != undefined ? req.body.endDate : null;
                         req.body.isDraft = req.body.isDraft != undefined ? req.body.isDraft : 1;
                         req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+                        req.body.textmsg = req.body.textmsg ? req.body.textmsg : '';
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -1409,7 +1416,8 @@ sendMessageCtrl.saveAsDraft = function (req, res, next) {
                             req.st.db.escape(req.body.isDraft),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp) 
+                            req.st.db.escape(req.body.createdTimeStamp) ,
+                            req.st.db.escape(req.body.textmsg) 
                         ];
 
                         var announcementFormId = 1033;
@@ -1917,6 +1925,8 @@ sendMessageCtrl.sendMessageTest = function (req, res, next) {
                         req.body.endDate = req.body.endDate != undefined ? req.body.endDate : null;
                         req.body.isDraft = req.body.isDraft != undefined ? req.body.isDraft : 0;
                         req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+                        req.body.textmsg = req.body.textmsg ? req.body.textmsg : '';
+                        
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -1944,7 +1954,8 @@ sendMessageCtrl.sendMessageTest = function (req, res, next) {
                             req.st.db.escape(req.body.isDraft),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp) 
+                            req.st.db.escape(req.body.createdTimeStamp),
+                            req.st.db.escape(req.body.textmsg) 
                         ];
                         var announcementFormId = 1033;
                         var keywordsParams = [

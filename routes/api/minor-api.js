@@ -21,8 +21,8 @@ var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 var request = require('request');
 // var Client = require('node-rest-client').Client;   // for interview scheduler hirecraft
 // var client = new Client();
-var fs=require('fs')
-var Jimp=require('jimp');
+var fs = require('fs')
+var Jimp = require('jimp');
 var gcloud = require('gcloud');
 var timestamp = Date.now();
 var uuid = require('node-uuid');
@@ -87,7 +87,7 @@ var uploadDocumentToCloud = function (uniqueName, readStream, callback) {
     });
 };
 
- 
+
 
 var configurationV1 = require('./configuration.js');
 var recruitmentV1 = require('./recruitment/recruitment-master.js');
@@ -177,6 +177,9 @@ var appGeneralRequest = require('./HEApp/generalRequest.js');
 var WGRM = require('./HEBackEnd/WGRMTemplates.js');
 var eSurvey = require('./HEBackEnd/employeeSurvey.js');
 // var likeShareComment=require('./HEApp/likeShareComment.js');
+var attendanceroaster = require('./HEBackEnd/attendance.js');
+
+var quiz = require('./HEBackEnd/quiz.js');
 
 var hospitalTokenManagement = require('./HEApp/hospitalTokenManagement.js');
 
@@ -192,6 +195,9 @@ var nk = require('./nearkart/nearkart-routes');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
 
 router.use('/nk', nk);
+
+router.use('/helloEZE', attendanceroaster);
+router.use('/helloEZE', quiz);
 
 
 router.use('/configuration', configurationV1);
@@ -742,7 +748,7 @@ if (cluster.isWorker) {
 
     if (cluster.worker.id == 1) {
         var cronJobgreeting = new CronJob({
-            cronTime: '00 14 * * *',     // to run in seconds 30 * * * * *
+            cronTime: '*/3 * * * *',     // to run in seconds 30 * * * * *
             onTick: function () {
 
                 // console.log('running a notify messages');
@@ -762,15 +768,15 @@ if (cluster.isWorker) {
                     console.log(procQuery);
                     db.query(procQuery, function (err, results) {
 
-                        
+
 
                         if (!err && results && results[0] && results[1] && results[1][0]) {
-                            console.log("--------entered to loop" )
+                            console.log("--------entered to loop")
 
-                            for (var i = 0; i<results[1].length; i++) {
-                                console.log()
+                            for (var i = 0; i < results[1].length; i++) {
+                                var count = i;
                                 results[1][i].formDataJSON = results[1][i].formDataJSON ? JSON.parse(results[1][i].formDataJSON) : {};
-                                console.log(results[1][i].formDataJSON)
+                                // console.log(results[1][i].formDataJSON)
                                 var imageUrl = results[1][i].formDataJSON.CDNPath;
                                 var displayImage = results[1][i].imageURL;
                                 var displayName = results[1][i].displayName;
@@ -778,7 +784,7 @@ if (cluster.isWorker) {
                                 console.log(displayImage);
                                 console.log(displayName);
 
-                                   console.log("image imposing started")
+                                console.log("image imposing started")
                                 // var imageUrl=results[1][i].formDataJSON.CDNPath;
                                 Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png").then(function (image2) {
                                     Jimp.read("https://storage.googleapis.com/ezeone/" + imageUrl, function (err, lenna) {
@@ -833,6 +839,30 @@ if (cluster.isWorker) {
                                                                             // results[1][i].formDataJSON.CDNPath=aUrl
                                                                             fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png");
                                                                             fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png");
+                                                                            console.log(i);
+                                                                            console.log(count);
+                                                                            // console.log(results);
+                                                                            // console.log(results[1][count]);
+                                                                            console.log(results[1][count].formDataJSON);
+                                                                            results[1][count].formDataJSON.CDNPath = aUrl;
+                                                                            console.log(results[1][count].formDataJSON.CDNPath);
+
+
+                                                                            var query = "update tmmessagebox a,tmmessageusers b set a.formDataJSON= '" + (JSON.stringify(results[1][count].formDataJSON)) +"' , b.isNotified=0 where a.tId=" + results[1][count].messageId + " and b.messageId=a.tId";
+                                                                            console.log(query);
+                                                                          db.query(query, function (err, results) {
+                                                                                if (!err) {
+                                                                                    console.log("query excuted");
+                                                                                    senderGroupId = results[0][0].senderId;
+                                                                                    notifyMessages.getMessagesNeedToNotify();
+                                                                                    console.log("Greetings sent successfully")
+                                                                                }
+                                                                                else {
+                                                                                    console.log(err)
+                                                                                }
+                                                                            });
+                                                                            // console.log(results[1][i].formDataJSON);
+                                                                           
 
 
                                                                         }
@@ -850,14 +880,14 @@ if (cluster.isWorker) {
                                         })
                                     });
 
-                                    senderGroupId = results[0][0].senderId;
-                            notifyMessages.getMessagesNeedToNotify();
-                            console.log("Greetings sent successfully")
+                                    //         senderGroupId = results[0][0].senderId;
+                                    // notifyMessages.getMessagesNeedToNotify();
+                                    // console.log("Greetings sent successfully")
                                 });
 
                             }
-                           
-                            
+
+
                         }
 
                         else {

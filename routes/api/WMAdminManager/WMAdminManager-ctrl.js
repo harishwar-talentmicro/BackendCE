@@ -787,4 +787,166 @@ wmAdminManagerCtrl.saveVaultTags = function(req, res, next){
     }
 };
 
+
+wmAdminManagerCtrl.saveTCConfig = function(req, res, next){
+
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    var error = {};
+
+   
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+    var mailBCC = req.body.mailBCC;
+    if (typeof (mailBCC) == "string") {
+        mailBCC = JSON.stringify(mailBCC);
+    }
+    if (!mailBCC) {
+        mailBCC = [];
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+            req.query.tagId = req.query.tagId ? req.query.tagId : 0;
+
+            req.body.mailTo = req.body.mailTo ? req.body.mailTo : "";
+            req.body.mailCC = req.body.mailCC ? req.body.mailCC : "";
+
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.mailTo),
+                    req.st.db.escape(req.body.mailCC),
+                    req.st.db.escape(JSON.stringify(mailBCC)),
+                    req.st.db.escape(req.body.mailSubject),
+                    req.st.db.escape(req.body.mailBody),
+                    req.st.db.escape(req.body.signature),
+                    req.st.db.escape(req.body.desclaimer),
+                    req.st.db.escape(req.body.termsAndCondition),
+                    req.st.db.escape(req.body.isTCEnabled)
+                   
+            ];
+
+            var procQuery = 'CALL wm_save_tCMailConfig( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,WMResult){
+                if(!err){
+                    response.status = true;
+                    response.message = "TC config saved successfully";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+                }
+                else{
+                    response.status = false;
+                    response.message = "Error while saving TC config";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else {
+            res.status(401).json(response);
+        }
+    });
+}
+
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + '......... error .........');
+            console.log(ex);
+            console.log('Error: ' + ex);
+        }
+    }
+
+};
+
+wmAdminManagerCtrl.getTCConfig = function(req, res, next){
+
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+            req.query.tagId = req.query.tagId ? req.query.tagId : 0;
+
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                   
+            ];
+
+            var procQuery = 'CALL wm_get_tCMailConfig( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery,function(err,WMResult){
+                if(!err){
+                    response.status = true;
+                    response.message = "TC config loaded successfully";
+                    response.error = null;
+
+                    WMResult[0][0].mailBCC=WMResult[0][0].mailBCC?JSON.parse(WMResult[0][0].mailBCC):[];
+                    response.data = WMResult[0][0];
+                    res.status(200).json(response);
+                }
+                else{
+                    response.status = false;
+                    response.message = "Error while loading TC config";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else {
+            res.status(401).json(response);
+        }
+    });
+}
+
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + '......... error .........');
+            console.log(ex);
+            console.log('Error: ' + ex);
+        }
+    }
+
+};
 module.exports = wmAdminManagerCtrl;

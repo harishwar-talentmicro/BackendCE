@@ -79,6 +79,144 @@ var uploadDocumentToCloud = function (uniqueName, readStream, callback) {
     });
 };
 
+
+var attachmentFunction = function (req,attachments,i) {
+    
+    var uniqueId = uuid.v4();
+    var timestamp = Date.now();
+    var filetype = attachments.filename ? attachments.filename.split('.')[1] : '';
+
+    var aUrl = uniqueId + '.' + filetype;
+    ///home/ezeonetalent/ezeone1/api/routes/api/JobRaiser
+    console.log('aUrl(',i,')', aUrl);
+    // C:\Users\TM2\Documents\gitproject\routes\api\JobRaiser\settings\imap
+    fs.writeFile("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/imap" + (timestamp+i) + "." + filetype, attachments.data, function (err) {
+        if (!err) {
+            console.log("file written",i);
+            var readStream = fs.createReadStream('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/imap' + (timestamp+i) + '.' + filetype);
+            console.log('file read',i, readStream);
+            uploadDocumentToCloud(aUrl, readStream, function (err) {
+                if (!err) {
+                    console.log('attachment Uploaded successfully',i, aUrl);
+                    console.log('https://storage.googleapis.com/ezeone/' + aUrl);
+
+
+                    // var buff = fs.readFileSync("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/imap" + (timestamp+i) + "." + filetype);
+                    // base64data = new Buffer(buff).toString('base64');
+                    // console.log('base64',base64data);
+
+                    var formData = {
+                        attachment : attachments
+                    };
+
+                    request.post({
+                        url: 'https://dms.tallint.com/parsing/jobraiser/parsing/?IsEmployment=false',
+                        //   headers : {
+                        //         "Authorization" : auth,
+                        //     "X-Atlassian-Token" : "nocheck"
+                        //       }, 
+                        formData: formData
+                    }, function optionalCallback(err, httpResponse, body) {
+                        if (err) {
+                            console.error('upload failed:', err);
+                        }
+                        else {
+                            fs.unlink("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/imap" +(timestamp+i) + "." + filetype, function (err) {
+                                if (!err) {
+                                    console.log('File Deleted');
+                                }
+                            });
+
+                            console.log('xml body',body);
+                            var body = body.replace(/^"(.*)"$/, '$1');
+
+                            var options = {
+                                trim: true,
+                                compact: true,
+                                ignoreComment: true,
+                                alwaysChildren: true,
+                                instructionHasAttributes: true,
+                                ignoreText: false,
+                                ignoreAttributes: true
+                            };
+                            var convert = require('xml-js');
+                            var jsonResult = convert.xml2json(body, options);
+
+                            var jsonResponse = JSON.parse(jsonResult);
+                            var Document = jsonResponse.Document;
+                            console.log(jsonResponse);
+                            console.log(typeof (Document));
+
+                            var Name = Document.Name._text;
+                            var firstName = "";
+                            var lastName = "";
+                            if (Name && Name.split(' ')[0])
+                                firstName = Name.split(' ')[0];
+
+                            if (Name && Name.split(' ')[1])
+                                lastName = Name.split(' ')[1];
+
+                            var DOB = Document.DOB._text ? Document.DOB._text : undefined;
+                            var gender = Document.Gender._text ? Document.Gender._text : undefined;
+                            var mobileNumber = Document.Mobile._text ? Document.Mobile._text : '';
+                            var emailId = Document.EMail._text ? Document.EMail._text : '';
+
+                            var passportNumber = Document.Passport._text ? Document.Passport._text : '';
+                            var SkillText = Document.SkillText._text ? Document.SkillText._text : '';
+                            var skills = SkillText.split(',');  // splits skills and forms array of skills
+                            var passportExpiryDate = Document.PassportExpiryDate._text ? Document.PassportExpiryDate._text : undefined;
+                            console.log(firstName, lastName, skills);
+
+
+                            var applicantId =  0;
+                            var heMasterId =  1000;
+                            var mobileISD ='+91';
+                            var cvPath = aUrl;
+
+                            var response = {
+                                status: false,
+                                message: "Something went wrong",
+                                data: null,
+                                error: null
+                            };
+
+                            var inputs = [
+                                req.st.db.escape(heMasterId),
+                                req.st.db.escape(applicantId),
+                                req.st.db.escape(firstName),
+                                req.st.db.escape(lastName),
+                                req.st.db.escape(DOB),
+                                req.st.db.escape(gender),
+                                req.st.db.escape(mobileISD),
+                                req.st.db.escape(mobileNumber),
+                                req.st.db.escape(passportNumber),
+                                req.st.db.escape(passportExpiryDate),
+                                req.st.db.escape(emailId),
+                                req.st.db.escape(JSON.stringify(skills || [])),
+                                req.st.db.escape(cvPath)
+                            ];
+                            var procQuery = 'CALL wm_save_cvSouring( ' + inputs.join(',') + ')';
+                            console.log(procQuery);
+
+                            req.db.query(procQuery, function (cvErr, cvResult) {
+                                console.log(cvErr);
+                                if (cvErr) {
+                                    console.log("error", cvErr);
+                                }
+                                else {
+                                    console.log("resume sourced successfully", cvResult);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+        }
+    });
+
+}
+
 settingsCtrl.getAccessrightsMaster = function (req, res, next) {
     var response = {
         status: false,
@@ -512,13 +650,15 @@ settingsCtrl.getOfferTemplateMaster = function (req, res, next) {
                         response.status = true;
                         response.message = "Offer templates loaded sucessfully";
                         response.error = null;
-                        // for (var i = 0; i < result[4].length; i++) {
-                        //     result[4][i].billingTable = result[4][0] ? JSON.parse(result[4][i].billingTable) : [];
-                        // }
+                        for (var i = 0; i < result[3].length; i++) {
+                            result[3][i].offerBreakUp = result[3][0] && result[3][0] ? JSON.parse(result[3][i].offerBreakUp) : [];
+                        }
 
                         response.data = {
                             offerTemplates: (result[0] && result[0][0]) ? result[0] : [],
-                            offerTemplateDetail: (result[1] && result[1][0]) ? JSON.parse(result[1][0].formData) : {}
+                            offerTemplateDetail: (result[1] && result[1][0]) ? JSON.parse(result[1][0].formData) : {},
+                            allowanceBreakUp : result[2] && result[2][0] ? result[2]:[],
+                            offerBreakUpTemplates :result[3] && result[3][0] ? result[3]:[],
                         };
                         res.status(200).json(response);
                     }
@@ -538,6 +678,126 @@ settingsCtrl.getOfferTemplateMaster = function (req, res, next) {
                     else {
                         response.status = false;
                         response.message = "Error while loading offer templates";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+settingsCtrl.saveOfferBreakUpTemplate = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0
+                
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(req.body.offerBreakUpTemplate || {})),
+                    req.st.db.escape(JSON.stringify(req.body.offerBreakUp || [])),
+
+                ];
+
+                var procQuery = 'CALL pace_save_offerBreakUpTemplate( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0] && result[0][0].saveMessage) {
+                        response.status = true;
+                        response.message = result[0][0].saveMessage;
+                        response.error = null;
+                        for (var i = 0; i < result[1].length; i++) {
+                            result[1][i].offerBreakUp = result[1][0] && result[1][0] ? JSON.parse(result[1][i].offerBreakUp) : [];
+                        }
+                        result[2][0].currentOfferBreakUpTemplate = result[2][0] && result[2][0] ? JSON.parse(result[2][i].currentOfferBreakUpTemplate) : {};
+
+                        response.data = {
+                            offerBreakUpTemplates : result[1] && result[1][0] ? result[1] : [],
+                            currentOfferBreakUpTemplate : result[2] && result[2][0] && result[2][0].currentOfferBreakUpTemplate ? result[2][0].currentOfferBreakUpTemplate : {}
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err && result && result[0] && result[0][0] && result[0][0].updateMessage) {
+                        response.status = true;
+                        response.message = result[0][0].updateMessage;
+                        response.error = null;
+                        for (var i = 0; i < result[1].length; i++) {
+                            result[1][i].offerBreakUp = result[1][0] && result[1][0] ? JSON.parse(result[1][i].offerBreakUp) : [];
+                        }
+
+                        result[2][0].currentOfferBreakUpTemplate = result[2][0] && result[2][0] ? JSON.parse(result[2][i].currentOfferBreakUpTemplate) : {};
+                        
+                        response.data = {
+                            offerBreakUpTemplates : result[1] && result[1][0] ? result[1] : [],
+                            currentOfferBreakUpTemplate : result[2] && result[2][0] && result[2][0].currentOfferBreakUpTemplate ? result[2][0].currentOfferBreakUpTemplate : {}
+                            
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err && result && result[0] && result[0][0] && result[0][0].duplicateName) {
+                        response.status = false;
+                        response.message = result[0][0].duplicateName;
+                        response.error = null;
+                        for (var i = 0; i < result[1].length; i++) {
+                            result[1][i].offerBreakUp = result[1][0] && result[1][0] ? JSON.parse(result[1][i].offerBreakUp) : [];
+                        }
+
+                        result[2][0].currentOfferBreakUpTemplate = result[2][0] && result[2][0] ? JSON.parse(result[2][i].currentOfferBreakUpTemplate) : {};
+                        
+                        response.data = {
+                            offerBreakUpTemplates : result[1] && result[1][0] ? result[1] : [],
+                            currentOfferBreakUpTemplate : result[2] && result[2][0] && result[2][0].currentOfferBreakUpTemplate ? result[2][0].currentOfferBreakUpTemplate : {}
+                            
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = {
+                            offerBreakUpTemplates:[]
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading offer break up templates";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
@@ -946,7 +1206,7 @@ settingsCtrl.temporary = function (req, res, next) {
                 transId = result[1][0].transId;
                 var response_server = (result[1][0].integrationFormdata);
                 // console.log('response_server',response_server);
-                if ( response_server && typeof (response_server) == "string") {
+                if (response_server && typeof (response_server) == "string") {
                     response_server = JSON.parse(response_server);
                 }
 
@@ -1007,6 +1267,154 @@ settingsCtrl.temporary = function (req, res, next) {
                 console.log('tallint interview hit for ', count, ' times');
             }
         }
+    });
+
+};
+
+
+settingsCtrl.imapFinally = function (req, res, next) {
+
+    var imaps = require('imap-simple');
+    var config = {
+        imap: {
+            user: 'arun@jobraiser.com',
+            password: 'arun@007',
+            host: 'imap.gmail.com',
+            port: 993,
+            tls: true,
+            authTimeout: 3000
+        }
+    };
+
+    imaps.connect(config).then(function (connection) {
+
+        connection.openBox('INBOX').then(function () {
+
+            // Fetch emails from the last 24h
+            var delay = 24 * 3600 * 1000;
+            var yesterday = new Date();
+            yesterday.setTime(Date.now() - delay);
+            yesterday = yesterday.toISOString();
+            var searchCriteria = ['UNSEEN', ['SUBJECT', 'testing'], ['SINCE', yesterday]];
+            var fetchOptions = { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'], struct: true, markSeen: true };
+
+            // retrieve only the headers of the messages
+            return connection.search(searchCriteria, fetchOptions);
+        }).then(function (messages) {
+
+            var attachments = [];
+
+            messages.forEach(function (message) {
+                var parts = imaps.getParts(message.attributes.struct);
+                attachments = attachments.concat(parts.filter(function (part) {
+                    return part.disposition && part.disposition.type.toUpperCase() === 'ATTACHMENT';
+                }).map(function (part) {
+                    // retrieve the attachments only of the messages with attachments
+                    return connection.getPartData(message, part)
+                        .then(function (partData) {
+                            return {
+                                filename: part.disposition.params.filename,
+                                data: partData
+                            };
+                        });
+                }));
+            });
+
+            return Promise.all(attachments);
+        }).then(function (attachments) {
+            console.log('attachments', attachments);
+            // =>
+            //    [ { filename: 'cats.jpg', data: Buffer() },
+            //      { filename: 'pay-stub.pdf', data: Buffer() } ]
+            for (var i = 0; i < attachments.length; i++) {
+                attachmentFunction(req,attachments[i],i);
+
+            }
+        });
+    });
+
+};
+
+
+settingsCtrl.fetchoutLook = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Api error",
+        data: null,
+        error: null
+    };
+
+    var imaps = require('imap-simple');
+    var config = {
+        imap: {
+            user: req.body.userName,
+            password: req.body.password,
+            host: req.body.popOrImapServer,  //'imap.gmail.com'
+            port: 993,
+            tls: true,
+            authTimeout: 3000
+        }
+    };
+
+    imaps.connect(config).then(function (connection) {
+
+        connection.openBox('INBOX').then(function () {
+
+            // Fetch emails from the last 24h
+            var delay = 24 * 3600 * 1000;
+            var yesterday = new Date();
+            yesterday.setTime(Date.now() - delay);
+            yesterday = yesterday.toISOString();  //['SUBJECT', 'testing'],
+            var searchCriteria = ['UNSEEN',  ['SINCE', yesterday]];
+            var fetchOptions = { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'], struct: true, markSeen: true };
+
+            // retrieve only the headers of the messages
+            return connection.search(searchCriteria, fetchOptions);
+        }).then(function (messages) {
+
+            var attachments = [];
+
+            messages.forEach(function (message) {
+                var parts = imaps.getParts(message.attributes.struct);
+                attachments = attachments.concat(parts.filter(function (part) {
+                    return part.disposition && part.disposition.type.toUpperCase() === 'ATTACHMENT';
+                }).map(function (part) {
+                    // retrieve the attachments only of the messages with attachments
+                    return connection.getPartData(message, part)
+                        .then(function (partData) {
+                            return {
+                                filename: part.disposition.params.filename,
+                                data: partData
+                            };
+                        });
+                }));
+            });
+
+            return Promise.all(attachments);
+        }).then(function (attachments) {
+            console.log('attachments', attachments);
+            // =>
+            //    [ { filename: 'cats.jpg', data: Buffer() },
+            //      { filename: 'pay-stub.pdf', data: Buffer() } ]
+            if (attachments.length) {
+                response.status = true;
+                response.message = "attachments fetched succesffuly";
+                response.error = null;
+                response.data = attachments;
+                res.status(200).json(response);
+                
+            }
+
+            else {
+                response.status = false;
+                response.message = "Something went wrong! Please try again";
+                response.error = null;
+                response.data = [];
+                res.status(500).json(response);
+                
+            }
+
+        });
     });
 
 };
@@ -1535,13 +1943,13 @@ settingsCtrl.temporary = function (req, res, next) {
 
 //                         var uniqueId = uuid.v4();
 //                         var filetype = (attachment.params.name.extension) ? filename.extension : '';
-    
+
 //                         aUrl = uniqueId + '.' + filetype;
-    
+
 //                         console.log("req.files.attachment.path", attachment.params.name);
-    
+
 //                         var readStream = fs.createReadStream(attachment.params.name);
-    
+
 //                         uploadDocumentToCloud(aUrl, readStream, function (err) {
 //                             if (!err) {
 //                                 console.log('FnSaveServiceAttachment: attachment Uploaded successfully', aUrl);
@@ -1598,24 +2006,6 @@ settingsCtrl.temporary = function (req, res, next) {
 // });
 
 // imap.connect();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ////////////////////////////////////
 // var request = require('request');
@@ -1745,30 +2135,6 @@ settingsCtrl.temporary = function (req, res, next) {
 //     });
 //   }
 // });
-
-
-
-
-
-// var FormData = require('form-data');
-// var fs = require('fs');
-
-// var form = new FormData();
-// form.append('attachment', fs.createReadStream('C:/Users/TM2/Desktop/Shweta-2yrs exp-Project Engineer.pdf'));
-
-// form.submit('http://23.236.49.140:1002/api/service_attachment', function(err, res){
-//     if(err){
-//       console.log("error",err);
-//     }
-//     else{
-//       console.log("response",res);
-//     res.resume();
-//     }
-
-// });
-
-
-
 
 
 module.exports = settingsCtrl;

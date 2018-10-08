@@ -1697,6 +1697,43 @@ salesCtrl.formTransaction = function(req,res,next){
         forms = [];
     }
 
+    var branchList = req.body.branchList;
+    if (typeof (branchList) == "string") {
+        branchList = JSON.parse(branchList);
+    }
+    if (!branchList) {
+        branchList = [];
+    }
+    var departmentList = req.body.departmentList;
+    if (typeof (departmentList) == "string") {
+        departmentList = JSON.parse(departmentList);
+    }
+    if (!departmentList) {
+        departmentList = [];
+    }
+    var gradeList = req.body.gradeList;
+    if (typeof (gradeList) == "string") {
+        gradeList = JSON.parse(gradeList);
+    }
+    if (!gradeList) {
+        gradeList = [];
+    }
+    var groupList = req.body.groupList;
+    if (typeof (groupList) == "string") {
+        groupList = JSON.parse(groupList);
+    }
+    if (!groupList) {
+        groupList = [];
+    }
+
+    var userList = req.body.userList;
+    if (typeof (userList) == "string") {
+        userList = JSON.parse(userList);
+    }
+    if (!userList) {
+        userList = [];
+    }
+
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
@@ -1714,7 +1751,11 @@ salesCtrl.formTransaction = function(req,res,next){
                     req.st.db.escape(req.body.fromDate),
                     req.st.db.escape(req.body.toDate),
                     req.st.db.escape(JSON.stringify(forms)),
-                    req.st.db.escape(req.body.userId)
+                    req.st.db.escape(JSON.stringify(userList)),
+                    req.st.db.escape(JSON.stringify(branchList)),
+                    req.st.db.escape(JSON.stringify(departmentList)),
+                    req.st.db.escape(JSON.stringify(gradeList)),
+                    req.st.db.escape(JSON.stringify(groupList))
                    
                 ];
                 /**
