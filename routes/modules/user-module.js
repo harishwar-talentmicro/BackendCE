@@ -27,6 +27,14 @@ var zlib = require('zlib');
 var AES_256_encryption = require('../encryption/encryption.js');
 var encryption = new  AES_256_encryption();
 
+var EZEIDEmail = 'noreply@talentmicro.com';
+// var appConfig = require('../../../ezeone-config.json');
+
+const accountSid = 'AC3765f2ec587b6b5b893566f1393a00f4';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'AC3765f2ec587b6b5b893566f1393a00f4';
+const authToken = 'b36eba6376b5939cebe146f06d33ec57';   //'3abf04f536ede7f6964919936a35e614';  //'b36eba6376b5939cebe146f06d33ec57';//
+const FromNumber = appConfig.DB.FromNumber || '+18647547021';
+var DBSecretKey = appConfig.DB.secretKey;
+
 var error ={};
 
 function FnEncryptPassword(Password) {
@@ -748,7 +756,7 @@ User.prototype.changePassword = function (req, res, next) {
     
                                                         var newPassword = hashPassword(NewPassword);
                                                         var passChangeQueryParams = st.db.escape(TokenNo) + ',' +
-                                                            st.db.escape(newPassword) + ',' + st.db.escape(ip) + ',' + st.db.escape(userAgent);
+                                                            st.db.escape(newPassword) + ',' + st.db.escape(ip) + ',' + st.db.escape(userAgent) + ',' + st.db.escape(DBSecretKey);
     
                                                         var passChangeQuery = 'CALL pChangePassword(' + passChangeQueryParams + ')';
                                                         console.log(passChangeQuery);
@@ -760,9 +768,66 @@ User.prototype.changePassword = function (req, res, next) {
                                                                 console.log(err);
                                                                 RtnMessage.status = false;
                                                                 RtnMessage.message = "Something went wrong";
+
+
                                                                 res.status(500).json(RtnMessage);
                                                             }
                                                             else {
+
+                                                                if(passChangeResult && passChangeResult[0] && passChangeResult[0][0] && passChangeResult[1] && passChangeResult[1][0]) {
+                                                                    var name=(passChangeResult[0] && passChangeResult[0][0]) ? passChangeResult[0][0].name : "";
+                                                                    var emailId=(passChangeResult[0] && passChangeResult[0][0]) ? passChangeResult[0][0].emailId : "";
+                                                                    var mailContent=(passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].mailbody : "";
+                                                               
+                                                            
+                                            
+                                                                if (mailContent) {
+                                                                            mailContent = mailContent.replace("[FirstName]", name);
+                                                                            mailContent = mailContent.replace("[FullName]", name);
+                                                    
+                                                                            var signature = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].signature : "";
+                                                                            var desclaimer = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].desclaimer : "";
+                                                                            var mailBCC = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].mailBCC : "";
+                                                                            mailBCC=mailBCC.replace("[","");
+                                                                            mailBCC=mailBCC.replace("]","");
+
+                                                                            var mailSubject = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].mailSubject : "";
+                                            
+                                                                            var linkurl = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].linkUrl : "";
+                                                                            var heMasterId = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].heMasterId : "";
+                                            
+                                                                            var code = Date.now().toString().concat(heMasterId);
+                                                                            var webLinkTo = linkurl + code;
+                                                                            webLinkTo = webLinkTo.replace('"', '');
+                                                                            webLinkTo = webLinkTo.replace('"', '');
+                                                    
+                                                                            mailContent = mailContent.replace("[Signature]", signature);
+                                                                            mailContent = mailContent.replace("[Disclaimer]", desclaimer);
+                                                                            mailContent=mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
+                                                                        }
+                                                                        // console.log(mailContent);
+                                                                        // console.log(desclaimer);
+                                                                        // console.log(emailId);
+                                                                        console.log(mailBCC);
+
+                                                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                                                var email = new sendgrid.Email();
+                                                                email.from = "noreply@talentmicro.com";
+                                                                email.to = emailId;
+                                                                email.bcc=mailBCC;
+                                                                email.subject = mailSubject;
+                                                                email.html = mailContent;
+                                                                sendgrid.send(email, function (err, result) {
+                                                                    //console.log(result);
+                                                                    if (!err) {
+                                                                        console.log("mail sent successfully");
+                                                                    }
+                                                                    else{
+                                                                        console.log(err);
+                                                                        console.log("error while sending mail");
+                                                                    }
+                                                                });
+                                                            }
                                                                 if (passChangeResult) {
                                                                     RtnMessage.IsChanged = true;
                                                                     RtnMessage.status = true;
@@ -5483,7 +5548,7 @@ User.prototype.paceChangePassword = function (req, res, next) {
     
                                                         var newPassword = hashPassword(NewPassword);
                                                         var passChangeQueryParams = st.db.escape(TokenNo) + ',' +
-                                                            st.db.escape(newPassword) + ',' + st.db.escape(ip) + ',' + st.db.escape(userAgent);
+                                                            st.db.escape(newPassword) + ',' + st.db.escape(ip) + ',' + st.db.escape(userAgent)+ ',' + st.db.escape(DBSecretKey);
     
                                                         var passChangeQuery = 'CALL pChangePassword(' + passChangeQueryParams + ')';
                                                         console.log(passChangeQuery);

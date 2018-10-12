@@ -4215,11 +4215,20 @@ walkInCvCtrl.saveOptionMaster = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.body.isInterviewStatus = req.body.isInterviewStatus ? req.body.isInterviewStatus : 0;
+                req.body.isSkillAddition = req.body.isSkillAddition ? req.body.isSkillAddition : 0;
+                req.body.isAssesmentAddition = req.body.isAssesmentAddition ? req.body.isAssesmentAddition : 0;
+                req.body.isSkill = req.body.isSkill ? req.body.isSkill : 0;
+                req.body.isAssesment = req.body.isAssesment ? req.body.isAssesment : 0;
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.heMasterId),
                 req.st.db.escape(JSON.stringify(optionList)),
-                req.st.db.escape(req.body.isInterviewStatus)
+                req.st.db.escape(req.body.isInterviewStatus),
+                req.st.db.escape(req.body.isSkillAddition),
+                req.st.db.escape(req.body.isAssesmentAddition),
+                req.st.db.escape(req.body.isSkill),
+                req.st.db.escape(req.body.isAssesment)
+            
                 ];
 
                 var procQuery = 'CALL wm_saveOptionsMaster( ' + inputs.join(',') + ')';
@@ -4297,6 +4306,10 @@ walkInCvCtrl.getoptions = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             isInterviewStatus:result[0][0].isInterviewStatus,
+                            isSkillAddition:result[0][0].isSkillAddition,
+                            isAssesmentAddition:result[0][0].isAssesmentAddition,
+                            isSkill:(result[0][0].isSkill) ? result[0][0].isSkill:0,
+                            isAssesment:(result[0][0].isAssessment) ? result[0][0].isAssessment:0,
                             optionList:result[1],
                             
                         };

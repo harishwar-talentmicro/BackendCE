@@ -27,5 +27,7 @@ router.post('/invite/public',userCtrl.invitePublicProfile);
 router.get('/welcome/attachments',userCtrl.getWelcomeAttachments);
 
 router.post('/dialer/details',userCtrl.getUserDetails);
+router.get('/termsConditionsLink',userCtrl.getUserLink);
+
 
 module.exports = router;

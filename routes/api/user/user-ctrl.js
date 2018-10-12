@@ -1444,6 +1444,51 @@ UserCtrl.changePassword = function (req, res, next) {
                     res.status(200).json(respMsg);
                 }
                 else if (!err) {
+                //     if(result && result[0] && result[0][0] && result[1] && result[1][0]) {
+                //         var name=(result[0] && result[0][0]) ? result[0][0].name : "";
+                //         var emailId=(result[0] && result[0][0]) ? result[0][0].emailId : "";
+                //         var mailContent=(result[1] && result[1][0]) ? result[1][0].mailbody : "";
+                   
+                
+
+                //     if (mailContent) {
+                //                 mailContent = mailContent.replace("[FirstName]", name);
+                //                 mailContent = mailContent.replace("[FullName]", name);
+        
+                //                 var signature = (result[1] && result[1][0]) ? result[1][0].signature : "";
+                //                 var disclaimer = (result[1] && result[1][0]) ? result[1][0].disclaimer : "";
+                //                 var mailBCC = (result[1] && result[1][0]) ? result[1][0].mailBCC : "";
+                //                 var mailSubject = (result[1] && result[1][0]) ? result[1][0].mailSubject : "";
+
+                //                 var linkurl = (result[1] && result[1][0]) ? result[1][0].linkUrl : "";
+                //                 var heMasterId = (result[1] && result[1][0]) ? result[1][0].heMasterId : "";
+
+                //                 var code = Date.now().toString().concat(heMasterId);
+                //                 var webLinkTo = linkurl + code;
+                //                 webLinkTo = webLinkTo.replace('"', '');
+                //                 webLinkTo = webLinkTo.replace('"', '');
+        
+                //                 mailContent = mailContent.replace("[Signature]", signature);
+                //                 mailContent = mailContent.replace("[Disclaimer]", disclaimer);
+                //                 mailContent=mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
+                //             }
+                //     var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                //     var email = new sendgrid.Email();
+                //     email.from = "noreply@talentmicro.com";
+                //     email.to = emailId;
+                //     email.bcc=mailBCC;
+                //     email.subject = mailSubject;
+                //     email.html = mailContent;
+                //     sendgrid.send(email, function (err, result) {
+                //         //console.log(result);
+                //         if (!err) {
+                //             console.log("mail sent successfully");
+                //         }
+                //         else{
+                //             console.log("error while sending mail");
+                //         }
+                //     });
+                // }
                     respMsg.status = true;
                     respMsg.message = "Password changed successfully";
                     res.status(200).json(respMsg);
@@ -2204,6 +2249,54 @@ UserCtrl.getUserDetails = function (req, res, next) {
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetUserDetails error:' + ex);
 
+    }
+};
+
+UserCtrl.getUserLink = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        var procParams = [
+           
+            req.st.db.escape(req.query.code)
+        ];
+
+        var procQuery = 'CALL wm_get_termsAndconditionlink( ' + procParams.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            if (!err && result && result[0] ) {
+               
+                    response.status = true;
+                    response.message = "success";
+                    response.error = null;
+                    response.data = (result[0][0]) ? result[0][0] :"";
+                    res.status(200).json(response);
+                }
+                
+                else {
+                    response.status = false;
+                    response.message = "error while loading";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+                        
+        });
     }
 };
 

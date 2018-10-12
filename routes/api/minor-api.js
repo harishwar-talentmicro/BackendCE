@@ -24,7 +24,7 @@ var request = require('request');
 var fs = require('fs')
 var Jimp = require('jimp');
 var gcloud = require('gcloud');
-var timestamp = Date.now();
+
 var uuid = require('node-uuid');
 
 var gcloud = require('gcloud');
@@ -178,11 +178,8 @@ var WGRM = require('./HEBackEnd/WGRMTemplates.js');
 var eSurvey = require('./HEBackEnd/employeeSurvey.js');
 // var likeShareComment=require('./HEApp/likeShareComment.js');
 var attendanceroaster = require('./HEBackEnd/attendance.js');
-<<<<<<< HEAD
 
 var quiz = require('./HEBackEnd/quiz.js');
-=======
->>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
 
 var hospitalTokenManagement = require('./HEApp/hospitalTokenManagement.js');
 
@@ -200,11 +197,8 @@ var nk = require('./nearkart/nearkart-routes');
 router.use('/nk', nk);
 
 router.use('/helloEZE', attendanceroaster);
-<<<<<<< HEAD
 router.use('/helloEZE', quiz);
 
-=======
->>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
 
 router.use('/configuration', configurationV1);
 router.use('/recruitment', recruitmentV1);
@@ -754,7 +748,7 @@ if (cluster.isWorker) {
 
     if (cluster.worker.id == 1) {
         var cronJobgreeting = new CronJob({
-            cronTime: '*/3 * * * *',     // to run in seconds 30 * * * * *
+            cronTime: '* 14 * * *',     // to run in seconds 30 * * * * *
             onTick: function () {
 
                 // console.log('running a notify messages');
@@ -774,124 +768,17 @@ if (cluster.isWorker) {
                     console.log(procQuery);
                     db.query(procQuery, function (err, results) {
 
-
+                        var count = 0;
 
                         if (!err && results && results[0] && results[1] && results[1][0]) {
                             console.log("--------entered to loop")
-
-                            for (var i = 0; i < results[1].length; i++) {
-                                var count = i;
-                                results[1][i].formDataJSON = results[1][i].formDataJSON ? JSON.parse(results[1][i].formDataJSON) : {};
-                                // console.log(results[1][i].formDataJSON)
-                                var imageUrl = results[1][i].formDataJSON.CDNPath;
-                                var displayImage = results[1][i].imageURL;
-                                var displayName = results[1][i].displayName;
-                                console.log(imageUrl);
-                                console.log(displayImage);
-                                console.log(displayName);
-
-                                console.log("image imposing started")
-                                // var imageUrl=results[1][i].formDataJSON.CDNPath;
-                                Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png").then(function (image2) {
-                                    Jimp.read("https://storage.googleapis.com/ezeone/" + imageUrl, function (err, lenna) {
-
-                                        var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + displayImage).then(function (image1) {
-
-                                            var profile = image1;
-                                            var mask = image2;
-                                            var w = mask.bitmap.width; // the width of the image
-                                            var h = mask.bitmap.height;
-                                            // console.log(w, h);
-                                            profile.resize(w, h);
-                                            // console.log(h);
-
-                                            profile.mask(mask, 0, 0)
-                                                .write("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png", function () {
-
-                                                    Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png", function (err, bdayImage) {
-                                                        bdayImage.resize(180, 180);
-
-                                                        if (err) throw err;
-                                                        bdayImage.quality(100)
-                                                        Jimp.loadFont(Jimp.FONT_SANS_64_BLACK).then(function (font) {
-                                                            lenna.print(font, 68, 850, displayName, 800);
-
-                                                            lenna.composite(bdayImage, 105, 104)
-                                                                .write("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png", function () {
-                                                                    console.log('writing final image');
-                                                                    var attachment = {
-                                                                        path: "/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png",
-                                                                        extension: 'png',
-                                                                        fileName: 'gunasheel'
-                                                                    };
-
-                                                                    console.log("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png")
-
-                                                                    var filetype = (attachment.extension) ? attachment.extension : '';
-                                                                    var uniqueId = uuid.v4();
-                                                                    // consol.log()
-                                                                    aUrl = uniqueId + '.' + filetype;
-                                                                    console.log(uniqueId);
-                                                                    aFilename = attachment.fileName;
-                                                                    // console.log("aFilenameaFilename", aFilename);
-                                                                    // console.log("req.files.attachment.path", attachment.path);
-
-                                                                    var readStream = fs.createReadStream(attachment.path);
-
-                                                                    // console.log(readStream);
-                                                                    uploadDocumentToCloud(aUrl, readStream, function (err) {
-                                                                        if (!err) {
-                                                                            console.log(aUrl);
-                                                                            // results[1][i].formDataJSON.CDNPath=aUrl
-                                                                            fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png");
-                                                                            fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png");
-                                                                            console.log(i);
-                                                                            console.log(count);
-                                                                            // console.log(results);
-                                                                            // console.log(results[1][count]);
-                                                                            console.log(results[1][count].formDataJSON);
-                                                                            results[1][count].formDataJSON.CDNPath = aUrl;
-                                                                            console.log(results[1][count].formDataJSON.CDNPath);
-
-
-                                                                            var query = "update tmmessagebox a,tmmessageusers b set a.formDataJSON= '" + (JSON.stringify(results[1][count].formDataJSON)) +"' , b.isNotified=0 where a.tId=" + results[1][count].messageId + " and b.messageId=a.tId";
-                                                                            console.log(query);
-                                                                          db.query(query, function (err, results) {
-                                                                                if (!err) {
-                                                                                    console.log("query excuted");
-                                                                                    senderGroupId = results[0][0].senderId;
-                                                                                    notifyMessages.getMessagesNeedToNotify();
-                                                                                    console.log("Greetings sent successfully")
-                                                                                }
-                                                                                else {
-                                                                                    console.log(err)
-                                                                                }
-                                                                            });
-                                                                            // console.log(results[1][i].formDataJSON);
-                                                                           
-
-
-                                                                        }
-                                                                        else {
-
-                                                                            console.log('FnSaveServiceAttachment:greetings not uploaded');
-                                                                        }
-                                                                    });
-
-
-                                                                });
-                                                        });
-                                                    });
-                                                });
-                                        })
-                                    });
-
-                                    //         senderGroupId = results[0][0].senderId;
-                                    // notifyMessages.getMessagesNeedToNotify();
-                                    // console.log("Greetings sent successfully")
-                                });
-
+                            var timestamp=[];
+                            for (var i = 0; i < results[1].length;i++ ) {
+                           
+                           greetingsFunction(results,i);
+                            
                             }
+                       
 
 
                         }
@@ -907,7 +794,7 @@ if (cluster.isWorker) {
             timeZone: 'America/Los_Angeles'
 
         });
-        // cronJobgreeting.start();
+         cronJobgreeting.start();
     }
 }
 
@@ -1075,6 +962,141 @@ if (cluster.isWorker) {
         });
         walkinMailreminder.start();
     }
+}
+
+
+function greetingsFunction(results,i){
+    var timestamp= Date.now();
+    console.log(timestamp);
+    console.log(i);
+    
+
+   results[1][i].formDataJSON = results[1][i].formDataJSON ? JSON.parse(results[1][i].formDataJSON) : {};
+   // console.log(results[1][i].formDataJSON)
+   var imageUrl = results[1][i].formDataJSON.CDNPath;
+   var displayImage = results[1][i].imageURL;
+   var displayName = results[1][i].displayName;
+   console.log(imageUrl);
+   console.log(displayImage);
+   console.log(displayName);
+
+   console.log("image imposing started")
+   // var imageUrl=results[1][i].formDataJSON.CDNPath;
+   Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png").then(function (image2) {
+       Jimp.read("https://storage.googleapis.com/ezeone/" + imageUrl, function (err, lenna) {
+
+           var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + displayImage).then(function (image1) {
+
+               var profile = image1;
+               var mask = image2;
+               var w = mask.bitmap.width; // the width of the image
+               var h = mask.bitmap.height;
+               // console.log(w, h);
+               profile.resize(w, h);
+               // console.log(h);
+               
+
+               profile.mask(mask, 0, 0)
+              
+                   .write("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png", function () {
+                      
+                       Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png", function (err, bdayImage) {
+                           console.log(bdayImage);
+                           bdayImage.resize(180, 180);
+
+                           if (err) throw err;
+                           bdayImage.quality(100)
+                           Jimp.loadFont(Jimp.FONT_SANS_64_BLACK).then(function (font) {
+                               lenna.print(font, 68, 850, displayName, 800);
+
+                               lenna.composite(bdayImage, 105, 104)
+                                   .write("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png" ,function () {
+                                       console.log('writing final image');
+                                       var attachment = {
+                                           path: "/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png",
+                                           extension: 'png',
+                                           fileName: 'gunasheel'
+                                       };
+
+                                       console.log("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png")
+
+                                       var filetype = (attachment.extension) ? attachment.extension : '';
+                                       var uniqueId = uuid.v4();
+                                       // consol.log()
+                                       aUrl = uniqueId + '.' + filetype;
+                                       console.log(uniqueId);
+                                       aFilename = attachment.fileName;
+                                       // console.log("aFilenameaFilename", aFilename);
+                                       // console.log("req.files.attachment.path", attachment.path);
+                                       // return new Promise(function (resolve, reject) {
+                                       var readStream = fs.createReadStream(attachment.path);
+                                       documnt(aUrl,readStream,results,i,timestamp)
+                                       // console.log(readStream);
+
+                                   
+                                     
+                                   // });
+
+
+
+                                   });
+                           });
+                       });
+                   });
+           })
+       });
+
+       //         senderGroupId = results[0][0].senderId;
+       // notifyMessages.getMessagesNeedToNotify();
+       // console.log("Greetings sent successfully")
+   });
+
+}
+
+function documnt(aUrl,readStream,results,i,timestamp){
+    uploadDocumentToCloud(aUrl, readStream, function (err) {
+        if (!err) {
+
+            console.log(aUrl);
+            // results[1][i].formDataJSON.CDNPath=aUrl
+            fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png");
+            fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp  + ".png");
+            console.log(i);
+         //    console.log(count);
+            // console.log(results);
+            // console.log(results[1][count]);
+            console.log(results[1][i].formDataJSON);
+            results[1][i].formDataJSON.CDNPath = aUrl;
+            console.log(results[1][i].formDataJSON.CDNPath);
+
+
+            var query = "update tmmessagebox a,tmmessageusers b set a.formDataJSON= '" + (JSON.stringify(results[1][i].formDataJSON)) + "' , b.isNotified=0 where a.tId=" + results[1][i].messageId + " and b.messageId=a.tId";
+            console.log(query);
+            db.query(query, function (err, results) {
+                if (!err) {
+                    console.log("query excuted");
+                    // senderGroupId = results[0][0].senderId;
+                    notifyMessages.getMessagesNeedToNotify();
+                    console.log("Greetings sent successfully");
+                  
+                  
+                    //  resolve(count);
+
+                }
+                else {
+                    console.log(err)
+                }
+            });
+            // console.log(results[1][i].formDataJSON);
+
+
+
+        }
+        else {
+
+            console.log('FnSaveServiceAttachment:greetings not uploaded');
+        }
+    });
 }
 
 module.exports = router;

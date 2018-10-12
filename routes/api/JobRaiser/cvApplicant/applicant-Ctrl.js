@@ -3220,16 +3220,10 @@ applicantCtrl.getMasterInterviewScheduler = function (req, res, next) {
                                 interviewRound: result[2] ? result[2] : [],
                                 skillLevelList: result[3] ? result[3] : [],
                                 heDepartment: result[4] ? result[4] : [],
-<<<<<<< HEAD
-                                skillOptionList: result[5] ? result[5] : [],
-                                isAddAssessmentEnable: result[6][0].isAddAssessmentEnable ? result[6][0].isAddAssessmentEnable : 0,
-                                isAddSkillEnable: result[6][0].isAddSkillEnable ? result[6][0].isAddSkillEnable : 0
-=======
                                 skillList: result[5] ? result[5] : [],
                                 assessmentOptionList: result[6] &&  result[6][0] ? result[6]:[],
                                 isAddAssessmentEnable: result[6] && result[6][0] && result[6][0].isAddAssessmentEnable ? result[6][0].isAddAssessmentEnable : 0,
                                 isAddSkillEnable: result[6] && result[6][0] && result[6][0].isAddSkillEnable ? result[6][0].isAddSkillEnable : 0
->>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                             };
 
                         if (req.query.isWeb == 0) {
