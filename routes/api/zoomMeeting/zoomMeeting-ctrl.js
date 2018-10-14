@@ -19,14 +19,14 @@ const VideoGrant = AccessToken.VideoGrant;
 const VoiceGrant = AccessToken.VoiceGrant;
 
 // Used when generating any kind of tokens
-// const accountSid = appConfig.DB.accountSid;  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'AC3765f2ec587b6b5b893566f1393a00f4';
-const authToken = appConfig.DB.authToken || 'b36eba6376b5939cebe146f06d33ec57';   //'3abf04f536ede7f6964919936a35e614';  //'b36eba6376b5939cebe146f06d33ec57';//
-const FromNumber = appConfig.DB.FromNumber || '+18647547021';  
+// const accountSid = appConfig.DB.accountSid;  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'AC62cf5e4f884a28b6ad9e2da511d24f4d';
+const authToken = appConfig.DB.authToken || 'ff62486827ce8b68c70c1b8f7cef9748';   //'3abf04f536ede7f6964919936a35e614';  //'ff62486827ce8b68c70c1b8f7cef9748';//
+const FromNumber = appConfig.DB.FromNumber || '+16012286363';  
 
 // used to get access token video
-const twilioAccountSid = 'AC3765f2ec587b6b5b893566f1393a00f4';//'ACcf64b25bcacbac0b6f77b28770852ec9';
-const twilioApiKey = 'SK1e1fac39290cebabde43283468428f07';//'SK325bcee2fd8a349792f9772907f0bfe8';
-const twilioApiSecret = 'Hdp0VqbQTKGRNwBh2p6NPQhFuCRoSZMK';// old 'oMrS8ymAimGGiIFIz80LhNrbQoSIWoUu'; 
+const twilioAccountSid = 'AC62cf5e4f884a28b6ad9e2da511d24f4d';//'ACcf64b25bcacbac0b6f77b28770852ec9';
+const twilioApiKey = 'SK6e0a385cf5886a5370593777e3a954c0';//'SK325bcee2fd8a349792f9772907f0bfe8';
+const twilioApiSecret = 'zhayNVpQhutvttQm1pozOioabkJYr1hR';// old 'oMrS8ymAimGGiIFIz80LhNrbQoSIWoUu'; 
 
 
 // Used specifically for creating Voice tokens
