@@ -511,7 +511,6 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                                 help.statusList = JSON.parse(help.statusList);
                                 output.push(help);    
                         }
-
                         
                         // console.log("----------",output);
 

@@ -581,7 +581,14 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             paceUserDetails: (result[47] && result[47][0]) ? result[47][0] : {},
                             stageStatusMapList: result[48] ? result[48] : [],
                             interviewModeList: result[49] ? result[49] : [],
-                            billTo: result[50] ? result[50] : []
+                            billTo: result[50] ? result[50] : [],
+                            organizationChart: {
+                                organizationBranches: result[52] && result[52][0] ? result[52] : [],
+                                organizationDepartments: result[53] && result[53][0] ? result[53] : [],
+                                organizationGrades: result[54] && result[54][0] ? result[54] : [],
+                                organizationJobTitles: result[55] && result[55][0] ? result[55] : []
+                            },
+                            typeView: result[56] ? result[56] : []
 
                         };
 
@@ -946,7 +953,10 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                     req.st.db.escape(req.body.requirementId),
                     req.st.db.escape(DBSecretKey),
                     req.st.db.escape(req.body.type),
-                    req.st.db.escape(req.body.name)
+                    req.st.db.escape(req.body.name),
+                    req.st.db.escape(req.body.from || null),
+                    req.st.db.escape(req.body.to || null),
+                    req.st.db.escape(req.body.userMasterId || 0)
                 ];
 
                 var procQuery = 'CALL wm_get_applicants( ' + getStatus.join(',') + ')';
@@ -957,45 +967,14 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                         response.status = true;
                         response.message = "Applicants loaded successfully";
                         response.error = null;
-                        var output = [];
-                        for (var i = 0; i < Result[0].length; i++) {
-                            var res2 = {};
-                            res2.reqApplicantId = Result[0][i].reqAppId;
-                            res2.applicantId = Result[0][i].applicantId;
-                            res2.imageUrl = Result[0][i].imageUrl;
-                            res2.createdDate = Result[0][i].createdDate;
-                            res2.lastUpdatedDate = Result[0][i].lastUpdatedDate;
-                            res2.reqCvCreatedUserId = Result[0][i].reqCvCreatedUserId;
-                            res2.reqCvCreatedUserName = Result[0][i].reqCvCreatedUserName;
-                            res2.reqCvUpdatedUserId = Result[0][i].reqCvUpdatedUserId;
-                            res2.reqCvUpdatedUserName = Result[0][i].reqCvUpdatedUserName;
-                            res2.cvCreatedDate = Result[0][i].cvCreatedDate;
-                            res2.cvCreatedUSerId = Result[0][i].cvCreatedUSerId;
-                            res2.cvCreatedUserName = Result[0][i].cvCreatedUserName;
-                            res2.cvUpdatedDate = Result[0][i].cvUpdatedDate;
-                            res2.cvUpdatedUserId = Result[0][i].cvUpdatedUserId;
-                            res2.cvUpdatedUserName = Result[0][i].cvUpdatedUserName;
-                            res2.requirementId = Result[0][i].requirementId;
-                            res2.name = Result[0][i].name;
-                            res2.emailId = Result[0][i].emailId;
-                            res2.clientId = Result[0][i].clientId;
-                            res2.clientName = Result[0][i].clientname;
-                            res2.jobCode = Result[0][i].jobCode;
-                            res2.jobTitleId = Result[0][i].jobTitleId;
-                            res2.jobTitle = Result[0][i].title;
-                            res2.stageId = Result[0][i].stageId;
-                            res2.stage = Result[0][i].stageTitle;
-                            res2.stageTypeId = Result[0][i].stageTypeId;
-                            res2.colorCode = Result[0][i].colorCode;
-                            res2.statusId = Result[0][i].statusId;
-                            res2.status = Result[0][i].statusTitle;
-                            res2.statusTypeId = Result[0][i].statusTypeId;
-                            res2.reqCreatedUserId = Result[0][i].reqCreatedUserId;
-                            res2.clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
-                            output.push(res2);
+                        if (Result[0][0].reqApplicantId) {
+                            for (var i = 0; i < Result[0].length; i++) {
+                                Result[0][i].clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
+                            }
                         }
+
                         response.data = {
-                            applicantlist: output,
+                            applicantlist: Result[0] ? Result[0] : [],
                             count: Result[1][0].count,
                             offerMasterData: {
                                 currency: Result[2] ? Result[2] : [],
@@ -1087,7 +1066,7 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(req.body.notes),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.body.reasonId)
+                    req.st.db.escape(JSON.stringify(req.body.reason || {}))
                 ];
 
                 var statusQuery = 'CALL wm_save_reqStageStatus( ' + statusParams.join(',') + ')';
@@ -1180,9 +1159,16 @@ applicantCtrl.getreqAppStageStatus = function (req, res, next) {
                         response.status = true;
                         response.message = "Transaction History and current scenario loaded successfully";
                         response.error = null;
+
+                        for (var i = 0; i < statusResult[0].length; i++) {
+                            statusResult[0][i].reason = statusResult[0][i] && JSON.parse(statusResult[0][i].reason).reasonId ? JSON.parse(statusResult[0][i].reason) : {}
+                        }
+
+                        statusResult[1][0].reason = statusResult[1][0] && JSON.parse(statusResult[1][0].reason).reasonId ? JSON.parse(statusResult[1][0].reason) : {}
+
                         response.data = {
                             transactionHistory: statusResult[0] ? statusResult[0] : [],
-                            currentScenario: statusResult[1][0] ? statusResult[1][0] : []
+                            currentScenario: statusResult[1][0] ? statusResult[1][0] : {}
                         };
                         isWeb = req.query.isWeb;
                         if (isWeb == 0) {
@@ -1391,7 +1377,7 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                         response.data = {
                             applicantList: result[0],
                             count: result[1][0].count,
-                            applicantIdArray : (result[2] && result[2][0] && JSON.parse(result[2][0].applicantIdArray)) ? JSON.parse(result[2][0].applicantIdArray) :[]
+                            applicantIdArray: (result[2] && result[2][0] && JSON.parse(result[2][0].applicantIdArray)) ? JSON.parse(result[2][0].applicantIdArray) : []
                         };
                         res.status(200).json(response);
 
@@ -1628,26 +1614,25 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[1]) {
+                    if (!err && result && result[0] && result[0][0] && result[1]) {
                         //parsing the result
                         var temp_result = result[0][0] ? result[0][0] : {};
                         temp_result.education = JSON.parse(temp_result.education);
                         temp_result.cvSource = JSON.parse(temp_result.cvSource);
-                        temp_result.expectedSalaryCurr = JSON.parse(temp_result.expectedSalaryCurr);
-                        temp_result.expectedSalaryPeriod = JSON.parse(temp_result.expectedSalaryPeriod);
-                        temp_result.expectedSalaryScale = JSON.parse(temp_result.expectedSalaryScale);
+                        temp_result.expectedSalaryCurr = temp_result.expectedSalaryCurr && JSON.parse(temp_result.expectedSalaryCurr).currencyId ? JSON.parse(temp_result.expectedSalaryCurr) : {};
+                        temp_result.expectedSalaryPeriod = temp_result.expectedSalaryPeriod && JSON.parse(temp_result.expectedSalaryPeriod).durationId ? JSON.parse(temp_result.expectedSalaryPeriod) : {};
+                        temp_result.expectedSalaryScale = temp_result.expectedSalaryScale && JSON.parse(temp_result.expectedSalaryScale).scaleId ? JSON.parse(temp_result.expectedSalaryScale) : {};
                         temp_result.industry = JSON.parse(temp_result.industry);
-                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle);
-                        //  temp_result.jobTitle = temp_result.jobTitle.titleId != null ? temp_result.jobTitle : undefined;
-                        temp_result.nationality = JSON.parse(temp_result.nationality);
+                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle).jobTitleId ? JSON.parse(temp_result.jobTitle) : {};
+                        temp_result.nationality = JSON.parse(temp_result.nationality).nationalityId ? JSON.parse(temp_result.nationality) : {};
                         temp_result.prefLocations = JSON.parse(temp_result.prefLocations);
-                        temp_result.presentSalaryCurr = JSON.parse(temp_result.presentSalaryCurr);
-                        temp_result.presentSalaryPeriod = JSON.parse(temp_result.presentSalaryPeriod);
-                        temp_result.presentSalaryScale = JSON.parse(temp_result.presentSalaryScale);
+                        temp_result.presentSalaryCurr = temp_result.presentSalaryCurr && JSON.parse(temp_result.presentSalaryCurr).currencyId ? JSON.parse(temp_result.presentSalaryCurr) : {};
+                        temp_result.presentSalaryPeriod = temp_result.presentSalaryPeriod && JSON.parse(temp_result.presentSalaryPeriod).durationId ? JSON.parse(temp_result.presentSalaryPeriod) : {};
+                        temp_result.presentSalaryScale = temp_result.presentSalaryScale && JSON.parse(temp_result.presentSalaryScale).scaleId ? JSON.parse(temp_result.presentSalaryScale) : {};
                         temp_result.primarySkills = JSON.parse(temp_result.primarySkills);
                         temp_result.secondarySkills = JSON.parse(temp_result.secondarySkills);
                         temp_result.functionalAreas = JSON.parse(temp_result.functionalAreas);
-                        temp_result.presentLocation = JSON.parse(temp_result.presentLocation);
+                        temp_result.presentLocation = JSON.parse(temp_result.presentLocation).locationId ? JSON.parse(temp_result.presentLocation) : {};
 
                         if (typeof (result[5] && result[5][0] && result[5][0].cc) == 'string') {
                             result[5][0].cc = JSON.parse(result[5][0].cc)
@@ -2154,22 +2139,33 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[0][0] && result[0][0].offerManagerId != 0) {
+                    if (!err && result && (result[0] || result[1] || result[2])) {
                         response.status = true;
                         response.message = "Offer manager list loaded successfully";
                         response.error = null;
-                        result[0][0].reqAppList = result[0][0].reqAppList ? JSON.parse(result[0][0].reqAppList) : [];
-                        result[0][0].documentAttachment = result[0][0].documentAttachment ? JSON.parse(result[0][0].documentAttachment) : [];
-                        result[0][0].billableCurrency = result[0][0].billableCurrency ? JSON.parse(result[0][0].billableCurrency) : {};
-                        result[0][0].billableScale = result[0][0].billableScale ? JSON.parse(result[0][0].billableScale) : {};
-                        result[0][0].billableDuration = result[0][0].billableDuration ? JSON.parse(result[0][0].billableDuration) : {};
-                        result[0][0].billingCurrency = result[0][0].billingCurrency ? JSON.parse(result[0][0].billingCurrency) : {};
-                        result[0][0].billingScale = result[0][0].billingScale ? JSON.parse(result[0][0].billingScale) : [];
-                        result[0][0].billingDuration = result[0][0].billingDuration ? JSON.parse(result[0][0].billingDuration) : {};
-                        response.data = result[0][0];
+                        if (result[0][0].offerManagerId != 0) {
+                            result[0][0].reqAppList = result[0][0].reqAppList ? JSON.parse(result[0][0].reqAppList) : [];
+                            result[0][0].documentAttachment = result[0][0].documentAttachment ? JSON.parse(result[0][0].documentAttachment) : [];
+                            result[0][0].billableCurrency = result[0][0].billableCurrency ? JSON.parse(result[0][0].billableCurrency) : {};
+                            result[0][0].billableScale = result[0][0].billableScale ? JSON.parse(result[0][0].billableScale) : {};
+                            result[0][0].billableDuration = result[0][0].billableDuration ? JSON.parse(result[0][0].billableDuration) : {};
+                            result[0][0].billingCurrency = result[0][0].billingCurrency ? JSON.parse(result[0][0].billingCurrency) : {};
+                            result[0][0].billingScale = result[0][0].billingScale ? JSON.parse(result[0][0].billingScale) : [];
+                            result[0][0].billingDuration = result[0][0].billingDuration ? JSON.parse(result[0][0].billingDuration) : {};
+                        }
+
+                        for (var i = 0; i < result[2].length; i++) {
+                            result[2][i].offerBreakUp = result[2][0] && result[2][0] ? JSON.parse(result[2][i].offerBreakUp) : [];
+                        }
+
+                        response.data = {
+                            offerDetails: result[0] && result[0][0] && result[0][0].offerManagerId ? result[0][0] : {},
+                            offerTemplate: result[1] && result[1][0] ? result[1] : [],
+                            offerBreakUpTemplate: result[2] && result[2][0] ? result[2] : []
+                        };
                         res.status(200).json(response);
                     }
-                    else if (!err && result) {
+                    else if (!err) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
@@ -3190,7 +3186,10 @@ applicantCtrl.getMasterInterviewScheduler = function (req, res, next) {
                                 interviewRound: result[2] ? result[2] : [],
                                 skillLevelList: result[3] ? result[3] : [],
                                 heDepartment: result[4] ? result[4] : [],
-                                skillList: result[5] ? result[5] : []
+                                skillList: result[5] ? result[5] : [],
+                                assessmentOptionList: result[6] && result[6][0] ? result[6] : [],
+                                isAddAssessmentEnable: result[6] && result[6][0] && result[6][0].isAddAssessmentEnable ? result[6][0].isAddAssessmentEnable : 0,
+                                isAddSkillEnable: result[6] && result[6][0] && result[6][0].isAddSkillEnable ? result[6][0].isAddSkillEnable : 0
                             };
 
                         if (req.query.isWeb == 0) {
@@ -3214,7 +3213,10 @@ applicantCtrl.getMasterInterviewScheduler = function (req, res, next) {
                             interviewRound: [],
                             skillLevelList: [],
                             heDepartment: [],
-                            skillList: []
+                            skillOptionList: [],
+                            isAddAssessmentEnable:0,
+                            isAddSkillEnable:0
+
                         };
 
                         if (req.query.isWeb == 0) {
@@ -3846,24 +3848,24 @@ applicantCtrl.getOnBoarding = function (req, res, next) {
 
                         if (result[0][0]) {
                             result[0][0].documentAttachment = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].documentAttachment) : [];
-                            result[0][0].offerLocation = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerLocation) : [];
+                            result[0][0].offerLocation = (result && result[0] && result[0][0] && JSON.parse(result[0][0].offerLocation).locationId) ? JSON.parse(result[0][0].offerLocation) : [];
 
-                            result[0][0].offerCTCCurr = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCCurr) : {};
-                            result[0][0].offerCTCScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCScale) : {};
-                            result[0][0].offerCTCPeriod = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].offerCTCPeriod) : {};
-                            result[0][0].salaryCurr = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryCurr) : {};
-                            result[0][0].salaryScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryScale) : {};
-                            result[0][0].salaryPeriod = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].salaryPeriod) : {};
+                            result[0][0].offerCTCCurr = (result && result[0] && result[0][0] && JSON.parse(result[0][0].offerCTCCurr).currencyId) ? JSON.parse(result[0][0].offerCTCCurr) : {};
+                            result[0][0].offerCTCScale = (result && result[0] && result[0][0] && JSON.parse(result[0][0].offerCTCScale).scaleId) ? JSON.parse(result[0][0].offerCTCScale) : {};
+                            result[0][0].offerCTCPeriod = (result && result[0] && result[0][0] && JSON.parse(result[0][0].offerCTCPeriod).durationId) ? JSON.parse(result[0][0].offerCTCPeriod) : {};
+                            result[0][0].salaryCurr = (result && result[0] && result[0][0] && JSON.parse(result[0][0].salaryCurr).currencyId) ? JSON.parse(result[0][0].salaryCurr) : {};
+                            result[0][0].salaryScale = (result && result[0] && result[0][0] && JSON.parse(result[0][0].salaryScale).scaleId) ? JSON.parse(result[0][0].salaryScale) : {};
+                            result[0][0].salaryPeriod = (result && result[0] && result[0][0] && JSON.parse(result[0][0].salaryPeriod).durationId) ? JSON.parse(result[0][0].salaryPeriod) : {};
 
-                            result[0][0].billableCurrency = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableCurrency) : {};
-                            result[0][0].billableScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableScale) : {};
-                            result[0][0].billableDuration = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].billableDuration) : {};
+                            result[0][0].billableCurrency = (result && result[0] && result[0][0] && JSON.parse(result[0][0].billableCurrency).currencyId) ? JSON.parse(result[0][0].billableCurrency) : {};
+                            result[0][0].billableScale = (result && result[0] && result[0][0] && JSON.parse(result[0][0].billableScale).scaleId) ? JSON.parse(result[0][0].billableScale) : {};
+                            result[0][0].billableDuration = (result && result[0] && result[0][0] && JSON.parse(result[0][0].billableDuration).durationId) ? JSON.parse(result[0][0].billableDuration) : {};
 
-                            result[0][0].vendorCurrency = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorCurrency) : {};
-                            result[0][0].vendorScale = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorScale) : {};
-                            result[0][0].vendorDuration = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].vendorDuration) : {};
+                            result[0][0].vendorCurrency = (result && result[0] && result[0][0] && JSON.parse(result[0][0].vendorCurrency).currencyId) ? JSON.parse(result[0][0].vendorCurrency) : {};
+                            result[0][0].vendorScale = (result && result[0] && result[0][0] && JSON.parse(result[0][0].vendorScale).scaleId) ? JSON.parse(result[0][0].vendorScale) : {};
+                            result[0][0].vendorDuration = (result && result[0] && result[0][0] && JSON.parse(result[0][0].vendorDuration).durationId) ? JSON.parse(result[0][0].vendorDuration) : {};
 
-                            result[0][0].designation = (result && result[0] && result[0][0]) ? JSON.parse(result[0][0].designation) : {};
+                            result[0][0].designation = (result && result[0] && result[0][0] && JSON.parse(result[0][0].designation).roleId) ? JSON.parse(result[0][0].designation) : {};
                         }
 
                         if (result[1][0]) {
@@ -4041,7 +4043,9 @@ applicantCtrl.faceSheetTemplate = function (req, res, next) {
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.body.templateId),
                     req.st.db.escape(req.body.templateName),
-                    req.st.db.escape(JSON.stringify(questions))
+                    req.st.db.escape(JSON.stringify(questions)),
+                    req.st.db.escape(req.body.customFaceSheet || ""),
+                    req.st.db.escape(req.body.isCustomTab || 0)
                 ];
 
                 var procQuery = 'CALL wm_save_paceFacesheetTemplate( ' + inputs.join(',') + ')';
@@ -4129,7 +4133,7 @@ applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
 
-                    if (!err && result && result[0][0]) {
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "Facesheet Template loaded sucessfully";
                         response.error = null;
@@ -4137,6 +4141,16 @@ applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
                             for (var i = 0; i < faceSheet.questions.length; i++) {
                                 faceSheet.questions[i].answer = result[0][0][faceSheet.questions[i].type.tagName];
                             }
+                            console.log("facesheet custom tags",faceSheet.customTags && faceSheet.customTags.length);
+                        if (faceSheet.customTags && faceSheet.customTags.length) {
+                            for (var customIndex = 0; customIndex < faceSheet.customTags.length; customIndex++) {
+                                console.log("resume",result[0][0][faceSheet.customTags[customIndex].tagName]);
+                                if (result[0][0] && result[0][0][faceSheet.customTags[customIndex].tagName]) {
+                                    faceSheet.customFaceSheet = faceSheet.customFaceSheet.replace('[facesheet.' + faceSheet.customTags[customIndex].tagName + ']', result[0][0][faceSheet.customTags[customIndex].tagName]);
+                                    console.log(faceSheet.customFaceSheet);
+                                }
+                            }
+                        }
 
                         response.data = {
                             faceSheet: faceSheet ? faceSheet : {}

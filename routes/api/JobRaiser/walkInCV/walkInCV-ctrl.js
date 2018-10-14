@@ -227,8 +227,7 @@ walkInCvCtrl.getmasterData = function (req, res, next) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 var inputs = [
-                    req.st.db.escape(req.query.token),
-
+                    req.st.db.escape(req.query.token)
                 ];
 
                 var procQuery = 'CALL wm_get_masterDataForWalkinForm( ' + inputs.join(',') + ')';
@@ -1756,7 +1755,7 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                 ];
 
                                 var procQuery = 'CALL wm_save_interviewSchedulerForHirecraft( ' + procParams.join(',') + ')';
-                                //  console.log(procQuery);
+                                  console.log(procQuery);
                                 req.db.query(procQuery, function (err, results) {
                                     console.log(err);
 
@@ -4178,5 +4177,172 @@ walkInCvCtrl.getCompanySearch = function (req, res, next) {
     }
 
 };
+
+
+walkInCvCtrl.saveOptionMaster = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.body.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+    var optionList = req.body.optionList
+    if (typeof (optionList) == 'string') {
+        optionList = JSON.parse(optionList);
+    }
+    if (!optionList) {
+        optionList = [];
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.body.isInterviewStatus = req.body.isInterviewStatus ? req.body.isInterviewStatus : 0;
+                req.body.isSkillAddition = req.body.isSkillAddition ? req.body.isSkillAddition : 0;
+                req.body.isAssesmentAddition = req.body.isAssesmentAddition ? req.body.isAssesmentAddition : 0;
+                req.body.isSkill = req.body.isSkill ? req.body.isSkill : 0;
+                req.body.isAssesment = req.body.isAssesment ? req.body.isAssesment : 0;
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.heMasterId),
+                req.st.db.escape(JSON.stringify(optionList)),
+                req.st.db.escape(req.body.isInterviewStatus),
+                req.st.db.escape(req.body.isSkillAddition),
+                req.st.db.escape(req.body.isAssesmentAddition),
+                req.st.db.escape(req.body.isSkill),
+                req.st.db.escape(req.body.isAssesment)
+            
+                ];
+
+                var procQuery = 'CALL wm_saveOptionsMaster( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result) {
+                        response.status = true;
+                        response.message = "Options saved successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving Options ";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+walkInCvCtrl.getoptions = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+                var isInterviewStatus=0;
+                var procQuery = 'CALL wm_getOptionsMaster( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    
+                    if (!err && result && result[0] && result[1]) {
+                        // result[1][isInterviewStatus]=result[0].isInterviewStatus ;
+
+                        response.status = true;
+                        response.message = "options loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            isInterviewStatus:result[0][0].isInterviewStatus,
+                            isSkillAddition:result[0][0].isSkillAddition,
+                            isAssesmentAddition:result[0][0].isAssesmentAddition,
+                            isSkill:(result[0][0].isSkill) ? result[0][0].isSkill:0,
+                            isAssesment:(result[0][0].isAssessment) ? result[0][0].isAssessment:0,
+                            optionList:result[1],
+                            
+                        };
+                        res.status(200).json(response);
+                    }
+
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = {
+                           
+                            optionList:[]
+
+                        };
+                        res.status(200).json(response);
+
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting user data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 
 module.exports = walkInCvCtrl;

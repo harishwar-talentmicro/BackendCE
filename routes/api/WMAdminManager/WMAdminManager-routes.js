@@ -21,4 +21,8 @@ router.post('/vault/datatype',WMAdminManagerCtrl.saveVaultDataTypes);
 router.post('/vault/tag',WMAdminManagerCtrl.saveVaultTags);
 router.get('/vault/tag',WMAdminManagerCtrl.getVaultTags);
 
+router.post('/TCconfig',WMAdminManagerCtrl.saveTCConfig);
+router.get('/TCconfig',WMAdminManagerCtrl.getTCConfig);
+
+
 module.exports = router;

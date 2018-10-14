@@ -444,7 +444,13 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(tags)),
                         req.st.db.escape(JSON.stringify(stage)),
                         req.st.db.escape(req.body.mailerType),
-                        req.st.db.escape(JSON.stringify(tableTags))
+                        req.st.db.escape(JSON.stringify(tableTags)),
+                        req.st.db.escape(req.body.sendSMS || 0),
+                        req.st.db.escape(req.body.attachJD || 0),
+                        req.st.db.escape(req.body.attachResume || 0),
+                        req.st.db.escape(req.body.interviewerFlag || 0),
+                        req.st.db.escape(req.body.resumeFileName || '')
+
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
@@ -534,6 +540,11 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
     var isWeb = req.query.isWeb || 0;
     var mailerType = req.body.mailerType || 0;
     var userId = req.query.userId || 0;
+
+    var attachJD = req.body.attachJD || 0;
+    var attachResume = req.body.attachResume || 0;
+    var interviewerFlag = req.body.interviewerFlag || 0;
+    var resumeFileName = req.body.resumeFileName || 0;
 
     //html styling for table in submission mailer
 
@@ -843,20 +854,29 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                                 response.status = true;
                                 
                                 if (isSendgrid && isSMS) {  // making changes here reminder
-                                    if (subject != '' && smsMsg != '') {
-                                        response.message = "Mail and SMS sent successfully";
-                                        response.data = transactions[0] ? transactions[0] : [];
+                                    if (subject != '' ) {
+                                        if(smsMsg !='' && smsFlag){
+                                            response.message = "Mail and SMS sent successfully";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
+                                        else{
+                                            response.message = "Mail sent successfully";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
                                     }
-                                    else if (subject != '' && smsMsg == '') {
-                                        response.message = "Mail sent successfully. Message field is empty,SMS cannot be sent";
-                                        response.data = transactions[0] ? transactions[0] : [];
-                                    }
-                                    else if (subject == '' && smsMsg != '') {
-                                        response.message = "SMS sent successfully. Mail subject is empty,mail cannot be sent";
-                                        response.data = transactions[0] ? transactions[0] : [];
+                                    
+                                    else if (subject == '') {
+                                        if(smsMsg != '' && smsFlag){
+                                            response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
+                                        else{
+                                            response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
                                     }
                                     else {
-                                        response.message = "Mail subject and SMS fields are empty,Mail and SMS cannot be sent";
+                                        response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
@@ -867,17 +887,21 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                     else if (subject == '') {
-                                        response.message = "Mail subject is empty,mail cannot be sent";
+                                        response.message = "Mail subject is empty, mail cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
                                 else if (isSMS && !isSendgrid) {
-                                    if (isSMS != '') {
+                                    if (smsMsg != '' && smsFlag) {
                                         response.message = "SMS sent successfully";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
-                                    else if (isSMS == '') {
-                                        response.message = "SMS field is empty,SMS cannot be sent";
+                                    else if (smsMsg == '' && smsFlag) {
+                                        response.message = "SMS field is empty, SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else{
+                                        response.message = "SMS flag is not enabled, SMS cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
@@ -950,7 +974,12 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(tags)),
                         req.st.db.escape(JSON.stringify(stage)),
                         req.st.db.escape(req.body.mailerType),
-                        req.st.db.escape(JSON.stringify(tableTags))
+                        req.st.db.escape(JSON.stringify(tableTags)),
+                        req.st.db.escape(req.body.sendSMS || 0),
+                        req.st.db.escape(req.body.attachJD || 0),
+                        req.st.db.escape(req.body.attachResume || 0),
+                        req.st.db.escape(req.body.interviewerFlag || 0),
+                        req.st.db.escape(req.body.resumeFileName || '')
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
@@ -1684,20 +1713,29 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                 response.status = true;
 
                                 if (isSendgrid && isSMS) {  // making changes here reminder
-                                    if (subject != '' && smsMsg != '') {
-                                        response.message = "Mail and SMS sent successfully";
-                                        response.data = transactions[0] ? transactions[0] : [];
+                                    if (subject != '' ) {
+                                        if(smsMsg !='' && smsFlag){
+                                            response.message = "Mail and SMS sent successfully";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
+                                        else{
+                                            response.message = "Mail sent successfully";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
                                     }
-                                    else if (subject != '' && smsMsg == '') {
-                                        response.message = "Mail sent successfully. Message field is empty,SMS cannot be sent";
-                                        response.data = transactions[0] ? transactions[0] : [];
-                                    }
-                                    else if (subject == '' && smsMsg != '') {
-                                        response.message = "SMS sent successfully. Mail subject is empty,mail cannot be sent";
-                                        response.data = transactions[0] ? transactions[0] : [];
+                                    
+                                    else if (subject == '') {
+                                        if(smsMsg != '' && smsFlag){
+                                            response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
+                                        else{
+                                            response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
                                     }
                                     else {
-                                        response.message = "Mail subject and SMS fields are empty,Mail and SMS cannot be sent";
+                                        response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
@@ -1708,17 +1746,21 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                     else if (subject == '') {
-                                        response.message = "Mail subject is empty,mail cannot be sent";
+                                        response.message = "Mail subject is empty, mail cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
                                 else if (isSMS && !isSendgrid) {
-                                    if (isSMS != '') {
+                                    if (smsMsg != '' && smsFlag) {
                                         response.message = "SMS sent successfully";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
-                                    else if (isSMS == '') {
-                                        response.message = "SMS field is empty,SMS cannot be sent";
+                                    else if (smsMsg == '' && smsFlag) {
+                                        response.message = "SMS field is empty, SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else{
+                                        response.message = "SMS flag is not enabled, SMS cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
@@ -1726,6 +1768,7 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                     response.message = "Sendgrid or SMS is not configured. Please contact the admin";
                                     response.data = null;
                                 }
+
                                 response.error = null;
                                 res.status(200).json(response);
                             }
@@ -1789,7 +1832,12 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(tags)),
                         req.st.db.escape(JSON.stringify(stage)),
                         req.st.db.escape(req.body.mailerType),
-                        req.st.db.escape(JSON.stringify(tableTags))
+                        req.st.db.escape(JSON.stringify(tableTags)),
+                        req.st.db.escape(req.body.sendSMS || 0),
+                        req.st.db.escape(req.body.attachJD || 0),
+                        req.st.db.escape(req.body.attachResume || 0),
+                        req.st.db.escape(req.body.interviewerFlag || 0),
+                        req.st.db.escape(req.body.resumeFileName || '')
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
@@ -2235,9 +2283,9 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                         }
 
 
-                        if (result[3] && result[3][0]) {
-                            isSendgrid = result[3][0].isSendgrid ? result[3][0].isSendgrid : 0,
-                                isSMS = result[3][0].isSMS ? result[3][0].isSMS : 0
+                        if (result[4] && result[4][0]) {
+                            isSendgrid = result[4][0].isSendgrid ? result[4][0].isSendgrid : 0,
+                                isSMS = result[4][0].isSMS ? result[4][0].isSMS : 0
                         }
 
                         if (!err && result && result[0] && result[0][0]) {
@@ -2566,20 +2614,29 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                 response.status = true;
 
                                 if (isSendgrid && isSMS) {  // making changes here reminder
-                                    if (subject != '' && smsMsg != '') {
-                                        response.message = "Mail and SMS sent successfully";
-                                        response.data = transactions[0] ? transactions[0] : [];
+                                    if (subject != '' ) {
+                                        if(smsMsg !='' && smsFlag){
+                                            response.message = "Mail and SMS sent successfully";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
+                                        else{
+                                            response.message = "Mail sent successfully";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
                                     }
-                                    else if (subject != '' && smsMsg == '') {
-                                        response.message = "Mail sent successfully. Message field is empty,SMS cannot be sent";
-                                        response.data = transactions[0] ? transactions[0] : [];
-                                    }
-                                    else if (subject == '' && smsMsg != '') {
-                                        response.message = "SMS sent successfully. Mail subject is empty,mail cannot be sent";
-                                        response.data = transactions[0] ? transactions[0] : [];
+                                    
+                                    else if (subject == '') {
+                                        if(smsMsg != '' && smsFlag){
+                                            response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
+                                        else{
+                                            response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
                                     }
                                     else {
-                                        response.message = "Mail subject and SMS fields are empty,Mail and SMS cannot be sent";
+                                        response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
@@ -2590,17 +2647,21 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                     else if (subject == '') {
-                                        response.message = "Mail subject is empty,mail cannot be sent";
+                                        response.message = "Mail subject is empty, mail cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
                                 else if (isSMS && !isSendgrid) {
-                                    if (isSMS != '') {
+                                    if (smsMsg != '' && smsFlag) {
                                         response.message = "SMS sent successfully";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
-                                    else if (isSMS == '') {
-                                        response.message = "SMS field is empty,SMS cannot be sent";
+                                    else if (smsMsg == '' && smsFlag) {
+                                        response.message = "SMS field is empty, SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else{
+                                        response.message = "SMS flag is not enabled, SMS cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
@@ -2673,7 +2734,12 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(tags)),
                         req.st.db.escape(JSON.stringify(stage)),
                         req.st.db.escape(req.body.mailerType),
-                        req.st.db.escape(JSON.stringify(tableTags))
+                        req.st.db.escape(JSON.stringify(tableTags)),
+                        req.st.db.escape(req.body.sendSMS || 0),
+                        req.st.db.escape(req.body.attachJD || 0),
+                        req.st.db.escape(req.body.attachResume || 0),
+                        req.st.db.escape(req.body.interviewerFlag || 0),
+                        req.st.db.escape(req.body.resumeFileName || '')
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
@@ -3232,20 +3298,29 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                                 response.status = true;
                                 
                                 if (isSendgrid && isSMS) {  // making changes here reminder
-                                    if (subject != '' && smsMsg != '') {
-                                        response.message = "Mail and SMS sent successfully";
-                                        response.data = transactions[0] ? transactions[0] : [];
+                                    if (subject != '' ) {
+                                        if(smsMsg !='' && smsFlag){
+                                            response.message = "Mail and SMS sent successfully";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
+                                        else{
+                                            response.message = "Mail sent successfully";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
                                     }
-                                    else if (subject != '' && smsMsg == '') {
-                                        response.message = "Mail sent successfully. Message field is empty,SMS cannot be sent";
-                                        response.data = transactions[0] ? transactions[0] : [];
-                                    }
-                                    else if (subject == '' && smsMsg != '') {
-                                        response.message = "SMS sent successfully. Mail subject is empty,mail cannot be sent";
-                                        response.data = transactions[0] ? transactions[0] : [];
+                                    
+                                    else if (subject == '') {
+                                        if(smsMsg != '' && smsFlag){
+                                            response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
+                                        else{
+                                            response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
                                     }
                                     else {
-                                        response.message = "Mail subject and SMS fields are empty,Mail and SMS cannot be sent";
+                                        response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
@@ -3256,17 +3331,21 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                     else if (subject == '') {
-                                        response.message = "Mail subject is empty,mail cannot be sent";
+                                        response.message = "Mail subject is empty, mail cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
                                 else if (isSMS && !isSendgrid) {
-                                    if (isSMS != '') {
+                                    if (smsMsg != '' && smsFlag) {
                                         response.message = "SMS sent successfully";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
-                                    else if (isSMS == '') {
-                                        response.message = "SMS field is empty,SMS cannot be sent";
+                                    else if (smsMsg == '' && smsFlag) {
+                                        response.message = "SMS field is empty, SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else{
+                                        response.message = "SMS flag is not enabled, SMS cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
@@ -3339,7 +3418,12 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(tags)),
                         req.st.db.escape(JSON.stringify(stage)),
                         req.st.db.escape(req.body.mailerType),
-                        req.st.db.escape(JSON.stringify(tableTags))
+                        req.st.db.escape(JSON.stringify(tableTags)),
+                        req.st.db.escape(req.body.sendSMS || 0),
+                        req.st.db.escape(req.body.attachJD || 0),
+                        req.st.db.escape(req.body.attachResume || 0),
+                        req.st.db.escape(req.body.interviewerFlag || 0),
+                        req.st.db.escape(req.body.resumeFileName || '')
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
@@ -3679,7 +3763,7 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
 
 
 sendgridCtrl.interviewMailer = function (req, res, next) {
-
+console.log("interview mailer start");
     var response = {
         status: false,
         message: "Invalid token",
@@ -3712,7 +3796,7 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
     var updateFlag = req.body.updateFlag || 0;
     var overWrite = req.body.overWrite || 0;
     var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
-    var templateId = req.body.template ? req.body.template.templateId : undefined;
+    var templateId = req.body.template ? req.body.template.templateId : 0;
     var trackerTemplate = req.body.trackerTemplate || {};
     var tags = req.body.tags || {};
     var cc = req.body.cc || [];
@@ -4207,20 +4291,29 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                 response.status = true;
 
                                 if (isSendgrid && isSMS) {  // making changes here reminder
-                                    if (subject != '' && smsMsg != '') {
-                                        response.message = "Mail and SMS sent successfully";
-                                        response.data = transactions[0] ? transactions[0] : [];
+                                    if (subject != '' ) {
+                                        if(smsMsg !='' && smsFlag){
+                                            response.message = "Mail and SMS sent successfully";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
+                                        else{
+                                            response.message = "Mail sent successfully";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
                                     }
-                                    else if (subject != '' && smsMsg == '') {
-                                        response.message = "Mail sent successfully. Message field is empty,SMS cannot be sent";
-                                        response.data = transactions[0] ? transactions[0] : [];
-                                    }
-                                    else if (subject == '' && smsMsg != '') {
-                                        response.message = "SMS sent successfully. Mail subject is empty,mail cannot be sent";
-                                        response.data = transactions[0] ? transactions[0] : [];
+                                    
+                                    else if (subject == '') {
+                                        if(smsMsg != '' && smsFlag){
+                                            response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
+                                        else{
+                                            response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
+                                            response.data = transactions[0] ? transactions[0] : [];    
+                                        }
                                     }
                                     else {
-                                        response.message = "Mail subject and SMS fields are empty,Mail and SMS cannot be sent";
+                                        response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
@@ -4231,17 +4324,21 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                     else if (subject == '') {
-                                        response.message = "Mail subject is empty,mail cannot be sent";
+                                        response.message = "Mail subject is empty, mail cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
                                 else if (isSMS && !isSendgrid) {
-                                    if (isSMS != '') {
+                                    if (smsMsg != '' && smsFlag) {
                                         response.message = "SMS sent successfully";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
-                                    else if (isSMS == '') {
-                                        response.message = "SMS field is empty,SMS cannot be sent";
+                                    else if (smsMsg == '' && smsFlag) {
+                                        response.message = "SMS field is empty, SMS cannot be sent";
+                                        response.data = transactions[0] ? transactions[0] : [];
+                                    }
+                                    else{
+                                        response.message = "SMS flag is not enabled, SMS cannot be sent";
                                         response.data = transactions[0] ? transactions[0] : [];
                                     }
                                 }
@@ -4280,8 +4377,15 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
-                    return;
+                   
                 }
+                else{
+                    response.status = true;
+                    response.message = "Hatra";
+                    res.status(200).json(response);
+                   
+                }
+                console.log("last if",templateId ,overWrite);
                 //save it as a template if flag is true or template id is 0
                 if (templateId == 0 || overWrite) {
                     req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
@@ -4314,7 +4418,12 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(tags)),
                         req.st.db.escape(JSON.stringify(stage)),
                         req.st.db.escape(req.body.mailerType),
-                        req.st.db.escape(JSON.stringify(tableTags))
+                        req.st.db.escape(JSON.stringify(tableTags)),
+                        req.st.db.escape(req.body.sendSMS || 0),
+                        req.st.db.escape(req.body.attachJD || 0),
+                        req.st.db.escape(req.body.attachResume || 0),
+                        req.st.db.escape(req.body.interviewerFlag || 0),
+                        req.st.db.escape(req.body.resumeFileName || '')
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
@@ -4510,6 +4619,175 @@ sendgridCtrl.saveMailSentByGmail = function (req, res, next) {
                     else {
                         response.status = false;
                         response.message = "Error while saving mails";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+
+sendgridCtrl.MobileScreeningMailerPreview = function (req, res, next) {
+
+    // var mailBody = req.body.mailBody ? req.body.mailBody : '';
+    // var subject = req.body.subject ? req.body.subject : '';
+    // var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
+    var isWeb = req.query.isWeb ? req.query.isWeb : 0;
+    var sendMailFlag = 0;
+    var attachJD = req.body.attachJD != undefined ? req.body.attachJD : 0;
+    var tags= [];
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+
+    // var tags = req.body.tags;
+    // if (typeof (tags) == "string") {
+    //     tags = JSON.parse(tags);
+    // }
+    // if (!tags) {
+    //     tags = [];
+    // }
+
+    var reqApplicants = req.body.reqApplicants;
+    if (typeof (reqApplicants) == "string") {
+        reqApplicants = JSON.parse(reqApplicants);
+    }
+    if (!reqApplicants) {
+        reqApplicants = [];
+    }
+
+    var validationFlag = true;
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                console.log(req.body);
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(reqApplicants)),
+                    req.st.db.escape(sendMailFlag),
+                    req.st.db.escape(JSON.stringify(req.body.template || {}))
+                ];
+                var idArray;
+                idArray = reqApplicants;
+                // idArray.sort(function(a,b){return a-b});
+                var mailbody_array = [];
+                var subject_array = [];
+                var smsMsg_array = [];
+
+                var procQuery;
+                procQuery = 'CALL wm_get_mobileScreeningMailerPreview( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+
+                        var mailBody = result[2] && result[2][0] && result[2][0].mailBody ? result[2][0].mailBody: "" ;
+                        var subject = result[2] && result[2][0] && result[2][0].subject ? result[2][0].subject: "" ;
+                        var smsMsg = result[2] && result[2][0] && result[2][0].smsMsg ? result[2][0].smsMsg: "" ;
+
+                        var temp = result[2] && result[2][0] && result[2][0].mailBody ? result[2][0].mailBody: "" ;
+                        var temp1 = result[2] && result[2][0] && result[2][0].subject ? result[2][0].subject: "" ;
+                        var temp2 = result[2] && result[2][0] && result[2][0].smsMsg ? result[2][0].smsMsg: "" ;
+                        var applicantData = [];
+                        var JDAttachment = [];
+                        var tags = result[2] && result[2][0] ? JSON.parse(result[2][0].tags) : {};
+                        
+                        for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+                            // console.log('applicantIndex=', applicantIndex);
+
+                            for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+
+                                if (result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') {
+
+                                    mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                    subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                    smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                }
+                            }
+
+                            for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+
+                                if (result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') {
+
+                                    mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                    subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                    smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                }
+                            }
+
+                            applicantData.push(result[0][applicantIndex].EmailId);
+                            JDAttachment.push(result[0][applicantIndex].JDAttachment);
+                            mailbody_array.push(mailBody);
+                            subject_array.push(subject);
+                            smsMsg_array.push(smsMsg);
+                            mailBody = temp;
+                            subject = temp1;
+                            smsMsg = temp2;
+                        }
+
+                        response.status = true;
+                        response.message = "Tags replaced successfully";
+                        response.error = null;
+                        response.data = {
+                            mailBodyPreview: mailbody_array,
+                            subjectPreview: subject_array,
+                            smsMsgPreview: smsMsg_array,
+                            applicantData: applicantData,
+                            JDAttachment: JDAttachment
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = {
+                            mailBodyPreview: [],
+                            subjectPreview: [],
+                            smsMsgPreview: [],
+                            applicantData: [],
+                            JDAttachment: []
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while replacing tags";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

@@ -19,4 +19,7 @@ router.get('/twilio/accessToken',zoomCtrl.getAccessTokenVideo);
 router.get('/twilio/voice/accessToken',zoomCtrl.getAccessTokenVoice);
 router.post('/twilio/makeCall',zoomCtrl.makeCall);
 
+router.post('/pacezoom/meeting',zoomCtrl.paceSaveZoomMeeting);
+router.post('/pacezoom/meeting/stop',zoomCtrl.paceStopMeeting);
+
 module.exports = router;

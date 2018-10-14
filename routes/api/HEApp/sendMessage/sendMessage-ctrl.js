@@ -14,6 +14,11 @@ var fs = require('fs');
 var sendMessageCtrl = {};
 var error = {};
 
+var request = require('request');
+var path = require('path');
+var uuid = require('node-uuid');
+var http = require('https');
+
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
@@ -38,6 +43,19 @@ var notifyMessages = new notifyMessages();
 
 var appConfig = require('../../../../ezeone-config.json');
 var DBSecretKey = appConfig.DB.secretKey;
+const FromNumber = appConfig.DB.FromNumber || '+18647547021';
+
+var qs = require("querystring");
+var options = {
+    "method": "POST",
+    "hostname": "www.smsgateway.center",
+    "port": null,
+    "path": "/SMSApi/rest/send",
+    "headers": {
+        "content-type": "application/x-www-form-urlencoded",
+        "cache-control": "no-cache"
+    }
+};
 
 sendMessageCtrl.sendMessage = function (req, res, next) {
     var response = {
@@ -161,6 +179,7 @@ sendMessageCtrl.sendMessage = function (req, res, next) {
                         req.body.status = req.body.status != undefined ? req.body.status : 0;
                         req.body.approverNotes = req.body.approverNotes != undefined ? req.body.approverNotes : '';
                         req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+                        req.body.textmsg = req.body.textmsg ? req.body.textmsg : '';
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -190,7 +209,8 @@ sendMessageCtrl.sendMessage = function (req, res, next) {
                             req.st.db.escape(req.body.status),
                             req.st.db.escape(req.body.approverNotes),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp) 
+                            req.st.db.escape(req.body.createdTimeStamp),
+                            req.st.db.escape(req.body.textmsg)
 
                         ];
 
@@ -251,6 +271,122 @@ sendMessageCtrl.sendMessage = function (req, res, next) {
                                     res.status(200).json(response);
                                 }
                                 notifyMessages.getMessagesNeedToNotify();
+
+                                if (req.body.alarmType == 4) {
+
+                                    for (var i = 0; i < results[1].length; i++) {
+                                        if (results[1][i].accessUserType == 2) {
+                                            console.log("===============================================");
+                                            var isdMobile = (results[1][i].isdMobile) ? (results[1][i].isdMobile) : '';
+                                            var mobileNo = (results[1][i].mobileNo) ? (results[1][i].mobileNo) : '';
+                                            var message = req.body.message;
+
+
+                                            if (isdMobile == "+977") {
+                                                request({
+                                                    url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                    qs: {
+                                                        token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                        to: mobileNo,
+                                                        message: message,
+                                                        sender: 'Techingen'
+                                                    },
+                                                    method: 'GET'
+
+                                                }, function (error2, response2, body2) {
+                                                    if (error2) {
+                                                        console.log(error2, "SMS");
+                                                    }
+                                                    else {
+                                                        console.log("SUCCESS", "SMS response");
+                                                        console.log("SUCCESS", "SMS response");
+                                                    }
+
+                                                });
+                                            }
+                                            else if (isdMobile == "+91") {
+                                                console.log('mobile number and isd is', isdMobile, mobileNo);
+                                                request({
+                                                    url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                    qs: {
+                                                        user_name: 'janardana@hirecraft.com',
+                                                        password: 'Ezeid2015',
+                                                        sender_id: 'WtMate',
+                                                        service: 'TRANS',
+                                                        mobile_no: mobileNo,
+                                                        message: message,
+                                                        method: 'send_sms'
+                                                    },
+                                                    method: 'GET'
+
+                                                }, function (error2, response2, body2) {
+                                                    if (error2) {
+                                                        console.log(error2, "SMS");
+                                                    }
+                                                    else {
+                                                        console.log("SUCCESS", "SMS response with ISD");
+                                                        msgSent = 1;
+
+                                                        // req.db.query('update 1039_trans set msgSent=1 where tid=' + results[4][0].walkInTransId, function (msgerr, msgsentResults) {
+                                                        //     if (!msgerr) {
+                                                        //         console.log('msg sent status is updated successfully');
+                                                        //     }
+                                                        // });
+                                                    }
+                                                });
+
+                                                var req5 = http.request(options, function (res5) {
+                                                    var chunks = [];
+
+                                                    res5.on("data", function (chunk) {
+                                                        chunks.push(chunk);
+                                                        console.log('sms fateway type 2 sent the sms');
+                                                    });
+
+                                                    res5.on("end", function () {
+                                                        var body5 = Buffer.concat(chunks);
+                                                        console.log(body5.toString());
+                                                    });
+                                                });
+
+                                                req5.write(qs.stringify({
+                                                    userId: 'talentmicro',
+                                                    password: 'TalentMicro@123',
+                                                    senderId: 'WTMATE',
+                                                    sendMethod: 'simpleMsg',
+                                                    msgType: 'text',
+                                                    mobile: isdMobile.replace("+", "") + mobileNo,
+                                                    msg: message,
+                                                    duplicateCheck: 'true',
+                                                    format: 'json'
+                                                }));
+                                                console.log('sms type 2 gateway worked');
+                                                req5.end();
+                                                msgSent = 1;
+                                            }
+                                            else if (isdMobile != "") {
+                                                client.messages.create(
+                                                    {
+                                                        body: message,
+                                                        to: isdMobile + mobileNo,
+                                                        from: FromNumber
+                                                    },
+                                                    function (error6, response6) {
+                                                        if (error6) {
+                                                            console.log(error6, "SMS");
+                                                        }
+                                                        else {
+                                                            msgSent = 1;
+
+                                                            console.log("SUCCESS", "SMS response with empty isd");
+                                                        }
+                                                    });
+                                            }
+
+
+                                        }
+                                    }
+                                }
 
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                 //     senderName : results[0][0].message
@@ -367,7 +503,9 @@ sendMessageCtrl.getUserConfig = function (req, res, next) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.groupId)
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(req.query.isAccess)
+
                 ];
                 /**
                  * Calling procedure to get form template
@@ -715,6 +853,7 @@ sendMessageCtrl.GetMsgMapUsersData = function (req, res, next) {
                 req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
                 req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
                 var startPage = 0;
+                req.query.HEUserId = req.query.HEUserId ? req.query.HEUserId : 0;
 
                 startPage = ((((parseInt(req.query.pageNo)) * req.query.limit) + 1) - req.query.limit) - 1;
 
@@ -723,7 +862,8 @@ sendMessageCtrl.GetMsgMapUsersData = function (req, res, next) {
                     req.st.db.escape(req.query.HEMasterId),
                     req.st.db.escape(req.query.keywords),
                     req.st.db.escape(startPage),
-                    req.st.db.escape(req.query.limit)
+                    req.st.db.escape(req.query.limit),
+                    req.st.db.escape(req.query.HEUserId)
                 ];
 
                 var procQuery = 'CALL he_get_msgMap_userList( ' + procParams.join(',') + ')';
@@ -740,6 +880,7 @@ sendMessageCtrl.GetMsgMapUsersData = function (req, res, next) {
                             res2.HEUserId = userResult[0][i].HEUserId;
                             res2.isNormal = userResult[0][i].isNormal;
                             res2.isTaxSaving = userResult[0][i].isTaxSaving;
+                            res2.isSMSEnabled = userResult[0][i].isSMSEnabled;
                             res2.name = userResult[0][i].name;
                             res2.branches = userResult[0][i].branch ? JSON.parse(userResult[0][i].branch) : [];
                             res2.departments = userResult[0][i].department ? JSON.parse(userResult[0][i].department) : [];
@@ -748,19 +889,38 @@ sendMessageCtrl.GetMsgMapUsersData = function (req, res, next) {
 
                             output.push(res2);
                         }
-
+                        if(req.query.HEUserId==0){
                         response.data = {
+                            
                             userData: output,
                             count: userResult[1][0].count
-                        };
+                        }
+                    }
+                        else{
+                            response.data = {
+                            
+                                HEUserId : userResult[0][0].HEUserId,
+                               isNormal : userResult[0][0].isNormal,
+                                isTaxSaving : userResult[0][0].isTaxSaving,
+                               isSMSEnabled : userResult[0][0].isSMSEnabled,
+                                name : userResult[0][0].name,
+                                branches : userResult[0][0].branch ? JSON.parse(userResult[0][0].branch) : [],
+                                departments: userResult[0][0].department ? JSON.parse(userResult[0][0].department) : [],
+                              grades: userResult[0][0].grade ? JSON.parse(userResult[0][0].grade) : [],
+                               RMGroups: userResult[0][0].RMGroup ? JSON.parse(userResult[0][0].RMGroup) : []
+    
+                            };
 
-                        // res.status(200).json(response);
+                        }
+                    //  console.log(response.data);
+
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
+
 
                     }
                     else if (!err) {
@@ -816,9 +976,16 @@ sendMessageCtrl.saveMsgMapUsersData = function (req, res, next) {
                         error.HEMasterId = 'Invalid HEMasterId';
                         validationFlag *= false;
                     }
-                    if (!req.body.HEUserId) {
-                        error.HEUserId = 'Invalid HEUserId';
-                        validationFlag *= false;
+                    // if (!req.body.HEUserId) {
+                    //     error.HEUserId = 'Invalid HEUserId';
+                    //     validationFlag *= false;
+                    // }
+                    var HEUserId = req.body.HEUserId;
+                    if (typeof (HEUserId) == "string") {
+                        HEUserId = JSON.parse(HEUserId);
+                    }
+                    if (!HEUserId) {
+                        HEUserId = [];
                     }
 
                     var branches = req.body.branches;
@@ -864,18 +1031,20 @@ sendMessageCtrl.saveMsgMapUsersData = function (req, res, next) {
                         req.query.keywords = req.query.keywords ? req.query.keywords : '';
                         req.query.isNormal = req.query.isNormal != undefined ? req.query.isNormal : 0;
                         req.query.isTaxSaving = req.query.isTaxSaving != undefined ? req.query.isTaxSaving : 0;
+                        req.body.isSMSEnabled = req.body.isSMSEnabled != undefined ? req.body.isSMSEnabled : 0;
 
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.HEMasterId),
-                            req.st.db.escape(req.body.HEUserId),
+                            req.st.db.escape(JSON.stringify(HEUserId)),
                             req.st.db.escape(JSON.stringify(branches)),
                             req.st.db.escape(JSON.stringify(departments)),
                             req.st.db.escape(JSON.stringify(grades)),
                             req.st.db.escape(JSON.stringify(RMGroups)),
                             req.st.db.escape(req.body.isNormal),
-                            req.st.db.escape(req.body.isTaxSaving)
+                            req.st.db.escape(req.body.isTaxSaving),
+                            req.st.db.escape(req.body.isSMSEnabled)
                         ];
 
                         var procQuery = 'CALL he_save_msgMapDetails( ' + procParams.join(',') + ')';
@@ -920,10 +1089,14 @@ sendMessageCtrl.DeleteMsgMapUsersData = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.query.HEUserId) {
-        error.HEUserId = 'Invalid HEUserId';
-        validationFlag *= false;
+    var HEUserId = req.body.HEUserId;
+    if (typeof (HEUserId) == "string") {
+        HEUserId = JSON.parse(HEUserId);
     }
+    if (!HEUserId) {
+        HEUserId = [];
+    }
+
 
     if (!validationFlag) {
         response.error = error;
@@ -937,7 +1110,7 @@ sendMessageCtrl.DeleteMsgMapUsersData = function (req, res, next) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.HEUserId)
+                    req.st.db.escape(JSON.stringify(HEUserId))
                 ];
 
                 var procQuery = 'CALL he_delete_msgmap( ' + procParams.join(',') + ')';
@@ -1017,6 +1190,7 @@ sendMessageCtrl.GetAnnouncementType = function (req, res, next) {
                         response.data = {
                             isNormal: (userResult[0] && userResult[0][0] && userResult[0][0].isNormal) ? userResult[0][0].isNormal : 0,
                             isTaxSaving: (userResult[0] && userResult[0][0] && userResult[0][0].isTaxSaving) ? userResult[0][0].isTaxSaving : 0,
+                            isSMSEnabled: (userResult[0] && userResult[0][0] && userResult[0][0].isSMSEnabled) ? userResult[0][0].isSMSEnabled : 0,
                             fStartDate: (userResult[1] && userResult[1][0] && userResult[1][0].startDate) ? userResult[1][0].startDate : null,
                             fEndDate: (userResult[1] && userResult[1][0] && userResult[1][0].startDate) ? userResult[1][0].endDate : null
                         };
@@ -1382,6 +1556,7 @@ sendMessageCtrl.saveAsDraft = function (req, res, next) {
                         req.body.endDate = req.body.endDate != undefined ? req.body.endDate : null;
                         req.body.isDraft = req.body.isDraft != undefined ? req.body.isDraft : 1;
                         req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+                        req.body.textmsg = req.body.textmsg ? req.body.textmsg : '';
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -1409,7 +1584,8 @@ sendMessageCtrl.saveAsDraft = function (req, res, next) {
                             req.st.db.escape(req.body.isDraft),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp) 
+                            req.st.db.escape(req.body.createdTimeStamp),
+                            req.st.db.escape(req.body.textmsg)
                         ];
 
                         var announcementFormId = 1033;
@@ -1917,6 +2093,8 @@ sendMessageCtrl.sendMessageTest = function (req, res, next) {
                         req.body.endDate = req.body.endDate != undefined ? req.body.endDate : null;
                         req.body.isDraft = req.body.isDraft != undefined ? req.body.isDraft : 0;
                         req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+                        req.body.textmsg = req.body.textmsg ? req.body.textmsg : '';
+
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -1944,7 +2122,8 @@ sendMessageCtrl.sendMessageTest = function (req, res, next) {
                             req.st.db.escape(req.body.isDraft),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp) 
+                            req.st.db.escape(req.body.createdTimeStamp),
+                            req.st.db.escape(req.body.textmsg)
                         ];
                         var announcementFormId = 1033;
                         var keywordsParams = [
@@ -1983,6 +2162,123 @@ sendMessageCtrl.sendMessageTest = function (req, res, next) {
                                 //             console.log('Worker has been terminated.');
                                 //         });
                                 // }
+
+                                if (req.body.alarmType == 4) {
+
+                                    for (var i = 0; i < results[1].length; i++) {
+
+                                        if (results[1][i].accessUserType == 2) {
+
+                                            var isdMobile = (results[1][i].isdMobile) ? (results[1][i].isdMobile) : '';
+                                            var mobileNo = (results[1][i].mobileNo) ? (results[1][i].mobileNo) : '';
+                                            var message = req.body.message;
+
+                                            console.log("entesress ======================================");
+                                            if (isdMobile == "+977") {
+                                                request({
+                                                    url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                    qs: {
+                                                        token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                        to: mobileNo,
+                                                        message: message,
+                                                        sender: 'Techingen'
+                                                    },
+                                                    method: 'GET'
+
+                                                }, function (error2, response2, body2) {
+                                                    if (error2) {
+                                                        console.log(error2, "SMS");
+                                                    }
+                                                    else {
+                                                        console.log("SUCCESS", "SMS response");
+                                                        console.log("SUCCESS", "SMS response");
+                                                    }
+
+                                                });
+                                            }
+                                            else if (isdMobile == "+91") {
+                                                console.log('mobile number and isd is', isdMobile, mobileNo);
+                                                request({
+                                                    url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                    qs: {
+                                                        user_name: 'janardana@hirecraft.com',
+                                                        password: 'Ezeid2015',
+                                                        sender_id: 'WtMate',
+                                                        service: 'TRANS',
+                                                        mobile_no: mobileNo,
+                                                        message: message,
+                                                        method: 'send_sms'
+                                                    },
+                                                    method: 'GET'
+
+                                                }, function (error2, response2, body2) {
+                                                    if (error2) {
+                                                        console.log(error2, "SMS");
+                                                    }
+                                                    else {
+                                                        console.log("SUCCESS", "SMS response with ISD");
+                                                        msgSent = 1;
+
+                                                        // req.db.query('update 1039_trans set msgSent=1 where tid=' + results[4][0].walkInTransId, function (msgerr, msgsentResults) {
+                                                        //     if (!msgerr) {
+                                                        //         console.log('msg sent status is updated successfully');
+                                                        //     }
+                                                        // });
+                                                    }
+                                                });
+
+                                                var req5 = http.request(options, function (res5) {
+                                                    var chunks = [];
+
+                                                    res5.on("data", function (chunk) {
+                                                        chunks.push(chunk);
+                                                        console.log('sms fateway type 2 sent the sms');
+                                                    });
+
+                                                    res5.on("end", function () {
+                                                        var body5 = Buffer.concat(chunks);
+                                                        console.log(body5.toString());
+                                                    });
+                                                });
+
+                                                req5.write(qs.stringify({
+                                                    userId: 'talentmicro',
+                                                    password: 'TalentMicro@123',
+                                                    senderId: 'WTMATE',
+                                                    sendMethod: 'simpleMsg',
+                                                    msgType: 'text',
+                                                    mobile: isdMobile.replace("+", "") + mobileNo,
+                                                    msg: message,
+                                                    duplicateCheck: 'true',
+                                                    format: 'json'
+                                                }));
+                                                console.log('sms type 2 gateway worked');
+                                                req5.end();
+                                                msgSent = 1;
+                                            }
+                                            else if (isdMobile != "") {
+                                                client.messages.create(
+                                                    {
+                                                        body: message,
+                                                        to: isdMobile + mobileNo,
+                                                        from: FromNumber
+                                                    },
+                                                    function (error6, response6) {
+                                                        if (error6) {
+                                                            console.log(error6, "SMS");
+                                                        }
+                                                        else {
+                                                            msgSent = 1;
+
+                                                            console.log("SUCCESS", "SMS response with empty isd");
+                                                        }
+                                                    });
+                                            }
+                                        }
+
+
+                                    }
+                                }
 
                                 response.status = true;
                                 response.message = "Message sent successfully";
@@ -2470,7 +2766,7 @@ sendMessageCtrl.processUpdate = function (req, res, next) {
                             req.st.db.escape(req.body.approvalStatus),
                             req.st.db.escape(req.body.approverNotes),
                             req.st.db.escape(req.body.timestamp),
-                                req.st.db.escape(req.body.createdTimeStamp)
+                            req.st.db.escape(req.body.createdTimeStamp)
 
                         ];
 
@@ -2832,7 +3128,7 @@ sendMessageCtrl.getBulkEmployeeAnnouncementTitle = function (req, res, next) {
             if ((!err) && tokenResult) {
                 req.query.isweb = req.query.isweb ? req.query.isweb : 0;
                 //req.query.status = req.query.status ? req.query.status : 0;
-                req.body.isDraft = req.body.isDraft!=undefined ? req.body.isDraft : 1;
+                req.body.isDraft = req.body.isDraft != undefined ? req.body.isDraft : 1;
                 req.body.announcementBatchTitleId = req.body.announcementBatchTitleId ? req.body.announcementBatchTitleId : 0;
 
                 var procParams = [
@@ -3007,7 +3303,7 @@ sendMessageCtrl.processUpdateReport = function (req, res, next) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
-                        response.data =( Result && Result[0] && Result[0][0]) ? Result[0] : [];
+                        response.data = (Result && Result[0] && Result[0][0]) ? Result[0] : [];
                         res.status(200).json(response);
                     }
                     else if (!err) {
