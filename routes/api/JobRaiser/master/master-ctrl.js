@@ -678,7 +678,19 @@ masterCtrl.getmailTemplate = function (req, res, next) {
                             jobseekerMailer: result[2] ? result[2] : [],
                             clientMailer: result[3] ? result[3] : [],
                             interviewMailer: result[4] ? result[4] : [],
-                            trackerTemplates: result[5] ? result[5] : []
+                            trackerTemplates: result[5] ? result[5] : [],
+
+                            tags: {
+                                candidate: result[6] ? result[6] : [],
+                                requirement: result[7] ? result[7] : [],
+                                client: result[8] ? result[8] : [],
+                                general: result[9] ? result[9] : [],
+                                clientContact: result[10] ? result[10] : [],
+                                interview: result[11] ? result[11] : [],
+                                billing: result[12] ? result[12] : [],
+                                billingTable: result[13] ? result[13] : [],
+                                offer: result[14] ? result[14] : []
+                            }
                         };
                         res.status(200).json(response);
                     }
@@ -815,7 +827,12 @@ masterCtrl.savetemplate = function (req, res, next) {
                     req.st.db.escape(req.body.whatmateMessage),
                     req.st.db.escape(JSON.stringify(attachment)),
                     req.st.db.escape(JSON.stringify(tags)),
-                    req.st.db.escape(JSON.stringify(stage))
+                    req.st.db.escape(JSON.stringify(stage)),
+                    req.st.db.escape(req.body.sendSMS || 0),
+                    req.st.db.escape(req.body.attachJD || 0),
+                    req.st.db.escape(req.body.attachResume || 0),
+                    req.st.db.escape(req.body.interviewerFlag || 0),
+                    req.st.db.escape(req.body.resumeFileName || "")
 
                 ];
                 var procQuery = 'CALL WM_save_1010_mailTemplate( ' + inputs.join(',') + ')';
@@ -1539,7 +1556,7 @@ masterCtrl.getClientView = function (req, res, next) {
                         response.error = null;
                         for (var i = 0; i < results[0].length; i++) {
                             results[0][i].stageDetail = results[0][i].stageDetail ? JSON.parse(results[0][i].stageDetail) : [],
-                            results[0][i].clientContacts = results[0][i].contacts ? JSON.parse(results[0][i].contacts) : [];
+                            results[0][i].clientContacts = results[0][i] && JSON.parse(results[0][i].clientContacts) ? JSON.parse(results[0][i].clientContacts) : [];
                         }
                         response.data = {
                             clientView: results[0] ? results[0] : []

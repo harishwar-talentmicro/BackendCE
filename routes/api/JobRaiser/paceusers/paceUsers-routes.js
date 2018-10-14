@@ -42,5 +42,7 @@ router.post('/resetPasswordOtp',paceUsersCtrl.sendPasswordResetOTP);
 router.post('/resetPasswordverifyotp',paceUsersCtrl.passwordResetVerifyOtp);
 router.post('/resetPassword',paceUsersCtrl.paceresetPassword);
 
+router.post('/smsAppInfo',paceUsersCtrl.sendApplicantInfoToPhone);
+router.post('/notifyAppInfo',paceUsersCtrl.sendApplicantInfoAsNotification);
 
 module.exports = router;

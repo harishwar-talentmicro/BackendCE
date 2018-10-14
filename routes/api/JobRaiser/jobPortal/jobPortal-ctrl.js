@@ -15,6 +15,7 @@ var request = require('request');
 var bodyParser = require('body-parser');
 var textract = require('textract');
 var http = require('https');
+var EZEIDEmail = 'noreply@talentmicro.com';
 
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
@@ -725,8 +726,8 @@ jobPortalCtrl.getPortalRequirementDetails = function (req, res, next) {
     }
 
     var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
+    if (!req.query.parentId) {
+        error.parentId = 'Invalid parentId';
         validationFlag *= false;
     }
     if (!validationFlag) {
@@ -736,53 +737,73 @@ jobPortalCtrl.getPortalRequirementDetails = function (req, res, next) {
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-                //req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0; // 1- web, 0-mobile
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+        //         //req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0; // 1- web, 0-mobile
 
-                var getStatus = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.groupBy)
+        var getStatus = [
+            req.st.db.escape(req.query.token || ""),
+            req.st.db.escape(req.query.parentId),
+            req.st.db.escape(DBSecretKey),
+            req.st.db.escape(req.query.applicantId || 0)
+        ];
 
-                ];
 
-                var procQuery = 'CALL portal_get_requirementDetails( ' + getStatus.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
+        var procQuery = 'CALL portal_get_requirementDetails( ' + getStatus.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            console.log(err);
 
-                    if (!err && result && result[0]) {
-                        response.status = true;
-                        response.message = "requirement Details loaded successfully";
-                        response.error = null;
-                        response.data = {
+            if (!err && result && result[0] && result[0][0]) {
+                response.status = true;
+                response.message = "requirement Details loaded successfully";
+                response.error = null;
 
-                            portalrequirementDetails: JSON.parse(result[1][0].reqJsonData) ? JSON.parse(result[1][0].reqJsonData) : []
-                        };
-                        res.status(200).json(response);
-                    }
-                    else if (!err) {
-                        response.status = false;
-                        response.message = "requirement Details not found";
-                        response.error = null;
-                        response.data = {
-                            portalrequirementDetails: []
-                        };
-                        res.status(200).json(response);
-                    }
-                    else {
-                        response.status = false;
-                        response.message = "Error while getting requirement Details";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
+                result[0][0].branchList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].branchList) : {};
+                result[0][0].contactList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].contactList) : [];
+                result[0][0].currency = (result[0] && result[0][0]) ? JSON.parse(result[0][0].currency) : {};
+                result[0][0].duration = (result[0] && result[0][0]) ? JSON.parse(result[0][0].duration) : {};
+                result[0][0].educationSpecialization = (result[0] && result[0][0]) ? JSON.parse(result[0][0].educationSpecialization) : [];
+                result[0][0].heDepartment = (result[0] && result[0][0]) ? JSON.parse(result[0][0].heDepartment) : {};
+                result[0][0].jobTitle = (result[0] && result[0][0]) ? JSON.parse(result[0][0].jobTitle) : {};
+                result[0][0].jobType = (result[0] && result[0][0]) ? JSON.parse(result[0][0].jobType) : {};
+                result[0][0].locationlist = (result[0] && result[0][0]) ? JSON.parse(result[0][0].locationlist) : [];
+                result[0][0].memberInterviewRound = (result[0] && result[0][0]) ? JSON.parse(result[0][0].memberInterviewRound) : [];
+                result[0][0].members = (result[0] && result[0][0]) ? JSON.parse(result[0][0].members) : [];
+                result[0][0].primarySkills = (result[0] && result[0][0]) ? JSON.parse(result[0][0].primarySkills) : [];
+                result[0][0].scale = (result[0] && result[0][0]) ? JSON.parse(result[0][0].scale) : {};
+                result[0][0].secondarySkills = (result[0] && result[0][0]) ? JSON.parse(result[0][0].secondarySkills) : [];
+                result[0][0].industry = (result[0] && result[0][0]) ? JSON.parse(result[0][0].industry) : [];
+                result[0][0].attachmentList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].attachmentList) : [];
+
+                response.data = {
+
+                    portalrequirementDetails: result[0] && result[0][0] ? result[0][0] : {}
+                };
+                res.status(200).json(response);
+            }
+            else if (!err) {
+                response.status = false;
+                response.message = "requirement Details not found";
+                response.error = null;
+                response.data = {
+                    portalrequirementDetails: {}
+                };
+                res.status(200).json(response);
             }
             else {
-                res.status(401).json(response);
+                response.status = false;
+                response.message = "Error while getting requirement Details";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
             }
         });
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+        // });
     }
 
 };
@@ -834,17 +855,17 @@ jobPortalCtrl.getPortalApplicantDetails = function (req, res, next) {
                         var temp_result = result[0][0] ? result[0][0] : {};
                         temp_result.education = JSON.parse(temp_result.education);
                         temp_result.cvSource = JSON.parse(temp_result.cvSource).cvSourceId ? JSON.parse(temp_result.cvSource) : {};
-                        temp_result.expectedSalaryCurr = JSON.parse(temp_result.expectedSalaryCurr).currencyId ?  JSON.parse(temp_result.expectedSalaryCurr) : {};
+                        temp_result.expectedSalaryCurr = JSON.parse(temp_result.expectedSalaryCurr).currencyId ? JSON.parse(temp_result.expectedSalaryCurr) : {};
                         temp_result.expectedSalaryPeriod = JSON.parse(temp_result.expectedSalaryPeriod).durationId ? JSON.parse(temp_result.expectedSalaryPeriod) : {};
-                        temp_result.expectedSalaryScale =JSON.parse(temp_result.expectedSalaryScale).scaleId ?  JSON.parse(temp_result.expectedSalaryScale) : {};
+                        temp_result.expectedSalaryScale = JSON.parse(temp_result.expectedSalaryScale).scaleId ? JSON.parse(temp_result.expectedSalaryScale) : {};
                         temp_result.industry = JSON.parse(temp_result.industry);
-                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle).jobTitleId ?  JSON.parse(temp_result.jobTitle) : {};
+                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle).jobTitleId ? JSON.parse(temp_result.jobTitle) : {};
                         //  temp_result.jobTitle = temp_result.jobTitle.titleId != null ? temp_result.jobTitle : undefined;
                         temp_result.nationality = JSON.parse(temp_result.nationality).nationalityId ? JSON.parse(temp_result.nationality) : {};
                         temp_result.prefLocations = JSON.parse(temp_result.prefLocations);
-                        temp_result.presentSalaryCurr = JSON.parse(temp_result.presentSalaryCurr).currencyId ?  JSON.parse(temp_result.presentSalaryCurr) : {};
+                        temp_result.presentSalaryCurr = JSON.parse(temp_result.presentSalaryCurr).currencyId ? JSON.parse(temp_result.presentSalaryCurr) : {};
                         temp_result.presentSalaryPeriod = JSON.parse(temp_result.presentSalaryPeriod).durationId ? JSON.parse(temp_result.presentSalaryPeriod) : {};
-                        temp_result.presentSalaryScale = JSON.parse(temp_result.presentSalaryScale).scaleId ?  JSON.parse(temp_result.presentSalaryScale) : {};
+                        temp_result.presentSalaryScale = JSON.parse(temp_result.presentSalaryScale).scaleId ? JSON.parse(temp_result.presentSalaryScale) : {};
                         temp_result.primarySkills = JSON.parse(temp_result.primarySkills);
                         temp_result.secondarySkills = JSON.parse(temp_result.secondarySkills);
                         temp_result.functionalAreas = JSON.parse(temp_result.functionalAreas);
@@ -1188,20 +1209,20 @@ jobPortalCtrl.portalverifyotp = function (req, res, next) {
     };
 
     var validationFlag = true;
-    if (!req.body.mobileNumber) {
-        error.mobileNumber = 'Invalid mobileNumber';
-        validationFlag *= false;
-    }
+    // if (!req.body.mobileNumber) {
+    //     error.mobileNumber = 'Invalid mobileNumber';
+    //     validationFlag *= false;
+    // }
 
-    if (!req.body.mobileISD) {
-        error.mobileISD = 'Invalid mobileISD';
-        validationFlag *= false;
-    }
+    // if (!req.body.mobileISD) {
+    //     error.mobileISD = 'Invalid mobileISD';
+    //     validationFlag *= false;
+    // }
 
-    if (!req.body.emailId) {
-        error.emailId = 'Invalid emailId';
-        validationFlag *= false;
-    }
+    // if (!req.body.emailId) {
+    //     error.emailId = 'Invalid emailId';
+    //     validationFlag *= false;
+    // }
 
     if (!req.body.otp) {
         error.otp = 'Invalid otp';
@@ -1219,10 +1240,10 @@ jobPortalCtrl.portalverifyotp = function (req, res, next) {
         //     if ((!err) && tokenResult) {
 
         var getStatus = [
-            req.st.db.escape(req.body.mobileNumber),
-            req.st.db.escape(req.body.mobileISD),
+            req.st.db.escape(req.body.mobileNumber || ""),
+            req.st.db.escape(req.body.mobileISD || ""),
             req.st.db.escape(req.body.otp),
-            req.st.db.escape(req.body.emailId),
+            req.st.db.escape(req.body.emailId || ""),
             req.st.db.escape(DBSecretKey)
         ];
 
@@ -1282,23 +1303,23 @@ jobPortalCtrl.portalsignup = function (req, res, next) {
     };
 
     var validationFlag = true;
-    if (!req.body.mobileNumber) {
-        error.mobileNumber = 'Invalid mobileNumber';
-        validationFlag *= false;
-    }
+    // if (!req.body.mobileNumber) {
+    //     error.mobileNumber = 'Invalid mobileNumber';
+    //     validationFlag *= false;
+    // }
 
     if (!req.body.firstName) {
         error.firstName = 'Invalid firstName';
         validationFlag *= false;
     }
 
-    if (!req.body.mobileISD) {
-        error.mobileISD = 'Invalid mobileISD';
-        validationFlag *= false;
-    }
+    // if (!req.body.mobileISD) {
+    //     error.mobileISD = 'Invalid mobileISD';
+    //     validationFlag *= false;
+    // }
 
-    if (!req.body.emailId) {
-        error.emailId = 'Invalid emailId';
+    if (!req.body.emailId && !req.body.mobileNumber) {
+        error.emailId = 'Invalid emailId or mobileNumber';
         validationFlag *= false;
     }
 
@@ -1328,9 +1349,9 @@ jobPortalCtrl.portalsignup = function (req, res, next) {
         var getStatus = [
             req.st.db.escape(req.body.firstName),
             req.st.db.escape(req.body.lastName),
-            req.st.db.escape(req.body.mobileNumber),
-            req.st.db.escape(req.body.mobileISD),
-            req.st.db.escape(req.body.emailId),
+            req.st.db.escape(req.body.mobileNumber || ""),
+            req.st.db.escape(req.body.mobileISD || ""),
+            req.st.db.escape(req.body.emailId || ""),
             req.st.db.escape(DBSecretKey),
             req.st.db.escape(encryptPwd),
             req.st.db.escape(req.body.heMasterId || 0)
@@ -1342,7 +1363,7 @@ jobPortalCtrl.portalsignup = function (req, res, next) {
             console.log(err);
 
             if (!err && result && result[0] && result[0][0] && result[0][0].message) {
-                response.status = true;
+                response.status = false;
                 response.message = result[0][0].message;
                 response.error = null;
                 response.data = null;
@@ -1514,7 +1535,7 @@ jobPortalCtrl.portalreqAppMap = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 // req.query.isWeb=req.query.isWeb ? req.query.isWeb:0;
-                req.body.requirements = req.body.requirements!=undefined ? req.body.requirements :[];
+                req.body.requirements = req.body.requirements != undefined ? req.body.requirements : [];
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -1527,7 +1548,7 @@ jobPortalCtrl.portalreqAppMap = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result[0] && result[0][0] && result[0][0].applicantName ) {
+                    if (!err && result[0] && result[0][0] && result[0][0].applicantName) {
                         response.status = true;
                         response.message = "Applied for jobs successfully";
                         response.error = null;
@@ -1569,7 +1590,7 @@ jobPortalCtrl.portalrequirementSearch = function (req, res, next) {
         error: null
     };
     var validationFlag = true;
-   
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -1579,52 +1600,55 @@ jobPortalCtrl.portalrequirementSearch = function (req, res, next) {
     else {
         // req.st.validateToken(req.query.token, function (err, tokenResult) {
         //     if ((!err) && tokenResult) {
-                // req.query.isWeb=req.query.isWeb ? req.query.isWeb:0;
-                req.body.industry = req.body.industry!=undefined ? req.body.industry :[];
-                req.body.location = req.body.location!=undefined ? req.body.location :[];
+        // req.query.isWeb=req.query.isWeb ? req.query.isWeb:0;
+        req.body.industry = req.body.industry != undefined ? req.body.industry : [];
+        req.body.location = req.body.location != undefined ? req.body.location : [];
 
-                var inputs = [
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(req.body.industry || [])),
-                    req.st.db.escape(JSON.stringify(req.body.location || [])),
-                    req.st.db.escape(req.body.keyword || ''),
-                    req.st.db.escape(req.body.applicantId),
-                    req.st.db.escape(req.body.startPage || 0),
-                    req.st.db.escape(req.body.limit || 50)
-                ];
+        var inputs = [
+            req.st.db.escape(req.query.heMasterId),
+            req.st.db.escape(JSON.stringify(req.body.industry || [])),
+            req.st.db.escape(JSON.stringify(req.body.location || [])),
+            req.st.db.escape(req.body.keyword || ''),
+            req.st.db.escape(req.body.applicantId),
+            req.st.db.escape(req.body.startPage || 0),
+            req.st.db.escape(req.body.limit || 50)
+        ];
 
-                var procQuery = 'CALL wm_save_portal_requirementSearch( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "Jobs loaded successfully";
-                        response.error = null;
-                        response.data = {
-                            jobList :result[0] && result[0][0] ? result[0] : [],
-                            count : result[1][0].count
-                        }
-                        res.status(200).json(response);
+        var procQuery = 'CALL wm_save_portal_requirementSearch( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            console.log(err);
+            if (!err && result[0] && result[0][0]) {
+                response.status = true;
+                response.message = "Jobs loaded successfully";
+                response.error = null;
+                response.data = {
+                    jobList: result[0] && result[0][0] ? result[0] : [],
+                    count: result[1][0].count,
+                    locationList: result[2] && result[2][0] ? result[2] : [],
+                    industryList : result[3] && result[3][0] ? result[3] : [],
+                    functionalAreas : []
+                }
+                res.status(200).json(response);
 
 
-                    }
-                    else if (!err) {
-                        response.status = true;
-                        response.message ='Jobs not found';
-                        response.error = null;
-                        response.data = null;
-                        res.status(200).json(response);
+            }
+            else if (!err) {
+                response.status = true;
+                response.message = 'Jobs not found';
+                response.error = null;
+                response.data = null;
+                res.status(200).json(response);
 
-                    }
-                    else {
-                        response.status = false;
-                        response.message = "Error while job search";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
+            }
+            else {
+                response.status = false;
+                response.message = "Error while job search";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
         //     }
         //     else {
         //         res.status(401).json(response);
@@ -1642,12 +1666,12 @@ jobPortalCtrl.portalApplicantHistory = function (req, res, next) {
         error: null
     };
     var validationFlag = true;
-   
+
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    
+
     if (!req.body.applicantId) {
         error.applicantId = 'Invalid applicantId';
         validationFlag *= false;
@@ -1662,7 +1686,7 @@ jobPortalCtrl.portalApplicantHistory = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.body.heMasterId = req.body.heMasterId ? req.body.heMasterId:0;
+                req.body.heMasterId = req.body.heMasterId ? req.body.heMasterId : 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -1681,8 +1705,8 @@ jobPortalCtrl.portalApplicantHistory = function (req, res, next) {
                         response.message = "Applied jobs loaded successfully";
                         response.error = null;
                         response.data = {
-                            jobList :result[0] && result[0][0] ? result[0] : [],
-                            count : result[1][0].count
+                            jobList: result[0] && result[0][0] ? result[0] : [],
+                            count: result[1][0].count
                         }
                         res.status(200).json(response);
 
@@ -1690,7 +1714,7 @@ jobPortalCtrl.portalApplicantHistory = function (req, res, next) {
                     }
                     else if (!err) {
                         response.status = true;
-                        response.message ='Applied jobs not found';
+                        response.message = 'Applied jobs not found';
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
@@ -1750,14 +1774,14 @@ jobPortalCtrl.portalPasswordResetOTP = function (req, res, next) {
 
             console.log('CALL portal_validateportaluser(' + query + ')');
             req.st.db.query('CALL portal_validateportaluser(' + query + ')', function (err, userResult) {
-                
-                console.log("error",err);
+
+                console.log("error", err);
 
                 if (!err && userResult && userResult[0] && userResult[0][0].applicantId) {
                     // code = userResult[0][0].otp;
 
                     message = 'Your career portal password reset OTP is ' + code + ' .';
-                    
+
                     if (userResult[0][0].emailId) {
                         var file = path.join(__dirname, '../../../../mail/templates/passwordResetOTP.html');
 
@@ -1782,7 +1806,7 @@ jobPortalCtrl.portalPasswordResetOTP = function (req, res, next) {
                                 email.html = mailOptions.html;
 
                                 sendgrid.send(email, function (err, result) {
-                                    if(!err){
+                                    if (!err) {
                                         console.log('message sent successfully');
                                     }
                                 });
@@ -1887,13 +1911,13 @@ jobPortalCtrl.portalPasswordResetOTP = function (req, res, next) {
                     res.status(200).json(respMsg);
 
                 }
-                else if(!err && userResult && userResult[0] && userResult[0][0].messageError){
+                else if (!err && userResult && userResult[0] && userResult[0][0].messageError) {
                     respMsg.status = true;
                     respMsg.message = userResult[0][0].messageError;
                     respMsg.data = null;
                     res.status(200).json(respMsg);
                 }
-                else if(!err && userResult && userResult[0] && userResult[0][0]._error){
+                else if (!err && userResult && userResult[0] && userResult[0][0]._error) {
                     respMsg.status = true;
                     respMsg.message = userResult[0][0]._error;
                     respMsg.data = null;
@@ -1932,7 +1956,7 @@ jobPortalCtrl.portalpasswordResetVerifyOtp = function (req, res, next) {
         data: null,
         error: null
     };
-   
+
     var otp = req.body.otp;
     var loginId = req.body.loginId;
 
@@ -2024,7 +2048,7 @@ jobPortalCtrl.portalresetPassword = function (req, res, next) {
         data: null,
         error: null
     };
-    
+
     var otp = req.body.otp;
     var loginId = req.body.loginId;
     var newPassword = req.body.newPassword;
@@ -2076,7 +2100,7 @@ jobPortalCtrl.portalresetPassword = function (req, res, next) {
             console.log(result);
             if (!err && result && result[0] && result[0][0] && result[0][0].message) {
                 response.status = true;
-                response.message = result[0][0].message;                
+                response.message = result[0][0].message;
                 response.error = false;
                 response.data = {
                     message: result[0][0].message
@@ -2084,18 +2108,18 @@ jobPortalCtrl.portalresetPassword = function (req, res, next) {
                 res.status(200).json(response);
             }
 
-            else if(!err && result && result[0] && result[0][0] && result[0][0].messageError){
+            else if (!err && result && result[0] && result[0][0] && result[0][0].messageError) {
                 response.status = false;
-                response.message = result[0][0].messageError;                
+                response.message = result[0][0].messageError;
                 response.error = false;
                 response.data = {
                     message: result[0][0].messageError
                 };
                 res.status(200).json(response);
             }
-            else if(!err && result && result[0] && result[0][0] && result[0][0]._error){
+            else if (!err && result && result[0] && result[0][0] && result[0][0]._error) {
                 response.status = false;
-                response.message = result[0][0]._error;                
+                response.message = result[0][0]._error;
                 response.error = false;
                 response.data = {
                     message: result[0][0]._error
@@ -2103,9 +2127,9 @@ jobPortalCtrl.portalresetPassword = function (req, res, next) {
                 res.status(200).json(response);
             }
 
-            else if(!err && result && result[0] && result[0][0] && result[0][0]._uerror){
+            else if (!err && result && result[0] && result[0][0] && result[0][0]._uerror) {
                 response.status = false;
-                response.message = result[0][0]._uerror;                
+                response.message = result[0][0]._uerror;
                 response.error = false;
                 response.data = {
                     message: result[0][0]._uerror
@@ -2120,6 +2144,234 @@ jobPortalCtrl.portalresetPassword = function (req, res, next) {
                 res.status(500).json(response);
             }
         });
+    }
+};
+
+jobPortalCtrl.signUpsendOtp = function (req, res, next) {
+
+    var mobileNo; //= req.body.mobileNo;
+    var isdMobile; //= req.body.isdMobile;
+    // var displayName = req.body.displayName ;
+    var emailId = req.body.emailId ? req.body.emailId : "";
+    var status = true, error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+
+    if (req.body.mobileNo) {
+        mobileNo = req.body.mobileNo || "";
+    }
+    else if (req.body.mobileNumber) {
+        mobileNo = req.body.mobileNumber || "";
+    }
+
+    if (req.body.isdMobile) {
+        isdMobile = req.body.isdMobile || "";
+    }
+    else if (req.body.mobileISD) {
+        isdMobile = req.body.mobileISD || "";
+    }
+
+    // if (!mobileNo) {
+    //     error['mobile'] = 'mobile no is mandatory';
+    //     status *= false;
+    // }
+    // if (!isdMobile) {
+    //     error['isdMobile'] = 'isd mobile is mandatory';
+    //     status *= false;
+    // }
+    if (status) {
+        try {
+            // var isWhatMate= req.body.isWhatMate ? req.body.isWhatMate : 0;
+            var message = "";
+            var resMessage = "";
+
+            //generate otp 6 digit random number
+            var code = "";
+            var possible = "1234567890";
+
+            for (var i = 0; i <= 3; i++) {
+
+                code += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+
+            message = 'Your WhatMate verification Code is ' + code + ' . Please enter this 4 digit number where prompted to proceed --WhatMate Helpdesk.';
+
+            var query = req.st.db.escape(mobileNo) + ',' + req.st.db.escape(code) + ',' + req.st.db.escape(isdMobile) + ',' + req.st.db.escape(emailId);
+            console.log("query", query);
+            req.st.db.query('CALL portal_generate_otp(' + query + ')', function (err, insertResult) {
+                if (!err) {
+
+                    if (mobileNo != "") {
+                        if (isdMobile == "+977") {
+                            request({
+                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                qs: {
+                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                    to: mobileNo,
+                                    message: message,
+                                    sender: 'Techingen'
+                                },
+                                method: 'GET'
+
+                            }, function (error, response, body) {
+                                if (error) {
+                                    console.log(error, "SMS");
+                                }
+                                else {
+                                    console.log("SUCCESS", "SMS response");
+                                }
+
+                            });
+                        }
+                        else if (isdMobile == "+91") {
+                            request({
+                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                qs: {
+                                    user_name: 'janardana@hirecraft.com',
+                                    password: 'Ezeid2015',
+                                    sender_id: 'WtMate',
+                                    service: 'TRANS',
+                                    mobile_no: mobileNo,
+                                    message: message,
+                                    method: 'send_sms'
+                                },
+                                method: 'GET'
+
+                            }, function (error, response, body) {
+                                if (error) {
+                                    console.log(error, "SMS");
+                                }
+                                else {
+                                    console.log("SUCCESS", "SMS response");
+                                }
+                            });
+
+                            var req = http.request(options, function (res) {
+                                var chunks = [];
+
+                                res.on("data", function (chunk) {
+                                    chunks.push(chunk);
+                                });
+
+                                res.on("end", function () {
+                                    var body = Buffer.concat(chunks);
+                                    console.log(body.toString());
+                                });
+                            });
+
+                            req.write(qs.stringify({
+                                userId: 'talentmicro',
+                                password: 'TalentMicro@123',
+                                senderId: 'WTMATE',
+                                sendMethod: 'simpleMsg',
+                                msgType: 'text',
+                                mobile: isdMobile.replace("+", "") + mobileNo,
+                                msg: message,
+                                duplicateCheck: 'true',
+                                format: 'json'
+                            }));
+                            req.end();
+
+
+                        }
+                        else if (isdMobile != "") {
+                            client.messages.create(
+                                {
+                                    body: message,
+                                    to: isdMobile + mobileNo,
+                                    from: FromNumber
+                                },
+                                function (error, response) {
+                                    if (error) {
+                                        console.log(error, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+                                }
+                            );
+                        }
+                    }
+
+
+                    if (emailId != "") {
+                        // var file = path.join(__dirname, '../../../../../mail/templates/JobportalSendOTP.html');
+                        // '/home/ezeonetalent/ezeone1/api/mail/templates/JobportalSendOTP.html'
+                        fs.readFile('/home/ezeonetalent/ezeone1/api/mail/templates/JobportalSendOTP.html', "utf8", function (err, data) {
+
+                            if (!err) {
+                                // data = data.replace("[DisplayName]", displayName);
+                                data = data.replace("[code]", code);
+
+                                var mailOptions = {
+                                    from: EZEIDEmail,
+                                    to: emailId,
+                                    subject: 'Portal Verification Code',
+                                    html: data // html body
+                                };
+
+                                // send mail with defined transport object
+                                //message Type 7 - Forgot password mails service
+                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                var email = new sendgrid.Email();
+                                email.from = mailOptions.from;
+                                email.to = mailOptions.to;
+                                email.subject = mailOptions.subject;
+                                email.html = mailOptions.html;
+
+                                sendgrid.send(email, function (err, result) {
+                                    if (!err) {
+                                        console.log('Mail sent');
+                                    }
+                                    else {
+                                        console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+                                    }
+                                });
+                            }
+                            else {
+                                console.log('FnForgetPassword: readfile ' + err);
+                            }
+                        });
+                        resMessage = "OTP is sent successfully to mobile and emailId";
+                    }
+                    else {
+                        resMessage = 'OTP is sent successfully';
+                    }
+
+                    respMsg.status = true;
+                    respMsg.message = 'OTP is sent successfully';
+                    respMsg.data = {
+                        mobileNo: mobileNo
+                    };
+                    res.status(200).json(respMsg);
+                }
+                else {
+                    respMsg.status = false;
+                    respMsg.message = 'Something went wrong';
+                    res.status(500).json(respMsg);
+                }
+            });
+
+
+        }
+        catch (ex) {
+            console.log('Error : FnSendOtp ' + ex);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = { server: 'Internal Server Error' };
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
     }
 };
 

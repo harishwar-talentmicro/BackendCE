@@ -913,7 +913,7 @@ settingsCtrl.offerGeneration = function (req, res, next) {
                                 data = data.replace('[Content]', offerBody);
                                 data = data.replace(/(<p>&nbsp;<\/p><p>&nbsp;<\/p>)+/g, '<p>&nbsp;<\/p>');
 
-                                var options = { format: 'A4', width: '8in', height: '10.5in', border: '0', timeout: 30000, "zoomFactor": "1" };
+                                var options = { format: 'A4', width: '8in', height: '10.5in', border: '10', timeout: 30000, "zoomFactor": "1" };
 
                                 var myBuffer = [];
                                 var buffer = new Buffer(data, 'utf16le');
@@ -945,7 +945,7 @@ settingsCtrl.offerGeneration = function (req, res, next) {
                                                             response.message = "Offer generated sucessfully";
                                                             response.error = null;
                                                             response.data = {
-                                                                invoicePdfCdnPath: aUrl
+                                                                offerPdfCdnPath: aUrl
                                                             }
                                                             res.status(200).json(response);
 

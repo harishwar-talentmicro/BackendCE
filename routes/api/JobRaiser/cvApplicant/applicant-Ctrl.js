@@ -588,7 +588,7 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                 organizationGrades: result[54] && result[54][0] ? result[54] : [],
                                 organizationJobTitles: result[55] && result[55][0] ? result[55] : []
                             },
-                            typeView : result[56] ? result[56] : []
+                            typeView: result[56] ? result[56] : []
 
                         };
 
@@ -967,48 +967,14 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                         response.status = true;
                         response.message = "Applicants loaded successfully";
                         response.error = null;
-                        var output = [];
-                        if (Result[0][0].reqAppId){
+                        if (Result[0][0].reqApplicantId) {
                             for (var i = 0; i < Result[0].length; i++) {
-                                var res2 = {};
-                                res2.reqApplicantId = Result[0][i].reqAppId;
-                                res2.applicantId = Result[0][i].applicantId;
-                                res2.imageUrl = Result[0][i].imageUrl;
-                                res2.createdDate = Result[0][i].createdDate;
-                                res2.lastUpdatedDate = Result[0][i].lastUpdatedDate;
-                                res2.reqCvCreatedUserId = Result[0][i].reqCvCreatedUserId;
-                                res2.reqCvCreatedUserName = Result[0][i].reqCvCreatedUserName;
-                                res2.reqCvUpdatedUserId = Result[0][i].reqCvUpdatedUserId;
-                                res2.reqCvUpdatedUserName = Result[0][i].reqCvUpdatedUserName;
-                                res2.cvCreatedDate = Result[0][i].cvCreatedDate;
-                                res2.cvCreatedUSerId = Result[0][i].cvCreatedUSerId;
-                                res2.cvCreatedUserName = Result[0][i].cvCreatedUserName;
-                                res2.cvUpdatedDate = Result[0][i].cvUpdatedDate;
-                                res2.cvUpdatedUserId = Result[0][i].cvUpdatedUserId;
-                                res2.cvUpdatedUserName = Result[0][i].cvUpdatedUserName;
-                                res2.requirementId = Result[0][i].requirementId;
-                                res2.name = Result[0][i].name;
-                                res2.emailId = Result[0][i].emailId;
-                                res2.clientId = Result[0][i].clientId;
-                                res2.clientName = Result[0][i].clientname;
-                                res2.jobCode = Result[0][i].jobCode;
-                                res2.jobTitleId = Result[0][i].jobTitleId;
-                                res2.jobTitle = Result[0][i].title;
-                                res2.stageId = Result[0][i].stageId;
-                                res2.stage = Result[0][i].stageTitle;
-                                res2.stageTypeId = Result[0][i].stageTypeId;
-                                res2.colorCode = Result[0][i].colorCode;
-                                res2.statusId = Result[0][i].statusId;
-                                res2.status = Result[0][i].statusTitle;
-                                res2.statusTypeId = Result[0][i].statusTypeId;
-                                res2.reqCreatedUserId = Result[0][i].reqCreatedUserId;
-                                res2.clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
-                                output.push(res2);
+                                Result[0][i].clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
                             }
                         }
-                      
+
                         response.data = {
-                            applicantlist: output,
+                            applicantlist: Result[0] ? Result[0] : [],
                             count: Result[1][0].count,
                             offerMasterData: {
                                 currency: Result[2] ? Result[2] : [],
@@ -1195,10 +1161,10 @@ applicantCtrl.getreqAppStageStatus = function (req, res, next) {
                         response.error = null;
 
                         for (var i = 0; i < statusResult[0].length; i++) {
-                            statusResult[0][i].reason = statusResult[0][i] && JSON.parse(statusResult[0][i].reason).reasonId ? JSON.parse(statusResult[0][i].reason) : {} 
+                            statusResult[0][i].reason = statusResult[0][i] && JSON.parse(statusResult[0][i].reason).reasonId ? JSON.parse(statusResult[0][i].reason) : {}
                         }
 
-                        statusResult[1][0].reason = statusResult[1][0] && JSON.parse(statusResult[1][0].reason).reasonId ? JSON.parse(statusResult[1][0].reason) : {} 
+                        statusResult[1][0].reason = statusResult[1][0] && JSON.parse(statusResult[1][0].reason).reasonId ? JSON.parse(statusResult[1][0].reason) : {}
 
                         response.data = {
                             transactionHistory: statusResult[0] ? statusResult[0] : [],
@@ -1653,12 +1619,12 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         var temp_result = result[0][0] ? result[0][0] : {};
                         temp_result.education = JSON.parse(temp_result.education);
                         temp_result.cvSource = JSON.parse(temp_result.cvSource);
-                        temp_result.expectedSalaryCurr =temp_result.expectedSalaryCurr && JSON.parse(temp_result.expectedSalaryCurr).currencyId ? JSON.parse(temp_result.expectedSalaryCurr):{};
-                        temp_result.expectedSalaryPeriod = temp_result.expectedSalaryPeriod && JSON.parse(temp_result.expectedSalaryPeriod).durationId ? JSON.parse(temp_result.expectedSalaryPeriod) :{};
-                        temp_result.expectedSalaryScale = temp_result.expectedSalaryScale && JSON.parse(temp_result.expectedSalaryScale).scaleId ? JSON.parse(temp_result.expectedSalaryScale) :{};
+                        temp_result.expectedSalaryCurr = temp_result.expectedSalaryCurr && JSON.parse(temp_result.expectedSalaryCurr).currencyId ? JSON.parse(temp_result.expectedSalaryCurr) : {};
+                        temp_result.expectedSalaryPeriod = temp_result.expectedSalaryPeriod && JSON.parse(temp_result.expectedSalaryPeriod).durationId ? JSON.parse(temp_result.expectedSalaryPeriod) : {};
+                        temp_result.expectedSalaryScale = temp_result.expectedSalaryScale && JSON.parse(temp_result.expectedSalaryScale).scaleId ? JSON.parse(temp_result.expectedSalaryScale) : {};
                         temp_result.industry = JSON.parse(temp_result.industry);
-                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle).jobTitleId ? JSON.parse(temp_result.jobTitle): {} ;
-                        temp_result.nationality = JSON.parse(temp_result.nationality).nationalityId ? JSON.parse(temp_result.nationality) :{};
+                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle).jobTitleId ? JSON.parse(temp_result.jobTitle) : {};
+                        temp_result.nationality = JSON.parse(temp_result.nationality).nationalityId ? JSON.parse(temp_result.nationality) : {};
                         temp_result.prefLocations = JSON.parse(temp_result.prefLocations);
                         temp_result.presentSalaryCurr = temp_result.presentSalaryCurr && JSON.parse(temp_result.presentSalaryCurr).currencyId ? JSON.parse(temp_result.presentSalaryCurr) : {};
                         temp_result.presentSalaryPeriod = temp_result.presentSalaryPeriod && JSON.parse(temp_result.presentSalaryPeriod).durationId ? JSON.parse(temp_result.presentSalaryPeriod) : {};
@@ -2177,7 +2143,7 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                         response.status = true;
                         response.message = "Offer manager list loaded successfully";
                         response.error = null;
-                        if(result[0][0].offerManagerId != 0){
+                        if (result[0][0].offerManagerId != 0) {
                             result[0][0].reqAppList = result[0][0].reqAppList ? JSON.parse(result[0][0].reqAppList) : [];
                             result[0][0].documentAttachment = result[0][0].documentAttachment ? JSON.parse(result[0][0].documentAttachment) : [];
                             result[0][0].billableCurrency = result[0][0].billableCurrency ? JSON.parse(result[0][0].billableCurrency) : {};
@@ -2185,7 +2151,7 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                             result[0][0].billableDuration = result[0][0].billableDuration ? JSON.parse(result[0][0].billableDuration) : {};
                             result[0][0].billingCurrency = result[0][0].billingCurrency ? JSON.parse(result[0][0].billingCurrency) : {};
                             result[0][0].billingScale = result[0][0].billingScale ? JSON.parse(result[0][0].billingScale) : [];
-                            result[0][0].billingDuration = result[0][0].billingDuration ? JSON.parse(result[0][0].billingDuration) : {};    
+                            result[0][0].billingDuration = result[0][0].billingDuration ? JSON.parse(result[0][0].billingDuration) : {};
                         }
 
                         for (var i = 0; i < result[2].length; i++) {
@@ -2194,12 +2160,12 @@ applicantCtrl.getOfferManager = function (req, res, next) {
 
                         response.data = {
                             offerDetails: result[0] && result[0][0] && result[0][0].offerManagerId ? result[0][0] : {},
-                            offerTemplate: result[1] && result[1][0] ? result[1] :[],
-                            offerBreakUpTemplate: result[2] && result[2][0] ? result[2] :[]
+                            offerTemplate: result[1] && result[1][0] ? result[1] : [],
+                            offerBreakUpTemplate: result[2] && result[2][0] ? result[2] : []
                         };
                         res.status(200).json(response);
                     }
-                    else if (!err ) {
+                    else if (!err) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
@@ -3221,7 +3187,7 @@ applicantCtrl.getMasterInterviewScheduler = function (req, res, next) {
                                 skillLevelList: result[3] ? result[3] : [],
                                 heDepartment: result[4] ? result[4] : [],
                                 skillList: result[5] ? result[5] : [],
-                                assessmentOptionList: result[6] &&  result[6][0] ? result[6]:[],
+                                assessmentOptionList: result[6] && result[6][0] ? result[6] : [],
                                 isAddAssessmentEnable: result[6] && result[6][0] && result[6][0].isAddAssessmentEnable ? result[6][0].isAddAssessmentEnable : 0,
                                 isAddSkillEnable: result[6] && result[6][0] && result[6][0].isAddSkillEnable ? result[6][0].isAddSkillEnable : 0
                             };
@@ -4164,7 +4130,7 @@ applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
 
-                    if (!err && result && result[0][0]) {
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "Facesheet Template loaded sucessfully";
                         response.error = null;
@@ -4172,6 +4138,16 @@ applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
                             for (var i = 0; i < faceSheet.questions.length; i++) {
                                 faceSheet.questions[i].answer = result[0][0][faceSheet.questions[i].type.tagName];
                             }
+                            console.log("facesheet custom tags",faceSheet.customTags && faceSheet.customTags.length);
+                        if (faceSheet.customTags && faceSheet.customTags.length) {
+                            for (var customIndex = 0; customIndex < faceSheet.customTags.length; customIndex++) {
+                                console.log("resume",result[0][0][faceSheet.customTags[customIndex].tagName]);
+                                if (result[0][0] && result[0][0][faceSheet.customTags[customIndex].tagName]) {
+                                    faceSheet.customFaceSheet = faceSheet.customFaceSheet.replace('[facesheet.' + faceSheet.customTags[customIndex].tagName + ']', result[0][0][faceSheet.customTags[customIndex].tagName]);
+                                    console.log(faceSheet.customFaceSheet);
+                                }
+                            }
+                        }
 
                         response.data = {
                             faceSheet: faceSheet ? faceSheet : {}

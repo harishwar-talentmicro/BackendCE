@@ -84,17 +84,22 @@ var uploadDocumentToCloud = function (uniqueName, readStream, callback) {
 
 
 var removeExtraChars = function (params) {
-    params = params.replace(/<[a-zA-Z0-9=|-|'|" ]*>/g, '');
-    params = params.replace(/<\/[a-z]*>/g, '');
-    params = params.replace(/(\n)+/, '');
-    params = params.replace(/not applicable/i, '');
-    params = params.replace(/not disclosed/i, '');
-    params = params.replace(/(Verified)/i, '');
-    params = params.replace(/Not Mentioned/i, '');
-    params = params.replace(/[ ]{2}/g, '');
-    params = params.replace(/&amp;/g, ' ');
-    params = params.trim();
-    return params;
+    if (params && typeof (params) == 'string' && params != '') {
+        params = params.replace(/<[a-zA-Z0-9=|-|'|" ]*>/g, '');
+        params = params.replace(/<\/[a-z]*>/g, '');
+        params = params.replace(/(\n)+/, '');
+        params = params.replace(/not applicable/i, '');
+        params = params.replace(/not disclosed/i, '');
+        params = params.replace(/(Verified)/i, '');
+        params = params.replace(/Not Mentioned/i, '');
+        params = params.replace(/[ ]{2}/g, '');
+        params = params.replace(/&amp;/g, ' ');
+        params = params.trim();
+        return params;
+    }
+    else {
+        return '';
+    }
 }
 
 
@@ -509,7 +514,7 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
         // var formData = {
         //     applicants: applicants
         // };
-        
+
         var a = {
             FirstName: details.firstName,
             EmailID: details.emailId,
@@ -641,140 +646,149 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
 
 
 portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
-    var response = {
-        status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-    var validationFlag = true;
-    var portalId = 1;
-    var cvSourceId = 1;
-    var details = {};
 
-    const { JSDOM } = jsdom;
-
-    var document = new JSDOM(req.body.xml_string).window.document;
-    // console.log('req.files.document',req.body.document);
-
-    var tempName = document.getElementsByClassName('bkt4 name userName');
-    if (tempName && tempName[0] && tempName[0].innerHTML) {
-        var name = tempName[0].innerHTML.trim(' ');
-        if (name && name.split(' ')[0])
-            details.firstName = removeExtraChars(name.split(' ')[0]);
-        if (name && name.split(' ')[1])
-            details.lastName = removeExtraChars(name.split(' ')[1]);
-    }
-
-    var tempEmailId = document.getElementsByClassName('bkt4 email');
-    if (tempEmailId && tempEmailId[0] && tempEmailId[0].innerHTML) {
-        var emailId = tempEmailId[0].innerHTML;
-        if (emailId.split('</em>') && emailId.split('</em>')[1])
-            details.emailId = removeExtraChars(emailId.split('</em>')[1].trim(' '));
-    }
-
-    var tempMobileNumber = document.getElementsByClassName('bkt4 phoneNo');
-    if (tempMobileNumber && tempMobileNumber[0] && tempMobileNumber[0].innerHTML) {
-        var mobileNumber = tempMobileNumber[0].innerHTML;
-        if (mobileNumber.split(':'))
-            details.mobileNumber = removeExtraChars(mobileNumber.split(':')[1].trim(' '));
-    }
-
-    var tempAddress = document.getElementsByClassName('address-box mt10');
-    if (tempAddress && tempAddress[0] && tempAddress[0].innerHTML && tempAddress[0].innerHTML.split('</div>') && tempAddress[0].innerHTML.split('</div>')[1]) {
-        details.address = removeExtraChars(tempAddress[0].innerHTML.split('</div>')[1].replace('<div>', '').trim(' '));
-    }
-
-    var tempProfilePic = document.getElementsByClassName('left-container');
-
-    if (tempProfilePic && tempProfilePic[0] && tempProfilePic[0].getElementsByClassName('imgRound user-pic') && tempProfilePic[0].getElementsByClassName('imgRound user-pic')[0] && tempProfilePic[0].getElementsByClassName('imgRound user-pic')[0].getAttribute('src')) {
-        console.log("Entered profile");
-        details.profilePic = tempProfilePic[0].getElementsByClassName('imgRound user-pic')[0].getAttribute('src');
-        // console.log(document.getElementsByClassName('left-container')[0].getElementsByClassName('imgRound user-pic')[0].getAttribute('src'));
-        details.profilePic = removeExtraChars(details.profilePic);
-        console.log(details.profilePic);
-    }
-
-    var tempExperience = document.getElementsByClassName('exp-sal-loc-box');
-    if (tempExperience && tempExperience[0] && tempExperience[0].getElementsByClassName('expInfo') && tempExperience[0].getElementsByClassName('expInfo')[0] && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>") && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1] && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr') && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr')[0]) {
-        console.log('Entered exp');
-        details.experience = tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr')[0].trim();
-        console.log(details.experience);
-        if (typeof (details.experience) == 'string') {
-            details.experience = 0;
-        }
-        details.experience = removeExtraChars(details.experience);
-        console.log(tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML);
-    }
-
-    var tempDesignation = document.getElementsByClassName('bkt4 cDesig');
-    if (tempDesignation && tempDesignation[0] && tempDesignation[0].innerHTML) {
-        console.log("Entered designation");
-        var designation = tempDesignation[0].innerHTML.replace(/<em class="hlite">/g, '');
-        designation = designation.replace(/<em class="b-hlite">/g, '');
-        designation = decodeURI(designation.replace(/<\/em>/g, ''));
-        details.jobTitle = removeExtraChars(designation.trim());
-        console.log(details.jobTitle);
-    }
-
-    var tempSkills = document.getElementsByClassName('right-container');
-    if (tempSkills && tempSkills[0] && tempSkills[0].getElementsByClassName('itSkill hKwd') && tempSkills[0].getElementsByClassName('itSkill hKwd')[0] && tempSkills[0].getElementsByClassName('itSkill hKwd')[0].innerHTML) {
-        console.log("Entered skill");
-        details.primarySkills = tempSkills[0].getElementsByClassName('itSkill hKwd')[0].innerHTML.replace(/<span id=".*/g, '');
-        details.primarySkills = details.primarySkills.replace(/<em class="b-hlite">/g, '');
-        details.primarySkills = details.primarySkills.replace(/<em class="hlite">/g, '');
-        details.primarySkills = details.primarySkills.replace(/<\/em>/g, '');
-        if (details.primarySkills && details.primarySkills.split(',').length) {
-            details.primarySkills = details.primarySkills.split(',');
-            for (var skill = 0; skill < details.primarySkills.length; skill++)
-                details.primarySkills[skill] = removeExtraChars(details.primarySkills[skill].trim());
-        }
-        console.log(details.primarySkills);
-    }
-
-    // presentSalaryCurr
-    var salaryDetails = document.getElementsByClassName('salInfo');
-    if (salaryDetails && salaryDetails[0] && salaryDetails[0].innerHTML) {
-        console.log("Entered salary");
-        var amount = salaryDetails[0].innerHTML.replace('<em class="iconRup"></em>', '').trim().split(' ');
-        if (amount && amount[0]) {
-            details.presentSalary = removeExtraChars(amount[0]);
-            if (amount[1] && amount[1].indexOf('Lac') > -1) {
-                details.presentSalaryScale = { scale: "Lakhs", scaleId: 4 }
-            }
-            document.getElementsByClassName('salInfo')[0].innerHTML.replace('<em class="iconRup"></em>', '').trim().split(' ')[0]
-            if (salaryDetails[0].getElementsByClassName('iconRup') && salaryDetails[0].getElementsByClassName('iconRup').length)
-                details.presentSalaryCurr = { currencyId: 2, currencySymbol: "INR" };
-            details.presentSalaryPeriod = { duration: "Per Annum", durationId: 4 };
-        }
-    }
-
-    var isTallint = req.query.isTallint || 0;
-
-    // for tallint
-    if (isTallint) {
-        var token = req.query.token;
-        var heMasterId = req.query.heMasterId;
-        // var portalId = 2;
-        var formData = {
-            applicants: applicants
+    try {
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
         };
+        var validationFlag = true;
+        var portalId = 1;
+        var cvSourceId = 1;
+        var details = {};
 
-        request({
-            url: "tallint url to come here",
-            method: "POST",
-            json: true,
-            body: formData
-        }, function (error, response, body) {
-            if (!err && body) {
-                console.log('tallint response here');
+        const { JSDOM } = jsdom;
+
+        var document = new JSDOM(req.body.xml_string).window.document;
+        // console.log('req.files.document',req.body.document);
+
+        var tempName = document.getElementsByClassName('bkt4 name userName');
+        if (tempName && tempName[0] && tempName[0].innerHTML) {
+            var name = tempName[0].innerHTML.trim(' ');
+            if (name && name.split(' ')[0])
+                details.firstName = removeExtraChars(name.split(' ')[0]);
+            if (name && name.split(' ')[1])
+                details.lastName = removeExtraChars(name.split(' ')[1]);
+        }
+
+        var tempEmailId = document.getElementsByClassName('bkt4 email');
+        if (tempEmailId && tempEmailId[0] && tempEmailId[0].innerHTML) {
+            var emailId = tempEmailId[0].innerHTML;
+            if (emailId.split('</em>') && emailId.split('</em>')[1])
+                details.emailId = removeExtraChars(emailId.split('</em>')[1].trim(' '));
+        }
+
+        var tempMobileNumber = document.getElementsByClassName('bkt4 phoneNo');
+        if (tempMobileNumber && tempMobileNumber[0] && tempMobileNumber[0].innerHTML) {
+            var mobileNumber = tempMobileNumber[0].innerHTML;
+            if (mobileNumber.split(':'))
+                details.mobileNumber = removeExtraChars(mobileNumber.split(':')[1].trim(' '));
+        }
+
+        var tempAddress = document.getElementsByClassName('address-box mt10');
+        if (tempAddress && tempAddress[0] && tempAddress[0].innerHTML && tempAddress[0].innerHTML.split('</div>') && tempAddress[0].innerHTML.split('</div>')[1]) {
+            details.address = removeExtraChars(tempAddress[0].innerHTML.split('</div>')[1].replace('<div>', '').trim(' '));
+        }
+
+        var tempProfilePic = document.getElementsByClassName('left-container');
+
+        if (tempProfilePic && tempProfilePic[0] && tempProfilePic[0].getElementsByClassName('imgRound user-pic') && tempProfilePic[0].getElementsByClassName('imgRound user-pic')[0] && tempProfilePic[0].getElementsByClassName('imgRound user-pic')[0].getAttribute('src')) {
+            console.log("Entered profile");
+            details.profilePic = tempProfilePic[0].getElementsByClassName('imgRound user-pic')[0].getAttribute('src');
+            // console.log(document.getElementsByClassName('left-container')[0].getElementsByClassName('imgRound user-pic')[0].getAttribute('src'));
+            details.profilePic = removeExtraChars(details.profilePic);
+            console.log(details.profilePic);
+        }
+
+        var tempExperience = document.getElementsByClassName('exp-sal-loc-box');
+        if (tempExperience && tempExperience[0] && tempExperience[0].getElementsByClassName('expInfo') && tempExperience[0].getElementsByClassName('expInfo')[0] && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>") && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1] && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr') && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr')[0]) {
+            console.log('Entered exp');
+            details.experience = tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr')[0].trim();
+            console.log(details.experience);
+            if (typeof (details.experience) == 'string') {
+                details.experience = 0;
             }
-        });
+            details.experience = removeExtraChars(details.experience);
+            console.log(tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML);
+        }
+
+        var tempDesignation = document.getElementsByClassName('bkt4 cDesig');
+        if (tempDesignation && tempDesignation[0] && tempDesignation[0].innerHTML) {
+            console.log("Entered designation");
+            var designation = tempDesignation[0].innerHTML.replace(/<em class="hlite">/g, '');
+            designation = designation.replace(/<em class="b-hlite">/g, '');
+            designation = decodeURI(designation.replace(/<\/em>/g, ''));
+            details.jobTitle = removeExtraChars(designation.trim());
+            console.log(details.jobTitle);
+        }
+
+        var tempSkills = document.getElementsByClassName('right-container');
+        if (tempSkills && tempSkills[0] && tempSkills[0].getElementsByClassName('itSkill hKwd') && tempSkills[0].getElementsByClassName('itSkill hKwd')[0] && tempSkills[0].getElementsByClassName('itSkill hKwd')[0].innerHTML) {
+            console.log("Entered skill");
+            details.primarySkills = tempSkills[0].getElementsByClassName('itSkill hKwd')[0].innerHTML.replace(/<span id=".*/g, '');
+            details.primarySkills = details.primarySkills.replace(/<em class="b-hlite">/g, '');
+            details.primarySkills = details.primarySkills.replace(/<em class="hlite">/g, '');
+            details.primarySkills = details.primarySkills.replace(/<\/em>/g, '');
+            if (details.primarySkills && details.primarySkills.split(',').length) {
+                details.primarySkills = details.primarySkills.split(',');
+                for (var skill = 0; skill < details.primarySkills.length; skill++)
+                    details.primarySkills[skill] = removeExtraChars(details.primarySkills[skill].trim());
+            }
+            console.log(details.primarySkills);
+        }
+
+        // presentSalaryCurr
+        var salaryDetails = document.getElementsByClassName('salInfo');
+        if (salaryDetails && salaryDetails[0] && salaryDetails[0].innerHTML) {
+            console.log("Entered salary");
+            var amount = salaryDetails[0].innerHTML.replace('<em class="iconRup"></em>', '').trim().split(' ');
+            if (amount && amount[0]) {
+                details.presentSalary = removeExtraChars(amount[0]);
+                if (amount[1] && amount[1].indexOf('Lac') > -1) {
+                    details.presentSalaryScale = { scale: "Lakhs", scaleId: 4 }
+                }
+                document.getElementsByClassName('salInfo')[0].innerHTML.replace('<em class="iconRup"></em>', '').trim().split(' ')[0]
+                if (salaryDetails[0].getElementsByClassName('iconRup') && salaryDetails[0].getElementsByClassName('iconRup').length)
+                    details.presentSalaryCurr = { currencyId: 2, currencySymbol: "INR" };
+                details.presentSalaryPeriod = { duration: "Per Annum", durationId: 4 };
+            }
+        }
+
+        var isTallint = req.query.isTallint || 0;
+
+        // for tallint
+        if (isTallint) {
+            var token = req.query.token;
+            var heMasterId = req.query.heMasterId;
+            // var portalId = 2;
+            var formData = {
+                applicants: applicants
+            };
+
+            request({
+                url: "tallint url to come here",
+                method: "POST",
+                json: true,
+                body: formData
+            }, function (error, response, body) {
+                if (!err && body) {
+                    console.log('tallint response here');
+                }
+            });
+        }
+
+        else {
+            savePortalApplicants(portalId, cvSourceId, details, req, res);
+        }
+
     }
 
-    else {
-        savePortalApplicants(portalId, cvSourceId, details, req, res);
+    catch (ex) {
+        console.log(ex);
     }
+
 };
 
 

@@ -227,8 +227,7 @@ walkInCvCtrl.getmasterData = function (req, res, next) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                 var inputs = [
-                    req.st.db.escape(req.query.token),
-
+                    req.st.db.escape(req.query.token)
                 ];
 
                 var procQuery = 'CALL wm_get_masterDataForWalkinForm( ' + inputs.join(',') + ')';
