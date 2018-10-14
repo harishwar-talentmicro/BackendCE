@@ -189,12 +189,10 @@ var onboardingctrl = require('./HEApp/onBoarding/onboarding-routes.js');
 
 var likeShareComment = require('./HEApp/likesharecomment.js');
 
-var nk = require('./nearkart/nearkart-routes');
 
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
 
-router.use('/nk', nk);
 
 router.use('/helloEZE', attendanceroaster);
 router.use('/helloEZE', quiz);
