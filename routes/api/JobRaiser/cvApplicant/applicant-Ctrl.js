@@ -3213,7 +3213,10 @@ applicantCtrl.getMasterInterviewScheduler = function (req, res, next) {
                             interviewRound: [],
                             skillLevelList: [],
                             heDepartment: [],
-                            skillList: []
+                            skillOptionList: [],
+                            isAddAssessmentEnable:0,
+                            isAddSkillEnable:0
+
                         };
 
                         if (req.query.isWeb == 0) {

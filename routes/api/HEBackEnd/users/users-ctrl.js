@@ -389,7 +389,7 @@ userCtrl.getUserList = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
-
+                req.query.isExport = (req.query.isExport) ? (req.query.isExport) : 0;
                 req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
                 req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
                 req.query.searchKeywords = (req.query.searchKeywords) ? (req.query.searchKeywords) : '';
@@ -403,7 +403,8 @@ userCtrl.getUserList = function(req,res,next){
                     req.st.db.escape(startPage),
                     req.st.db.escape(req.query.limit),
                     req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(DBSecretKey)                
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.query.isExport)               
                 ];
                 /**
                  * Calling procedure to get form template

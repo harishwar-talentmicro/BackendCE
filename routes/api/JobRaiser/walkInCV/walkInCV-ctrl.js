@@ -762,12 +762,12 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                             }
 
                             var subject = results[3][0].mailSubject ? results[3][0].mailSubject : 'Registration Completed Successfully';
-                            var bcc=[];
-                            if(results[3][0] && results[3][0].bccMailId && typeof(results[3][0].bccMailId) =='string'){
+                            var bcc = [];
+                            if (results[3][0] && results[3][0].bccMailId && typeof (results[3][0].bccMailId) == 'string') {
                                 bcc = results[3][0].bccMailId ? JSON.parse(results[3][0].bccMailId) : [];
-                                bccMailId=bcc[0];
+                                bccMailId = bcc[0];
                             }
-                           console.log(mailContent);
+                            console.log(mailContent);
                             // send mail to candidate
                             var email = new sendgrid.Email();
                             email.from = results[2][0].fromEmailId ? results[2][0].fromEmailId : 'noreply@talentmicro.com';
@@ -949,7 +949,7 @@ walkInCvCtrl.saveCandidate = function (req, res, next) {
                         response.data = {
                             walkinMessage: results[0][0],
                             token: results[1][0].token,
-                            localId : req.body.localId ? req.body.localId: 0
+                            localId: req.body.localId ? req.body.localId : 0
                         };
                         res.status(200).json(response);
                     }
@@ -1297,7 +1297,7 @@ walkInCvCtrl.verifyOtp = function (req, res, next) {
                     message: (result[0] && result[0][0]) ? result[0][0].message : '',
                     existsMessage: (result[1] && result[1][0]) ? result[1][0]._error : '',
                     applicantDetails: (result[2] && result[2][0]) ? result[2][0] : {}
-                   
+
                 };
                 res.status(200).json(response);
             }
@@ -1493,9 +1493,9 @@ walkInCvCtrl.bannerList = function (req, res, next) {
                             referredByName: 0,
                             vendors: 0,
                             showJobCode: 0,
-                            syncInBackground:0,
-                            completionMessage:''
-                            
+                            syncInBackground: 0,
+                            completionMessage: ''
+
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -1756,7 +1756,7 @@ walkInCvCtrl.InterviewSchedulerForPublish = function (req, res, next) {
                                 ];
 
                                 var procQuery = 'CALL wm_save_interviewSchedulerForHirecraft( ' + procParams.join(',') + ')';
-                                //  console.log(procQuery);
+                                  console.log(procQuery);
                                 req.db.query(procQuery, function (err, results) {
                                     console.log(err);
 
@@ -2058,9 +2058,9 @@ walkInCvCtrl.getWalkinJoblist = function (req, res, next) {
                         }
 
                         result[1][0].userList = (result[1] && result[1][0]) ? JSON.parse(result[1][0].userList) : [];
-                        if(result[1][0] && result[1][0].bccMailId && typeof(result[1][0].bccMailId)=='string')
-                        result[1][0].bccMailId = (result[1] && result[1][0]) ? JSON.parse(result[1][0].bccMailId) : [];
-                        
+                        if (result[1][0] && result[1][0].bccMailId && typeof (result[1][0].bccMailId) == 'string')
+                            result[1][0].bccMailId = (result[1] && result[1][0]) ? JSON.parse(result[1][0].bccMailId) : [];
+
 
                         response.data = {
                             jobList: (result[0] && result[0][0]) ? result[0] : [],
@@ -3089,11 +3089,11 @@ walkInCvCtrl.walkInWebConfig = function (req, res, next) {
                     req.st.db.escape(req.body.isIDNumberOrStringNew),
                     req.st.db.escape(req.body.showJobCode),
                     req.st.db.escape(req.body.syncBackground),
-                    req.st.db.escape(JSON.stringify(req.body.bccMailId || []) ),
+                    req.st.db.escape(JSON.stringify(req.body.bccMailId || [])),
                     req.st.db.escape(req.body.reminderMailSubject || ''),
-                    req.st.db.escape(req.body.reminderMailBody || '' ),
+                    req.st.db.escape(req.body.reminderMailBody || ''),
                     req.st.db.escape(req.body.empListBasedOnLocation || 0),
-                    req.st.db.escape(req.body.masterOTPLength || 4 ),
+                    req.st.db.escape(req.body.masterOTPLength || 4),
                     req.st.db.escape(req.body.masterOTP || 1111)
 
                 ];
@@ -3224,14 +3224,14 @@ walkInCvCtrl.walkInUploadLinkFlag = function (req, res, next) {
 
             if (!err && result && result[0] && result[0][0]) {
 
-                if(result[0][0].validateLinkFlag=='true'){
-                    result[0][0].validateLinkFlag= true;
+                if (result[0][0].validateLinkFlag == 'true') {
+                    result[0][0].validateLinkFlag = true;
                     response.message = "Please upload your resume";
                 }
-                else{
-                    result[0][0].validateLinkFlag=false;
+                else {
+                    result[0][0].validateLinkFlag = false;
                     response.message = "Link has expired";
-               
+
                 }
 
                 response.status = result[0][0].validateLinkFlag;
@@ -3831,14 +3831,14 @@ walkInCvCtrl.publicWalkInConfig = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.body.tid = req.body.tid ? req.body.tid : 0;
-                
+
                 req.body.IDRequired = req.body.IDRequired ? req.body.IDRequired : 0;
                 req.body.IDType = req.body.IDType ? req.body.IDType : '';
                 req.body.maxIDLength = req.body.maxIDLength ? req.body.maxIDLength : 0;
                 req.body.isIDNumberOrString = req.body.isIDNumberOrString ? req.body.isIDNumberOrString : 1;
                 req.body.sendCandidateSms = req.body.sendCandidateSms ? req.body.sendCandidateSms : 0;
                 req.body.candidateSmsFormat = req.body.candidateSmsFormat ? req.body.candidateSmsFormat : "";
-                
+
                 req.body.showJobCode = req.body.showJobCode ? req.body.showJobCode : 0;
                 req.body.syncInBackground = req.body.syncInBackground ? req.body.syncInBackground : 0;
 
@@ -3869,7 +3869,7 @@ walkInCvCtrl.publicWalkInConfig = function (req, res, next) {
                     req.st.db.escape(req.body.maxIDLength),
                     req.st.db.escape(req.body.isIDNumberOrString),
                     req.st.db.escape(req.body.sendCandidateSms),
-                    req.st.db.escape(req.body.candidateSmsFormat),            
+                    req.st.db.escape(req.body.candidateSmsFormat),
                     req.st.db.escape(req.body.profilePic),
                     req.st.db.escape(req.body.IDRequiredNew),
                     req.st.db.escape(req.body.IDTypeNew),
@@ -3895,7 +3895,7 @@ walkInCvCtrl.publicWalkInConfig = function (req, res, next) {
                         response.message = "Walk-In configuration details saved successfully";
                         response.error = null;
                         response.data = {
-                            companyList:result[0]
+                            companyList: result[0]
                         };
                         res.status(200).json(response);
                     }
@@ -3975,7 +3975,7 @@ walkInCvCtrl.publicWalkinMaster = function (req, res, next) {
                         response.message = "Banner List loaded successfully";
                         response.error = null;
                         response.data = {
-                           // bannerList: result[0],
+                            // bannerList: result[0],
                             companyLogo: result[1][0].companyLogo,
                             registrationType: result[6][0].walkinRegistrationType,  // need to come from backend, will be done later.
                             tokenGeneration: result[6][0].walkinTokenGeneration,
@@ -4070,9 +4070,9 @@ walkInCvCtrl.publicWalkinMaster = function (req, res, next) {
                             referredByName: 0,
                             vendors: 0,
                             showJobCode: 0,
-                            syncInBackground:0,
-                            completionMessage:''
-                            
+                            syncInBackground: 0,
+                            completionMessage: ''
+
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -4119,7 +4119,7 @@ walkInCvCtrl.getCompanySearch = function (req, res, next) {
         validationFlag *= false;
     }
 
-    
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -4157,7 +4157,7 @@ walkInCvCtrl.getCompanySearch = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             companyConfigDetails: {},
-                            
+
                         };
                         res.status(200).json(response);
 
@@ -4178,5 +4178,172 @@ walkInCvCtrl.getCompanySearch = function (req, res, next) {
     }
 
 };
+
+
+walkInCvCtrl.saveOptionMaster = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.body.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+    var optionList = req.body.optionList
+    if (typeof (optionList) == 'string') {
+        optionList = JSON.parse(optionList);
+    }
+    if (!optionList) {
+        optionList = [];
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.body.isInterviewStatus = req.body.isInterviewStatus ? req.body.isInterviewStatus : 0;
+                req.body.isSkillAddition = req.body.isSkillAddition ? req.body.isSkillAddition : 0;
+                req.body.isAssesmentAddition = req.body.isAssesmentAddition ? req.body.isAssesmentAddition : 0;
+                req.body.isSkill = req.body.isSkill ? req.body.isSkill : 0;
+                req.body.isAssesment = req.body.isAssesment ? req.body.isAssesment : 0;
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.heMasterId),
+                req.st.db.escape(JSON.stringify(optionList)),
+                req.st.db.escape(req.body.isInterviewStatus),
+                req.st.db.escape(req.body.isSkillAddition),
+                req.st.db.escape(req.body.isAssesmentAddition),
+                req.st.db.escape(req.body.isSkill),
+                req.st.db.escape(req.body.isAssesment)
+            
+                ];
+
+                var procQuery = 'CALL wm_saveOptionsMaster( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result) {
+                        response.status = true;
+                        response.message = "Options saved successfully";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving Options ";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+walkInCvCtrl.getoptions = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+                var isInterviewStatus=0;
+                var procQuery = 'CALL wm_getOptionsMaster( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    
+                    if (!err && result && result[0] && result[1]) {
+                        // result[1][isInterviewStatus]=result[0].isInterviewStatus ;
+
+                        response.status = true;
+                        response.message = "options loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            isInterviewStatus:result[0][0].isInterviewStatus,
+                            isSkillAddition:result[0][0].isSkillAddition,
+                            isAssesmentAddition:result[0][0].isAssesmentAddition,
+                            isSkill:(result[0][0].isSkill) ? result[0][0].isSkill:0,
+                            isAssesment:(result[0][0].isAssessment) ? result[0][0].isAssessment:0,
+                            optionList:result[1],
+                            
+                        };
+                        res.status(200).json(response);
+                    }
+
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = {
+                           
+                            optionList:[]
+
+                        };
+                        res.status(200).json(response);
+
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting user data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 
 module.exports = walkInCvCtrl;

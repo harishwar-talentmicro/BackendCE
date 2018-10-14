@@ -503,7 +503,9 @@ sendMessageCtrl.getUserConfig = function (req, res, next) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.groupId)
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(req.query.isAccess)
+
                 ];
                 /**
                  * Calling procedure to get form template
@@ -1087,10 +1089,14 @@ sendMessageCtrl.DeleteMsgMapUsersData = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.query.HEUserId) {
-        error.HEUserId = 'Invalid HEUserId';
-        validationFlag *= false;
+    var HEUserId = req.body.HEUserId;
+    if (typeof (HEUserId) == "string") {
+        HEUserId = JSON.parse(HEUserId);
     }
+    if (!HEUserId) {
+        HEUserId = [];
+    }
+
 
     if (!validationFlag) {
         response.error = error;
@@ -1104,7 +1110,7 @@ sendMessageCtrl.DeleteMsgMapUsersData = function (req, res, next) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.HEUserId)
+                    req.st.db.escape(JSON.stringify(HEUserId))
                 ];
 
                 var procQuery = 'CALL he_delete_msgmap( ' + procParams.join(',') + ')';

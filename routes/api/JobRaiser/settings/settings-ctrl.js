@@ -82,14 +82,31 @@ var uploadDocumentToCloud = function (uniqueName, readStream, callback) {
 };
 
 
+<<<<<<< HEAD
+var attachmentFunction = function (req,attachments,i) {
+    
+=======
 var attachmentFunction = function (req, attachments, i) {
 
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
     var uniqueId = uuid.v4();
     var timestamp = Date.now();
     var filetype = attachments.filename ? attachments.filename.split('.')[1] : '';
 
     var aUrl = uniqueId + '.' + filetype;
     ///home/ezeonetalent/ezeone1/api/routes/api/JobRaiser
+<<<<<<< HEAD
+    console.log('aUrl(',i,')', aUrl);
+    // C:\Users\TM2\Documents\gitproject\routes\api\JobRaiser\settings\imap
+    fs.writeFile("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/imap" + (timestamp+i) + "." + filetype, attachments.data, function (err) {
+        if (!err) {
+            console.log("file written",i);
+            var readStream = fs.createReadStream('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/imap' + (timestamp+i) + '.' + filetype);
+            console.log('file read',i, readStream);
+            uploadDocumentToCloud(aUrl, readStream, function (err) {
+                if (!err) {
+                    console.log('attachment Uploaded successfully',i, aUrl);
+=======
     console.log('aUrl(', i, ')', aUrl);
     // C:\Users\TM2\Documents\gitproject\routes\api\JobRaiser\settings\imap
     fs.writeFile("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/imap" + (timestamp + i) + "." + filetype, attachments.data, function (err) {
@@ -100,6 +117,7 @@ var attachmentFunction = function (req, attachments, i) {
             uploadDocumentToCloud(aUrl, readStream, function (err) {
                 if (!err) {
                     console.log('attachment Uploaded successfully', i, aUrl);
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                     console.log('https://storage.googleapis.com/ezeone/' + aUrl);
 
 
@@ -108,7 +126,11 @@ var attachmentFunction = function (req, attachments, i) {
                     // console.log('base64',base64data);
 
                     var formData = {
+<<<<<<< HEAD
+                        attachment : attachments
+=======
                         attachment: attachments
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                     };
 
                     request.post({
@@ -123,13 +145,21 @@ var attachmentFunction = function (req, attachments, i) {
                             console.error('upload failed:', err);
                         }
                         else {
+<<<<<<< HEAD
+                            fs.unlink("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/imap" +(timestamp+i) + "." + filetype, function (err) {
+=======
                             fs.unlink("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/imap" + (timestamp + i) + "." + filetype, function (err) {
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                                 if (!err) {
                                     console.log('File Deleted');
                                 }
                             });
 
+<<<<<<< HEAD
+                            console.log('xml body',body);
+=======
                             console.log('xml body', body);
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                             var body = body.replace(/^"(.*)"$/, '$1');
 
                             var options = {
@@ -170,9 +200,15 @@ var attachmentFunction = function (req, attachments, i) {
                             console.log(firstName, lastName, skills);
 
 
+<<<<<<< HEAD
+                            var applicantId =  0;
+                            var heMasterId =  1000;
+                            var mobileISD ='+91';
+=======
                             var applicantId = 0;
                             var heMasterId = 1000;
                             var mobileISD = '+91';
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                             var cvPath = aUrl;
 
                             var response = {
@@ -659,8 +695,13 @@ settingsCtrl.getOfferTemplateMaster = function (req, res, next) {
                         response.data = {
                             offerTemplates: (result[0] && result[0][0]) ? result[0] : [],
                             offerTemplateDetail: (result[1] && result[1][0]) ? JSON.parse(result[1][0].formData) : {},
+<<<<<<< HEAD
+                            allowanceBreakUp : result[2] && result[2][0] ? result[2]:[],
+                            offerBreakUpTemplates :result[3] && result[3][0] ? result[3]:[],
+=======
                             allowanceBreakUp: result[2] && result[2][0] ? result[2] : [],
                             offerBreakUpTemplates: result[3] && result[3][0] ? result[3] : [],
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                         };
                         res.status(200).json(response);
                     }
@@ -722,7 +763,11 @@ settingsCtrl.saveOfferBreakUpTemplate = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0
+<<<<<<< HEAD
+                
+=======
 
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -743,11 +788,19 @@ settingsCtrl.saveOfferBreakUpTemplate = function (req, res, next) {
                         for (var i = 0; i < result[1].length; i++) {
                             result[1][i].offerBreakUp = result[1][0] && result[1][0] ? JSON.parse(result[1][i].offerBreakUp) : [];
                         }
+<<<<<<< HEAD
+                        result[2][0].currentOfferBreakUpTemplate = result[2][0] && result[2][0] ? JSON.parse(result[2][i].currentOfferBreakUpTemplate) : {};
+
+                        response.data = {
+                            offerBreakUpTemplates : result[1] && result[1][0] ? result[1] : [],
+                            currentOfferBreakUpTemplate : result[2] && result[2][0] && result[2][0].currentOfferBreakUpTemplate ? result[2][0].currentOfferBreakUpTemplate : {}
+=======
                         result[2][0].currentOfferBreakUpTemplate = result[2][0] && result[2][0] ? JSON.parse(result[2][0].currentOfferBreakUpTemplate) : {};
 
                         response.data = {
                             offerBreakUpTemplates: result[1] && result[1][0] ? result[1] : [],
                             currentOfferBreakUpTemplate: result[2] && result[2][0] && result[2][0].currentOfferBreakUpTemplate ? result[2][0].currentOfferBreakUpTemplate : {}
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                         };
                         res.status(200).json(response);
                     }
@@ -760,12 +813,21 @@ settingsCtrl.saveOfferBreakUpTemplate = function (req, res, next) {
                             result[1][i].offerBreakUp = result[1][0] && result[1][0] ? JSON.parse(result[1][i].offerBreakUp) : [];
                         }
 
+<<<<<<< HEAD
+                        result[2][0].currentOfferBreakUpTemplate = result[2][0] && result[2][0] ? JSON.parse(result[2][i].currentOfferBreakUpTemplate) : {};
+                        
+                        response.data = {
+                            offerBreakUpTemplates : result[1] && result[1][0] ? result[1] : [],
+                            currentOfferBreakUpTemplate : result[2] && result[2][0] && result[2][0].currentOfferBreakUpTemplate ? result[2][0].currentOfferBreakUpTemplate : {}
+                            
+=======
                         result[2][0].currentOfferBreakUpTemplate = result[2][0] && result[2][0] ? JSON.parse(result[2][0].currentOfferBreakUpTemplate) : {};
 
                         response.data = {
                             offerBreakUpTemplates: result[1] && result[1][0] ? result[1] : [],
                             currentOfferBreakUpTemplate: result[2] && result[2][0] && result[2][0].currentOfferBreakUpTemplate ? result[2][0].currentOfferBreakUpTemplate : {}
 
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                         };
                         res.status(200).json(response);
                     }
@@ -778,12 +840,21 @@ settingsCtrl.saveOfferBreakUpTemplate = function (req, res, next) {
                             result[1][i].offerBreakUp = result[1][0] && result[1][0] ? JSON.parse(result[1][i].offerBreakUp) : [];
                         }
 
+<<<<<<< HEAD
+                        result[2][0].currentOfferBreakUpTemplate = result[2][0] && result[2][0] ? JSON.parse(result[2][i].currentOfferBreakUpTemplate) : {};
+                        
+                        response.data = {
+                            offerBreakUpTemplates : result[1] && result[1][0] ? result[1] : [],
+                            currentOfferBreakUpTemplate : result[2] && result[2][0] && result[2][0].currentOfferBreakUpTemplate ? result[2][0].currentOfferBreakUpTemplate : {}
+                            
+=======
                         result[2][0].currentOfferBreakUpTemplate = result[2][0] && result[2][0] ? JSON.parse(result[2][0].currentOfferBreakUpTemplate) : {};
 
                         response.data = {
                             offerBreakUpTemplates: result[1] && result[1][0] ? result[1] : [],
                             currentOfferBreakUpTemplate: result[2] && result[2][0] && result[2][0].currentOfferBreakUpTemplate ? result[2][0].currentOfferBreakUpTemplate : {}
 
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                         };
                         res.status(200).json(response);
                     }
@@ -792,7 +863,11 @@ settingsCtrl.saveOfferBreakUpTemplate = function (req, res, next) {
                         response.message = "No result found";
                         response.error = null;
                         response.data = {
+<<<<<<< HEAD
+                            offerBreakUpTemplates:[]
+=======
                             offerBreakUpTemplates: []
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
                         };
                         res.status(200).json(response);
                     }
@@ -813,6 +888,8 @@ settingsCtrl.saveOfferBreakUpTemplate = function (req, res, next) {
     }
 };
 
+<<<<<<< HEAD
+=======
 
 settingsCtrl.offerGeneration = function (req, res, next) {
     var response = {
@@ -1001,6 +1078,7 @@ settingsCtrl.offerGeneration = function (req, res, next) {
     }
 };
 
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
 // settingsCtrl.mailExtract = function (req, res, next) {
 //     var Imap = require('imap'),
 //     inspect = require('util').inspect;
@@ -1517,7 +1595,11 @@ settingsCtrl.imapFinally = function (req, res, next) {
             //    [ { filename: 'cats.jpg', data: Buffer() },
             //      { filename: 'pay-stub.pdf', data: Buffer() } ]
             for (var i = 0; i < attachments.length; i++) {
+<<<<<<< HEAD
+                attachmentFunction(req,attachments[i],i);
+=======
                 attachmentFunction(req, attachments[i], i);
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
 
             }
         });
@@ -1555,7 +1637,11 @@ settingsCtrl.fetchoutLook = function (req, res, next) {
             var yesterday = new Date();
             yesterday.setTime(Date.now() - delay);
             yesterday = yesterday.toISOString();  //['SUBJECT', 'testing'],
+<<<<<<< HEAD
+            var searchCriteria = ['UNSEEN',  ['SINCE', yesterday]];
+=======
             var searchCriteria = ['UNSEEN', ['SINCE', yesterday]];
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
             var fetchOptions = { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'], struct: true, markSeen: true };
 
             // retrieve only the headers of the messages
@@ -1592,7 +1678,11 @@ settingsCtrl.fetchoutLook = function (req, res, next) {
                 response.error = null;
                 response.data = attachments;
                 res.status(200).json(response);
+<<<<<<< HEAD
+                
+=======
 
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
             }
 
             else {
@@ -1601,7 +1691,11 @@ settingsCtrl.fetchoutLook = function (req, res, next) {
                 response.error = null;
                 response.data = [];
                 res.status(500).json(response);
+<<<<<<< HEAD
+                
+=======
 
+>>>>>>> 9028c96f411c82a158ea85e480c1c564861889ef
             }
 
         });
