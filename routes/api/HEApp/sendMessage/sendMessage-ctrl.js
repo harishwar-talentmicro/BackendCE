@@ -874,55 +874,52 @@ sendMessageCtrl.GetMsgMapUsersData = function (req, res, next) {
                         response.message = "User data loaded successfully .";
                         response.error = null;
 
-                        var output = [];
-                        for (var i = 0; i < userResult[0].length; i++) {
-                            var res2 = {};
-                            res2.HEUserId = userResult[0][i].HEUserId;
-                            res2.isNormal = userResult[0][i].isNormal;
-                            res2.isTaxSaving = userResult[0][i].isTaxSaving;
-                            res2.isSMSEnabled = userResult[0][i].isSMSEnabled;
-                            res2.name = userResult[0][i].name;
-                            res2.branches = userResult[0][i].branch ? JSON.parse(userResult[0][i].branch) : [];
-                            res2.departments = userResult[0][i].department ? JSON.parse(userResult[0][i].department) : [];
-                            res2.grades = userResult[0][i].grade ? JSON.parse(userResult[0][i].grade) : [];
-                            res2.RMGroups = userResult[0][i].RMGroup ? JSON.parse(userResult[0][i].RMGroup) : [];
+                        if (req.query.HEUserId == 0) {
+                            var output = [];
+                            for (var i = 0; i < userResult[0].length; i++) {
+                                var res2 = {};
+                                res2.HEUserId = userResult[0][i].HEUserId;
+                                res2.isNormal = userResult[0][i].isNormal;
+                                res2.isTaxSaving = userResult[0][i].isTaxSaving;
+                                res2.isSMSEnabled = userResult[0][i].isSMSEnabled;
+                                res2.name = userResult[0][i].name;
+                                res2.branches = userResult[0][i].branch ? JSON.parse(userResult[0][i].branch) : [];
+                                res2.departments = userResult[0][i].department ? JSON.parse(userResult[0][i].department) : [];
+                                res2.grades = userResult[0][i].grade ? JSON.parse(userResult[0][i].grade) : [];
+                                res2.RMGroups = userResult[0][i].RMGroup ? JSON.parse(userResult[0][i].RMGroup) : [];
 
-                            output.push(res2);
-                        }
-                        if(req.query.HEUserId==0){
-                        response.data = {
-                            
-                            userData: output,
-                            count: userResult[1][0].count
-                        }
-                    }
-                        else{
+                                output.push(res2);
+                            }
                             response.data = {
-                            
-                                HEUserId : userResult[0][0].HEUserId,
-                               isNormal : userResult[0][0].isNormal,
-                                isTaxSaving : userResult[0][0].isTaxSaving,
-                               isSMSEnabled : userResult[0][0].isSMSEnabled,
-                                name : userResult[0][0].name,
-                                branches : userResult[0][0].branch ? JSON.parse(userResult[0][0].branch) : [],
-                                departments: userResult[0][0].department ? JSON.parse(userResult[0][0].department) : [],
-                              grades: userResult[0][0].grade ? JSON.parse(userResult[0][0].grade) : [],
-                               RMGroups: userResult[0][0].RMGroup ? JSON.parse(userResult[0][0].RMGroup) : []
-    
-                            };
 
+                                userData: output ? output : [],
+                                count: userResult[1][0] && userResult[1][0].count ? userResult[1][0].count : 0
+                            }
                         }
-                    //  console.log(response.data);
+                        else { //CALL he_get_msgMap_userList( 'a72207a3-cdeb-11e8-b50d-42010a8e006e','1','',0,'15',0);
+                            response.data = {
 
+                                HEUserId: userResult[0][0].HEUserId,
+                                isNormal: userResult[0][0].isNormal,
+                                isTaxSaving: userResult[0][0].isTaxSaving,
+                                isSMSEnabled: userResult[0][0].isSMSEnabled,
+                                name: userResult[0][0].name,
+                                branches: userResult[0][0].branch ? JSON.parse(userResult[0][0].branch) : [],
+                                departments: userResult[0][0].department ? JSON.parse(userResult[0][0].department) : [],
+                                grades: userResult[0][0].grade ? JSON.parse(userResult[0][0].grade) : [],
+                                RMGroups: userResult[0][0].RMGroup ? JSON.parse(userResult[0][0].RMGroup) : []
 
+                            };
+                        }
+
+                        console.log(response.data);
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
-
-
                     }
+
                     else if (!err) {
                         response.status = true;
                         response.message = "User data not found";
