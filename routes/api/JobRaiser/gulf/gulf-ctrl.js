@@ -232,10 +232,12 @@ gulfCtrl.getMedical = function (req, res, next) {
                         
                         }
 
+
                         response.data = {   
                             medicalDetails: Result[0][0],
                             medicalNotes : Result[1],
-                            allMedicalCentreList : Result[2] ? Result[2]:[]
+                            allMedicalCentreList : Result[2] ? Result[2]:[],
+                            medicalHistory : Result[3] && Result[3][0] && Result[3][0].medicalHistory ? JSON.parse(Result[3][0].medicalHistory) : []
                         };
                         res.status(200).json(response);
                     }

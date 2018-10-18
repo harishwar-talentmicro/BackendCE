@@ -657,7 +657,7 @@ Auth.prototype.login = function (req, res, next) {
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
     var ezeoneId = req.st.alterEzeoneId(req.body.UserName);
-    var isDialer= req.query.isDialer ? req.query.isDialer :0;
+    var isDialer = req.query.isDialer ? req.query.isDialer : 0;
     var password = req.body.Password;
     var isIphone = req.body.device ? parseInt(req.body.device) : 0;
     var deviceToken = req.body.device_token ? req.body.device_token : '';
@@ -872,14 +872,14 @@ Auth.prototype.login = function (req, res, next) {
                                             if ((!err) && tokenResult && loginDetails[0]) {
                                                 var APNSID = req.query.APNSID ? req.query.APNSID : '';
                                                 var GCMID = req.query.GCMID ? req.query.GCMID : '';
-                                                console.log('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(APNSID) +  ')');
-                                                st.db.query('CALL pGetEZEIDDetailsPace(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(isDialer) + ')', function (err, UserDetailsResult) {
+                                                console.log('CALL pGetEZEIDDetailsPace(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(req.query.isDialer || 0) + ')');
+                                                st.db.query('CALL pGetEZEIDDetailsPace(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(req.query.isDialer || 0) + ')', function (err, UserDetailsResult) {
                                                     if (!err) {
                                                         var procParams = [
                                                             req.db.escape(tokenResult),
                                                             req.db.escape(null),
                                                             req.db.escape(DBSecretKey),
-                                                            req.db.escape(isDialer)
+                                                            req.db.escape(req.query.isDialer || 0)
 
                                                         ];
                                                         var procQuery = 'CALL pGetGroupAndIndividuals_newPace(' + procParams.join(' ,') + ')';
@@ -1124,7 +1124,7 @@ Auth.prototype.logout = function (req, res, next) {
                                 st.db.query(query, function (err, result) {
                                     if (!err) {
                                         console.log('FnDeleteIphoneID:IphoneDeviceID deleted successfully');
-                                        var query1 = 'CALL pLogout(' + st.db.escape(token) +')';
+                                        var query1 = 'CALL pLogout(' + st.db.escape(token) + ')';
                                         st.db.query(query1, function (err, result) {
                                             if (!err) {
                                                 if (result) {
@@ -1751,7 +1751,7 @@ Auth.prototype.loginNew = function (req, res, next) {
         var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
         var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
         var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
-        var isDialer= req.query.isDialer ? req.query.isDialer :0;
+        var isDialer = req.query.isDialer ? req.query.isDialer : 0;
         console.log("secretKey", secretKey);
 
         if (ezeoneId && password) {
@@ -2123,7 +2123,8 @@ Auth.prototype.loginLatest = function (req, res, next) {
         attachmentCount: '',
         isNewUser: '',
         brandingPageUrl: '',
-        masterId: ''
+        masterId: '',
+        termsAndCondition: ''
 
     };
     // if(isWhatMate == 0){
@@ -2280,7 +2281,7 @@ Auth.prototype.loginLatest = function (req, res, next) {
         var apnsId = (req.body.apnsId) ? (req.body.apnsId) : "";
         var gcmId = (req.body.gcmId) ? (req.body.gcmId) : "";
         var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
-        var isDialer= req.query.isDialer ? req.query.isDialer :0;
+        var isDialer = req.query.isDialer ? req.query.isDialer : 0;
         console.log("secretKey", secretKey);
 
         if (ezeoneId && password) {
@@ -2338,6 +2339,11 @@ Auth.prototype.loginLatest = function (req, res, next) {
                                                 // responseMessage.mobilenumber = loginDetails[0].mobilenumber;
                                                 // responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
                                                 responseMessage.groupId = loginDetails[0].group_id;
+                                                var termsAndCondition = (loginDetails[0].termsAndCondition) ? (loginDetails[0].termsAndCondition) : '';
+                                                if (termsAndCondition) {
+                                                    termsAndCondition = termsAndCondition.replace("[DisplayName]", loginDetails[0].displayName);
+                                                }
+                                                responseMessage.termsAndCondition = termsAndCondition;
                                                 // responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
                                                 // responseMessage.cvid = loginDetails[0].cvid;
                                                 // responseMessage.profile_status = loginDetails[0].ps;
@@ -2427,6 +2433,11 @@ Auth.prototype.loginLatest = function (req, res, next) {
                                     responseMessage.tId = loginDetails[0].TID;
                                     responseMessage.ezeoneId = loginDetails[0].EZEID;
                                     responseMessage.displayName = loginDetails[0].displayName;
+                                    var termsAndCondition = (loginDetails[0].termsAndCondition) ? (loginDetails[0].termsAndCondition) : '';
+                                    if (termsAndCondition) {
+                                        termsAndCondition = termsAndCondition.replace("[DisplayName]", loginDetails[0].displayName);
+                                    }
+                                    responseMessage.termsAndCondition = termsAndCondition;
                                     // responseMessage.companyName = loginDetails[0].CompanyName;
                                     // responseMessage.Type = loginDetails[0].IDTypeID;
                                     // responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
@@ -2608,7 +2619,11 @@ Auth.prototype.portalLogin = function (req, res, next) {
 
     try {
 
-        var ezeoneId = req.st.alterEzeoneId(req.body.userName);
+        var emailId = req.body.emailId || "";
+        var mobileNumber = req.body.mobileNumber || "";
+        var mobileISD = req.body.mobileISD || "";
+
+        var ezeoneId = req.st.alterEzeoneId(req.body.userName || "");
 
         var password = req.body.password;
         var isIphone = req.body.device ? parseInt(req.body.device) : 0;
@@ -2618,11 +2633,12 @@ Auth.prototype.portalLogin = function (req, res, next) {
         var apnsId = (req.body.apnsId) ? (req.body.apnsId) : "";
         var gcmId = (req.body.gcmId) ? (req.body.gcmId) : "";
         var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
+        var heMasterId = req.body.heMasterId ? req.body.heMasterId : 0;
         console.log("secretKey", secretKey);
 
-        if (ezeoneId && password) {
+        if ((ezeoneId || emailId || (mobileNumber && mobileISD)) && password) {
 
-            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(DBSecretKey);
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(emailId) + ',' + st.db.escape(mobileISD) + ',' + st.db.escape(mobileNumber)+ ',' + st.db.escape(heMasterId);
             var query = 'CALL wm_portal_login(' + queryParams + ')';
             console.log('query', query);
             st.db.query(query, function (err, loginResult) {
@@ -2634,23 +2650,23 @@ Auth.prototype.portalLogin = function (req, res, next) {
                             if (loginResult[0].length > 0) {
                                 var loginDetails = loginResult[0];
                                 if (!token) {
-                                    if(loginDetails[0].message){
+                                    if (loginDetails[0].message) {
                                         response.status = false;
                                         response.message = loginDetails[0].message;
                                         response.error = null;
-                                        response.data =null;
+                                        response.data = null;
                                         res.status(200).json(response);
                                     }
-                                    else{
-
+                                    else {
+                                        var isDialer = 0;
                                         if (comparePassword(password, loginDetails[0].Password)) {
-                                            st.generateToken(ip, userAgent, loginDetails[0].ezeid, isWhatMate, apnsId, gcmId, secretKey, function (err, tokenResult) {
+                                            st.generateToken(ip, userAgent, loginDetails[0].ezeid, isWhatMate, apnsId, gcmId, secretKey, isDialer, function (err, tokenResult) {
                                                 if ((!err) && tokenResult && loginDetails[0].userMasterId) {
-    
+
                                                     response.status = true;
                                                     response.message = "Logged in successfully";
                                                     response.error = null;
-    
+
                                                     response.data = {
                                                         token: tokenResult,
                                                         isAuthenticate: true,
@@ -2658,21 +2674,21 @@ Auth.prototype.portalLogin = function (req, res, next) {
                                                         ezeoneId: loginDetails[0].ezeid,
                                                         displayName: loginDetails[0].displayName,
                                                         groupId: loginDetails[0].groupId,
-                                                        applicantId : loginDetails[0].applicantId,
-                                                        imageUrl : loginDetails[0].imageUrl
+                                                        applicantId: loginDetails[0].applicantId,
+                                                        imageUrl: loginDetails[0].imageUrl
 
                                                     }
                                                     res.status(200).json(response);
-    
+
                                                 }
-    
+
                                                 else {
                                                     response.status = false;
                                                     response.message = "failed to generate a token";
                                                     response.error = null;
                                                     response.data = null;
                                                     res.status(500).json(response);
-    
+
                                                     console.log('FnLogin:failed to generate a token ');
                                                     console.log('FnLogin:' + err);
                                                 }
@@ -2683,12 +2699,12 @@ Auth.prototype.portalLogin = function (req, res, next) {
                                             response.message = "Invalid credentials";
                                             response.error = null;
                                             response.data = null;
-                                            res.status(500).json(response);
-    
+                                            res.status(200).json(response);
+
                                             console.log('FnLogin:password not matched ');
                                         }
                                     }
-                                    
+
                                 }
                                 else {
 
@@ -2704,7 +2720,7 @@ Auth.prototype.portalLogin = function (req, res, next) {
                                         ezeoneId: loginDetails[0].ezeid,
                                         displayName: loginDetails[0].displayName,
                                         groupId: loginDetails[0].groupId,
-                                        applicantId : loginDetails[0].applicantId
+                                        applicantId: loginDetails[0].applicantId
 
                                     }
                                     res.status(200).json(response);
@@ -2715,7 +2731,7 @@ Auth.prototype.portalLogin = function (req, res, next) {
                                 response.message = "Invalid credentials";
                                 response.error = null;
                                 response.data = null;
-                                res.status(500).json(response);
+                                res.status(200).json(response);
 
                                 console.log('FnLogin:login result not found');
                             }
@@ -2725,7 +2741,7 @@ Auth.prototype.portalLogin = function (req, res, next) {
                             response.message = "Invalid credentials";
                             response.error = null;
                             response.data = null;
-                            res.status(500).json(response);
+                            res.status(200).json(response);
                             console.log('FnLogin:login result not found');
                         }
                     }
@@ -2734,7 +2750,7 @@ Auth.prototype.portalLogin = function (req, res, next) {
                         response.message = "Invalid credentials";
                         response.error = null;
                         response.data = null;
-                        res.status(500).json(response);
+                        res.status(200).json(response);
 
                         console.log('FnLogin: Invalid login credentials');
                     }
@@ -2743,7 +2759,7 @@ Auth.prototype.portalLogin = function (req, res, next) {
                     response.status = false;
                     response.message = "Invalid credentials";
                     response.error = null;
-                    response.data=null;
+                    response.data = null;
                     res.status(500).json(response);
 
                     console.log('FnLogin:' + err);
@@ -2764,6 +2780,224 @@ Auth.prototype.portalLogin = function (req, res, next) {
             res.status(400).json(response);
         }
 
+    }
+    catch (ex) {
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log(ex);
+        console.log('FnLogin:: error:' + ex);
+        response.message = "Internal server error";
+        res.status(500).json(response);
+    }
+};
+
+
+Auth.prototype.pacehcmLogin = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+
+    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+    var ip = req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress;
+
+    var token = req.query.token ? req.query.token : ''; // token in query now
+
+
+    var responseMessage = {
+        token: '',
+        tId: '',
+        isAuthenticate: false,
+        ezeoneId: '',
+        displayName: '',
+        groupId: '',
+        pendingViewCount: '',
+        attachmentCount: '',
+        isNewUser: '',
+        brandingPageUrl: '',
+        masterId: ''
+
+    };
+
+    try {
+
+        var ezeoneId = req.st.alterEzeoneId(req.body.userName);
+
+        var password = req.body.password;
+        var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+        var deviceToken = req.body.device_token ? req.body.device_token : '';
+        var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
+        var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+        var apnsId = (req.body.apnsId) ? (req.body.apnsId) : "";
+        var gcmId = (req.body.gcmId) ? (req.body.gcmId) : "";
+        var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
+        var isDialer = req.query.isDialer ? req.query.isDialer : 0;
+        console.log("secretKey", secretKey);
+
+        if (ezeoneId && password) {
+
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(isDialer);
+            var query = 'CALL PLoginNewPace(' + queryParams + ')';
+            console.log('query', query);
+            st.db.query(query, function (err, loginResult) {
+                // console.log(loginResult);
+                if (!err) {
+                    if (loginResult && password) {
+                        //console.log('loginDetails',loginDetails);
+                        if (loginResult[0]) {
+                            if (loginResult[0].length > 0) {
+                                var loginDetails = loginResult[0];
+                                if (!token) {
+                                    if (comparePassword(password, loginDetails[0].Password)) {
+                                        st.generateToken(ip, userAgent, loginDetails[0].EZEID, isWhatMate, apnsId, gcmId, secretKey, isDialer, function (err, tokenResult) {
+                                            if ((!err) && tokenResult && loginDetails[0]) {
+
+                                                responseMessage.token = tokenResult,
+                                                    responseMessage.isAuthenticate = true;
+                                                responseMessage.tId = loginDetails[0].TID;
+                                                responseMessage.ezeoneId = loginDetails[0].EZEID;
+                                                responseMessage.displayName = loginDetails[0].displayName;
+
+                                                if (loginDetails[0].ParentMasterID == 0) {
+                                                    responseMessage.masterId = loginDetails[0].TID;
+                                                }
+                                                else {
+                                                    responseMessage.masterId = loginDetails[0].ParentMasterID;
+                                                }
+                                                responseMessage.groupId = loginDetails[0].group_id;
+                                                responseMessage.isNewUser = loginDetails[0].isNewUser;
+                                                responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
+                                                responseMessage.attachmentCount = loginDetails[0].attachmentCount;
+                                                responseMessage.brandingPageUrl = loginDetails[0].brandingPageUrl;
+
+                                                response.status = true;
+                                                response.message = "Logged in successfully";
+                                                response.error = null;
+                                                response.data = responseMessage;
+                                                res.status(200).json(response);
+
+                                            }
+
+                                            else {
+
+                                                response.status = false;
+                                                response.message = "failed to generate a token";
+                                                response.error = null;
+                                                response.data = responseMessage;
+                                                res.status(500).json(response);
+
+                                                console.log('FnLogin:failed to generate a token ');
+                                                console.log('FnLogin:' + err);
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        response.status = false;
+                                        response.message = "Invalid credentials";
+                                        response.error = null;
+                                        response.data = responseMessage;
+                                        res.status(200).json(response);
+                                        console.log('FnLogin:password not matched ');
+                                    }
+                                }
+                                else {
+
+                                    for (var i = 0; i < loginResult[1].length; i++) {
+                                        loginResult[1][i].trackTemplateDetails = loginResult[1][i] && loginResult[1][i].trackTemplateDetails ? JSON.parse(loginResult[1][i].trackTemplateDetails) : [];
+                                    }
+                                    console.log("login company details with existing token", loginResult[1][0]);
+
+                                    responseMessage.token = tokenResult;
+                                    responseMessage.isAuthenticate = true;
+                                    responseMessage.tId = loginDetails[0].TID;
+                                    responseMessage.ezeoneId = loginDetails[0].EZEID;
+                                    responseMessage.displayName = loginDetails[0].displayName;
+                                    if (loginDetails[0].ParentMasterID == 0) {
+                                        responseMessage.masterId = loginDetails[0].TID;
+                                    }
+                                    else {
+                                        responseMessage.masterId = loginDetails[0].ParentMasterID;
+                                    }
+                                    responseMessage.groupId = loginDetails[0].group_id;
+                                    responseMessage.isNewUser = loginDetails[0].isNewUser;
+                                    responseMessage.pendingViewCount = loginDetails[0].pendingViewCount;
+                                    responseMessage.attachmentCount = loginDetails[0].attachmentCount;
+                                    responseMessage.brandingPageUrl = loginDetails[0].brandingPageUrl;
+
+                                    response.status = true;
+                                    response.message = "Logged in successfully";
+                                    response.error = null;
+                                    response.data = responseMessage;
+                                    res.status(200).json(response);
+
+                                }
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Invalid credentials";
+                                response.error = null;
+                                response.data = responseMessage;
+                                res.status(200).json(response);
+                                console.log('FnLogin:login result not found');
+                            }
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Invalid credentials";
+                            response.error = null;
+                            response.data = responseMessage;
+                            res.status(200).json(response);
+
+                            console.log('FnLogin:login result not found');
+                        }
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Invalid credentials";
+                        response.error = null;
+                        response.data = responseMessage;
+                        res.status(200).json(response);
+
+                        console.log('FnLogin: Invalid login credentials');
+                    }
+                }
+                else {
+                    response.status = false;
+                    response.message = "Internal server error..";
+                    response.error = null;
+                    response.data = responseMessage;
+                    res.status(500).json(response);
+                    console.log('FnLogin:' + err);
+                }
+            });
+        }
+        else {
+            if (!ezeoneId) {
+                console.log('FnLogin: EZEOneId is mandatory');
+            }
+            else if (!password) {
+                console.log('FnLogin: password is mandatory');
+            }
+
+            response.status = false;
+            response.message = "Please fill mandatory fields";
+            response.error = null;
+            response.data = responseMessage;
+            res.status(400).json(response);
+
+        }
+
+        //close here
     }
     catch (ex) {
         var errorDate = new Date();

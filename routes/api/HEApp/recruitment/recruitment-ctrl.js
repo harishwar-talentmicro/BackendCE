@@ -1243,6 +1243,7 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
                             for(var j = 0; j < docs.length; j++) {
                                     var res1 = {};
                                     res1.docTitle = docs[j].docTitle;
+                                    res1.docId = docs[j].docId;
                                     res1.docDetailId = docs[j].docDetailId;
                                     res1.contentType = docs[j].contentType;
                                     res1.versionDate = docs[j].versionDate;
@@ -1881,8 +1882,10 @@ recruitmentCtrl.saveProcessUpdateFeedback = function(req,res,next){
                         var procQuery = 'CALL he_save_processUpdateFeedback( ' + procParams.join(',') + ')';
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,informationResult){
+                            console.log(err);
                             if(!err){
                                 var filePath = "";
+                                notifyMessages.getMessagesNeedToNotify();                                
                                 response.status = true;
                                 response.message = "Feedback saved successfully";
                                 response.error = null;

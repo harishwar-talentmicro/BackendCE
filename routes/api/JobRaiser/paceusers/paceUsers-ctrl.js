@@ -4,16 +4,44 @@ var NotificationTemplater = require('../../../lib/NotificationTemplater.js');
 var notificationTemplater = new NotificationTemplater();
 var Notification = require('../../../modules/notification/notification-master.js');
 var notification = new Notification();
+
+var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
+var notifyMessages = new notifyMessages();
+
 var fs = require('fs');
 var bodyParser = require('body-parser');
 var http = require('https');
+var path = require('path');
+
 var request = require('request');
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 
+var appConfig = require('../../../../ezeone-config.json');
+
 var CONFIG = require('../../../../ezeone-config.json');
 var DBSecretKey = CONFIG.DB.secretKey;
+
+const accountSid = 'AC3765f2ec587b6b5b893566f1393a00f4';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'AC3765f2ec587b6b5b893566f1393a00f4';
+const authToken = 'b36eba6376b5939cebe146f06d33ec57';   //'3abf04f536ede7f6964919936a35e614';  //'b36eba6376b5939cebe146f06d33ec57';//
+const FromNumber = appConfig.DB.FromNumber || '+18647547021';
+const client = require('twilio')(accountSid, authToken);
+
+
+var qs = require("querystring");
+var options = {
+    "method": "POST",
+    "hostname": "www.smsgateway.center",
+    "port": null,
+    "path": "/SMSApi/rest/send",
+    "headers": {
+        "content-type": "application/x-www-form-urlencoded",
+        "cache-control": "no-cache"
+    }
+};
+
+
 
 var paceUsersCtrl = {};
 var error = {};
@@ -241,24 +269,38 @@ paceUsersCtrl.getUsers = function (req, res, next) {
                         response.message = "Users loaded successfully";
                         response.error = false;
 
-                        if (req.query.userMasterId == 0){
-                            for(var i=0; i<result[0].length;i++){
-                                result[0][i].accessRights = (result[0][i].accessRights && JSON.parse(result[0][i].accessRights).templateId) ? JSON.parse(result[0][i].accessRights) :{};
-                            }    
+                        if (req.query.userMasterId == 0) {
+                            for (var i = 0; i < result[0].length; i++) {
+                                result[0][i].accessRights = (result[0][i].accessRights && JSON.parse(result[0][i].accessRights).templateId) ? JSON.parse(result[0][i].accessRights) : {};
+
+                                result[0][i].department = (result[0][i].department && JSON.parse(result[0][i].department).departmentId) ? JSON.parse(result[0][i].department) : {};
+
+                                result[0][i].branch = (result[0][i].branch && JSON.parse(result[0][i].branch).branchId) ? JSON.parse(result[0][i].branch) : {};
+
+                                result[0][i].grade = (result[0][i].grade && JSON.parse(result[0][i].grade).gradeId) ? JSON.parse(result[0][i].grade) : {};
+
+
+                            }
                         }
-                        else{
-                       
-                                result[0][0].jobTitle = (result[0][0].jobTitle && JSON.parse(result[0][0].jobTitle).jobTitleId) ? JSON.parse(result[0][0].jobTitle) : {};
+                        else {
 
-                                result[0][0].userType = (result[0][0].userType && JSON.parse(result[0][0].userType).userTypeId) ? JSON.parse(result[0][0].userType) : {};
+                            result[0][0].jobTitle = (result[0][0].jobTitle && JSON.parse(result[0][0].jobTitle).jobTitleId) ? JSON.parse(result[0][0].jobTitle) : {};
 
-                                result[0][0].transferredTo = (result[0][0].transferredTo && JSON.parse(result[0][0].transferredTo).transferredToUserId) ? JSON.parse(result[0][0].transferredTo) : {};
+                            result[0][0].userType = (result[0][0].userType && JSON.parse(result[0][0].userType).userTypeId) ? JSON.parse(result[0][0].userType) : {};
 
-                                result[0][0].reportingTo = result[0][0].reportingTo ? JSON.parse(result[0][0].reportingTo) : [];
+                            result[0][0].transferredTo = (result[0][0].transferredTo && JSON.parse(result[0][0].transferredTo).transferredToUserId) ? JSON.parse(result[0][0].transferredTo) : {};
 
-                                result[0][0].accessRights = (result[0][0].accessRights && JSON.parse(result[0][0].accessRights).templateId) ? JSON.parse(result[0][0].accessRights) : {};   
+                            result[0][0].reportingTo = result[0][0].reportingTo ? JSON.parse(result[0][0].reportingTo) : [];
+
+                            result[0][0].accessRights = (result[0][0].accessRights && JSON.parse(result[0][0].accessRights).templateId) ? JSON.parse(result[0][0].accessRights) : {};
+
+                            result[0][0].department = (result[0][0].department && JSON.parse(result[0][0].department).departmentId) ? JSON.parse(result[0][0].department) : {};
+
+                            result[0][0].branch = (result[0][0].branch && JSON.parse(result[0][0].branch).branchId) ? JSON.parse(result[0][0].branch) : {};
+
+                            result[0][0].grade = (result[0][0].grade && JSON.parse(result[0][0].grade).gradeId) ? JSON.parse(result[0][0].grade) : {};
                         }
-                       
+
                         response.data = {
                             userList: result[0] ? result[0] : [],
                             userDetail: result[0][0] ? result[0][0] : {}
@@ -370,14 +412,14 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                             result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
                             result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
                             result[0][i].attachmentList = result[0][i].attachmentList ? JSON.parse(result[0][i].attachmentList) : [];
-                            
+
                         }
 
                         for (var i = 0; i < result[1].length; i++) {
                             result[1][i].anchor = result[1][i].anchor ? JSON.parse(result[1][i].anchor) : {};
                             result[1][i].venue = result[1][i].venue ? JSON.parse(result[1][i].venue) : {};
                             result[1][i].attachmentList = result[1][i].attachmentList ? JSON.parse(result[1][i].attachmentList) : [];
-                        
+
                         }
                         response.data = {
                             pendingTasks: result[0],
@@ -432,14 +474,15 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.taskByMonth)
+                    req.st.db.escape(req.query.taskByMonth),
+                    req.st.db.escape(req.query.keywords || "")
                 ];
 
                 var procQuery = 'CALL wm_get_pacePlanner( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] || result[1]) {
+                    if (!err && result && (result[0] || result[1])) {
                         response.status = true;
                         response.message = "Tasks loaded successfully";
                         response.error = null;
@@ -447,14 +490,14 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
                             result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
                             result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
                             result[0][i].attachmentList = result[0][i].attachmentList ? JSON.parse(result[0][i].attachmentList) : [];
-                            
+
                         }
 
                         for (var i = 0; i < result[1].length; i++) {
                             result[1][i].anchor = result[1][i].anchor ? JSON.parse(result[1][i].anchor) : {};
                             result[1][i].venue = result[1][i].venue ? JSON.parse(result[1][i].venue) : {};
                             result[1][i].attachmentList = result[1][i].attachmentList ? JSON.parse(result[1][i].attachmentList) : [];
-                        
+
                         }
                         response.data =
                             {
@@ -1150,7 +1193,7 @@ paceUsersCtrl.getJobPortalUsers = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     // console.log(result);
-                    if (!err && result&& (result[0] || result[1][0])) {
+                    if (!err && result && (result[0] || result[1][0])) {
                         response.status = true;
                         response.message = "Job portal details loaded successfully";
                         response.error = null;
@@ -1236,16 +1279,16 @@ paceUsersCtrl.freeJobPortalUsers = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     // console.log(result);
-                    if (!err && result&& result[0] && result[0][0]) {
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "Job portal details loaded successfully";
                         response.error = null;
-                        
+
                         result[0][0].portalName = (result[0] && result[0][0] && JSON.parse(result[0][0].portalName)) ? JSON.parse(result[0][0].portalName) : {};
 
                         response.data = {
                             freePortal: (result[0] && result[0]) ? result[0][0] : {}
-                          
+
                         }
                         res.status(200).json(response);
                     }
@@ -1298,12 +1341,12 @@ paceUsersCtrl.checkApplicantExists = function (req, res, next) {
     }
 
     var applicants = req.body.applicants;
-    if (typeof(applicants) == 'string'){
+    if (typeof (applicants) == 'string') {
         applicants = JSON.parse(applicants);
     }
 
-    if(!applicants){
-        applicants=[];
+    if (!applicants) {
+        applicants = [];
     }
 
     if (!validationFlag) {
@@ -1320,7 +1363,7 @@ paceUsersCtrl.checkApplicantExists = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(applicants)),                    
+                    req.st.db.escape(JSON.stringify(applicants)),
                     req.st.db.escape(req.query.portalId)
                 ];
 
@@ -1330,12 +1373,12 @@ paceUsersCtrl.checkApplicantExists = function (req, res, next) {
                     // console.log(result);
                     if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
-                        response.message ="Applicants imported successfully";
+                        response.message = "Applicants imported successfully";
                         response.error = null;
-                        if(result[0][0].importerResults && typeof(result[0][0].importerResults)=='string'){
+                        if (result[0][0].importerResults && typeof (result[0][0].importerResults) == 'string') {
                             result[0][0].importerResults = JSON.parse(result[0][0].importerResults);
                         }
-                        response.data = result[0][0].importerResults ? result[0][0].importerResults:[];
+                        response.data = result[0][0].importerResults ? result[0][0].importerResults : [];
                         res.status(200).json(response);
                     }
                     // else if (!err && result && result[0] && result[0][0] && result[0][0].newResume) {
@@ -1358,6 +1401,1289 @@ paceUsersCtrl.checkApplicantExists = function (req, res, next) {
                 res.status(401).json(response);
             }
         });
+    }
+};
+
+
+paceUsersCtrl.deleteJobPortalUsers = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = "Invalid Company";
+        validationFlag *= false;
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(req.body.portalUserId || []))
+                ];
+
+                var procQuery = 'CALL wm_delete_jobportaluserIds( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    // console.log(result);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Portal users deleted successfully";
+                        response.error = null;
+                        response.data = result[0][0];
+
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while deleting portal user";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+paceUsersCtrl.pacehcmTips = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+        var inputs = [
+            req.st.db.escape(req.query.currentDateTime)
+        ];
+
+        var procQuery = 'CALL wm_get_pacehcmTips( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            // console.log(result);
+            if (!err && result && result[0] && result[0][0]) {
+                response.status = true;
+                response.message = "paceHCM tips loaded successfully";
+                response.error = null;
+                response.data = {
+                    tipsArray: result[0] && result[0][0] ? result[0] : []
+                }
+
+                res.status(200).json(response);
+            }
+            else if (!err) {
+                response.status = true;
+                response.message = "No result found";
+                response.error = null;
+                response.data = null;
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while getting tips";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+        // });
+    }
+};
+
+
+paceUsersCtrl.saveOrgChartBranches = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        validationFlag = false;
+        error.heMasterId = "Invalid Company";
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    var branches = req.body.branches;
+    if (typeof (branches) == "string") {
+        branches = JSON.parse(branches);
+    }
+    if (!branches) {
+        branches = [];
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(branches))
+                ];
+
+                var procQuery = 'CALL pace_save_orgchartBranches( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Organization branches saved successfully";
+                        response.error = null;
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].contactISD = result[0][i].contactISD ? JSON.parse(result[0][i].contactISD) : {};
+                            result[0][i].currency = result[0][i].currency && JSON.parse(result[0][i].currency).currencyId ? JSON.parse(result[0][i].currency) : {};
+                            result[0][i].duration = result[0][i].duration && JSON.parse(result[0][i].duration).durationId ? JSON.parse(result[0][i].duration) : {};
+                            result[0][i].scale = result[0][i].scale && JSON.parse(result[0][i].scale).scaleId ? JSON.parse(result[0][i].scale) : {};
+                        }
+
+                        response.data = {
+                            organizationBranches: result[0] && result[0][0] ? result[0] : []
+                        }
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Organization branches saved successfully";
+                        response.error = null;
+                        response.data = {
+                            organizationBranches: []
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving organization branches";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+paceUsersCtrl.saveOrgChartDepartments = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        validationFlag = false;
+        error.heMasterId = "Invalid Company";
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    var departments = req.body.departments;
+    if (typeof (departments) == "string") {
+        departments = JSON.parse(departments);
+    }
+    if (!departments) {
+        departments = [];
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(departments))
+                ];
+
+                var procQuery = 'CALL pace_save_departments( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Organization departments saved successfully";
+                        response.error = null;
+                        response.data = {
+                            organizationDepartments: result[0] && result[0][0] ? result[0] : []
+                        }
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Organization departments saved successfully";
+                        response.error = null;
+                        response.data = {
+                            organizationDepartments: []
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving organization departments";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+paceUsersCtrl.saveOrgChartGrades = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        validationFlag = false;
+        error.heMasterId = "Invalid Company";
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    var grades = req.body.grades;
+    if (typeof (grades) == "string") {
+        grades = JSON.parse(grades);
+    }
+    if (!grades) {
+        grades = [];
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(grades))
+                ];
+
+                var procQuery = 'CALL pace_save_grade( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Organization grades saved successfully";
+                        response.error = null;
+                        response.data = {
+                            organizationGrades: result[0] && result[0][0] ? result[0] : []
+                        }
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Organization grades saved successfully";
+                        response.error = null;
+                        response.data = {
+                            organizationGrades: []
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving organization grades";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+paceUsersCtrl.saveOrgChartJobtitles = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        validationFlag = false;
+        error.heMasterId = "Invalid Company";
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    var jobTitles = req.body.jobTitles;
+    if (jobTitles != "" && typeof (jobTitles) == "string") {
+        jobTitles = JSON.parse(jobTitles);
+    }
+    if (!jobTitles) {
+        jobTitles = [];
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(jobTitles))
+                ];
+
+                var procQuery = 'CALL pace_save_jobtitles( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Organization jobtitles saved successfully";
+                        response.error = null;
+                        response.data = {
+                            organizationJobTitles: result[0] && result[0][0] ? result[0] : []
+                        }
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Organization jobtitles saved successfully";
+                        response.error = null;
+                        response.data = {
+                            organizationJobTitles: []
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving organization jobtitles";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+paceUsersCtrl.getOrgChartData = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        validationFlag = false;
+        error.heMasterId = "Invalid Company";
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL pace_get_orgChartDetails( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && (result[0] || result[1] || result[2] || result[3])) {
+                        response.status = true;
+                        response.message = "Organization data loaded successfully";
+                        response.error = null;
+
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].contactISD = result[0][i].contactISD ? JSON.parse(result[0][i].contactISD) : {};
+                            result[0][i].currency = result[0][i].currency && JSON.parse(result[0][i].currency).currencyId ? JSON.parse(result[0][i].currency) : {};
+                            result[0][i].duration = result[0][i].duration && JSON.parse(result[0][i].duration).durationId ? JSON.parse(result[0][i].duration) : {};
+                            result[0][i].scale = result[0][i].scale && JSON.parse(result[0][i].scale).scaleId ? JSON.parse(result[0][i].scale) : {};
+                        }
+
+                        response.data = {
+                            organizationBranches: result[0] && result[0][0] ? result[0] : [],
+                            organizationDepartments: result[1] && result[1][0] ? result[1] : [],
+                            organizationGrades: result[2] && result[2][0] ? result[2] : [],
+                            organizationJobTitles: result[3] && result[3][0] ? result[3] : []
+                        }
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Organization data loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            organizationBranches: [],
+                            organizationDepartments: [],
+                            organizationGrades: []
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while loaded organization data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+paceUsersCtrl.sendPasswordResetOTP = function (req, res, next) {
+
+    var status = true, error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+
+    if (!req.body.loginId) {
+        error['loginId'] = 'loginId is mandatory';
+        status *= false;
+    }
+
+    if (status) {
+        try {
+            var message = "";
+
+            //generate otp 6 digit random number
+            var code = "";
+            var possible = "1234567890";
+
+            for (var i = 0; i <= 3; i++) {
+
+                code += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+
+            var query = [
+                req.st.db.escape(req.body.loginId),
+                req.st.db.escape(code),
+                req.st.db.escape(DBSecretKey)
+            ];
+
+            console.log('CALL pace_validatePaceuser(' + query + ')');
+            req.st.db.query('CALL pace_validatePaceuser(' + query + ')', function (err, userResult) {
+
+                console.log("error", err);
+
+                if (!err && userResult && userResult[0] && userResult[0][0].userMasterId) {
+                    // code = userResult[0][0].otp;
+
+                    message = 'Your paceHCM password reset OTP is ' + code + ' .';
+
+                    if (userResult[0][0].emailId) {
+                        var file = path.join(__dirname, '../../../../mail/templates/passwordResetOTP.html');
+
+                        fs.readFile(file, "utf8", function (err, data) {
+
+                            if (!err) {
+                                data = data.replace("[name]", userResult[0][0].displayName);
+                                data = data.replace("[OTP]", code);
+
+                                var mailOptions = {
+                                    from: "noreply@talentmicro.com",
+                                    to: userResult[0][0].emailId,
+                                    subject: 'Password Reset Request',
+                                    html: data // html body
+                                };
+
+                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                var email = new sendgrid.Email();
+                                email.from = mailOptions.from;
+                                email.to = mailOptions.to;
+                                email.subject = mailOptions.subject;
+                                email.html = mailOptions.html;
+
+                                sendgrid.send(email, function (err, result) {
+                                    if (!err) {
+                                        console.log('message sent successfully');
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    if (userResult[0][0].isd && userResult[0][0].mobile) {
+                        if (userResult[0][0].isd == "+977") {
+                            request({
+                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                qs: {
+                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                    to: userResult[0][0].mobile,
+                                    message: message,
+                                    sender: 'Techingen'
+                                },
+                                method: 'GET'
+
+                            }, function (error, response, body) {
+                                if (error) {
+                                    console.log(error, "SMS");
+                                }
+                                else {
+                                    console.log("SUCCESS", "SMS response");
+                                }
+
+                            });
+                        }
+                        else if (userResult[0][0].isd == "+91") {
+                            request({
+                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                qs: {
+                                    user_name: 'janardana@hirecraft.com',
+                                    password: 'Ezeid2015',
+                                    sender_id: 'WtMate',
+                                    service: 'TRANS',
+                                    mobile_no: userResult[0][0].mobile,
+                                    message: message,
+                                    method: 'send_sms'
+                                },
+                                method: 'GET'
+
+                            }, function (error, response, body) {
+                                if (error) {
+                                    console.log(error, "SMS");
+                                }
+                                else {
+                                    console.log("SUCCESS", "SMS response");
+                                }
+                            });
+
+                            var req = http.request(options, function (res) {
+                                var chunks = [];
+
+                                res.on("data", function (chunk) {
+                                    chunks.push(chunk);
+                                });
+
+                                res.on("end", function () {
+                                    var body = Buffer.concat(chunks);
+                                    console.log(body.toString());
+                                });
+                            });
+
+                            req.write(qs.stringify({
+                                userId: 'talentmicro',
+                                password: 'TalentMicro@123',
+                                senderId: 'WTMATE',
+                                sendMethod: 'simpleMsg',
+                                msgType: 'text',
+                                mobile: userResult[0][0].isd.replace("+", "") + userResult[0][0].mobile,
+                                msg: message,
+                                duplicateCheck: 'true',
+                                format: 'json'
+                            }));
+                            req.end();
+
+
+                        }
+                        else if (userResult[0][0].isd != "") {
+                            client.messages.create(
+                                {
+                                    body: message,
+                                    to: userResult[0][0].isd + userResult[0][0].mobile,
+                                    from: FromNumber
+                                },
+                                function (error, response) {
+                                    if (error) {
+                                        console.log(error, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+                                }
+                            );
+                        }
+                    }
+                    respMsg.status = true;
+                    respMsg.message = 'OTP Sent Successfully';
+                    respMsg.data = null;
+                    res.status(200).json(respMsg);
+
+                }
+                else if (!err && userResult && userResult[0] && userResult[0][0].messageError) {
+                    respMsg.status = true;
+                    respMsg.message = userResult[0][0].messageError;
+                    respMsg.data = null;
+                    res.status(200).json(respMsg);
+                }
+                else {
+                    respMsg.status = false;
+                    respMsg.message = 'Something went wrong';
+                    res.status(500).json(respMsg);
+                }
+            });
+        }
+        catch (ex) {
+            console.log('Error : FnSendOtp ' + ex);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = { server: 'Internal Server Error' };
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
+    }
+};
+
+
+paceUsersCtrl.passwordResetVerifyOtp = function (req, res, next) {
+    console.log("inside otp");
+    var response = {
+        status: false,
+        message: "Invalid otp",
+        data: null,
+        error: null
+    };
+
+    var otp = req.body.otp;
+    var loginId = req.body.loginId;
+
+    var validationFlag = true;
+    if (!loginId) {
+        error.loginId = "Invalid loginId";
+        validationFlag = false;
+    }
+
+    if (!otp) {
+        error.otp = "Please enter OTP";
+        validationFlag = false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        var inputs = [
+            req.st.db.escape(loginId),
+            req.st.db.escape(otp),
+            req.st.db.escape(DBSecretKey)
+        ];
+
+        var procQuery = 'CALL pace_passwordResetverifyOtp( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+
+        req.db.query(procQuery, function (err, result) {
+            console.log(err);
+            console.log(result);
+            if (!err && result && result[0] && result[0][0] && result[0][0].message) {
+                response.status = true;
+                response.message = result[0][0].message;
+                response.error = false;
+                response.data = {
+                    message: result[0][0].message
+                };
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0] && result[0][0] && result[0][0].messageError) {
+                response.status = false;
+                response.message = result[0][0].messageError;
+                response.error = false;
+                response.data = {
+                    message: result[0][0].messageError
+                };
+                res.status(200).json(response);
+            }
+            else if (!err && result && result[0] && result[0][0] && result[0][0]._error) {
+                response.status = false;
+                response.message = result[0][0]._error;
+                response.error = false;
+                response.data = {
+                    message: result[0][0]._error
+                };
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while verifying OTP";
+                response.error = true;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+    }
+};
+
+
+paceUsersCtrl.paceresetPassword = function (req, res, next) {
+    console.log("inside otp");
+    var response = {
+        status: false,
+        message: "Invalid mobile number",
+        data: null,
+        error: null
+    };
+
+    var otp = req.body.otp;
+    var loginId = req.body.loginId;
+    var newPassword = req.body.newPassword;
+
+    var validationFlag = true;
+    if (!loginId) {
+        error.loginId = "loginId is mandatory";
+        validationFlag = false;
+    }
+    if (!otp) {
+        error.otp = "otp is mandatory";
+        validationFlag = false;
+    }
+
+    if (!newPassword) {
+        error.newPassword = "Please enter New Password";
+        validationFlag = false;
+    }
+
+    if (!req.body.otp) {
+        error.otp = "Enter otp";
+        validationFlag = false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+
+        var encryptPwd = req.st.hashPassword(newPassword);
+        console.log(encryptPwd);
+
+        var inputs = [
+            req.st.db.escape(loginId),
+            req.st.db.escape(encryptPwd),
+            req.st.db.escape(DBSecretKey),
+            req.st.db.escape(otp)
+        ];
+
+        var procQuery = 'CALL pace_resetPassword( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+
+        req.db.query(procQuery, function (err, result) {
+            console.log(err);
+            console.log(result);
+            if (!err && result && result[0] && result[0][0] && result[0][0].message) {
+                response.status = true;
+                response.message = result[0][0].message;
+                response.error = false;
+                response.data = {
+                    message: result[0][0].message
+                };
+                res.status(200).json(response);
+            }
+
+            else if (!err && result && result[0] && result[0][0] && result[0][0].messageError) {
+                response.status = false;
+                response.message = result[0][0].messageError;
+                response.error = false;
+                response.data = {
+                    message: result[0][0].messageError
+                };
+                res.status(200).json(response);
+            }
+            else if (!err && result && result[0] && result[0][0] && result[0][0]._error) {
+                response.status = false;
+                response.message = result[0][0]._error;
+                response.error = false;
+                response.data = {
+                    message: result[0][0]._error
+                };
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while updating password";
+                response.error = true;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+    }
+};
+
+
+paceUsersCtrl.sendApplicantInfoToPhone = function (req, res, next) {
+
+    var status = true, error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+
+    if (!req.query.token) {
+        error['token'] = 'token is mandatory';
+        status *= false;
+    }
+    var applicantInfo = req.body.applicantInfo || {};
+
+
+    if (status) {
+        try {
+            var message = "";
+            for (var i = 0; i < applicantInfo.length; i++) {
+                if (i + 1 == applicantInfo.length)
+                    message = message + applicantInfo.applicantName + ", " + applicantInfo.mobileNumber;
+                else
+                    message = message + applicantInfo.applicantName + ", " + applicantInfo.mobileNumber + ", ";
+            }
+
+            message = "Contact details: " + message + " --PaceHCM";
+
+            var query = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.body.userMasterId || 0),
+                req.st.db.escape(JSON.parse(req.body.applicantInfo || [])),
+                req.st.db.escape(DBSecretKey)
+            ];
+
+            console.log('CALL pace_get_callApplicantMobile(' + query.join(',') + ')');
+            req.st.db.query('CALL pace_get_callApplicantMobile(' + query.join(',') + ')', function (err, userResult) {
+
+                console.log("error", err);
+
+                if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].mobile) {
+
+                    if (userResult[0][0].isd && userResult[0][0].mobile) {
+                        if (userResult[0][0].isd == "+977") {
+                            request({
+                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                qs: {
+                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                    to: userResult[0][0].mobile,
+                                    message: message,
+                                    sender: 'Techingen'
+                                },
+                                method: 'GET'
+
+                            }, function (error, response, body) {
+                                if (error) {
+                                    console.log(error, "SMS");
+                                }
+                                else {
+                                    console.log("SUCCESS", "SMS response");
+                                }
+
+                            });
+                        }
+                        else if (userResult[0][0].isd == "+91") {
+                            request({
+                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                qs: {
+                                    user_name: 'janardana@hirecraft.com',
+                                    password: 'Ezeid2015',
+                                    sender_id: 'WtMate',
+                                    service: 'TRANS',
+                                    mobile_no: userResult[0][0].mobile,
+                                    message: message,
+                                    method: 'send_sms'
+                                },
+                                method: 'GET'
+
+                            }, function (error, response, body) {
+                                if (error) {
+                                    console.log(error, "SMS");
+                                }
+                                else {
+                                    console.log("SUCCESS", "SMS response");
+                                }
+                            });
+
+                            var req = http.request(options, function (res) {
+                                var chunks = [];
+
+                                res.on("data", function (chunk) {
+                                    chunks.push(chunk);
+                                });
+
+                                res.on("end", function () {
+                                    var body = Buffer.concat(chunks);
+                                    console.log(body.toString());
+                                });
+                            });
+
+                            req.write(qs.stringify({
+                                userId: 'talentmicro',
+                                password: 'TalentMicro@123',
+                                senderId: 'WTMATE',
+                                sendMethod: 'simpleMsg',
+                                msgType: 'text',
+                                mobile: userResult[0][0].isd.replace("+", "") + userResult[0][0].mobile,
+                                msg: message,
+                                duplicateCheck: 'true',
+                                format: 'json'
+                            }));
+                            req.end();
+
+
+                        }
+                        else if (userResult[0][0].isd != "") {
+                            client.messages.create(
+                                {
+                                    body: message,
+                                    to: userResult[0][0].isd + userResult[0][0].mobile,
+                                    from: FromNumber
+                                },
+                                function (error, response) {
+                                    if (error) {
+                                        console.log(error, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+                                }
+                            );
+                        }
+                    }
+                    respMsg.status = true;
+                    respMsg.message = 'Contact details Sent Successfully';
+                    respMsg.data = null;
+                    res.status(200).json(respMsg);
+
+                }
+                // else if (!err && userResult && userResult[0] && userResult[0][0].messageError) {
+                //     respMsg.status = true;
+                //     respMsg.message = userResult[0][0].messageError;
+                //     respMsg.data = null;
+                //     res.status(200).json(respMsg);
+                // }
+                else {
+                    respMsg.status = false;
+                    respMsg.message = 'Something went wrong';
+                    res.status(500).json(respMsg);
+                }
+            });
+        }
+        catch (ex) {
+            console.log('Error : FnSendOtp ' + ex);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = { server: 'Internal Server Error' };
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Invalid token';
+        res.status(401).json(respMsg);
+    }
+};
+
+
+paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
+
+    var status = true, error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+
+    if (!req.query.token) {
+        error['token'] = 'token is mandatory';
+        status *= false;
+    }
+    var applicantInfo = req.body.applicantInfo || {};
+
+    if (status) {
+        try {
+            var message = "";
+            message = message + applicantInfo[0].applicantName + ", " + applicantInfo[0].mobileIsd + applicantInfo[0].mobileNumber ;
+            message = "Contact details: " + message + " --PaceHCM";
+
+            var query = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(JSON.stringify(req.body.applicantInfo || {})),                
+                req.st.db.escape(message),
+                req.st.db.escape(DBSecretKey)
+            ];
+
+            console.log('CALL pace_notifyApplicantInfo(' + query.join(',') + ')');
+            req.st.db.query('CALL pace_notifyApplicantInfo(' + query.join(',') + ')', function (err, userResult) {
+
+                console.log("error", err);
+
+                if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].mobile) {
+
+                    if (userResult[0][0].isd && userResult[0][0].mobile) {
+                        if (userResult[0][0].isd == "+977") {
+                            request({
+                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                qs: {
+                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                    to: userResult[0][0].mobile,
+                                    message: message,
+                                    sender: 'Techingen'
+                                },
+                                method: 'GET'
+
+                            }, function (error, response, body) {
+                                if (error) {
+                                    console.log(error, "SMS");
+                                }
+                                else {
+                                    console.log("SUCCESS", "SMS response");
+                                }
+
+                            });
+                        }
+                        else if (userResult[0][0].isd == "+91") {
+                            request({
+                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                qs: {
+                                    user_name: 'janardana@hirecraft.com',
+                                    password: 'Ezeid2015',
+                                    sender_id: 'WtMate',
+                                    service: 'TRANS',
+                                    mobile_no: userResult[0][0].mobile,
+                                    message: message,
+                                    method: 'send_sms'
+                                },
+                                method: 'GET'
+
+                            }, function (error, response, body) {
+                                if (error) {
+                                    console.log(error, "SMS");
+                                }
+                                else {
+                                    console.log("SUCCESS", "SMS response");
+                                }
+                            });
+
+                            var req = http.request(options, function (res) {
+                                var chunks = [];
+
+                                res.on("data", function (chunk) {
+                                    chunks.push(chunk);
+                                });
+
+                                res.on("end", function () {
+                                    var body = Buffer.concat(chunks);
+                                    console.log(body.toString());
+                                });
+                            });
+
+                            req.write(qs.stringify({
+                                userId: 'talentmicro',
+                                password: 'TalentMicro@123',
+                                senderId: 'WTMATE',
+                                sendMethod: 'simpleMsg',
+                                msgType: 'text',
+                                mobile: userResult[0][0].isd.replace("+", "") + userResult[0][0].mobile,
+                                msg: message,
+                                duplicateCheck: 'true',
+                                format: 'json'
+                            }));
+                            req.end();
+
+
+                        }
+                        else if (userResult[0][0].isd != "") {
+                            client.messages.create(
+                                {
+                                    body: message,
+                                    to: userResult[0][0].isd + userResult[0][0].mobile,
+                                    from: FromNumber
+                                },
+                                function (error, response) {
+                                    if (error) {
+                                        console.log(error, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+                                }
+                            );
+                        }
+                    }
+                    respMsg.status = true;
+                    respMsg.message = 'Contact details Sent Successfully';
+                    respMsg.data = null;
+                    res.status(200).json(respMsg);
+
+                }
+                else if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].loggedInWhatmateUser) {
+
+                    notifyMessages.getMessagesNeedToNotify();
+                    respMsg.status = true;
+                    respMsg.message = userResult[0][0].loggedInWhatmateUser;
+                    respMsg.data = null;
+                    res.status(200).json(respMsg);
+                }
+                else {
+                    respMsg.status = false;
+                    respMsg.message = 'Something went wrong';
+                    res.status(500).json(respMsg);
+                }
+            });
+        }
+        catch (ex) {
+            console.log('Error : FnSendOtp ' + ex);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = { server: 'Internal Server Error' };
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Invalid token';
+        res.status(401).json(respMsg);
     }
 };
 

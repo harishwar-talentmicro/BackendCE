@@ -116,6 +116,11 @@ Notification_aws.prototype.publish_IOS = function(deviceId,messagePayload,issos)
             body : messagePayload.message
         }
     }
+
+    else if(messagePayload.type == 201){
+        alert = "";
+    }
+    
     else {
         alert = messagePayload.message ;
     }
@@ -353,6 +358,12 @@ Notification_aws.prototype.publish_dialer_IOS = function(deviceId,messagePayload
             body : messagePayload.message
         }
     }
+
+    else if(messagePayload.type == 201){
+        alert = "";
+    }
+
+
     else {
         alert = messagePayload.message ;
     }

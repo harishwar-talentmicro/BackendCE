@@ -91,5 +91,9 @@ router.get('/resumeSearchedResults',applicantCtrl.resumeSearchResultsByPage);
 
 router.post('/mailerApplicants',applicantCtrl.getMailerApplicants);
 
+
+router.post('/screenMailPreview',sendgridCtrl.MobileScreeningMailerPreview);
+router.post('/sendScreenMailPreview',sendgridCtrl.SendMobileScreeningMailerPreview);
+
 module.exports = router;
 

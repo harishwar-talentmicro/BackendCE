@@ -7,6 +7,11 @@ var settingsCtrl = require('./settings-ctrl');
 router.get('/master',settingsCtrl.getAccessrightsMaster);
 
 router.post('/template',settingsCtrl.saveAccessrightsTemplate);
+router.post('/saveoffertemplate',settingsCtrl.saveofferTemplate);
+
+router.get('/getOfferTemplateMaster',settingsCtrl.getOfferTemplateMaster);
+router.post('/saveOfferBreakUpTemplate',settingsCtrl.saveOfferBreakUpTemplate);
+router.post('/offerGeneration',settingsCtrl.offerGeneration);
 
 // router.get('/mailExtract',settingsCtrl.mailExtract);
 
@@ -16,5 +21,8 @@ router.post('/template',settingsCtrl.saveAccessrightsTemplate);
 
 
 router.get('/temporary',settingsCtrl.temporary);
+router.get('/imapFinally',settingsCtrl.imapFinally);
+
+router.post('/fetchOutlookMails',settingsCtrl.fetchoutLook);
 
 module.exports = router;

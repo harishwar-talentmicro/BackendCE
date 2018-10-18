@@ -484,7 +484,7 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                  * Calling procedure to save deal
                  * @type {string}
                  */
-                var procQuery = 'CALL get_whatmate_dashboard( ' + procParams.join(',') + ')';
+                var procQuery = 'CALL get_whatmate_dashboard1( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,result){
                     if(!err && result && result[0] && result[0][0] && result[0][0].message){
@@ -504,6 +504,17 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                             res1.statusList = JSON.parse(dashboard[i].statusList);
                             output.push(res1);
                         }
+                      
+                        if(result[3] && result[3][0] && result[3][0].helpDeskDEtails){
+                            var help = JSON.parse(result[3][0].helpDeskDEtails) ;
+                            console.log(help);
+                                help.statusList = JSON.parse(help.statusList);
+                                output.push(help);    
+                        }
+                        
+                        // console.log("----------",output);
+
+                    // output.push(output2);
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;

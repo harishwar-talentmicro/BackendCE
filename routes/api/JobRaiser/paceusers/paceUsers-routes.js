@@ -27,5 +27,22 @@ router.get('/getJobPortalUsers',paceUsersCtrl.getJobPortalUsers);
 router.get('/freeJobPortalUsers',paceUsersCtrl.freeJobPortalUsers);
 
 router.post('/checkPortalApplicants',paceUsersCtrl.checkApplicantExists);
+router.post('/deleteJobPortalUsers',paceUsersCtrl.deleteJobPortalUsers);
+
+router.get('/pacehcmTips',paceUsersCtrl.pacehcmTips);
+
+router.post('/orgChart/branches',paceUsersCtrl.saveOrgChartBranches);
+router.post('/orgChart/departments',paceUsersCtrl.saveOrgChartDepartments);
+router.post('/orgChart/grades',paceUsersCtrl.saveOrgChartGrades);
+router.post('/orgChart/jobtitles',paceUsersCtrl.saveOrgChartJobtitles);
+
+router.get('/orgChart/allData',paceUsersCtrl.getOrgChartData);
+
+router.post('/resetPasswordOtp',paceUsersCtrl.sendPasswordResetOTP);
+router.post('/resetPasswordverifyotp',paceUsersCtrl.passwordResetVerifyOtp);
+router.post('/resetPassword',paceUsersCtrl.paceresetPassword);
+
+router.post('/smsAppInfo',paceUsersCtrl.sendApplicantInfoToPhone);
+router.post('/notifyAppInfo',paceUsersCtrl.sendApplicantInfoAsNotification);
 
 module.exports = router;

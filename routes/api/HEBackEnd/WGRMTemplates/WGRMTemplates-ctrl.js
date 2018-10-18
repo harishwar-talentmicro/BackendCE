@@ -67,7 +67,7 @@ WGRMTemplateCtrl.saveWGTemplate = function(req,res,next){
                         response.error = null;
 
                         var messagePayload = {
-                            message: "Changes in form group",
+                            message: "",
                             type: 201,
                             alarmType: 4,
                             data :{

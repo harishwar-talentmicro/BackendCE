@@ -56,6 +56,7 @@ module.exports = function(favoriteBook,done) {
     var limit = favoriteBook.limitValues ;
     results = favoriteBook.messageList ;
     var data={};
+    var archiveFlag = 0;
     var initialValue = (startPage * limit) ;
 
 
@@ -83,12 +84,16 @@ module.exports = function(favoriteBook,done) {
                 senderName : results[i].message ? results[i].message : ""
             });
             var msgId=results[i].messageId;
-           
-            
-                var procQuery = 'ifnull((select isArchive from tmmessageusers where messageId='+ msgId +' limit 1),0);'
+            console.log('msgId',msgId);            
+                var procQuery = 'select ifnull((isArchive),0) as isArchive from tmmessageusers where messageId='+ msgId +' limit 1';
+                console.log('isArchive query',procQuery);
                 db.query(procQuery,function(err,archiveresults){
+                    console.log('archiveresults',archiveresults[0]);
+                    console.log('err',err);
                     if(!err ){
-                    archiveFlag:archiveresults[0].isArchive ? archiveresults[0].isArchive:0; 
+                     archiveFlag = archiveresults[0].isArchive ? archiveresults[0].isArchive:0; 
+                    }
+                });
             data ={
                 messageList: {
                     messageId: results[i].messageId,
@@ -115,8 +120,8 @@ module.exports = function(favoriteBook,done) {
                 },
                 contactList: results[i].contactData ? JSON.parse(results[i].contactData) : null
             } ;
-        }
-    });
+      
+      
 
 
             var buf = new Buffer(JSON.stringify(data), 'utf-8');
@@ -152,11 +157,15 @@ module.exports = function(favoriteBook,done) {
                 var dialerGCM_Id=(results[i].DialerGCM_Id) ? (results[i].DialerGCM_Id) :'';
                 var GCM_Id = (results[i].GCM_Id) ? (results[i].GCM_Id) : '';
 
+                console.log('from results GCM_Id',results[i].GCM_Id);
+                console.log('iphoneId',results[i].iphoneId);
+                // console.log('results[i]',results[i]);
+
                 if(isDialer==1){
                     GCM_Id=dialerGCM_Id;
                 }
 
-
+                // console.log('iphoneId',iphoneId,'GCM_Id',GCM_Id);
                 if(iphoneId != ""){
                     var sound = "default";
                     var alert ="" ;
@@ -245,7 +254,9 @@ module.exports = function(favoriteBook,done) {
 
 
                 }
+
                 else if(GCM_Id != ""){
+                    console.log("GCM_ID",GCM_Id);
 
                         //  _Notification_aws.publish_Android(GCM_Id,messagePayload);
                         params = {
@@ -261,7 +272,7 @@ module.exports = function(favoriteBook,done) {
 
                         ANDROID_SNS.addUser(GCM_Id, null, function(err, endpointArn) {
                             if (err) {
-                                // console.log(err);
+                                console.log('err',err);
                                 if(messageIds == ""){
                                     messageIds = results[i].messageUserId ;
                                 }
@@ -298,6 +309,7 @@ module.exports = function(favoriteBook,done) {
                         });
                 }
                 else {
+                    console.log('NO GCM_Id');
                     if(messageIds == ""){
                         messageIds = results[i].messageUserId ;
                     }

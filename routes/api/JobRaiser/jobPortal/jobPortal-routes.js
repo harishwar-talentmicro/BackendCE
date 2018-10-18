@@ -24,5 +24,18 @@ router.post('/portalsignup',jobPortalCtrl.portalsignup);
 
 router.get('/genericmaster',jobPortalCtrl.generalMasterNoToken);
 
+router.post('/careerJobList',jobPortalCtrl.getCareerPortalRequirementList);
+
+router.post('/reqAppMap',jobPortalCtrl.portalreqAppMap);
+router.post('/jobSearch',jobPortalCtrl.portalrequirementSearch);
+
+router.post('/portalApplicantHistory',jobPortalCtrl.portalApplicantHistory);
+
+router.post('/portalPasswordResetOTP',jobPortalCtrl.portalPasswordResetOTP);
+router.post('/portalPasswordResetVerifyOtp',jobPortalCtrl.portalpasswordResetVerifyOtp);
+router.post('/portalresetPassword',jobPortalCtrl.portalresetPassword);
+
+router.post('/portalsignUpsendOtp',jobPortalCtrl.signUpsendOtp);
+
 module.exports = router;
 

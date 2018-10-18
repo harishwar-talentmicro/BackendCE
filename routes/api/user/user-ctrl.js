@@ -12,9 +12,9 @@ var path = require('path');
 var EZEIDEmail = 'noreply@talentmicro.com';
 var appConfig = require('../../../ezeone-config.json');
 
-const accountSid = 'AC3765f2ec587b6b5b893566f1393a00f4';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'AC3765f2ec587b6b5b893566f1393a00f4';
-const authToken = 'b36eba6376b5939cebe146f06d33ec57';   //'3abf04f536ede7f6964919936a35e614';  //'b36eba6376b5939cebe146f06d33ec57';//
-const FromNumber = appConfig.DB.FromNumber || '+18647547021';  
+const accountSid = 'AC62cf5e4f884a28b6ad9e2da511d24f4d';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'AC62cf5e4f884a28b6ad9e2da511d24f4d';
+const authToken = 'ff62486827ce8b68c70c1b8f7cef9748';   //'3abf04f536ede7f6964919936a35e614';  //'ff62486827ce8b68c70c1b8f7cef9748';//
+const FromNumber = appConfig.DB.FromNumber || '+16012286363';
 
 const client = require('twilio')(accountSid, authToken);
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
@@ -145,9 +145,13 @@ UserCtrl.signup = function (req, res, next) {
                 var ip = req.headers['x-forwarded-for'] ||
                     req.connection.remoteAddress ||
                     req.socket.remoteAddress;
+                var apnsId = '';
+                var gcmId = '';
+                var secretKey = '';
+                var isDialer = 0;
                 var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
                 if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].masterId) {
-                    req.st.generateToken(ip, userAgent, userResult[0][0].ezeoneId, req.body.isWhatMate, function (err, token) {
+                    req.st.generateToken(ip, userAgent, userResult[0][0].ezeoneId, req.body.isWhatMate,apnsId, gcmId, secretKey,isDialer, function (err, token) {
                         if (err) {
                             console.log('Error while generating token' + err);
                             response.status = false;
@@ -690,7 +694,7 @@ UserCtrl.login = function (req, res, next) {
         req.connection.remoteAddress ||
         req.socket.remoteAddress ||
         req.connection.socket.remoteAddress;
-    var isDialer= req.query.isDialer ? req.query.isDialer :0;
+    var isDialer = req.query.isDialer ? req.query.isDialer : 0;
     var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
     var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
     var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
@@ -787,9 +791,9 @@ UserCtrl.login = function (req, res, next) {
                     req.st.generateToken(ip, userAgent, ezeoneId, isWhatMate, APNS_Id, GCM_Id, isDialer, function (err, tokenResult) {
 
                         if ((!err) && tokenResult) {
-                            var APNSID= req.query.APNSID ? req.query.APNSID :'';
-                            var GCMID=req.query.GCMID ? req.query.GCMID :''; 
-                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ',' + req.st.db.escape(DBSecretKey) +',' + st.db.escape(APNSID) +',' + st.db.escape(GCMID) + ',' + st.db.escape(isDialer) + ')';
+                            var APNSID = req.query.APNSID ? req.query.APNSID : '';
+                            var GCMID = req.query.GCMID ? req.query.GCMID : '';
+                            var procQuery = 'CALL pGetEZEIDDetails(' + req.st.db.escape(tokenResult) + ',' + req.st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(isDialer) + ')';
                             console.log(procQuery);
                             req.db.query(procQuery, function (err, UserDetailsResult) {
                                 console.log(UserDetailsResult);
@@ -1142,7 +1146,10 @@ UserCtrl.sendPasswordResetOTP = function (req, res, next) {
                 req.st.db.escape(DBSecretKey)
             ];
 
+            console.log('CALL pvalidateEZEOne(' + query + ')');
             req.st.db.query('CALL pvalidateEZEOne(' + query + ')', function (err, otpResult) {
+                
+                console.log("error",err);
 
                 if (!err && otpResult && otpResult[0] && otpResult[0][0].otp) {
                     console.log("otpResult[0][0].name", otpResult[0][0].name);
@@ -1297,6 +1304,12 @@ UserCtrl.sendPasswordResetOTP = function (req, res, next) {
                     res.status(200).json(respMsg);
 
                 }
+                else if(!err && otpResult && otpResult[0] && otpResult[0][0].messageError){
+                    respMsg.status = true;
+                    respMsg.message = otpResult[0][0].messageError;
+                    respMsg.data = null;
+                    res.status(200).json(respMsg);
+                }
                 else {
                     respMsg.status = false;
                     respMsg.message = 'Something went wrong';
@@ -1431,6 +1444,51 @@ UserCtrl.changePassword = function (req, res, next) {
                     res.status(200).json(respMsg);
                 }
                 else if (!err) {
+                //     if(result && result[0] && result[0][0] && result[1] && result[1][0]) {
+                //         var name=(result[0] && result[0][0]) ? result[0][0].name : "";
+                //         var emailId=(result[0] && result[0][0]) ? result[0][0].emailId : "";
+                //         var mailContent=(result[1] && result[1][0]) ? result[1][0].mailbody : "";
+                   
+                
+
+                //     if (mailContent) {
+                //                 mailContent = mailContent.replace("[FirstName]", name);
+                //                 mailContent = mailContent.replace("[FullName]", name);
+        
+                //                 var signature = (result[1] && result[1][0]) ? result[1][0].signature : "";
+                //                 var disclaimer = (result[1] && result[1][0]) ? result[1][0].disclaimer : "";
+                //                 var mailBCC = (result[1] && result[1][0]) ? result[1][0].mailBCC : "";
+                //                 var mailSubject = (result[1] && result[1][0]) ? result[1][0].mailSubject : "";
+
+                //                 var linkurl = (result[1] && result[1][0]) ? result[1][0].linkUrl : "";
+                //                 var heMasterId = (result[1] && result[1][0]) ? result[1][0].heMasterId : "";
+
+                //                 var code = Date.now().toString().concat(heMasterId);
+                //                 var webLinkTo = linkurl + code;
+                //                 webLinkTo = webLinkTo.replace('"', '');
+                //                 webLinkTo = webLinkTo.replace('"', '');
+        
+                //                 mailContent = mailContent.replace("[Signature]", signature);
+                //                 mailContent = mailContent.replace("[Disclaimer]", disclaimer);
+                //                 mailContent=mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
+                //             }
+                //     var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                //     var email = new sendgrid.Email();
+                //     email.from = "noreply@talentmicro.com";
+                //     email.to = emailId;
+                //     email.bcc=mailBCC;
+                //     email.subject = mailSubject;
+                //     email.html = mailContent;
+                //     sendgrid.send(email, function (err, result) {
+                //         //console.log(result);
+                //         if (!err) {
+                //             console.log("mail sent successfully");
+                //         }
+                //         else{
+                //             console.log("error while sending mail");
+                //         }
+                //     });
+                // }
                     respMsg.status = true;
                     respMsg.message = "Password changed successfully";
                     res.status(200).json(respMsg);
@@ -1689,7 +1747,7 @@ UserCtrl.invitePublicProfile = function (req, res, next) {
 
                     var encryptPwd = req.st.hashPassword(password);
 
-                req.query.isDialer = req.query.isDialer ? req.query.isDialer:0;
+                    req.query.isDialer = req.query.isDialer ? req.query.isDialer : 0;
 
 
                     var procParams = [
@@ -2128,7 +2186,7 @@ UserCtrl.getUserDetails = function (req, res, next) {
                                             response.status = true;
                                             response.message = "FnGetUserDetails : tmaster: No User details found";
                                             response.error = null;
-                                            response.data =null;
+                                            response.data = null;
                                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                             zlib.gzip(buf, function (_, result) {
                                                 response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -2142,7 +2200,7 @@ UserCtrl.getUserDetails = function (req, res, next) {
                                         response.status = true;
                                         response.message = "FnGetUserDetails : tmaster: No User details found";
                                         response.error = null;
-                                        response.data =null;
+                                        response.data = null;
                                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                         zlib.gzip(buf, function (_, result) {
                                             response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -2155,7 +2213,7 @@ UserCtrl.getUserDetails = function (req, res, next) {
                                 }
                                 else {
                                     response.status = false;
-                                    response.message = "FnGetUserDetails : tmaster:"+ err;
+                                    response.message = "FnGetUserDetails : tmaster:" + err;
                                     response.error = null;
                                     response.data = null;
                                     res.status(500).json(response);
@@ -2191,6 +2249,54 @@ UserCtrl.getUserDetails = function (req, res, next) {
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetUserDetails error:' + ex);
 
+    }
+};
+
+UserCtrl.getUserLink = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        var procParams = [
+           
+            req.st.db.escape(req.query.code)
+        ];
+
+        var procQuery = 'CALL wm_get_termsAndconditionlink( ' + procParams.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            if (!err && result && result[0] ) {
+               
+                    response.status = true;
+                    response.message = "success";
+                    response.error = null;
+                    response.data = (result[0][0]) ? result[0][0] :"";
+                    res.status(200).json(response);
+                }
+                
+                else {
+                    response.status = false;
+                    response.message = "error while loading";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+                        
+        });
     }
 };
 
