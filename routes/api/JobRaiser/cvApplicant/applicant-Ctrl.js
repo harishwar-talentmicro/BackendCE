@@ -970,6 +970,21 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                         if (Result[0][0].reqApplicantId) {
                             for (var i = 0; i < Result[0].length; i++) {
                                 Result[0][i].clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
+
+                                Result[0][i].faceSheetDetailWithAnswers = Result[0][i].faceSheetDetailWithAnswers ? JSON.parse(Result[0][i].faceSheetDetailWithAnswers) : [];
+
+                                var facesheet = [];
+                                for (var f = 0; f < Result[0][i].faceSheetDetailWithAnswers.length; f++) {
+                                    if (Result[0][i].faceSheetDetailWithAnswers[f].answer) {
+                                        var answer = Result[0][i].faceSheetDetailWithAnswers[f].answer;
+                                    }
+                                    else {
+                                        var answer = "Not Applicable";
+                                    }
+                                    var QandA = Result[0][i].faceSheetDetailWithAnswers[f].question + " - " + answer;
+                                    facesheet.push(QandA);
+                                }
+                                Result[0][i].faceSheetDetailWithAnswers = facesheet;
                             }
                         }
 
@@ -1348,8 +1363,8 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                     req.st.db.escape(req.body.limit),
                     req.st.db.escape(req.body.cvRating),
                     req.st.db.escape(req.body.searchResultsLimit),
-                    req.st.db.escape(req.body.includeJd)
-
+                    req.st.db.escape(req.body.includeJd),
+                    req.st.db.escape(req.body.applicantId || "")
                 ];
 
                 var procQuery = 'CALL wd_resume_search_newAlgorithm( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -3214,8 +3229,8 @@ applicantCtrl.getMasterInterviewScheduler = function (req, res, next) {
                             skillLevelList: [],
                             heDepartment: [],
                             skillOptionList: [],
-                            isAddAssessmentEnable:0,
-                            isAddSkillEnable:0
+                            isAddAssessmentEnable: 0,
+                            isAddSkillEnable: 0
 
                         };
 
@@ -4141,10 +4156,10 @@ applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
                             for (var i = 0; i < faceSheet.questions.length; i++) {
                                 faceSheet.questions[i].answer = result[0][0][faceSheet.questions[i].type.tagName];
                             }
-                            console.log("facesheet custom tags",faceSheet.customTags && faceSheet.customTags.length);
+                        console.log("facesheet custom tags", faceSheet.customTags && faceSheet.customTags.length);
                         if (faceSheet.customTags && faceSheet.customTags.length) {
                             for (var customIndex = 0; customIndex < faceSheet.customTags.length; customIndex++) {
-                                console.log("resume",result[0][0][faceSheet.customTags[customIndex].tagName]);
+                                console.log("resume", result[0][0][faceSheet.customTags[customIndex].tagName]);
                                 if (result[0][0] && result[0][0][faceSheet.customTags[customIndex].tagName]) {
                                     faceSheet.customFaceSheet = faceSheet.customFaceSheet.replace('[facesheet.' + faceSheet.customTags[customIndex].tagName + ']', result[0][0][faceSheet.customTags[customIndex].tagName]);
                                     console.log(faceSheet.customFaceSheet);
@@ -4750,8 +4765,9 @@ applicantCtrl.resumeSearchResultsByPage = function (req, res, next) {
                 req.query.start = req.query.start ? req.query.start : 0;
                 req.query.limit = (req.query.limit) ? req.query.limit : 10;
 
-                // req.query.start = ((((req.query.start) * req.query.limit) + 1) - req.query.limit) - 1;
-
+                if (req.query.isWeb == 0) {
+                    req.query.start = ((((req.query.start) * req.query.limit) + 1) - req.query.limit) - 1;
+                }
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
