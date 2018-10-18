@@ -549,7 +549,8 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
 
                         for (var i = 0; i < result[2].length; i++) {
                             var res3 = {};
-                            res3.name = result[2][i].name;
+                            res3.name = result[2][i] ? result[2][i].name:"";
+                            res3.userMasterId = result[2] && result[2][i] ? result[2][i].userMasterId : 0;
                             res3.stage = result[2][i].stage ? JSON.parse(result[2][i].stage) : [];
                             output1.push(res3);
                         }

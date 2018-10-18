@@ -1408,7 +1408,7 @@ billingCtrl.savePaceFollowUpNotes = function (req, res, next) {
                 else if (req.body.type == 2)
                     clientorReqorResumeId = req.body.requirementId || 0;
                 else if (req.body.type == 3)
-                    clientorReqorResumeId = req.body.requirementId || 0;
+                    clientorReqorResumeId = req.body.applicantId || 0;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),

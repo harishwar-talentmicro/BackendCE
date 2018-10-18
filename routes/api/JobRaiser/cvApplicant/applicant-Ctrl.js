@@ -267,6 +267,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             fileResponse.on('data', function (d) { bufs.push(d); });
                             fileResponse.on('end', function () {
                                 var buf = Buffer.concat(bufs);
+                                process.env.ANTIWORDHOME = '/usr/share/antiword';
                                 textract.fromBufferWithName(cv, buf, function (error, txt) {
                                     if (error) {
                                         // var tempCVPath = cv.replace('docx', 'doc');
@@ -944,7 +945,10 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                     req.st.db.escape(req.body.requirementId),
                     req.st.db.escape(DBSecretKey),
                     req.st.db.escape(req.body.type),
-                    req.st.db.escape(req.body.name)
+                    req.st.db.escape(req.body.name),
+                    req.st.db.escape(req.body.from || null),
+                    req.st.db.escape(req.body.to || null),
+                    req.st.db.escape(req.body.userMasterId || 0)
                 ];
 
                 var procQuery = 'CALL wm_get_applicants( ' + getStatus.join(',') + ')';
@@ -1630,21 +1634,21 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         var temp_result = result[0][0] ? result[0][0] : {};
                         temp_result.education = JSON.parse(temp_result.education);
                         temp_result.cvSource = JSON.parse(temp_result.cvSource);
-                        temp_result.expectedSalaryCurr = JSON.parse(temp_result.expectedSalaryCurr);
-                        temp_result.expectedSalaryPeriod = JSON.parse(temp_result.expectedSalaryPeriod);
-                        temp_result.expectedSalaryScale = JSON.parse(temp_result.expectedSalaryScale);
+                        temp_result.expectedSalaryCurr =temp_result.expectedSalaryCurr && JSON.parse(temp_result.expectedSalaryCurr).currencyId ? JSON.parse(temp_result.expectedSalaryCurr):{};
+                        temp_result.expectedSalaryPeriod = temp_result.expectedSalaryPeriod && JSON.parse(temp_result.expectedSalaryPeriod).durationId ? JSON.parse(temp_result.expectedSalaryPeriod) :{};
+                        temp_result.expectedSalaryScale = temp_result.expectedSalaryScale && JSON.parse(temp_result.expectedSalaryScale).scaleId ? JSON.parse(temp_result.expectedSalaryScale) :{};
                         temp_result.industry = JSON.parse(temp_result.industry);
-                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle);
-                        //  temp_result.jobTitle = temp_result.jobTitle.titleId != null ? temp_result.jobTitle : undefined;
-                        temp_result.nationality = JSON.parse(temp_result.nationality);
+                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle).jobTitleId ? JSON.parse(temp_result.jobTitle): {} ;
+                        temp_result.nationality = JSON.parse(temp_result.nationality).nationalityId ? JSON.parse(temp_result.nationality) :{};
                         temp_result.prefLocations = JSON.parse(temp_result.prefLocations);
-                        temp_result.presentSalaryCurr = JSON.parse(temp_result.presentSalaryCurr);
-                        temp_result.presentSalaryPeriod = JSON.parse(temp_result.presentSalaryPeriod);
-                        temp_result.presentSalaryScale = JSON.parse(temp_result.presentSalaryScale);
+                        temp_result.presentSalaryCurr = temp_result.presentSalaryCurr && JSON.parse(temp_result.presentSalaryCurr).currencyId ? JSON.parse(temp_result.presentSalaryCurr) : {};
+                        temp_result.presentSalaryPeriod = temp_result.presentSalaryPeriod && JSON.parse(temp_result.presentSalaryPeriod).durationId ? JSON.parse(temp_result.presentSalaryPeriod) : {};
+                        temp_result.presentSalaryScale = temp_result.presentSalaryScale && JSON.parse(temp_result.presentSalaryScale).scaleId ? JSON.parse(temp_result.presentSalaryScale) : {};
                         temp_result.primarySkills = JSON.parse(temp_result.primarySkills);
                         temp_result.secondarySkills = JSON.parse(temp_result.secondarySkills);
                         temp_result.functionalAreas = JSON.parse(temp_result.functionalAreas);
-                        temp_result.presentLocation = JSON.parse(temp_result.presentLocation);
+                        temp_result.presentLocation = JSON.parse(temp_result.presentLocation).locationId ? JSON.parse(temp_result.presentLocation) : {};
+
 
                         if (typeof (result[5] && result[5][0] && result[5][0].cc) == 'string') {
                             result[5][0].cc = JSON.parse(result[5][0].cc)
@@ -4731,9 +4735,9 @@ applicantCtrl.resumeSearchResultsByPage = function (req, res, next) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
                 req.query.start = req.query.start ? req.query.start : 1;
-                req.query.limit = (req.query.limit) ? req.query.limit : 0;
+                req.query.limit = (req.query.limit) ? req.query.limit : 10;
 
-                req.query.start = ((((req.query.start) * req.query.limit) + 1) - req.query.limit) - 1;
+                // req.query.start = ((((req.query.start) * req.query.limit) + 1) - req.query.limit) - 1;
 
 
                 var inputs = [
