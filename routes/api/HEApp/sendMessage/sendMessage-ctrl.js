@@ -874,7 +874,9 @@ sendMessageCtrl.GetMsgMapUsersData = function (req, res, next) {
                         response.message = "User data loaded successfully .";
                         response.error = null;
 
-                        var output = [];
+                        
+                        if (req.query.HEUserId == 0) {
+                            var output = [];
                         for (var i = 0; i < userResult[0].length; i++) {
                             var res2 = {};
                             res2.HEUserId = userResult[0][i].HEUserId;
@@ -889,37 +891,34 @@ sendMessageCtrl.GetMsgMapUsersData = function (req, res, next) {
 
                             output.push(res2);
                         }
-                        if(req.query.HEUserId==0){
-                        response.data = {
-                            
-                            userData: output,
-                            count: userResult[1][0].count
-                        }
-                    }
-                        else{
                             response.data = {
-                            
-                                HEUserId : userResult[0][0].HEUserId,
-                               isNormal : userResult[0][0].isNormal,
-                                isTaxSaving : userResult[0][0].isTaxSaving,
-                               isSMSEnabled : userResult[0][0].isSMSEnabled,
-                                name : userResult[0][0].name,
-                                branches : userResult[0][0].branch ? JSON.parse(userResult[0][0].branch) : [],
+
+                                userData: output,
+                                count: userResult[1][0].count
+                            }
+                        }
+                        else {
+                            response.data = {
+                                userDetails: userResult[0][0].userDetails ? JSON.parse(userResult[0][0].userDetails) : {},
+                                HEUserId: userResult[0][0].HEUserId,
+                                isNormal: userResult[0][0].isNormal,
+                                isTaxSaving: userResult[0][0].isTaxSaving,
+                                isSMSEnabled: userResult[0][0].isSMSEnabled,
+                                name: userResult[0][0].name,
+                                branches: userResult[0][0].branch ? JSON.parse(userResult[0][0].branch) : [],
                                 departments: userResult[0][0].department ? JSON.parse(userResult[0][0].department) : [],
-                              grades: userResult[0][0].grade ? JSON.parse(userResult[0][0].grade) : [],
-                               RMGroups: userResult[0][0].RMGroup ? JSON.parse(userResult[0][0].RMGroup) : []
-    
+                                grades: userResult[0][0].grade ? JSON.parse(userResult[0][0].grade) : [],
+                                RMGroups: userResult[0][0].RMGroup ? JSON.parse(userResult[0][0].RMGroup) : []
+
                             };
 
                         }
-                    //  console.log(response.data);
-
-
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                        console.log(response.data);
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
-                        });
+                        // });
 
 
                     }
@@ -1869,7 +1868,11 @@ sendMessageCtrl.GetAnnouncementDetail = function (req, res, next) {
                         // }
                         //
                         response.data = {
-                            userDetails: (Result[0] && Result[0][0] && Result[0][0].formDataJSON) ? (JSON.parse(Result[0][0].formDataJSON)) : []
+                            userDetails: (Result[0] && Result[0][0] && Result[0][0].formDataJSON) ? (JSON.parse(Result[0][0].formDataJSON)) : [],
+                            isNormal: Result[1][0].isNormal,
+                            isTaxSaving: Result[1][0].isTaxSaving,
+                            isSMSEnabled: Result[1][0].isSMSEnabled
+
                         };
 
                         // res.status(200).json(response)

@@ -2271,9 +2271,12 @@ UserCtrl.getUserLink = function (req, res, next) {
         console.log(response);
     }
     else {
+        req.query.name = req.query.name ? req.query.name : '';
+
         var procParams = [
            
-            req.st.db.escape(req.query.code)
+            req.st.db.escape(req.query.code),
+            req.st.db.escape(req.query.name)
         ];
 
         var procQuery = 'CALL wm_get_termsAndconditionlink( ' + procParams.join(',') + ')';
@@ -2284,6 +2287,10 @@ UserCtrl.getUserLink = function (req, res, next) {
                     response.status = true;
                     response.message = "success";
                     response.error = null;
+                    if (result[0][0].termsAndCondition) {
+                        result[0][0].termsAndCondition = result[0][0].termsAndCondition.replace("[DisplayName]",req.query.name);
+                        result[0][0].termsAndCondition = result[0][0].termsAndCondition.replace("[DisplayName]",req.query.name);
+                    }
                     response.data = (result[0][0]) ? result[0][0] :"";
                     res.status(200).json(response);
                 }

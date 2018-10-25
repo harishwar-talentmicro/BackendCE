@@ -724,7 +724,7 @@ User.prototype.changePassword = function (req, res, next) {
                             req.body = JSON.parse(resultDecrypt.toString('utf-8'));
                         
                             var OldPassword = req.body.OldPassword;
-                            // console.log("OldPassword input",req.body.OldPassword,"hashed output",OldPassword);
+                            console.log("OldPassword input",req.body.OldPassword,"hashed output",OldPassword);
                             // console.log("req.body",req.body);
                             var NewPassword = req.body.NewPassword;
     
@@ -796,7 +796,8 @@ User.prototype.changePassword = function (req, res, next) {
                                                                             var heMasterId = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].heMasterId : "";
                                             
                                                                             var code = Date.now().toString().concat(heMasterId);
-                                                                            var webLinkTo = linkurl + code;
+                                                                      
+                                                                            var webLinkTo = linkurl + code +'/'+name;
                                                                             webLinkTo = webLinkTo.replace('"', '');
                                                                             webLinkTo = webLinkTo.replace('"', '');
                                                     
@@ -807,7 +808,7 @@ User.prototype.changePassword = function (req, res, next) {
                                                                         // console.log(mailContent);
                                                                         // console.log(desclaimer);
                                                                         // console.log(emailId);
-                                                                        console.log(mailBCC);
+                                                                        console.log(webLinkTo);
 
                                                                 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
                                                                 var email = new sendgrid.Email();
