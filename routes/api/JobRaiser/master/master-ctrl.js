@@ -64,11 +64,11 @@ masterCtrl.getReqMasterData = function (req, res, next) {
                         response.message = "Master data loaded successfully";
                         response.error = null;
                         var intRoundList = [];
-                        if(isWeb){
-                            intRoundList= result[8] ? result[8] : [];
+                        if (isWeb) {
+                            intRoundList = result[8] ? result[8] : [];
                         }
-                        else{
-                            intRoundList= result[13] ? result[13] : [];
+                        else {
+                            intRoundList = result[13] ? result[13] : [];
                         }
 
                         response.data = {
@@ -80,11 +80,11 @@ masterCtrl.getReqMasterData = function (req, res, next) {
                             country: (result && result[5]) ? result[5] : [],
                             jobTitle: (result && result[6]) ? result[6] : [],
                             roleList: result[7] ? result[7] : [],
-                            interviewRoundList : intRoundList,
+                            interviewRoundList: intRoundList,
                             status: result[9] ? result[9] : [],
                             requirementList: result[10] ? result[10] : [],
                             portalList: result[11] ? result[11] : [],
-                            reasons : result[12] ? result[12] : []
+                            reasons: result[12] ? result[12] : []
 
                         };
                         if (isWeb == 1) {
@@ -672,6 +672,37 @@ masterCtrl.getmailTemplate = function (req, res, next) {
                         response.status = true;
                         response.message = "Mail template list loaded successfully";
                         response.error = null;
+
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].cc = result[0][i] ? JSON.parse(result[0][i].cc) : [];
+                            result[0][i].bcc = result[0][i] ? JSON.parse(result[0][i].bcc) : [];
+                            result[0][i].attachment = result[0][i] ? JSON.parse(result[0][i].attachment) : [];
+
+                        }
+                        for (var i = 0; i < result[1].length; i++) {
+                            result[1][i].cc = result[1][i] ? JSON.parse(result[1][i].cc) : [];
+                            result[1][i].bcc = result[1][i] ? JSON.parse(result[1][i].bcc) : [];
+                            result[1][i].attachment = result[1][i] ? JSON.parse(result[1][i].attachment) : [];
+                        }
+
+                        for (var i = 0; i < result[2].length; i++) {
+                            result[2][i].cc = result[2][i] ? JSON.parse(result[2][i].cc) : [];
+                            result[2][i].bcc = result[2][i] ? JSON.parse(result[2][i].bcc) : [];
+                            result[2][i].attachment = result[2][i] ? JSON.parse(result[2][i].attachment) : [];
+                        }
+
+                        for (var i = 0; i < result[3].length; i++) {
+                            result[3][i].cc = result[3][i] ? JSON.parse(result[3][i].cc) : [];
+                            result[3][i].bcc = result[3][i] ? JSON.parse(result[3][i].bcc) : [];
+                            result[3][i].attachment = result[3][i] ? JSON.parse(result[3][i].attachment) : [];
+                        }
+
+                        for (var i = 0; i < result[4].length; i++) {
+                            result[4][i].cc = result[4][i] ? JSON.parse(result[4][i].cc) : [];
+                            result[4][i].bcc = result[4][i] ? JSON.parse(result[4][i].bcc) : [];
+                            result[4][i].attachment = result[4][i] ? JSON.parse(result[4][i].attachment) : [];
+                        }
+
                         response.data = {
                             screeningMailer: result[0] ? result[0] : [],
                             submissionMailer: result[1] ? result[1] : [],
@@ -1445,13 +1476,13 @@ masterCtrl.getRequirementView = function (req, res, next) {
                         }
 
                         for (var i = 0; i < results[2].length; i++) {
-                            results[2][i].status =results[2] && results[2][i] && JSON.parse(results[2][i].status) ? JSON.parse(results[2][i].status) : [];
+                            results[2][i].status = results[2] && results[2][i] && JSON.parse(results[2][i].status) ? JSON.parse(results[2][i].status) : [];
                         }
 
                         response.data = {
                             requirementView: output,
                             // stageStatusList: (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList) : [],
-                            stageList: results[2] && results[2][0] ? results[2]: []
+                            stageList: results[2] && results[2][0] ? results[2] : []
                         };
 
                         if (req.query.isWeb == 0) {
@@ -1556,7 +1587,7 @@ masterCtrl.getClientView = function (req, res, next) {
                         response.error = null;
                         for (var i = 0; i < results[0].length; i++) {
                             results[0][i].stageDetail = results[0][i].stageDetail ? JSON.parse(results[0][i].stageDetail) : [],
-                            results[0][i].clientContacts = results[0][i] && JSON.parse(results[0][i].clientContacts) ? JSON.parse(results[0][i].clientContacts) : [];
+                                results[0][i].clientContacts = results[0][i] && JSON.parse(results[0][i].clientContacts) ? JSON.parse(results[0][i].clientContacts) : [];
                         }
                         response.data = {
                             clientView: results[0] ? results[0] : []
@@ -2249,7 +2280,7 @@ masterCtrl.saveUserManager = function (req, res, next) {
     if (!department || department == "") {
         department = {};
     }
-    console.log('department',department);
+    console.log('department', department);
     var grade = req.body.grade;
     if (typeof (grade) == "string") {
         grade = JSON.parse(grade);
@@ -2320,7 +2351,7 @@ masterCtrl.saveUserManager = function (req, res, next) {
                     req.st.db.escape(DBSecretKey),
                     req.st.db.escape(encryptPwd),
                     req.st.db.escape(req.body.mailer),
-                    req.st.db.escape(JSON.stringify(branch))                
+                    req.st.db.escape(JSON.stringify(branch))
                 ];
                 var procQuery = 'CALL save_Pace_User( ' + inputs.join(',') + ')';
                 console.log(procQuery);
