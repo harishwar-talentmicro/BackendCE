@@ -9,4 +9,6 @@ router.get('/onBoardingMaster',onboardingctrl.onBoardingDynamicMaster);
 router.post('/config',onboardingctrl.onBoardingDynamicConfig);
 router.post('/onBoarding',onboardingctrl.saveOnBoarding);
 
+router.get('/tracker',onboardingctrl.onBoardingTracker);
+
 module.exports = router;

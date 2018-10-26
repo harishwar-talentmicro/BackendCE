@@ -25,7 +25,7 @@ var appConfig = require('../../ezeone-config.json');
 var DBSecretKey = appConfig.DB.secretKey;
 var zlib = require('zlib');
 var AES_256_encryption = require('../encryption/encryption.js');
-var encryption = new  AES_256_encryption();
+var encryption = new AES_256_encryption();
 
 var EZEIDEmail = 'noreply@talentmicro.com';
 // var appConfig = require('../../../ezeone-config.json');
@@ -35,7 +35,7 @@ const authToken = 'b36eba6376b5939cebe146f06d33ec57';   //'3abf04f536ede7f696491
 const FromNumber = appConfig.DB.FromNumber || '+18647547021';
 var DBSecretKey = appConfig.DB.secretKey;
 
-var error ={};
+var error = {};
 
 function FnEncryptPassword(Password) {
     try {
@@ -507,11 +507,11 @@ User.prototype.getUserDetails = function (req, res, next) {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var isDialer= req.query.isDialer ? req.query.isDialer :0
+        var isDialer = req.query.isDialer ? req.query.isDialer : 0
         var Token = req.query.Token;
-        var APNSID= req.query.APNSID ? req.query.APNSID :'';
-        var GCMID=req.query.GCMID ? req.query.GCMID :'';
-        var isDialer=req.query.isDialer ? req.query.isDialer :0;
+        var APNSID = req.query.APNSID ? req.query.APNSID : '';
+        var GCMID = req.query.GCMID ? req.query.GCMID : '';
+        var isDialer = req.query.isDialer ? req.query.isDialer : 0;
 
         if (Token) {
             st.validateToken(Token, function (err, tokenResult) {
@@ -519,7 +519,7 @@ User.prototype.getUserDetails = function (req, res, next) {
                 //console.log(Result);
                 if (!err) {
                     if (tokenResult) {
-                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ',' +  st.db.escape(APNSID) + ',' +  st.db.escape(GCMID) + ',' +  st.db.escape(isDialer) + ')', function (err, UserDetailsResult) {
+                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(isDialer) + ')', function (err, UserDetailsResult) {
                             console.log(err);
                             if (!err) {
                                 //console.log('UserDetailsResult',UserDetailsResult);
@@ -531,12 +531,12 @@ User.prototype.getUserDetails = function (req, res, next) {
                                         UserDetailsResult[0][0].versionStatus = rtnMessage.versionStatus;
                                         UserDetailsResult[0][0].versionMessage = rtnMessage.versionMessage;
 
-                                        for (var i=0 ; i<UserDetailsResult[1].length ; i++){
-                                            UserDetailsResult[1][i].trackTemplateDetails = UserDetailsResult[1][i] && UserDetailsResult[1][i].trackTemplateDetails ?  JSON.parse(UserDetailsResult[1][i].trackTemplateDetails):[];
+                                        for (var i = 0; i < UserDetailsResult[1].length; i++) {
+                                            UserDetailsResult[1][i].trackTemplateDetails = UserDetailsResult[1][i] && UserDetailsResult[1][i].trackTemplateDetails ? JSON.parse(UserDetailsResult[1][i].trackTemplateDetails) : [];
                                         }
-                                        console.log('user details',UserDetailsResult[1][0]);
+                                        console.log('user details', UserDetailsResult[1][0]);
 
-                                        UserDetailsResult[0][0].companyDetails = UserDetailsResult[1][0] ? UserDetailsResult[1][0]:{}
+                                        UserDetailsResult[0][0].companyDetails = UserDetailsResult[1][0] ? UserDetailsResult[1][0] : {}
                                         res.send(UserDetailsResult[0]);
                                     }
                                     else {
@@ -690,10 +690,10 @@ User.prototype.changePassword = function (req, res, next) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var TokenNo = req.query.token;   // token is now query  //token was in body  T was caps before
 
-        
+
         var RtnMessage = {
             status: true,
-            error:null,
+            error: null,
             message: "Invalid token",
             IsChanged: false
         };
@@ -701,33 +701,33 @@ User.prototype.changePassword = function (req, res, next) {
 
         var validationFlag = true;
 
-    if (!TokenNo) {
-        error.TokenNo = 'Invalid token';
-        validationFlag *= false;
-    }
+        if (!TokenNo) {
+            error.TokenNo = 'Invalid token';
+            validationFlag *= false;
+        }
 
 
-        if (!validationFlag){
+        if (!validationFlag) {
             RtnMessage.error = error;
             RtnMessage.message = 'Please check the errors';
             res.status(400).json(RtnMessage);
             console.log(RtnMessage);
         }
-        else{
+        else {
             // if (OldPassword && NewPassword && TokenNo ) {
             st.validateToken(TokenNo, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
 
-                        var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                         zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                             req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                        
+
                             var OldPassword = req.body.OldPassword;
-                            console.log("OldPassword input",req.body.OldPassword,"hashed output",OldPassword);
+                            console.log("OldPassword input", req.body.OldPassword, "hashed output", OldPassword);
                             // console.log("req.body",req.body);
                             var NewPassword = req.body.NewPassword;
-    
+
                             var oldPassQueryParams = st.db.escape(TokenNo);
 
                             var oldPassQuery = 'CALL pgetoldpassword(' + oldPassQueryParams + ')';
@@ -741,27 +741,27 @@ User.prototype.changePassword = function (req, res, next) {
                                     res.status(400).json(RtnMessage);
                                 }
                                 else {
-                                    console.log("oldPassResult",oldPassResult);
+                                    console.log("oldPassResult", oldPassResult);
                                     if (oldPassResult) {
                                         if (oldPassResult[0]) {
                                             if (oldPassResult[0][0]) {
                                                 if (oldPassResult[0][0].Password) {
-    
+
                                                     if (comparePassword(OldPassword, oldPassResult[0][0].Password)) {
                                                         var ip = req.headers['x-forwarded-for'] ||
                                                             req.connection.remoteAddress ||
                                                             req.socket.remoteAddress ||
                                                             req.connection.socket.remoteAddress;
                                                         var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
-    
+
                                                         var newPassword = hashPassword(NewPassword);
                                                         var passChangeQueryParams = st.db.escape(TokenNo) + ',' +
                                                             st.db.escape(newPassword) + ',' + st.db.escape(ip) + ',' + st.db.escape(userAgent) + ',' + st.db.escape(DBSecretKey);
-    
+
                                                         var passChangeQuery = 'CALL pChangePassword(' + passChangeQueryParams + ')';
                                                         console.log(passChangeQuery);
-    
-    
+
+
                                                         st.db.query(passChangeQuery, function (err, passChangeResult) {
                                                             if (err) {
                                                                 console.log('Error FnChangePassword :  procedure pChangePassword');
@@ -774,60 +774,62 @@ User.prototype.changePassword = function (req, res, next) {
                                                             }
                                                             else {
 
-                                                                if(passChangeResult && passChangeResult[0] && passChangeResult[0][0] && passChangeResult[1] && passChangeResult[1][0]) {
-                                                                    var name=(passChangeResult[0] && passChangeResult[0][0]) ? passChangeResult[0][0].name : "";
-                                                                    var emailId=(passChangeResult[0] && passChangeResult[0][0]) ? passChangeResult[0][0].emailId : "";
-                                                                    var mailContent=(passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].mailbody : "";
-                                                               
-                                                            
-                                            
-                                                                if (mailContent) {
+                                                                if (passChangeResult && passChangeResult[0] && passChangeResult[0][0] && passChangeResult[1] && passChangeResult[1][0]) {
+                                                                    var name = (passChangeResult[0] && passChangeResult[0][0]) ? passChangeResult[0][0].name : "";
+                                                                    var emailId = (passChangeResult[0] && passChangeResult[0][0]) ? passChangeResult[0][0].emailId : "";
+                                                                    var mailContent = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].mailbody : "";
+                                                                    var user = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].newUser : 0;
+
+
+                                                                    if (user == 1) {
+                                                                        if (mailContent) {
                                                                             mailContent = mailContent.replace("[FirstName]", name);
                                                                             mailContent = mailContent.replace("[FullName]", name);
-                                                    
+
                                                                             var signature = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].signature : "";
                                                                             var desclaimer = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].desclaimer : "";
                                                                             var mailBCC = (passChangeResult[1] && passChangeResult[1][0]) ? JSON.parse(passChangeResult[1][0].mailBCC) : [];
-                                                                           console.log(mailBCC);
+                                                                            console.log(mailBCC);
 
                                                                             var mailSubject = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].mailSubject : "";
-                                            
+
                                                                             var linkurl = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].linkUrl : "";
                                                                             var heMasterId = (passChangeResult[1] && passChangeResult[1][0]) ? passChangeResult[1][0].heMasterId : "";
-                                            
+
                                                                             var code = Date.now().toString().concat(heMasterId);
-                                                                      
-                                                                            var webLinkTo = linkurl + code +'/'+name;
+
+                                                                            var webLinkTo = linkurl + code + '/' + name;
                                                                             webLinkTo = webLinkTo.replace('"', '');
                                                                             webLinkTo = webLinkTo.replace('"', '');
-                                                    
+
                                                                             mailContent = mailContent.replace("[Signature]", signature);
                                                                             mailContent = mailContent.replace("[Disclaimer]", desclaimer);
-                                                                            mailContent=mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
+                                                                            mailContent = mailContent.replace("[ClickHere]", "<a title='Link' target='_blank' href=" + webLinkTo + ">Click Here</a>");
                                                                         }
                                                                         // console.log(mailContent);
                                                                         // console.log(desclaimer);
                                                                         // console.log(emailId);
                                                                         console.log(webLinkTo);
 
-                                                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                                                var email = new sendgrid.Email();
-                                                                email.from = "noreply@talentmicro.com";
-                                                                email.to = emailId;
-                                                                email.bcc=mailBCC;
-                                                                email.subject = mailSubject;
-                                                                email.html = mailContent;
-                                                                sendgrid.send(email, function (err, result) {
-                                                                    //console.log(result);
-                                                                    if (!err) {
-                                                                        console.log("mail sent successfully");
+                                                                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                                                        var email = new sendgrid.Email();
+                                                                        email.from = "noreply@talentmicro.com";
+                                                                        email.to = emailId;
+                                                                        email.bcc = mailBCC;
+                                                                        email.subject = mailSubject;
+                                                                        email.html = mailContent;
+                                                                        sendgrid.send(email, function (err, result) {
+                                                                            //console.log(result);
+                                                                            if (!err) {
+                                                                                console.log("mail sent successfully");
+                                                                            }
+                                                                            else {
+                                                                                console.log(err);
+                                                                                console.log("error while sending mail");
+                                                                            }
+                                                                        });
                                                                     }
-                                                                    else{
-                                                                        console.log(err);
-                                                                        console.log("error while sending mail");
-                                                                    }
-                                                                });
-                                                            }
+                                                                }
                                                                 if (passChangeResult) {
                                                                     RtnMessage.IsChanged = true;
                                                                     RtnMessage.status = true;
@@ -956,7 +958,7 @@ User.prototype.forgetPassword = function (req, res, next) {
                     if (ForgetPasswordResult) {
                         if (ForgetPasswordResult.affectedRows > 0) {
                             RtnMessage.IsChanged = true;
-                            var UserQuery = 'call wm_get_EWTForgotPassword(' + st.db.escape(EZEID) + ',' + st.db.escape(DBSecretKey)+')';
+                            var UserQuery = 'call wm_get_EWTForgotPassword(' + st.db.escape(EZEID) + ',' + st.db.escape(DBSecretKey) + ')';
                             //console.log(UserQuery);
                             st.db.query(UserQuery, function (err, UserResult) {
                                 if (!err) {
@@ -4074,7 +4076,7 @@ User.prototype.saveUserDetails = function (req, res, next) {
     var locTitle = (req.body.loc_title) ? req.body.loc_title : '';
     // var latitude = (req.body.lat) ? req.body.lat : '';
     // var longitude = (req.body.lng) ? req.body.lng : '';
-    var address1 = (req.body.address_line1) ? req.body.address_line1 : ''; 
+    var address1 = (req.body.address_line1) ? req.body.address_line1 : '';
     var address2 = (req.body.address_line2) ? req.body.address_line2 : '';
     var city = (req.body.city) ? req.body.city : '';
     var stateId = (req.body.state_id) ? req.body.state_id : '';
@@ -5308,11 +5310,11 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var isDialer= req.query.isDialer ? req.query.isDialer :0
+        var isDialer = req.query.isDialer ? req.query.isDialer : 0
         var Token = req.query.token;
-        var APNSID= req.body.apnsId;
-        var GCMID=req.body.gcmId;
-        var isDialer=req.query.isDialer ? req.query.isDialer :0;
+        var APNSID = req.body.apnsId;
+        var GCMID = req.body.gcmId;
+        var isDialer = req.query.isDialer ? req.query.isDialer : 0;
 
         if (Token) {
             st.validateToken(Token, function (err, tokenResult) {
@@ -5320,7 +5322,7 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
                 //console.log(Result);
                 if (!err) {
                     if (tokenResult) {
-                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ',' +  st.db.escape(APNSID) + ',' +  st.db.escape(GCMID) + ',' +  st.db.escape(isDialer) + ')', function (err, UserDetailsResult) {
+                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(isDialer) + ')', function (err, UserDetailsResult) {
                             console.log(err);
                             if (!err) {
                                 //console.log('UserDetailsResult',UserDetailsResult);
@@ -5328,54 +5330,54 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
                                     if (UserDetailsResult[0].length > 0) {
                                         UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
                                             (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
-                                        
+
                                         UserDetailsResult[0][0].versionStatus = rtnMessage.versionStatus;
                                         UserDetailsResult[0][0].versionMessage = rtnMessage.versionMessage;
 
-                                        for (var i=0 ; i<UserDetailsResult[1].length ; i++){
-                                            UserDetailsResult[1][i].trackTemplateDetails = UserDetailsResult[1][i] && UserDetailsResult[1][i].trackTemplateDetails ?  JSON.parse(UserDetailsResult[1][i].trackTemplateDetails):[];
+                                        for (var i = 0; i < UserDetailsResult[1].length; i++) {
+                                            UserDetailsResult[1][i].trackTemplateDetails = UserDetailsResult[1][i] && UserDetailsResult[1][i].trackTemplateDetails ? JSON.parse(UserDetailsResult[1][i].trackTemplateDetails) : [];
                                         }
-                                      
-                                        if (UserDetailsResult[1] && UserDetailsResult[1][0] && UserDetailsResult[1][0].isFormGroupHide !=undefined){
 
-                                            if(UserDetailsResult[1][0].isFormGroupHide !=0 || UserDetailsResult[3][0].count !=0){
-                                                UserDetailsResult[1][0].homePageBanner='';
+                                        if (UserDetailsResult[1] && UserDetailsResult[1][0] && UserDetailsResult[1][0].isFormGroupHide != undefined) {
+
+                                            if (UserDetailsResult[1][0].isFormGroupHide != 0 || UserDetailsResult[3][0].count != 0) {
+                                                UserDetailsResult[1][0].homePageBanner = '';
                                             }
-    
+
                                         }
 
                                         // UserDetailsResult[0][0].companyDetails = UserDetailsResult[1][0] ? UserDetailsResult[1][0]:{}
-                                       
+
                                         // var output = 
                                         // {
-                                           
+
                                         //    isHideSearchPage : UserDetailsResult[0][0].isHideSearchPage ? UserDetailsResult[0][0].isHideSearchPage : 0,
                                         //    isHideChatPage : UserDetailsResult[0][0].isHideChatPage ? UserDetailsResult[0][0].isHideChatPage : 0,
                                         //   isHideProfilePage : UserDetailsResult[0][0].isHideProfilePage ? UserDetailsResult[0][0].isHideProfilePage : 0,
                                         //    brandingPageUrl : UserDetailsResult[0][0].brandingPageUrl ? UserDetailsResult[0][0].brandingPageUrl : ''
-                                           
-                                            
+
+
                                         // }
 
-                                        
-                                          response.status = true;
+
+                                        response.status = true;
                                         response.message = "User details loaded successfully";
                                         response.error = null;
                                         response.data = {
-                                            isdMobile:UserDetailsResult[0][0].ISDMobileNumber,
-                                            mobileNo:UserDetailsResult[0][0].MobileNumber,
-                                            profilePictureUrl:UserDetailsResult[0][0].Picture,
-                                            ezeId:UserDetailsResult[0][0].EZEID,
-                                            displayName:UserDetailsResult[0][0].displayName,
-                                            emailId:UserDetailsResult[0][0].EMailID,
-                                            masterId:UserDetailsResult[0][0].MasterID,
-                                            headerImageFlag:UserDetailsResult[0][0].headerImageFlag,
-                                            attachmentCount:UserDetailsResult[0][0].attachmentCount,
-                                            isNewUser:UserDetailsResult[0][0].isNewUser,
-                                            isConfigManager:UserDetailsResult[0][0].isConfigManager,
-                                            groupId:UserDetailsResult[0][0].groupId,
-                                            
-                                           companyDetails : UserDetailsResult[1][0] ? (UserDetailsResult[1][0]):null
+                                            isdMobile: UserDetailsResult[0][0].ISDMobileNumber,
+                                            mobileNo: UserDetailsResult[0][0].MobileNumber,
+                                            profilePictureUrl: UserDetailsResult[0][0].Picture,
+                                            ezeId: UserDetailsResult[0][0].EZEID,
+                                            displayName: UserDetailsResult[0][0].displayName,
+                                            emailId: UserDetailsResult[0][0].EMailID,
+                                            masterId: UserDetailsResult[0][0].MasterID,
+                                            headerImageFlag: UserDetailsResult[0][0].headerImageFlag,
+                                            attachmentCount: UserDetailsResult[0][0].attachmentCount,
+                                            isNewUser: UserDetailsResult[0][0].isNewUser,
+                                            isConfigManager: UserDetailsResult[0][0].isConfigManager,
+                                            groupId: UserDetailsResult[0][0].groupId,
+
+                                            companyDetails: UserDetailsResult[1][0] ? (UserDetailsResult[1][0]) : null
                                         }
                                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                         zlib.gzip(buf, function (_, result) {
@@ -5383,12 +5385,27 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
                                             res.status(200).json(response);
                                         });
                                         console.log('FnGetUserDetails : tmaster: User details sent successfully');
-                                    
-                                    }
-                                    else{
 
-                                     response.status = true;
-                                    response.message = "User details sent successfully";
+                                    }
+                                    else {
+
+                                        response.status = true;
+                                        response.message = "User details sent successfully";
+                                        response.error = null;
+                                        response.data = null;
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        });
+                                    }
+                                }
+                                else {
+
+
+                                    console.log('FnGetUserDetails : tmaster: No User details found');
+                                    response.status = true;
+                                    response.message = "tmaster: No User details found";
                                     response.error = null;
                                     response.data = null;
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -5396,23 +5413,8 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
                                         response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                         res.status(200).json(response);
                                     });
-                                }   
-                                }
-                                else {
-                                   
-                                 
-                                   console.log('FnGetUserDetails : tmaster: No User details found');
-                                   response.status = true;
-                                   response.message = "tmaster: No User details found";
-                                   response.error = null;
-                                   response.data = null;
-                                   var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                   zlib.gzip(buf, function (_, result) {
-                                       response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                       res.status(200).json(response);
-                                   });
-                                 
-                               
+
+
                                 }
 
                             }
@@ -5422,11 +5424,11 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
                                 // console.log('FnGetUserDetails : tmaster:' + err);
 
                                 response.status = false;
-                                   response.message = "FnGetUserDetails : tmaster:" + err;
-                                   response.error = null;
-                                   response.data = null;
+                                response.message = "FnGetUserDetails : tmaster:" + err;
+                                response.error = null;
+                                response.data = null;
 
-                                   res.status(500).json(response);
+                                res.status(500).json(response);
                             }
                         });
                     }
@@ -5482,10 +5484,10 @@ User.prototype.paceChangePassword = function (req, res, next) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var TokenNo = req.query.token;   // token is now query  //token was in body  T was caps before
 
-        
+
         var RtnMessage = {
             status: true,
-            error:null,
+            error: null,
             message: "Invalid token",
             IsChanged: false
         };
@@ -5493,19 +5495,19 @@ User.prototype.paceChangePassword = function (req, res, next) {
 
         var validationFlag = true;
 
-    if (!TokenNo) {
-        error.TokenNo = 'Invalid token';
-        validationFlag *= false;
-    }
+        if (!TokenNo) {
+            error.TokenNo = 'Invalid token';
+            validationFlag *= false;
+        }
 
 
-        if (!validationFlag){
+        if (!validationFlag) {
             RtnMessage.error = error;
             RtnMessage.message = 'Please check the errors';
             res.status(400).json(RtnMessage);
             console.log(RtnMessage);
         }
-        else{
+        else {
             // if (OldPassword && NewPassword && TokenNo ) {
             st.validateToken(TokenNo, function (err, tokenResult) {
                 if (!err) {
@@ -5514,79 +5516,73 @@ User.prototype.paceChangePassword = function (req, res, next) {
                         // var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
                         // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                         //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                        
-                            var OldPassword = req.body.OldPassword;
-                            // console.log("OldPassword input",req.body.OldPassword,"hashed output",OldPassword);
-                            // console.log("req.body",req.body);
-                            var NewPassword = req.body.NewPassword;
-    
-                            var oldPassQueryParams = st.db.escape(TokenNo);
 
-                            var oldPassQuery = 'CALL pgetoldpassword(' + oldPassQueryParams + ')';
-                            console.log(oldPassQuery);
-                            st.db.query(oldPassQuery, function (err, oldPassResult) {
-                                if (err) {
-                                    console.log('Error : FnChangePassword - During old password retrieval; Procedure: pgetoldpassword');
-                                    console.log(err);
-                                    RtnMessage.status = false;
-                                    RtnMessage.message = "Something went wrong";
-                                    res.status(400).json(RtnMessage);
-                                }
-                                else {
-                                    console.log("oldPassResult",oldPassResult);
-                                    if (oldPassResult) {
-                                        if (oldPassResult[0]) {
-                                            if (oldPassResult[0][0]) {
-                                                if (oldPassResult[0][0].Password) {
-    
-                                                    if (comparePassword(OldPassword, oldPassResult[0][0].Password)) {
-                                                        var ip = req.headers['x-forwarded-for'] ||
-                                                            req.connection.remoteAddress ||
-                                                            req.socket.remoteAddress ||
-                                                            req.connection.socket.remoteAddress;
-                                                        var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
-    
-                                                        var newPassword = hashPassword(NewPassword);
-                                                        var passChangeQueryParams = st.db.escape(TokenNo) + ',' +
-                                                            st.db.escape(newPassword) + ',' + st.db.escape(ip) + ',' + st.db.escape(userAgent)+ ',' + st.db.escape(DBSecretKey);
-    
-                                                        var passChangeQuery = 'CALL pChangePassword(' + passChangeQueryParams + ')';
-                                                        console.log(passChangeQuery);
-    
-    
-                                                        st.db.query(passChangeQuery, function (err, passChangeResult) {
-                                                            if (err) {
-                                                                console.log('Error FnChangePassword :  procedure pChangePassword');
-                                                                console.log(err);
-                                                                RtnMessage.status = false;
-                                                                RtnMessage.message = "Something went wrong";
-                                                                res.status(500).json(RtnMessage);
+                        var OldPassword = req.body.OldPassword;
+                        // console.log("OldPassword input",req.body.OldPassword,"hashed output",OldPassword);
+                        // console.log("req.body",req.body);
+                        var NewPassword = req.body.NewPassword;
+
+                        var oldPassQueryParams = st.db.escape(TokenNo);
+
+                        var oldPassQuery = 'CALL pgetoldpassword(' + oldPassQueryParams + ')';
+                        console.log(oldPassQuery);
+                        st.db.query(oldPassQuery, function (err, oldPassResult) {
+                            if (err) {
+                                console.log('Error : FnChangePassword - During old password retrieval; Procedure: pgetoldpassword');
+                                console.log(err);
+                                RtnMessage.status = false;
+                                RtnMessage.message = "Something went wrong";
+                                res.status(400).json(RtnMessage);
+                            }
+                            else {
+                                console.log("oldPassResult", oldPassResult);
+                                if (oldPassResult) {
+                                    if (oldPassResult[0]) {
+                                        if (oldPassResult[0][0]) {
+                                            if (oldPassResult[0][0].Password) {
+
+                                                if (comparePassword(OldPassword, oldPassResult[0][0].Password)) {
+                                                    var ip = req.headers['x-forwarded-for'] ||
+                                                        req.connection.remoteAddress ||
+                                                        req.socket.remoteAddress ||
+                                                        req.connection.socket.remoteAddress;
+                                                    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+
+                                                    var newPassword = hashPassword(NewPassword);
+                                                    var passChangeQueryParams = st.db.escape(TokenNo) + ',' +
+                                                        st.db.escape(newPassword) + ',' + st.db.escape(ip) + ',' + st.db.escape(userAgent) + ',' + st.db.escape(DBSecretKey);
+
+                                                    var passChangeQuery = 'CALL pChangePassword(' + passChangeQueryParams + ')';
+                                                    console.log(passChangeQuery);
+
+
+                                                    st.db.query(passChangeQuery, function (err, passChangeResult) {
+                                                        if (err) {
+                                                            console.log('Error FnChangePassword :  procedure pChangePassword');
+                                                            console.log(err);
+                                                            RtnMessage.status = false;
+                                                            RtnMessage.message = "Something went wrong";
+                                                            res.status(500).json(RtnMessage);
+                                                        }
+                                                        else {
+                                                            if (passChangeResult) {
+                                                                RtnMessage.IsChanged = true;
+                                                                RtnMessage.status = true;
+                                                                RtnMessage.message = "Password changed ..";
+                                                                res.status(200).json(RtnMessage);
                                                             }
                                                             else {
-                                                                if (passChangeResult) {
-                                                                    RtnMessage.IsChanged = true;
-                                                                    RtnMessage.status = true;
-                                                                    RtnMessage.message = "Password changed ..";
-                                                                    res.status(200).json(RtnMessage);
-                                                                }
-                                                                else {
-                                                                    RtnMessage.status = true;
-                                                                    RtnMessage.message = "Password changed ..";
-                                                                    res.status(200).status(RtnMessage);
-                                                                }
+                                                                RtnMessage.status = true;
+                                                                RtnMessage.message = "Password changed ..";
+                                                                res.status(200).status(RtnMessage);
                                                             }
-                                                        });
-                                                    }
-                                                    else {
-                                                        RtnMessage.status = false;
-                                                        RtnMessage.message = "Old password does not match. Please re-enter password..";
-                                                        res.status(200).json(RtnMessage);
-                                                    }
+                                                        }
+                                                    });
                                                 }
                                                 else {
                                                     RtnMessage.status = false;
-                                                    RtnMessage.message = "Unable to fetch old password ..";
-                                                    res.status(401).json(RtnMessage);
+                                                    RtnMessage.message = "Old password does not match. Please re-enter password..";
+                                                    res.status(200).json(RtnMessage);
                                                 }
                                             }
                                             else {
@@ -5607,7 +5603,13 @@ User.prototype.paceChangePassword = function (req, res, next) {
                                         res.status(401).json(RtnMessage);
                                     }
                                 }
-                            });
+                                else {
+                                    RtnMessage.status = false;
+                                    RtnMessage.message = "Unable to fetch old password ..";
+                                    res.status(401).json(RtnMessage);
+                                }
+                            }
+                        });
                         // });
 
                     } else {
