@@ -606,6 +606,16 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             res4.stage = result[4][i].stage ? JSON.parse(result[4][i].stage) : {};
                             output2.push(res4);
                         }
+                        if(result[9] && result[9][0]){
+                            for (var i = 0; i < result[9].length; i++) {
+                            result[9][i].stageDetails= result[9][i].stageDetails?JSON.parse(result[9][i].stageDetails) :[];
+                            for (var j=0;j< result[9][i].stageDetails.length;j++){
+                                result[9][i].stageDetails[j].details=result[9][i].stageDetails[j].details ? JSON.parse(result[9][i].stageDetails[j].details) :{};
+                            }
+                            }
+                        }
+
+                        console.log(result[9][0])
 
                         // for (var i = 0; i < result[7].length; i++) {
                         //     result[7][i].reqAppDetails = result[7][i].reqAppDetails ? JSON.parse(result[7][i].reqAppDetails) : [];
@@ -626,7 +636,14 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                                 fullfilmentReportTotalCount: result[5],
                                 converstionReport: result[6][0],
                                 turnAroundTime: result[7][0],
-                                firstCVResponse: result[8][0]
+                                firstCVResponse: result[8][0],
+                                recruiterWiseReport:result[9]
+                                // CVsCalled_SentToTheClient: result[9][0],
+                                // CVsSentToTheClient_CVsShortlistedByTheClient: result[10][0],
+                                // CVsShortlisted_CandidatesInterviewedByClient: result[11][0],
+                                // CandidatesInterviewedByClient_CandidatesOffered: result[12][0],
+                                // CandidatesOffered_CandidatesJoined: result[13][0]
+
                             };
                         res.status(200).json(response);
                     }
@@ -644,7 +661,13 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             fullfilmentReportTotalCount: [],
                             converstionReport: {},
                             turnAroundTime: [],
-                            firstCVResponse: []
+                            firstCVResponse: [],
+                            stageWiseReport:[]
+                            // CVsCalled_SentToTheClient:[],
+                            // CVsSentToTheClient_CVsShortlistedByTheClient: [],
+                            // CVsShortlisted_CandidatesInterviewedByClient: [],
+                            // CandidatesInterviewedByClient_CandidatesOffered: [],
+                            // CandidatesOffered_CandidatesJoined: []
 
                         };
                         res.status(200).json(response);
@@ -2541,7 +2564,7 @@ paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
     if (status) {
         try {
             var message = "";
-            message = message + applicantInfo[0].applicantName + ", " + applicantInfo[0].mobileIsd + applicantInfo[0].mobileNumber ;
+            message = message + applicantInfo.applicantName + ", " + applicantInfo.mobileIsd + applicantInfo.mobileNumber ;
             message = "Contact details: " + message + " --PaceHCM";
 
             var query = [

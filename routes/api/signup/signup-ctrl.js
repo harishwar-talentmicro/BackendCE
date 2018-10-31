@@ -14,9 +14,9 @@ var bcrypt = null;
 var EZEIDEmail = 'noreply@talentmicro.com';
 var CONFIG = require('../../../ezeone-config.json');
 
-const accountSid = 'AC62cf5e4f884a28b6ad9e2da511d24f4d';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'AC62cf5e4f884a28b6ad9e2da511d24f4d';
-const authToken = 'ff62486827ce8b68c70c1b8f7cef9748';   //'3abf04f536ede7f6964919936a35e614';  //'ff62486827ce8b68c70c1b8f7cef9748';//
-const FromNumber = CONFIG.DB.FromNumber || '+16012286363'; 
+const accountSid = 'AC3765f2ec587b6b5b893566f1393a00f4';  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'AC3765f2ec587b6b5b893566f1393a00f4';
+const authToken = 'b36eba6376b5939cebe146f06d33ec57';   //'3abf04f536ede7f6964919936a35e614';  //'b36eba6376b5939cebe146f06d33ec57';//
+const FromNumber = CONFIG.DB.FromNumber || '+18647547021'; 
 const client = require('twilio')(accountSid, authToken);
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
@@ -138,38 +138,39 @@ signupCtrl.sendOtp = function (req, res, next) {
 
                         }, function (error, response, body) {
                             if (error) {
-                                console.log(error, "SMS then try with smsGateway service if one fails");
-                                var req = http.request(options, function (res) {
-                                    var chunks = [];
-        
-                                    res.on("data", function (chunk) {
-                                        chunks.push(chunk);
-                                        console.log("smsgateway service");
-                                    });
-        
-                                    res.on("end", function () {
-                                        var body = Buffer.concat(chunks);
-                                        console.log(body.toString());
-                                    });
-                                });
-        
-                                req.write(qs.stringify({
-                                    userId: 'talentmicro',
-                                    password: 'TalentMicro@123',
-                                    senderId: 'WTMATE',
-                                    sendMethod: 'simpleMsg',
-                                    msgType: 'text',
-                                    mobile: isdMobile.replace("+", "") + mobileNo,
-                                    msg: message,
-                                    duplicateCheck: 'true',
-                                    format: 'json'
-                                }));
-                                req.end();
+                                console.log(error, "SMS");
                             }
                             else {
-                                console.log("SUCCESS aikon sms service", "SMS response");
+                                console.log("SUCCESS", "SMS response");
                             }
                         });
+
+                        var req = http.request(options, function (res) {
+                            var chunks = [];
+
+                            res.on("data", function (chunk) {
+                                chunks.push(chunk);
+                            });
+
+                            res.on("end", function () {
+                                var body = Buffer.concat(chunks);
+                                console.log(body.toString());
+                            });
+                        });
+
+                        req.write(qs.stringify({
+                            userId: 'talentmicro',
+                            password: 'TalentMicro@123',
+                            senderId: 'WTMATE',
+                            sendMethod: 'simpleMsg',
+                            msgType: 'text',
+                            mobile: isdMobile.replace("+", "") + mobileNo,
+                            msg: message,
+                            duplicateCheck: 'true',
+                            format: 'json'
+                        }));
+                        req.end();
+
 
                     }
                     else if (isdMobile != "") {
@@ -600,21 +601,22 @@ signupCtrl.verifyOTP = function (req, res, next) {
         error['isdMobile'] = 'isd mobile is mandatory';
         validationFlag *= false;
     }
-    if (!emailId) {
-        error['emailId'] = 'Email id is mandatory';
-        validationFlag *= false;
-    }
+    // if (!emailId) {
+    //     error['emailId'] = 'Email id is mandatory';
+    //     validationFlag *= false;
+    // }
 
     if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
+        respMsg.error = error;
+        respMsg.message = 'Please check the errors';
+        res.status(400).json(respMsg);
+        console.log(respMsg);
     }
     else {
         try {
-
+            var emailId = req.body.emailId  ? req.body.emailId :'';
             var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+            var isDialer= req.query.isDialer ? req.query.isDialer :0;
             req.query.token = req.query.token ? req.query.token : "";
             var pictureURL = req.body.pictureURL ? req.body.pictureURL : "";
             var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
@@ -631,7 +633,7 @@ signupCtrl.verifyOTP = function (req, res, next) {
                 pictureURL = (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + pictureURL);
             }
             var password = randomstring.generate({
-                length: 6,
+                length: 4,
                 charset: 'alphanumeric'
             });
             var message = "";
@@ -794,9 +796,8 @@ signupCtrl.verifyOTP = function (req, res, next) {
                         req.connection.remoteAddress ||
                         req.socket.remoteAddress;
                     var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
-                    var isDialer=0;
-                    
-                    req.st.generateToken(ip, userAgent, EZEOneId, isWhatMate, APNS_Id, GCM_Id, secretKey,isDialer, function (err, token) {
+
+                    req.st.generateToken(ip, userAgent, EZEOneId, isWhatMate, APNS_Id, GCM_Id, secretKey, isDialer, function (err, token) {
                         if (err) {
                             respMsg.status = false;
                             respMsg.message = "Error while generating token";

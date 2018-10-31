@@ -2342,6 +2342,7 @@ Auth.prototype.loginLatest = function (req, res, next) {
                                                 var termsAndCondition = (loginDetails[0].termsAndCondition) ? (loginDetails[0].termsAndCondition) : '';
                                                 if (termsAndCondition) {
                                                     termsAndCondition = termsAndCondition.replace("[DisplayName]", loginDetails[0].displayName);
+                                                    termsAndCondition = termsAndCondition.replace("[DisplayName]", loginDetails[0].displayName);
                                                 }
                                                 responseMessage.termsAndCondition = termsAndCondition;
                                                 // responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
@@ -2435,6 +2436,7 @@ Auth.prototype.loginLatest = function (req, res, next) {
                                     responseMessage.displayName = loginDetails[0].displayName;
                                     var termsAndCondition = (loginDetails[0].termsAndCondition) ? (loginDetails[0].termsAndCondition) : '';
                                     if (termsAndCondition) {
+                                        termsAndCondition = termsAndCondition.replace("[DisplayName]", loginDetails[0].displayName);
                                         termsAndCondition = termsAndCondition.replace("[DisplayName]", loginDetails[0].displayName);
                                     }
                                     responseMessage.termsAndCondition = termsAndCondition;
