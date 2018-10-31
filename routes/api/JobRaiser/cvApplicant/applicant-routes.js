@@ -93,7 +93,11 @@ router.post('/mailerApplicants',applicantCtrl.getMailerApplicants);
 
 
 router.post('/screenMailPreview',sendgridCtrl.MobileScreeningMailerPreview);
-router.post('/sendScreenMailPreview',sendgridCtrl.SendMobileScreeningMailerPreview);
+router.post('/sendScreenMailMobile',sendgridCtrl.SendMobileScreeningMailerPreview);
+router.post('/submissionMailerPreview',sendgridCtrl.MobileSubmissionMailerPreview);
+router.post('/sendSubmissionMailerMobile',sendgridCtrl.sendSubmissionMailerMobile);
+
+router.post('/reqViewMapApplicant',applicantCtrl.ReqAppMapFromReqView);
 
 module.exports = router;
 

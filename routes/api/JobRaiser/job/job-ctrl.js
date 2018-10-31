@@ -2566,4 +2566,97 @@ jobCtrl.getClientManagerList = function (req, res, next) {
     }
 };
 
+jobCtrl.getrequirementListMobile = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.keywords || "")
+                ];
+
+                var procQuery = 'CALL wm_get_mobileRequirementListAtSearchpage( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Requirement list loaded successfully";
+                        response.error = null;
+
+                        for (var i = 0; i < result[0].length; i++){
+                            result[0][i].currency = (result[0] && result[0][i] && JSON.parse(result[0][i].currency).currencyId) ? JSON.parse(result[0][i].currency) : {};
+                            result[0][i].scale = (result[0] && result[0][i] && JSON.parse(result[0][i].scale).scaleId) ? JSON.parse(result[0][i].scale) : {};
+                            result[0][i].duration = (result[0] && result[0][i] && JSON.parse(result[0][i].duration).durationId) ? JSON.parse(result[0][i].duration) : {};
+                            result[0][i].jobType = (result[0] && result[0][i] && JSON.parse(result[0][i].jobType).jobTypeId) ? JSON.parse(result[0][i].jobType) : {};
+                            result[0][i].primarySkills = (result[0] && result[0][i]) ? JSON.parse(result[0][i].primarySkills) : [];
+                            result[0][i].industry = (result[0] && result[0][i]) ? JSON.parse(result[0][i].industry) : [];
+                            result[0][i].educationSpecialization = (result[0] && result[0][i]) ? JSON.parse(result[0][i].educationSpecialization) : [];
+                            result[0][i].locationlist = (result[0] && result[0][i]) ? JSON.parse(result[0][i].locationlist) : [];
+                        }
+
+                        response.data = {
+                            requirementList: result[0] ? result[0] : []
+                        }
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                        // res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = {
+                            requirementList: []
+                        };
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                        // res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting requirement List";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
 module.exports = jobCtrl;

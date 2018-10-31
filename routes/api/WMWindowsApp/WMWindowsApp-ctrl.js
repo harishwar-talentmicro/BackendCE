@@ -63,7 +63,7 @@ windowsCtrl.uploadPaySlip = function(req,res,next){
             if((!err) && tokenResult){
                 req.body.stageId = req.body.stageId ? req.body.stageId : 0;
                 req.body.type = req.body.type ? req.body.type : 0;
-
+                // console.log("req.body",req.body.data);
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.HEMasterId),
@@ -758,6 +758,69 @@ windowsCtrl.uploadUsers = function(req,res,next){
                     else{
                         response.status = false;
                         response.message = "Error while uploading users";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+windowsCtrl.getDocTypeList = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId)
+    {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL wm_get_master_DocumentTypes( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,payslipResult){
+                    if (!err){
+                        response.status = true;
+                        response.message = "Document Types loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            docTypeList : payslipResult[0] ? payslipResult[0] : []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while loading document types list";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

@@ -638,7 +638,7 @@ masterCtrl.getmailTemplate = function (req, res, next) {
         data: null,
         error: null
     };
-    if (!req.query.heMasterId) {
+    if (!req.query.heMasterId || req.query.heMasterId == 'null' || req.query.heMasterId == null) {
         error.heMasterId = 'invalid company';
         validationFlag *= false;
     }
@@ -1448,31 +1448,9 @@ masterCtrl.getRequirementView = function (req, res, next) {
                         response.error = null;
                         var output = [];
                         for (var i = 0; i < results[0].length; i++) {
-                            var res2 = {};
-                            res2.parentId = results[0][i].parentId ? results[0][i].parentId : 0,
-                                res2.transId = results[0][i].transId ? results[0][i].transId : 0,
-                                res2.notes = results[0][i].notes ? results[0][i].notes : '',
-                                res2.heDepartmentId = results[0][i].heDepartmentId ? results[0][i].heDepartmentId : 0,
-                                res2.positions = results[0][i].positions ? results[0][i].positions : 0,
-                                res2.positionsFilled = results[0][i].positionsFilled ? results[0][i].positionsFilled : 0,
-                                res2.departmentTitle = results[0][i].departmentTitle ? results[0][i].departmentTitle : '',
-                                res2.jobCode = results[0][i].jobCode ? results[0][i].jobCode : '',
-                                res2.jobtitleId = results[0][i].jobtitleId ? results[0][i].jobtitleId : 0,
-                                res2.title = results[0][i].title ? results[0][i].title : '',
-                                res2.jobtypeid = results[0][i].jobtypeid ? results[0][i].jobtypeid : 0,
-                                res2.jobType = results[0][i].jobType ? results[0][i].jobType : '',
-                                res2.jobDescription = results[0][i].jobDescription ? results[0][i].jobDescription : '',
-                                res2.remainingDays = results[0][i].remainingDays ? results[0][i].remainingDays : 0,
-                                res2.keywords = results[0][i].keywords ? results[0][i].keywords : '',
-                                res2.createdUserId = results[0][i].createdUserId ? results[0][i].createdUserId : 0,
-                                res2.creatorName = results[0][i].name ? results[0][i].name : '',
-                                res2.createdDate = results[0][i].createdDate,
-                                res2.branchList = JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
-                                res2.contactList = JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
-                                res2.stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
-                                res2.newRequirement = results[0][i].newRequirement ? results[0][i].newRequirement : 0,
-                                res2.billAmount = results[0][i].billAmount ? results[0][i].billAmount : 0
-                            output.push(res2);
+                            results[0][i].branchList = JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
+                            results[0][i].contactList = JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
+                            results[0][i].stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : []
                         }
 
                         for (var i = 0; i < results[2].length; i++) {
@@ -1480,7 +1458,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                         }
 
                         response.data = {
-                            requirementView: output,
+                            requirementView: results[0] ? results[0] : [],
                             // stageStatusList: (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList) : [],
                             stageList: results[2] && results[2][0] ? results[2] : []
                         };
@@ -1587,7 +1565,9 @@ masterCtrl.getClientView = function (req, res, next) {
                         response.error = null;
                         for (var i = 0; i < results[0].length; i++) {
                             results[0][i].stageDetail = results[0][i].stageDetail ? JSON.parse(results[0][i].stageDetail) : [],
-                                results[0][i].clientContacts = results[0][i] && JSON.parse(results[0][i].clientContacts) ? JSON.parse(results[0][i].clientContacts) : [];
+                            results[0][i].clientContacts = results[0][i] && JSON.parse(results[0][i].clientContacts) ? JSON.parse(results[0][i].clientContacts) : [];
+                            results[0][i].branchList = results[0][i] && JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [];
+                        
                         }
                         response.data = {
                             clientView: results[0] ? results[0] : []

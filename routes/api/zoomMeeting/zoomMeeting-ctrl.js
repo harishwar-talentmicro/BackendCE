@@ -385,7 +385,7 @@ zoomCtrl.getAccessTokenVideo = function (req, res, next) {
                     response.status = true;
                     response.message = "Access token generated";
                     response.error = null;
-                    console.log("access token ",token.toJwt());
+                    console.log("access token ", token.toJwt());
                     response.data = {
                         accessToken: token.toJwt(),
                         meetingId: req.query.meetingId
@@ -862,59 +862,148 @@ zoomCtrl.paceStopMeeting = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-                        req.query.isDialer = req.query.isDialer ? req.query.isDialer : 0;
+                req.query.isDialer = req.query.isDialer ? req.query.isDialer : 0;
 
-                        var procParams = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.body.meetingId),
-                            req.st.db.escape(DBSecretKey),
-                            req.st.db.escape(req.query.isDialer)
-                        ];
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.meetingId),
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.query.isDialer)
+                ];
 
-                        var procQuery = 'CALL HE_stop_zoomMeeting( ' + procParams.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, questionsData) {
-                            if (!err) {
-                                var messagePayload = {
-                                    message: questionsData[0][0].message,
-                                    meetingId: req.body.meetingId,
-                                    type: 92
-                                };
+                var procQuery = 'CALL HE_stop_zoomMeeting( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, questionsData) {
+                    if (!err) {
+                        var messagePayload = {
+                            message: questionsData[0][0].message,
+                            meetingId: req.body.meetingId,
+                            type: 92
+                        };
 
-                                if (questionsData[1] && questionsData[1][0].APNS_Id) {
-                                    _Notification_aws.publish_IOS(questionsData[1][0].APNS_Id, messagePayload, 0);
-                                }
-                                if (questionsData[2] && questionsData[2][0].GCM_Id) {
-                                    _Notification_aws.publish_Android(questionsData[2][0].GCM_Id, messagePayload);
-                                }
-                                if (questionsData[3] && questionsData[3][0].dialerAPNS_Id) {
-                                    _Notification_aws.publish_dialer_IOS(questionsData[3][0].dialerAPNS_Id, messagePayload, 0);
-                                }
-                                if (questionsData[4] && questionsData[4][0].dialerGCM_Id) {
-                                    _Notification_aws.publish_dialer_Android(questionsData[4][0].dialerGCM_Id, messagePayload);
-                                }
+                        if (questionsData[1] && questionsData[1][0].APNS_Id) {
+                            _Notification_aws.publish_IOS(questionsData[1][0].APNS_Id, messagePayload, 0);
+                        }
+                        if (questionsData[2] && questionsData[2][0].GCM_Id) {
+                            _Notification_aws.publish_Android(questionsData[2][0].GCM_Id, messagePayload);
+                        }
+                        if (questionsData[3] && questionsData[3][0].dialerAPNS_Id) {
+                            _Notification_aws.publish_dialer_IOS(questionsData[3][0].dialerAPNS_Id, messagePayload, 0);
+                        }
+                        if (questionsData[4] && questionsData[4][0].dialerGCM_Id) {
+                            _Notification_aws.publish_dialer_Android(questionsData[4][0].dialerGCM_Id, messagePayload);
+                        }
 
-                                response.status = true;
-                                response.message = "Meeting stopped successfully.";
-                                response.error = null;
-                                response.data = null;
-                                res.status(200).json(response);
-                            }
-                            else {
-                                response.status = false;
-                                response.message = "Error while saving ";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
-                            }
-                        });
-                    // }
+                        response.status = true;
+                        response.message = "Meeting stopped successfully.";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving ";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+                // }
                 // });
             }
             else {
                 res.status(401).json(response);
             }
         });
+    }
+};
+
+zoomCtrl.getAccessTokenVideoForPace = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid MeetingId",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    req.query.isDialer = req.query.isDialer ? req.query.isDialer : 0;
+
+    if (!req.query.meetingId && req.query.meetingId == "") {
+        error.meetingId = "Invalid meetingId",
+            validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+        var date = new Date();
+        // Create Video Grant
+        var videoGrant = new VideoGrant();
+        videoGrant = new VideoGrant({
+            room: req.query.meetingId ? req.query.meetingId : "Guest_"+date
+        });
+
+
+        // Create an access token which we will sign and return to the client,
+        // containing the grant we just created
+        const token = new AccessToken(twilioAccountSid, twilioApiKey, twilioApiSecret);
+        token.addGrant(videoGrant);
+        token.identity = identity || "Guest";
+
+        var inputs = [
+            req.st.db.escape(req.query.meetingId),
+            req.st.db.escape(req.query.userMasterId)
+        ];
+
+        var query = 'call pace_get_zoomMeetingList(' + inputs.join(',') + ')';
+        req.db.query(query,function(err,result){
+            console.log(err);
+            if(!err && result && result[0] && result[0][0]){
+                if (token.toJwt()) {
+                    response.status = true;
+                    response.message = "Access token generated";
+                    response.error = null;
+                    console.log("access token ", token.toJwt());
+                    response.data = {
+                        accessToken: token.toJwt(),
+                        meetingId: req.query.meetingId,
+                        meetingList : result[0] ? result[0] : []
+                    };
+                    res.status(200).json(response);
+                }
+                else if (!err){
+                    response.status = false;
+                    response.message = "Access token could not be generated";
+                    response.error = null;
+                    response.data = {
+                        meetingList : result[0] ? result[0] : []
+                    }
+                    res.status(200).json(response);
+
+                }
+                else {
+                    response.status = false;
+                    response.message = "Error while saving ";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            };
+        });
+
+       
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+        // });
     }
 };
 

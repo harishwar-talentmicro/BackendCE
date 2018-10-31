@@ -42,6 +42,50 @@ var options = {
     }
 };
 
+var bcrypt = null;
+
+try {
+    bcrypt = require('bcrypt');
+}
+catch (ex) {
+    console.log('Bcrypt not found, falling back to bcrypt-nodejs');
+    bcrypt = require('bcrypt-nodejs');
+}
+
+/**
+ * Hashes the password for saving into database
+ * @param password
+ * @returns {*}
+ */
+function hashPassword(password) {
+    if (!password) {
+        return null;
+    }
+    try {
+        var hash = bcrypt.hashSync(password, 12);
+        return hash;
+    }
+    catch (ex) {
+        console.log(ex);
+    }
+}
+
+/**
+ * Compare the password and the hash for authenticating purposes
+ * @param password
+ * @param hash
+ * @returns {*}
+ */
+function comparePassword(password, hash) {
+    if (!password) {
+        return false;
+    }
+    if (!hash) {
+        return false;
+    }
+    return bcrypt.compareSync(password, hash);
+}
+
 
 var jobPortalCtrl = {};
 var error = {};
@@ -659,7 +703,8 @@ jobPortalCtrl.portalSaveApplicant = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(requirementArray)),
                             req.st.db.escape(req.body.referredBy),
                             req.st.db.escape(JSON.stringify(faceSheet)),
-                            req.st.db.escape(JSON.stringify(presentLocation))
+                            req.st.db.escape(JSON.stringify(presentLocation)),
+                            req.st.db.escape(DBSecretKey)
 
                         ];
 
@@ -1579,7 +1624,6 @@ jobPortalCtrl.portalreqAppMap = function (req, res, next) {
             }
         });
     }
-
 };
 
 jobPortalCtrl.portalrequirementSearch = function (req, res, next) {
@@ -1626,8 +1670,8 @@ jobPortalCtrl.portalrequirementSearch = function (req, res, next) {
                     jobList: result[0] && result[0][0] ? result[0] : [],
                     count: result[1][0].count,
                     locationList: result[2] && result[2][0] ? result[2] : [],
-                    industryList : result[3] && result[3][0] ? result[3] : [],
-                    functionalAreas : []
+                    industryList: result[3] && result[3][0] ? result[3] : [],
+                    functionalAreas: []
                 }
                 res.status(200).json(response);
 
@@ -2372,6 +2416,115 @@ jobPortalCtrl.signUpsendOtp = function (req, res, next) {
         respMsg.error = error;
         respMsg.message = 'Please check all the errors';
         res.status(400).json(respMsg);
+    }
+};
+
+jobPortalCtrl.portalChangePassword = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var oldPassword = req.body.oldPassword;
+    var newPassword = req.body.newPassword;
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.body.oldPassword) {
+        error.oldPassword = 'Invalid oldPassword';
+        validationFlag *= false;
+    }
+    if (!req.body.newPassword) {
+        error.newPassword = 'Invalid newPassword';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                console.log(req.body);
+                console.log(hashPassword(req.body.newPassword));
+                var inputs = [
+                    req.st.db.escape(req.query.token)
+                ];
+
+                var procQuery = 'CALL portal_get_oldPassword( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, oldresult) {
+                    console.log(err);
+                    if (err) {
+                        response.status = false;
+                        response.message = "Something went wrong. On Old Password retrival";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+
+                    else if (!err && oldresult[0] && oldresult[0][0] && oldresult[0][0].oldPassword) {
+
+                        if (comparePassword(oldPassword, oldresult[0][0].oldPassword)) {
+
+                            var changePassword = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(hashPassword(newPassword))
+                            ];
+
+                            var procQuery = 'CALL portal_changePassword( ' + changePassword.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, result) {
+                                console.log(err);
+                                if (err) {
+                                    response.status = false;
+                                    response.message = "Something went wrong";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                                else if (!err && result && result[0] && result[0][0] && result[0][0].message) {
+                                    response.status = true;
+                                    response.message = result[0][0].message;
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(200).json(response);
+                                }
+                            });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Password did not match";
+                            response.error = null;
+                            response.data = null;
+                            res.status(200).json(response);
+                        }
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Something went wrong";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+
+
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
     }
 };
 

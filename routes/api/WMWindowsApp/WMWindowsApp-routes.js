@@ -16,4 +16,6 @@ router.get('/taxDeclaration',WMWindowsCtrl.exportTaxDeclaration);
 
 router.post('/users',WMWindowsCtrl.uploadUsers);
 
+router.get('/docTypeList',WMWindowsCtrl.getDocTypeList);
+
 module.exports = router;
