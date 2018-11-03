@@ -2091,7 +2091,9 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(billingCurrency)),
                     req.st.db.escape(JSON.stringify(billingScale)),
                     req.st.db.escape(JSON.stringify(billingDuration)),
-                    req.st.db.escape(req.body.billingCTCAmount)
+                    req.st.db.escape(req.body.billingCTCAmount),
+                    req.st.db.escape(req.body.offerExpiryDate || null),
+                    req.st.db.escape(req.body.noticePeriod || 0)
                 ];
 
                 var procQuery = 'CALL wm_save_offerManager( ' + inputs.join(',') + ')';

@@ -458,7 +458,8 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                         req.st.db.escape(req.body.attachJD || 0),
                         req.st.db.escape(req.body.attachResume || 0),
                         req.st.db.escape(req.body.interviewerFlag || 0),
-                        req.st.db.escape(req.body.resumeFileName || '')
+                        req.st.db.escape(req.body.resumeFileName || ''),
+                        req.st.db.escape(req.body.attachResumeFlag || 0)
 
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
@@ -994,7 +995,8 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                         req.st.db.escape(req.body.attachJD || 0),
                         req.st.db.escape(req.body.attachResume || 0),
                         req.st.db.escape(req.body.interviewerFlag || 0),
-                        req.st.db.escape(req.body.resumeFileName || '')
+                        req.st.db.escape(req.body.resumeFileName || ''),
+                        req.st.db.escape(req.body.attachResumeFlag || 0)
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
@@ -1884,7 +1886,8 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                         req.st.db.escape(req.body.attachJD || 0),
                         req.st.db.escape(req.body.attachResume || 0),
                         req.st.db.escape(req.body.interviewerFlag || 0),
-                        req.st.db.escape(req.body.resumeFileName || '')
+                        req.st.db.escape(req.body.resumeFileName || ''),
+                        req.st.db.escape(req.body.attachResumeFlag || 0)
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
@@ -2839,7 +2842,8 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                         req.st.db.escape(req.body.attachJD || 0),
                         req.st.db.escape(req.body.attachResume || 0),
                         req.st.db.escape(req.body.interviewerFlag || 0),
-                        req.st.db.escape(req.body.resumeFileName || '')
+                        req.st.db.escape(req.body.resumeFileName || ''),
+                        req.st.db.escape(req.body.attachResumeFlag || 0)
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
@@ -3561,7 +3565,8 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                         req.st.db.escape(req.body.attachJD || 0),
                         req.st.db.escape(req.body.attachResume || 0),
                         req.st.db.escape(req.body.interviewerFlag || 0),
-                        req.st.db.escape(req.body.resumeFileName || '')
+                        req.st.db.escape(req.body.resumeFileName || ''),
+                        req.st.db.escape(req.body.attachResumeFlag || 0)
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
@@ -4648,7 +4653,8 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                         req.st.db.escape(req.body.attachJD || 0),
                         req.st.db.escape(req.body.attachResume || 0),
                         req.st.db.escape(req.body.interviewerFlag || 0),
-                        req.st.db.escape(req.body.resumeFileName || '')
+                        req.st.db.escape(req.body.resumeFileName || ''),
+                        req.st.db.escape(req.body.attachResumeFlag || 0)
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);

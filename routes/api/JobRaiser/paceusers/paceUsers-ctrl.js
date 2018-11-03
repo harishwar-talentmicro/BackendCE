@@ -1291,7 +1291,7 @@ paceUsersCtrl.freeJobPortalUsers = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-
+                req.query.detailsFlag = req.query.detailsFlag ==0 ? req.query.detailsFlag : 1;
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -1302,15 +1302,34 @@ paceUsersCtrl.freeJobPortalUsers = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     // console.log(result);
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0] || result[1]) {
                         response.status = true;
                         response.message = "Job portal details loaded successfully";
                         response.error = null;
 
-                        result[0][0].portalName = (result[0] && result[0][0] && JSON.parse(result[0][0].portalName)) ? JSON.parse(result[0][0].portalName) : {};
+                        if (result[0] && result[0][0]){
+                            result[0][0].portalName = (result[0] && result[0][0] && JSON.parse(result[0][0].portalName)) ? JSON.parse(result[0][0].portalName) : {};
+                        }
+
+                        if(result[1] && result[1][0]){
+                            result[1][0].portalName = (result[1] && result[1][0] && JSON.parse(result[1][0].portalName)) ? JSON.parse(result[1][0].portalName) : {};
+                        }
+
+                        var freePortal = {};
+                        if(req.query.detailsFlag == 0){
+                            freePortal = (result[1] && result[1][0]) ? result[1][0] : {};
+                        }
+                        else{
+                            if(result[0].length){
+                                freePortal= (result[0] && result[0]) ? result[0][0] : {}   
+                            }
+                            else{
+                                freePortal = (result[1] && result[1]) ? result[1][0] : {}   
+                            }
+                        }
 
                         response.data = {
-                            freePortal: (result[0] && result[0]) ? result[0][0] : {}
+                            freePortal: freePortal
 
                         }
                         res.status(200).json(response);

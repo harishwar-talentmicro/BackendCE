@@ -820,6 +820,7 @@ jobPortalCtrl.getPortalRequirementDetails = function (req, res, next) {
                 result[0][0].secondarySkills = (result[0] && result[0][0]) ? JSON.parse(result[0][0].secondarySkills) : [];
                 result[0][0].industry = (result[0] && result[0][0]) ? JSON.parse(result[0][0].industry) : [];
                 result[0][0].attachmentList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].attachmentList) : [];
+                result[0][0].functionalAreas = (result[0] && result[0][0]) ? JSON.parse(result[0][0].functionalAreas) : [];
 
                 response.data = {
 
@@ -1671,7 +1672,7 @@ jobPortalCtrl.portalrequirementSearch = function (req, res, next) {
                     count: result[1][0].count,
                     locationList: result[2] && result[2][0] ? result[2] : [],
                     industryList: result[3] && result[3][0] ? result[3] : [],
-                    functionalAreas: []
+                    functionalAreas: result[4] && result[4][0] ? result[4] : []
                 }
                 res.status(200).json(response);
 

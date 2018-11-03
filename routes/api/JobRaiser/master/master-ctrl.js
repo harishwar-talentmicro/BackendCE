@@ -863,8 +863,8 @@ masterCtrl.savetemplate = function (req, res, next) {
                     req.st.db.escape(req.body.attachJD || 0),
                     req.st.db.escape(req.body.attachResume || 0),
                     req.st.db.escape(req.body.interviewerFlag || 0),
-                    req.st.db.escape(req.body.resumeFileName || "")
-
+                    req.st.db.escape(req.body.resumeFileName || ""),
+                    req.st.db.escape(req.body.attachResumeFlag || 0)
                 ];
                 var procQuery = 'CALL WM_save_1010_mailTemplate( ' + inputs.join(',') + ')';
                 console.log(procQuery);
