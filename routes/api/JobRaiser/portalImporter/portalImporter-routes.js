@@ -19,4 +19,6 @@ router.post('/checkPortalApplicantsTimesJobs',portalimporter.checkApplicantExist
 router.post('/savePortalApplicantsShine',portalimporter.saveApplicantsFromShine);
 router.post('/savePortalApplicantsTimesJobs',portalimporter.saveApplicantsFromTimesjobs);
 
+router.post('/savePortalApplicantsLinkedIn',portalimporter.savePortalApplicantsLinkedIn);
+
 module.exports = router;

@@ -21,5 +21,6 @@ router.post('/twilio/makeCall',zoomCtrl.makeCall);
 
 router.post('/pacezoom/meeting',zoomCtrl.paceSaveZoomMeeting);
 router.post('/pacezoom/meeting/stop',zoomCtrl.paceStopMeeting);
+router.get('/twilio/accessTokenForPace',zoomCtrl.getAccessTokenVideoForPace);
 
 module.exports = router;

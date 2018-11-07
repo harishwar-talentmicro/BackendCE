@@ -37,5 +37,7 @@ router.get('/jdTemplateDetails',jobCtrl.getJdTemplateDetails);
 router.get('/manpowerStatus',jobCtrl.manpowerRequirementStatus);
 router.get('/clientManagerList',jobCtrl.getClientManagerList);
 
+router.post('/requirementListForMobile',jobCtrl.getrequirementListMobile);
+
 module.exports = router;
 

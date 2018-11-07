@@ -1291,7 +1291,7 @@ paceUsersCtrl.freeJobPortalUsers = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-
+                req.query.detailsFlag = req.query.detailsFlag ==0 ? req.query.detailsFlag : 1;
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -1302,15 +1302,34 @@ paceUsersCtrl.freeJobPortalUsers = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     // console.log(result);
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0] || result[1]) {
                         response.status = true;
                         response.message = "Job portal details loaded successfully";
                         response.error = null;
 
-                        result[0][0].portalName = (result[0] && result[0][0] && JSON.parse(result[0][0].portalName)) ? JSON.parse(result[0][0].portalName) : {};
+                        if (result[0] && result[0][0]){
+                            result[0][0].portalName = (result[0] && result[0][0] && JSON.parse(result[0][0].portalName)) ? JSON.parse(result[0][0].portalName) : {};
+                        }
+
+                        if(result[1] && result[1][0]){
+                            result[1][0].portalName = (result[1] && result[1][0] && JSON.parse(result[1][0].portalName)) ? JSON.parse(result[1][0].portalName) : {};
+                        }
+
+                        var freePortal = {};
+                        if(req.query.detailsFlag == 0){
+                            freePortal = (result[1] && result[1][0]) ? result[1][0] : {};
+                        }
+                        else{
+                            if(result[0].length){
+                                freePortal= (result[0] && result[0]) ? result[0][0] : {}   
+                            }
+                            else{
+                                freePortal = (result[1] && result[1]) ? result[1][0] : {}   
+                            }
+                        }
 
                         response.data = {
-                            freePortal: (result[0] && result[0]) ? result[0][0] : {}
+                            freePortal: freePortal
 
                         }
                         res.status(200).json(response);
@@ -2581,99 +2600,99 @@ paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
 
                 if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].mobile) {
 
-                    if (userResult[0][0].isd && userResult[0][0].mobile) {
-                        if (userResult[0][0].isd == "+977") {
-                            request({
-                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                qs: {
-                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                    to: userResult[0][0].mobile,
-                                    message: message,
-                                    sender: 'Techingen'
-                                },
-                                method: 'GET'
+                    // if (userResult[0][0].isd && userResult[0][0].mobile) {
+                    //     if (userResult[0][0].isd == "+977") {
+                    //         request({
+                    //             url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                    //             qs: {
+                    //                 token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                    //                 to: userResult[0][0].mobile,
+                    //                 message: message,
+                    //                 sender: 'Techingen'
+                    //             },
+                    //             method: 'GET'
 
-                            }, function (error, response, body) {
-                                if (error) {
-                                    console.log(error, "SMS");
-                                }
-                                else {
-                                    console.log("SUCCESS", "SMS response");
-                                }
+                    //         }, function (error, response, body) {
+                    //             if (error) {
+                    //                 console.log(error, "SMS");
+                    //             }
+                    //             else {
+                    //                 console.log("SUCCESS", "SMS response");
+                    //             }
 
-                            });
-                        }
-                        else if (userResult[0][0].isd == "+91") {
-                            request({
-                                url: 'https://aikonsms.co.in/control/smsapi.php',
-                                qs: {
-                                    user_name: 'janardana@hirecraft.com',
-                                    password: 'Ezeid2015',
-                                    sender_id: 'WtMate',
-                                    service: 'TRANS',
-                                    mobile_no: userResult[0][0].mobile,
-                                    message: message,
-                                    method: 'send_sms'
-                                },
-                                method: 'GET'
+                    //         });
+                    //     }
+                    //     else if (userResult[0][0].isd == "+91") {
+                    //         request({
+                    //             url: 'https://aikonsms.co.in/control/smsapi.php',
+                    //             qs: {
+                    //                 user_name: 'janardana@hirecraft.com',
+                    //                 password: 'Ezeid2015',
+                    //                 sender_id: 'WtMate',
+                    //                 service: 'TRANS',
+                    //                 mobile_no: userResult[0][0].mobile,
+                    //                 message: message,
+                    //                 method: 'send_sms'
+                    //             },
+                    //             method: 'GET'
 
-                            }, function (error, response, body) {
-                                if (error) {
-                                    console.log(error, "SMS");
-                                }
-                                else {
-                                    console.log("SUCCESS", "SMS response");
-                                }
-                            });
+                    //         }, function (error, response, body) {
+                    //             if (error) {
+                    //                 console.log(error, "SMS");
+                    //             }
+                    //             else {
+                    //                 console.log("SUCCESS", "SMS response");
+                    //             }
+                    //         });
 
-                            var req = http.request(options, function (res) {
-                                var chunks = [];
+                    //         var req = http.request(options, function (res) {
+                    //             var chunks = [];
 
-                                res.on("data", function (chunk) {
-                                    chunks.push(chunk);
-                                });
+                    //             res.on("data", function (chunk) {
+                    //                 chunks.push(chunk);
+                    //             });
 
-                                res.on("end", function () {
-                                    var body = Buffer.concat(chunks);
-                                    console.log(body.toString());
-                                });
-                            });
+                    //             res.on("end", function () {
+                    //                 var body = Buffer.concat(chunks);
+                    //                 console.log(body.toString());
+                    //             });
+                    //         });
 
-                            req.write(qs.stringify({
-                                userId: 'talentmicro',
-                                password: 'TalentMicro@123',
-                                senderId: 'WTMATE',
-                                sendMethod: 'simpleMsg',
-                                msgType: 'text',
-                                mobile: userResult[0][0].isd.replace("+", "") + userResult[0][0].mobile,
-                                msg: message,
-                                duplicateCheck: 'true',
-                                format: 'json'
-                            }));
-                            req.end();
+                    //         req.write(qs.stringify({
+                    //             userId: 'talentmicro',
+                    //             password: 'TalentMicro@123',
+                    //             senderId: 'WTMATE',
+                    //             sendMethod: 'simpleMsg',
+                    //             msgType: 'text',
+                    //             mobile: userResult[0][0].isd.replace("+", "") + userResult[0][0].mobile,
+                    //             msg: message,
+                    //             duplicateCheck: 'true',
+                    //             format: 'json'
+                    //         }));
+                    //         req.end();
 
 
-                        }
-                        else if (userResult[0][0].isd != "") {
-                            client.messages.create(
-                                {
-                                    body: message,
-                                    to: userResult[0][0].isd + userResult[0][0].mobile,
-                                    from: FromNumber
-                                },
-                                function (error, response) {
-                                    if (error) {
-                                        console.log(error, "SMS");
-                                    }
-                                    else {
-                                        console.log("SUCCESS", "SMS response");
-                                    }
-                                }
-                            );
-                        }
-                    }
+                    //     }
+                    //     else if (userResult[0][0].isd != "") {
+                    //         client.messages.create(
+                    //             {
+                    //                 body: message,
+                    //                 to: userResult[0][0].isd + userResult[0][0].mobile,
+                    //                 from: FromNumber
+                    //             },
+                    //             function (error, response) {
+                    //                 if (error) {
+                    //                     console.log(error, "SMS");
+                    //                 }
+                    //                 else {
+                    //                     console.log("SUCCESS", "SMS response");
+                    //                 }
+                    //             }
+                    //         );
+                    //     }
+                    // }
                     respMsg.status = true;
-                    respMsg.message = 'Contact details Sent Successfully';
+                    respMsg.message = 'Applicant details sent to whatmate.Please login into whatmate';
                     respMsg.data = null;
                     res.status(200).json(respMsg);
 

@@ -894,7 +894,7 @@ sendMessageCtrl.GetMsgMapUsersData = function (req, res, next) {
                             response.data = {
 
                                 userData: output,
-                                count: userResult[1][0].count
+                                count: userResult[1][0] && userResult[1][0].count ? userResult[1][0].count : 0
                             }
                         }
                         else {

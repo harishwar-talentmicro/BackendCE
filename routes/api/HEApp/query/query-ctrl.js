@@ -1130,7 +1130,7 @@ queryCtrl.getQuerydetails = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0] || result[1]) {
                         response.status = true;
                         response.message = "Query types loaded successfully";
                         response.error = null;
@@ -1151,8 +1151,8 @@ queryCtrl.getQuerydetails = function (req, res, next) {
                             
                         }
                         response.data = {
-                            queryDetails: result[0],
-                           queryList:result[1]
+                            queryDetails: result[0] ? result[0] : [],
+                           queryList:result[1] ? result[1] : []
                         }
                         res.status(200).json(response);
                     }

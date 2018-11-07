@@ -37,5 +37,7 @@ router.post('/portalresetPassword',jobPortalCtrl.portalresetPassword);
 
 router.post('/portalsignUpsendOtp',jobPortalCtrl.signUpsendOtp);
 
+router.post('/portalChangePassword',jobPortalCtrl.portalChangePassword);
+
 module.exports = router;
 

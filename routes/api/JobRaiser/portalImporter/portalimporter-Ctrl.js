@@ -244,8 +244,10 @@ var savePortalApplicants = function (portalId, cvSourceId, details, req, res) {
                         req.st.db.escape(details.presentSalary || 0),
                         req.st.db.escape(JSON.stringify(req.body.requirements || [])),
                         req.st.db.escape(details.noticePeriod || 0),
-                        req.st.db.escape(details.gender || 5),
-                        req.st.db.escape(details.DOB || null)
+                        req.st.db.escape(details.gender || 3),  // 3 not disclosed
+                        req.st.db.escape(details.DOB || null),
+                        req.st.db.escape(details.resumeText || ""),
+                        req.st.db.escape(details.linkedInProfile || "")
 
                     ];
 
@@ -505,7 +507,7 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
     }
 
     var isTallint = req.query.isTallint || 0;
-
+    details.resumeText = req.body.resume_text || "";
     // for tallint
     if (isTallint) {
         var token = req.query.token;
@@ -1073,7 +1075,7 @@ portalimporter.saveApplicantsFromShine = function (req, res, next) {
         if (tempEmailId && tempEmailId[0] && tempEmailId[0].innerHTML) {
 
             var emailid = tempEmailId[0].innerHTML.trim();
-            var regularExp = /[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}/s;   // include /s in the end
+            var regularExp = /[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}/;   // include /s in the end
             console.log(emailid);
             // console.log("using match all",matchAll(emailid,regularExp).toArray());
             console.log('match all here', regularExp.exec(emailid));
@@ -1312,5 +1314,109 @@ portalimporter.saveApplicantsFromTimesjobs = function (req, res, next) {
     }
 };
 
+
+portalimporter.savePortalApplicantsLinkedIn = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    // var validationFlag = true;
+    var portalId = 8;  // linkedIn
+    var cvSourceId = 8; // linkedIn
+    const { JSDOM } = jsdom;
+    var xml_string = req.body.xml_string;
+    var contact_string = req.body.contact_string;
+
+    var document = new JSDOM(xml_string).window.document;
+
+    var contact = new JSDOM(contact_string).window.document;
+    var applicants = [];
+    var details = {};
+
+    // linkedIn Profile
+    if (contact.getElementsByClassName('pv-contact-info__contact-type ci-vanity-url') && contact.getElementsByClassName('pv-contact-info__contact-type ci-vanity-url')[0] && contact.getElementsByClassName('pv-contact-info__contact-type ci-vanity-url')[0].getElementsByClassName('pv-contact-info__contact-link') && contact.getElementsByClassName('pv-contact-info__contact-type ci-vanity-url')[0].getElementsByClassName('pv-contact-info__contact-link')[0] && contact.getElementsByClassName('pv-contact-info__contact-type ci-vanity-url')[0].getElementsByClassName('pv-contact-info__contact-link')[0].innerHTML) {
+        details.linkedInProfile = removeExtraChars(contact.getElementsByClassName('pv-contact-info__contact-type ci-vanity-url')[0].getElementsByClassName('pv-contact-info__contact-link')[0].innerHTML.trim());
+    }
+
+    if (document.getElementsByClassName('pv-top-card-section__name')[0].innerHTML.trim()) {
+        name = document.getElementsByClassName('pv-top-card-section__name')[0].innerHTML.trim();
+        if (name.split(' ')) {
+            if (name.split(' ')[0])
+                details.firstName = removeExtraChars(name.split(' ')[0]);
+            if (name.split(' ')[1]) {
+                last_name = name.split(' ').splice(1).join(' ');
+                details.lastName = removeExtraChars(last_name.trim());
+            }
+        }
+    }
+
+    //skills
+    if (document.getElementsByClassName('pv-skill-category-entity__name') && document.getElementsByClassName('pv-skill-category-entity__name').length && document.getElementsByClassName('pv-skill-category-entity__name')[0]) {
+        // window.scrollTo(0, (document.body.scrollHeight - 1000));
+        // document.getElementsByClassName('pv-profile-section__card-action-bar')[0].click()
+        var skilllength = document.getElementsByClassName('pv-skill-category-entity__name').length;
+        var skills = [];
+        for (var i = 0; i < skilllength; i++) {
+            if (document.getElementsByClassName('pv-skill-category-entity__name')[i] && document.getElementsByClassName('pv-skill-category-entity__name')[i].getElementsByTagName('span').length)
+                skills.push(removeExtraChars(document.getElementsByClassName('pv-skill-category-entity__name')[i].getElementsByTagName('span')[0].innerHTML.trim()));
+            else
+                skills.push(removeExtraChars(document.getElementsByClassName('pv-skill-category-entity__name')[i].innerHTML.trim()));
+        }
+        details.primarySkills = skills;
+    }
+
+
+    //company name 
+    if (document.getElementsByClassName('pv-top-card-v2-section__entity-name pv-top-card-v2-section__company-name') && document.getElementsByClassName('pv-top-card-v2-section__entity-name pv-top-card-v2-section__company-name')[0] && document.getElementsByClassName('pv-top-card-v2-section__entity-name pv-top-card-v2-section__company-name')[0].innerHTML) {
+
+        details.employer = removeExtraChars(document.getElementsByClassName('pv-top-card-v2-section__entity-name pv-top-card-v2-section__company-name')[0].innerHTML.trim());
+    }
+
+    //location
+    if (document.getElementsByClassName('pv-top-card-section__location') && document.getElementsByClassName('pv-top-card-section__location')[0] && document.getElementsByClassName('pv-top-card-section__location')[0].innerHTML) {
+
+        details.presentLocation = removeExtraChars(document.getElementsByClassName('pv-top-card-section__location')[0].innerHTML.trim());
+    }
+
+    //emailid
+    if (contact.getElementsByClassName('pv-contact-info__contact-type ci-email') && contact.getElementsByClassName('pv-contact-info__contact-type ci-email')[0] && contact.getElementsByClassName('pv-contact-info__contact-type ci-email')[0].getElementsByClassName('pv-contact-info__contact-link') && contact.getElementsByClassName('pv-contact-info__contact-type ci-email')[0].getElementsByClassName('pv-contact-info__contact-link')[0] && contact.getElementsByClassName('pv-contact-info__contact-type ci-email')[0].getElementsByClassName('pv-contact-info__contact-link')[0].innerHTML) {
+        var emailId = contact.getElementsByClassName('pv-contact-info__contact-type ci-email')[0].getElementsByClassName('pv-contact-info__contact-link')[0].innerHTML;
+
+        var regularExp = /[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}/;   // include /s in the end
+        if (regularExp.exec(emailId) && regularExp.exec(emailId)[0]){
+            details.emailId = removeExtraChars(regularExp.exec(emailId)[0].trim());
+        }
+    }
+
+    var isTallint = req.query.isTallint || 0;
+
+    // for tallint
+    if (isTallint) {
+        var token = req.query.token;
+        var heMasterId = req.query.heMasterId;
+        var portalId = 8;
+        var formData = {
+            applicants: applicants
+        };
+
+        request({
+            url: "tallint url to come here",
+            method: "POST",
+            json: true,
+            body: formData
+        }, function (error, response, body) {
+            if (!err && body) {
+                console.log('tallint response here');
+            }
+        });
+    }
+
+    else {
+        savePortalApplicants(portalId, cvSourceId, details, req, res);
+    }
+
+};
 
 module.exports = portalimporter;

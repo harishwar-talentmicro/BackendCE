@@ -395,7 +395,8 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(requirementArray)),
                             req.st.db.escape(req.body.referredBy),
                             req.st.db.escape(JSON.stringify(faceSheet)),
-                            req.st.db.escape(JSON.stringify(presentLocation))
+                            req.st.db.escape(JSON.stringify(presentLocation)),
+                            req.st.db.escape(req.body.ppIssueDate || null)
 
                         ];
 
@@ -526,6 +527,15 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             result[46][0].teamUsers = (result[46] && result[46][0] && result[46][0].teamUsers) ? JSON.parse(result[46][0].teamUsers) : []
                         }
 
+                        // for (var i = 0; i < result[57].length; i++){
+                        //     result[57][i].states = result[57][i] ? JSON.parse(result[57][i].states) : [];
+
+                        //     for (var k = 0; k < result[57][i].states.length; k++){
+                        //         result[57][i].states[k].cities = result[57][i].states[k] ? JSON.parse(result[57][i].states[k].cities) : [];
+                        //     }
+
+                        // }
+
 
                         response.data = {
                             jobType: result[0] ? result[0] : [],
@@ -589,7 +599,7 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                 organizationJobTitles: result[55] && result[55][0] ? result[55] : []
                             },
                             typeView: result[56] ? result[56] : []
-
+                            // countryStateCity : result[57] ? result[57] : []
                         };
 
                         if (req.query.isWeb == 0) {
@@ -989,7 +999,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                         }
 
                         response.data = {
-                            applicantlist: Result[0] ? Result[0] : [],
+                            applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId ? Result[0] : [],
                             count: Result[1][0].count,
                             offerMasterData: {
                                 currency: Result[2] ? Result[2] : [],
@@ -2081,7 +2091,9 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(billingCurrency)),
                     req.st.db.escape(JSON.stringify(billingScale)),
                     req.st.db.escape(JSON.stringify(billingDuration)),
-                    req.st.db.escape(req.body.billingCTCAmount)
+                    req.st.db.escape(req.body.billingCTCAmount),
+                    req.st.db.escape(req.body.offerExpiryDate || null),
+                    req.st.db.escape(req.body.noticePeriod || 0)
                 ];
 
                 var procQuery = 'CALL wm_save_offerManager( ' + inputs.join(',') + ')';
@@ -4967,6 +4979,100 @@ applicantCtrl.getMailerApplicants = function (req, res, next) {
                 res.status(401).json(response);
             }
         });
+    }
+
+};
+
+applicantCtrl.ReqAppMapFromReqView = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    var applicants = req.body.applicants;
+    if (typeof (applicants) == 'string') {
+        applicants = JSON.parse(applicants);
+    }
+    if (!applicants) {
+        applicants = [];
+    }
+
+    var requirements = req.body.requirements;
+    if (typeof (requirements) == 'string') {
+        requirements = JSON.parse(requirements);
+    }
+    if (!requirements) {
+        requirements = [];
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+    
+                    var inputs = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(JSON.stringify(requirements)),
+                        req.st.db.escape(JSON.stringify(applicants))
+                    ];
+    
+                    var procQuery = 'CALL pace_save_reqAppMapFromReqView( ' + inputs.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        console.log(err);
+                        if (!err && result && result[0] && result[0][0].message) {
+                            response.status = true;
+                            response.message = result[0][0].message;
+                            response.error = null;
+                            response.data = null;
+                            res.status(200).json(response);
+                        }
+                        else if (!err && result && result[0] && result[0][0]._error) {
+                            response.status = false;
+                            response.message = result[0][0]._error;
+                            response.error = null;
+                            response.data = null;
+                            res.status(200).json(response);
+                        }
+    
+                        else {
+                            response.status = false;
+                            response.message = "Error while tagging applicant";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                else {
+                    res.status(401).json(response);
+                }
+            });
+        }
+        catch(ex){
+            console.log("exception",ex);
+            response.message = ex;
+            response.status(500).json(response);
+        }
     }
 
 };

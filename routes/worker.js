@@ -272,7 +272,7 @@ module.exports = function(favoriteBook,done) {
 
                         ANDROID_SNS.addUser(GCM_Id, null, function(err, endpointArn) {
                             if (err) {
-                                console.log('err',err);
+                                console.log('err at addUser to endpointArn',err);
                                 if(messageIds == ""){
                                     messageIds = results[i].messageUserId ;
                                 }
