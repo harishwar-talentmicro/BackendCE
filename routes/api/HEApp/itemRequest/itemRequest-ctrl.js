@@ -62,6 +62,14 @@ itemRequestCtrl.saveStationaryRequest = function(req,res,next){
                             keywordList = [];
                         }
 
+                        var attachmentList =req.body.attachmentList;
+                        if(typeof(attachmentList) == "string") {
+                            attachmentList = JSON.parse(attachmentList);
+                        }
+                        if(!attachmentList){
+                            attachmentList = [];
+                        }
+
                     var senderGroupId;
                 
                     if (!validationFlag){
@@ -102,7 +110,8 @@ itemRequestCtrl.saveStationaryRequest = function(req,res,next){
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp)
+                            req.st.db.escape(req.body.createdTimeStamp),
+                            req.st.db.escape(JSON.stringify(attachmentList))
                         ];
                         
                         var stationaryFormId=1008;
@@ -277,6 +286,14 @@ itemRequestCtrl.savePantryRequest = function(req,res,next){
                             keywordList = [];
                         }
 
+                        var attachmentList =req.body.attachmentList;
+                        if(typeof(attachmentList) == "string") {
+                            attachmentList = JSON.parse(attachmentList);
+                        }
+                        if(!attachmentList){
+                            attachmentList = [];
+                        }
+
                     var senderGroupId;
                 
                     if (!validationFlag){
@@ -317,7 +334,8 @@ itemRequestCtrl.savePantryRequest = function(req,res,next){
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp)
+                            req.st.db.escape(req.body.createdTimeStamp),
+                            req.st.db.escape(JSON.stringify(attachmentList))
                         ];
 
                         var pantryFormId=1009;
@@ -485,6 +503,13 @@ itemRequestCtrl.saveAssetRequest = function(req,res,next){
                         error.itemList = 'Invalid itemList';
                         validationFlag *= false;
                     }
+                    var attachmentList =req.body.attachmentList;
+                    if(typeof(attachmentList) == "string") {
+                        attachmentList = JSON.parse(attachmentList);
+                    }
+                    if(!attachmentList){
+                        attachmentList = [];
+                    }
                     var keywordList =req.body.keywordList;
                         if(typeof(keywordList) == "string") {
                             keywordList = JSON.parse(keywordList);
@@ -539,7 +564,8 @@ itemRequestCtrl.saveAssetRequest = function(req,res,next){
                             req.st.db.escape(req.body.receiverCount),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp)
+                            req.st.db.escape(req.body.createdTimeStamp),
+                            req.st.db.escape(JSON.stringify(attachmentList))
             ];
 
                         var assestFormId=1018;
