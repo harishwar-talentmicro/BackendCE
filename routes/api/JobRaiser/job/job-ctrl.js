@@ -2147,7 +2147,7 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                         result[2][0].secondarySkills = (result[2] && result[2][0]) ? JSON.parse(result[2][0].secondarySkills) : [];
                         result[2][0].industry = (result[2] && result[2][0]) ? JSON.parse(result[2][0].industry) : [];
                         result[2][0].attachmentList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].attachmentList) : [];
-                        result[2][0].functionalAreas = (result[2] && result[2][0]) ? JSON.parse(result[2][0].functionalAreas) : [];
+                        result[2][0].functionalAreas = (result[2] && result[2][0] && JSON.parse(result[2][0].functionalAreas)) ? JSON.parse(result[2][0].functionalAreas) : [];
 
                         for(var i=0; i<result[3].length; i++){
                             result[3][i].followUpNotes = (result[3] && result[3][i]) ? JSON.parse(result[3][i].followUpNotes) :[];

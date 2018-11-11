@@ -99,5 +99,10 @@ router.post('/sendSubmissionMailerMobile',sendgridCtrl.sendSubmissionMailerMobil
 
 router.post('/reqViewMapApplicant',applicantCtrl.ReqAppMapFromReqView);
 
+router.get('/interviewPanelMembers',applicantCtrl.getPanelMembersForInterviewMailerMobile);
+
+router.post('/interviewMailPreview',sendgridCtrl.interviewMailerPreviewForMobile);
+router.post('/sendInterviewMailForMobile',sendgridCtrl.sendInterviewMailerForMobile);
+
 module.exports = router;
 

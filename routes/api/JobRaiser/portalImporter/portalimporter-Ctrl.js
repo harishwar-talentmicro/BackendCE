@@ -94,6 +94,7 @@ var removeExtraChars = function (params) {
         params = params.replace(/Not Mentioned/i, '');
         params = params.replace(/[ ]{2}/g, '');
         params = params.replace(/&amp;/g, ' ');
+        params = params.replace(/<!--[a-zA-Z0-9=|-|'|" ]*-->/g, '');
         params = params.trim();
         return params;
     }
@@ -1358,6 +1359,7 @@ portalimporter.savePortalApplicantsLinkedIn = function (req, res, next) {
         // document.getElementsByClassName('pv-profile-section__card-action-bar')[0].click()
         var skilllength = document.getElementsByClassName('pv-skill-category-entity__name').length;
         var skills = [];
+        details.primarySkills = [];
         for (var i = 0; i < skilllength; i++) {
             if (document.getElementsByClassName('pv-skill-category-entity__name')[i] && document.getElementsByClassName('pv-skill-category-entity__name')[i].getElementsByTagName('span').length)
                 skills.push(removeExtraChars(document.getElementsByClassName('pv-skill-category-entity__name')[i].getElementsByTagName('span')[0].innerHTML.trim()));

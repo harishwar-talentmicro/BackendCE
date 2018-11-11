@@ -21,7 +21,7 @@ var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 var request = require('request');
 // var Client = require('node-rest-client').Client;   // for interview scheduler hirecraft
 // var client = new Client();
-var fs = require('fs')
+var fs = require('fs');
 var Jimp = require('jimp');
 var gcloud = require('gcloud');
 

@@ -465,9 +465,9 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
                     req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
+                        console.log(tempSaveErr);
                         if (!tempSaveErr && tempSaveResult) {
-                            console.log(tempSaveErr);
-                            console.log(tempSaveResult);
+                            // console.log(tempSaveResult);
                             response.status = true;
                             //check if there are any receivers, if yes sent and saved
                             if (emailReceivers.length != 0)
@@ -996,14 +996,15 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                         req.st.db.escape(req.body.attachResume || 0),
                         req.st.db.escape(req.body.interviewerFlag || 0),
                         req.st.db.escape(req.body.resumeFileName || ''),
-                        req.st.db.escape(req.body.attachResumeFlag || 0)
+                        req.st.db.escape(req.body.attachResumeFlag || 0),
+                        req.st.db.escape(JSON.stringify(trackerTemplate))
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
                     req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
+                        console.log(tempSaveErr);
                         if (!tempSaveErr && tempSaveResult) {
-                            console.log(tempSaveErr);
-                            console.log(tempSaveResult);
+                            // console.log(tempSaveResult);
                             response.status = true;
                             //check if there are any receivers, if yes sent and saved
                             if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
@@ -1887,14 +1888,16 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                         req.st.db.escape(req.body.attachResume || 0),
                         req.st.db.escape(req.body.interviewerFlag || 0),
                         req.st.db.escape(req.body.resumeFileName || ''),
-                        req.st.db.escape(req.body.attachResumeFlag || 0)
+                        req.st.db.escape(req.body.attachResumeFlag || 0),
+                        req.st.db.escape(JSON.stringify(trackerTemplate))
+
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
                     req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
+                        console.log(tempSaveErr);
                         if (!tempSaveErr && tempSaveResult) {
-                            console.log(tempSaveErr);
-                            console.log(tempSaveResult);
+                            // console.log(tempSaveResult);
                             response.status = true;
                             //check if there are any receivers, if yes sent and saved
                             if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
@@ -1941,6 +1944,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
     var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
     var isWeb = req.query.isWeb ? req.query.isWeb : 0;
     var sendMailFlag = 0;
+    var trackerTemplate = req.body.trackerTemplate;
 
     var response = {
         status: false,
@@ -1989,6 +1993,17 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
     }
     if (!tableTags) {
         tableTags = [];
+    }
+
+    if (typeof (trackerTemplate) == "string") {
+        trackerTemplate = JSON.parse(trackerTemplate);
+    }
+    if (!trackerTemplate) {
+        trackerTemplate = {};
+        trackerTags = [];
+    }
+    else {
+        trackerTags = JSON.parse(trackerTemplate.trackerTags);
     }
 
     var validationFlag = true;
@@ -2162,6 +2177,36 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                             }
                         }
 
+                        var buffer;
+                        var ws_data;
+                        if (trackerTemplate.trackerId) {
+                            console.log('tracker', trackerTemplate.trackerId);
+                            ws_data = '[[';
+                            // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
+                            for (var i = 0; i < trackerTags.length; i++) {
+                                if (i != trackerTags.length - 1)
+                                    ws_data += '"' + trackerTags[i].displayTagAs + '",';
+                                else
+                                    ws_data += '"' + trackerTags[i].displayTagAs + '"';
+                            }
+                            ws_data += "]";
+
+                            // console.log(new Buffer(buffer).toString("base64"));
+                            for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+                                ws_data += ',[';
+                                for (var tagIndex = 0; tagIndex < trackerTags.length; tagIndex++) {
+                                    if (tagIndex < trackerTags.length - 1)
+                                        ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '",';
+                                    else
+                                        ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '"';
+                                }
+                                ws_data += ']';
+                            }
+                            ws_data += ']';
+                            console.log(ws_data);
+                            // buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]); // Returns a buffer
+                        }
+
                         response.status = true;
                         response.message = "Tags replaced successfully";
                         response.error = null;
@@ -2172,7 +2217,8 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                             clientData: clientData,
                             originalCVArray: originalCVArray,
                             clientCVArray: clientCVArray,
-                            resumeFileName: resumeFileNameArray
+                            resumeFileName: resumeFileNameArray,
+                            trackerData: ws_data || ""
                         };
                         res.status(200).json(response);
                     }
@@ -2188,7 +2234,8 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                             clientData: [],
                             originalCVArray: [],
                             clientCVArray: [],
-                            resumeFileName: []
+                            resumeFileName: [],
+                            trackerData: []
                         };
                         res.status(200).json(response);
                     }
@@ -2843,14 +2890,16 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                         req.st.db.escape(req.body.attachResume || 0),
                         req.st.db.escape(req.body.interviewerFlag || 0),
                         req.st.db.escape(req.body.resumeFileName || ''),
-                        req.st.db.escape(req.body.attachResumeFlag || 0)
+                        req.st.db.escape(req.body.attachResumeFlag || 0),
+                        req.st.db.escape(JSON.stringify(trackerTemplate))
+
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
                     req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
+                        console.log(tempSaveErr);
                         if (!tempSaveErr && tempSaveResult) {
-                            console.log(tempSaveErr);
-                            console.log(tempSaveResult);
+                            // console.log(tempSaveResult);
                             response.status = true;
                             //check if there are any receivers, if yes sent and saved
                             if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
@@ -3566,13 +3615,15 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                         req.st.db.escape(req.body.attachResume || 0),
                         req.st.db.escape(req.body.interviewerFlag || 0),
                         req.st.db.escape(req.body.resumeFileName || ''),
-                        req.st.db.escape(req.body.attachResumeFlag || 0)
+                        req.st.db.escape(req.body.attachResumeFlag || 0),
+                        req.st.db.escape(JSON.stringify(trackerTemplate))
+
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
                     req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
+                        console.log(tempSaveErr);
                         if (!tempSaveErr && tempSaveResult) {
-                            console.log(tempSaveErr);
                             // console.log(tempSaveResult);
                             response.status = true;
                             //check if there are any receivers, if yes sent and saved
@@ -4609,12 +4660,12 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                     res.status(200).json(response);
 
                 }
-                else {
-                    response.status = true;
-                    response.message = "Hatra";
-                    res.status(200).json(response);
+                // else {
+                //     response.status = true;
+                //     response.message = "Something went wrong";
+                //     res.status(200).json(response);
 
-                }
+                // }
                 console.log("last if", templateId, overWrite);
                 //save it as a template if flag is true or template id is 0
                 if (templateId == 0 || overWrite) {
@@ -4654,13 +4705,15 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                         req.st.db.escape(req.body.attachResume || 0),
                         req.st.db.escape(req.body.interviewerFlag || 0),
                         req.st.db.escape(req.body.resumeFileName || ''),
-                        req.st.db.escape(req.body.attachResumeFlag || 0)
+                        req.st.db.escape(req.body.attachResumeFlag || 0),
+                        req.st.db.escape(JSON.stringify(trackerTemplate))
+
                     ];
                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                     console.log(saveTemplateQuery);
                     req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
+                        console.log(tempSaveErr);
                         if (!tempSaveErr && tempSaveResult) {
-                            console.log(tempSaveErr);
                             // console.log(tempSaveResult);
                             response.status = true;
                             //check if there are any receivers, if yes sent and saved
@@ -5540,7 +5593,7 @@ sendgridCtrl.MobileSubmissionMailerPreview = function (req, res, next) {
                         var temp = result[3] && result[3][0] && result[3][0].mailBody ? result[3][0].mailBody : "";
                         var temp1 = result[3] && result[3][0] && result[3][0].subject && result[3][0].subject != '' ? result[3][0].subject : "(no subject)";
                         var temp2 = result[3] && result[3][0] && result[3][0].smsMsg ? result[3][0].smsMsg : "";
-                        var resumeFileName = result[3] && result[3][0] && result[3][0].resumeFileName ? result[3][0].resumeFileName : "";                     
+                        var resumeFileName = result[3] && result[3][0] && result[3][0].resumeFileName ? result[3][0].resumeFileName : "";
                         var tableTags = result[3] && result[3][0] && result[3][0].tableTags ? JSON.parse(result[3][0].tableTags) : [];
 
                         var applicantData = [];
@@ -5602,7 +5655,7 @@ sendgridCtrl.MobileSubmissionMailerPreview = function (req, res, next) {
 
                                     }
                                 }
-                                 resumeFileNameArray.push(tempFileName);
+                                resumeFileNameArray.push(tempFileName);
                             }
                             for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
 
@@ -5664,7 +5717,7 @@ sendgridCtrl.MobileSubmissionMailerPreview = function (req, res, next) {
                             mailBodyPreview: mailbody_array,
                             subjectPreview: subject_array,
                             smsMsgPreview: smsMsg_array,
-                            resumeFileNameArray : resumeFileNameArray,
+                            resumeFileNameArray: resumeFileNameArray,
                             originalResumeArray: originalCVArray,
                             duplicateResumeArray: clientCVArray,
 
@@ -5682,7 +5735,7 @@ sendgridCtrl.MobileSubmissionMailerPreview = function (req, res, next) {
                             mailBodyPreview: [],
                             subjectPreview: [],
                             smsMsgPreview: [],
-                            resumeFileNameArray : [],
+                            resumeFileNameArray: [],
                             originalResumeArray: originalCVArray,
                             duplicateResumeArray: clientCVArray
                             // applicantData: [],
@@ -5717,9 +5770,10 @@ sendgridCtrl.sendSubmissionMailerMobile = function (req, res, next) {
         error: null
     };
     var sendMailFlag = 1;
-    var isSendgrid;
-    var isSMS;
+    var isSendgrid = 1;
+    var isSMS = 0;
 
+    console.log("req.body", req.body);
     var emailReceivers;                //emailReceivers to store the recipients
     var mailbody_array = [];    //array to store all mailbody after replacing tags
     var subject_array = [];
@@ -5828,7 +5882,7 @@ sendgridCtrl.sendSubmissionMailerMobile = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(clientContacts)),
                         req.st.db.escape(sendMailFlag),
                         req.st.db.escape(JSON.stringify(req.body.template || {})),
-                        req.st.db.escape(JSON.stringify(req.body.trackerTemplate || {}))                        
+                        req.st.db.escape(JSON.stringify(req.body.trackerTemplate || {}))
                     ];
 
                     var procQuery = 'CALL wm_paceSubmissionMailerMobile( ' + inputs.join(',') + ')';
@@ -5841,10 +5895,10 @@ sendgridCtrl.sendSubmissionMailerMobile = function (req, res, next) {
                         // }
                         if (!err && result && result[0] && result[0][0]) {
 
-                            if (result[4] && result[4][0]) {
-                                isSendgrid = result[4][0].isSendgrid ? result[4][0].isSendgrid : 0,
-                                    isSMS = result[4][0].isSMS ? result[4][0].isSMS : 0
-                            }
+                            // if (result[4] && result[4][0]) {
+                            //     isSendgrid = result[4][0].isSendgrid ? result[4][0].isSendgrid : 0,
+                            //         isSMS = result[4][0].isSMS ? result[4][0].isSMS : 0
+                            // }
                             var temp = mailBody;
                             var temp1 = subject;
                             var temp2 = smsMsg;
@@ -5872,7 +5926,7 @@ sendgridCtrl.sendSubmissionMailerMobile = function (req, res, next) {
 
                             for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
                                 for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
-                                    
+
 
                                     for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
 
@@ -6011,7 +6065,7 @@ sendgridCtrl.sendSubmissionMailerMobile = function (req, res, next) {
                                     subject: subject_array[receiverIndex],
                                     html: mailbody_array[receiverIndex]
                                 };
-                        
+
                                 mailOptions.cc = [];
 
                                 for (var j = 0; j < cc.length; j++) {
@@ -6154,7 +6208,6 @@ sendgridCtrl.sendSubmissionMailerMobile = function (req, res, next) {
                                     }
                                 }
 
-                                isSendgrid = 1;
                                 if (isSendgrid) {
                                     sendgrid.send(email, function (err, result) {
                                         if (!err) {
@@ -6291,7 +6344,7 @@ sendgridCtrl.sendSubmissionMailerMobile = function (req, res, next) {
 
                 else if (!emailReceivers.length) {
                     response.status = false;
-                    response.message = "Please select receipiants";
+                    response.message = "Please select recipients";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
@@ -6379,5 +6432,1041 @@ sendgridCtrl.sendSubmissionMailerMobile = function (req, res, next) {
     }
 };
 
+sendgridCtrl.interviewMailerPreviewForMobile = function (req, res, next) {
+
+    var sendMailFlag = 0;
+    var attachJD = req.body.attachJD != undefined ? req.body.attachJD : 0;
+    var interviewerFlag = req.body.interviewerFlag ? req.body.interviewerFlag : 0;
+
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+
+
+    var reqApplicants = req.body.reqApplicants;
+    if (typeof (reqApplicants) == "string") {
+        reqApplicants = JSON.parse(reqApplicants);
+    }
+    if (!reqApplicants) {
+        reqApplicants = [];
+    }
+
+    var clientContacts = req.body.clientContacts;
+    if (typeof (clientContacts) == "string") {
+        clientContacts = JSON.parse(clientContacts);
+        // clientContacts.sort(function(a,b){return a-b});
+    }
+    if (!clientContacts) {
+        clientContacts = [];
+    }
+
+    var validationFlag = true;
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(reqApplicants)),
+                    req.st.db.escape(JSON.stringify(clientContacts)),
+                    req.st.db.escape(sendMailFlag),
+                    req.st.db.escape(JSON.stringify(req.body.template || {}))
+                ];
+                var idArray;
+                idArray = reqApplicants;
+                // idArray.sort(function(a,b){return a-b});
+                var mailbody_array = [];
+                var subject_array = [];
+                var smsMsg_array = [];
+
+                var procQuery;
+                procQuery = 'CALL wm_paceInterviewMailerForMobile( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0] || result[1] || result[1][0]) {
+                        var mailBody = result[3] && result[3][0] && result[3][0].mailBody ? result[3][0].mailBody : "";
+                        var subject = result[3] && result[3][0] && result[3][0].subject && result[3][0].subject != '' ? result[3][0].subject : "(no subject)";
+                        var smsMsg = result[3] && result[3][0] && result[3][0].smsMsg ? result[3][0].smsMsg : "";
+                        var tableTags = result[3] && result[3][0] && result[3][0].tableTags ? JSON.parse(result[3][0].tableTags) : [];
+                        var tags = result[3] && result[3][0] ? JSON.parse(result[3][0].tags) : {};
+
+
+                        var temp = mailBody;
+                        var temp1 = subject;
+                        var temp2 = smsMsg;
+                        var clientData = [];
+                        var applicantData = [];
+
+                        if (interviewerFlag) {
+                            console.log("interviewer mailer", interviewerFlag);
+                            for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
+                                for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+
+                                    for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+
+                                        if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+
+                                            mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                            subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                            smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                            // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                            // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                            // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                        }
+                                    }
+
+                                    for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+
+                                        if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
+
+                                            mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                            subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                            smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                            // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                            // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                            // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                        }
+                                    }
+
+                                    for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+
+                                        if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
+
+                                            mailBody = replaceAll(mailBody, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                            subject = replaceAll(subject, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                            smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                            // mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                            // subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                            // smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                        }
+                                    }
+                                }
+                                for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+
+                                    if ((result[1][clientIndex][tags.clientContacts[tagIndex].tagName] && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != null && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != 'null' && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != '') || result[1][clientIndex][tags.clientContacts[tagIndex].tagName] >= 0) {
+
+                                        mailBody = replaceAll(mailBody, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                        subject = replaceAll(subject, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                        smsMsg = replaceAll(smsMsg, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                        // mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                        // subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                        // smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                    }
+                                }
+
+                                if (tableTags.applicant.length > 0) {
+                                    var position = mailBody.indexOf('@table');
+                                    var tableContent = '';
+                                    mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
+                                    tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
+                                    console.log(tableContent, 'mailbody');
+                                    for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                        tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                                    }
+                                    tableContent += "</tr>";
+                                    for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
+                                        tableContent += "<tr>";
+                                        for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                            tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                        }
+                                        tableContent += "</tr>";
+                                    }
+
+                                    tableContent += "</table>";
+                                    mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
+
+                                }
+
+                                clientData.push(result[1][clientIndex].EmailId);
+                                mailbody_array.push(mailBody);
+                                subject_array.push(subject);
+                                smsMsg_array.push(smsMsg);
+                                mailBody = temp;
+                                subject = temp1;
+                                smsMsg = temp2;
+                            }
+
+                            // if (idArray.length == result[0].length) {
+                            //     for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+                            //         originalCVArray.push(result[0][applicantIndex].originalCVPath);
+                            //         clientCVArray.push(result[0][applicantIndex].clientCVPath);
+                            //     }
+                            // }
+
+                        }
+                        else {
+                            console.log('applicants interview mail', interviewerFlag);
+                            for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+
+                                for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+
+                                    if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+
+                                        mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+
+                                        subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                        smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                        // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                        // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                        // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                    }
+                                }
+
+                                for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+
+                                    if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
+
+                                        mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                        subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                        smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                        // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                        // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                        // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                    }
+                                }
+
+                                for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+
+                                    if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
+
+                                        mailBody = replaceAll(mailBody, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                        subject = replaceAll(subject, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                        smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                        // mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                        // subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                        // smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                    }
+                                }
+                                applicantData.push(result[0][applicantIndex].EmailId);
+                                mailbody_array.push(mailBody);
+                                subject_array.push(subject);
+                                smsMsg_array.push(smsMsg);
+                                mailBody = temp;
+                                subject = temp1;
+                                smsMsg = temp2;
+                            }
+
+
+                        }
+                        // console.log(mailbody_array);
+
+                        response.status = true;
+                        response.message = "Tags replaced successfully";
+                        response.error = null;
+                        response.data = {
+                            mailBodyPreview: mailbody_array,
+                            subjectPreview: subject_array,
+                            smsMsgPreview: smsMsg_array,
+                            // applicants: result[0],
+                            // clientContacts: result[1],
+                            clientData: clientData,
+                            applicantData: applicantData
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = {
+                            mailBodyPreview: [],
+                            subjectPreview: [],
+                            smsMsgPreview: []
+
+                        };
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while replacing tags";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+sendgridCtrl.sendInterviewMailerForMobile = function (req, res, next) {
+    console.log("interview mailer start");
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var sendMailFlag = 1;
+    var interviewerFlag = req.body.interviewerFlag ? req.body.interviewerFlag : 0;  // if 0 mail is for  applicants if 1- mail is for client contacts
+
+    var isSendgrid = 1;
+    var isSMS = 0;
+
+    var emailReceivers;                //emailReceivers to store the recipients
+    var mailbody_array = [];    //array to store all mailbody after replacing tags
+    var subject_array = [];
+    var smsMsg_array = [];
+
+    var validationFlag = true;
+    var fromEmailID;
+    var toEmailID = [];
+    var MobileISD = [];
+    var MobileNumber = [];
+    var isdMobile = '';
+    var mobileNo = '';
+    var message = '';
+    //request parameters
+    var cc = req.body.cc || [];
+    var bcc = req.body.bcc || [];
+    var attachment = req.body.attachment || [];
+    var reqApplicants = req.body.reqApplicants || [];
+    var clientContacts = req.body.clientContacts || [];
+
+    var whatmateMessage = req.body.whatmateMessage || '';
+    var smsMsg = req.body.smsMsg || '';
+    var smsFlag = req.body.smsFlag || 0;
+
+    //html styling for table in submission mailer
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid tenant';
+        validationFlag *= false;
+    }
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (typeof (cc) == "string") {
+        cc = JSON.parse(cc);
+    }
+
+
+    if (typeof (bcc) == "string") {
+        bcc = JSON.parse(bcc);
+    }
+
+    if (typeof (attachment) == "string") {
+        attachment = JSON.parse(attachment);
+    }
+
+    if (typeof (clientContacts) == "string") {
+        clientContacts = JSON.parse(clientContacts);
+    }
+
+    if (typeof (reqApplicants) == "string") {
+        reqApplicants = JSON.parse(reqApplicants);
+        // reqApplicants.sort(function(a,b){return a-b});
+    }
+
+    //check for mail type and assign the recipients
+    if (interviewerFlag) {
+        emailReceivers = clientContacts;
+        // emailReceivers.sort(function(a,b){return a-b});
+    }
+    else {
+        emailReceivers = reqApplicants;
+        // emailReceivers.sort(function(a,b){return a-b});
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                if (emailReceivers.length > 0) {				//for checking if the mailer is just a template
+
+                    var inputs = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(JSON.stringify(reqApplicants)),
+                        req.st.db.escape(JSON.stringify(clientContacts)),
+                        req.st.db.escape(sendMailFlag),
+                        req.st.db.escape(JSON.stringify(req.body.template || {}))
+                    ];
+
+                    var procQuery = 'CALL wm_paceInterviewMailerForMobile( ' + inputs.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        console.log(err);
+
+                        // if (result[4] && result[4][0]) {
+                        //     isSendgrid = result[4][0].isSendgrid ? result[4][0].isSendgrid : 0,
+                        //         isSMS = result[4][0].isSMS ? result[4][0].isSMS : 0
+                        // }
+
+                        if (!err && result && result[0] || result[1]) {
+
+                            var mailBody = result[3] && result[3][0] && result[3][0].mailBody ? result[3][0].mailBody : "";
+                            var subject = result[3] && result[3][0] && result[3][0].subject && result[3][0].subject != '' ? result[3][0].subject : "(no subject)";
+                            var smsMsg = result[3] && result[3][0] && result[3][0].smsMsg ? result[3][0].smsMsg : "";
+                            var tableTags = result[3] && result[3][0] && result[3][0].tableTags ? JSON.parse(result[3][0].tableTags) : [];
+                            var tags = result[3] && result[3][0] ? JSON.parse(result[3][0].tags) : {};
+
+
+                            var temp = mailBody;
+                            var temp1 = subject;
+                            var temp2 = smsMsg;
+
+                            if (interviewerFlag) {
+                                for (var clientIndex = 0; clientIndex < emailReceivers.length; clientIndex++) {
+                                    for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
+
+                                        for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+
+                                            if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+
+                                                mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                            }
+
+                                        }
+
+                                        for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+
+                                            if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
+
+                                                mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                            }
+                                        }
+
+                                        for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+
+                                            if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
+
+                                                mailBody = replaceAll(mailBody, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                subject = replaceAll(subject, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+
+                                                // mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                // subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                // smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                            }
+
+                                        }
+                                    }
+                                    for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+
+                                        if ((result[1][clientIndex][tags.clientContacts[tagIndex].tagName] && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != null && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != 'null' && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != '') || result[1][clientIndex][tags.clientContacts[tagIndex].tagName] >= 0) {
+
+                                            mailBody = replaceAll(mailBody, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                            subject = replaceAll(subject, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                            smsMsg = replaceAll(smsMsg, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                            // mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                            // subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                            // smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                        }
+                                    }
+
+                                    if (tableTags.applicant.length > 0) {
+                                        var position = mailBody.indexOf('@table');
+                                        var tableContent = '';
+                                        mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
+                                        tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
+                                        console.log(tableContent, 'mailbody');
+                                        for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                            tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                                        }
+                                        tableContent += "</tr>";
+                                        for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
+                                            tableContent += "<tr>";
+                                            for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                                tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                            }
+                                            tableContent += "</tr>";
+                                        }
+
+                                        tableContent += "</table>";
+                                        mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
+
+                                    }
+
+                                    mailbody_array.push(mailBody);
+                                    subject_array.push(subject);
+                                    smsMsg_array.push(smsMsg);
+                                    fromEmailID = result[2][0].fromEmailId;
+                                    toEmailID.push(result[1][clientIndex].EmailId);
+                                    MobileISD.push(result[1][clientIndex].MobileISD);
+                                    MobileNumber.push(result[1][clientIndex].MobileNo);
+                                    mailBody = temp;
+                                    subject = temp1;
+                                    smsMsg = temp2;
+                                }
+
+                                // var buffer;
+                                // if (trackerTemplate.trackerId) {
+                                //     var ws_data = '[[';
+                                //     // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
+                                //     for (var i = 0; i < trackerTags.length; i++) {
+                                //         if (i != trackerTags.length - 1)
+                                //             ws_data += '"' + trackerTags[i].displayTagAs + '",';
+                                //         else
+                                //             ws_data += '"' + trackerTags[i].displayTagAs + '"';
+                                //     }
+                                //     ws_data += "]";
+
+                                //     // console.log(new Buffer(buffer).toString("base64"));
+                                //     for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
+                                //         ws_data += ',[';
+                                //         for (var tagIndex = 0; tagIndex < trackerTags.length; tagIndex++) {
+                                //             if (tagIndex < trackerTags.length - 1)
+                                //                 ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '",';
+                                //             else
+                                //                 ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '"';
+                                //         }
+                                //         ws_data += ']';
+                                //     }
+                                //     ws_data += ']';
+                                //     // console.log(ws_data);
+                                //     buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]); // Returns a buffer
+                                // }
+                            }
+                            else {
+                                for (var applicantIndex = 0; applicantIndex < emailReceivers.length; applicantIndex++) {
+
+                                    for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+
+                                        if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+
+                                            mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                            subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                            smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                            // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                            // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                            // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                        }
+                                    }
+
+                                    for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+
+                                        if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
+
+                                            mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                            subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                            smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                            // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                            // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                            // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                        }
+                                    }
+
+                                    for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+
+                                        if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
+
+                                            mailBody = replaceAll(mailBody, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                            subject = replaceAll(subject, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                            smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                            // mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                            // subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                            // smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                        }
+                                    }
+
+                                    mailbody_array.push(mailBody);
+                                    subject_array.push(subject);
+                                    smsMsg_array.push(smsMsg);
+                                    fromEmailID = result[2][0].fromEmailId;
+                                    toEmailID.push(result[0][applicantIndex].EmailId);
+                                    MobileISD.push(result[0][applicantIndex].MobileISD);
+                                    MobileNumber.push(result[0][applicantIndex].MobileNo);
+                                    mailBody = temp;
+                                    subject = temp1;
+                                    smsMsg = temp2;
+                                }
+                            }
+
+                            for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
+                                var mailOptions = {
+                                    from: fromEmailID,
+                                    to: toEmailID[receiverIndex],
+                                    subject: subject_array[receiverIndex],
+                                    html: mailbody_array[receiverIndex]
+                                };
+
+                                mailOptions.cc = [];
+
+                                for (var j = 0; j < cc.length; j++) {
+                                    mailOptions.cc.push(cc[j].emailId);
+                                }
+                                mailOptions.bcc = [];
+
+                                for (var j = 0; j < bcc.length; j++) {
+                                    mailOptions.bcc.push(bcc[j].emailId);
+                                }
+
+                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                var email = new sendgrid.Email();
+                                email.from = mailOptions.from;
+                                email.to = mailOptions.to;
+                                email.subject = mailOptions.subject;
+                                email.mbody = mailOptions.html;
+                                email.cc = mailOptions.cc;
+                                email.bcc = mailOptions.bcc;
+                                email.html = mailOptions.html;
+                                //if 1 or more attachments are present
+                                for (var file = 0; file < attachment.length; file++) {
+                                    email.addFile({
+                                        filename: attachment[file].fileName,
+                                        content: new Buffer(attachment[file].binaryFile, 'base64'),
+                                        contentType: attachment[file].fileType
+                                    });
+                                }
+
+                                // if (trackerTemplate.trackerId) {
+                                //     email.addFile({
+                                //         filename: trackerTemplate.templateName + '.xlsx',
+                                //         content: new Buffer(new Buffer(buffer).toString("base64"), 'base64'),
+                                //         contentType: 'application/*'
+                                //     });
+                                // }
+
+                                // assign mobile no and isdMobile to send sms
+                                isdMobile = MobileISD[receiverIndex];
+                                mobileNo = MobileNumber[receiverIndex];
+                                message = smsMsg_array[receiverIndex];
+
+                                // to send normal sms
+                                if (isSMS) {
+                                    if (smsFlag) {
+                                        if (isdMobile == "+977") {
+                                            request({
+                                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                qs: {
+                                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                    to: mobileNo,
+                                                    message: message,
+                                                    sender: 'Techingen'
+                                                },
+                                                method: 'GET'
+
+                                            }, function (error, response, body) {
+                                                if (error) {
+                                                    console.log(error, "SMS");
+                                                }
+                                                else {
+                                                    console.log("SUCCESS", "SMS response");
+                                                }
+
+                                            });
+                                        }
+                                        else if (isdMobile == "+91") {
+                                            console.log('inside send sms');
+                                            console.log(isdMobile, ' ', mobileNo);
+                                            request({
+                                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                qs: {
+                                                    user_name: 'janardana@hirecraft.com',
+                                                    password: 'Ezeid2015',
+                                                    sender_id: 'WtMate',
+                                                    service: 'TRANS',
+                                                    mobile_no: mobileNo,
+                                                    message: message,
+                                                    method: 'send_sms'
+                                                },
+                                                method: 'GET'
+
+                                            }, function (error, response, body) {
+                                                if (error) {
+                                                    console.log(error, "SMS");
+                                                }
+                                                else {
+                                                    console.log("SUCCESS", "SMS response");
+                                                }
+                                            });
+
+                                            var req1 = http.request(options, function (res1) {
+                                                var chunks = [];
+
+                                                res1.on("data", function (chunk) {
+                                                    chunks.push(chunk);
+                                                });
+
+                                                res1.on("end", function () {
+                                                    var body = Buffer.concat(chunks);
+                                                    console.log(body.toString());
+                                                });
+                                            });
+
+                                            req1.write(qs.stringify({
+                                                userId: 'talentmicro',
+                                                password: 'TalentMicro@123',
+                                                senderId: 'WTMATE',
+                                                sendMethod: 'simpleMsg',
+                                                msgType: 'text',
+                                                mobile: isdMobile.replace("+", "") + mobileNo,
+                                                msg: message,
+                                                duplicateCheck: 'true',
+                                                format: 'json'
+                                            }));
+                                            req1.end();
+                                        }
+                                        else if (isdMobile != "") {
+                                            console.log('inside without isd', isdMobile, ' ', mobileNo);
+                                            client.messages.create(
+                                                {
+                                                    body: message,
+                                                    to: isdMobile + mobileNo,
+                                                    from: FromNumber
+                                                },
+                                                function (error, response) {
+                                                    if (error) {
+                                                        console.log(error, "SMS");
+                                                    }
+                                                    else {
+                                                        console.log("SUCCESS", "SMS response");
+                                                    }
+                                                }
+                                            );
+                                        }
+                                    }
+                                }
+
+                                if (isSendgrid) {
+                                    sendgrid.send(email, function (err, result) {
+                                        if (!err) {
+
+                                            var saveMails = [
+                                                req.st.db.escape(req.query.token),
+                                                req.st.db.escape(req.query.heMasterId),
+                                                req.st.db.escape(req.body.heDepartmentId),
+                                                req.st.db.escape(req.body.userId || 0),
+                                                req.st.db.escape(req.body.mailerType || 5),
+                                                req.st.db.escape(mailOptions.from),
+                                                req.st.db.escape(mailOptions.to),
+                                                req.st.db.escape(mailOptions.subject),
+                                                req.st.db.escape(mailOptions.html),    // contains mail body
+                                                req.st.db.escape(JSON.stringify(cc)),
+                                                req.st.db.escape(JSON.stringify(bcc)),
+                                                req.st.db.escape(JSON.stringify(attachment)),
+                                                req.st.db.escape(req.body.replyMailId || ""),
+                                                req.st.db.escape(req.body.priority || 1),
+                                                req.st.db.escape(req.body.stageId || 0),
+                                                req.st.db.escape(req.body.statusId || 0),
+                                                req.st.db.escape(message),    // sms message
+                                                req.st.db.escape(whatmateMessage),
+                                                req.st.db.escape(clientContacts[0]),
+                                                req.st.db.escape(JSON.stringify(req.body.transactions ? req.body.transactions : []))
+                                            ];
+
+                                            //saving the mail after sending it
+                                            var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                            console.log(saveMailHistory);
+                                            req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                console.log(mailHistoryErr);
+                                                // console.log(mailHistoryResult);
+                                                if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
+                                                    console.log('sent mails saved successfully');
+                                                }
+                                                else {
+                                                    console.log('mails could not be saved');
+                                                }
+                                            });
+                                            console.log('Mail sent now save sent history');
+                                        } //end of if(sendgrid sent mail successfully)
+                                        //if mail is not sent
+                                        else {
+                                            console.log('Mail not Sent Successfully' + err);
+                                        }
+                                    });
+                                }
+                            }
+
+                            // if (!(templateId == 0 || overWrite)) {
+
+                                if (isSendgrid && isSMS) {  // making changes here reminder
+                                    if (subject != '') {
+                                        if (smsMsg != '' && smsFlag) {
+                                            response.message = "Mail and SMS sent successfully";
+                                            response.data = null;
+                                        }
+                                        else {
+                                            response.message = "Mail sent successfully";
+                                            response.data = null;
+                                        }
+                                    }
+
+                                    else if (subject == '') {
+                                        if (smsMsg != '' && smsFlag) {
+                                            response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
+                                            response.data = null;
+                                        }
+                                        else {
+                                            response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
+                                            response.data = null;
+                                        }
+                                    }
+                                    else {
+                                        response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
+                                        response.data = null;
+                                    }
+                                }
+                                else if (isSendgrid && !isSMS) {
+
+                                    if (subject != '') {
+                                        response.message = "Mail sent successfully";
+                                        response.data = null;
+                                    }
+                                    else if (subject == '') {
+                                        response.message = "Mail subject is empty, mail cannot be sent";
+                                        response.data = null;
+                                    }
+                                }
+                                else if (isSMS && !isSendgrid) {
+                                    if (smsMsg != '' && smsFlag) {
+                                        response.message = "SMS sent successfully";
+                                        response.data = null;
+                                    }
+                                    else if (smsMsg == '' && smsFlag) {
+                                        response.message = "SMS field is empty, SMS cannot be sent";
+                                        response.data = null;
+                                    }
+                                    else {
+                                        response.message = "SMS flag is not enabled, SMS cannot be sent";
+                                        response.data = null;
+                                    }
+                                }
+                                else {
+                                    response.message = "Sendgrid or SMS is not configured. Please contact the admin";
+                                    response.data = null;
+                                }
+                                response.status = true;
+                                response.error = null;
+                                res.status(200).json(response);
+                            // }
+                        }
+
+                        else {
+                            response.status = false;
+                            response.message = "Error while sending mail";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                            return;
+                        }
+                    });
+                }
+                // else if(!templateId && !overWrite){
+                //     response.status = false;
+                //     response.message = "To mail is empty. Mail not sent";
+                //     response.error = null;
+                //     response.data = null;
+                //     res.status(200).json(response);
+                //     return;
+                // }
+
+                else if (!emailReceivers.length) {
+                    response.status = false;
+                    response.message = "Recipients is empty.Please Check";
+                    response.error = null;
+                    response.data = null;
+                    res.status(200).json(response);
+
+                }
+                // else {
+                //     response.status = true;
+                //     response.message = "Something went wrong";
+                //     res.status(200).json(response);
+
+                // }
+                //save it as a template if flag is true or template id is 0
+                // if (templateId == 0 || overWrite) {
+                //     req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
+                //     req.body.type = req.body.type ? req.body.type : 0;
+                //     req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
+                //     req.body.subject = req.body.subject ? req.body.subject : '';
+                //     req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
+                //     req.body.replymailId = req.body.replymailId ? req.body.replymailId : '';
+                //     req.body.priority = req.body.priority ? req.body.priority : 0;
+                //     req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
+                //     req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
+
+                //     var templateInputs = [
+                //         req.st.db.escape(req.query.token),
+                //         req.st.db.escape(templateId),
+                //         req.st.db.escape(req.query.heMasterId),
+                //         req.st.db.escape(req.body.templateName),
+                //         req.st.db.escape(req.body.type),
+                //         req.st.db.escape(JSON.stringify(toMail)),
+                //         req.st.db.escape(JSON.stringify(cc)),
+                //         req.st.db.escape(JSON.stringify(bcc)),
+                //         req.st.db.escape(req.body.subject),
+                //         req.st.db.escape(req.body.mailBody),
+                //         req.st.db.escape(req.body.replymailId),
+                //         req.st.db.escape(req.body.priority),
+                //         req.st.db.escape(req.body.updateFlag),
+                //         req.st.db.escape(smsMsg),
+                //         req.st.db.escape(whatmateMessage),
+                //         req.st.db.escape(JSON.stringify(attachment)),
+                //         req.st.db.escape(JSON.stringify(tags)),
+                //         req.st.db.escape(JSON.stringify(stage)),
+                //         req.st.db.escape(req.body.mailerType),
+                //         req.st.db.escape(JSON.stringify(tableTags)),
+                //         req.st.db.escape(req.body.sendSMS || 0),
+                //         req.st.db.escape(req.body.attachJD || 0),
+                //         req.st.db.escape(req.body.attachResume || 0),
+                //         req.st.db.escape(req.body.interviewerFlag || 0),
+                //         req.st.db.escape(req.body.resumeFileName || ''),
+                //         req.st.db.escape(req.body.attachResumeFlag || 0),
+                //         req.st.db.escape(JSON.stringify(trackerTemplate))
+
+                //     ];
+                //     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
+                //     console.log(saveTemplateQuery);
+                //     req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
+                //         console.log(tempSaveErr);
+                //         if (!tempSaveErr && tempSaveResult) {
+                //             // console.log(tempSaveResult);
+                //             response.status = true;
+                //             //check if there are any receivers, if yes sent and saved
+                //             if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
+                //                 if (isSendgrid && isSMS) {
+                //                     response.message = "Mail and SMS Sent and Template Saved successfully";
+                //                 }
+                //                 else if (!isSendgrid && isSMS) {
+                //                     response.message = "SMS is Sent and Template Saved successfully";
+                //                 }
+                //                 else if (isSendgrid && !isSMS) {
+                //                     response.message = "Mail is Sent and Template Saved successfully";
+                //                 }
+                //                 else {
+                //                     response.message = "Template saved successfully";
+                //                 }
+                //             }
+                //             //else saved
+                //             else {
+                //                 response.message = "Template saved successfully";
+                //             }
+                //             response.error = null;
+                //             response.data = null;
+                //             res.status(200).json(response);
+                //         }
+                //     });
+                // }
+            }
+            //end of if(token validation)
+            //else invalid token
+            else {
+                res.status(401).json(response);
+            }
+            //end of else (token validation)
+        });
+    }
+};
 
 module.exports = sendgridCtrl;
