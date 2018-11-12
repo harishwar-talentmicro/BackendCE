@@ -395,8 +395,12 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(requirementArray)),
                             req.st.db.escape(req.body.referredBy),
                             req.st.db.escape(JSON.stringify(faceSheet)),
-                            req.st.db.escape(JSON.stringify(presentLocation))
-
+                            req.st.db.escape(JSON.stringify(presentLocation)),
+                            req.st.db.escape(req.body.ppIssueDate || null),
+                            req.st.db.escape(req.body.gccExp || 0.0),
+                            req.st.db.escape(req.body.licenseOption || 0),
+                            req.st.db.escape(req.body.passportCategory || ""),
+                            req.st.db.escape(JSON.stringify(req.body.licenseData || []))
                         ];
 
                         var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -1453,7 +1457,8 @@ applicantCtrl.getrequirementList = function (req, res, next) {
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.applicantId || 0)
                 ];
 
                 var procQuery = 'CALL wm_get_requirementList( ' + inputs.join(',') + ')';
@@ -1648,6 +1653,7 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         temp_result.secondarySkills = JSON.parse(temp_result.secondarySkills);
                         temp_result.functionalAreas = JSON.parse(temp_result.functionalAreas);
                         temp_result.presentLocation = JSON.parse(temp_result.presentLocation).locationId ? JSON.parse(temp_result.presentLocation) : {};
+                        temp_result.licenseData = JSON.parse(temp_result.licenseData);
 
                         if (typeof (result[5] && result[5][0] && result[5][0].cc) == 'string') {
                             result[5][0].cc = JSON.parse(result[5][0].cc)
@@ -4971,4 +4977,177 @@ applicantCtrl.getMailerApplicants = function (req, res, next) {
 
 };
 
+applicantCtrl.ReqAppMapFromReqView = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    var applicants = req.body.applicants;
+    if (typeof (applicants) == 'string') {
+        applicants = JSON.parse(applicants);
+    }
+    if (!applicants) {
+        applicants = [];
+    }
+
+    var requirements = req.body.requirements;
+    if (typeof (requirements) == 'string') {
+        requirements = JSON.parse(requirements);
+    }
+    if (!requirements) {
+        requirements = [];
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+    
+                    var inputs = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(JSON.stringify(requirements)),
+                        req.st.db.escape(JSON.stringify(applicants))
+                    ];
+    
+                    var procQuery = 'CALL pace_save_reqAppMapFromReqView( ' + inputs.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        console.log(err);
+                        if (!err && result && result[0] && result[0][0].message) {
+                            response.status = true;
+                            response.message = result[0][0].message;
+                            response.error = null;
+                            response.data = null;
+                            res.status(200).json(response);
+                        }
+                        else if (!err && result && result[0] && result[0][0]._error) {
+                            response.status = false;
+                            response.message = result[0][0]._error;
+                            response.error = null;
+                            response.data = null;
+                            res.status(200).json(response);
+                        }
+    
+                        else {
+                            response.status = false;
+                            response.message = "Error while tagging applicant";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                else {
+                    res.status(401).json(response);
+                }
+            });
+        }
+        catch(ex){
+            console.log("exception",ex);
+            response.message = ex;
+            response.status(500).json(response);
+        }
+    }
+
+};
+
+
+applicantCtrl.getPanelMembersForInterviewMailerMobile = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.requirementId) {
+        error.requirementId = 'Invalid requirementId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.requirementId)
+                ];
+
+                var procQuery = 'CALL wm_get_interviewMailerPanelMembersForMobile( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Panel members loaded successfully";
+                        response.error = null;
+                        response.data =
+                            {
+                                interviewPanelMembers: result[0]
+                            };
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = {
+                            interviewPanelMembers: []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading panel members";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
 module.exports = applicantCtrl;
