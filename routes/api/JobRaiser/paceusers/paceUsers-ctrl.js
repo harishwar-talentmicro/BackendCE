@@ -615,8 +615,15 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             }
                         }
 
-                        console.log(result[9][0])
+                        if(result[10] && result[10][0]){
+                            for (var i = 0; i < result[10].length; i++) {
+                                result[10][i].countDetails= result[10][i].countDetails?JSON.parse(result[10][i].countDetails) :[];
+                                for (var j=0;j< result[10][i].countDetails.length;j++){
+                                    result[10][i].countDetails[j].details=result[10][i].countDetails[j].details ? JSON.parse(result[10][i].countDetails[j].details) :{};
+                                }
+                                }
 
+                        }
                         // for (var i = 0; i < result[7].length; i++) {
                         //     result[7][i].reqAppDetails = result[7][i].reqAppDetails ? JSON.parse(result[7][i].reqAppDetails) : [];
                         // }
@@ -637,7 +644,8 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                                 converstionReport: result[6][0],
                                 turnAroundTime: result[7][0],
                                 firstCVResponse: result[8][0],
-                                recruiterWiseReport:result[9]
+                                recruiterWiseReport:result[9],
+                                stagewiseTurnAroundReport:result[10]
                                 // CVsCalled_SentToTheClient: result[9][0],
                                 // CVsSentToTheClient_CVsShortlistedByTheClient: result[10][0],
                                 // CVsShortlisted_CandidatesInterviewedByClient: result[11][0],
@@ -662,7 +670,8 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             converstionReport: {},
                             turnAroundTime: [],
                             firstCVResponse: [],
-                            stageWiseReport:[]
+                            stageWiseReport:[],
+                            stagewiseTurnAroundReport:[]
                             // CVsCalled_SentToTheClient:[],
                             // CVsSentToTheClient_CVsShortlistedByTheClient: [],
                             // CVsShortlisted_CandidatesInterviewedByClient: [],

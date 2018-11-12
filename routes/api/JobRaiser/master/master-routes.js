@@ -48,5 +48,6 @@ router.post('/saveAssessmentGroupType',masterCtrl.saveAssessmentGroupType);
 
 router.get('/generateJobCode',masterCtrl.jobCodeGeneration);
 
+router.get('/report',masterCtrl.getportalRequirementReport);
 module.exports = router;
 
