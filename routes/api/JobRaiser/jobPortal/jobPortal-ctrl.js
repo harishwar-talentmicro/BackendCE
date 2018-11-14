@@ -29,6 +29,7 @@ const authToken = 'b36eba6376b5939cebe146f06d33ec57';   //'3abf04f536ede7f696491
 const FromNumber = appConfig.DB.FromNumber || '+18647547021';
 const client = require('twilio')(accountSid, authToken);
 
+const iplocation = require("iplocation").default;
 
 var qs = require("querystring");
 var options = {
@@ -1298,24 +1299,17 @@ jobPortalCtrl.portalverifyotp = function (req, res, next) {
         req.db.query(procQuery, function (err, result) {
             console.log(err);
 
-            if (!err && result && result[0] && result[0][0] && result[0][0].message == "OTP verified successfully") {
+            if (!err && result && result[0] && result[0][0] && result[0][0].success) {
                 response.status = true;
-                response.message = result[0][0].message;
+                response.message = result[0][0].success;
                 response.error = null;
                 response.data = null;
                 res.status(200).json(response);
             }
-            else if (!err && result && result[0] && result[0][0] && result[0][0].message == "Mobile Number or EmailId already exists") {
+           
+            else if (!err && result && result[0] && result[0][0] && result[0][0]._error) {
                 response.status = false;
-                response.message = result[0][0].message;
-                response.error = null;
-                response.data = null;
-                res.status(200).json(response);
-            }
-
-            else if (!err && result && result[0] && result[0][0] && result[0][0].message == "INVALID OTP") {
-                response.status = false;
-                response.message = result[0][0].message;
+                response.message = result[0][0]._error;
                 response.error = null;
                 response.data = null;
                 res.status(200).json(response);
@@ -1458,31 +1452,113 @@ jobPortalCtrl.generalMasterNoToken = function (req, res, next) {
         error: null
     };
 
-    var procQuery = 'CALL wm_generalMasterDataNoToken()';
-    console.log(procQuery);
-    req.db.query(procQuery, function (err, result) {
-        console.log(err);
+    var ip = req.connection.remoteAddress.split('f:')[1];
 
-        if (!err && result && result[0] && result[0][0]) {
-            response.status = true;
-            response.message = "Data loaded successfully";
-            response.error = null;
-            response.data = {
-                countryList: result[0] ? result[0] : [],
-                industryList: result[1] ? result[1] : [],
-                locationList: result[2] ? result[2] : []
+    iplocation(ip)
+    .then((resp) => {
+        countryCode = resp.countryCode || "";
+        var procQuery = 'CALL wm_generalMasterDataNoToken('+req.st.db.escape(countryCode)+')';
+            console.log(procQuery);
+            req.db.query(procQuery, function (err, result) {
+                console.log(err);
+        
+                if (!err && result && result[0] && result[0][0]) {
+                    response.status = true;
+                    response.message = "Data loaded successfully";
+                    response.error = null;
+                    response.data = {
+                        countryList: result[0] ? result[0] : [],
+                        industryList: result[1] ? result[1] : [],
+                        locationList: result[2] ? result[2] : [],
+                        defaultIsdCode: result[3] && result[3][0] && result[3][0].isdCode ? result[3][0].isdCode : "",
+                        defaultCountryCode : countryCode
+                    }
+                    res.status(200).json(response);
+                }
+        
+                else {
+                    response.status = false;
+                    response.message = "Error while loading data";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+
+
+    })
+    .catch(iperr => {
+        var ipApi = "https://ipapi.co/" + ip + "/country_calling_code/";
+        request({
+            url : ipApi,
+            method: "GET"
+        },function(errReq,httpresponse,body){
+            if(!errReq){
+                console.log("body",body);
+                var procQuery = 'CALL wm_generalMasterDataNoToken('+req.st.db.escape(countryCode)+')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+            
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            countryList: result[0] ? result[0] : [],
+                            industryList: result[1] ? result[1] : [],
+                            locationList: result[2] ? result[2] : [],
+                            defaultIsdCode: body,
+                            deafultCountryCode : ""
+                        }
+                        res.status(200).json(response);
+                    }
+            
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
             }
-            res.status(200).json(response);
-        }
-
-        else {
-            response.status = false;
-            response.message = "Error while loading data";
-            response.error = null;
-            response.data = null;
-            res.status(500).json(response);
-        }
+            // else{
+            //     console.log("err",errReq);
+            //     var procQuery = 'CALL wm_generalMasterDataNoToken()';
+            //     console.log(procQuery);
+            //     req.db.query(procQuery, function (err, result) {
+            //         console.log(err);
+            
+            //         if (!err && result && result[0] && result[0][0]) {
+            //             response.status = true;
+            //             response.message = "Data loaded successfully";
+            //             response.error = null;
+            //             response.data = {
+            //                 countryList: result[0] ? result[0] : [],
+            //                 industryList: result[1] ? result[1] : [],
+            //                 locationList: result[2] ? result[2] : [],
+            //                 defaultCountryCode: ""
+            //             }
+            //             res.status(200).json(response);
+            //         }
+            
+            //         else {
+            //             response.status = false;
+            //             response.message = "Error while loading data";
+            //             response.error = null;
+            //             response.data = null;
+            //             res.status(500).json(response);
+            //         }
+            //     });
+            // }
+    
+        });
     });
+
+   
+
+   
 
 };
 
@@ -1957,13 +2033,13 @@ jobPortalCtrl.portalPasswordResetOTP = function (req, res, next) {
 
                 }
                 else if (!err && userResult && userResult[0] && userResult[0][0].messageError) {
-                    respMsg.status = true;
+                    respMsg.status = false;
                     respMsg.message = userResult[0][0].messageError;
                     respMsg.data = null;
                     res.status(200).json(respMsg);
                 }
                 else if (!err && userResult && userResult[0] && userResult[0][0]._error) {
-                    respMsg.status = true;
+                    respMsg.status = false;
                     respMsg.message = userResult[0][0]._error;
                     respMsg.data = null;
                     res.status(200).json(respMsg);
@@ -2194,8 +2270,8 @@ jobPortalCtrl.portalresetPassword = function (req, res, next) {
 
 jobPortalCtrl.signUpsendOtp = function (req, res, next) {
 
-    var mobileNo; //= req.body.mobileNo;
-    var isdMobile; //= req.body.isdMobile;
+    var mobileNo = ""; //= req.body.mobileNo;
+    var isdMobile = ""; //= req.body.isdMobile;
     // var displayName = req.body.displayName ;
     var emailId = req.body.emailId ? req.body.emailId : "";
     var status = true, error = {};
@@ -2245,12 +2321,13 @@ jobPortalCtrl.signUpsendOtp = function (req, res, next) {
 
             message = 'Your WhatMate verification Code is ' + code + ' . Please enter this 4 digit number where prompted to proceed --WhatMate Helpdesk.';
 
-            var query = req.st.db.escape(mobileNo) + ',' + req.st.db.escape(code) + ',' + req.st.db.escape(isdMobile) + ',' + req.st.db.escape(emailId);
+            var query = req.st.db.escape(mobileNo) + ',' + req.st.db.escape(code) + ',' + req.st.db.escape(isdMobile) + ',' + req.st.db.escape(emailId)+','+req.st.db.escape(DBSecretKey);
             console.log("query", query);
             req.st.db.query('CALL portal_generate_otp(' + query + ')', function (err, insertResult) {
-                if (!err) {
+                console.log(err);
+                if (!err && insertResult && insertResult[0] && insertResult[0][0] && insertResult[0][0].otp) {
 
-                    if (mobileNo != "") {
+                    if (mobileNo && mobileNo != "") {
                         if (isdMobile == "+977") {
                             request({
                                 url: 'http://beta.thesmscentral.com/api/v3/sms?',
@@ -2393,6 +2470,12 @@ jobPortalCtrl.signUpsendOtp = function (req, res, next) {
                         mobileNo: mobileNo
                     };
                     res.status(200).json(respMsg);
+                }
+                else if (!err && insertResult && insertResult[0] && insertResult[0][0] && insertResult[0][0].message){
+                    respMsg.status = false;
+                    respMsg.message = insertResult[0][0].message;
+                    res.status(200).json(respMsg);
+
                 }
                 else {
                     respMsg.status = false;

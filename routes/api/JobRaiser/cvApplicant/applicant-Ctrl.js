@@ -400,7 +400,8 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(req.body.gccExp || 0.0),
                             req.st.db.escape(req.body.licenseOption || 0),
                             req.st.db.escape(req.body.passportCategory || ""),
-                            req.st.db.escape(JSON.stringify(req.body.licenseData || []))
+                            req.st.db.escape(JSON.stringify(req.body.licenseData || [])),
+                            req.st.db.escape(JSON.stringify(req.body.document_attachments_list || []))
                         ];
 
                         var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -946,8 +947,15 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                 req.body.applicantId = (req.body.applicantId) || (req.body.applicantId == "") ? req.body.applicantId : 0;
                 req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
                 req.body.type = (req.body.type) ? req.body.type : 1;
-                req.body.name = (req.body.name) ? req.body.name : '';
+                req.body.name = (req.body.name) ? req.body.name.trim() : '';
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
+                if(req.body.name != "") {
+                    req.body.name = req.body.name.split(',');
+                }
+                else{
+                    req.body.name = [];
+                }
 
                 var getStatus = [
                     req.st.db.escape(req.query.token),
@@ -966,21 +974,22 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                     req.st.db.escape(req.body.requirementId),
                     req.st.db.escape(DBSecretKey),
                     req.st.db.escape(req.body.type),
-                    req.st.db.escape(req.body.name),
+                    req.st.db.escape(JSON.stringify(req.body.name || [])),
                     req.st.db.escape(req.body.from || null),
                     req.st.db.escape(req.body.to || null),
-                    req.st.db.escape(req.body.userMasterId || 0)
+                    req.st.db.escape(req.body.userMasterId || 0),
+                    req.st.db.escape(req.query.isWeb || 0)
                 ];
 
                 var procQuery = 'CALL wm_get_applicants( ' + getStatus.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, Result) {
                     console.log(err);
-                    if (!err && Result && Result[0] && Result[0][0]) {
+                    if (!err && Result && Result[0] || Result[2] || Result[3]) {
                         response.status = true;
                         response.message = "Applicants loaded successfully";
                         response.error = null;
-                        if (Result[0][0].reqApplicantId) {
+                        if (Result[0] && Result[0][0] && Result[0][0].reqApplicantId) {
                             for (var i = 0; i < Result[0].length; i++) {
                                 Result[0][i].clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
 
@@ -1000,6 +1009,18 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                                 Result[0][i].faceSheetDetailWithAnswers = facesheet;
                             }
                         }
+                        var cvSearchMasterData = {};
+                        if(req.query.isWeb == 0 && Result[6] && Result[6][0] && Result[7] && Result[7][0]){
+                           cvSearchMasterData = {
+                                skillList : Result[6] ? Result[6] : [],
+                                roles : Result[7] ? Result[7] : [],
+                                industry : Result[8] ? Result[8] : [],
+                                cvSource : Result[9] ? Result[9] : [],
+                                functionalAreas : Result[10] ? Result[10] : [],
+                                nationality : Result[11] ? Result[11] : []                           
+
+                            }    
+                        }
 
                         response.data = {
                             applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId ? Result[0] : [],
@@ -1008,8 +1029,10 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                                 currency: Result[2] ? Result[2] : [],
                                 scale: Result[3] ? Result[3] : [],
                                 duration: Result[4] ? Result[4] : [],
-                                attachment: Result[5] ? Result[5] : []
-                            }
+                                attachment: Result[5] ? Result[5] : [],
+                                grade : Result[12] ? Result[12] : []
+                            },
+                            cvSearchMasterData : cvSearchMasterData
                         };
                         // console.log(response.data);
                         res.status(200).json(response);
@@ -1663,6 +1686,8 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         temp_result.functionalAreas = JSON.parse(temp_result.functionalAreas);
                         temp_result.presentLocation = JSON.parse(temp_result.presentLocation).locationId ? JSON.parse(temp_result.presentLocation) : {};
                         temp_result.licenseData = JSON.parse(temp_result.licenseData);
+                        temp_result.document_attachments_list = JSON.parse(temp_result.document_attachments_list);
+
 
                         if (typeof (result[5] && result[5][0] && result[5][0].cc) == 'string') {
                             result[5][0].cc = JSON.parse(result[5][0].cc)
@@ -2098,7 +2123,10 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(billingDuration)),
                     req.st.db.escape(req.body.billingCTCAmount),
                     req.st.db.escape(req.body.offerExpiryDate || null),
-                    req.st.db.escape(req.body.noticePeriod || 0)
+                    req.st.db.escape(req.body.noticePeriod || 0),
+                    req.st.db.escape(JSON.stringify(req.body.grade || {})),
+                    req.st.db.escape(req.body.employeeCode || ""),
+                    req.st.db.escape(JSON.stringify(req.body.designation || {}))
                 ];
 
                 var procQuery = 'CALL wm_save_offerManager( ' + inputs.join(',') + ')';
@@ -2184,6 +2212,9 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                             result[0][0].billingCurrency = result[0][0].billingCurrency ? JSON.parse(result[0][0].billingCurrency) : {};
                             result[0][0].billingScale = result[0][0].billingScale ? JSON.parse(result[0][0].billingScale) : [];
                             result[0][0].billingDuration = result[0][0].billingDuration ? JSON.parse(result[0][0].billingDuration) : {};
+                            result[0][0].grade = result[0][0] && result[0][0].grade && JSON.parse(result[0][0].grade).gradeId ? JSON.parse(result[0][0].grade) : {};
+                            result[0][0].designation = result[0][0] && result[0][0].designation && JSON.parse(result[0][0].designation).jobtitleId? JSON.parse(result[0][0].designation) : {};
+
                         }
 
                         for (var i = 0; i < result[2].length; i++) {
