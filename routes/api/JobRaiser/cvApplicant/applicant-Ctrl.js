@@ -531,15 +531,6 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             result[46][0].teamUsers = (result[46] && result[46][0] && result[46][0].teamUsers) ? JSON.parse(result[46][0].teamUsers) : []
                         }
 
-                        // for (var i = 0; i < result[57].length; i++){
-                        //     result[57][i].states = result[57][i] ? JSON.parse(result[57][i].states) : [];
-
-                        //     for (var k = 0; k < result[57][i].states.length; k++){
-                        //         result[57][i].states[k].cities = result[57][i].states[k] ? JSON.parse(result[57][i].states[k].cities) : [];
-                        //     }
-
-                        // }
-
 
                         response.data = {
                             jobType: result[0] ? result[0] : [],
@@ -597,13 +588,13 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             interviewModeList: result[49] ? result[49] : [],
                             billTo: result[50] ? result[50] : [],
                             organizationChart: {
-                                organizationBranches: result[52] && result[52][0] ? result[52] : [],
+                                 organizationBranches: result[52] && result[52][0] ? result[52] : [],
                                 organizationDepartments: result[53] && result[53][0] ? result[53] : [],
                                 organizationGrades: result[54] && result[54][0] ? result[54] : [],
                                 organizationJobTitles: result[55] && result[55][0] ? result[55] : []
                             },
                             typeView: result[56] ? result[56] : []
-                            // countryStateCity : result[57] ? result[57] : []
+
                         };
 
                         if (req.query.isWeb == 0) {
@@ -1023,7 +1014,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                         }
 
                         response.data = {
-                            applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId ? Result[0] : [],
+                            applicantlist: Result[0] ? Result[0] : [],
                             count: Result[1][0].count,
                             offerMasterData: {
                                 currency: Result[2] ? Result[2] : [],
