@@ -615,6 +615,14 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             }
                         }
 
+
+                        if(result[11] && result[11][0]){
+                            for (var i = 0; i < result[11].length; i++) {
+                            result[11][i].cvDetails= result[11][i].cvDetails?JSON.parse(result[11][i].cvDetails) :[];
+                            
+                            }
+                        }
+
                         console.log(result[9][0])
 
                         // for (var i = 0; i < result[7].length; i++) {
@@ -637,7 +645,9 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                                 converstionReport: result[6][0],
                                 turnAroundTime: result[7][0],
                                 firstCVResponse: result[8][0],
-                                recruiterWiseReport:result[9]
+                                recruiterWiseReport:result[9],
+                                cvSourceReport:result[10],
+                                cvSourceRecruiterReport:result[11]
                                 // CVsCalled_SentToTheClient: result[9][0],
                                 // CVsSentToTheClient_CVsShortlistedByTheClient: result[10][0],
                                 // CVsShortlisted_CandidatesInterviewedByClient: result[11][0],
@@ -662,7 +672,9 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             converstionReport: {},
                             turnAroundTime: [],
                             firstCVResponse: [],
-                            stageWiseReport:[]
+                            stageWiseReport:[],
+                            cvSourceReport:[],
+                                cvSourceRecruiterReport:[]
                             // CVsCalled_SentToTheClient:[],
                             // CVsSentToTheClient_CVsShortlistedByTheClient: [],
                             // CVsShortlisted_CandidatesInterviewedByClient: [],
