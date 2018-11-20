@@ -1078,6 +1078,221 @@ Auth.prototype.login = function (req, res, next) {
     }
 };
 
+
+/**
+ * @todo FnLogin
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+Auth.prototype.pacelogin = function (req, res, next) {
+
+
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+    var ezeoneId = req.st.alterEzeoneId(req.body.UserName);
+    var isDialer = req.query.isDialer ? req.query.isDialer : 0;
+    var password = req.body.Password;
+    var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+    var deviceToken = req.body.device_token ? req.body.device_token : '';
+    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+    var ip = req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress;
+
+    var token = req.body.token ? req.body.token : '';
+    var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';
+    var isWhatMate = req.body.isWhatMate ? req.body.isWhatMate : 0;
+    var APNS_Id = (req.body.APNS_Id) ? (req.body.APNS_Id) : "";
+    var GCM_Id = (req.body.GCM_Id) ? (req.body.GCM_Id) : "";
+    var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
+
+    var responseMessage = {
+        status: false,
+        message: 'Failed to login',
+        data: {},
+        error: null
+    };
+
+    try {
+
+        if (ezeoneId && password) {
+
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(isDialer);
+            var query = 'CALL PLoginNewOld(' + queryParams + ')';
+            console.log('query', query);
+            st.db.query(query, function (err, loginResult) {
+                console.log(loginResult);
+                if (!err) {
+                    if (loginResult && password) {
+                        //console.log('loginDetails',loginDetails);
+                        if (loginResult[0]) {
+                            if (loginResult[0].length > 0) {
+                                var loginDetails = loginResult[0];
+                                if (!token) {
+                                    if (comparePassword(password, loginDetails[0].Password)) {
+                                        st.generateTokenPace(ip, userAgent, loginDetails[0].EZEID, isWhatMate, APNS_Id, GCM_Id, secretKey, isDialer, function (err, tokenResult) {
+                                            if ((!err) && tokenResult && loginDetails[0]) {
+
+                                                var paceInQueryParams = st.db.escape(tokenResult) + ',' + st.db.escape(loginDetails[0].EZEID);
+                                                var paceQry = 'CALL wm_pace_login(' + paceInQueryParams + ')';
+                                                console.log('paceQry', paceQry);
+                                                st.db.query(paceQry, function (err, paceResult) {
+                                                    if (!err && paceResult && paceResult[0] && paceResult[0][0]) {
+                                                        /*
+                                                         Every time the user loads the website the browser sends the cookie back to the server to notify the user previous activity
+                                                        */
+                                                        res.cookie('Token', tokenResult, {
+                                                            maxAge: 900000,
+                                                            httpOnly: true
+                                                        });
+                                                        responseMessage.status = true;
+                                                        responseMessage.message = "Logged in successfully";
+                                                        responseMessage.data.Token = tokenResult;
+                                                        responseMessage.data.IsAuthenticate = true;
+                                                        responseMessage.data.TID = loginDetails[0].TID;
+                                                        responseMessage.data.ezeone_id = loginDetails[0].EZEID;
+                                                        if (loginDetails[0].ParentMasterID == 0) {
+                                                            responseMessage.data.MasterID = loginDetails[0].TID;
+                                                        }
+                                                        else {
+                                                            responseMessage.data.MasterID = loginDetails[0].ParentMasterID;
+                                                        }
+                                                        responseMessage.data.mobilenumber = loginDetails[0].mobilenumber;
+                                                        responseMessage.data.group_id = loginDetails[0].group_id;
+                                                        responseMessage.data.isWMAdmin = loginDetails[0].isWMAdmin;
+                                                        responseMessage.data.displayName = loginDetails[0].displayName;
+                                                        responseMessage.data.paceUserDetails = paceResult[0][0];
+                                                        res.status(200).json(responseMessage);
+                                                    }
+                                                    else {
+                                                        responseMessage.status = false;
+                                                        responseMessage.message = "Not a Valid Pace HCM User";
+                                                        responseMessage.error = null;
+                                                        responseMessage.data = null;
+                                                        res.status(500).json(responseMessage);
+                                                    }
+                                                });
+
+                                            }
+                                            else {
+
+                                                responseMessage.status = false;
+                                                responseMessage.message = "Failed to generate a token";
+                                                res.status(500).json(responseMessage);
+                                                console.log('FnLogin:failed to generate a token ');
+                                                console.log('FnLogin:' + err);
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.message = "password not matched";
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnLogin:password not matched ');
+                                    }
+                                }
+                                else {
+
+                                    var paceInQueryParams = st.db.escape(token) + ',' + st.db.escape(loginDetails[0].EZEID);
+                                    var paceQry = 'CALL wm_pace_login(' + paceInQueryParams + ')';
+                                    console.log('paceQry', paceQry);
+                                    st.db.query(paceQry, function (err, paceResult) {
+                                        if (!err && paceResult && paceResult[0] && paceResult[0][0]) {
+                                            /*
+                                             Every time the user loads the website the browser sends the cookie back to the server to notify the user previous activity
+                                            */
+                                            res.cookie('Token', tokenResult, {
+                                                maxAge: 900000,
+                                                httpOnly: true
+                                            });
+                                            responseMessage.status = true;
+                                            responseMessage.message = "Logged in successfully";
+
+                                            responseMessage.data.Token = tokenResult;
+                                            responseMessage.data.IsAuthenticate = true;
+                                            responseMessage.data.TID = loginDetails[0].TID;
+                                            responseMessage.data.ezeone_id = loginDetails[0].EZEID;
+                                            if (loginDetails[0].ParentMasterID == 0) {
+                                                responseMessage.data.MasterID = loginDetails[0].TID;
+                                            }
+                                            else {
+                                                responseMessage.data.MasterID = loginDetails[0].ParentMasterID;
+                                            }
+                                            responseMessage.data.mobilenumber = loginDetails[0].mobilenumber;
+                                            responseMessage.data.group_id = loginDetails[0].group_id;
+                                            responseMessage.data.isWMAdmin = loginDetails[0].isWMAdmin;
+                                            responseMessage.data.displayName = loginDetails[0].displayName;
+                                            responseMessage.data.paceUserDetails = paceResult[0][0];
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.message = "Not a Valid Pace HCM User";
+                                            responseMessage.error = null;
+                                            responseMessage.data = null;
+                                            res.status(500).json(responseMessage);
+                                        }
+                                    });
+                                }
+                            }
+                            else {
+                                responseMessage.status = false;
+                                responseMessage.message = "login result not found";
+                                res.status(200).json(responseMessage);
+                                console.log('FnLogin:login result not found');
+                            }
+                        }
+                        else {
+                            responseMessage.status = false;
+                            responseMessage.message = "login result not found";
+                            res.status(200).json(responseMessage);
+                            console.log('FnLogin:login result not found');
+                        }
+                    }
+                    else {
+                        responseMessage.status = false;
+                        responseMessage.message = "Invalid login credentials";
+                        res.status(200).json(responseMessage);
+                        console.log('FnLogin: Invalid login credentials');
+                    }
+                }
+                else {
+                    responseMessage.status = false;
+                    responseMessage.message = "Failed to login! try again";
+                    res.status(500).json(responseMessage);
+                    console.log('FnLogin:' + err);
+                }
+            });
+        }
+        else {
+            if (!ezeoneId) {
+                console.log('FnLogin: EZEOneId is mandatory');
+                responseMessage.status = false;
+                responseMessage.message = 'EZEOneId is mandatory';
+            }
+            else if (!password) {
+                console.log('FnLogin: password is mandatory');
+                responseMessage.status = false;
+                responseMessage.message = 'password is mandatory';
+            }
+            responseMessage.status = false;
+            res.status(400).json(responseMessage);
+        }
+    }
+    catch (ex) {
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log(ex);
+        console.log('FnLogin:: error:' + ex);
+
+    }
+};
+
 /**
  * @todo FnLogout
  * Method : GET
@@ -2640,7 +2855,7 @@ Auth.prototype.portalLogin = function (req, res, next) {
 
         if ((ezeoneId || emailId || (mobileNumber && mobileISD)) && password) {
 
-            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(emailId) + ',' + st.db.escape(mobileISD) + ',' + st.db.escape(mobileNumber)+ ',' + st.db.escape(heMasterId);
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(emailId) + ',' + st.db.escape(mobileISD) + ',' + st.db.escape(mobileNumber) + ',' + st.db.escape(heMasterId);
             var query = 'CALL wm_portal_login(' + queryParams + ')';
             console.log('query', query);
             st.db.query(query, function (err, loginResult) {

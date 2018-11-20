@@ -1355,17 +1355,11 @@ billingCtrl.getPaceReqAppBilling = function (req, res, next) {
 
                         if (result[0][0].billData && JSON.parse(result[0][0].billData).length) {
                             result[0][0].billData = result[0][0].billData ? JSON.parse(result[0][0].billData) : [];
-                            for (var i = 0; i < result[0][0].billData[i].length; i++) {
-
-                                result[0][0].billData[i].billTo = (result[0] && result[0][0] && result[0][0].billData[i] && result[0][0].billData[i].billTo && JSON.parse(result[0][0].billData[i].billTo).id) ? JSON.parse(result[0][0].billData[i].billTo) : {};
-
-                                result[0][0].billData[i].amountCurrency = (result[0] && result[0][0] && result[0][0].billData[i] && result[0][0].billData[i].amountCurrency && JSON.parse(result[0][0].billData[i].amountCurrency).currencyId) ? JSON.parse(result[0][0].billData[i].amountCurrency) : {};
-
-                                result[0][0].billData[i].amountScale = (result[0] && result[0][0] && result[0][0].billData[i] && result[0][0].billData[i].amountScale && JSON.parse(result[0][0].billData[i].amountScale).scaleId) ? JSON.parse(result[0][0].billData[i].amountScale) : {};
-
-                                result[0][0].billData[i].amountDuration = (result[0] && result[0][0] && result[0][0].billData[i] && result[0][0].billData[i].amountDuration && JSON.parse(result[0][0].billData[i].amountDuration).durationId) ? JSON.parse(result[0][0].billData[i].amountDuration) : {};
-
+                            for (var i = 0; i < result[0][0].billData.length; i++) {                            
+                            
+                                result[0][0].billData[i].documents = result[0][0].billData[i] && result[0][0].billData[i].documents  && JSON.parse(result[0][0].billData[i].documents) ? JSON.parse(result[0][0].billData[i].documents) : [];   
                             }
+
                         }
 
                         response.status = true;
@@ -1695,6 +1689,7 @@ billingCtrl.billingFilterNew = function (req, res, next) {
 
                             result[0][i].amountDuration = (result[0][i].amountDuration && JSON.parse(result[0][i].amountDuration).durationId) ? JSON.parse(result[0][i].amountDuration) : {};
 
+                            result[0][i].documents = result[0] && result[0][i] && JSON.parse(result[0][i].documents) ? JSON.parse(result[0][i].documents) : []
                         }
 
                         response.data = {

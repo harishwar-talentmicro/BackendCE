@@ -615,6 +615,15 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             }
                         }
 
+
+                        if(result[11] && result[11][0]){
+                            for (var i = 0; i < result[11].length; i++) {
+                            result[11][i].cvDetails= result[11][i].cvDetails?JSON.parse(result[11][i].cvDetails) :[];
+                            
+                            }
+                        }
+
+                        // console.log(result[9][0])
                         if(result[10] && result[10][0]){
                             for (var i = 0; i < result[10].length; i++) {
                                 result[10][i].countDetails= result[10][i].countDetails?JSON.parse(result[10][i].countDetails) :[];
@@ -655,6 +664,7 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                                 turnAroundTime: result[7][0],
                                 firstCVResponse: result[8][0],
                                 recruiterWiseReport:result[9],
+<<<<<<< HEAD
                                 stagewiseTurnAroundReport:result[10],
                                 cvSourceReport: result[11],
                                  cvSourceRecruiterReport: result[12],
@@ -662,6 +672,12 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
 
                                 totalCVCount: result[13][0].count,
                                 filteredCVCount: result[14][0].count,
+=======
+                                cvSourceReport:result[10], // check this result[10] key name
+                                cvSourceRecruiterReport:result[11],
+                                stagewiseTurnAroundReport:result[10]  // check this result[10] key name
+                                // CVsCalled_SentToTheClient: result[9][0],
+>>>>>>> 38c7a28fbef9abc52fbedca251869d00bd179b2a
                                 // CVsSentToTheClient_CVsShortlistedByTheClient: result[10][0],
                                 // CVsShortlisted_CandidatesInterviewedByClient: result[11][0],
                                 // CandidatesInterviewedByClient_CandidatesOffered: result[12][0],
@@ -686,11 +702,17 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             turnAroundTime: [],
                             firstCVResponse: [],
                             stageWiseReport:[],
+<<<<<<< HEAD
                             stagewiseTurnAroundReport:[],
                             cvsourceReport:[],
                             cvSourceRecruiterReport: [],
                             totalCVCount:[],
                             filteredCVCount:[],
+=======
+                            cvSourceReport:[],
+                            cvSourceRecruiterReport:[],  
+                            stagewiseTurnAroundReport:[]
+>>>>>>> 38c7a28fbef9abc52fbedca251869d00bd179b2a
                             // CVsCalled_SentToTheClient:[],
                             // CVsSentToTheClient_CVsShortlistedByTheClient: [],
                             // CVsShortlisted_CandidatesInterviewedByClient: [],

@@ -107,6 +107,7 @@ var Auth = require('./modules/auth-module.js');
 var authModule = new Auth(db,stdLib);
 router.post('/ewSavePrimaryEZEData', authModule.register);
 router.post('/ewLogin', authModule.login);
+router.post('/pacelogin', authModule.pacelogin);
 router.post('/login', authModule.loginNew);
 router.post('/latestLogin', authModule.loginLatest);
 router.get('/ewLogout', authModule.logout);
