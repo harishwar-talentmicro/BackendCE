@@ -224,7 +224,7 @@ gulfCtrl.getMedical = function (req, res, next) {
                         } 
 
                         for (var i=0;i<Result[2].length;i++){
-                            Result[2][i].stateWiseList = (Result[2][i] && Result[1][i]) ? JSON.parse(Result[2][i].stateWiseList):[];
+                            Result[2][i].stateWiseList = (Result[2][i] && Result[2][i]) ? JSON.parse(Result[2][i].stateWiseList):[];
 
                             for(var j=0;j<Result[2][i].stateWiseList.length;j++){
                                 Result[2][i].stateWiseList[j].medicalCentreList = (Result[2][i].stateWiseList[j]) ? JSON.parse(Result[2][i].stateWiseList[j].medicalCentreList) :[];

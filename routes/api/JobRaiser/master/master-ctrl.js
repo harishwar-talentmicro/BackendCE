@@ -2635,17 +2635,25 @@ masterCtrl.getportalRequirementReport = function (req, res, next) {
                 req.db.query(procQuery, function (err, results) {
                     console.log(err);
 
-                    if (!err && results && results[0]) {
+                    if (!err && results && results[0] || results[1] || results[2] || results[3] || results[4]) {
                         response.status = true;
                         response.message = " Report loaded sucessfully";
                         response.error = null;
                         
-                        response.data = {
-                            industry:results[0],
-                            function:results[1],
-                            location:results[2],
-                            jobtype:results[3]
+                        for(var i = 0; i < results[7].length; i++){
+                            results[7][i].anchor = results[7] && results[7][i] && JSON.parse(results[7][i].anchor) && JSON.parse(results[7][i].anchor).userMasterId ?  JSON.parse(results[7][i].anchor) : {};
+                            results[7][i].venue = results[7] && results[7][i] && JSON.parse(results[7][i].venue) && JSON.parse(results[7][i].venue).locationId ?  JSON.parse(results[7][i].venue) : {};
+                        }
 
+                        response.data = {
+                            industry:results[0] ? results[0] : [],
+                            function:results[1] ? results[1] : [],
+                            location:results[2] ? results[2] : [],
+                            jobtype:results[3] ? results[3] : [],
+                            clients : results[4] ? results[4] : [],
+                            clientCount : results[5] && results[5][0] && results[5][0].clientCount ? results[5][0].clientCount : 0,
+                            jobList :  results[6] ? results[6] : [],
+                            eventList : results[7] ? results[7] : []
                         }
                         res.status(200).json(response);
                     }

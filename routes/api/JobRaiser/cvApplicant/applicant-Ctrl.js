@@ -338,8 +338,25 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         req.body.emailId = req.body.emailId ? req.body.emailId : "";
                         req.body.mobileNumber = req.body.mobileNumber ? req.body.mobileNumber : "";
 
-                        req.body.gender = (req.body.gender && req.body.gender != 'null') ? req.body.gender : undefined;
+                        var educationKey = [];
+                        if (req.body.importerFlag == 1 && education.length){
+                            for (var i = 0; i < education.length; i++){
+                                // console.log("education[i].split('-')",education[i].split('-'),"education[i].split(' in ')",education[i].split(' in '));
 
+                                if (education[i].split('-').length == 1 &&  education[i].split(' in ').length == 1) {
+                                    educationKey.push({educationName : education[i].trim(),specializationName : "" });
+                                }
+                                else if (education[i].split('-').length == 1 &&  education[i].split(' in ').length > 1) {
+                                    educationKey.push({educationName : education[i].split(' in ')[0].trim(), specializationName : education[i].split(' in ')[1].trim()});
+                                }
+                                else if (education[i].split('-').length > 1 &&  education[i].split(' in ').length == 1){
+                                    educationKey.push({educationName : education[i].split('-')[0].trim(), specializationName : education[i].split('-')[1].trim()});
+                                }
+                            }
+                            console.log("educationKey",educationKey);
+                            education = educationKey;
+                        }
+                        
                         var inputs = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.heMasterId),
@@ -376,15 +393,15 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(req.body.cvRating),
                             req.st.db.escape(JSON.stringify(attachmentList)),
                             req.st.db.escape(JSON.stringify(cvSource)),
-                            req.st.db.escape(req.body.gender),
-                            req.st.db.escape(req.body.DOB),
+                            req.st.db.escape(req.body.gender || 3),
+                            req.st.db.escape(req.body.DOB || null),
                             //req.st.db.escape(req.body.originalCvId),
                             req.st.db.escape(req.body.blockingPeriod),
                             req.st.db.escape(req.body.status),
                             req.st.db.escape(JSON.stringify(prefLocations)),
                             req.st.db.escape(JSON.stringify(industry)),
                             req.st.db.escape(JSON.stringify(nationality)),
-                            req.st.db.escape(req.body.cvKeywords || cvKeywords || ''),
+                            req.st.db.escape(req.body.cvKeywords || cvKeywords || ""),
                             req.st.db.escape(req.body.requirementId),
                             req.st.db.escape(req.body.imageUrl),
                             req.st.db.escape(req.body.htmlText),
@@ -593,7 +610,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                 organizationGrades: result[54] && result[54][0] ? result[54] : [],
                                 organizationJobTitles: result[55] && result[55][0] ? result[55] : []
                             },
-                            typeView: result[56] ? result[56] : []
+                            typeView: result[56] ? result[56] : [],
+                            taskMembers :result[57] ? result[57] : []
 
                         };
 
@@ -1108,7 +1126,8 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(req.body.notes),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(req.body.reason || {}))
+                    req.st.db.escape(JSON.stringify(req.body.reason || {})),
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var statusQuery = 'CALL wm_save_reqStageStatus( ' + statusParams.join(',') + ')';
@@ -1134,6 +1153,7 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
                         //     statusResult[0][0].message = JSON.parse(statusResult[0][0].message);
                         // }
                         response.data = statusResult[0][0] ? statusResult[0][0] : {};
+                        response.reqAppList = statusResult[2] && statusResult[2][0] ? statusResult[2]: [];
                         res.status(200).json(response);
                     }
                     else {
@@ -1488,12 +1508,13 @@ applicantCtrl.getrequirementList = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0] || result[1]) {
                         response.status = true;
                         response.message = "Requirement list loaded successfully";
                         response.error = null;
                         response.data = {
-                            requirementList: result[0] ? result[0] : []
+                            requirementList: result[0] && result[0][0] ? result[0] : [],
+                            totalDBResumeCount : result[1] && result[1][0] && result[1][0].totalDBResumeCount ? result[1][0].totalDBResumeCount : 0
                         }
                         res.status(200).json(response);
                     }
@@ -1502,7 +1523,8 @@ applicantCtrl.getrequirementList = function (req, res, next) {
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            requirementList: []
+                            requirementList: [],
+                            totalDBResumeCount : result[1] && result[1][0] && result[1][0].totalDBResumeCount ? result[1][0].totalDBResumeCount : 0
                         };
                         res.status(200).json(response);
                     }
@@ -2115,7 +2137,7 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
                     req.st.db.escape(req.body.billingCTCAmount),
                     req.st.db.escape(req.body.offerExpiryDate || null),
                     req.st.db.escape(req.body.noticePeriod || 0),
-                    req.st.db.escape(JSON.stringify(req.body.grade || {})),
+                    req.st.db.escape(req.body.grade || ""),
                     req.st.db.escape(req.body.employeeCode || ""),
                     req.st.db.escape(JSON.stringify(req.body.designation || {}))
                 ];
@@ -2203,7 +2225,7 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                             result[0][0].billingCurrency = result[0][0].billingCurrency ? JSON.parse(result[0][0].billingCurrency) : {};
                             result[0][0].billingScale = result[0][0].billingScale ? JSON.parse(result[0][0].billingScale) : [];
                             result[0][0].billingDuration = result[0][0].billingDuration ? JSON.parse(result[0][0].billingDuration) : {};
-                            result[0][0].grade = result[0][0] && result[0][0].grade && JSON.parse(result[0][0].grade).gradeId ? JSON.parse(result[0][0].grade) : {};
+                            // result[0][0].grade = result[0][0] && result[0][0].grade && JSON.parse(result[0][0].grade).gradeId ? JSON.parse(result[0][0].grade) : {};
                             result[0][0].designation = result[0][0] && result[0][0].designation && JSON.parse(result[0][0].designation).jobtitleId? JSON.parse(result[0][0].designation) : {};
 
                         }

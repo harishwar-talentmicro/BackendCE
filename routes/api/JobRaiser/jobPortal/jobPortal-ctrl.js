@@ -63,7 +63,9 @@ function hashPassword(password) {
         return null;
     }
     try {
-        var hash = bcrypt.hashSync(password, 12);
+        var salt = bcrypt.genSaltSync(12);
+        var hash = bcrypt.hashSync(password, salt);
+ 
         return hash;
     }
     catch (ex) {
@@ -2540,7 +2542,6 @@ jobPortalCtrl.portalChangePassword = function (req, res, next) {
             if ((!err) && tokenResult) {
 
                 console.log(req.body);
-                console.log(hashPassword(req.body.newPassword));
                 var inputs = [
                     req.st.db.escape(req.query.token)
                 ];

@@ -45,4 +45,6 @@ router.post('/resetPassword',paceUsersCtrl.paceresetPassword);
 router.post('/smsAppInfo',paceUsersCtrl.sendApplicantInfoToPhone);
 router.post('/notifyAppInfo',paceUsersCtrl.sendApplicantInfoAsNotification);
 
+router.get('/exportPlanner',paceUsersCtrl.getTaskPlannerForExport);
+
 module.exports = router;

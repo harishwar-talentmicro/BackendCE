@@ -396,8 +396,10 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(venue)),
                     req.st.db.escape(JSON.stringify(anchor)),
                     req.st.db.escape(req.body.status),
-                    req.st.db.escape(JSON.stringify(attachmentList))
-
+                    req.st.db.escape(JSON.stringify(attachmentList)),
+                    req.st.db.escape(JSON.stringify(req.body.taskMembers || [])),
+                    req.st.db.escape(req.body.eventFlag || 0),
+                    req.st.db.escape(req.body.address || "")
                 ];
 
                 var procQuery = 'CALL wm_save_pacePlanner( ' + inputs.join(',') + ')';
@@ -412,14 +414,14 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                             result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
                             result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
                             result[0][i].attachmentList = result[0][i].attachmentList ? JSON.parse(result[0][i].attachmentList) : [];
-
+                            result[0][i].taskMembers = result[0][i].taskMembers ? JSON.parse(result[0][i].taskMembers) : [];
                         }
 
                         for (var i = 0; i < result[1].length; i++) {
                             result[1][i].anchor = result[1][i].anchor ? JSON.parse(result[1][i].anchor) : {};
                             result[1][i].venue = result[1][i].venue ? JSON.parse(result[1][i].venue) : {};
                             result[1][i].attachmentList = result[1][i].attachmentList ? JSON.parse(result[1][i].attachmentList) : [];
-
+                            result[1][i].taskMembers = result[1][i].taskMembers ? JSON.parse(result[1][i].taskMembers) : [];
                         }
                         response.data = {
                             pendingTasks: result[0],
@@ -490,6 +492,7 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
                             result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
                             result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
                             result[0][i].attachmentList = result[0][i].attachmentList ? JSON.parse(result[0][i].attachmentList) : [];
+                            result[0][i].taskMembers = result[0][i].taskMembers ? JSON.parse(result[0][i].taskMembers) : [];
 
                         }
 
@@ -497,6 +500,7 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
                             result[1][i].anchor = result[1][i].anchor ? JSON.parse(result[1][i].anchor) : {};
                             result[1][i].venue = result[1][i].venue ? JSON.parse(result[1][i].venue) : {};
                             result[1][i].attachmentList = result[1][i].attachmentList ? JSON.parse(result[1][i].attachmentList) : [];
+                            result[1][i].taskMembers = result[1][i].taskMembers ? JSON.parse(result[1][i].taskMembers) : [];
 
                         }
                         response.data =
@@ -2751,5 +2755,93 @@ paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
     }
 };
 
+
+paceUsersCtrl.getTaskPlannerForExport = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        validationFlag *= false;
+        error.heMasterId = "Invalid Company";
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.from) {
+        error.from = 'Invalid from Date';
+        validationFlag *= false;
+    }
+
+    if (!req.query.to) {
+        error.to = 'Invalid To Date';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.from),
+                    req.st.db.escape(req.query.to)
+                ];
+
+                var procQuery = 'CALL wm_get_pacePlannerByFromAndToDate( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0] ) {
+                        response.status = true;
+                        response.message = "Tasks data loaded successfully";
+                        response.error = null;
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
+                            result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
+                            result[0][i].attachmentList = result[0][i].attachmentList ? JSON.parse(result[0][i].attachmentList) : [];
+
+                        }
+                        response.data =
+                            {
+                                tasks: result[0] ? result[0] : []
+                            };
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading tasks";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
 
 module.exports = paceUsersCtrl;
