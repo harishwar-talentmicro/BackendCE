@@ -835,15 +835,44 @@ userCtrl.uploadUsersfromweb = function (req, res, next) {
         validationFlag *= false;
     }
 
-    if (!req.query.bulkImporterId) {
-        error.bulkImporterId = 'Invalid bulkImporterId';
+    function isValidDate(dateString) {
+        var regEx = /[1-9][0-9][0-9][0-9][-/]((0?[1-9])|(1?[0-2]))[-/]((0?[1-9])|([12][0-9])|(3?[0-1]))/;
+        return dateString.match(regEx) != null;
+      }
+    
+      var JoiningDateValidate=isValidDate(req.body.JoiningDate);
+      var BirthDateValidate=isValidDate(req.body.BirthDate);
+    
+      if (JoiningDateValidate==false) {
+        error.JoiningDate = 'Invalid JoiningDateFormat';
         validationFlag *= false;
     }
 
+    console.log("---------------------------",BirthDateValidate);
+    console.log("-==========================",JoiningDateValidate);
+
+    
+    if (BirthDateValidate==false) {
+        error.BirthDate = 'Invalid BirthDateFormat';
+        validationFlag = "dateerror";
+    }
+
+
+    if (!req.query.bulkImporterId) {
+        error.bulkImporterId = 'Invalid bulkImporterId';
+        validationFlag = "dateerror";
+    }
+console.log("validationFlag",validationFlag)
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
+        console.log(response);
+    }
+    else if(validationFlag=="dateerror") {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(500).json(response);
         console.log(response);
     }
     else {
@@ -853,11 +882,17 @@ userCtrl.uploadUsersfromweb = function (req, res, next) {
                 req.body.Department = req.body.Department ? req.body.Department : '';
                 req.body.JobTitle = req.body.JobTitle ? req.body.JobTitle : '';
                 req.body.Location = req.body.Location ? req.body.Location : '';
+                req.body.JoiningDate = req.body.JoiningDate ? req.body.JoiningDate : null;
+                req.body.BirthDate = req.body.BirthDate ? req.body.BirthDate : null;
+
 
                 var password = randomstring.generate({
                     length: 6,
                     charset: 'alphanumeric'
                 });
+                
+            
+                  
 
                 var encryptPwd = req.st.hashPassword(password);
                 // var Qndata = req.body.data;
@@ -906,7 +941,10 @@ userCtrl.uploadUsersfromweb = function (req, res, next) {
                     req.st.db.escape(req.body.Location),
                     req.st.db.escape(DBSecretKey),
                     req.st.db.escape(req.query.bulkImporterId),
-                    req.st.db.escape(password)
+                    req.st.db.escape(password),
+                    req.st.db.escape(req.body.JoiningDate),
+                    req.st.db.escape(req.body.BirthDate)
+
 
                 ];
 
@@ -934,6 +972,8 @@ userCtrl.uploadUsersfromweb = function (req, res, next) {
                                     Department: resinput.Department,
                                     JobTitle: resinput.JobTitle,
                                     Location: resinput.Location,
+                                    JoiningDate:req.body.JoiningDate,
+                                    BirthDate:req.body.BirthDate,
                                     status: userResult[0][0].status
                                 };
                                 res.status(200).json(response);
