@@ -46,5 +46,7 @@ router.post('/smsAppInfo',paceUsersCtrl.sendApplicantInfoToPhone);
 router.post('/notifyAppInfo',paceUsersCtrl.sendApplicantInfoAsNotification);
 
 router.get('/exportPlanner',paceUsersCtrl.getTaskPlannerForExport);
+router.get('/applicants',paceUsersCtrl.getSourcedApplicants);
+
 
 module.exports = router;
