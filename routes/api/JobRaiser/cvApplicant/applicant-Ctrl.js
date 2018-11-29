@@ -418,7 +418,9 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                             req.st.db.escape(req.body.licenseOption || 0),
                             req.st.db.escape(req.body.passportCategory || ""),
                             req.st.db.escape(JSON.stringify(req.body.licenseData || [])),
-                            req.st.db.escape(JSON.stringify(req.body.document_attachments_list || []))
+                            req.st.db.escape(JSON.stringify(req.body.document_attachments_list || [])),
+                            req.st.db.escape(req.body.importedFromFolder || 0),
+                            req.st.db.escape(req.body.importedFromExcel || 0)
                         ];
 
                         var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -1019,6 +1021,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                             }
                         }
                         var cvSearchMasterData = {};
+                        var offerMasterData = {};
                         if(req.query.isWeb == 0 && Result[6] && Result[6][0] && Result[7] && Result[7][0]){
                            cvSearchMasterData = {
                                 skillList : Result[6] ? Result[6] : [],
@@ -1028,19 +1031,21 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                                 functionalAreas : Result[10] ? Result[10] : [],
                                 nationality : Result[11] ? Result[11] : []                           
 
-                            }    
-                        }
-
-                        response.data = {
-                            applicantlist: Result[0] ? Result[0] : [],
-                            count: Result[1][0].count,
-                            offerMasterData: {
+                            }
+                            offerMasterData  = {
                                 currency: Result[2] ? Result[2] : [],
                                 scale: Result[3] ? Result[3] : [],
                                 duration: Result[4] ? Result[4] : [],
                                 attachment: Result[5] ? Result[5] : [],
-                                grade : Result[12] ? Result[12] : []
-                            },
+                                grade : Result[12] ? Result[12] : [],
+                                designation :  Result[7] ? Result[7] : []
+                            } 
+                        }
+
+                        response.data = {
+                            applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId? Result[0] : [],
+                            count: Result[1][0].count,
+                            offerMasterData: offerMasterData,
                             cvSearchMasterData : cvSearchMasterData
                         };
                         // console.log(response.data);
@@ -1385,7 +1390,7 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.heMasterId),
                     req.st.db.escape(req.body.parentId),
-                    req.st.db.escape(req.body.resumeDaysFreshness),
+                    req.st.db.escape(req.body.searchBy || 1),
                     req.st.db.escape(JSON.stringify(skills)),
                     req.st.db.escape(req.body.cvKeywords),
                     //req.st.db.escape(req.body.functions),
@@ -1411,7 +1416,16 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                     req.st.db.escape(req.body.cvRating),
                     req.st.db.escape(req.body.searchResultsLimit),
                     req.st.db.escape(req.body.includeJd),
-                    req.st.db.escape(req.body.applicantId || "")
+                    req.st.db.escape(req.body.applicantId || ""),
+                    req.st.db.escape(req.body.presentSalFrom ||  0),
+                    req.st.db.escape(req.body.presentSalTo || 0),
+                    req.st.db.escape(req.body.presentSalScale || 0),
+                    req.st.db.escape(req.body.presentSalDuration || 0),
+                    req.st.db.escape(req.body.presentSalCurrency || 0),
+                    req.st.db.escape(JSON.stringify(req.body.functionalAreas || [])),
+                    req.st.db.escape(JSON.stringify(req.body.cvSource || [])),
+                    req.st.db.escape(JSON.stringify(req.body.cvStatus || [])),
+                    req.st.db.escape(JSON.stringify(req.body.stageResume || []))
                 ];
 
                 var procQuery = 'CALL wd_resume_search_newAlgorithm( ' + inputs.join(',') + ')';  // call procedure to save requirement data

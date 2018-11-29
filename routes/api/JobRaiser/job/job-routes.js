@@ -38,6 +38,7 @@ router.get('/manpowerStatus',jobCtrl.manpowerRequirementStatus);
 router.get('/clientManagerList',jobCtrl.getClientManagerList);
 
 router.post('/requirementListForMobile',jobCtrl.getrequirementListMobile);
+router.get('/getReqContactsForMobile',jobCtrl.getRequirementContactsOfBranchForMobile);
 
 module.exports = router;
 

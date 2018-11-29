@@ -124,7 +124,9 @@ gulfCtrl.saveMedical = function (req, res, next) {
                     req.st.db.escape(req.body.medicalStage),
                     req.st.db.escape(JSON.stringify(gamcaMedicalCentre)),
                     req.st.db.escape(JSON.stringify(cdnFilePath)),
-                    req.st.db.escape(req.body.isGamca)
+                    req.st.db.escape(req.body.isGamca),
+                    req.st.db.escape(req.body.clinicName || ""),
+                    req.st.db.escape(req.body.clinicAddress || "")
                     
                 ];
             

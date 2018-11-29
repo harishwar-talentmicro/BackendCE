@@ -835,27 +835,27 @@ userCtrl.uploadUsersfromweb = function (req, res, next) {
         validationFlag *= false;
     }
 
-    function isValidDate(dateString) {
-        var regEx = /[1-9][0-9][0-9][0-9][-/]((0?[1-9])|(1?[0-2]))[-/]((0?[1-9])|([12][0-9])|(3?[0-1]))/;
-        return dateString.match(regEx) != null;
-      }
+    // function isValidDate(dateString) {
+    //     var regEx = /[1-9][0-9][0-9][0-9][-/]((0?[1-9])|(1?[0-2]))[-/]((0?[1-9])|([12][0-9])|(3?[0-1]))/;
+    //     return dateString.match(regEx) != null;
+    //   }
     
-      var JoiningDateValidate=isValidDate(req.body.JoiningDate);
-      var BirthDateValidate=isValidDate(req.body.BirthDate);
+    //   var JoiningDateValidate=isValidDate(req.body.JoiningDate);
+    //   var BirthDateValidate=isValidDate(req.body.BirthDate);
     
-      if (JoiningDateValidate==false) {
-        error.JoiningDate = 'Invalid JoiningDateFormat';
-        validationFlag *= false;
-    }
+    //   if (JoiningDateValidate==false) {
+    //     error.JoiningDate = 'Invalid JoiningDateFormat';
+    //     validationFlag *= false;
+    // }
 
-    console.log("---------------------------",BirthDateValidate);
-    console.log("-==========================",JoiningDateValidate);
+    // console.log("---------------------------",BirthDateValidate);
+    // console.log("-==========================",JoiningDateValidate);
 
     
-    if (BirthDateValidate==false) {
-        error.BirthDate = 'Invalid BirthDateFormat';
-        validationFlag = "dateerror";
-    }
+    // if (BirthDateValidate==false) {
+    //     error.BirthDate = 'Invalid BirthDateFormat';
+    //     validationFlag = "dateerror";
+    // }
 
 
     if (!req.query.bulkImporterId) {
@@ -869,12 +869,12 @@ console.log("validationFlag",validationFlag)
         res.status(400).json(response);
         console.log(response);
     }
-    else if(validationFlag=="dateerror") {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(500).json(response);
-        console.log(response);
-    }
+    // else if(validationFlag=="dateerror") {
+    //     response.error = error;
+    //     response.message = 'Please check the errors';
+    //     res.status(500).json(response);
+    //     console.log(response);
+    // }
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
