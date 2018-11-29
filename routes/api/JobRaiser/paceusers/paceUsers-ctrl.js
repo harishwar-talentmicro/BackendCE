@@ -596,7 +596,7 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
 
                         for (var i = 0; i < result[2].length; i++) {
                             var res3 = {};
-                            res3.name = result[2][i] ? result[2][i].name:"";
+                            res3.name = result[2][i] ? result[2][i].name : "";
                             res3.userMasterId = result[2] && result[2][i] ? result[2][i].userMasterId : 0;
                             res3.stage = result[2][i].stage ? JSON.parse(result[2][i].stage) : [];
                             output1.push(res3);
@@ -610,39 +610,39 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             res4.stage = result[4][i].stage ? JSON.parse(result[4][i].stage) : {};
                             output2.push(res4);
                         }
-                        if(result[9] && result[9][0]){
+                        if (result[9] && result[9][0]) {
                             for (var i = 0; i < result[9].length; i++) {
-                            result[9][i].stageDetails= result[9][i].stageDetails?JSON.parse(result[9][i].stageDetails) :[];
-                            for (var j=0;j< result[9][i].stageDetails.length;j++){
-                                result[9][i].stageDetails[j].details=result[9][i].stageDetails[j].details ? JSON.parse(result[9][i].stageDetails[j].details) :{};
-                            }
+                                result[9][i].stageDetails = result[9][i].stageDetails ? JSON.parse(result[9][i].stageDetails) : [];
+                                for (var j = 0; j < result[9][i].stageDetails.length; j++) {
+                                    result[9][i].stageDetails[j].details = result[9][i].stageDetails[j].details ? JSON.parse(result[9][i].stageDetails[j].details) : {};
+                                }
                             }
                         }
 
 
-                        if(result[11] && result[11][0]){
-                            for (var i = 0; i < result[11].length; i++) {
-                            result[11][i].cvDetails= result[11][i].cvDetails?JSON.parse(result[11][i].cvDetails) :[];
-                            
-                            }
-                        }
+                        // if (result[11] && result[11][0]) {
+                        //     for (var i = 0; i < result[11].length; i++) {
+                        //         result[11][i].cvDetails = result[11][i].cvDetails ? JSON.parse(result[11][i].cvDetails) : [];
+
+                        //     }
+                        // }
 
                         // console.log(result[9][0])
-                        if(result[10] && result[10][0]){
+                        if (result[10] && result[10][0]) {
                             for (var i = 0; i < result[10].length; i++) {
-                                result[10][i].countDetails= result[10][i].countDetails?JSON.parse(result[10][i].countDetails) :[];
-                                for (var j=0;j< result[10][i].countDetails.length;j++){
-                                    result[10][i].countDetails[j].details=result[10][i].countDetails[j].details ? JSON.parse(result[10][i].countDetails[j].details) :{};
+                                result[10][i].countDetails = result[10][i].countDetails ? JSON.parse(result[10][i].countDetails) : [];
+                                for (var j = 0; j < result[10][i].countDetails.length; j++) {
+                                    result[10][i].countDetails[j].details = result[10][i].countDetails[j].details ? JSON.parse(result[10][i].countDetails[j].details) : {};
                                 }
-                                }
+                            }
 
                         }
-                        if(result[12] && result[12][0]){
-                      
+                        if (result[12] && result[12][0]) {
+
                             for (var i = 0; i < result[12].length; i++) {
-                                result[12][i].cvDetails= result[12][i].cvDetails?JSON.parse(result[12][i].cvDetails) :[];
-                                
-                                }
+                                result[12][i].cvDetails = result[12][i].cvDetails ? JSON.parse(result[12][i].cvDetails) : [];
+
+                            }
 
                         }
                         // for (var i = 0; i < result[7].length; i++) {
@@ -653,7 +653,7 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         //     result[8][i].reqAppDetails = result[8][i].reqAppDetails ? JSON.parse(result[8][i].reqAppDetails) : [];
                         // }
 
-                      
+
 
 
                         response.data =
@@ -667,10 +667,10 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                                 converstionReport: result[6][0],
                                 turnAroundTime: result[7][0],
                                 firstCVResponse: result[8][0],
-                                recruiterWiseReport:result[9],
-                                stagewiseTurnAroundReport:result[10],
+                                recruiterWiseReport: result[9],
+                                stagewiseTurnAroundReport: result[10],
                                 cvSourceReport: result[11],
-                                 cvSourceRecruiterReport: result[12],
+                                cvSourceRecruiterReport: result[12],
 
 
                                 totalCVCount: result[13][0].count,
@@ -698,12 +698,12 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                             converstionReport: {},
                             turnAroundTime: [],
                             firstCVResponse: [],
-                            stageWiseReport:[],
-                            stagewiseTurnAroundReport:[],
-                            cvsourceReport:[],
+                            stageWiseReport: [],
+                            stagewiseTurnAroundReport: [],
+                            cvsourceReport: [],
                             cvSourceRecruiterReport: [],
-                            totalCVCount:[],
-                            filteredCVCount:[],
+                            totalCVCount: [],
+                            filteredCVCount: [],
                             // CVsCalled_SentToTheClient:[],
                             // CVsSentToTheClient_CVsShortlistedByTheClient: [],
                             // CVsShortlisted_CandidatesInterviewedByClient: [],
@@ -1332,7 +1332,7 @@ paceUsersCtrl.freeJobPortalUsers = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                req.query.detailsFlag = req.query.detailsFlag ==0 ? req.query.detailsFlag : 1;
+                req.query.detailsFlag = req.query.detailsFlag == 0 ? req.query.detailsFlag : 1;
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
@@ -1348,24 +1348,24 @@ paceUsersCtrl.freeJobPortalUsers = function (req, res, next) {
                         response.message = "Job portal details loaded successfully";
                         response.error = null;
 
-                        if (result[0] && result[0][0]){
+                        if (result[0] && result[0][0]) {
                             result[0][0].portalName = (result[0] && result[0][0] && JSON.parse(result[0][0].portalName)) ? JSON.parse(result[0][0].portalName) : {};
                         }
 
-                        if(result[1] && result[1][0]){
+                        if (result[1] && result[1][0]) {
                             result[1][0].portalName = (result[1] && result[1][0] && JSON.parse(result[1][0].portalName)) ? JSON.parse(result[1][0].portalName) : {};
                         }
 
                         var freePortal = {};
-                        if(req.query.detailsFlag == 0){
+                        if (req.query.detailsFlag == 0) {
                             freePortal = (result[1] && result[1][0]) ? result[1][0] : {};
                         }
-                        else{
-                            if(result[0].length){
-                                freePortal= (result[0] && result[0]) ? result[0][0] : {}   
+                        else {
+                            if (result[0].length) {
+                                freePortal = (result[0] && result[0]) ? result[0][0] : {}
                             }
-                            else{
-                                freePortal = (result[1] && result[1]) ? result[1][0] : {}   
+                            else {
+                                freePortal = (result[1] && result[1]) ? result[1][0] : {}
                             }
                         }
 
@@ -2624,12 +2624,12 @@ paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
     if (status) {
         try {
             var message = "";
-            message = message + applicantInfo.applicantName + ", " + applicantInfo.mobileIsd + applicantInfo.mobileNumber ;
+            message = message + applicantInfo.applicantName + ", " + applicantInfo.mobileIsd + applicantInfo.mobileNumber;
             message = "Contact details: " + message + " --PaceHCM";
 
             var query = [
                 req.st.db.escape(req.query.token),
-                req.st.db.escape(JSON.stringify(req.body.applicantInfo || {})),                
+                req.st.db.escape(JSON.stringify(req.body.applicantInfo || {})),
                 req.st.db.escape(message),
                 req.st.db.escape(DBSecretKey)
             ];
@@ -2819,7 +2819,7 @@ paceUsersCtrl.getTaskPlannerForExport = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[0][0] ) {
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
                         response.message = "Tasks data loaded successfully";
                         response.error = null;
@@ -2859,4 +2859,109 @@ paceUsersCtrl.getTaskPlannerForExport = function (req, res, next) {
     }
 };
 
+paceUsersCtrl.getSourcedApplicants = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        validationFlag *= false;
+        error.heMasterId = "Invalid Company";
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.from) {
+        error.from = 'Invalid from Date';
+        validationFlag *= false;
+    }
+
+    if (!req.query.to) {
+        error.to = 'Invalid To Date';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.recruiterId),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.sourceId),
+                    req.st.db.escape(req.query.from),
+                    req.st.db.escape(req.query.to),
+                    req.st.db.escape(DBSecretKey)
+
+                ];
+
+                var procQuery = 'CALL wm_get_sourceApplicants( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Applicants data loaded successfully";
+                        response.error = null;
+                        for (var i = 0; i < result[0].length; i++){
+                            result[0][i].jobTitle=result[0][i].jobTitle? JSON.parse(result[0][i].jobTitle):{};
+                            result[0][i].expectedSalaryCurr=result[0][i].expectedSalaryCurr? JSON.parse(result[0][i].expectedSalaryCurr):{};
+                            result[0][i].expectedSalaryScale=result[0][i].expectedSalaryScale? JSON.parse(result[0][i].expectedSalaryScale):{};
+                            result[0][i].expectedSalaryPeriod=result[0][i].expectedSalaryPeriod? JSON.parse(result[0][i].expectedSalaryPeriod):{};
+                            result[0][i].presentSalaryCurr=result[0][i].presentSalaryCurr? JSON.parse(result[0][i].presentSalaryCurr):{};
+                            result[0][i].presentSalaryScale=result[0][i].presentSalaryScale? JSON.parse(result[0][i].presentSalaryScale):{};
+                            result[0][i].presentSalaryPeriod=result[0][i].presentSalaryPeriod? JSON.parse(result[0][i].presentSalaryPeriod):{};
+                            result[0][i].education=result[0][i].education? JSON.parse(result[0][i].education):[];
+                            result[0][i].primarySkills=result[0][i].primarySkills? JSON.parse(result[0][i].primarySkills):[];
+                            result[0][i].secondarySkills=result[0][i].secondarySkills? JSON.parse(result[0][i].secondarySkills):[];
+                            result[0][i].functionalAreas=result[0][i].functionalAreas? JSON.parse(result[0][i].functionalAreas):[];
+                            result[0][i].document_attachments_list=result[0][i].document_attachments_list? JSON.parse(result[0][i].document_attachments_list):[];
+                            result[0][i].industry=result[0][i].industry? JSON.parse(result[0][i].industry):{};
+                            result[0][i].cvSource=result[0][i].cvSource? JSON.parse(result[0][i].cvSource):{};
+                            result[0][i].nationality=result[0][i].nationality? JSON.parse(result[0][i].nationality):{};
+                            result[0][i].prefLocations=result[0][i].prefLocations? JSON.parse(result[0][i].prefLocations):{};
+                            
+                        }
+
+                            response.data =
+                                {
+                                    ApplicantsList: result[0] ? result[0] : []
+                                };
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading Applicants";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
 module.exports = paceUsersCtrl;
