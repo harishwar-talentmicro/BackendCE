@@ -607,6 +607,7 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
 
     //check for mail type and assign the recipients
     emailReceivers = applicants;
+    var recipients = applicants;
     // emailReceivers.sort(function(a,b){return a-b});
 
     if (!validationFlag) {
@@ -839,8 +840,9 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                                                 req.st.db.escape(req.body.statusId),
                                                 req.st.db.escape(message),    // sms message
                                                 req.st.db.escape(whatmateMessage),
-                                                req.st.db.escape(applicants[0]),   // in procedure only reAppId is stored
-                                                req.st.db.escape(JSON.stringify(transactions ? transactions : []))
+                                                req.st.db.escape(recipients[0]),   // in procedure only reAppId is stored
+                                                req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
+                                                req.st.db.escape(req.body.interviewerFlag || 0)
                                             ];
 
                                             //saving the mail after sending it
@@ -1477,6 +1479,7 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
 
     //check for mail type and assign the recipients
     emailReceivers = reqApplicants;
+    var recipients = reqApplicants;
     // emailReceivers.sort(function(a,b){return a-b});
 
     if (!validationFlag) {
@@ -1732,8 +1735,9 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                                 req.st.db.escape(req.body.statusId),
                                                 req.st.db.escape(message),    // sms message
                                                 req.st.db.escape(whatmateMessage),
-                                                req.st.db.escape(reqApplicants[0]),
-                                                req.st.db.escape(JSON.stringify(transactions ? transactions : []))
+                                                req.st.db.escape(recipients[0]),
+                                                req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
+                                                req.st.db.escape(req.body.interviewerFlag || 0)
                                             ];
 
                                             //saving the mail after sending it
@@ -2225,7 +2229,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
 
                     else if (!err) {
                         response.status = false;
-                        response.message = "No receipiants found";
+                        response.message = "No recipients found";
                         response.error = null;
                         response.data = {
                             tagsPreview: [],
@@ -2379,6 +2383,7 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
 
     //check for mail type and assign the recipients
     emailReceivers = clientContacts;
+    var recipients = clientContacts;
     // emailReceivers.sort(function(a,b){return a-b});
     if (!validationFlag) {
         response.error = error;
@@ -2404,8 +2409,8 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                     req.db.query(procQuery, function (err, result) {
                         console.log(err);
 
-                        if (result[2] && result[2][0] && result[2][0].transactions) {
-                            transactions = JSON.parse(result[2][0].transactions);
+                        if (result[3] && result[3][0] && result[3][0].transactions) {
+                            transactions = JSON.parse(result[3][0].transactions);
                         }
 
 
@@ -2732,8 +2737,9 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                                 req.st.db.escape(req.body.statusId || 0),
                                                 req.st.db.escape(message),    // sms message
                                                 req.st.db.escape(whatmateMessage),
-                                                req.st.db.escape(clientContacts[0]),   // submission mailer save client contactid
-                                                req.st.db.escape(JSON.stringify(transactions ? transactions : []))
+                                                req.st.db.escape(recipients[0]),   // submission mailer save client contactid
+                                                req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
+                                                req.st.db.escape(req.body.interviewerFlag || 0)
                                             ];
 
                                             //saving the mail after sending it
@@ -3209,7 +3215,7 @@ sendgridCtrl.clientMailer = function (req, res, next) {
 
     //check for mail type and assign the recipients
     emailReceivers = clientContacts;
-    transactions = clientContacts; // for saving in mailer history
+    var recipients = clientContacts; // for saving in mailer history
     // emailReceivers.sort(function(a,b){return a-b});
 
     if (!validationFlag) {
@@ -3457,8 +3463,9 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                                                 req.st.db.escape(req.body.statusId || 0),
                                                 req.st.db.escape(message),    // sms message
                                                 req.st.db.escape(whatmateMessage),
-                                                req.st.db.escape(reqApplicants[0]),
-                                                req.st.db.escape(JSON.stringify(transactions ? transactions : []))
+                                                req.st.db.escape(recipients[0]),
+                                                req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
+                                                req.st.db.escape(req.body.interviewerFlag || 0)
                                             ];
 
                                             //saving the mail after sending it
@@ -4115,10 +4122,12 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
     //check for mail type and assign the recipients
     if (interviewerFlag) {
         emailReceivers = clientContacts;
+        var recipients = clientContacts;
         // emailReceivers.sort(function(a,b){return a-b});
     }
     else {
         emailReceivers = reqApplicants;
+        var recipients = reqApplicants;
         // emailReceivers.sort(function(a,b){return a-b});
     }
 
@@ -4541,8 +4550,9 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                                 req.st.db.escape(req.body.statusId),
                                                 req.st.db.escape(message),    // sms message
                                                 req.st.db.escape(whatmateMessage),
-                                                req.st.db.escape(clientContacts[0]),
-                                                req.st.db.escape(JSON.stringify(transactions ? transactions : []))
+                                                req.st.db.escape(recipients[0]),
+                                                req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
+                                                req.st.db.escape(req.body.interviewerFlag || 0)
                                             ];
 
                                             //saving the mail after sending it
@@ -4884,7 +4894,8 @@ sendgridCtrl.saveMailSentByGmail = function (req, res, next) {
                     req.st.db.escape(whatmateMessage),
                     req.st.db.escape(JSON.stringify(receipients)),
                     req.st.db.escape(JSON.stringify(reqApplicants)),
-                    req.st.db.escape(req.body.interviewerFlag || 0)
+                    req.st.db.escape(req.body.interviewerFlag || 0),
+                    req.st.db.escape(req.body.threadId || "")
                 ];
 
                 var procQuery = 'CALL wm_save_sentByGMailerHistory( ' + inputs.join(',') + ')';

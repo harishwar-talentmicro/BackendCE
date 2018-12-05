@@ -321,6 +321,8 @@ masterCtrl.saveClients = function (req, res, next) {
                         response.message = "Client saved sucessfully";
                         response.error = null;
 
+                        results[1][0].clientCareerData = results[1] && results[1][0] && JSON.parse(results[1][0].clientCareerData) ? JSON.parse(results[1][0].clientCareerData) : {};
+
                         if (results[2] && results[2][0]) {
                             for (var i = 0; i < results[2].length; i++) {
 
@@ -556,25 +558,14 @@ masterCtrl.getbranchList = function (req, res, next) {
                         response.error = null;
                         var output = [];
                         for (var i = 0; i < results[3].length; i++) {
-                            var res2 = {};
-                            res2.heDepartmentId = results[3][i].heDepartmentId ? results[3][i].heDepartmentId : 0;
-                            res2.businessLocationId = results[3][i].businessLocationId ? results[3][i].businessLocationId : 0;
-                            res2.businessLocationTitle = results[3][i].businessLocationTitle ? results[3][i].businessLocationTitle : '';
-                            res2.location = results[3][i].location ? results[3][i].location : '';
-                            res2.address = results[3][i].address ? results[3][i].address : '';
-                            res2.latitude = results[3][i].latitude ? results[3][i].latitude : 0.0;
-                            res2.longitude = results[3][i].longitude ? results[3][i].longitude : 0.0;
-                            res2.nearestParking = results[3][i].nearestParking ? results[3][i].nearestParking : '';
-                            res2.entryProcedure = results[3][i].entryProcedure ? results[3][i].entryProcedure : '';
-                            res2.contactList = results[3][i].contactList ? JSON.parse(results[3][i].contactList) : [];
-                            output.push(res2);
+                            results[3][i].contactList = results[3][i].contactList ? JSON.parse(results[3][i].contactList) : [];
                         };
 
                         response.data = {
                             branchList: results[0] ? results[0] : [],
                             detailedBranchList: results[1] ? results[1] : [],
                             wBranchList: results[2] ? results[2] : [],
-                            branch_contacts: output
+                            branch_contacts: results[3] ? results[3] : []
                         };
                         if (isWeb == 1) {
                             res.status(200).json(response);
@@ -723,7 +714,7 @@ masterCtrl.getmailTemplate = function (req, res, next) {
                                 billingTable: result[13] ? result[13] : [],
                                 offer: result[14] ? result[14] : []
                             },
-                            interviewPanelMembers : result[15] && result[15][0] ? result[15] : []
+                            interviewPanelMembers: result[15] && result[15][0] ? result[15] : []
                         };
                         res.status(200).json(response);
                     }
@@ -1452,8 +1443,8 @@ masterCtrl.getRequirementView = function (req, res, next) {
                         var output = [];
                         for (var i = 0; i < results[0].length; i++) {
                             results[0][i].branchList = JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
-                            results[0][i].contactList = JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
-                            results[0][i].stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : []
+                                results[0][i].contactList = JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
+                                results[0][i].stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : []
                         }
 
                         for (var i = 0; i < results[2].length; i++) {
@@ -1568,9 +1559,9 @@ masterCtrl.getClientView = function (req, res, next) {
                         response.error = null;
                         for (var i = 0; i < results[0].length; i++) {
                             results[0][i].stageDetail = results[0][i].stageDetail ? JSON.parse(results[0][i].stageDetail) : [],
-                            results[0][i].clientContacts = results[0][i] && JSON.parse(results[0][i].clientContacts) ? JSON.parse(results[0][i].clientContacts) : [];
+                                results[0][i].clientContacts = results[0][i] && JSON.parse(results[0][i].clientContacts) ? JSON.parse(results[0][i].clientContacts) : [];
                             results[0][i].branchList = results[0][i] && JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [];
-                        
+
                         }
                         response.data = {
                             clientView: results[0] ? results[0] : []
@@ -1941,9 +1932,10 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                             result[4][i].followUpNotes = (result[4] && result[4][i]) ? JSON.parse(result[4][i].followUpNotes) : [];
                         }
 
-                        result[0][0].managers = JSON.parse(result[0][0].managers);
-                        result[0][0].department = JSON.parse(result[0][0].department);
-                        result[0][0].clientStatus = JSON.parse(result[0][0].clientStatus);
+                        result[0][0].managers = result[0][0] && JSON.parse(result[0][0].managers) ? JSON.parse(result[0][0].managers) : {};
+                        result[0][0].department = result[0][0] && JSON.parse(result[0][0].department) ? JSON.parse(result[0][0].department) : {};
+                        result[0][0].clientStatus = result[0][0] && JSON.parse(result[0][0].clientStatus) ? JSON.parse(result[0][0].clientStatus) : {};
+                        result[0][0].clientCareerData = result[0] && result[0][0] && JSON.parse(result[0][0].clientCareerData) ? JSON.parse(result[0][0].clientCareerData) : {};
 
 
                         // contracts parsing
@@ -1959,14 +1951,22 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                         // client contact parsing
                         result[3][0].contactList = (result && result[3] && result[3][0]) ? JSON.parse(result[3][0].contactList) : [];
 
+                        if (result[5]){
+                            for (var k = 0; k < result[5].length; k++) {
+                                result[5][k].attachment = result[5] && result[5][k] && result[5][k].attachment && JSON.parse(result[5][k].attachment) ? JSON.parse(result[5][k].attachment) : [];
+                                result[5][k].bcc = result[5] && result[5][k] && JSON.parse(result[5][k].bcc) ? JSON.parse(result[5][k].bcc) : [];
+                                result[5][k].cc = result[5] && result[5][k] && JSON.parse(result[5][k].cc) ? JSON.parse(result[5][k].cc) : [];
+                            }    
+                        }
+
                         response.data = {
                             heDepartment: result[0][0],
                             businessLocation: result[1],
                             contracts: contracts,//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
                             contactList: result[3][0].contactList,
-                            followUpNotes: result[4] && result[4][0] ? result[4] : []
+                            followUpNotes: result[4] && result[4][0] ? result[4] : [],
+                            mailHistory : result[5] && result[5][0] ? result[5] : []
                         };
-
 
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -2601,10 +2601,10 @@ masterCtrl.getportalRequirementReport = function (req, res, next) {
         error: null
     };
     var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
+    // if (!req.query.token) {
+    //     error.token = 'Invalid token';
+    //     validationFlag *= false;
+    // }
 
     if (!req.query.heMasterId) {
         error.heMasterId = 'Invalid heMasterId';
@@ -2618,63 +2618,63 @@ masterCtrl.getportalRequirementReport = function (req, res, next) {
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
-                req.query.type = (req.query.type) ? req.query.type : 1;
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+        req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+        req.query.type = (req.query.type) ? req.query.type : 1;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    
-                    req.st.db.escape(req.query.type)
+        var inputs = [
+            req.st.db.escape(req.query.token),
+            req.st.db.escape(req.query.heMasterId),
 
-                ];
-                var procQuery = 'CALL wm_get_requirementDataWiseReport( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, results) {
-                    console.log(err);
+            req.st.db.escape(req.query.type)
 
-                    if (!err && results && results[0] || results[1] || results[2] || results[3] || results[4]) {
-                        response.status = true;
-                        response.message = " Report loaded sucessfully";
-                        response.error = null;
-                        
-                        for(var i = 0; i < results[7].length; i++){
-                            results[7][i].anchor = results[7] && results[7][i] && JSON.parse(results[7][i].anchor) && JSON.parse(results[7][i].anchor).userMasterId ?  JSON.parse(results[7][i].anchor) : {};
-                            results[7][i].venue = results[7] && results[7][i] && JSON.parse(results[7][i].venue) && JSON.parse(results[7][i].venue).locationId ?  JSON.parse(results[7][i].venue) : {};
-                        }
+        ];
+        var procQuery = 'CALL wm_get_requirementDataWiseReport( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, results) {
+            console.log(err);
 
-                        response.data = {
-                            industry:results[0] ? results[0] : [],
-                            function:results[1] ? results[1] : [],
-                            location:results[2] ? results[2] : [],
-                            jobtype:results[3] ? results[3] : [],
-                            clients : results[4] ? results[4] : [],
-                            clientCount : results[5] && results[5][0] && results[5][0].clientCount ? results[5][0].clientCount : 0,
-                            jobList :  results[6] ? results[6] : [],
-                            eventList : results[7] ? results[7] : []
-                        }
-                        res.status(200).json(response);
-                    }
+            if (!err && results && results[0] || results[1] || results[2] || results[3] || results[4]) {
+                response.status = true;
+                response.message = " Report loaded sucessfully";
+                response.error = null;
 
-                    else {
-                        response.status = false;
-                        response.message = "Error while loading report";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
+                for (var i = 0; i < results[7].length; i++) {
+                    results[7][i].anchor = results[7] && results[7][i] && JSON.parse(results[7][i].anchor) && JSON.parse(results[7][i].anchor).userMasterId ? JSON.parse(results[7][i].anchor) : {};
+                    results[7][i].venue = results[7] && results[7][i] && JSON.parse(results[7][i].venue) && JSON.parse(results[7][i].venue).locationId ? JSON.parse(results[7][i].venue) : {};
+                }
 
-                });
-
+                response.data = {
+                    industry: results[0] ? results[0] : [],
+                    function: results[1] ? results[1] : [],
+                    location: results[2] ? results[2] : [],
+                    jobtype: results[3] ? results[3] : [],
+                    clients: results[4] ? results[4] : [],
+                    clientCount: results[5] && results[5][0] && results[5][0].clientCount ? results[5][0].clientCount : 0,
+                    jobList: results[6] ? results[6] : [],
+                    eventList: results[7] ? results[7] : []
+                }
+                res.status(200).json(response);
             }
+
             else {
-                res.status(401).json(response);
+                response.status = false;
+                response.message = "Error while loading report";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
             }
-
 
         });
+
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+
+
+        // });
     }
 };
 

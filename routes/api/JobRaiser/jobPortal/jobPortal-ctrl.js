@@ -2613,4 +2613,148 @@ jobPortalCtrl.portalChangePassword = function (req, res, next) {
     }
 };
 
+
+jobPortalCtrl.getClientWisePortalRequirements = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.heDepartmentId) {
+        error.heDepartmentId = 'Invalid heDepartmentId';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+               
+                var getStatus = [
+                    req.st.db.escape(req.query.heMasterId || 0),
+                    req.st.db.escape(req.query.heDepartmentId)
+                ];
+
+                var procQuery = 'CALL portal_get_clientwiseRequirements( ' + getStatus.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] || result[1]) {
+                        response.status = true;
+                        response.message = "Jobs loaded successfully";
+                        response.error = null;
+                        response.data = {
+
+                            clientDetails : result[0] && result[0][0] ? result[0][0] : {},
+                            jobList :  result[1] && result[1][0] ? result[1] : []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "job not found";
+                        response.error = null;
+                        response.data = {
+                            jobList: []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading jobs";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+        // });
+    }
+
+};
+
+
+jobPortalCtrl.getEvents = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+               
+                var getStatus = [
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL portal_get_eventLists( ' + getStatus.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Events loaded successfully";
+                        response.error = null;
+
+                        for(var i=0; i < result[0].length; i++){
+                            result[0][i].groupByDateList = result[0][i] && JSON.parse(result[0][i].groupByDateList) ? JSON.parse(result[0][i].groupByDateList) : []                            
+                        }
+                    
+                        response.data = {
+                            eventList : result[0] && result[0][0] ? result[0] : []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "Events not found";
+                        response.error = null;
+                        response.data = {
+                            eventList: []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading Events";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+        // });
+    }
+
+};
 module.exports = jobPortalCtrl;

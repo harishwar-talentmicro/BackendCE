@@ -85,7 +85,7 @@ var uploadDocumentToCloud = function (uniqueName, readStream, callback) {
 
 var removeExtraChars = function (params) {
     if (params && typeof (params) == 'string' && params != '') {
-        params = params.replace(/<[a-zA-Z0-9=|-|'|" ]*>/g, '');
+        params = params.replace(/<[a-zA-Z0-9=|-|'|" \\|\/|_]*>/g, '');
         params = params.replace(/<\/[a-z]*>/g, '');
         params = params.replace(/(\n)+/, '');
         params = params.replace(/not applicable/i, '');
@@ -95,6 +95,7 @@ var removeExtraChars = function (params) {
         params = params.replace(/[ ]{2}/g, '');
         params = params.replace(/&amp;/g, ' ');
         params = params.replace(/<!--[a-zA-Z0-9=|-|'|" ]*-->/g, '');
+        params = params.replace(/[^\x00-\x7F]/g, "");
         params = params.trim();
         return params;
     }
@@ -219,7 +220,7 @@ var savePortalApplicants = function (portalId, cvSourceId, details, req, res) {
                 attachment(req, function (aUrl) {
 
                     req.body.requirements = req.body.requirements != 'undefined' && req.body.requirements ? req.body.requirements : [];
-
+                   
                     var inputs = [
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.query.heMasterId),
@@ -248,8 +249,11 @@ var savePortalApplicants = function (portalId, cvSourceId, details, req, res) {
                         req.st.db.escape(details.gender || 3),  // 3 not disclosed
                         req.st.db.escape(details.DOB || null),
                         req.st.db.escape(details.resumeText || ""),
-                        req.st.db.escape(details.linkedInProfile || "")
-
+                        req.st.db.escape(details.linkedInProfile || ""),
+                        req.st.db.escape(JSON.stringify(details.industry || [])),
+                        req.st.db.escape(JSON.stringify(details.prefLocations || [])),
+                        req.st.db.escape(details.nationality || ""),
+                        req.st.db.escape(JSON.stringify(details.functionalAreas || []))
                     ];
 
                     var procQuery = 'CALL wm_save_savePortalApplicants( ' + inputs.join(',') + ')';
@@ -408,7 +412,6 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
                     }
                 }
                 applicants.push({ firstName: first_name, lastName: last_name, portalId: 2, index: selected_candidates[i] });
-
             }
     }
 
@@ -443,111 +446,228 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
 
 
 portalimporter.saveApplicantsFromMonster = function (req, res, next) {
-    var response = {
-        status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-    var portalId = 2;   // monster
-    var cvSourceId = 2;
-    // var validationFlag = true;
-
-    var details = {};
-    const { JSDOM } = jsdom;
-
-    var document = new JSDOM(req.body.xml_string).window.document;
-    // console.log('req.files.document',req.body.document);
-
-    var tempName = document.getElementsByClassName('skname');
-    if (tempName && tempName[0] && tempName[0].innerHTML)
-        // details.firstName = document.getElementsByClassName('skname')[0].innerHTML.trim();
-        var fullName = document.getElementsByClassName('skname')[0].innerHTML.trim();
-
-    if (fullName && fullName.split(' ') && fullName.split(' ')[0])
-        details.firstName = removeExtraChars(fullName.split(' ')[0]);
-    if (fullName && fullName.split(' ') && fullName.split(' ')[1]) {
-        details.lastName = fullName.split(' ').splice(1).join(' ')
-        details.lastName = removeExtraChars(details.lastName.trim());
-    }
-
-    var tempDetails = document.getElementsByClassName('skinfo hg_mtch');
-    if (tempDetails && tempDetails[0] && tempDetails[0].innerHTML) {
-        var emailid = tempDetails[0].innerHTML.trim();
-        var regularExp = /[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}/;   // include /s in the end
-        console.log(emailid);
-
-        if (regularExp.exec(emailid) && regularExp.exec(emailid)[0])
-            details.emailId = removeExtraChars(regularExp.exec(emailid)[0].trim());
-
-        if (tempDetails[0].innerHTML.indexOf(' at ') > -1) {
-            var tempDesignation = tempDetails[0].innerHTML.split(' at ');
-            if (tempDesignation && tempDesignation[0]) {
-                details.jobTitle = removeExtraChars(tempDesignation[0].trim());
-            }
-            if (tempDesignation && tempDesignation[1] && tempDesignation[1].split('<br>') && tempDesignation[1].split('<br>').length) {
-                details.employer = removeExtraChars(tempDesignation[1].split('<br>')[0].trim());
-            }
-        }
-    }
-    console.log('asdf');
-
-    var tempMobile = document.getElementsByClassName('mob_container');
-    if (tempMobile && tempMobile[0] && tempMobile[0].innerHTML) {
-        var mobilenumber = tempMobile[0].innerHTML;
-        var regularExp = /(\d{7,10})/;
-
-        if (regularExp.exec(mobilenumber) && regularExp.exec(mobilenumber)[0])
-            details.mobileNumber = removeExtraChars(regularExp.exec(mobilenumber)[0].trim());
-    }
-
-    var tempLocation = document.getElementsByClassName('skinfoitem info_loc');
-    if (tempLocation && tempLocation[0] && tempLocation[0].innerHTML) {
-        var location = tempLocation[0].innerHTML;
-        details.presentLocation = removeExtraChars(location.trim());
-    }
-
-    var isTallint = req.query.isTallint || 0;
-    details.resumeText = req.body.resume_text || "";
-    // for tallint
-    if (isTallint) {
-        var token = req.query.token;
-        var heMasterId = req.query.heMasterId;
-        // var portalId = 2;
-        // var formData = {
-        //     applicants: applicants
-        // };
-
-        var a = {
-            FirstName: details.firstName,
-            EmailID: details.emailId,
-            MobileNo: details.mobileNumber,
-            FileData: req.body.attachment
+    try{
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
         };
-
-        if (req.body.attachment.indexOf('pdf') > 0) {
-            a.FileName = "asdf.pdf"
+        var portalId = 2;   // monster
+        var cvSourceId = 2;
+        // var validationFlag = true;
+    
+        var details = {};
+        const { JSDOM } = jsdom;
+    
+        var document = new JSDOM(req.body.xml_string).window.document;
+        // console.log('req.files.document',req.body.document);
+    
+        var tempName = document.getElementsByClassName('skname');
+        if (tempName && tempName[0] && tempName[0].innerHTML)
+            // details.firstName = document.getElementsByClassName('skname')[0].innerHTML.trim();
+            var fullName = document.getElementsByClassName('skname')[0].innerHTML.trim();
+    
+        if (fullName && fullName.split(' ') && fullName.split(' ')[0])
+            details.firstName = removeExtraChars(fullName.split(' ')[0]);
+        if (fullName && fullName.split(' ') && fullName.split(' ')[1]) {
+            details.lastName = fullName.split(' ').splice(1).join(' ')
+            details.lastName = removeExtraChars(details.lastName.trim());
         }
-        else if (req.body.attachment.indexOf('application/msword') > -1) {
-            a.FileName = "asdf.docx"
+    
+        var tempDetails = document.getElementsByClassName('skinfo hg_mtch');
+        if (tempDetails && tempDetails[0] && tempDetails[0].innerHTML) {
+            var emailid = tempDetails[0].innerHTML.trim();
+            var regularExp = /[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}/;   // include /s in the end
+            console.log(emailid);
+    
+            if (regularExp.exec(emailid) && regularExp.exec(emailid)[0])
+                details.emailId = removeExtraChars(regularExp.exec(emailid)[0].trim());
+    
+            if (tempDetails[0].innerHTML.indexOf(' at ') > -1) {
+                var tempDesignation = tempDetails[0].innerHTML.split(' at ');
+                if (tempDesignation && tempDesignation[0]) {
+                    details.jobTitle = removeExtraChars(tempDesignation[0].trim());
+                }
+                if (tempDesignation && tempDesignation[1] && tempDesignation[1].split('<br>') && tempDesignation[1].split('<br>').length) {
+                    details.employer = removeExtraChars(tempDesignation[1].split('<br>')[0].trim());
+                }
+            }
         }
-
-        request({
-            url: req.body.tallint_url,
-            method: "POST",
-            json: true,
-            body: a
-        }, function (error, response, body) {
-            // if (!err && body) {
-            // console.log('tallint response here');
-            // }
-            console.log(response);
-            console.log(error);
-        });
+        console.log('asdf');
+    
+        var tempMobile = document.getElementsByClassName('mob_container');
+        if (tempMobile && tempMobile[0] && tempMobile[0].innerHTML) {
+            var mobilenumber = tempMobile[0].innerHTML;
+            var regularExp = /(\d{7,10})/;
+    
+            if (regularExp.exec(mobilenumber) && regularExp.exec(mobilenumber)[0])
+                details.mobileNumber = removeExtraChars(regularExp.exec(mobilenumber)[0].trim());
+        }
+    
+        var tempLocation = document.getElementsByClassName('skinfoitem info_loc');
+        if (tempLocation && tempLocation[0] && tempLocation[0].innerHTML) {
+            var location = tempLocation[0].innerHTML;
+            details.presentLocation = removeExtraChars(location.trim());
+        }
+    
+        var isTallint = req.query.isTallint || 0;
+        details.resumeText = removeExtraChars(req.body.resume_text || "");
+    
+    
+        var arrWSI = [];
+        if (document.getElementsByClassName('scndinfo mrgn hg_mtch')) {
+            arrWSI = document.getElementsByClassName('scndinfo mrgn hg_mtch');
+    
+            for (i = 0; i < arrWSI.length; i++) {
+                if (arrWSI[i].innerHTML && arrWSI[i].innerHTML.indexOf('Work Experience') > -1) {
+                    if (arrWSI[i].innerHTML.split('>:') && arrWSI[i].innerHTML.split('>:')[1] && arrWSI[i].innerHTML.split('>:')[1].trim()) {
+                        var exp = arrWSI[i].innerHTML.split('>:')[1].trim();
+                        var years = 0;
+                        var months = 0;
+                        if (exp.split(' ') && exp.split(' ')[0] && exp.split(' ')[0].trim()) {
+                            years = parseInt(removeExtraChars(exp.split(' ')[0].trim()));
+                        }
+                        if (exp.split(' ') && exp.split(' ')[3] && exp.split(' ')[3].trim()) {
+                            months = parseInt(removeExtraChars(exp.split(' ')[3].trim()));
+                        }
+                        if (months == 6) {
+                            details.experience = years + months;
+                        }
+                        else {
+                            details.experience = years
+                        }
+                    }
+                }
+    
+                //Skills
+                else if (arrWSI[i].innerHTML  && arrWSI[i].innerHTML.indexOf('Skills') > -1) {
+                    if (arrWSI[i].innerHTML.split('>:') && arrWSI[i].innerHTML.split('>:')[1] && arrWSI[i].innerHTML.split('>:')[1].trim()) {
+                        var skills = arrWSI[i].innerHTML.split('>:')[1].trim();
+                        if (skills) {
+                            details.primarySkills = skills;
+                            if (details.primarySkills && details.primarySkills.split(',').length) {
+                                details.primarySkills = details.primarySkills.split(',');
+                                for (var skill = 0; skill < details.primarySkills.length; skill++)
+                                    details.primarySkills[skill] = removeExtraChars(details.primarySkills[skill].trim());
+                            }
+                        }
+                    }
+                }
+    
+                //industry
+                else if (arrWSI[i].innerHTML  && arrWSI[i].innerHTML.indexOf('Industry') > -1) {
+                    if (arrWSI[i].innerHTML.split('>:') && arrWSI[i].innerHTML.split('>:')[1] && arrWSI[i].innerHTML.split('>:')[1].trim()) {
+                        var industry = arrWSI[i].innerHTML.split('>:')[1].trim();
+                        if (industry && industry != 'Not Specified') {
+                            details.industry = industry;
+                            if (details.industry && details.industry.split(',').length) {
+                                details.industry = details.industry.split(',');
+                                for (var a = 0; a < details.industry.length; a++)
+                                    details.industry[a] = removeExtraChars(details.industry[a].trim());
+                            }
+                        }
+                    }
+                }
+    
+                //preferred location
+                else if (arrWSI[i].innerHTML  && arrWSI[i].innerHTML.indexOf('Preferred Job Location') > -1) {
+                    if (arrWSI[i].innerHTML.split('>:') && arrWSI[i].innerHTML.split('>:')[1] && arrWSI[i].innerHTML.split('>:')[1].trim()) {
+                        var locations = arrWSI[i].innerHTML.split('>:')[1].trim();
+                        if (locations && locations != 'Not Specified')
+                            details.prefLocations = locations;
+                        if (details.prefLocations && details.prefLocations.split(',').length) {
+                            details.prefLocations = details.prefLocations.split(',');
+                            for (var a = 0; a < details.prefLocations.length; a++)
+                                details.prefLocations[a] = removeExtraChars(details.prefLocations[a].trim());
+                        }
+                    }
+                }
+            }
+        }
+    
+    
+        // dob nationality gender
+        var arrGN = [];
+        if (document.getElementsByClassName('skr_basicinfo_other left') && document.getElementsByClassName('skr_basicinfo_other left')[0] && document.getElementsByClassName('skr_basicinfo_other left')[0].innerHTML && document.getElementsByClassName('skr_basicinfo_other left')[0].innerHTML.split('<br>')) {
+            arrGN = document.getElementsByClassName('skr_basicinfo_other left')[0].innerHTML.split('<br>');
+    
+            for (i = 0; i < arrGN.length; i++) {
+                if (arrGN[i].indexOf('Date of Birth') > -1) {
+                    if (arrGN[i].split(':') && arrGN[i].split(':')[1] && arrGN[i].split(':')[1].trim()) {
+                        var DOB = new Date(arrGN[i].split(':')[1].trim());
+                        details.DOB = DOB.getFullYear() + "-" + (DOB.getMonth() + 1) + "-" + DOB.getDate();
+                    }
+                }
+    
+                else if (arrGN[i].indexOf('Gender') > -1) {
+                    if (arrGN[i].split(':') && arrGN[i].split(':')[1] && arrGN[i].split(':')[1].trim()) {
+                        if (removeExtraChars(arrGN[i].split(':')[1].trim()).toLowerCase() == 'male') {
+                            details.gender = 1
+                        }
+                        else if (removeExtraChars(arrGN[i].split(':')[1].trim()).toLowerCase() == 'female') {
+                            details.gender = 2
+                        }
+                        else {
+                            details.gender = 3
+                        }
+                    }
+                }
+                else if (arrGN[i].indexOf('Nationality') > -1) {
+                    if (arrGN[i].split(':') && arrGN[i].split(':')[1] && arrGN[i].split(':')[1].trim()) {
+                        details.nationality = removeExtraChars(arrGN[i].split(':')[1].trim());
+                    }
+                }
+            }
+        }
+    
+    
+    
+    
+        // for tallint
+        if (isTallint) {
+            var token = req.query.token;
+            var heMasterId = req.query.heMasterId;
+            // var portalId = 2;
+            // var formData = {
+            //     applicants: applicants
+            // };
+    
+            var a = {
+                FirstName: details.firstName,
+                EmailID: details.emailId,
+                MobileNo: details.mobileNumber,
+                FileData: req.body.attachment
+            };
+    
+            if (req.body.attachment.indexOf('pdf') > 0) {
+                a.FileName = "asdf.pdf"
+            }
+            else if (req.body.attachment.indexOf('application/msword') > -1) {
+                a.FileName = "asdf.docx"
+            }
+    
+            request({
+                url: req.body.tallint_url,
+                method: "POST",
+                json: true,
+                body: a
+            }, function (error, response, body) {
+                // if (!err && body) {
+                // console.log('tallint response here');
+                // }
+                console.log(response);
+                console.log(error);
+            });
+        }
+    
+        else {
+            savePortalApplicants(portalId, cvSourceId, details, req, res);
+        }
     }
-
-    else {
-        savePortalApplicants(portalId, cvSourceId, details, req, res);
+    catch(ex){
+        response.status(500).send("Error occured");
+        console.log("ex",ex);
     }
 };
 
@@ -573,7 +693,10 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
     var is_select_all = req.body.is_select_all;
 
     console.log(document.getElementsByClassName('tuple').length)
+    var uniqueIdArray = xml_string.match(/srpTupleJson = \[\{.*\}\];/);
+
     if (is_select_all == 1) {
+
         if (document.getElementsByClassName('tuple'))
             for (var i = 0; i < document.getElementsByClassName('tuple').length; i++) {
                 if (document.getElementsByClassName('tuple')[i].getAttribute('class').indexOf('viewed') == -1) {
@@ -594,7 +717,12 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                         var lastModifiedDate = dateConverter(document.getElementsByClassName('ftRight')[i].innerHTML.split('Modified: ')[1].split('</span>')[0]);
 
                     }
-                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: i, lastModifiedDate: lastModifiedDate });
+                    var uniqueId = "";
+                    if(uniqueIdArray && uniqueIdArray[0] && uniqueIdArray[0].split('= ') && uniqueIdArray[0].split('= ')[1] && uniqueIdArray[0].split('= ')[1].split('];') && uniqueIdArray[0].split('= ')[1].split('];')[0] && JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']') && JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[i] && JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[i].uniqueId){
+                        uniqueId = JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[i].uniqueId;
+                    }
+
+                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: i, lastModifiedDate: lastModifiedDate,uniqueId : uniqueId});
                 }
             }
     }
@@ -615,7 +743,18 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                     if (name.split(' ')[1])
                         last_name = removeExtraChars(name.split(' ')[1]);
                 }
-                applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: selected_candidates[i] });
+
+                if (document.getElementsByClassName('ftRight') && document.getElementsByClassName('ftRight')[selected_candidates[i]] && document.getElementsByClassName('ftRight')[selected_candidates[i]].innerHTML && document.getElementsByClassName('ftRight')[selected_candidates[i]].innerHTML.split('Modified: ') && document.getElementsByClassName('ftRight')[selected_candidates[i]].innerHTML.split('Modified: ')[1] && document.getElementsByClassName('ftRight')[selected_candidates[i]].innerHTML.split('Modified: ')[1].split('</span>') && document.getElementsByClassName('ftRight')[selected_candidates[i]].innerHTML.split('Modified: ')[1].split('</span>')[0]) {
+
+                    var lastModifiedDate = dateConverter(document.getElementsByClassName('ftRight')[selected_candidates[i]].innerHTML.split('Modified: ')[1].split('</span>')[0]);
+                }
+
+                 var uniqueId = "";
+                    if(uniqueIdArray && uniqueIdArray[0] && uniqueIdArray[0].split('= ') && uniqueIdArray[0].split('= ')[1] && uniqueIdArray[0].split('= ')[1].split('];') && uniqueIdArray[0].split('= ')[1].split('];')[0] && JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']') && JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[selected_candidates[i]] && JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[selected_candidates[i]].uniqueId){
+                        uniqueId = JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[selected_candidates[i]].uniqueId;
+                    }
+
+                applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: selected_candidates[i],lastModifiedDate : lastModifiedDate,uniqueId:uniqueId });
             }
     }
 
@@ -710,11 +849,10 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             console.log('Entered exp');
             details.experience = tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr')[0].trim();
             console.log(details.experience);
-            if (typeof (details.experience) == 'string') {
+            if (!(parseInt(details.experience) >= 0)) {
                 details.experience = 0;
             }
             details.experience = removeExtraChars(details.experience);
-            console.log(tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML);
         }
 
         var tempDesignation = document.getElementsByClassName('bkt4 cDesig');
@@ -725,6 +863,13 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             designation = decodeURI(designation.replace(/<\/em>/g, ''));
             details.jobTitle = removeExtraChars(designation.trim());
             console.log(details.jobTitle);
+        }
+
+        //employer
+        var tempEmployer = document.getElementsByClassName('desc cOrg');
+        if (tempEmployer && tempEmployer[0] && tempEmployer[0].getElementsByClassName('cOrg bkt4') && tempEmployer[0].getElementsByClassName('cOrg bkt4')[0] && tempEmployer[0].getElementsByClassName('cOrg bkt4')[0].innerHTML) {
+            var employer = document.getElementsByClassName('desc cOrg')[0].getElementsByClassName('cOrg bkt4')[0].innerHTML;
+            details.employer = removeExtraChars(employer);
         }
 
         var tempSkills = document.getElementsByClassName('right-container');
@@ -739,7 +884,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                 for (var skill = 0; skill < details.primarySkills.length; skill++)
                     details.primarySkills[skill] = removeExtraChars(details.primarySkills[skill].trim());
             }
-            console.log(details.primarySkills);
+            // console.log(details.primarySkills);
         }
 
         // presentSalaryCurr
@@ -757,6 +902,63 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                     details.presentSalaryCurr = { currencyId: 2, currencySymbol: "INR" };
                 details.presentSalaryPeriod = { duration: "Per Annum", durationId: 4 };
             }
+        }
+
+        // present location
+        if (document.getElementsByClassName('locInfo') && document.getElementsByClassName('locInfo')[0] && document.getElementsByClassName('locInfo')[0].innerHTML && document.getElementsByClassName('locInfo')[0].innerHTML.split('</em>') && document.getElementsByClassName('locInfo')[0].innerHTML.split('</em>')[1] && document.getElementsByClassName('locInfo')[0].innerHTML.split('</em>')[1].trim()) {
+            var presentLocation = document.getElementsByClassName('locInfo')[0].innerHTML.split('</em>')[1].trim();
+            details.presentLocation = removeExtraChars(presentLocation.trim());
+        }
+
+        var tempPreferedLocation = document.getElementsByClassName('exp-sal-loc-box');
+        if (tempPreferedLocation && tempPreferedLocation[0] && tempPreferedLocation[0].innerHTML && tempPreferedLocation[0].innerHTML.split('>Pref </span') && tempPreferedLocation[0].innerHTML.split('>Pref </span')[1]) {
+            var prefLocations = document.getElementsByClassName('exp-sal-loc-box')[0].innerHTML.split('>Pref </span')[1];
+
+            if (details.prefLocations && details.prefLocations.split(',').length) {
+                details.prefLocations = details.prefLocations.split(',');
+                for (var i = 0; i < details.prefLocations.length; i++)
+                    details.prefLocations[i] = removeExtraChars(details.prefLocations[i].trim());
+            }
+        }
+
+
+        var tempGDOB = document.getElementsByClassName('clFx details-box');
+        if (tempGDOB && tempGDOB[0] && tempGDOB[0].innerHTML) {
+            for (var i = 0; i < document.getElementsByClassName('clFx details-box')[0].innerHTML.split('</div>').length; i++) {
+
+                if (document.getElementsByClassName('clFx details-box')[0].innerHTML.split('</div>')[i].indexOf('Date of Birth') > -1) {
+                    if (document.getElementsByClassName('clFx details-box')[0].innerHTML.split('</div>')[i].split('"desc">') && document.getElementsByClassName('clFx details-box')[0].innerHTML.split('</div>')[i].split('"desc">')[1]) {
+                        var DOB = document.getElementsByClassName('clFx details-box')[0].innerHTML.split('</div>')[i].split('"desc">')[1];
+                        DOB = new Date(DOB.trim());
+                        details.DOB = DOB.getFullYear() + "-" + (DOB.getMonth() + 1) + "-" + DOB.getDate();
+                    }
+                }
+                else if (document.getElementsByClassName('clFx details-box')[0].innerHTML.split('</div>')[i].indexOf('Gender') > -1) {
+                    if (document.getElementsByClassName('clFx details-box')[0].innerHTML.split('</div>')[i].split('"desc">') && document.getElementsByClassName('clFx details-box')[0].innerHTML.split('</div>')[i].split('"desc">')[1]) {
+                        var gender = document.getElementsByClassName('clFx details-box')[0].innerHTML.split('</div>')[i].split('"desc">')[1];
+                        gender = removeExtraChars(gender);
+                        if (gender.toLowerCase() == "male") {
+                            details.gender = 1;
+                        }
+                        else if (gender.toLowerCase() == "female") {
+                            details.gender = 2;
+                        }
+                        else {
+                            details.gender = 3;
+                        }
+                    }
+                }
+            }
+        }
+
+        var tempIndustry = document.getElementsByClassName('desc indInfo');
+        if (tempIndustry && tempIndustry[0] && tempIndustry[0].innerHTML && removeExtraChars(tempIndustry[0].innerHTML) != "") {
+            details.industry = removeExtraChars(document.getElementsByClassName('desc indInfo')[0].innerHTML).split(',');
+        }
+
+        var tempFunctionArea = document.getElementsByClassName('desc faInfo')[0].innerHTML;
+        if (tempFunctionArea && tempFunctionArea[0] && tempFunctionArea[0].innerHTML && removeExtraChars(tempFunctionArea[0].innerHTML) != "") {
+            details.functionalAreas = removeExtraChars(document.getElementsByClassName('desc faInfo')[0].innerHTML).split(',');
         }
 
         var isTallint = req.query.isTallint || 0;
@@ -1150,10 +1352,9 @@ portalimporter.saveApplicantsFromShine = function (req, res, next) {
         var tempGender = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li');
         if (tempGender && tempGender[3] && tempGender[3].innerHTML) {
 
-            details.gender = removeExtraChars(tempGender[3].innerHTML.trim(' '));
-            if (details.gender.toLowerCase().indexOf('female') > -1)
+            if (removeExtraChars(tempGender[3].innerHTML.trim(' ')).toLowerCase().indexOf('female') > -1)
                 details.gender = 2;
-            else if (details.gender.toLowerCase().indexOf('male') > -1)
+            else if (removeExtraChars(tempGender[3].innerHTML.trim(' ')).toLowerCase().indexOf('male') > -1)
                 details.gender = 1;
         }
     }
@@ -1387,7 +1588,7 @@ portalimporter.savePortalApplicantsLinkedIn = function (req, res, next) {
         var emailId = contact.getElementsByClassName('pv-contact-info__contact-type ci-email')[0].getElementsByClassName('pv-contact-info__contact-link')[0].innerHTML;
 
         var regularExp = /[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}/;   // include /s in the end
-        if (regularExp.exec(emailId) && regularExp.exec(emailId)[0]){
+        if (regularExp.exec(emailId) && regularExp.exec(emailId)[0]) {
             details.emailId = removeExtraChars(regularExp.exec(emailId)[0].trim());
         }
     }

@@ -176,8 +176,8 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(req.body.updateSubmissionStageStatus || {})),
                     req.st.db.escape(req.body.autoSourcingMail || ''),
                     req.st.db.escape(req.body.autoScreeningMail || ''),
-                    req.st.db.escape(req.body.isGulf)
-                    
+                    req.st.db.escape(req.body.isGulf || 0),
+                    req.st.db.escape(req.body.isCareerPortal || 0)
                 ];
 
                 var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
@@ -954,7 +954,7 @@ jobCtrl.saveEducation = function (req, res, next) {
                             results[1][j].specialization = results[1][j].specialization ? JSON.parse(results[1][j].specialization) : [];
                         }
                         response.data = {
-                            educationList: results[1] ? results[1] :[]
+                            educationList: results[1] ? results[1] : []
                         };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1237,11 +1237,11 @@ jobCtrl.saveRequirement = function (req, res, next) {
                         jobTitle = [];
                     }
 
-                    if(req.body.jdTemplateFlag!=1){
+                    if (req.body.jdTemplateFlag != 1) {
                         if (!req.body.jobCode) {
                             error.jobCode = 'Invalid jobCode';
                             validationFlag *= false;
-                        }    
+                        }
                     }
                     if (!req.body.positions) {
                         error.positions = 'Positions is not specified';
@@ -1440,7 +1440,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                         req.db.query(procQuery, function (err, results) {
                             console.log(err);
 
-                            if (!err && results && results[0] && results[0][0] && results[0][0].error){
+                            if (!err && results && results[0] && results[0][0] && results[0][0].error) {
                                 response.status = false;
                                 response.message = "Jobcode already exists! Please Change Jobcode";
                                 response.error = null;
@@ -1538,11 +1538,11 @@ jobCtrl.saveRequirement = function (req, res, next) {
                             jobTitle = {};
                         }
 
-                        if(req.body.jdTemplateFlag!=1){
+                        if (req.body.jdTemplateFlag != 1) {
                             if (!req.body.jobCode) {
                                 error.jobCode = 'Invalid jobCode';
                                 validationFlag *= false;
-                            }    
+                            }
                         }
                         if (!req.body.positions) {
                             error.positions = 'Positions is not specified';
@@ -1733,71 +1733,72 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 console.log(err);
 
                                 if (!err && results && results[0]) {
-                                    senderGroupId = results[0][0].senderId;
-                                    notificationTemplaterRes = notificationTemplater.parse('compose_message', {
-                                        senderName: results[0][0].senderName
-                                    });
+                                    // senderGroupId = results[0][0].senderId;
+                                    // notificationTemplaterRes = notificationTemplater.parse('compose_message', {
+                                    //     senderName: results[0][0].senderName
+                                    // });
 
-                                    for (var i = 0; i < results[1].length; i++) {
-                                        if (notificationTemplaterRes.parsedTpl) {
-                                            notification.publish(
-                                                results[1][i].receiverId,
-                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                                results[0][0].senderId,
-                                                notificationTemplaterRes.parsedTpl,
-                                                31,
-                                                0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                                (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                                0,
-                                                0,
-                                                0,
-                                                0,
-                                                1,
-                                                moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                '',
-                                                0,
-                                                0,
-                                                null,
-                                                '',
-                                                /** Data object property to be sent with notification **/
-                                                {
-                                                    messageList: {
-                                                        messageId: results[1][i].messageId,
-                                                        message: results[1][i].message,
-                                                        messageLink: results[1][i].messageLink,
-                                                        createdDate: results[1][i].createdDate,
-                                                        messageType: results[1][i].messageType,
-                                                        messageStatus: results[1][i].messageStatus,
-                                                        priority: results[1][i].priority,
-                                                        senderName: results[1][i].senderName,
-                                                        senderId: results[1][i].senderId,
-                                                        receiverId: results[1][i].receiverId,
-                                                        groupId: results[1][i].senderId,
-                                                        groupType: 2,
-                                                        transId: results[1][i].transId,
-                                                        formId: results[1][i].formId,
-                                                        currentStatus: results[1][i].currentStatus,
-                                                        currentTransId: results[1][i].currentTransId,
-                                                        parentId: results[1][i].parentId,
-                                                        accessUserType: results[1][i].accessUserType,
-                                                        heUserId: results[1][i].heUserId,
-                                                        formData: (results[1] && results[1][i] && results[1][i].formDataJSON) ? JSON.parse(results[1][i].formDataJSON) : {}
+                                    // for (var i = 0; i < results[1].length; i++) {
+                                    //     if (notificationTemplaterRes.parsedTpl) {
+                                    //         notification.publish(
+                                    //             results[1][i].receiverId,
+                                    //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                    //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                    //             results[0][0].senderId,
+                                    //             notificationTemplaterRes.parsedTpl,
+                                    //             31,
+                                    //             0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                    //             (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                    //             0,
+                                    //             0,
+                                    //             0,
+                                    //             0,
+                                    //             1,
+                                    //             moment().format("YYYY-MM-DD HH:mm:ss"),
+                                    //             '',
+                                    //             0,
+                                    //             0,
+                                    //             null,
+                                    //             '',
+                                    //             /** Data object property to be sent with notification **/
+                                    //             {
+                                    //                 messageList: {
+                                    //                     messageId: results[1][i].messageId,
+                                    //                     message: results[1][i].message,
+                                    //                     messageLink: results[1][i].messageLink,
+                                    //                     createdDate: results[1][i].createdDate,
+                                    //                     messageType: results[1][i].messageType,
+                                    //                     messageStatus: results[1][i].messageStatus,
+                                    //                     priority: results[1][i].priority,
+                                    //                     senderName: results[1][i].senderName,
+                                    //                     senderId: results[1][i].senderId,
+                                    //                     receiverId: results[1][i].receiverId,
+                                    //                     groupId: results[1][i].senderId,
+                                    //                     groupType: 2,
+                                    //                     transId: results[1][i].transId,
+                                    //                     formId: results[1][i].formId,
+                                    //                     currentStatus: results[1][i].currentStatus,
+                                    //                     currentTransId: results[1][i].currentTransId,
+                                    //                     parentId: results[1][i].parentId,
+                                    //                     accessUserType: results[1][i].accessUserType,
+                                    //                     heUserId: results[1][i].heUserId,
+                                    //                     formData: (results[1] && results[1][i] && results[1][i].formDataJSON) ? JSON.parse(results[1][i].formDataJSON) : {}
 
-                                                    }
-                                                },
-                                                null,
-                                                tokenResult[0].isWhatMate,
-                                                results[1][i].secretKey);
-                                            console.log('postNotification : notification for compose_message is sent successfully');
-                                        }
-                                        else {
-                                            console.log('Error in parsing notification compose_message template - ',
-                                                notificationTemplaterRes.error);
-                                            console.log('postNotification : notification for compose_message is not sent successfully');
-                                        }
-                                    }
+                                    //                 }
+                                    //             },
+                                    //             null,
+                                    //             tokenResult[0].isWhatMate,
+                                    //             results[1][i].secretKey);
+                                    //         console.log('postNotification : notification for compose_message is sent successfully');
+                                    //     }
+                                    //     else {
+                                    //         console.log('Error in parsing notification compose_message template - ',
+                                    //             notificationTemplaterRes.error);
+                                    //         console.log('postNotification : notification for compose_message is not sent successfully');
+                                    //     }
+                                    // }
 
+                                    notifyMessages.getMessagesNeedToNotify();
                                     response.status = true;
                                     if (req.body.jdTemplateFlag == 1) {
                                         response.message = "Requirement template saved successfully";
@@ -1833,11 +1834,11 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                         requirementList: results[2]
                                     };
                                     if (isWeb == 0) {
-                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                        zlib.gzip(buf, function (_, result) {
-                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                            res.status(200).json(response);
-                                        });
+                                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        // zlib.gzip(buf, function (_, result) {
+                                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                        // });
                                     }
                                     else {
                                         res.status(200).json(response);
@@ -2149,14 +2150,14 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                         result[2][0].attachmentList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].attachmentList) : [];
                         result[2][0].functionalAreas = (result[2] && result[2][0] && JSON.parse(result[2][0].functionalAreas)) ? JSON.parse(result[2][0].functionalAreas) : [];
 
-                        for(var i=0; i<result[3].length; i++){
-                            result[3][i].followUpNotes = (result[3] && result[3][i]) ? JSON.parse(result[3][i].followUpNotes) :[];
-                          }
+                        for (var i = 0; i < result[3].length; i++) {
+                            result[3][i].followUpNotes = (result[3] && result[3][i]) ? JSON.parse(result[3][i].followUpNotes) : [];
+                        }
                         response.data = {
                             requirementDetails: result[0][0] ? result[0][0] : [],
                             //  requirementCompleteDetails: (result[1][0].reqJsonData) ? JSON.parse(result[1][0].reqJsonData) : {},
                             requirementCompleteDetails: (result[2] && result[2][0]) ? result[2][0] : {},
-                            followUpNotes : (result[3] && result[3][0]) ? result[3] : []
+                            followUpNotes: (result[3] && result[3][0]) ? result[3] : []
                         };
 
                         if (isWeb == 1) {
@@ -2179,7 +2180,7 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                             requirementDetails: {},
                             requirementCompleteDetails: {},
                             requirementNew: {},
-                            followUpNotes:[]
+                            followUpNotes: []
                         };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -2303,7 +2304,6 @@ jobCtrl.getJdTemplate = function (req, res, next) {
             }
         });
     }
-
 };
 
 jobCtrl.getJdTemplateDetails = function (req, res, next) {
@@ -2632,7 +2632,7 @@ jobCtrl.getrequirementListMobile = function (req, res, next) {
                         response.message = "Requirement list loaded successfully";
                         response.error = null;
 
-                        for (var i = 0; i < result[0].length; i++){
+                        for (var i = 0; i < result[0].length; i++) {
                             result[0][i].currency = (result[0] && result[0][i] && JSON.parse(result[0][i].currency).currencyId) ? JSON.parse(result[0][i].currency) : {};
                             result[0][i].scale = (result[0] && result[0][i] && JSON.parse(result[0][i].scale).scaleId) ? JSON.parse(result[0][i].scale) : {};
                             result[0][i].duration = (result[0] && result[0][i] && JSON.parse(result[0][i].duration).durationId) ? JSON.parse(result[0][i].duration) : {};
@@ -2670,6 +2670,100 @@ jobCtrl.getrequirementListMobile = function (req, res, next) {
                     else {
                         response.status = false;
                         response.message = "Error while getting requirement List";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+jobCtrl.getRequirementContactsOfBranchForMobile = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.branchId) {
+        error.branchId = 'Invalid branchId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heDepartmentId) {
+        error.heDepartmentId = 'Invalid heDepartmentId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+
+                var getStatus = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.heDepartmentId),
+                    req.st.db.escape(req.query.branchId)
+                ];
+
+                var procQuery = 'CALL wm_get_reqclientContactsForMobile( ' + getStatus.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    var isWeb = req.query.isWeb;
+
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Contact list loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            contactList: result[0] ? result[0] : []
+                        };
+
+
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                        // });
+
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Contacts not found";
+                        response.error = null;
+                        response.data = {
+                            jdTemplateList: []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting contacts";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
