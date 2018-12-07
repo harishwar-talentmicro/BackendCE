@@ -2006,9 +2006,6 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
         trackerTemplate = {};
         trackerTags = [];
     }
-    else {
-        trackerTags = JSON.parse(trackerTemplate.trackerTags);
-    }
 
     var validationFlag = true;
     if (!validationFlag) {

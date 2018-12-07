@@ -23,5 +23,6 @@ router.get('/bulkImportTitle',userCtrl.bulkImporterTitleSave);  //save bulk impo
 
 router.get('/getBulkImportTitles',userCtrl.getBulkImporterTitles);
 
+router.post('/updateUserDetails',userCtrl.updateMultipleUserDetails);
 
 module.exports = router;
