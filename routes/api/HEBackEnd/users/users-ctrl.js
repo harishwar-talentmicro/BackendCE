@@ -944,7 +944,8 @@ console.log("validationFlag",validationFlag)
                     req.st.db.escape(req.query.bulkImporterId),
                     req.st.db.escape(password),
                     req.st.db.escape(req.body.JoiningDate),
-                    req.st.db.escape(req.body.BirthDate)
+                    req.st.db.escape(req.body.BirthDate),
+                    req.st.db.escape(req.body.Grade)
 
 
                 ];
@@ -1056,7 +1057,7 @@ userCtrl.bulkImporterTitleSave = function(req,res,next){
                 var procQuery = 'CALL wm_save_bulkImporterTitle( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,userresult){
-                    if(!err && userresult && userresult[0] && userresult[0][0]){
+                    if(!err && userresult && userresult[0] && !userresult[0][0].error){
 
                         if(isPublish!=0){
 
@@ -1581,17 +1582,36 @@ userCtrl.bulkImporterTitleSave = function(req,res,next){
                         response.bulkImporterId=resData;
                         res.status(200).json(response);
                     }
-                    else{
+                    
+                    
+                    else if(!err && userresult[0] && userresult[0][0].error){
+
+                        // if(isPublish){
+                        //     var resError = "Error while notifing user credentials";
+                        // }
+                        // else{
+                        //     var resError = "Error while saving importer title";
+                        // }
+                        response.status = false;
+                        response.message = userresult[0][0].error;
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                    else {
                         if(isPublish){
                             var resError = "Error while notifing user credentials";
                         }
                         else{
                             var resError = "Error while saving importer title";
                         }
+
+           
                         response.status = false;
                         response.message = resError;
                         response.error = null;
-                        response.data = null;
+                   
+                    response.data = null;
                         res.status(500).json(response);
                     }
                 });
@@ -1654,6 +1674,754 @@ userCtrl.getBulkImporterTitles = function(req,res,next){
                     else{
                         response.status = false;
                         response.message = "Error while loading list";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+userCtrl.getBulkImporterDetails = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+    if (!req.query.bulkImporterId) {
+        error.bulkImporterId = 'Invalid bulkImporterId';
+        validationFlag *= false;
+    }
+   
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+            
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.bulkImporterId)
+                 
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_get_bulkImportDetails( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,result){
+                    if(!err){
+                        response.status = true;
+                        response.message = "Bulk importer Details loaded successfully";
+                        response.error = null;
+                        response.data = (result[0] &&  result[0][0]) ? result[0] :[];
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while loading list";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else{
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+userCtrl.userNotifySave = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                req.query.importTitleId = req.query.importTitleId ? req.query.importTitleId : 0;
+                req.query.isPublish = req.query.isPublish > 0 ? req.query.isPublish : 0;
+
+                // var password = randomstring.generate({
+                //     length: 6,
+                //     charset: 'alphanumeric'
+                // });
+
+                // var encryptPwd = req.st.hashPassword(password);
+
+                var isPublish = req.query.isPublish ? req.query.isPublish : 0;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(req.body.employeeCode)),
+                    
+                    req.st.db.escape(DBSecretKey)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_save_bulkImporterUserPublish( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, userresult) {
+                    if (!err && userresult && userresult[0] && userresult[0][0]) {
+
+                        // if (isPublish != 0) {
+
+                            for (var i = 0; i < userresult[0].length; i++) {
+
+                                var companyName = userresult[0][i].companyName;
+                                var Email = userresult[0][i].Email ? userresult[0][i].Email : '';
+                                var mobile = userresult[0][i].mobile ? userresult[0][i].mobile : '';
+                                var isdmobile = userresult[0][i].isdmobile ? userresult[0][i].isdmobile : '';
+                                var name = userresult[0][i].name ? userresult[0][i].name : '';
+                                var password = userresult[0][i].unhashPassword ? userresult[0][i].unhashPassword : '';
+
+                                if (userresult[0][i].status == "New") {
+                                    if (Email != "") {
+
+
+                                        if (userresult[0][i].emailtext != "") {
+                                            userresult[0][i].emailtext = userresult[0][i].emailtext.replace("[Name]", name);
+                                            userresult[0][i].emailtext = userresult[0][i].emailtext.replace("[name]", name);
+                                            userresult[0][i].emailtext = userresult[0][i].emailtext.replace("[UserName]", (userresult[0][i].loginId ? userresult[0][i].loginId : userresult[0][i].whatmateId));
+                                            userresult[0][i].emailtext = userresult[0][i].emailtext.replace("[Password]", password);
+
+                                            var mail = {
+                                                from: 'noreply@talentmicro.com',
+                                                to: Email,
+                                                subject: userresult[0][i].whatmateSignUpSubject ? userresult[0][i].whatmateSignUpSubject : 'Your user Credentials for WhatMate App',
+                                                html: userresult[0][i].emailtext ? userresult[0][i].emailtext : '' // html body
+                                            };
+
+                                            // console.log('new mail details',mail);
+
+                                            var email = new sendgrid.Email();
+                                            email.from = mail.from;
+                                            email.to = mail.to;
+
+                                            // email.addCc(cc);
+                                            email.subject = mail.subject;
+                                            email.html = mail.html;
+                                            sendgrid.send(email, function (err, result) {
+                                                if (!err) {
+                                                    console.log("Mail sent success");
+                                                }
+                                                else {
+                                                    console.log("Mail Error", err);
+                                                }
+                                            });
+
+                                        }
+                                    }
+                                    //whatmateId
+                                    // message = 'Dear ' + name + ', Your WhatMate credentials, Login ID: ' + (userresult[0][i].loginId ? userresult[0][i].loginId : userresult[0][i].whatmateId) + ',Password: ' + password;
+
+
+                                    // message = userresult[0][i].whatmateSignUpMessage ? userresult[0][i].whatmateSignUpMessage : message;
+                                    // message = message.replace('[LoginId]', (userresult[0][i].loginId ? userresult[0][i].loginId : userresult[0][i].whatmateId));
+                                    // message = message.replace('[password]', password);
+
+
+                                    // if (mobile != "") {
+                                    //     if (isdmobile == "+977") {
+                                    //         request({
+                                    //             url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                    //             qs: {
+                                    //                 token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                    //                 to: mobile,
+                                    //                 message: message,
+                                    //                 sender: 'Techingen'
+                                    //             },
+                                    //             method: 'GET'
+
+                                    //         }, function (error, response, body) {
+                                    //             if (error) {
+                                    //                 console.log(error, "SMS");
+                                    //             }
+                                    //             else {
+                                    //                 console.log("SUCCESS for isd +977", "SMS response");
+                                    //             }
+
+                                    //         });
+                                    //     }
+                                    //     else if (isdmobile == "+91") {
+                                    //         request({
+                                    //             url: 'https://aikonsms.co.in/control/smsapi.php',
+                                    //             qs: {
+                                    //                 user_name: 'janardana@hirecraft.com',
+                                    //                 password: 'Ezeid2015',
+                                    //                 sender_id: 'WtMate',
+                                    //                 service: 'TRANS',
+                                    //                 mobile_no: mobile,
+                                    //                 message: message,
+                                    //                 method: 'send_sms'
+                                    //             },
+                                    //             method: 'GET'
+
+                                    //         }, function (error, response, body) {
+                                    //             if (error) {
+                                    //                 console.log(error, "SMS");
+                                    //             }
+                                    //             else {
+                                    //                 console.log("SUCCESS for isd +91", "SMS response");
+                                    //             }
+                                    //         });
+
+                                    //         var req = http.request(options, function (res) {
+                                    //             var chunks = [];
+
+                                    //             res.on("data", function (chunk) {
+                                    //                 chunks.push(chunk);
+                                    //             });
+
+                                    //             res.on("end", function () {
+                                    //                 var body = Buffer.concat(chunks);
+                                    //                 console.log(body.toString());
+                                    //             });
+                                    //         });
+
+                                    //         req.write(qs.stringify({
+                                    //             userId: 'talentmicro',
+                                    //             password: 'TalentMicro@123',
+                                    //             senderId: 'WTMATE',
+                                    //             sendMethod: 'simpleMsg',
+                                    //             msgType: 'text',
+                                    //             mobile: isdmobile.replace("+", "") + mobile,
+                                    //             msg: message,
+                                    //             duplicateCheck: 'true',
+                                    //             format: 'json'
+                                    //         }));
+                                    //         req.end();
+
+
+                                    //     }
+                                    //     else if (isdmobile != "") {
+                                    //         client.messages.create(
+                                    //             {
+                                    //                 body: message,
+                                    //                 to: isdmobile + mobile,
+                                    //                 from: '+14434322305'
+                                    //             },
+                                    //             function (error, response) {
+                                    //                 if (error) {
+                                    //                     console.log(error, "SMS");
+                                    //                 }
+                                    //                 else {
+                                    //                     console.log("SUCCESS for isd others", "SMS response");
+                                    //                 }
+                                    //             }
+                                    //         );
+                                    //     }
+
+                                    // }
+
+                                }
+                                else if (userresult[0][i].status == "Existing" || userresult[0][i].status == "Duplicate") {
+                                    if (Email != "") {
+
+                                        if (userresult[0][i].ExistingUserEmailText != "") {
+                                            userresult[0][i].ExistingUserEmailText = userresult[0][i].ExistingUserEmailText.replace("[Name]", name);
+                                            userresult[0][i].ExistingUserEmailText = userresult[0][i].ExistingUserEmailText.replace("[UserName]", (userresult[0][i].loginId ? userresult[0][i].loginId : userresult[0][i].whatmateId));
+                                            userresult[0][i].ExistingUserEmailText = userresult[0][i].ExistingUserEmailText.replace("[CompanyName]", companyName);
+
+
+                                            mail = {
+                                                from: 'noreply@talentmicro.com',
+                                                to: Email,
+                                                subject: 'Your user Credentials for WhatMate App',
+                                                html: userresult[0][i].ExistingUserEmailText // html body
+                                            };
+
+                                             console.log('existing mail details',mail);
+
+                                            email = new sendgrid.Email();
+                                            email.from = mail.from;
+                                            email.to = mail.to;
+                                            // email.addCc(cc);
+                                            email.subject = mail.subject;
+                                            email.html = mail.html;
+                                            sendgrid.send(email, function (err, result) {
+                                                if (!err) {
+                                                    console.log("Mail sent success");
+                                                }
+                                                else {
+                                                    console.log("Mail Error", err);
+                                                }
+                                            });
+
+                                        }
+                                    }
+
+                                    // message = 'Dear ' + name + ', Your WhatMate credentials, Login ID: ' + (userresult[0][i].loginId ? userresult[0][i].loginId : userresult[0][i].whatmateId) + ',Password: ' + password;
+
+
+                                    // message = userresult[0][i].whatmateSignUpMessage ? userresult[0][i].whatmateSignUpMessage : message;
+                                    // message = message.replace('[LoginId]', (userresult[0][i].loginId ? userresult[0][i].loginId : userresult[0][i].whatmateId));
+                                    // message = message.replace('[password]', password);
+
+                                    // if (mobile != "") {
+                                    //     if (isdmobile == "+977") {
+                                    //         request({
+                                    //             url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                    //             qs: {
+                                    //                 token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                    //                 to: mobile,
+                                    //                 message: message,
+                                    //                 sender: 'Techingen'
+                                    //             },
+                                    //             method: 'GET'
+
+                                    //         }, function (error, response, body) {
+                                    //             if (error) {
+                                    //                 console.log(error, "SMS");
+                                    //             }
+                                    //             else {
+                                    //                 console.log("SUCCESS for isd +977", "SMS response");
+                                    //             }
+
+                                    //         });
+                                    //     }
+                                    //     else if (isdmobile == "+91") {
+                                    //         request({
+                                    //             url: 'https://aikonsms.co.in/control/smsapi.php',
+                                    //             qs: {
+                                    //                 user_name: 'janardana@hirecraft.com',
+                                    //                 password: 'Ezeid2015',
+                                    //                 sender_id: 'WtMate',
+                                    //                 service: 'TRANS',
+                                    //                 mobile_no: mobile,
+                                    //                 message: message,
+                                    //                 method: 'send_sms'
+                                    //             },
+                                    //             method: 'GET'
+
+                                    //         }, function (error, response, body) {
+                                    //             if (error) {
+                                    //                 console.log(error, "SMS");
+                                    //             }
+                                    //             else {
+                                    //                 console.log("SUCCESS for isd +91", "SMS response");
+                                    //             }
+                                    //         });
+
+                                    //         req = http.request(options, function (res) {
+                                    //             var chunks = [];
+
+                                    //             res.on("data", function (chunk) {
+                                    //                 chunks.push(chunk);
+                                    //             });
+
+                                    //             res.on("end", function () {
+                                    //                 var body = Buffer.concat(chunks);
+                                    //                 console.log(body.toString());
+                                    //             });
+                                    //         });
+
+                                    //         req.write(qs.stringify({
+                                    //             userId: 'talentmicro',
+                                    //             password: 'TalentMicro@123',
+                                    //             senderId: 'WTMATE',
+                                    //             sendMethod: 'simpleMsg',
+                                    //             msgType: 'text',
+                                    //             mobile: isdmobile.replace("+", "") + mobile,
+                                    //             msg: message,
+                                    //             duplicateCheck: 'true',
+                                    //             format: 'json'
+                                    //         }));
+                                    //         req.end();
+                                    //     }
+                                    //     else if (isdmobile != "") {
+                                    //         client.messages.create(
+                                    //             {
+                                    //                 body: message,
+                                    //                 to: isdmobile + mobile,
+                                    //                 from: '+14434322305'
+                                    //             },
+                                    //             function (error, response) {
+                                    //                 if (error) {
+                                    //                     console.log(error, "SMS");
+                                    //                 }
+                                    //                 else {
+                                    //                     console.log("SUCCESS for isd others", "SMS response");
+                                    //                 }
+                                    //             }
+                                    //         );
+                                    //     }
+
+                                    // }
+                                }
+
+                            }
+
+                            for (var i = 0; i < userresult[0].length; i++) {
+
+                                var companyName = userresult[0][i].companyName;
+                                var Email = userresult[0][i].Email ? userresult[0][i].Email : '';
+                                var mobile = userresult[0][i].mobile ? userresult[0][i].mobile : '';
+                                var isdmobile = userresult[0][i].isdmobile ? userresult[0][i].isdmobile : '';
+                                var name = userresult[0][i].name ? userresult[0][i].name : '';
+                                var password = userresult[0][i].unhashPassword ? userresult[0][i].unhashPassword : '';
+
+                                if (userresult[0][i].status == "New") {
+
+                                    //whatmateId
+                                    message = 'Dear ' + name + ', Your WhatMate credentials, Login ID: ' + (userresult[0][i].loginId ? userresult[0][i].loginId : userresult[0][i].whatmateId) + ',Password: ' + password;
+
+
+                                    message = userresult[0][i].whatmateSignUpMessage ? userresult[0][i].whatmateSignUpMessage : message;
+                                    message = message.replace('[LoginId]', (userresult[0][i].loginId ? userresult[0][i].loginId : userresult[0][i].whatmateId));
+                                    message = message.replace('[password]', password);
+
+
+                                    if (mobile != "") {
+                                        if (isdmobile == "+977") {
+                                            request({
+                                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                qs: {
+                                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                    to: mobile,
+                                                    message: message,
+                                                    sender: 'Techingen'
+                                                },
+                                                method: 'GET'
+
+                                            }, function (error, response, body) {
+                                                if (error) {
+                                                    console.log(error, "SMS");
+                                                }
+                                                else {
+                                                    console.log("SUCCESS for isd +977", "SMS response");
+                                                }
+
+                                            });
+                                        }
+                                        else if (isdmobile == "+91") {
+                                            request({
+                                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                qs: {
+                                                    user_name: 'janardana@hirecraft.com',
+                                                    password: 'Ezeid2015',
+                                                    sender_id: 'WtMate',
+                                                    service: 'TRANS',
+                                                    mobile_no: mobile,
+                                                    message: message,
+                                                    method: 'send_sms'
+                                                },
+                                                method: 'GET'
+
+                                            }, function (error, response, body) {
+                                                if (error) {
+                                                    console.log(error, "SMS");
+                                                }
+                                                else {
+                                                    console.log("SUCCESS for isd +91", "SMS response");
+                                                }
+                                            });
+
+                                            var req = http.request(options, function (res) {
+                                                var chunks = [];
+
+                                                res.on("data", function (chunk) {
+                                                    chunks.push(chunk);
+                                                });
+
+                                                res.on("end", function () {
+                                                    var body = Buffer.concat(chunks);
+                                                    console.log(body.toString());
+                                                });
+                                            });
+
+                                            req.write(qs.stringify({
+                                                userId: 'talentmicro',
+                                                password: 'TalentMicro@123',
+                                                senderId: 'WTMATE',
+                                                sendMethod: 'simpleMsg',
+                                                msgType: 'text',
+                                                mobile: isdmobile.replace("+", "") + mobile,
+                                                msg: message,
+                                                duplicateCheck: 'true',
+                                                format: 'json'
+                                            }));
+                                            req.end();
+
+
+                                        }
+                                        else if (isdmobile != "") {
+                                            client.messages.create(
+                                                {
+                                                    body: message,
+                                                    to: isdmobile + mobile,
+                                                    from: FromNumber
+                                                },
+                                                function (error, response) {
+                                                    if (error) {
+                                                        console.log(error, "SMS");
+                                                    }
+                                                    else {
+                                                        console.log("SUCCESS for isd others", "SMS response");
+                                                    }
+                                                }
+                                            );
+                                        }
+
+                                    }
+
+                                }
+                                else if (userresult[0][i].status == "Existing" || userresult[0][i].status == "Duplicate") {
+
+                                    message = 'Dear ' + name + ', Your WhatMate credentials, Login ID: ' + (userresult[0][i].loginId ? userresult[0][i].loginId : userresult[0][i].whatmateId) + ',Password: ' + password;
+
+
+                                    message = userresult[0][i].whatmateSignUpMessage ? userresult[0][i].whatmateSignUpMessage : message;
+                                    message = message.replace('[LoginId]', (userresult[0][i].loginId ? userresult[0][i].loginId : userresult[0][i].whatmateId));
+                                    message = message.replace('[password]', password);
+
+                                    if (mobile != "") {
+                                        if (isdmobile == "+977") {
+                                            request({
+                                                url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                qs: {
+                                                    token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                    to: mobile,
+                                                    message: message,
+                                                    sender: 'Techingen'
+                                                },
+                                                method: 'GET'
+
+                                            }, function (error, response, body) {
+                                                if (error) {
+                                                    console.log(error, "SMS");
+                                                }
+                                                else {
+                                                    console.log("SUCCESS for isd +977", "SMS response");
+                                                }
+
+                                            });
+                                        }
+                                        else if (isdmobile == "+91") {
+                                            request({
+                                                url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                qs: {
+                                                    user_name: 'janardana@hirecraft.com',
+                                                    password: 'Ezeid2015',
+                                                    sender_id: 'WtMate',
+                                                    service: 'TRANS',
+                                                    mobile_no: mobile,
+                                                    message: message,
+                                                    method: 'send_sms'
+                                                },
+                                                method: 'GET'
+
+                                            }, function (error, response, body) {
+                                                if (error) {
+                                                    console.log(error, "SMS");
+                                                }
+                                                else {
+                                                    console.log("SUCCESS for isd +91", "SMS response");
+                                                }
+                                            });
+
+                                            req = http.request(options, function (res) {
+                                                var chunks = [];
+
+                                                res.on("data", function (chunk) {
+                                                    chunks.push(chunk);
+                                                });
+
+                                                res.on("end", function () {
+                                                    var body = Buffer.concat(chunks);
+                                                    console.log(body.toString());
+                                                });
+                                            });
+
+                                            req.write(qs.stringify({
+                                                userId: 'talentmicro',
+                                                password: 'TalentMicro@123',
+                                                senderId: 'WTMATE',
+                                                sendMethod: 'simpleMsg',
+                                                msgType: 'text',
+                                                mobile: isdmobile.replace("+", "") + mobile,
+                                                msg: message,
+                                                duplicateCheck: 'true',
+                                                format: 'json'
+                                            }));
+                                            req.end();
+                                        }
+                                        else if (isdmobile != "") {
+                                            client.messages.create(
+                                                {
+                                                    body: message,
+                                                    to: isdmobile + mobile,
+                                                    from: FromNumber
+                                                },
+                                                function (error, response) {
+                                                    if (error) {
+                                                        console.log(error, "SMS");
+                                                    }
+                                                    else {
+                                                        console.log("SUCCESS for isd others", "SMS response");
+                                                    }
+                                                }
+                                            );
+                                        }
+
+                                    }
+                                }
+
+                            }
+                        // }
+
+                        // if (isPublish) {
+                        //     var resData = (userresult[1] && userresult[1][0]) ? userresult[1][0].bulkImporterId : 0;
+                            var resMessage = "User credentials sent successfully";
+                        // }
+                        // else {
+                        //     var resData = (userresult[0] && userresult[0][0]) ? userresult[0][0].bulkImporterId : 0;
+                        //     var resMessage = "Importer title saved successfully";
+
+                        // }
+
+
+
+                        response.status = true;
+                        response.message = resMessage;
+                        response.error = null;
+               
+                        res.status(200).json(response);
+                    }
+                    else {
+                        // if (isPublish) {
+                            var resError = "Error while notifing user credentials";
+                        // }
+                        // else {
+                        //     var resError = "Error while saving importer title";
+                        // }
+                        response.status = false;
+                        response.message = resError;
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+userCtrl.updateMultipleUserDetails = function(req,res,next){
+    var response = {
+        status : false,
+        message : "Invalid token",
+        data : null,
+        error : null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+  
+    if (!req.query.APIKey){
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag){
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token,function(err,tokenResult){
+            if((!err) && tokenResult){
+             
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(JSON.stringify(req.body.HEUserId || [])),
+                    req.st.db.escape(req.body.grade || 0),
+                    req.st.db.escape(req.body.departmentTitle || 0),
+                    req.st.db.escape(req.body.userType || 0),
+                    req.st.db.escape(req.body.workLocationId || 0),
+                    req.st.db.escape(req.body.RMGroupId || 0),
+                    req.st.db.escape(req.body.jobTitle || ""),
+                    req.st.db.escape(req.body.locationTitle || ""),
+                    req.st.db.escape(req.body.DOJ || null),
+                    req.st.db.escape(req.body.status || null),
+                    req.st.db.escape(JSON.stringify(req.body.trackTemplate || [])),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.body.workGroupId || 0)
+                ];
+                /**
+                 * Calling procedure to save form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_update_HE_usersNew( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery,function(err,currencyResult){
+                    if(!err){
+                        response.status = true;
+                        response.message = "User data updated successfully";
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+                    else{
+                        response.status = false;
+                        response.message = "Error while updating user";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

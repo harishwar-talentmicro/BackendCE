@@ -1838,11 +1838,11 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                         requirementList: results[2]
                                     };
                                     if (isWeb == 0) {
-                                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                        // zlib.gzip(buf, function (_, result) {
-                                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                         res.status(200).json(response);
-                                        // });
+                                        });
                                     }
                                     else {
                                         res.status(200).json(response);
