@@ -6,6 +6,10 @@ var NotificationTemplater = require('../../../lib/NotificationTemplater.js');
 var notificationTemplater = new NotificationTemplater();
 var Notification = require('../../../modules/notification/notification-master.js');
 var notification = new Notification();
+
+var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
+var notifyMessages = new notifyMessages();
+
 var fs = require('fs');
 var bodyParser = require('body-parser');
 
@@ -1834,11 +1838,11 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                         requirementList: results[2]
                                     };
                                     if (isWeb == 0) {
-                                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                        // zlib.gzip(buf, function (_, result) {
-                                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                         res.status(200).json(response);
-                                        // });
+                                        });
                                     }
                                     else {
                                         res.status(200).json(response);

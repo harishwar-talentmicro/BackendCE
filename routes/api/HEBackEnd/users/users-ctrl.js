@@ -943,7 +943,8 @@ console.log("validationFlag",validationFlag)
                     req.st.db.escape(req.query.bulkImporterId),
                     req.st.db.escape(password),
                     req.st.db.escape(req.body.JoiningDate),
-                    req.st.db.escape(req.body.BirthDate)
+                    req.st.db.escape(req.body.BirthDate),
+                    req.st.db.escape(req.body.Grade)
 
 
                 ];

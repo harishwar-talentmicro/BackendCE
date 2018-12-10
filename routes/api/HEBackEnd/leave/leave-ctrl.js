@@ -389,10 +389,10 @@ leaveCtrl.saveLeaveBalance = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.body.HEUsersId) {
-        error.HEUsersId = 'Invalid HEUsersId';
-        validationFlag *= false;
-    }
+    // if (!req.body.HEUsersId) {
+    //     error.HEUsersId = 'Invalid HEUsersId';
+    //     validationFlag *= false;
+    // }
     if (!req.query.APIKey)
     {
         error.APIKey = 'Invalid APIKey';
@@ -421,9 +421,12 @@ leaveCtrl.saveLeaveBalance = function(req,res,next){
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.HEUsersId),
+                    req.st.db.escape(req.body.HEUsersId || 0),
                     req.st.db.escape(JSON.stringify(leaveTypes)),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.body.employeeCode || 0),
+                    req.st.db.escape(req.body.isExcel || 0)
+
                 ];
                 /**
                  * Calling procedure to save form template
@@ -497,7 +500,8 @@ leaveCtrl.getLeaveBalance = function(req,res,next){
                 req.st.db.escape(req.query.dateFrom),
                 req.st.db.escape(req.query.dateTo),
                 req.st.db.escape(req.query.APIKey),
-                req.st.db.escape(DBSecretKey)                                                                                                        
+                req.st.db.escape(DBSecretKey),                                                                                                        
+                req.st.db.escape(req.query.isExcel || 0)                                                                                                        
             ];
             /**
              * Calling procedure to get form template
