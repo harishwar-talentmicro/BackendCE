@@ -41,6 +41,8 @@ router.post('/portalChangePassword',jobPortalCtrl.portalChangePassword);
 router.get('/portalClientJobs',jobPortalCtrl.getClientWisePortalRequirements);
 router.get('/eventList',jobPortalCtrl.getEvents);
 
+router.post('/portalAdminAttachments',jobPortalCtrl.portalAdminAttachments);
+router.get('/getportalAdminAttachments',jobPortalCtrl.getportalAdminAttachments);
 
 module.exports = router;
 

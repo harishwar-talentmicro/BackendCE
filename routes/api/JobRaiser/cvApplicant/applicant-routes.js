@@ -104,5 +104,7 @@ router.get('/interviewPanelMembers',applicantCtrl.getPanelMembersForInterviewMai
 router.post('/interviewMailPreview',sendgridCtrl.interviewMailerPreviewForMobile);
 router.post('/sendInterviewMailForMobile',sendgridCtrl.sendInterviewMailerForMobile);
 
+router.get('/interviewPanelMembersMobile',applicantCtrl.getInterviewPanelMembersForMobile);
+
 module.exports = router;
 

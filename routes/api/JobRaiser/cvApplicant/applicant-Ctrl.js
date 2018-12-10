@@ -989,7 +989,8 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                     req.st.db.escape(req.body.from || null),
                     req.st.db.escape(req.body.to || null),
                     req.st.db.escape(req.body.userMasterId || 0),
-                    req.st.db.escape(req.query.isWeb || 0)
+                    req.st.db.escape(req.query.isWeb || 0),
+                    req.st.db.escape(JSON.stringify(req.body.stageDetail || {}))
                 ];
 
                 var procQuery = 'CALL wm_get_applicants( ' + getStatus.join(',') + ')';
@@ -1043,7 +1044,7 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                         }
 
                         response.data = {
-                            applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId? Result[0] : [],
+                            applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId ? Result[0] : [],
                             count: Result[1][0].count,
                             offerMasterData: offerMasterData,
                             cvSearchMasterData : cvSearchMasterData
@@ -2151,7 +2152,7 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
                     req.st.db.escape(req.body.billingCTCAmount),
                     req.st.db.escape(req.body.offerExpiryDate || null),
                     req.st.db.escape(req.body.noticePeriod || 0),
-                    req.st.db.escape(req.body.grade || ""),
+                    req.st.db.escape(JSON.stringify(req.body.grade || {})),
                     req.st.db.escape(req.body.employeeCode || ""),
                     req.st.db.escape(JSON.stringify(req.body.designation || {}))
                 ];
@@ -2239,7 +2240,7 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                             result[0][0].billingCurrency = result[0][0].billingCurrency ? JSON.parse(result[0][0].billingCurrency) : {};
                             result[0][0].billingScale = result[0][0].billingScale ? JSON.parse(result[0][0].billingScale) : [];
                             result[0][0].billingDuration = result[0][0].billingDuration ? JSON.parse(result[0][0].billingDuration) : {};
-                            // result[0][0].grade = result[0][0] && result[0][0].grade && JSON.parse(result[0][0].grade).gradeId ? JSON.parse(result[0][0].grade) : {};
+                            result[0][0].grade = result[0][0] && result[0][0].grade && JSON.parse(result[0][0].grade).gradeId ? JSON.parse(result[0][0].grade) : {};
                             result[0][0].designation = result[0][0] && result[0][0].designation && JSON.parse(result[0][0].designation).jobtitleId? JSON.parse(result[0][0].designation) : {};
 
                         }
@@ -5219,4 +5220,98 @@ applicantCtrl.getPanelMembersForInterviewMailerMobile = function (req, res, next
         });
     }
 };
+
+applicantCtrl.getInterviewPanelMembersForMobile = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.requirementId) {
+        error.requirementId = 'Invalid requirementId';
+        validationFlag *= false;
+    }
+    if (!req.query.interviewStageId) {
+        error.interviewStageId = 'Invalid interviewStageId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.requirementId),
+                    req.st.db.escape(req.query.interviewStageId)
+                ];
+
+                var procQuery = 'CALL wm_get_interviewPanelMembersForMobile( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Interview Panel members loaded successfully";
+                        response.error = null;
+                        var output = [];
+                        response.data ={
+                                interviewPanel: result[0] ? result[0] : []                               
+                            };
+
+                        // if (req.query.isWeb == 0) {
+                        //     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        //     zlib.gzip(buf, function (_, result) {
+                        //         response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                        //         res.status(200).json(response);
+                        //     });
+                        // }
+                        // else {
+                            res.status(200).json(response);
+                        // }
+                    }
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data =null;
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading interview panel members";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
 module.exports = applicantCtrl;

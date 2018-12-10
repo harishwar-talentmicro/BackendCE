@@ -334,7 +334,8 @@ userCtrl.getUserDetails = function(req,res,next){
                             mobileNumber : userData[0][0].mobileNumber,
                             emailId : userData[0][0].emailId,
                             displayName : userData[0][0].displayName,
-                            DOJ : userData[0][0].DOJ
+                            DOJ : userData[0][0].DOJ,
+                            BirthDate : userData[0][0].BirthDate
                         };
 // firstName,lastName,mobileISD,mobileNumber,emailId,displayName
 
