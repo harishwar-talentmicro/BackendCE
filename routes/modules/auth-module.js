@@ -33,7 +33,7 @@ var DBSecretKey = CONFIG.DB.secretKey;
 var bcrypt = null;
 
 try {
-    bcrypt = require('bcrypt');
+    bcrypt = require('bcrypt-nodejs');
 }
 catch (ex) {
     console.log('Bcrypt not found, falling back to bcrypt-nodejs');
@@ -2852,7 +2852,7 @@ Auth.prototype.portalLogin = function (req, res, next) {
         var apnsId = (req.body.apnsId) ? (req.body.apnsId) : "";
         var gcmId = (req.body.gcmId) ? (req.body.gcmId) : "";
         var secretKey = (req.body.secretKey) ? (req.body.secretKey) : null;
-        var heMasterId = req.body.heMasterId ? req.body.heMasterId : 0;
+        var heMasterId = req.query.heMasterId ? req.query.heMasterId : 0;
         console.log("secretKey", secretKey);
 
         if ((ezeoneId || emailId || (mobileNumber && mobileISD)) && password) {

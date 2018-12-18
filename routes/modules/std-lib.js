@@ -17,7 +17,7 @@ var gcloud = require('gcloud');
 var bcrypt = null;
 
 try{
-    bcrypt = require('bcrypt');
+    bcrypt = require('bcrypt-nodejs');
 }
 catch(ex){
     console.log('Bcrypt not found, falling back to bcrypt-nodejs');
@@ -515,7 +515,7 @@ StdLib.prototype.hashPassword = function(password){
     var bcrypt = null;
 
     try{
-        bcrypt = require('bcrypt');
+        bcrypt = require('bcrypt-nodejs');
     }
     catch(ex){
         console.log('Bcrypt not found, falling back to bcrypt-nodejs');

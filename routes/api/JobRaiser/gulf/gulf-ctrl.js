@@ -611,8 +611,8 @@ gulfCtrl.saveVisa = function (req, res, next) {
                     req.st.db.escape(req.body.stageId),
                     req.st.db.escape(req.body.statusId),
                     req.st.db.escape(req.body.ecr),
-                    req.st.db.escape(JSON.stringify(cdnFilePath))
-                
+                    req.st.db.escape(JSON.stringify(cdnFilePath)),
+                    req.st.db.escape(req.body.visaCategory || "")
                 ];
                 var procQuery = 'CALL wm_save_paceVisa( ' + inputs.join(',') + ')';
                 console.log(procQuery);
@@ -697,16 +697,22 @@ gulfCtrl.getVisa = function (req, res, next) {
                     console.log(err);
 
                     var isWeb = req.query.isWeb;
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0] || result[1]) {
                         response.status = true;
                         response.message = "Visa data loaded successfully";
                         response.error = null;
-                        result[0][0].visaCurrency=result[0][0].visaCurrency ? JSON.parse(result[0][0].visaCurrency):{};
-                        result[0][0].country=result[0][0].country ? JSON.parse(result[0][0].country):{};
-                        result[0][0].visaScale=result[0][0].visaScale ? JSON.parse(result[0][0].visaScale):{}; 
-                        result[0][0].cdnFilePath=result[0][0].cdnFilePath ? JSON.parse(result[0][0].cdnFilePath):{};
+                        if (result[0][0]){
+                            result[0][0].visaCurrency=result[0][0].visaCurrency ? JSON.parse(result[0][0].visaCurrency):{};
+                            result[0][0].country=result[0][0].country ? JSON.parse(result[0][0].country):{};
+                            result[0][0].visaScale=result[0][0].visaScale ? JSON.parse(result[0][0].visaScale):{}; 
+                            result[0][0].cdnFilePath=result[0][0].cdnFilePath ? JSON.parse(result[0][0].cdnFilePath):{};    
+                        }
 
-                        response.data = (result && result[0] && result[0][0]) ? result[0][0] : {};
+                        response.data = {
+                            visaDetails: (result && result[0] && result[0][0]) ? result[0][0] : {},
+                            passportDetails : result[1] && result[1][0] ? result[1][0] : {}                            
+                        };
+
                         res.status(200).json(response);
                     }
                     else if (!err) {

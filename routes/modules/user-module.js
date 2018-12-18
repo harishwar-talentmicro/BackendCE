@@ -61,7 +61,7 @@ function FnEncryptPassword(Password) {
 var bcrypt = null;
 
 try {
-    bcrypt = require('bcrypt');
+    bcrypt = require('bcrypt-nodejs');
 }
 catch (ex) {
     console.log('Bcrypt not found, falling back to bcrypt-nodejs');

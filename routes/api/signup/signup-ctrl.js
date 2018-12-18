@@ -42,7 +42,7 @@ var mailerApi = new Mailer();
 var randomstring = require("randomstring");
 
 try {
-    bcrypt = require('bcrypt');
+    bcrypt = require('bcrypt-nodejs');
 }
 catch (ex) {
     console.log('Bcrypt not found, falling back to bcrypt-nodejs');

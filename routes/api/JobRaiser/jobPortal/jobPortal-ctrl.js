@@ -30,6 +30,7 @@ const FromNumber = appConfig.DB.FromNumber || '+18647547021';
 const client = require('twilio')(accountSid, authToken);
 
 const iplocation = require("iplocation").default;
+var geoip = require('geoip-lite');
 
 var qs = require("querystring");
 var options = {
@@ -46,7 +47,7 @@ var options = {
 var bcrypt = null;
 
 try {
-    bcrypt = require('bcrypt');
+    bcrypt = require('bcrypt-nodejs');
 }
 catch (ex) {
     console.log('Bcrypt not found, falling back to bcrypt-nodejs');
@@ -446,7 +447,7 @@ jobPortalCtrl.portalSaveApplicant = function (req, res, next) {
         error.firstName = 'First Name is Mandatory';
         validationFlag *= false;
     }
-    if (!req.body.emailId || !req.body.mobileNumber) {   // any one is mandatory
+    if (!req.body.emailId && !req.body.mobileNumber) {   // any one is mandatory
         error.emailId = 'EMail ID or Mobile Number is mandatory';
         validationFlag *= false;
     }
@@ -707,8 +708,13 @@ jobPortalCtrl.portalSaveApplicant = function (req, res, next) {
                             req.st.db.escape(req.body.referredBy),
                             req.st.db.escape(JSON.stringify(faceSheet)),
                             req.st.db.escape(JSON.stringify(presentLocation)),
-                            req.st.db.escape(DBSecretKey)
-
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.ppIssueDate || null),
+                            req.st.db.escape(req.body.gccExp || 0.0),
+                            req.st.db.escape(req.body.licenseOption || 0),
+                            req.st.db.escape(req.body.passportCategory || ""),
+                            req.st.db.escape(JSON.stringify(req.body.licenseData || [])),
+                            req.st.db.escape(JSON.stringify(req.body.document_attachments_list || []))
                         ];
 
                         var procQuery = 'CALL portal_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -919,7 +925,8 @@ jobPortalCtrl.getPortalApplicantDetails = function (req, res, next) {
                         temp_result.secondarySkills = JSON.parse(temp_result.secondarySkills);
                         temp_result.functionalAreas = JSON.parse(temp_result.functionalAreas);
                         temp_result.presentLocation = JSON.parse(temp_result.presentLocation);
-
+                        temp_result.document_attachments_list = temp_result.document_attachments_list && JSON.parse(temp_result.document_attachments_list) ? JSON.parse(temp_result.document_attachments_list) : [];
+                        temp_result.licenseData = temp_result.licenseData && JSON.parse(temp_result.licenseData) ? JSON.parse(temp_result.licenseData) : [];
                         response.data = {
                             applicantDetails: temp_result ? temp_result : {}
                         };
@@ -1082,7 +1089,9 @@ jobPortalCtrl.getportalApplicantMasterData = function (req, res, next) {
                             skills: result[9] ? result[9] : [],
                             educationList: result[10] ? result[10] : [],
                             industryList: result[11] ? result[11] : [],
-                            locationList: result[12] ? result[12] : []
+                            locationList: result[12] ? result[12] : [],
+                            functionalAreas : result[13] ? result[13] : [],
+                            attachment : result[14] ? result[14] : []
                         };
                         res.status(200).json(response);
 
@@ -1258,15 +1267,15 @@ jobPortalCtrl.portalverifyotp = function (req, res, next) {
     };
 
     var validationFlag = true;
-    // if (!req.body.mobileNumber) {
-    //     error.mobileNumber = 'Invalid mobileNumber';
-    //     validationFlag *= false;
-    // }
+    if (!req.body.mobileNumber) {
+        error.mobileNumber = 'Invalid mobileNumber';
+        validationFlag *= false;
+    }
 
-    // if (!req.body.mobileISD) {
-    //     error.mobileISD = 'Invalid mobileISD';
-    //     validationFlag *= false;
-    // }
+    if (!req.body.mobileISD) {
+        error.mobileISD = 'Invalid mobileISD';
+        validationFlag *= false;
+    }
 
     // if (!req.body.emailId) {
     //     error.emailId = 'Invalid emailId';
@@ -1396,7 +1405,7 @@ jobPortalCtrl.portalsignup = function (req, res, next) {
             req.st.db.escape(req.body.emailId || ""),
             req.st.db.escape(DBSecretKey),
             req.st.db.escape(encryptPwd),
-            req.st.db.escape(req.body.heMasterId || 0)
+            req.st.db.escape(req.query.heMasterId || 0)
         ];
 
         var procQuery = 'CALL portal_save_signUp( ' + getStatus.join(',') + ')';
@@ -1453,13 +1462,20 @@ jobPortalCtrl.generalMasterNoToken = function (req, res, next) {
         data: null,
         error: null
     };
-
+    var countryCode = "";
     var ip = req.connection.remoteAddress.split('f:')[1];
-
+    console.log("ip address req.connection.remoteAddress",ip);
     iplocation(ip)
     .then((resp) => {
-        countryCode = resp.countryCode || "";
-        var procQuery = 'CALL wm_generalMasterDataNoToken('+req.st.db.escape(countryCode)+')';
+        if (resp.countryCode == '') {
+            countryCode = geoip.lookup(ip).country;
+            console.log("geoip countryCode",countryCode);
+        }
+        else {
+            countryCode = resp.countryCode || "IN";
+        }
+
+        var procQuery = 'CALL wm_generalMasterDataNoToken('+req.st.db.escape(countryCode)+','+req.st.db.escape(req.query.heMasterId)+')';
             console.log(procQuery);
             req.db.query(procQuery, function (err, result) {
                 console.log(err);
@@ -1468,12 +1484,18 @@ jobPortalCtrl.generalMasterNoToken = function (req, res, next) {
                     response.status = true;
                     response.message = "Data loaded successfully";
                     response.error = null;
+
+                    if (result[4] && result[4][0]){
+                        result[4][0].attachments = result[4][0] && JSON.parse(result[4][0].attachments) ? JSON.parse(result[4][0].attachments) : [];
+                    }
                     response.data = {
                         countryList: result[0] ? result[0] : [],
                         industryList: result[1] ? result[1] : [],
                         locationList: result[2] ? result[2] : [],
                         defaultIsdCode: result[3] && result[3][0] && result[3][0].isdCode ? result[3][0].isdCode : "",
-                        defaultCountryCode : countryCode
+                        defaultCountryCode : countryCode,
+                        defaultCountry: result[3] && result[3][0] ? result[3][0]: {},
+                        adminContentAttachment : result[4] && result[4][0] ? result[4][0]: {}
                     }
                     res.status(200).json(response);
                 }
@@ -1486,17 +1508,18 @@ jobPortalCtrl.generalMasterNoToken = function (req, res, next) {
                     res.status(500).json(response);
                 }
             });
-
+        
 
     })
     .catch(iperr => {
+        console.log("at catch ipapi link");
         var ipApi = "https://ipapi.co/" + ip + "/country_calling_code/";
         request({
             url : ipApi,
             method: "GET"
         },function(errReq,httpresponse,body){
             if(!errReq){
-                console.log("body",body);
+                var countryCode = "+91";
                 var procQuery = 'CALL wm_generalMasterDataNoToken('+req.st.db.escape(countryCode)+')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
@@ -1511,7 +1534,8 @@ jobPortalCtrl.generalMasterNoToken = function (req, res, next) {
                             industryList: result[1] ? result[1] : [],
                             locationList: result[2] ? result[2] : [],
                             defaultIsdCode: body,
-                            deafultCountryCode : ""
+                            deafultCountryCode : "",
+                            defaultCountry: result[3] && result[3][0] ? result[3][0]: {}
                         }
                         res.status(200).json(response);
                     }
@@ -1649,6 +1673,12 @@ jobPortalCtrl.portalreqAppMap = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -2298,14 +2328,14 @@ jobPortalCtrl.signUpsendOtp = function (req, res, next) {
         isdMobile = req.body.mobileISD || "";
     }
 
-    // if (!mobileNo) {
-    //     error['mobile'] = 'mobile no is mandatory';
-    //     status *= false;
-    // }
-    // if (!isdMobile) {
-    //     error['isdMobile'] = 'isd mobile is mandatory';
-    //     status *= false;
-    // }
+    if (!mobileNo) {
+        error['mobile'] = 'mobile no is mandatory';
+        status *= false;
+    }
+    if (!isdMobile) {
+        error['isdMobile'] = 'isd mobile is mandatory';
+        status *= false;
+    }
     if (status) {
         try {
             // var isWhatMate= req.body.isWhatMate ? req.body.isWhatMate : 0;
@@ -2754,6 +2784,172 @@ jobPortalCtrl.getEvents = function (req, res, next) {
         //         res.status(401).json(response);
         //     }
         // });
+    }
+
+};
+
+
+jobPortalCtrl.portalAdminAttachments = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(req.body.attachments || []))
+                ];
+
+                var procQuery = 'CALL wm_save_pacePortalContent( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0] && result[0][0].message) {
+                        response.status = false;
+                        response.message = result[0][0].message;
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+
+                    }
+                    else if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Data saved successfully";
+                        response.error = null;
+                        result[0][0].attachments  = result[0][0] && JSON.parse(result[0][0].attachments)? JSON.parse(result[0][0].attachments) : {};
+
+                        response.data =result[0] && result[0][0] ? result[0][0] : {};
+                        res.status(200).json(response);
+
+                    }
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+jobPortalCtrl.getportalAdminAttachments = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL wm_get_portalCareerContent( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0] && result[0][0].message) {
+                        response.status = false;
+                        response.message = result[0][0].message;
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+
+                    }
+                    else if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        result[0][0].attachments  = result[0][0] && JSON.parse(result[0][0].attachments)? JSON.parse(result[0][0].attachments) : {};
+                        response.data = result[0] && result[0][0] ? result[0][0] : {};
+                        res.status(200).json(response);
+
+                    }
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
     }
 
 };
