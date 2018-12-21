@@ -84,7 +84,8 @@ masterCtrl.getReqMasterData = function (req, res, next) {
                             status: result[9] ? result[9] : [],
                             requirementList: result[10] ? result[10] : [],
                             portalList: result[11] ? result[11] : [],
-                            reasons: result[12] ? result[12] : []
+                            reasons: result[12] ? result[12] : [],
+                            teamMembers: result[14] ? result[14] : []
 
                         };
                         if (isWeb == 1) {
@@ -1429,8 +1430,15 @@ masterCtrl.getRequirementView = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.status),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.type)
+                    req.st.db.escape(req.query.type),
+                    req.st.db.escape(req.query.startPage || 0),
+                    req.st.db.escape(req.query.limit || 0),
+                    req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
+                    req.st.db.escape(req.query.search || ""),
+                    req.st.db.escape(JSON.stringify(req.body.webstatusFilter || [])),
+                    req.st.db.escape(req.query.isWeb || 0)
                 ];
+
                 var procQuery = 'CALL wm_get_requirementView( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {
@@ -1453,7 +1461,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
 
                         response.data = {
                             requirementView: results[0] ? results[0] : [],
-                            // stageStatusList: (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList) : [],
+                            requirementCount: (results[1] && results[1][0] && results[1][0].requirementCount) ? results[1][0].requirementCount : 0,
                             stageList: results[2] && results[2][0] ? results[2] : []
                         };
 
@@ -1545,7 +1553,10 @@ masterCtrl.getClientView = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(DBSecretKey),
-                    req.st.db.escape(req.query.type)
+                    req.st.db.escape(req.query.type),
+                    req.st.db.escape(req.query.startPage || 0),
+                    req.st.db.escape(req.query.limit || 0),
+                    req.st.db.escape(req.query.search || "")
 
                 ];
                 var procQuery = 'CALL wm_get_clientView( ' + inputs.join(',') + ')';
@@ -1564,7 +1575,8 @@ masterCtrl.getClientView = function (req, res, next) {
 
                         }
                         response.data = {
-                            clientView: results[0] ? results[0] : []
+                            clientView: results[0] ? results[0] : [],
+                            clientCount : results[1] && results[1][0] && results[1][0].clientCount ? results[1][0].clientCount : 0
                         };
                         res.status(200).json(response);
                     }

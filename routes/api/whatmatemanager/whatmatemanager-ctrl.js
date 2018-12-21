@@ -126,8 +126,8 @@ managerCtrl.saveUsers = function(req,res,next){
                     req.st.db.escape(JSON.stringify(formList)),
                     req.st.db.escape(req.body.adoptionReport),
                     req.st.db.escape(req.body.empDocuments),
-                    req.st.db.escape(req.body.eventManager)
-
+                    req.st.db.escape(req.body.eventManager),
+                    req.st.db.escape(req.body.HRPayrollDocs || 0)
                 ];
                 /**
                  * Calling procedure to save deal
@@ -213,7 +213,7 @@ managerCtrl.getUserDetails = function(req,res,next){
                             adoptionReport : result[1][0].adoptionReport,
                             empDocuments : result[1][0].empDocuments,
                             eventManager : result[1][0].eventManager,
-
+                            HRPayrollDocs : result[1][0].HRPayrollDocs,
                             formList : result[0][0].formList ? JSON.parse(result[0][0].formList) : null
                         };
                         res.status(200).json(response);

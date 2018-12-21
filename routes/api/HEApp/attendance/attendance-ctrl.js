@@ -361,6 +361,8 @@ attendanceCtrl.attendanceReport=function(req,res,next){
                      req.st.db.escape(req.query.startDay),
                      req.st.db.escape(req.query.endDay),
                      req.st.db.escape(DBSecretKey),
+                     req.st.db.escape(req.query.start || 1),
+                     req.st.db.escape(req.query.limit || 9999)
                      
                      
                 ];
@@ -379,6 +381,7 @@ attendanceCtrl.attendanceReport=function(req,res,next){
 
                         // template list with questions options
                            response.data = results[0] ;
+                           response.count = results[1] && results[1][0] ? results[1][0].count :0 ;
                         //    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         //    zlib.gzip(buf, function (_, result) {
                         //        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');

@@ -48,5 +48,7 @@ router.post('/notifyAppInfo',paceUsersCtrl.sendApplicantInfoAsNotification);
 router.get('/exportPlanner',paceUsersCtrl.getTaskPlannerForExport);
 router.get('/applicants',paceUsersCtrl.getSourcedApplicants);
 
+router.get('/logoutPortalUsers',paceUsersCtrl.logoutPortalUsers);
+
 
 module.exports = router;
