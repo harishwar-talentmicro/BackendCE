@@ -43,5 +43,6 @@ router.get('/getBulkEmployeeAnnouncementTitles',messageCtrl.getBulkEmployeeAnnou
 
 
 router.get('/processUpdateReport',messageCtrl.processUpdateReport);   //save api
+router.post('/bulkTitle',messageCtrl.saveBulkTitle);   //save api
 
 module.exports = router;

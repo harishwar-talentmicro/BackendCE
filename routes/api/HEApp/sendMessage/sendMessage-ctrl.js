@@ -3152,7 +3152,7 @@ sendMessageCtrl.getBulkEmployeeAnnouncementTitle = function (req, res, next) {
                         response.message = "Employee Announcement details saved successfully .";
                         response.error = null;
 
-                        Result[0][0].announcementFormData = (Result[0][0] && Result[0][0].announcementFormData) ? JSON.parse(Result[0][0].announcementFormData) : {};
+                        // Result[0][0].announcementFormData = (Result[0][0] && Result[0][0].announcementFormData) ? JSON.parse(Result[0][0].announcementFormData) : {};
 
                         response.data = Result[0][0];
                         res.status(200).json(response);
@@ -3208,10 +3208,18 @@ sendMessageCtrl.getBulkEmployeeAnnouncementTitles = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 10;
+                req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
+                var startPage = 0;
+
+                startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(startPage),
+                    req.st.db.escape(req.query.limit)
+
 
                 ];
                 /**
@@ -3231,6 +3239,7 @@ sendMessageCtrl.getBulkEmployeeAnnouncementTitles = function (req, res, next) {
                         }
 
                         response.announcementBatchList = (result[0] && result[0][0]) ? result[0] : [];
+                        response.count = (result[1] && result[1][0]) ? result[1][0].count : 0;
                         res.status(200).json(response);
                     }
                     else {
@@ -3319,6 +3328,93 @@ sendMessageCtrl.processUpdateReport = function (req, res, next) {
                     else {
                         response.status = false;
                         response.message = "Error while getting data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+
+sendMessageCtrl.saveBulkTitle = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var isweb;
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.body.announcementBatchTitle) {
+        error.announcementBatchTitle = 'Invalid announcementBatchTitle';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isweb = req.query.isweb ? req.query.isweb : 0;
+                //req.query.status = req.query.status ? req.query.status : 0;
+                req.body.isDraft = req.body.isDraft != undefined ? req.body.isDraft : 1;
+                req.body.announcementBatchTitleId = req.body.announcementBatchTitleId ? req.body.announcementBatchTitleId : 0;
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.announcementBatchTitleId),
+                    req.st.db.escape(req.body.announcementBatchTitle),
+                    req.st.db.escape(req.body.isDraft),
+                    // req.st.db.escape(JSON.stringify(req.body.announcementFormData) || JSON.stringify([]))
+
+                ];
+
+                var procQuery = 'CALL wm_save_EmployeeAnnouncementBatchTitle( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, Result) {
+                    if (!err && Result && Result[0] && Result[0][0]) {
+                        response.status = true;
+                        response.message = "Employee Announcement Bulktitle saved successfully .";
+                        response.error = null;
+
+                        // Result[0][0].announcementFormData = (Result[0][0] && Result[0][0].announcementFormData) ? JSON.parse(Result[0][0].announcementFormData) : {};
+
+                        response.data = Result[0][0];
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving data";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
