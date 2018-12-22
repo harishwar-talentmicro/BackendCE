@@ -1435,7 +1435,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                     req.st.db.escape(req.query.limit || 0),
                     req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
                     req.st.db.escape(req.query.search || ""),
-                    req.st.db.escape(JSON.stringify(req.body.webstatusFilter || [])),
+                    req.st.db.escape(JSON.stringify(req.body.webStatusFilter || [])),
                     req.st.db.escape(req.query.isWeb || 0)
                 ];
 

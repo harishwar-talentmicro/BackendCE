@@ -29,6 +29,11 @@ wmAdminManagerCtrl.saveWhatMate = function(req, res, next){
         validationFlag *= false;
     }
 
+    // if (!req.body.companyTitle) {
+    //     error.companyTitle = 'Invalid companyTitle';
+    //     validationFlag *= false;
+    // }
+
     if (!validationFlag){
         response.error = error;
         response.message = 'Please check the errors';
@@ -52,7 +57,7 @@ wmAdminManagerCtrl.saveWhatMate = function(req, res, next){
             var procParams = [
                 req.st.db.escape(req.body.WMId),
                 req.st.db.escape(req.body.masterId),
-                req.st.db.escape(req.body.title || ''),
+                req.st.db.escape(req.body.companyTitle),
                 req.st.db.escape(req.body.type || 0),
                 req.st.db.escape(req.body.sequence || 0),
                 req.st.db.escape(req.body.latitude || 0.0),
@@ -77,8 +82,8 @@ wmAdminManagerCtrl.saveWhatMate = function(req, res, next){
                 req.st.db.escape(req.body.enableHomePageScroll || 0),
                 req.st.db.escape(req.body.showFormsOnHomePage || 0),
                 req.st.db.escape(req.body.homePageTutorialBanner || ''),
-                req.st.db.escape(req.body.isHideDashboard || 0)
-              
+                req.st.db.escape(req.body.isHideDashboard || 0),
+                req.st.db.escape(req.body.displayName || "")              
             ];
 
             var procQuery = 'CALL wm_save_whatmateList( ' + procParams.join(',') + ')';
@@ -146,7 +151,7 @@ wmAdminManagerCtrl.getWhatMateList = function(req, res, next){
             var procQuery = 'CALL wm_get_whatmateList( ' + procParams.join(',') + ')';
             console.log(procQuery);
             req.db.query(procQuery,function(err,WMResult){
-                if(!err && WMResult){
+                if(!err && WMResult && WMResult[0] && WMResult[0][0]){
                     response.status = true;
                     response.message = "WhatMate details loaded successfully";
                     response.error = null;
@@ -154,6 +159,13 @@ wmAdminManagerCtrl.getWhatMateList = function(req, res, next){
                         WhatMateList : WMResult[0],
                         count : WMResult[1][0].count
                     };
+                    res.status(200).json(response);
+                }
+                else if(!err){
+                    response.status = false;
+                    response.message = "No results found";
+                    response.error = null;
+                    response.data = null;
                     res.status(200).json(response);
                 }
                 else{
@@ -205,15 +217,15 @@ wmAdminManagerCtrl.getWhatMateDetails = function(req, res, next){
             var procQuery = 'CALL wm_get_whatmat_details( ' + procParams.join(',') + ')';
             console.log(procQuery);
             req.db.query(procQuery,function(err,whatMateResult){
-                if(!err && whatMateResult && whatMateResult[0] ){
+                if(!err && whatMateResult && whatMateResult[0] &&  whatMateResult[0][0]){
                     response.status = true;
                     response.message = "WhatMate details loaded successfully";
                     response.error = null;
                     response.data = {
-                        WMId : whatMateResult[0][0].id,
+                        WMId : whatMateResult[0] && whatMateResult[0][0] ? whatMateResult[0][0].id : 0,
                         masterId : whatMateResult[0][0].masterId,
                         ezeoneId : whatMateResult[0][0].ezeoneId,
-                        title : whatMateResult[0][0].title,
+                        companyTitle : whatMateResult[0][0].companyTitle,
                         type : whatMateResult[0][0].type,
                         sequence : whatMateResult[0][0].sequence,
                         latitude : whatMateResult[0][0].latitude,
@@ -241,9 +253,17 @@ wmAdminManagerCtrl.getWhatMateDetails = function(req, res, next){
                         homePageTutorialBanner : whatMateResult[0][0].homePageTutorialBanner,
                         isHideDashboard : whatMateResult[0][0].isHideDashboard,
                         isHideSearchPage : whatMateResult[0][0].isHideSearchPage,
-                        isHideDashboard : whatMateResult[0][0].isHideDashboard
+                        isHideDashboard : whatMateResult[0][0].isHideDashboard,
+                        displayName : whatMateResult[0][0].displayName
 
                     };
+                    res.status(200).json(response);
+                }
+                else if(!err){
+                    response.status = false;
+                    response.message = "No data found";
+                    response.error = null;
+                    response.data = null;
                     res.status(200).json(response);
                 }
                 else{
@@ -325,6 +345,7 @@ wmAdminManagerCtrl.checkWhatMateCompany = function(req, res, next){
                         masterId : WMResult[0][0].masterId,
                         displayName : WMResult[0][0].displayName,
                         about : WMResult[0][0].about,
+                        companyTitle : WMResult[0][0].companyTitle,
                         Keywords : WMResult[0][0].Keywords
                     };
                     res.status(200).json(response);

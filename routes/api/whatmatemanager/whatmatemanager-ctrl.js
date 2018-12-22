@@ -525,6 +525,7 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                             adoptionReport : result[1][0].adoptionReport,
                             empDocuments : result[1][0].empDocuments,
                             eventManager : result[1][0].eventManager,
+                            HRPayrollDocs : result[1][0].HRPayrollDocs,
                             formList : output,
                             accessableFormList : result[2][0].formList ? JSON.parse(result[2][0].formList) : null
                         };
@@ -541,6 +542,7 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                             adoptionReport : result[1][0].adoptionReport,
                             empDocuments : result[1][0].empDocuments,
                             eventManager : result[1][0].eventManager,
+                            HRPayrollDocs : result[1][0].HRPayrollDocs,
                             formList : [],
                            accessableFormList : []
                         };
