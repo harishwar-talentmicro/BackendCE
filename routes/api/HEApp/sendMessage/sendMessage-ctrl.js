@@ -1262,6 +1262,8 @@ sendMessageCtrl.GetAnnouncementSummaryList = function (req, res, next) {
             if ((!err) && tokenResult) {
                 req.query.isweb = req.query.isweb ? req.query.isweb : 0;
                 req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                req.query.from = (req.query.from) ? (req.query.from) : null;
+                req.query.to = (req.query.to) ? (req.query.to) : null;
                 req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
                 var startPage = 0;
 
@@ -1272,7 +1274,9 @@ sendMessageCtrl.GetAnnouncementSummaryList = function (req, res, next) {
                     req.st.db.escape(startPage),
                     req.st.db.escape(req.query.limit),
                     req.st.db.escape(req.query.type),
-                    req.st.db.escape(req.query.groupId)
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(req.query.from),
+                    req.st.db.escape(req.query.to)
                 ];
 
                 var procQuery = 'CALL he_get_announcementList( ' + procParams.join(',') + ')';

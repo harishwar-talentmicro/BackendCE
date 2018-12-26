@@ -103,6 +103,7 @@ userCtrl.saveUser = function(req,res,next){
                 req.body.mobileNumber = (req.body.mobileNumber) ? req.body.mobileNumber : "";
                 req.body.emailId = (req.body.emailId) ? req.body.emailId : "";
                 req.body.DOJ = (req.body.DOJ) ? req.body.DOJ : null;
+                req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
                 // firstName,lastName,mobileISD,mobileNumber,emailId,displayName
 
                 var procParams = [
@@ -127,6 +128,7 @@ userCtrl.saveUser = function(req,res,next){
                     req.st.db.escape(req.body.mobileNumber),
                     req.st.db.escape(req.body.emailId),
                     req.st.db.escape(req.body.DOJ),
+                    req.st.db.escape(req.body.DOB),
                     req.st.db.escape(DBSecretKey)
                 ];
                 /**
@@ -335,7 +337,7 @@ userCtrl.getUserDetails = function(req,res,next){
                             emailId : userData[0][0].emailId,
                             displayName : userData[0][0].displayName,
                             DOJ : userData[0][0].DOJ,
-                            BirthDate : userData[0][0].BirthDate
+                            
                         };
 // firstName,lastName,mobileISD,mobileNumber,emailId,displayName
 
@@ -2435,80 +2437,5 @@ userCtrl.updateMultipleUserDetails = function(req,res,next){
     }
 };
 
-
-userCtrl.updateMultipleUserDetails = function(req,res,next){
-    var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
-    };
-    var validationFlag = true;
-
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-  
-    if (!req.query.APIKey){
-        error.APIKey = 'Invalid APIKey';
-        validationFlag *= false;
-    }
-
-    if (!validationFlag){
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
-             
-
-                var procParams = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(JSON.stringify(req.body.HEUserId || [])),
-                    req.st.db.escape(req.body.grade || 0),
-                    req.st.db.escape(req.body.departmentTitle || 0),
-                    req.st.db.escape(req.body.userType || 0),
-                    req.st.db.escape(req.body.workLocationId || 0),
-                    req.st.db.escape(req.body.RMGroupId || 0),
-                    req.st.db.escape(req.body.jobTitle || ""),
-                    req.st.db.escape(req.body.locationTitle || ""),
-                    req.st.db.escape(req.body.DOJ || null),
-                    req.st.db.escape(req.body.status || null),
-                    req.st.db.escape(JSON.stringify(req.body.trackTemplate || [])),
-                    req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(req.body.workGroupId || 0)
-                ];
-                /**
-                 * Calling procedure to save form template
-                 * @type {string}
-                 */
-                var procQuery = 'CALL wm_update_HE_usersNew( ' + procParams.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery,function(err,currencyResult){
-                    if(!err){
-                        response.status = true;
-                        response.message = "User data updated successfully";
-                        response.error = null;
-                        res.status(200).json(response);
-                    }
-                    else{
-                        response.status = false;
-                        response.message = "Error while updating user";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
-            }
-            else{
-                res.status(401).json(response);
-            }
-        });
-    }
-};
 
 module.exports = userCtrl;
