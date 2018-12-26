@@ -1058,13 +1058,12 @@ jobCtrl.getdefaults = function (req, res, next) {
                         response.error = null;
                         response.data =
                             {
-                                purpose: results[0][0].purpose ? results[0][0].purpose : 0,
-                                jobType: results[0][0].jobtype ? results[0][0].jobtype : 0,
-                                currency: results[0][0].currency ? results[0][0].currency : 0,
-                                scale: results[0][0].scale ? results[0][0].scale : 0,
-                                duration: results[0][0].duration ? results[0][0].duration : 0,
-                                List: JSON.parse(results[0][0].List) ? JSON.parse(results[0][0].List) : []
-
+                                purpose: results[0][0] && results[0][0].purpose ? results[0][0].purpose : 0,
+                                jobType: results[0][0] &&  results[0][0].jobtype ? results[0][0].jobtype : 0,
+                                currency: results[0][0] && results[0][0].currency ? results[0][0].currency : 0,
+                                scale: results[0][0] && results[0][0].scale ? results[0][0].scale : 0,
+                                duration: results[0][0] && results[0][0].duration ? results[0][0].duration : 0,
+                                List: results[0][0] && results[0][0].List && JSON.parse(results[0][0].List) ? JSON.parse(results[0][0].List) : []
                             };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

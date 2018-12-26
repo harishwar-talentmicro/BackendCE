@@ -1520,7 +1520,7 @@ jobPortalCtrl.generalMasterNoToken = function (req, res, next) {
         },function(errReq,httpresponse,body){
             if(!errReq){
                 var countryCode = "+91";
-                var procQuery = 'CALL wm_generalMasterDataNoToken('+req.st.db.escape(countryCode)+')';
+                var procQuery = 'CALL wm_generalMasterDataNoToken('+req.st.db.escape(countryCode)+','+req.st.db.escape(req.query.heMasterId)+')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
@@ -1529,13 +1529,17 @@ jobPortalCtrl.generalMasterNoToken = function (req, res, next) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
+                        if (result[4] && result[4][0]){
+                            result[4][0].attachments = result[4][0] && JSON.parse(result[4][0].attachments) ? JSON.parse(result[4][0].attachments) : [];
+                        }
                         response.data = {
                             countryList: result[0] ? result[0] : [],
                             industryList: result[1] ? result[1] : [],
                             locationList: result[2] ? result[2] : [],
                             defaultIsdCode: body,
                             deafultCountryCode : "",
-                            defaultCountry: result[3] && result[3][0] ? result[3][0]: {}
+                            defaultCountry: result[3] && result[3][0] ? result[3][0]: {},
+                            adminContentAttachment : result[4] && result[4][0] ? result[4][0]: {}
                         }
                         res.status(200).json(response);
                     }

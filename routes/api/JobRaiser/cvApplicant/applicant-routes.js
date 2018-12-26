@@ -106,5 +106,9 @@ router.post('/sendInterviewMailForMobile',sendgridCtrl.sendInterviewMailerForMob
 
 router.get('/interviewPanelMembersMobile',applicantCtrl.getInterviewPanelMembersForMobile);
 
+router.post('/recruitersClientData',applicantCtrl.getRecruiterPerformanceByClientWise);
+router.post('/recruitersReqData',applicantCtrl.getRecruiterPerformanceByRequirementWise);
+router.post('/recruitersReqApplicantData',applicantCtrl.getRecruiterPerformanceReqApplicantData);
+
 module.exports = router;
 

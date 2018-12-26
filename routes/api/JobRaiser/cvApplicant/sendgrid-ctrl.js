@@ -1949,6 +1949,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
     var isWeb = req.query.isWeb ? req.query.isWeb : 0;
     var sendMailFlag = 0;
     var trackerTemplate = req.body.trackerTemplate;
+    var trackerTags = [];
 
     var response = {
         status: false,
@@ -1999,13 +2000,19 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
         tableTags = [];
     }
 
-    if (typeof (trackerTemplate) == "string") {
+    if (trackerTemplate && typeof (trackerTemplate) == "string") {
         trackerTemplate = JSON.parse(trackerTemplate);
     }
-    if (!trackerTemplate) {
+    if (trackerTemplate && trackerTemplate.trackerId) {
+        if (typeof (trackerTemplate.trackerTags) == 'string') {
+            trackerTags = trackerTemplate && trackerTemplate.trackerTags && JSON.parse(trackerTemplate.trackerTags) ? JSON.parse(trackerTemplate.trackerTags) : [];
+        }
+    }
+    else {
         trackerTemplate = {};
         trackerTags = [];
     }
+
 
     var validationFlag = true;
     if (!validationFlag) {
@@ -2137,23 +2144,41 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                                 }
                             }
 
-                            if (tableTags.applicant.length > 0) {
+                            if (tableTags.applicant.length > 0 || tableTags.requirement.length > 0 || tableTags.client.length > 0) {
                                 var position = mailBody.indexOf('@table');
                                 var tableContent = '';
                                 mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
                                 tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
                                 console.log(tableContent, 'mailbody');
-                                for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
-                                }
-                                tableContent += "</tr>";
-                                for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
-                                    tableContent += "<tr>";
+                                if (tableTags && tableTags.applicant && tableTags.applicant.length)
                                     for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                        tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
                                     }
-                                    tableContent += "</tr>";
-                                }
+                                if (tableTags && tableTags.requirement && tableTags.requirement.length)
+                                    for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
+                                        tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.requirement[tagCount].displayTagAs + "</th>";
+                                    }
+                                if (tableTags && tableTags.client && tableTags.client.length)
+                                    for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
+                                        tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.client[tagCount].displayTagAs + "</th>";
+                                    }
+                                tableContent += "</tr>";
+                                if (tableTags && tableTags.applicant && tableTags.applicant.length)
+                                    for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
+                                        tableContent += "<tr>";
+                                        for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                            tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                        }
+                                        if (tableTags && tableTags.requirement && tableTags.requirement.length)
+                                            for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
+                                                tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.requirement[tagCount].tagName] + "</td>";
+                                            }
+                                        if (tableTags && tableTags.client && tableTags.client.length)
+                                            for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
+                                                tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.client[tagCount].tagName] + "</td>";
+                                            }
+                                        tableContent += "</tr>";
+                                    }
 
                                 tableContent += "</table>";
                                 mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
@@ -2180,7 +2205,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
 
                         var buffer;
                         var ws_data;
-                        if (trackerTemplate.trackerId) {
+                        if (trackerTemplate && trackerTemplate.trackerId) {
                             console.log('tracker', trackerTemplate.trackerId);
                             ws_data = '[[';
                             // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
@@ -2497,27 +2522,45 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                     }
                                 }
 
-                                if (tableTags.applicant.length > 0) {
+                                if (tableTags.applicant.length > 0 || tableTags.requirement.length > 0 || tableTags.client.length > 0) {
                                     var position = mailBody.indexOf('@table');
                                     var tableContent = '';
                                     mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
                                     tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
                                     console.log(tableContent, 'mailbody');
-                                    for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                        tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
-                                    }
-                                    tableContent += "</tr>";
-                                    for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
-                                        tableContent += "<tr>";
+                                    if (tableTags && tableTags.applicant && tableTags.applicant.length)
                                         for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                            tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                            tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
                                         }
-                                        tableContent += "</tr>";
-                                    }
-
+                                    if (tableTags && tableTags.requirement && tableTags.requirement.length)
+                                        for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
+                                            tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.requirement[tagCount].displayTagAs + "</th>";
+                                        }
+                                    if (tableTags && tableTags.client && tableTags.client.length)
+                                        for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
+                                            tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.client[tagCount].displayTagAs + "</th>";
+                                        }
+                                    tableContent += "</tr>";
+                                    if (tableTags && tableTags.applicant && tableTags.applicant.length)
+                                        for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
+                                            tableContent += "<tr>";
+                                            for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                                tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                            }
+                                            if (tableTags && tableTags.requirement && tableTags.requirement.length)
+                                                for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
+                                                    tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.requirement[tagCount].tagName] + "</td>";
+                                                }
+                                            if (tableTags && tableTags.client && tableTags.client.length)
+                                                for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
+                                                    tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.client[tagCount].tagName] + "</td>";
+                                                }
+                                            tableContent += "</tr>";
+                                        }
+    
                                     tableContent += "</table>";
                                     mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
-
+    
                                 }
 
                                 mailbody_array.push(mailBody);
@@ -7297,65 +7340,65 @@ sendgridCtrl.sendInterviewMailerForMobile = function (req, res, next) {
 
                             // if (!(templateId == 0 || overWrite)) {
 
-                                if (isSendgrid && isSMS) {  // making changes here reminder
-                                    if (subject != '') {
-                                        if (smsMsg != '' && smsFlag) {
-                                            response.message = "Mail and SMS sent successfully";
-                                            response.data = null;
-                                        }
-                                        else {
-                                            response.message = "Mail sent successfully";
-                                            response.data = null;
-                                        }
-                                    }
-
-                                    else if (subject == '') {
-                                        if (smsMsg != '' && smsFlag) {
-                                            response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
-                                            response.data = null;
-                                        }
-                                        else {
-                                            response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
-                                            response.data = null;
-                                        }
-                                    }
-                                    else {
-                                        response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
+                            if (isSendgrid && isSMS) {  // making changes here reminder
+                                if (subject != '') {
+                                    if (smsMsg != '' && smsFlag) {
+                                        response.message = "Mail and SMS sent successfully";
                                         response.data = null;
                                     }
-                                }
-                                else if (isSendgrid && !isSMS) {
-
-                                    if (subject != '') {
+                                    else {
                                         response.message = "Mail sent successfully";
                                         response.data = null;
                                     }
-                                    else if (subject == '') {
-                                        response.message = "Mail subject is empty, mail cannot be sent";
-                                        response.data = null;
-                                    }
                                 }
-                                else if (isSMS && !isSendgrid) {
+
+                                else if (subject == '') {
                                     if (smsMsg != '' && smsFlag) {
-                                        response.message = "SMS sent successfully";
-                                        response.data = null;
-                                    }
-                                    else if (smsMsg == '' && smsFlag) {
-                                        response.message = "SMS field is empty, SMS cannot be sent";
+                                        response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
                                         response.data = null;
                                     }
                                     else {
-                                        response.message = "SMS flag is not enabled, SMS cannot be sent";
+                                        response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
                                         response.data = null;
                                     }
                                 }
                                 else {
-                                    response.message = "Sendgrid or SMS is not configured. Please contact the admin";
+                                    response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
                                     response.data = null;
                                 }
-                                response.status = true;
-                                response.error = null;
-                                res.status(200).json(response);
+                            }
+                            else if (isSendgrid && !isSMS) {
+
+                                if (subject != '') {
+                                    response.message = "Mail sent successfully";
+                                    response.data = null;
+                                }
+                                else if (subject == '') {
+                                    response.message = "Mail subject is empty, mail cannot be sent";
+                                    response.data = null;
+                                }
+                            }
+                            else if (isSMS && !isSendgrid) {
+                                if (smsMsg != '' && smsFlag) {
+                                    response.message = "SMS sent successfully";
+                                    response.data = null;
+                                }
+                                else if (smsMsg == '' && smsFlag) {
+                                    response.message = "SMS field is empty, SMS cannot be sent";
+                                    response.data = null;
+                                }
+                                else {
+                                    response.message = "SMS flag is not enabled, SMS cannot be sent";
+                                    response.data = null;
+                                }
+                            }
+                            else {
+                                response.message = "Sendgrid or SMS is not configured. Please contact the admin";
+                                response.data = null;
+                            }
+                            response.status = true;
+                            response.error = null;
+                            res.status(200).json(response);
                             // }
                         }
 

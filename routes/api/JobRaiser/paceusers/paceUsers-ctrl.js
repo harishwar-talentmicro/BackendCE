@@ -279,6 +279,7 @@ paceUsersCtrl.getUsers = function (req, res, next) {
 
                                 result[0][i].grade = (result[0][i].grade && JSON.parse(result[0][i].grade).gradeId) ? JSON.parse(result[0][i].grade) : {};
 
+                                result[0][i].reportingTo = result[0] && result[0][i] && result[0][i].reportingTo ? JSON.parse(result[0][i].reportingTo) : [];
 
                             }
                         }
@@ -303,7 +304,8 @@ paceUsersCtrl.getUsers = function (req, res, next) {
 
                         response.data = {
                             userList: result[0] ? result[0] : [],
-                            userDetail: result[0][0] ? result[0][0] : {}
+                            userDetail: result[0][0] ? result[0][0] : {},
+                            reportingTo : result[1] && result[1][0] ? result[1][0] : []
                         };
                         res.status(200).json(response);
                     }
@@ -1264,6 +1266,10 @@ paceUsersCtrl.getJobPortalUsers = function (req, res, next) {
 
                         for (var i = 0; i < result[0].length; i++) {
                             result[0][i].portalName = result[0] ? JSON.parse(result[0][i].portalName) : {};
+                        }
+
+                        for (var i = 0; i < result[1].length; i++) {
+                            result[1][i].websiteList = result[1] ? JSON.parse(result[1][i].websiteList) : [];
                         }
 
                         response.data = {
@@ -2915,25 +2921,25 @@ paceUsersCtrl.getSourcedApplicants = function (req, res, next) {
                         response.status = true;
                         response.message = "Applicants data loaded successfully";
                         response.error = null;
-                        for (var i = 0; i < result[0].length; i++){
-                            result[0][i].jobTitle=result[0][i].jobTitle? JSON.parse(result[0][i].jobTitle):{};
-                            result[0][i].expectedSalaryCurr=result[0][i].expectedSalaryCurr? JSON.parse(result[0][i].expectedSalaryCurr):{};
-                            result[0][i].expectedSalaryScale=result[0][i].expectedSalaryScale? JSON.parse(result[0][i].expectedSalaryScale):{};
-                            result[0][i].expectedSalaryPeriod=result[0][i].expectedSalaryPeriod? JSON.parse(result[0][i].expectedSalaryPeriod):{};
-                            result[0][i].presentSalaryCurr=result[0][i].presentSalaryCurr? JSON.parse(result[0][i].presentSalaryCurr):{};
-                            result[0][i].presentSalaryScale=result[0][i].presentSalaryScale? JSON.parse(result[0][i].presentSalaryScale):{};
-                            result[0][i].presentSalaryPeriod=result[0][i].presentSalaryPeriod? JSON.parse(result[0][i].presentSalaryPeriod):{};
-                            result[0][i].education=result[0][i].education? JSON.parse(result[0][i].education):[];
-                            result[0][i].primarySkills=result[0][i].primarySkills? JSON.parse(result[0][i].primarySkills):[];
-                            result[0][i].secondarySkills=result[0][i].secondarySkills? JSON.parse(result[0][i].secondarySkills):[];
-                            result[0][i].functionalAreas=result[0][i].functionalAreas? JSON.parse(result[0][i].functionalAreas):[];
-                            result[0][i].document_attachments_list=result[0][i].document_attachments_list? JSON.parse(result[0][i].document_attachments_list):[];
-                            result[0][i].industry=result[0][i].industry? JSON.parse(result[0][i].industry):{};
-                            result[0][i].cvSource=result[0][i].cvSource? JSON.parse(result[0][i].cvSource):{};
-                            result[0][i].nationality=result[0][i].nationality? JSON.parse(result[0][i].nationality):{};
-                            result[0][i].prefLocations=result[0][i].prefLocations? JSON.parse(result[0][i].prefLocations):{};
+                        // for (var i = 0; i < result[0].length; i++){
+                        //     result[0][i].jobTitle=result[0][i].jobTitle? JSON.parse(result[0][i].jobTitle):{};
+                        //     result[0][i].expectedSalaryCurr=result[0][i].expectedSalaryCurr? JSON.parse(result[0][i].expectedSalaryCurr):{};
+                        //     result[0][i].expectedSalaryScale=result[0][i].expectedSalaryScale? JSON.parse(result[0][i].expectedSalaryScale):{};
+                        //     result[0][i].expectedSalaryPeriod=result[0][i].expectedSalaryPeriod? JSON.parse(result[0][i].expectedSalaryPeriod):{};
+                        //     result[0][i].presentSalaryCurr=result[0][i].presentSalaryCurr? JSON.parse(result[0][i].presentSalaryCurr):{};
+                        //     result[0][i].presentSalaryScale=result[0][i].presentSalaryScale? JSON.parse(result[0][i].presentSalaryScale):{};
+                        //     result[0][i].presentSalaryPeriod=result[0][i].presentSalaryPeriod? JSON.parse(result[0][i].presentSalaryPeriod):{};
+                        //     result[0][i].education=result[0][i].education? JSON.parse(result[0][i].education):[];
+                        //     result[0][i].primarySkills=result[0][i].primarySkills? JSON.parse(result[0][i].primarySkills):[];
+                        //     result[0][i].secondarySkills=result[0][i].secondarySkills? JSON.parse(result[0][i].secondarySkills):[];
+                        //     result[0][i].functionalAreas=result[0][i].functionalAreas? JSON.parse(result[0][i].functionalAreas):[];
+                        //     result[0][i].document_attachments_list=result[0][i].document_attachments_list? JSON.parse(result[0][i].document_attachments_list):[];
+                        //     result[0][i].industry=result[0][i].industry? JSON.parse(result[0][i].industry):{};
+                        //     result[0][i].cvSource=result[0][i].cvSource? JSON.parse(result[0][i].cvSource):{};
+                        //     result[0][i].nationality=result[0][i].nationality? JSON.parse(result[0][i].nationality):{};
+                        //     result[0][i].prefLocations=result[0][i].prefLocations? JSON.parse(result[0][i].prefLocations):{};
                             
-                        }
+                        // }
 
                             response.data =
                                 {
@@ -2964,4 +2970,88 @@ paceUsersCtrl.getSourcedApplicants = function (req, res, next) {
         });
     }
 };
+
+
+paceUsersCtrl.logoutPortalUsers = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = "Invalid Company";
+        validationFlag *= false;
+    }
+
+    if (!req.query.portalId) {
+        error.portalId = "Invalid portalId";
+        validationFlag *= false;
+    }
+
+    if (!req.query.userName) {
+        error.userName = "Invalid userName";
+        validationFlag *= false;
+    }
+    // if (!req.query.token) {
+    //     error.token = 'Invalid token';
+    //     validationFlag *= false;
+    // }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.portalId),
+                    req.st.db.escape(req.query.userName)
+                ];
+
+                var procQuery = 'CALL pace_portalLogOut( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    // console.log(result);
+                    if (!err && result && result[0] && result[0][0] && result[0][0].message) {
+                        response.status = true;
+                        response.message = result[0][0].message;
+                        response.error = null;
+                        response.data =null;
+
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Failed to log out";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while logging from portal";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+        // });
+    }
+};
+
+
 module.exports = paceUsersCtrl;

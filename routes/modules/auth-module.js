@@ -858,7 +858,7 @@ Auth.prototype.login = function (req, res, next) {
         if (ezeoneId && password) {
 
             var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(isDialer);
-            var query = 'CALL PLoginNewOld(' + queryParams + ')';
+            var query = 'CALL PLoginNew(' + queryParams + ')';
             console.log('query', query);
             st.db.query(query, function (err, loginResult) {
                 console.log(loginResult);
@@ -874,8 +874,8 @@ Auth.prototype.login = function (req, res, next) {
                                             if ((!err) && tokenResult && loginDetails[0]) {
                                                 var APNSID = req.query.APNSID ? req.query.APNSID : '';
                                                 var GCMID = req.query.GCMID ? req.query.GCMID : '';
-                                                console.log('CALL pGetEZEIDDetailsPace(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(req.query.isDialer || 0) + ')');
-                                                st.db.query('CALL pGetEZEIDDetailsPace(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(req.query.isDialer || 0) + ')', function (err, UserDetailsResult) {
+                                                console.log('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(req.query.isDialer || 0) + ')');
+                                                st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(tokenResult) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(req.query.isDialer || 0) + ')', function (err, UserDetailsResult) {
                                                     if (!err) {
                                                         var procParams = [
                                                             req.db.escape(tokenResult),
@@ -884,7 +884,7 @@ Auth.prototype.login = function (req, res, next) {
                                                             req.db.escape(req.query.isDialer || 0)
 
                                                         ];
-                                                        var procQuery = 'CALL pGetGroupAndIndividuals_newPace(' + procParams.join(' ,') + ')';
+                                                        var procQuery = 'CALL pGetGroupAndIndividuals_new(' + procParams.join(' ,') + ')';
                                                         console.log(procQuery);
                                                         req.db.query(procQuery, function (err, contactResult) {
                                                             if (!err) {
@@ -1125,7 +1125,7 @@ Auth.prototype.pacelogin = function (req, res, next) {
         if (ezeoneId && password) {
 
             var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(code) + ',' + st.db.escape(token) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(isDialer);
-            var query = 'CALL PLoginNewOld(' + queryParams + ')';
+            var query = 'CALL PLoginNew(' + queryParams + ')';
             console.log('query', query);
             st.db.query(query, function (err, loginResult) {
                 console.log(loginResult);

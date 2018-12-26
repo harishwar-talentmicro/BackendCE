@@ -1426,7 +1426,8 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(req.body.functionalAreas || [])),
                     req.st.db.escape(JSON.stringify(req.body.cvSource || [])),
                     req.st.db.escape(JSON.stringify(req.body.cvStatus || [])),
-                    req.st.db.escape(JSON.stringify(req.body.stageResume || []))
+                    req.st.db.escape(JSON.stringify(req.body.stageResume || [])),
+                    req.st.db.escape(req.body.uploadedUsers || "")
                 ];
 
                 var procQuery = 'CALL wd_resume_search_newAlgorithm( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -5301,6 +5302,297 @@ applicantCtrl.getInterviewPanelMembersForMobile = function (req, res, next) {
                     else {
                         response.status = false;
                         response.message = "Error while loading interview panel members";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+applicantCtrl.getRecruiterPerformanceByClientWise = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    // if (!req.query.userMasterId) {
+    //     error.userMasterId = 'Invalid userMasterId';
+    //     validationFlag *= false;
+    // }
+
+    if (!req.body.from) {
+        error.from = 'Invalid from';
+        validationFlag *= false;
+    }
+
+    if (!req.body.to) {
+        error.to = 'Invalid to';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.from),
+                    req.st.db.escape(req.body.to),
+                    req.st.db.escape(JSON.stringify(req.body.userMasterId || [])),
+                    req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
+                    req.st.db.escape(JSON.stringify(req.body.requirementId || [])),
+                    req.st.db.escape(DBSecretKey)
+
+                ];
+
+                var procQuery = 'CALL pace_get_dashboardRecruiterPerformance( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data ={
+                                clientWiseData: result[0] ? result[0] : []                               
+                            };
+                            res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data =null;
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+applicantCtrl.getRecruiterPerformanceByRequirementWise = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    // if (!req.query.userMasterId) {
+    //     error.userMasterId = 'Invalid userMasterId';
+    //     validationFlag *= false;
+    // }
+
+    // if (!req.query.heDepartmentId) {
+    //     error.heDepartmentId = 'Invalid heDepartmentId';
+    //     validationFlag *= false;
+    // }
+    if (!req.body.from) {
+        error.from = 'Invalid from';
+        validationFlag *= false;
+    }
+
+    if (!req.body.to) {
+        error.to = 'Invalid to';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.from),
+                    req.st.db.escape(req.body.to),
+                    req.st.db.escape(JSON.stringify(req.body.userMasterId || [])),
+                    req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
+                    req.st.db.escape(JSON.stringify(req.body.requirementId || [])),
+                    req.st.db.escape(DBSecretKey)
+                ];
+
+                var procQuery = 'CALL pace_get_dashboardRecruiterPerformance( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data ={
+                                requirementWiseData: result[0] ? result[0] : []                               
+                            };
+                            res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data =null;
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+applicantCtrl.getRecruiterPerformanceReqApplicantData = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    // if (!req.query.userMasterId) {
+    //     error.userMasterId = 'Invalid userMasterId';
+    //     validationFlag *= false;
+    // }
+
+    // if (!req.query.heDepartmentId) {
+    //     error.heDepartmentId = 'Invalid heDepartmentId';
+    //     validationFlag *= false;
+    // }
+
+    // if (!req.query.requirementId) {
+    //     error.requirementId = 'Invalid requirementId';
+    //     validationFlag *= false;
+    // }
+    if (!req.body.from) {
+        error.from = 'Invalid from';
+        validationFlag *= false;
+    }
+
+    if (!req.body.to) {
+        error.to = 'Invalid to';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.from),
+                    req.st.db.escape(req.body.to),
+                    req.st.db.escape(JSON.stringify(req.body.userMasterId || [])),
+                    req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
+                    req.st.db.escape(JSON.stringify(req.body.requirementId || [])),
+                    req.st.db.escape(DBSecretKey)
+                ];
+
+                var procQuery = 'CALL pace_get_dashboardRecruiterPerformance( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data ={
+                                reqApplicantData: result[0] ? result[0] : []                               
+                            };
+                            res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data =null;
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading data";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
