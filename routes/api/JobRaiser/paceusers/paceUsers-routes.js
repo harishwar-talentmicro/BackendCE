@@ -49,6 +49,7 @@ router.get('/exportPlanner',paceUsersCtrl.getTaskPlannerForExport);
 router.get('/applicants',paceUsersCtrl.getSourcedApplicants);
 
 router.get('/logoutPortalUsers',paceUsersCtrl.logoutPortalUsers);
+router.post('/requirements',paceUsersCtrl.getclientRequuirements);
 
 
 module.exports = router;

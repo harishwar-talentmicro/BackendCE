@@ -1392,6 +1392,7 @@ sendMessageCtrl.GetAnnouncementDetailedSummary = function (req, res, next) {
                         for (var i = 0; i < announcementResult[0].length; i++) {
                             var res1 = {};
                             res1.name = announcementResult[0][i].name;
+                            res1.employeeCode= announcementResult[0][i].employeeCode;
                             res1.jobTitle = announcementResult[0][i].jobTitle;
                             res1.department = announcementResult[0][i].department;
                             res1.location = announcementResult[0][i].location;

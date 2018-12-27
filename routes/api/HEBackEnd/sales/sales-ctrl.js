@@ -1593,10 +1593,21 @@ salesCtrl.getUserstats = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-
+                req.query.startPage = (req.query.startPage) ? req.query.startPage : 0;
+                req.query.isExcel = (req.query.isExcel) ? req.query.isExcel : 0;
+                req.query.isActive = (req.query.isActive) ? req.query.isActive : 0;
+                req.query.limit = (req.query.limit) ? req.query.limit :50;
+                req.query.keywords = (req.query.keywords) ? req.query.keywords :'';
+                var startPage;
+                startPage = ((((parseInt(req.query.startPage)) * req.query.startPage) + 1) - req.query.startPage) - 1;
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.HEMasterId)
+                    req.st.db.escape(req.query.HEMasterId),
+                    req.st.db.escape(req.query.keywords),
+                    req.st.db.escape(req.query.limit),
+                    req.st.db.escape(startPage),
+                    req.st.db.escape(req.query.isExcel),
+                    req.st.db.escape(req.query.isActive)
                 ];
                 /**
                  * Calling procedure to save form sales items
@@ -1610,7 +1621,8 @@ salesCtrl.getUserstats = function (req, res, next) {
                         response.message = "Login statistics data loaded successfully";
 
                         response.data = {
-                            userLoginoutdata: result[0]
+                            userLoginoutdata: result[0],
+                            count:result[1][0].COUNT
                         };
 
                         response.error = null;
