@@ -6,14 +6,14 @@
 var salesCtrl = {};
 var error = {};
 var appConfig = require('../../../../ezeone-config.json');
-var DBSecretKey=appConfig.DB.secretKey;
+var DBSecretKey = appConfig.DB.secretKey;
 
-salesCtrl.saveItems = function(req,res,next){
+salesCtrl.saveItems = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -21,27 +21,25 @@ salesCtrl.saveItems = function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.body.itemName)
-    {
+    if (!req.body.itemName) {
         error.itemName = 'Invalid itemName';
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 req.body.itemCode = (req.body.itemCode) ? req.body.itemCode : '';
                 // UOM means Units of measurements
                 req.body.UOM = (req.body.UOM) ? req.body.UOM : 0;
@@ -74,33 +72,33 @@ salesCtrl.saveItems = function(req,res,next){
                  */
                 var procQuery = 'CALL HE_save_salesItems( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,salesItems){
-                    if(!err && salesItems[0] && salesItems[0][0]){
+                req.db.query(procQuery, function (err, salesItems) {
+                    if (!err && salesItems[0] && salesItems[0][0]) {
                         response.status = true;
                         response.message = "Sales item saved successfully";
                         response.data = {
-                          itemId : salesItems[0][0].itemId,
-                          itemName : req.body.itemName,
-                          itemCode : req.body.itemCode,
-                          UOM  : req.body.UOM,
-                            UOMTitle : salesItems[0][0].UOMTitle,
-                            description  : req.body.description,
-                            status  : req.body.status,
-                            minQuantity  : req.body.minQuantity,
-                            maxQuantity  : req.body.maxQuantity,
-                            notes  : req.body.notes
+                            itemId: salesItems[0][0].itemId,
+                            itemName: req.body.itemName,
+                            itemCode: req.body.itemCode,
+                            UOM: req.body.UOM,
+                            UOMTitle: salesItems[0][0].UOMTitle,
+                            description: req.body.description,
+                            status: req.body.status,
+                            minQuantity: req.body.minQuantity,
+                            maxQuantity: req.body.maxQuantity,
+                            notes: req.body.notes
                         };
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else if (!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Sales item saved successfully";
                         response.data = null;
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving sales item";
                         response.error = null;
@@ -109,7 +107,7 @@ salesCtrl.saveItems = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -117,40 +115,38 @@ salesCtrl.saveItems = function(req,res,next){
 
 };
 
-salesCtrl.getSalesItems = function(req,res,next){
+salesCtrl.getSalesItems = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
-    if (!req.query.token)
-    {
+    if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(DBSecretKey)                                                                    
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to get form template
@@ -158,25 +154,25 @@ salesCtrl.getSalesItems = function(req,res,next){
                  */
                 var procQuery = 'CALL HE_get_salesItems( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,salesItems){
-                    if(!err && salesItems && salesItems[0] && salesItems[0][0]){
+                req.db.query(procQuery, function (err, salesItems) {
+                    if (!err && salesItems && salesItems[0] && salesItems[0][0]) {
                         response.status = true;
                         response.message = "Sales items loaded successfully";
                         response.error = null;
                         response.data = {
-                            salesItemList : salesItems[0]
+                            salesItemList: salesItems[0]
                         };
                         res.status(200).json(response);
 
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Sales items loaded successfully";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting sales items";
                         response.error = null;
@@ -185,19 +181,19 @@ salesCtrl.getSalesItems = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 };
 
-salesCtrl.saveUOM = function(req,res,next){
+salesCtrl.saveUOM = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -205,27 +201,25 @@ salesCtrl.saveUOM = function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.body.UOMTitle)
-    {
+    if (!req.body.UOMTitle) {
         error.UOMTitle = 'Invalid UOMTitle';
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 // UOM means Units of measurements
                 req.body.status = (req.body.status) ? req.body.status : 1;
                 req.body.factor = (req.body.factor) ? req.body.factor : 1;
@@ -244,34 +238,34 @@ salesCtrl.saveUOM = function(req,res,next){
                  */
                 var procQuery = 'CALL HE_save_UOM( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,UOM){
-                    if(!err && UOM[0] && UOM[0][0] && UOM[0][0].message){
+                req.db.query(procQuery, function (err, UOM) {
+                    if (!err && UOM[0] && UOM[0][0] && UOM[0][0].message) {
                         response.status = true;
                         response.message = "Units of measurement title already exists";
-                        response.data = null ;
+                        response.data = null;
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else if(!err && UOM[0] && UOM[0][0] && UOM[0][0].UOMId){
+                    else if (!err && UOM[0] && UOM[0][0] && UOM[0][0].UOMId) {
                         response.status = true;
                         response.message = "Units of measurements saved successfully";
                         response.data = {
-                            UOMId : UOM[0][0].UOMId,
-                            UOMTitle : req.body.UOMTitle,
-                            status  : req.body.status,
-                            factor  : req.body.factor
+                            UOMId: UOM[0][0].UOMId,
+                            UOMTitle: req.body.UOMTitle,
+                            status: req.body.status,
+                            factor: req.body.factor
                         };
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else if (!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Units of measurements saved successfully";
                         response.data = null;
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving units of measurements";
                         response.error = null;
@@ -280,7 +274,7 @@ salesCtrl.saveUOM = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -288,40 +282,38 @@ salesCtrl.saveUOM = function(req,res,next){
 
 };
 
-salesCtrl.getUOM = function(req,res,next){
+salesCtrl.getUOM = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
-    if (!req.query.token)
-    {
+    if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(DBSecretKey)                                                                    
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to get form template
@@ -329,25 +321,25 @@ salesCtrl.getUOM = function(req,res,next){
                  */
                 var procQuery = 'CALL HE_get_UOM( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,UOMList){
-                    if(!err && UOMList && UOMList[0] && UOMList[0][0]){
+                req.db.query(procQuery, function (err, UOMList) {
+                    if (!err && UOMList && UOMList[0] && UOMList[0][0]) {
                         response.status = true;
                         response.message = "Units of measurements loaded successfully";
                         response.error = null;
                         response.data = {
-                            UOMList : UOMList[0]
+                            UOMList: UOMList[0]
                         };
                         res.status(200).json(response);
 
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Units of measurements loaded successfully";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting units of measurements";
                         response.error = null;
@@ -356,19 +348,19 @@ salesCtrl.getUOM = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 };
 
-salesCtrl.saveStageStatus = function(req,res,next){
+salesCtrl.saveStageStatus = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -377,35 +369,33 @@ salesCtrl.saveStageStatus = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!req.body.stageTitle)
-    {
+    if (!req.body.stageTitle) {
         error.stageTitle = 'Invalid stageTitle';
         validationFlag *= false;
     }
 
-    var statusList =req.body.statusList;
-    if(typeof(statusList) == "string") {
+    var statusList = req.body.statusList;
+    if (typeof (statusList) == "string") {
         statusList = JSON.parse(statusList);
     }
-    if(!statusList){
+    if (!statusList) {
         statusList = [];
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 // UOM means Units of measurements
                 req.body.stageId = (req.body.stageId) ? req.body.stageId : 0;
                 req.body.stageProgress = (req.body.stageProgress) ? req.body.stageProgress : 0;
@@ -425,35 +415,35 @@ salesCtrl.saveStageStatus = function(req,res,next){
                  */
                 var procQuery = 'CALL he_save_stageStatus( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,stageStatus){
-                    if(!err && stageStatus[0] && stageStatus[0][0] && stageStatus[0][0].message){
+                req.db.query(procQuery, function (err, stageStatus) {
+                    if (!err && stageStatus[0] && stageStatus[0][0] && stageStatus[0][0].message) {
                         response.status = true;
                         response.message = "Stage title already exists";
-                        response.data = null ;
+                        response.data = null;
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else if(!err && stageStatus[0] && stageStatus[0][0] && stageStatus[0][0].stageId){
+                    else if (!err && stageStatus[0] && stageStatus[0][0] && stageStatus[0][0].stageId) {
                         response.status = true;
                         response.message = "Sales stage and status saved successfully";
                         response.data = {
-                            stageId : stageStatus[0][0].stageId,
-                            stageTitle : req.body.stageTitle,
-                            stageProgress  : req.body.stageProgress,
-                            stageStatus  : req.body.stageStatus,
-                            statusList : req.body.statusList
+                            stageId: stageStatus[0][0].stageId,
+                            stageTitle: req.body.stageTitle,
+                            stageProgress: req.body.stageProgress,
+                            stageStatus: req.body.stageStatus,
+                            statusList: req.body.statusList
                         };
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else if (!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Sales stage and status saved successfully";
                         response.data = null;
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving Sales stage and status";
                         response.error = null;
@@ -462,7 +452,7 @@ salesCtrl.saveStageStatus = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -470,12 +460,12 @@ salesCtrl.saveStageStatus = function(req,res,next){
 
 };
 
-salesCtrl.getStageStatus = function(req,res,next){
+salesCtrl.getStageStatus = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -484,21 +474,20 @@ salesCtrl.getStageStatus = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 // UOM means Units of measurements
 
                 var procParams = [
@@ -510,11 +499,11 @@ salesCtrl.getStageStatus = function(req,res,next){
                  */
                 var procQuery = 'CALL he_get_stageStatus( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,stageStatus){
-                    if(!err && stageStatus[0] && stageStatus[0][0] ){
+                req.db.query(procQuery, function (err, stageStatus) {
+                    if (!err && stageStatus[0] && stageStatus[0][0]) {
 
                         var output = [];
-                        for(var i = 0; i < stageStatus[0].length; i++) {
+                        for (var i = 0; i < stageStatus[0].length; i++) {
                             var res1 = {};
                             res1.stageId = stageStatus[0][i].stageId;
                             res1.stageTitle = stageStatus[0][i].stageTitle;
@@ -525,18 +514,18 @@ salesCtrl.getStageStatus = function(req,res,next){
                         }
                         response.status = true;
                         response.message = "Sales stage and status loaded successfully";
-                        response.data = output ;
+                        response.data = output;
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else if (!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Sales stage and status loaded successfully";
                         response.data = null;
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while loaded Sales stage and status";
                         response.error = null;
@@ -545,7 +534,7 @@ salesCtrl.getStageStatus = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -553,12 +542,12 @@ salesCtrl.getStageStatus = function(req,res,next){
 
 };
 
-salesCtrl.saveSalesMembers = function(req,res,next){
+salesCtrl.saveSalesMembers = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -567,27 +556,25 @@ salesCtrl.saveSalesMembers = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!req.body.memberId)
-    {
+    if (!req.body.memberId) {
         error.memberId = 'Invalid memberId';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 req.body.id = (req.body.id) ? req.body.id : 0;
                 req.body.customerId = (req.body.customerId) ? req.body.customerId : 0;
 
@@ -597,27 +584,27 @@ salesCtrl.saveSalesMembers = function(req,res,next){
                     req.st.db.escape(req.body.id),
                     req.st.db.escape(req.body.memberId),
                     req.st.db.escape(req.body.customerId),
-                    req.st.db.escape(DBSecretKey)                                                                    
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL he_save_salesMembers( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,salesMemberList){
-                    if(!err && salesMemberList[0] && salesMemberList[0][0]){
+                req.db.query(procQuery, function (err, salesMemberList) {
+                    if (!err && salesMemberList[0] && salesMemberList[0][0]) {
                         response.status = true;
                         response.message = "Sales member added successfully";
                         response.data = salesMemberList[0];
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else if (!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Sales member added successfully";
                         response.data = null;
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving Sales member";
                         response.error = null;
@@ -626,7 +613,7 @@ salesCtrl.saveSalesMembers = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -634,12 +621,12 @@ salesCtrl.saveSalesMembers = function(req,res,next){
 
 };
 
-salesCtrl.getSalesMembers = function(req,res,next){
+salesCtrl.getSalesMembers = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -648,50 +635,49 @@ salesCtrl.getSalesMembers = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 // UOM means Units of measurements
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(DBSecretKey)                                                                    
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save units of measurements
                  */
                 var procQuery = 'CALL he_get_salesMembers( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,salesMemberList){
-                    if(!err && salesMemberList[0] && salesMemberList[0][0] ){
+                req.db.query(procQuery, function (err, salesMemberList) {
+                    if (!err && salesMemberList[0] && salesMemberList[0][0]) {
 
                         response.status = true;
                         response.message = "Sales members loaded successfully";
-                        response.data = salesMemberList[0] ;
+                        response.data = salesMemberList[0];
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else if (!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Sales members loaded successfully";
                         response.data = null;
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while loaded Sales members";
                         response.error = null;
@@ -700,7 +686,7 @@ salesCtrl.getSalesMembers = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -708,12 +694,12 @@ salesCtrl.getSalesMembers = function(req,res,next){
 
 };
 
-salesCtrl.saveCategory = function(req,res,next){
+salesCtrl.saveCategory = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -722,26 +708,24 @@ salesCtrl.saveCategory = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
-    if (!req.body.title)
-    {
+    if (!req.body.title) {
         error.title = 'Invalid title';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 // UOM means Units of measurements
                 req.body.categoryId = req.body.categoryId ? req.body.categoryId : 0;
 
@@ -751,29 +735,29 @@ salesCtrl.saveCategory = function(req,res,next){
                     req.st.db.escape(req.body.categoryId),
                     req.st.db.escape(req.body.title),
                     req.st.db.escape(req.body.status),
-                    req.st.db.escape(DBSecretKey)                                                                    
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save units of measurements
                  */
                 var procQuery = 'CALL he_save_categories( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,categories){
-                    if(!err && categories[0] && categories[0][0] ){
+                req.db.query(procQuery, function (err, categories) {
+                    if (!err && categories[0] && categories[0][0]) {
                         response.status = true;
                         response.message = "Categories saved successfully";
-                        response.data = categories[0] ;
+                        response.data = categories[0];
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else if (!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Categories saved successfully";
                         response.data = null;
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving categories";
                         response.error = null;
@@ -782,7 +766,7 @@ salesCtrl.saveCategory = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -790,12 +774,12 @@ salesCtrl.saveCategory = function(req,res,next){
 
 };
 
-salesCtrl.getCategory = function(req,res,next){
+salesCtrl.getCategory = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -804,50 +788,49 @@ salesCtrl.getCategory = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 // UOM means Units of measurements
 
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(DBSecretKey)                                                                    
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save units of measurements
                  */
                 var procQuery = 'CALL he_get_categories( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,categories){
-                    if(!err && categories[0] && categories[0][0] ){
+                req.db.query(procQuery, function (err, categories) {
+                    if (!err && categories[0] && categories[0][0]) {
                         response.status = true;
                         response.message = "Categories loaded successfully";
-                        response.data = categories[0] ;
+                        response.data = categories[0];
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else if (!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Categories loaded successfully";
                         response.data = null;
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while loading categories";
                         response.error = null;
@@ -856,7 +839,7 @@ salesCtrl.getCategory = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -864,12 +847,12 @@ salesCtrl.getCategory = function(req,res,next){
 
 };
 
-salesCtrl.saveSupportMembers = function(req,res,next){
+salesCtrl.saveSupportMembers = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -878,27 +861,25 @@ salesCtrl.saveSupportMembers = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!req.body.memberId)
-    {
+    if (!req.body.memberId) {
         error.memberId = 'Invalid memberId';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 req.body.id = (req.body.id) ? req.body.id : 0;
                 req.body.customerId = (req.body.customerId) ? req.body.customerId : 0;
 
@@ -908,27 +889,27 @@ salesCtrl.saveSupportMembers = function(req,res,next){
                     req.st.db.escape(req.body.id),
                     req.st.db.escape(req.body.memberId),
                     req.st.db.escape(req.body.customerId),
-                    req.st.db.escape(DBSecretKey)                                                                    
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 var procQuery = 'CALL he_save_supportMembers( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,salesMemberList){
-                    if(!err && salesMemberList[0] && salesMemberList[0][0]){
+                req.db.query(procQuery, function (err, salesMemberList) {
+                    if (!err && salesMemberList[0] && salesMemberList[0][0]) {
                         response.status = true;
                         response.message = "Support member added successfully";
                         response.data = salesMemberList[0];
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else if (!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Support member added successfully";
                         response.data = null;
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving support member";
                         response.error = null;
@@ -937,7 +918,7 @@ salesCtrl.saveSupportMembers = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -945,12 +926,12 @@ salesCtrl.saveSupportMembers = function(req,res,next){
 
 };
 
-salesCtrl.getSupportMembers = function(req,res,next){
+salesCtrl.getSupportMembers = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -959,50 +940,49 @@ salesCtrl.getSupportMembers = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 // UOM means Units of measurements
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(DBSecretKey)                                                                    
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save units of measurements
                  */
                 var procQuery = 'CALL he_get_supportMembers( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,salesMemberList){
-                    if(!err && salesMemberList[0] && salesMemberList[0][0] ){
+                req.db.query(procQuery, function (err, salesMemberList) {
+                    if (!err && salesMemberList[0] && salesMemberList[0][0]) {
 
                         response.status = true;
                         response.message = "Support members loaded successfully";
-                        response.data = salesMemberList[0] ;
+                        response.data = salesMemberList[0];
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else if (!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Support members loaded successfully";
                         response.data = null;
                         response.error = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while loaded Support members";
                         response.error = null;
@@ -1011,7 +991,7 @@ salesCtrl.getSupportMembers = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1019,47 +999,44 @@ salesCtrl.getSupportMembers = function(req,res,next){
 
 };
 
-salesCtrl.getSalesItemDetails = function(req,res,next){
+salesCtrl.getSalesItemDetails = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
-    if (!req.query.token)
-    {
+    if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!req.query.itemId)
-    {
+    if (!req.query.itemId) {
         error.itemId = 'Invalid itemId';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.itemId),
-                    req.st.db.escape(DBSecretKey)                                                                    
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to get form template
@@ -1067,40 +1044,40 @@ salesCtrl.getSalesItemDetails = function(req,res,next){
                  */
                 var procQuery = 'CALL HE_get_salesItem_details( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,salesItems){
-                    if(!err && salesItems && salesItems[0] && salesItems[0][0]){
+                req.db.query(procQuery, function (err, salesItems) {
+                    if (!err && salesItems && salesItems[0] && salesItems[0][0]) {
                         response.status = true;
                         response.message = "Sales items loaded successfully";
                         response.error = null;
                         response.data = {
-                            itemId : salesItems[0][0].itemId,
-                            itemName : salesItems[0][0].itemName,
-                            itemCode : salesItems[0][0].itemCode,
-                            UOM : salesItems[0][0].UOM,
-                            UOMTitle : salesItems[0][0].UOMTitle,
-                            description : salesItems[0][0].description,
-                            status : salesItems[0][0].status,
-                            minQuantity : salesItems[0][0].minQuantity,
-                            maxQuantity : salesItems[0][0].maxQuantity,
-                            createdDate : salesItems[0][0].createdDate,
-                            updatedDate : salesItems[0][0].updatedDate,
-                            createdBy : salesItems[0][0].createdBy,
-                            updatedBy : salesItems[0][0].updatedBy,
-                            itemRate : salesItems[0][0].itemRate,
-                            notes : salesItems[0][0].notes,
-                            itemImage : (salesItems[0][0].itemImage) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + salesItems[0][0].itemImage) : ""
+                            itemId: salesItems[0][0].itemId,
+                            itemName: salesItems[0][0].itemName,
+                            itemCode: salesItems[0][0].itemCode,
+                            UOM: salesItems[0][0].UOM,
+                            UOMTitle: salesItems[0][0].UOMTitle,
+                            description: salesItems[0][0].description,
+                            status: salesItems[0][0].status,
+                            minQuantity: salesItems[0][0].minQuantity,
+                            maxQuantity: salesItems[0][0].maxQuantity,
+                            createdDate: salesItems[0][0].createdDate,
+                            updatedDate: salesItems[0][0].updatedDate,
+                            createdBy: salesItems[0][0].createdBy,
+                            updatedBy: salesItems[0][0].updatedBy,
+                            itemRate: salesItems[0][0].itemRate,
+                            notes: salesItems[0][0].notes,
+                            itemImage: (salesItems[0][0].itemImage) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + salesItems[0][0].itemImage) : ""
                         };
                         res.status(200).json(response);
 
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Sales items loaded successfully";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting sales items";
                         response.error = null;
@@ -1109,7 +1086,7 @@ salesCtrl.getSalesItemDetails = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1117,12 +1094,12 @@ salesCtrl.getSalesItemDetails = function(req,res,next){
 };
 
 
-salesCtrl.saveprobability = function(req,res,next){
+salesCtrl.saveprobability = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -1131,22 +1108,21 @@ salesCtrl.saveprobability = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.body.HEMasterId)
-    {
+    if (!req.body.HEMasterId) {
         error.HEMasterId = 'Invalid HEMasterId';
         validationFlag *= false;
     }
 
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
-    else{
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 req.body.probabilityId = (req.body.probabilityId) ? (req.body.probabilityId) : 0;
 
 
@@ -1166,9 +1142,9 @@ salesCtrl.saveprobability = function(req,res,next){
 
                 var procQuery = 'CALL he_save_probabilities( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
+                req.db.query(procQuery, function (err, results) {
                     console.log(results);
-                    if(!err && results){
+                    if (!err && results) {
                         response.status = true;
                         response.message = "Probability saved successfully";
                         response.error = null;
@@ -1179,7 +1155,7 @@ salesCtrl.saveprobability = function(req,res,next){
                         res.status(200).json(response);
                         //});
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving probability";
                         response.error = null;
@@ -1188,7 +1164,7 @@ salesCtrl.saveprobability = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1196,12 +1172,12 @@ salesCtrl.saveprobability = function(req,res,next){
 
 };
 
-salesCtrl.savetimeline = function(req,res,next){
+salesCtrl.savetimeline = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -1210,22 +1186,21 @@ salesCtrl.savetimeline = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.body.HEMasterId)
-    {
+    if (!req.body.HEMasterId) {
         error.HEMasterId = 'Invalid HEMasterId';
         validationFlag *= false;
     }
 
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
-    else{
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 req.body.timelineId = (req.body.timelineId) ? (req.body.timelineId) : 0;
 
 
@@ -1247,9 +1222,9 @@ salesCtrl.savetimeline = function(req,res,next){
 
                 var procQuery = 'CALL he_save_mheperformancetimeline( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
+                req.db.query(procQuery, function (err, results) {
                     console.log(results);
-                    if(!err && results){
+                    if (!err && results) {
                         response.status = true;
                         response.message = "Timeline data saved successfully";
                         response.error = null;
@@ -1260,7 +1235,7 @@ salesCtrl.savetimeline = function(req,res,next){
                         res.status(200).json(response);
                         // });
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while saving Timeline data";
                         response.error = null;
@@ -1269,7 +1244,7 @@ salesCtrl.savetimeline = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1277,12 +1252,12 @@ salesCtrl.savetimeline = function(req,res,next){
 
 };
 
-salesCtrl.getprobability = function(req,res,next){
+salesCtrl.getprobability = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -1291,22 +1266,21 @@ salesCtrl.getprobability = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.HEMasterId)
-    {
+    if (!req.query.HEMasterId) {
         error.HEMasterId = 'Invalid HEMasterId';
         validationFlag *= false;
     }
 
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
-    else{
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -1320,15 +1294,15 @@ salesCtrl.getprobability = function(req,res,next){
 
                 var procQuery = 'CALL he_get_probabilities( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
+                req.db.query(procQuery, function (err, results) {
                     console.log(results);
-                    if(!err && results){
+                    if (!err && results) {
                         response.status = true;
                         response.message = "Probability loaded successfully";
                         response.error = null;
                         response.data =
                             {
-                                probabilityList:results[0]
+                                probabilityList: results[0]
                             };
                         // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         // zlib.gzip(buf, function (_, result) {
@@ -1336,7 +1310,7 @@ salesCtrl.getprobability = function(req,res,next){
                         res.status(200).json(response);
                         // });
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while loading probability";
                         response.error = null;
@@ -1345,7 +1319,7 @@ salesCtrl.getprobability = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1353,12 +1327,12 @@ salesCtrl.getprobability = function(req,res,next){
 
 };
 
-salesCtrl.gettimeline = function(req,res,next){
+salesCtrl.gettimeline = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -1367,22 +1341,21 @@ salesCtrl.gettimeline = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.HEMasterId)
-    {
+    if (!req.query.HEMasterId) {
         error.HEMasterId = 'Invalid HEMasterId';
         validationFlag *= false;
     }
 
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
-    else{
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -1397,14 +1370,14 @@ salesCtrl.gettimeline = function(req,res,next){
 
                 var procQuery = 'CALL he_get_mheperformancetimeline( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
+                req.db.query(procQuery, function (err, results) {
                     console.log(results);
-                    if(!err && results){
+                    if (!err && results) {
                         response.status = true;
                         response.message = "Timeline data loaded successfully";
                         response.error = null;
                         response.data = {
-                            timelineList:results[0]
+                            timelineList: results[0]
                         };
                         // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         // zlib.gzip(buf, function (_, result) {
@@ -1412,7 +1385,7 @@ salesCtrl.gettimeline = function(req,res,next){
                         res.status(200).json(response);
                         // });
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while loading Timeline data";
                         response.error = null;
@@ -1421,7 +1394,7 @@ salesCtrl.gettimeline = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1430,12 +1403,12 @@ salesCtrl.gettimeline = function(req,res,next){
 };
 
 
-salesCtrl.deleteprobability = function(req,res,next){
+salesCtrl.deleteprobability = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -1444,22 +1417,21 @@ salesCtrl.deleteprobability = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.HEMasterId)
-    {
+    if (!req.query.HEMasterId) {
         error.HEMasterId = 'Invalid HEMasterId';
         validationFlag *= false;
     }
 
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
-    else{
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -1475,9 +1447,9 @@ salesCtrl.deleteprobability = function(req,res,next){
 
                 var procQuery = 'CALL he_delete_probabilities( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
+                req.db.query(procQuery, function (err, results) {
                     console.log(results);
-                    if(!err && results && results[0] && results[0][0]){
+                    if (!err && results && results[0] && results[0][0]) {
                         response.status = false;
                         response.message = "Probability is already in use";
                         response.error = null;
@@ -1490,7 +1462,7 @@ salesCtrl.deleteprobability = function(req,res,next){
                         //});
                     }
 
-                    else if(!err && results ){
+                    else if (!err && results) {
                         response.status = true;
                         response.message = "Probability deleted successfully";
                         response.error = null;
@@ -1502,7 +1474,7 @@ salesCtrl.deleteprobability = function(req,res,next){
                         res.status(200).json(response);
                         // });
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while deleting probability";
                         response.error = null;
@@ -1511,7 +1483,7 @@ salesCtrl.deleteprobability = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1519,12 +1491,12 @@ salesCtrl.deleteprobability = function(req,res,next){
 
 };
 
-salesCtrl.deletetimeline = function(req,res,next){
+salesCtrl.deletetimeline = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -1533,22 +1505,21 @@ salesCtrl.deletetimeline = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.HEMasterId)
-    {
+    if (!req.query.HEMasterId) {
         error.HEMasterId = 'Invalid HEMasterId';
         validationFlag *= false;
     }
 
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
-    else{
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -1564,9 +1535,9 @@ salesCtrl.deletetimeline = function(req,res,next){
 
                 var procQuery = 'CALL he_delete_mheperformancetimeline( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,results){
+                req.db.query(procQuery, function (err, results) {
                     console.log(results);
-                    if(!err && results){
+                    if (!err && results) {
                         response.status = true;
                         response.message = "Timeline data deleted successfully";
                         response.error = null;
@@ -1577,7 +1548,7 @@ salesCtrl.deletetimeline = function(req,res,next){
                         res.status(200).json(response);
                         //});
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while deleting Timeline data";
                         response.error = null;
@@ -1586,19 +1557,19 @@ salesCtrl.deletetimeline = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 
 };
-salesCtrl.getUserstats = function(req,res,next){
+salesCtrl.getUserstats = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -1607,21 +1578,20 @@ salesCtrl.getUserstats = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.HEMasterId)
-    {
+    if (!req.query.HEMasterId) {
         error.HEMasterId = 'Invalid HEMasterId';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
 
                 var procParams = [
@@ -1633,14 +1603,14 @@ salesCtrl.getUserstats = function(req,res,next){
                  */
                 var procQuery = 'CALL he_get_loginStats( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
-                    if(!err && result && result[0]){
+                req.db.query(procQuery, function (err, result) {
+                    if (!err && result && result[0]) {
 
                         response.status = true;
                         response.message = "Login statistics data loaded successfully";
 
                         response.data = {
-                            userLoginoutdata : result[0]
+                            userLoginoutdata: result[0]
                         };
 
                         response.error = null;
@@ -1653,7 +1623,7 @@ salesCtrl.getUserstats = function(req,res,next){
 
                     }
 
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while loading Login statistics data ";
                         response.error = null;
@@ -1662,7 +1632,7 @@ salesCtrl.getUserstats = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -1670,12 +1640,12 @@ salesCtrl.getUserstats = function(req,res,next){
 
 };
 
-salesCtrl.formTransaction = function(req,res,next){
+salesCtrl.formTransaction = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -1684,8 +1654,7 @@ salesCtrl.formTransaction = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.body.HEMasterId)
-    {
+    if (!req.body.HEMasterId) {
         error.HEMasterId = 'Invalid HEMasterId';
         validationFlag *= false;
     }
@@ -1734,17 +1703,17 @@ salesCtrl.formTransaction = function(req,res,next){
         userList = [];
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
-
+                // var totalTransactionCount="totalTransactionCount" ;
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.body.HEMasterId),
@@ -1756,21 +1725,25 @@ salesCtrl.formTransaction = function(req,res,next){
                     req.st.db.escape(JSON.stringify(departmentList)),
                     req.st.db.escape(JSON.stringify(gradeList)),
                     req.st.db.escape(JSON.stringify(groupList))
-                   
+
                 ];
                 /**
                  * Calling procedure to save form sales items
                  */
                 var procQuery = 'CALL he_get_formAdoptionReport( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
-                    if(!err && result && result[0]){
+                req.db.query(procQuery, function (err, result) {
+                    // console.log(result);
+                    console.log(err);
+                    if (!err && result && result[0]) {
 
                         response.status = true;
                         response.message = "Form Transaction Data loaded successfully";
-
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i]["totalTransactionCount"] = (result[0][i].senderCount + result[0][i].approverCount + result[0][i].receiverCount);
+                        }
                         response.data = {
-                            formTransactionData : result[0]
+                            formTransactionData: result[0]
                         };
 
                         response.error = null;
@@ -1783,7 +1756,7 @@ salesCtrl.formTransaction = function(req,res,next){
 
                     }
 
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while loading Form Transaction data ";
                         response.error = null;
@@ -1792,7 +1765,7 @@ salesCtrl.formTransaction = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
