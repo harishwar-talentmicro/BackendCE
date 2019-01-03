@@ -398,6 +398,7 @@ WGRMTemplateCtrl.getWGTemplatedetailes = function(req,res,next){
                                 res2.approvalLevels=workgroupresult[2][i].approvalLevels,
                                 res2.approvalEscalation=workgroupresult[2][i].approvalEscalation,
                                 res2.formTitle=workgroupresult[2][i].title,
+                                res2.seqNo=workgroupresult[2][i].seqNo,
                                 res2.receivers=workgroupresult[2][i].receivers ? JSON.parse(workgroupresult[2][i].receivers):[];
                             output.push(res2);
                         }

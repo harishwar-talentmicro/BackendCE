@@ -1595,7 +1595,7 @@ salesCtrl.getUserstats = function (req, res, next) {
 
                 req.query.startPage = (req.query.startPage) ? req.query.startPage : 0;
                 req.query.isExcel = (req.query.isExcel) ? req.query.isExcel : 0;
-                req.query.isActive = (req.query.isActive) ? req.query.isActive : 0;
+                req.query.isActive = (req.query.isActive) ? req.query.isActive : 2;
                 req.query.limit = (req.query.limit) ? req.query.limit :50;
                 req.query.keywords = (req.query.keywords) ? req.query.keywords :'';
                 var startPage;
