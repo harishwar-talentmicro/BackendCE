@@ -576,7 +576,8 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                     req.st.db.escape(req.query.userMasterId),
                     req.st.db.escape(req.query.type),
                     req.st.db.escape(req.body.from),
-                    req.st.db.escape(req.body.to)
+                    req.st.db.escape(req.body.to),
+                    req.st.db.escape(req.body.resultType ||0)
                 ];
 
                 var procQuery = 'CALL wm_get_DashBoard( ' + inputs.join(',') + ')';
@@ -588,38 +589,38 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         response.message = "data loaded successfully";
                         response.error = null;
                         var output = [];
-                        for (var i = 0; i < result[1].length; i++) {
-                            var res2 = {};
-                            res2.stage = result[1][i].stage ? JSON.parse(result[1][i].stage) : {};
-                            output.push(res2);
-                        }
+                        // for (var i = 0; i < result[1].length; i++) {
+                        //     var res2 = {};
+                        //     res2.stage = result[1][i].stage ? JSON.parse(result[1][i].stage) : {};
+                        //     output.push(res2);
+                        // }
 
-                        var output1 = [];
+                        // var output1 = [];
 
-                        for (var i = 0; i < result[2].length; i++) {
-                            var res3 = {};
-                            res3.name = result[2][i] ? result[2][i].name : "";
-                            res3.userMasterId = result[2] && result[2][i] ? result[2][i].userMasterId : 0;
-                            res3.stage = result[2][i].stage ? JSON.parse(result[2][i].stage) : [];
-                            output1.push(res3);
-                        }
+                        // for (var i = 0; i < result[2].length; i++) {
+                        //     var res3 = {};
+                        //     res3.name = result[2][i] ? result[2][i].name : "";
+                        //     res3.userMasterId = result[2] && result[2][i] ? result[2][i].userMasterId : 0;
+                        //     res3.stage = result[2][i].stage ? JSON.parse(result[2][i].stage) : [];
+                        //     output1.push(res3);
+                        // }
 
-                        var output2 = [];
-                        for (var i = 0; i < result[4].length; i++) {
-                            var res4 = {};
-                            res4.clientId = result[4][i].clientId;
-                            res4.clientName = result[4][i].clientName;
-                            res4.stage = result[4][i].stage ? JSON.parse(result[4][i].stage) : {};
-                            output2.push(res4);
-                        }
-                        if (result[9] && result[9][0]) {
-                            for (var i = 0; i < result[9].length; i++) {
-                                result[9][i].stageDetails = result[9][i].stageDetails ? JSON.parse(result[9][i].stageDetails) : [];
-                                for (var j = 0; j < result[9][i].stageDetails.length; j++) {
-                                    result[9][i].stageDetails[j].details = result[9][i].stageDetails[j].details ? JSON.parse(result[9][i].stageDetails[j].details) : {};
-                                }
-                            }
-                        }
+                        // var output2 = [];
+                        // for (var i = 0; i < result[4].length; i++) {
+                        //     var res4 = {};
+                        //     res4.clientId = result[4][i].clientId;
+                        //     res4.clientName = result[4][i].clientName;
+                        //     res4.stage = result[4][i].stage ? JSON.parse(result[4][i].stage) : {};
+                        //     output2.push(res4);
+                        // }
+                        // if (result[9] && result[9][0]) {
+                        //     for (var i = 0; i < result[9].length; i++) {
+                        //         result[9][i].stageDetails = result[9][i].stageDetails ? JSON.parse(result[9][i].stageDetails) : [];
+                        //         for (var j = 0; j < result[9][i].stageDetails.length; j++) {
+                        //             result[9][i].stageDetails[j].details = result[9][i].stageDetails[j].details ? JSON.parse(result[9][i].stageDetails[j].details) : {};
+                        //         }
+                        //     }
+                        // }
 
 
                         // if (result[11] && result[11][0]) {
@@ -630,23 +631,23 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         // }
 
                         // console.log(result[9][0])
-                        if (result[10] && result[10][0]) {
-                            for (var i = 0; i < result[10].length; i++) {
-                                result[10][i].countDetails = result[10][i].countDetails ? JSON.parse(result[10][i].countDetails) : [];
-                                for (var j = 0; j < result[10][i].countDetails.length; j++) {
-                                    result[10][i].countDetails[j].details = result[10][i].countDetails[j].details ? JSON.parse(result[10][i].countDetails[j].details) : {};
-                                }
-                            }
+                        // if (result[10] && result[10][0]) {
+                        //     for (var i = 0; i < result[10].length; i++) {
+                        //         result[10][i].countDetails = result[10][i].countDetails ? JSON.parse(result[10][i].countDetails) : [];
+                        //         for (var j = 0; j < result[10][i].countDetails.length; j++) {
+                        //             result[10][i].countDetails[j].details = result[10][i].countDetails[j].details ? JSON.parse(result[10][i].countDetails[j].details) : {};
+                        //         }
+                        //     }
 
-                        }
-                        if (result[12] && result[12][0]) {
+                        // }
+                        // if (result[12] && result[12][0]) {
 
-                            for (var i = 0; i < result[12].length; i++) {
-                                result[12][i].cvDetails = result[12][i].cvDetails ? JSON.parse(result[12][i].cvDetails) : [];
+                        //     for (var i = 0; i < result[12].length; i++) {
+                        //         result[12][i].cvDetails = result[12][i].cvDetails ? JSON.parse(result[12][i].cvDetails) : [];
 
-                            }
+                        //     }
 
-                        }
+                        // }
                         // for (var i = 0; i < result[7].length; i++) {
                         //     result[7][i].reqAppDetails = result[7][i].reqAppDetails ? JSON.parse(result[7][i].reqAppDetails) : [];
                         // }
@@ -656,33 +657,80 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         // }
 
 
+                         if (req.body.resultType ==1) {
+                             response.data={
+                            requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
+                            stages: result[1],
+                            converstionReport: result[2][0],
+                                turnAroundTime: result[3][0],
+                                firstCVResponse: result[4][0],
+
+                             }
+                            }
+                             else if(req.body.resultType ==2){
+                                response.data={
+                                requirementReport:  result[0],
+                                requirementReportTotalCount: result[1],
+                             }
+                            }
+
+                            else if(req.body.resultType ==3){
+                                response.data={
+                                    fullfilmentReport: result[0],
+                                    fullfilmentReportTotalCount: result[1],
+                             }
+                            }
+
+                            else if(req.body.resultType ==4){
+                                response.data={
+                                    recruiterWiseReport: result[0]
+                             }
+                            }
+
+                            else if(req.body.resultType ==5){
+                                response.data={
+                                    stagewiseTurnAroundReport: result[0]
+                             }
+                            }
+                            else {
+                                response.data={
+                                    // recruiterWiseReport: result[0],
+                                    // stagewiseTurnAroundReport: result[1],
+                                    cvSourceReport: result[0],
+                                    cvSourceRecruiterReport: result[1],
+    
+    
+                                    totalCVCount: result[2][0].count,
+                                    filteredCVCount: result[3][0].count,
+                             }
+                            }
+                         
+
+                        // response.data =
+                        //     {
+                        //         requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
+                        //         stages: output,
+                        //         requirementReport: output1,
+                        //         requirementReportTotalCount: result[3],
+                        //         fullfilmentReport: output2,
+                        //         fullfilmentReportTotalCount: result[5],
+                        //         converstionReport: result[6][0],
+                        //         turnAroundTime: result[7][0],
+                        //         firstCVResponse: result[8][0],
+                        //         recruiterWiseReport: result[9],
+                        //         stagewiseTurnAroundReport: result[10],
+                        //         cvSourceReport: result[11],
+                        //         cvSourceRecruiterReport: result[12],
 
 
-                        response.data =
-                            {
-                                requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
-                                stages: output,
-                                requirementReport: output1,
-                                requirementReportTotalCount: result[3],
-                                fullfilmentReport: output2,
-                                fullfilmentReportTotalCount: result[5],
-                                converstionReport: result[6][0],
-                                turnAroundTime: result[7][0],
-                                firstCVResponse: result[8][0],
-                                recruiterWiseReport: result[9],
-                                stagewiseTurnAroundReport: result[10],
-                                cvSourceReport: result[11],
-                                cvSourceRecruiterReport: result[12],
+                        //         totalCVCount: result[13][0].count,
+                        //         filteredCVCount: result[14][0].count,
+                        //         // CVsSentToTheClient_CVsShortlistedByTheClient: result[10][0],
+                        //         // CVsShortlisted_CandidatesInterviewedByClient: result[11][0],
+                        //         // CandidatesInterviewedByClient_CandidatesOffered: result[12][0],
+                        //         // CandidatesOffered_CandidatesJoined: result[13][0]
 
-
-                                totalCVCount: result[13][0].count,
-                                filteredCVCount: result[14][0].count,
-                                // CVsSentToTheClient_CVsShortlistedByTheClient: result[10][0],
-                                // CVsShortlisted_CandidatesInterviewedByClient: result[11][0],
-                                // CandidatesInterviewedByClient_CandidatesOffered: result[12][0],
-                                // CandidatesOffered_CandidatesJoined: result[13][0]
-
-                            };
+                            // };
                         res.status(200).json(response);
                     }
 
