@@ -1704,7 +1704,7 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         temp_result.expectedSalaryPeriod = temp_result.expectedSalaryPeriod && JSON.parse(temp_result.expectedSalaryPeriod).durationId ? JSON.parse(temp_result.expectedSalaryPeriod) :{};
                         temp_result.expectedSalaryScale = temp_result.expectedSalaryScale && JSON.parse(temp_result.expectedSalaryScale).scaleId ? JSON.parse(temp_result.expectedSalaryScale) :{};
                         temp_result.industry = JSON.parse(temp_result.industry);
-                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle).jobTitleId ? JSON.parse(temp_result.jobTitle): {} ;
+                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle).jobtitleId ? JSON.parse(temp_result.jobTitle): {} ;
                         temp_result.nationality = JSON.parse(temp_result.nationality).nationalityId ? JSON.parse(temp_result.nationality) :{};
                         temp_result.prefLocations = JSON.parse(temp_result.prefLocations);
                         temp_result.presentSalaryCurr = temp_result.presentSalaryCurr && JSON.parse(temp_result.presentSalaryCurr).currencyId ? JSON.parse(temp_result.presentSalaryCurr) : {};
@@ -5577,6 +5577,11 @@ applicantCtrl.getRecruiterPerformanceReqApplicantData = function (req, res, next
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
+
+                        for (var i=0; i < result[0].length; i++){
+                            result[0][i].clientContacts = result[0][i] && result[0][i].clientContacts && JSON.parse(result[0][i].clientContacts) ? JSON.parse(result[0][i].clientContacts) : [];
+
+                        }
                         response.data ={
                                 reqApplicantData: result[0] ? result[0] : []                               
                             };

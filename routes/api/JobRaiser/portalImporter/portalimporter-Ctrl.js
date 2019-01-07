@@ -85,7 +85,7 @@ var uploadDocumentToCloud = function (uniqueName, readStream, callback) {
 
 var removeExtraChars = function (params) {
     if (params && typeof (params) == 'string' && params != '') {
-        params = params.replace(/<[a-zA-Z0-9=|-|'|" \\|\/|_]*>/g, '');
+        params = params.replace(/<[a-zA-Z0-9=|\-|'|" \\|\/|_;&():#\.]*>/g, '');
         params = params.replace(/<\/[a-z]*>/g, '');
         params = params.replace(/(\n)+/, '');
         params = params.replace(/not applicable/i, '');
@@ -93,10 +93,10 @@ var removeExtraChars = function (params) {
         params = params.replace(/(Verified)/i, '');
         params = params.replace(/Not Mentioned/i, '');
         params = params.replace(/[ ]{2}/g, '');
-        params = params.replace(/&amp;/g, ' ');
-        params = params.replace(/<!--[a-zA-Z0-9=|-|'|" ]*-->/g, '');
+        params = params.replace(/&amp;/g, '&');
+        params = params.replace(/<!--[a-zA-Z0-9=|-|'|" \\|\/|_;&():#\.]*-->/g, '');
         params = params.replace(/[^\x00-\x7F]/g, "");
-        params = params.replace(/&nbsp;/g, '');
+        params = params.replace(/&nbsp;/g, ' ');
         params = params.trim();
         return params;
     }
@@ -104,7 +104,6 @@ var removeExtraChars = function (params) {
         return '';
     }
 }
-
 
 var dateConverter = function (params) {
     params = removeExtraChars(params);
@@ -352,13 +351,15 @@ var attachment = function (req, callback) {
 };
 
 portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+   
     try {
-        var response = {
-            status: false,
-            message: "Invalid token",
-            data: null,
-            error: null
-        };
+       
         // var validationFlag = true;
         var portalId = 2;
 
@@ -376,8 +377,6 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
 
                     var name = document.getElementsByClassName('resumeitem')[i].getElementsByClassName('ritemheader')[0].getElementsByClassName('skname')[0].innerHTML;
 
-                    console.log("name", name);
-                    console.log(name);
                     var first_name = "";
                     var last_name = "";
 
@@ -389,7 +388,84 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
                             last_name = removeExtraChars(last_name.trim());
                         }
                     }
-                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 2, index: i });
+
+                    var element = document.getElementsByClassName('resumeitem')[i];
+
+                    var education;
+                    var specialization;
+                    if (element && element.getElementsByClassName('basicinfo') && element.getElementsByClassName('basicinfo')[0] && element.getElementsByClassName('basicinfo')[0].getElementsByClassName('scndinfo') && element.getElementsByClassName('basicinfo')[0].getElementsByClassName('scndinfo')[1] && element.getElementsByClassName('basicinfo')[0].getElementsByClassName('scndinfo')[1].getElementsByTagName('a') && element.getElementsByClassName('basicinfo')[0].getElementsByClassName('scndinfo')[1].getElementsByTagName('a')[0] && element.getElementsByClassName('basicinfo')[0].getElementsByClassName('scndinfo')[1].getElementsByTagName('a')[0].innerHTML) {
+                        var temp = removeExtraChars(element.getElementsByClassName('basicinfo')[0].getElementsByClassName('scndinfo')[1].getElementsByTagName('a')[0].innerHTML);
+                        if (temp && temp != '' && temp.split('(')) {
+                            education = removeExtraChars(temp.split('(')[0]);
+                            if (temp.split('(')[1])
+                                specialization = removeExtraChars(temp.split('(')[1].split(')')[0]);
+                        }
+                    }
+
+                    //skills
+                    var skills = [];
+                    if (element && element.getElementsByClassName('scndinfo skills') && element.getElementsByClassName('scndinfo skills')[0] && element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span') && element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span')[1] && element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span')[1].innerHTML && element.getElementsByClassName('scndinfo skills') && element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span')[1].innerHTML.split(',') && element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span')[1].innerHTML.split(',') && element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span')[1].innerHTML.split(',').length)
+                        skills = element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span')[1].innerHTML.split(',')
+
+                    for (var j = 0; j < skills.length; j++) {
+                        skills[j] = removeExtraChars(skills[j]);
+                    }
+
+                    var current_employer;
+                    var previous_employer;
+                    if (element && element.getElementsByClassName('scndinfo') && element.getElementsByClassName('scndinfo')[0] && element.getElementsByClassName('scndinfo')[0] && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('a') && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('a')[0]) {
+                        var temp_element = element.getElementsByClassName('scndinfo')[0].getElementsByTagName('a')[0].innerHTML;
+                        if (element.getElementsByClassName('scndinfo_h')[0].innerHTML.indexOf('Current') > -1) {
+                            if (removeExtraChars(temp_element).toLowerCase != 'confidential' || removeExtraChars(temp_element).toLowerCase != 'freshers')
+                                current_employer = removeExtraChars(element.getElementsByClassName('scndinfo')[0].getElementsByTagName('a')[0].innerHTML);
+                        }
+                        else if (element.getElementsByClassName('scndinfo_h')[0].innerHTML.indexOf('Previous') > -1) {
+                            if (removeExtraChars(temp_element).toLowerCase != 'confidential' || removeExtraChars(temp_element).toLowerCase != 'freshers')
+                                previous_employer = removeExtraChars(element.getElementsByClassName('scndinfo')[0].getElementsByTagName('a')[0].innerHTML);
+                        }
+                    }
+
+
+                    if (element && element.getElementsByClassName('scndinfo_h') && element.getElementsByClassName('scndinfo_h')[1] && element.getElementsByClassName('scndinfo_h')[1].innerHTML && element.getElementsByClassName('scndinfo_h')[1].innerHTML.indexOf('Previous') > -1 && element.getElementsByClassName('scndinfo') && element.getElementsByClassName('scndinfo')[0] && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('div') && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('div')[0] && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('div')[0].getElementsByTagName('a') && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('div')[0].getElementsByTagName('a')[0] && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('div')[0].getElementsByTagName('a')[0].innerHTML) {
+                        var temp_element = element.getElementsByClassName('scndinfo')[0].getElementsByTagName('div')[0].getElementsByTagName('a')[0].innerHTML.split('<span');
+                        if (temp_element && temp_element[0] && removeExtraChars(temp_element[0]) != 'freshers' && removeExtraChars(temp_element[0]) != 'Confidential') {
+                            previous_employer = removeExtraChars(temp_element[0]);
+                        }
+                    }
+
+                    var nationality;
+                    if (element.getElementsByClassName('skinfoitem nationality') && element.getElementsByClassName('skinfoitem nationality')[0])
+                        nationality = removeExtraChars(element.getElementsByClassName('skinfoitem nationality')[0].innerHTML);
+
+                    var current_location;
+                    if (element.getElementsByClassName('skinfoitem info_loc') && element.getElementsByClassName('skinfoitem info_loc')[1] && element.getElementsByClassName('skinfoitem info_loc')[1].innerHTML)
+                        current_location = removeExtraChars(document.getElementsByClassName('skinfoitem info_loc')[1].innerHTML);
+
+                    var experience;
+                    if (element.getElementsByClassName('basicinfo_h haspic') && element.getElementsByClassName('basicinfo_h haspic')[0] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1])
+                        if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1]) {
+                            if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Years') > -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Months') > -1)
+                                experience = parseFloat((element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split('Years ')[1].split(' Months')[0] / 12).toFixed(1)) + parseInt(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ')[0]);
+
+                            else if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Years') == -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Year') > -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Months') > -1)
+                                experience = parseFloat((element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split('Year ')[1].split(' Months')[0] / 12).toFixed(1)) + parseInt(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ')[0]);
+
+                            else if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Years') > -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Months') == -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Month') > -1)
+                                experience = parseFloat((element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split('Years ')[1].split(' Month')[0] / 12).toFixed(1)) + parseInt(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ')[0]);
+
+                            else if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Years') == -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Year') > -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Months') == -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Month') > -1)
+                                experience = parseFloat((element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split('Year ')[1].split(' Month')[0] / 12).toFixed(1)) + parseInt(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ')[0])
+                            else if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ')[0])
+                                experience = parseInt(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ')[0])
+                        }
+
+
+                    var jobTitle;
+                    if (element.getElementsByClassName('basicinfo_h haspic') && element.getElementsByClassName('basicinfo_h haspic')[0] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].getElementsByTagName('span') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].getElementsByTagName('span')[0] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].getElementsByTagName('span')[0].innerHTML)
+                        jobTitle = removeExtraChars(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].getElementsByTagName('span')[0].innerHTML);
+
+
+                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 2, index: i, education: education, specialization: specialization, skills: skills, current_employer: current_employer, previous_employer: previous_employer, job_title: jobTitle, experience: experience });
                 }
 
             console.log("applicants", applicants);
@@ -399,12 +475,13 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
             console.log("else part");
             if (document.getElementsByClassName('resumeitem'))
                 for (var i = 0; i < selected_candidates.length; i++) {
-                    console.log("iiii", i);
+
+
                     var name = document.getElementsByClassName('resumeitem')[selected_candidates[i]].getElementsByClassName('ritemheader')[0].getElementsByClassName('skname')[0].innerHTML;
-                    console.log(name);
+
                     var first_name = "";
                     var last_name = "";
-                    console.log("name", name);
+
                     if (name.split(' ')) {
                         if (name.split(' ')[0])
                             first_name = removeExtraChars(name.split(' ')[0]);
@@ -413,29 +490,118 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
                             last_name = removeExtraChars(last_name.trim());
                         }
                     }
-                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 2, index: selected_candidates[i] });
+
+                    var element = document.getElementsByClassName('resumeitem')[selected_candidates[i]];
+
+                    var education;
+                    var specialization;
+                    if (element && element.getElementsByClassName('basicinfo') && element.getElementsByClassName('basicinfo')[0] && element.getElementsByClassName('basicinfo')[0].getElementsByClassName('scndinfo') && element.getElementsByClassName('basicinfo')[0].getElementsByClassName('scndinfo')[1] && element.getElementsByClassName('basicinfo')[0].getElementsByClassName('scndinfo')[1].getElementsByTagName('a') && element.getElementsByClassName('basicinfo')[0].getElementsByClassName('scndinfo')[1].getElementsByTagName('a')[0] && element.getElementsByClassName('basicinfo')[0].getElementsByClassName('scndinfo')[1].getElementsByTagName('a')[0].innerHTML) {
+                        var temp = removeExtraChars(element.getElementsByClassName('basicinfo')[0].getElementsByClassName('scndinfo')[1].getElementsByTagName('a')[0].innerHTML);
+                        if (temp && temp != '' && temp.split('(')) {
+                            education = temp.split('(')[0];
+                            if (temp.split('(')[1])
+                                specialization = temp.split('(')[1].split(')')[0];
+                        }
+                    }
+
+                    //skills
+                    var skills = [];
+                    if (element && element.getElementsByClassName('scndinfo skills') && element.getElementsByClassName('scndinfo skills')[0] && element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span') && element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span')[1] && element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span')[1].innerHTML && element.getElementsByClassName('scndinfo skills') && element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span')[1].innerHTML.split(',') && element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span')[1].innerHTML.split(',') && element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span')[1].innerHTML.split(',').length)
+                        skills = element.getElementsByClassName('scndinfo skills')[0].getElementsByTagName('span')[1].innerHTML.split(',')
+
+                    for (var j = 0; j < skills.length; j++) {
+                        skills[j] = removeExtraChars(skills[j]);
+                    }
+
+                    var current_employer;
+                    var previous_employer;
+                    if (element && element.getElementsByClassName('scndinfo') && element.getElementsByClassName('scndinfo')[0] && element.getElementsByClassName('scndinfo')[0] && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('a') && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('a')[0]) {
+                        var temp_element = element.getElementsByClassName('scndinfo')[0].getElementsByTagName('a')[0].innerHTML;
+                        if (element.getElementsByClassName('scndinfo_h')[0].innerHTML.indexOf('Current') > -1) {
+                            if (removeExtraChars(temp_element).toLowerCase != 'confidential' || removeExtraChars(temp_element).toLowerCase != 'freshers')
+                                current_employer = removeExtraChars(element.getElementsByClassName('scndinfo')[0].getElementsByTagName('a')[0].innerHTML);
+                        }
+                        else if (element.getElementsByClassName('scndinfo_h')[0].innerHTML.indexOf('Previous') > -1) {
+                            if (removeExtraChars(temp_element).toLowerCase != 'confidential' || removeExtraChars(temp_element).toLowerCase != 'freshers')
+                                previous_employer = removeExtraChars(element.getElementsByClassName('scndinfo')[0].getElementsByTagName('a')[0].innerHTML);
+                        }
+                    }
+
+
+                    if (element && element.getElementsByClassName('scndinfo_h') && element.getElementsByClassName('scndinfo_h')[1] && element.getElementsByClassName('scndinfo_h')[1].innerHTML && element.getElementsByClassName('scndinfo_h')[1].innerHTML.indexOf('Previous') > -1 && element.getElementsByClassName('scndinfo') && element.getElementsByClassName('scndinfo')[0] && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('div') && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('div')[0] && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('div')[0].getElementsByTagName('a') && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('div')[0].getElementsByTagName('a')[0] && element.getElementsByClassName('scndinfo')[0].getElementsByTagName('div')[0].getElementsByTagName('a')[0].innerHTML) {
+                        var temp_element = element.getElementsByClassName('scndinfo')[0].getElementsByTagName('div')[0].getElementsByTagName('a')[0].innerHTML.split('<span');
+                        if (temp_element && temp_element[0] && removeExtraChars(temp_element[0]) != 'freshers' && removeExtraChars(temp_element[0]) != 'Confidential') {
+                            previous_employer = removeExtraChars(temp_element[0]);
+                        }
+                    }
+
+                    var nationality;
+                    if (element.getElementsByClassName('skinfoitem nationality') && element.getElementsByClassName('skinfoitem nationality')[0])
+                        nationality = removeExtraChars(element.getElementsByClassName('skinfoitem nationality')[0].innerHTML);
+
+                    var current_location;
+                    if (element.getElementsByClassName('skinfoitem info_loc') && element.getElementsByClassName('skinfoitem info_loc')[1] && element.getElementsByClassName('skinfoitem info_loc')[1].innerHTML)
+                        current_location = removeExtraChars(document.getElementsByClassName('skinfoitem info_loc')[1].innerHTML);
+
+                    var experience;
+                    if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1]) {
+                        if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Years') > -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Months') > -1)
+                            experience = parseFloat((element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split('Years ')[1].split(' Months')[0] / 12).toFixed(1)) + parseInt(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ')[0]);
+
+                        else if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Years') == -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Year') > -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Months') > -1)
+                            experience = parseFloat((element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split('Year ')[1].split(' Months')[0] / 12).toFixed(1)) + parseInt(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ')[0]);
+
+                        else if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Years') > -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Months') == -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Month') > -1)
+                            experience = parseFloat((element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split('Years ')[1].split(' Month')[0] / 12).toFixed(1)) + parseInt(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ')[0]);
+
+                        else if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Years') == -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Year') > -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Months') == -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Month') > -1)
+                            experience = parseFloat((element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split('Year ')[1].split(' Month')[0] / 12).toFixed(1)) + parseInt(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ')[0])
+                        else if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ')[0])
+                            experience = parseInt(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ')[0])
+                    }
+
+                    var jobTitle;
+                    if (element.getElementsByClassName('basicinfo_h haspic') && element.getElementsByClassName('basicinfo_h haspic')[0] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].getElementsByTagName('span') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].getElementsByTagName('span')[0] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].getElementsByTagName('span')[0].innerHTML)
+                        jobTitle = removeExtraChars(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].getElementsByTagName('span')[0].innerHTML);
+
+
+                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 2, index: selected_candidates[i], education: education, specialization: specialization, skills: skills, current_employer: current_employer, previous_employer: previous_employer, job_title: jobTitle, experience: experience });
                 }
         }
 
-        var isTallint = req.query.isTallint || 0;
+        var isTallint = req.body.isTallint || 0;
 
         // for tallint
         if (isTallint) {
-            var token = req.query.token;
-            var heMasterId = req.query.heMasterId;
+            // var token = req.query.token;
+            // var heMasterId = req.query.heMasterId;
             var portalId = 2;
-            var formData = {
-                applicants: applicants
-            };
 
             request({
                 url: req.body.tallint_url,
                 method: "POST",
                 json: true,
-                body: applicants
-            }, function (error, response, body) {
-                if (!err && body) {
-                    console.log('tallint response here');
+                body: { applicants: applicants }
+            }, function (error, resp, body) {
+                if (!error && body) {
+                    response.status = true;
+                    response.message = "Response from tallint DB";
+                    response.error = null;
+                    response.data = {
+                        ourjson: applicants,
+                        resonseOfTallint: body
+                    };
+                    res.status(200).json(response);
+                }
+                else if (error) {
+                    response.status = false;
+                    response.message = "Error from tallint DB";
+                    response.error = null;
+                    response.data = {
+                        ourjson: applicants,
+                        resonseOfTallint: error
+                    };
+                    res.status(500).json(response);
                 }
             });
         }
@@ -453,13 +619,14 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
 
 
 portalimporter.saveApplicantsFromMonster = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Some error occurred",
+        data: null,
+        error: null
+    };
     try {
-        var response = {
-            status: false,
-            message: "Some error occurred",
-            data: null,
-            error: null
-        };
+        
         var portalId = 2;   // monster
         var cvSourceId = 2;
         // var validationFlag = true;
@@ -537,13 +704,13 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
                             years = removeExtraChars(exp.split(' ')[0].trim());
                         }
                         if (exp.split(' ') && exp.split(' ')[3] && exp.split(' ')[3].trim() && removeExtraChars(exp.split(' ')[3].trim()) > 0) {
-                            months = removeExtraChars(exp.split(' ')[3].trim());
+                            months = (removeExtraChars(exp.split(' ')[3].trim()) / 12).toFixed(1);
                         }
                         if (years && months) {
-                            details.experience = years + '.' + months;
+                            details.experience = parseFloat(years) + parseFloat(months);
                         }
-                        else {
-                            details.experience = years + '';
+                        else if (years > 0) {
+                            details.experience = parseInt(years);
                         }
                     }
                 }
@@ -689,8 +856,16 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
                         if (tempElement[i].getElementsByClassName('skrworkcell') && tempElement[i].getElementsByClassName('skrworkcell')[2].innerHTML && tempElement[i].getElementsByClassName('skrworkcell')[2].innerHTML.split('<strong>to</strong>') && tempElement[i].getElementsByClassName('skrworkcell')[2].innerHTML.split('<strong>to</strong>')[1])
                             work_history.duration.to = removeExtraChars(tempElement[i].getElementsByClassName('skrworkcell')[2].innerHTML.split('<strong>to</strong>')[1]);
                         if (tempElement[i].getElementsByClassName('skrworkcell') && tempElement[i].getElementsByClassName('skrworkcell')[3].innerHTML) {
-                            var salaryString = removeExtraChars(tempElement[i].getElementsByClassName('skrworkcell')[3].innerHTML);
-                            work_history.salary = salaryString.split(' ')[0];
+                            try {
+                                var salaryString = removeExtraChars(tempElement[i].getElementsByClassName('skrworkcell')[3].innerHTML);
+                                if (salaryString && (salaryString.indexOf('lac') > -1 || salaryString.indexOf('lacs') > -1))
+                                    work_history.salary = salaryString.split(' ')[0] * 100000;
+                                else
+                                    work_history.salary = salaryString.split(' ')[0];
+                            }
+                            catch (err) {
+                                console.log(err);
+                            }
                         }
                         work_histories.push(work_history);
                     }
@@ -742,7 +917,7 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
                 if (tempElement && tempElement[i] && tempElement[i].getElementsByClassName('skrworkcell') && tempElement[i].getElementsByClassName('skrworkcell')[0] && tempElement[i].getElementsByClassName('skrworkcell')[0].innerHTML) {
                     var skill_experience_detail = {};
                     if (tempElement[i].getElementsByClassName('skrworkcell') && tempElement[i].getElementsByClassName('skrworkcell')[0] && tempElement[i].getElementsByClassName('skrworkcell')[0].innerHTML)
-                        skill_experience_detail.skill_name = document.getElementsByClassName('skrworktbl')[1].getElementsByClassName('skrworkrow')[i].getElementsByClassName('skrworkcell')[0].innerHTML;
+                        skill_experience_detail.skill_name = removeExtraChars(document.getElementsByClassName('skrworktbl')[1].getElementsByClassName('skrworkrow')[i].getElementsByClassName('skrworkcell')[0].innerHTML);
 
                     if (tempElement[i].getElementsByClassName('skrworkcell') && tempElement[i].getElementsByClassName('skrworkcell')[1] && tempElement[i].getElementsByClassName('skrworkcell')[1].innerHTML) {
                         var experience = removeExtraChars(tempElement[i].getElementsByClassName('skrworkcell')[1].innerHTML);
@@ -942,9 +1117,64 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                         uniqueId = JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[i].uniqueId;
                     }
 
-                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: i, lastModifiedDate: lastModifiedDate, uniqueId: uniqueId });
+                    //experience
+                    var experience = 0;
+                    var element = document.getElementsByClassName('tuple')[i];
+                    if (element && element.getElementsByClassName('exp') && element.getElementsByClassName('exp')[0] && element.getElementsByClassName('exp')[0].innerHTML) {
+                        var temp_experience = 0;
+                        if (element.getElementsByClassName('exp')[0].innerHTML.split('yr ') && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0] && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0] != 0 && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0] != '') {
+                            temp_experience += parseInt(document.getElementsByClassName('tuple')[0].getElementsByClassName('exp')[0].innerHTML.split('yr ')[0]);
+                        }
+                        if (element.getElementsByClassName('exp')[0].innerHTML.split('yr ') && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1] && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0] != 0 && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0] != '') {
+                            temp_experience += parseFloat(((document.getElementsByClassName('tuple')[0].getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0]) / 12).toFixed(1));
+                        }
+                        if (temp_experience) {
+                            experience = temp_experience;
+                        }
+                    }
+
+                    //present location
+                    var current_location = '';
+                    if (element && element.getElementsByClassName('loc') && element.getElementsByClassName('loc')[0] && element.getElementsByClassName('loc')[0].innerHTML && removeExtraChars(element.getElementsByClassName('loc')[0].innerHTML) != '') {
+                        current_location = removeExtraChars(element.getElementsByClassName('loc')[0].innerHTML);
+                    }
+
+                    //current designation
+                    var job_title = '';
+                    if (element.getElementsByClassName('desc currInfo') && element.getElementsByClassName('desc currInfo')[0] && element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a') && element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[0] && element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[0].innerHTML && removeExtraChars(element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[0].innerHTML) != '') {
+                        job_title = removeExtraChars(element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[0].innerHTML);
+                    }
+
+                    //current employer
+                    var current_employer = '';
+                    if (element.getElementsByClassName('desc currInfo') && element.getElementsByClassName('desc currInfo')[0] && element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a') && element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[1] && element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[1].innerHTML && removeExtraChars(element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[1].innerHTML) != '') {
+                        current_employer = removeExtraChars(element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[1].innerHTML);
+                    }
+
+                    //previous designation
+                    var prev_jobtitle = '';
+                    if (element.getElementsByClassName('desc prvInfo') && element.getElementsByClassName('desc prvInfo')[0] && element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a') && element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[0] && element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[0].innerHTML && removeExtraChars(element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[0].innerHTML) != '') {
+                        prev_jobtitle = removeExtraChars(element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[0].innerHTML);
+                    }
+
+                    //previous employer
+                    var previous_employer = '';
+                    if (element.getElementsByClassName('desc prvInfo') && element.getElementsByClassName('desc prvInfo')[0] && element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a') && element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[1] && element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[1].innerHTML && removeExtraChars(element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[1].innerHTML) != '') {
+                        previous_employer = removeExtraChars(element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[1].innerHTML);
+                    }
+
+                    //skills
+                    var skills = [];
+                    var skill_element = element.getElementsByClassName('skillkey');
+                    for (var x = 0; x < skill_element.length; x++) {
+                        if (skill_element[x] && skill_element[x].innerHTML)
+                            skills[x] = removeExtraChars(skill_element[x].innerHTML);
+                    }
+
+                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: i, lastModifiedDate: lastModifiedDate, uniqueId: uniqueId, current_location: current_location, current_employer: current_employer, job_title: job_title, previous_employer: previous_employer, skills: skills });
                 }
             }
+        console.log(JSON.stringify(applicants));
     }
 
     else {
@@ -974,30 +1204,98 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                     uniqueId = JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[selected_candidates[i]].uniqueId;
                 }
 
-                applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: selected_candidates[i], lastModifiedDate: lastModifiedDate, uniqueId: uniqueId });
+                //experience
+                var experience = 0;
+                var element = document.getElementsByClassName('tuple')[i];
+                if (element && element.getElementsByClassName('exp') && element.getElementsByClassName('exp')[0] && element.getElementsByClassName('exp')[0].innerHTML) {
+                    var temp_experience = 0;
+                    if (element.getElementsByClassName('exp')[0].innerHTML.split('yr ') && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0] && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0] != 0 && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0] != '') {
+                        temp_experience += parseInt(document.getElementsByClassName('tuple')[0].getElementsByClassName('exp')[0].innerHTML.split('yr ')[0]);
+                    }
+                    if (element.getElementsByClassName('exp')[0].innerHTML.split('yr ') && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1] && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0] != 0 && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0] != '') {
+                        temp_experience += parseFloat(((document.getElementsByClassName('tuple')[0].getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0]) / 12).toFixed(1));
+                    }
+                    if (temp_experience) {
+                        experience = temp_experience;
+                    }
+                }
+
+                //present location
+                var current_location = '';
+                if (element && element.getElementsByClassName('loc') && element.getElementsByClassName('loc')[0] && element.getElementsByClassName('loc')[0].innerHTML && removeExtraChars(element.getElementsByClassName('loc')[0].innerHTML != '')) {
+                    location = removeExtraChars(document.getElementsByClassName('tuple')[0].getElementsByClassName('loc')[0].innerHTML);
+                }
+
+                //current designation
+                var job_title = '';
+                if (element.getElementsByClassName('desc currInfo') && element.getElementsByClassName('desc currInfo')[0] && element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a') && element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[0] && element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[0].innerHTML && removeExtraChars(element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[0].innerHTML) != '') {
+                    job_title = removeExtraChars(element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[0].innerHTML);
+                }
+
+                //current employer
+                var current_employer = '';
+                if (element.getElementsByClassName('desc currInfo') && element.getElementsByClassName('desc currInfo')[0] && element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a') && element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[1] && element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[1].innerHTML && removeExtraChars(element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[1].innerHTML) != '') {
+                    current_employer = removeExtraChars(element.getElementsByClassName('desc currInfo')[0].getElementsByTagName('a')[1].innerHTML);
+                }
+
+                //previous designation
+                var prev_jobtitle = '';
+                if (element.getElementsByClassName('desc prvInfo') && element.getElementsByClassName('desc prvInfo')[0] && element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a') && element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[0] && element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[0].innerHTML && removeExtraChars(element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[0].innerHTML) != '') {
+                    prev_jobtitle = removeExtraChars(element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[0].innerHTML);
+                }
+
+                //previous employer
+                var previous_employer = '';
+                if (element.getElementsByClassName('desc prvInfo') && element.getElementsByClassName('desc prvInfo')[0] && element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a') && element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[1] && element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[1].innerHTML && removeExtraChars(element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[1].innerHTML) != '') {
+                    previous_employer = removeExtraChars(element.getElementsByClassName('desc prvInfo')[0].getElementsByTagName('a')[1].innerHTML);
+                }
+
+                //skills
+                var skills = [];
+                var skill_element = element.getElementsByClassName('skillkey');
+                for (var x = 0; x < skill_element.length; x++) {
+                    if (skill_element[x] && skill_element[x].innerHTML)
+                        skills[x] = removeExtraChars(skill_element[x].innerHTML);
+                }
+
+                applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: selected_candidates[i], lastModifiedDate: lastModifiedDate, uniqueId: uniqueId, current_location: current_location, current_employer: current_employer, job_title: job_title, previous_employer: previous_employer, skills: skills });
             }
     }
 
 
-    var isTallint = req.query.isTallint || 0;
+    var isTallint = req.body.isTallint || 0;
 
     // for tallint
     if (isTallint) {
-        var token = req.query.token;
-        var heMasterId = req.query.heMasterId;
+        // var token = req.query.token;
+        // var heMasterId = req.query.heMasterId;
         var portalId = 1;
-        var formData = {
-            applicants: applicants
-        };
 
         request({
             url: req.body.tallint_url,
             method: "POST",
             json: true,
-            body: applicants
-        }, function (error, response, body) {
-            if (!err && body) {
-                console.log('tallint response here');
+            body: { applicants: applicants }
+        }, function (error, resp, body) {
+            if (!error && body) {
+                response.status = true;
+                response.message = "Response from tallint DB";
+                response.error = null;
+                response.data = {
+                    ourjson: applicants,
+                    resonseOfTallint: body
+                };
+                res.status(200).json(response);
+            }
+            else if (error) {
+                response.status = false;
+                response.message = "Error from tallint DB";
+                response.error = null;
+                response.data = {
+                    ourjson: applicants,
+                    resonseOfTallint: error
+                };
+                res.status(500).json(response);
             }
         });
     }
@@ -1009,13 +1307,15 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
 
 portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
 
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    
     try {
-        var response = {
-            status: false,
-            message: "Invalid token",
-            data: null,
-            error: null
-        };
+     
         var validationFlag = true;
         var portalId = 1;
         var cvSourceId = 1;
@@ -1025,6 +1325,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
 
         var document = new JSDOM(req.body.xml_string).window.document;
         // console.log('req.files.document',req.body.document);
+        var isTallint = req.query.isTallint || 0;
 
         var tempName = document.getElementsByClassName('bkt4 name userName');
         if (tempName && tempName[0] && tempName[0].innerHTML) {
@@ -1123,12 +1424,22 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             if (amount && amount[0]) {
                 details.presentSalary = removeExtraChars(amount[0]);
                 if (amount[1] && amount[1].indexOf('Lac') > -1) {
-                    details.presentSalaryScale = { scale: "Lakhs", scaleId: 4 }
+                    if (!isTallint)
+                        details.presentSalaryScale = { scale: "Lakhs", scaleId: 4 }
+                    else
+                        details.presentSalaryScale = "Lakhs"
                 }
                 document.getElementsByClassName('salInfo')[0].innerHTML.replace('<em class="iconRup"></em>', '').trim().split(' ')[0]
-                if (salaryDetails[0].getElementsByClassName('iconRup') && salaryDetails[0].getElementsByClassName('iconRup').length)
-                    details.presentSalaryCurr = { currencyId: 2, currencySymbol: "INR" };
-                details.presentSalaryPeriod = { duration: "Per Annum", durationId: 4 };
+                if (salaryDetails[0].getElementsByClassName('iconRup') && salaryDetails[0].getElementsByClassName('iconRup').length) {
+                    if (!isTallint)
+                        details.presentSalaryCurr = { currencyId: 2, currencySymbol: "INR" };
+                    else
+                        details.presentSalaryCurr = 'INR';
+                }
+                if (!isTallint)
+                    details.presentSalaryPeriod = { duration: "Per Annum", durationId: 4 };
+                else
+                    details.presentSalaryPeriod = "Per Annum";
             }
         }
 
@@ -1176,14 +1487,23 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                     if (document.getElementsByClassName('clFx details-box')[0].innerHTML.split('</div>')[i].split('"desc">') && document.getElementsByClassName('clFx details-box')[0].innerHTML.split('</div>')[i].split('"desc">')[1]) {
                         var gender = document.getElementsByClassName('clFx details-box')[0].innerHTML.split('</div>')[i].split('"desc">')[1];
                         gender = removeExtraChars(gender);
-                        if (gender.toLowerCase() == "male") {
-                            details.gender = 1;
+                        if (gender.toLowerCase() == "female") {
+                            if (!isTallint)
+                                details.gender = 2;
+                            else
+                                details.gender = 'F'
                         }
-                        else if (gender.toLowerCase() == "female") {
-                            details.gender = 2;
+                        else if (gender.toLowerCase() == "male") {
+                            if (!isTallint)
+                                details.gender = 1;
+                            else
+                                details.gender = 'M'
                         }
                         else {
-                            details.gender = 3;
+                            if (!isTallint)
+                                details.gender = 3;
+                            else
+                                details.gender = '';
                         }
                     }
                 }
@@ -1200,6 +1520,76 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             details.functionalAreas = removeExtraChars(document.getElementsByClassName('desc faInfo')[0].innerHTML).split(',');
         }
 
+        var work_histories = [];
+        var work_history_element = document.getElementsByClassName('exp-container');
+        //index 0 consists of current organization
+        if (work_history_element && work_history_element.length)
+            for (var i = 1; i < work_history_element.length; i++) {
+                var work_history = {};
+                if (work_history_element[i]) {
+                    var company_name = work_history_element[i].getElementsByClassName('org pOrg');
+                    var designation = work_history_element[i].getElementsByClassName('designation pDesig bkt4');
+                    work_history.duration = {};
+                    var temp_from = work_history_element[i].getElementsByClassName('time');
+                    if (company_name && company_name[0] && company_name[0].innerHTML && removeExtraChars(company_name[0].innerHTML) != '')
+                        work_history.company_name = removeExtraChars(company_name[0].innerHTML);
+                    if (designation && designation[0] && designation[0].innerHTML && removeExtraChars(designation[0].innerHTML) != '')
+                        work_history.designation = removeExtraChars(designation[0].innerHTML);
+                    if (temp_from && temp_from[0] && temp_from[0].innerHTML && temp_from[0].innerHTML.split('</span>') && temp_from[0].innerHTML.split('</span>')[1] && temp_from[0].innerHTML.split('</span>')[1].split('to') && temp_from[0].innerHTML.split('</span>')[1].split('to')[0]) {
+                        work_history.duration.from = removeExtraChars(temp_from[0].innerHTML.split('</span>')[1].split('to')[0]);
+                    }
+                    if (temp_from && temp_from[0] && temp_from[0].innerHTML && temp_from[0].innerHTML.split('</span>') && temp_from[0].innerHTML.split('</span>')[1] && temp_from[0].innerHTML.split('</span>')[1].split('to') && temp_from[0].innerHTML.split('</span>')[1].split('to')[1]) {
+                        work_history.duration.to = removeExtraChars(temp_from[0].innerHTML.split('</span>')[1].split('to')[1]);
+                    }
+                    work_histories.push(work_history);
+                }
+            }
+
+        details.work_history = work_histories;
+
+        var skill_experiences = [];
+        var skill_experience_element = document.getElementById('jump-it-skill') ? document.getElementById('jump-it-skill').getElementsByTagName('tr') : undefined;
+        if (skill_experience_element && skill_experience_element.length) {
+            for (var i = 1; i < document.getElementById('jump-it-skill').getElementsByTagName('tr').length; i++) {
+                var skill_experience = {};
+                if (skill_experience_element[i] && skill_experience_element[i].getElementsByTagName('td') && skill_experience_element[i].getElementsByTagName('td')[0] && removeExtraChars(skill_experience_element[i].getElementsByTagName('td')[0].innerHTML) != '')
+                    skill_experience.skill_name = removeExtraChars(document.getElementById('jump-it-skill').getElementsByTagName('tr')[i].getElementsByTagName('td')[0].innerHTML);
+                if (skill_experience_element[i] && skill_experience_element[i].getElementsByTagName('td') && skill_experience_element[i].getElementsByTagName('td')[0] && removeExtraChars(skill_experience_element[i].getElementsByTagName('td')[2].innerHTML) != '')
+                    skill_experience.last_used = removeExtraChars(document.getElementById('jump-it-skill').getElementsByTagName('tr')[i].getElementsByTagName('td')[2].innerHTML);
+                if (skill_experience_element[i] && skill_experience_element[i].getElementsByTagName('td') && skill_experience_element[i].getElementsByTagName('td')[0] && removeExtraChars(skill_experience_element[i].getElementsByTagName('td')[3].innerHTML) != '') {
+                    skill_experience.experience = removeExtraChars(document.getElementById('jump-it-skill').getElementsByTagName('tr')[i].getElementsByTagName('td')[3].innerHTML);
+                    if (skill_experience.experience && skill_experience.experience.split(' Year(s) ')[0] && skill_experience.experience.split(' Year(s) ')[1] && skill_experience.experience.split(' Year(s) ')[1].split(' Month(s)')[0] && skill_experience.experience.split(' Year(s) ')[1].split(' Month(s)')[0] != '0')
+                        skill_experience.experience = parseFloat(removeExtraChars(skill_experience.experience.split(' Year(s) ')[0])) + parseFloat(parseFloat(removeExtraChars(skill_experience.experience.split(' Year(s) ')[1].split(' Month(s)')[0]) / 12).toFixed(1));
+                    else if (skill_experience.experience && skill_experience.experience.split(' Year(s) ')[0] && skill_experience.experience.split(' Year(s) ')[1] && skill_experience.experience.split(' Year(s) ')[1].split(' Month(s)')[0])
+                        skill_experience.experience = parseFloat(removeExtraChars(skill_experience.experience.split(' Year(s) ')[0]));
+                }
+                skill_experiences.push(skill_experience);
+            }
+        }
+
+        details.skill_experience = skill_experiences;
+
+        //naukri education 
+        var education = [];
+        var education_element = document.getElementsByClassName('education-inner');
+        for (var x = 0; x < education_element.length; x++) {
+            var education_object = {};
+            if (education_element[x] && education_element[x].getElementsByClassName('org bkt4') && education_element[x].getElementsByClassName('org bkt4')[0] && education_element[x].getElementsByClassName('org bkt4')[0].innerHTML)
+                education_object.institution = removeExtraChars(education_element[x].getElementsByClassName('org bkt4')[0].innerHTML);
+            if (education_element[x] && education_element[x].getElementsByClassName('detail') && education_element[x].getElementsByClassName('detail')[0] && education_element[x].getElementsByClassName('detail')[0].innerHTML && education_element[x].getElementsByClassName('detail')[0].innerHTML.split('</span>') && education_element[x].getElementsByClassName('detail')[0].innerHTML.split('</span>')[1] && education_element[x].getElementsByClassName('detail')[0].innerHTML.split('</span>')[1])
+                education_object.passing_year = removeExtraChars(education_element[x].getElementsByClassName('detail')[0].innerHTML.split('</span>')[1]);
+
+            if (education_element[x] && education_element[x].getElementsByClassName('detail') && education_element[x].getElementsByClassName('detail')[0] && education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg') && education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0] && education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML) {
+                education_object.education = removeExtraChars(education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML.split('(')[0]);
+                if (education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML.split('(')[1] && education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML.split('(')[1].split(')')[0])
+                    education_object.specialization = removeExtraChars(education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML.split('(')[1].split(')')[0]);
+            }
+            education.push(education_object);
+        }
+
+        details.education = education;
+
+
         var isTallint = req.query.isTallint || 0;
 
         // for tallint
@@ -1207,9 +1597,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             var token = req.query.token;
             var heMasterId = req.query.heMasterId;
             // var portalId = 2;
-            var formData = {
-                applicants: applicants
-            };
+
             details.portalId = portalId;
             if (req.body.attachment) {
                 var attachment1 = req.body.attachment.split(',');
@@ -1218,7 +1606,6 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
 
                     details.resume_document = attachment1[1];
                     var filetype = '';
-                    console.log(re);
                     if (attachment1[0].indexOf('png') > 0 || attachment1[0].indexOf('jpg') > 0) {
                         filetype = "png";
                     }
@@ -1253,12 +1640,13 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                 method: "POST",
                 json: true,
                 body: details
-            }, function (error, response, body) {
+            }, function (error, resp, body) {
                 if (!error && body) {
                     response.status = true;
                     response.message = "Response from tallint DB";
                     response.error = null;
                     response.data = {
+                        ourjson: details,
                         resonseOfTallint: body
                     };
                     res.status(200).json(response);
@@ -1268,6 +1656,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                     response.message = "Error from tallint DB";
                     response.error = null;
                     response.data = {
+                        ourjson: details,
                         resonseOfTallint: error
                     };
                     res.status(200).json(response);
@@ -1415,6 +1804,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortal = function (req, res, nex
         data: null,
         error: null
     };
+    
     var validationFlag = true;
     var portalId = 3;   // timesjob portal
 
