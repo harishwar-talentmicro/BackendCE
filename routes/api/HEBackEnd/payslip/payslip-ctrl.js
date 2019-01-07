@@ -180,7 +180,8 @@ payslipCtrl.getPaySlips = function(req,res,next){
                         }
                     }
                         response.data =  {
-                            paySlips : output
+                            paySlips : output,
+                            totalCount:salaryLedger[1][0].count
                         };
                         res.status(200).json(response);
                     }

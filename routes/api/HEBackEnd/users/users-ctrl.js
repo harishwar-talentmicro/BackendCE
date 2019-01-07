@@ -103,6 +103,7 @@ userCtrl.saveUser = function(req,res,next){
                 req.body.mobileNumber = (req.body.mobileNumber) ? req.body.mobileNumber : "";
                 req.body.emailId = (req.body.emailId) ? req.body.emailId : "";
                 req.body.DOJ = (req.body.DOJ) ? req.body.DOJ : null;
+                req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
                 // firstName,lastName,mobileISD,mobileNumber,emailId,displayName
 
                 var procParams = [
@@ -127,6 +128,8 @@ userCtrl.saveUser = function(req,res,next){
                     req.st.db.escape(req.body.mobileNumber),
                     req.st.db.escape(req.body.emailId),
                     req.st.db.escape(req.body.DOJ),
+                    req.st.db.escape(req.body.DOB),
+                    
                     req.st.db.escape(DBSecretKey)
                 ];
                 /**
@@ -1651,10 +1654,16 @@ userCtrl.getBulkImporterTitles = function(req,res,next){
     else {
         req.st.validateToken(req.query.token,function(err,tokenResult){
             if((!err) && tokenResult){
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                var startPage = 0;
+
+                startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
             
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(startPage),
+                    req.st.db.escape(req.query.limit)
                  
                 ];
                 /**
@@ -1668,7 +1677,10 @@ userCtrl.getBulkImporterTitles = function(req,res,next){
                         response.status = true;
                         response.message = "Bulk importer list loaded successfully";
                         response.error = null;
-                        response.importList = (result[0] &&  result[0][0]) ? result[0] :[];
+                        response.data ={
+                            importList:(result[0] &&  result[0][0]) ? result[0] :[],
+                            count:result[1][0].count                     
+                          } 
                         res.status(200).json(response);
                     }
                     else{
