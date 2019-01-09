@@ -622,7 +622,7 @@ quizCtrl.saveQuizTemplateWithQuestions = function (req, res, next) {
                     console.log(err);
                     if (!err && results && results[0] && results[0][0]) {
                         response.status = true;
-                        response.message = "Survey template saved successfully";
+                        response.message = "Quiz template saved successfully";
                         response.error = null;
                         response.data = results[0][0];
                         res.status(200).json(response);
@@ -630,7 +630,7 @@ quizCtrl.saveQuizTemplateWithQuestions = function (req, res, next) {
                     }
                     else {
                         response.status = false;
-                        response.message = "Error while saving survey template";
+                        response.message = "Error while saving Quiz template";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
@@ -806,7 +806,7 @@ quizCtrl.quizStatusChange = function (req, res, next) {
                     }
                     else {
                         response.status = false;
-                        response.message = "Error while notifying survey";
+                        response.message = "Error while notifying Quiz";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

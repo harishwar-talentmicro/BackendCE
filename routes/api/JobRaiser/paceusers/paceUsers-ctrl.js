@@ -569,6 +569,7 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
                 req.query.type = req.query.type ? req.query.type : 1;
+                req.body.resultType = req.body.resultType ? req.body.resultType : 1;
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
@@ -683,15 +684,16 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
 
                             else if(req.body.resultType ==4){
                                 response.data={
-                                    recruiterWiseReport: result[0]
+                                    recruiterWiseReport: result[0],
+                                    stagewiseTurnAroundReport: result[1]
                              }
                             }
 
-                            else if(req.body.resultType ==5){
-                                response.data={
-                                    stagewiseTurnAroundReport: result[0]
-                             }
-                            }
+                            // else if(req.body.resultType ==5){
+                            //     response.data={
+                            //         stagewiseTurnAroundReport: result[0]
+                            //  }
+                            // }
                             else {
                                 response.data={
                                     // recruiterWiseReport: result[0],
