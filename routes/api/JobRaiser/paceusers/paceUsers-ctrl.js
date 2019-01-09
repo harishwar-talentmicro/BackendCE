@@ -305,7 +305,7 @@ paceUsersCtrl.getUsers = function (req, res, next) {
                         response.data = {
                             userList: result[0] ? result[0] : [],
                             userDetail: result[0][0] ? result[0][0] : {},
-                            reportingTo : result[1] && result[1][0] ? result[1][0] : []
+                            reportingTo: result[1] && result[1][0] ? result[1][0] : []
                         };
                         res.status(200).json(response);
                     }
@@ -578,7 +578,7 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                     req.st.db.escape(req.query.type),
                     req.st.db.escape(req.body.from),
                     req.st.db.escape(req.body.to),
-                    req.st.db.escape(req.body.resultType ||0)
+                    req.st.db.escape(req.body.resultType || 0)
                 ];
 
                 var procQuery = 'CALL wm_get_DashBoard( ' + inputs.join(',') + ')';
@@ -658,55 +658,61 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         // }
 
 
-                         if (req.body.resultType ==1) {
-                             response.data={
-                            requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
-                            stages: result[1],
-                            converstionReport: result[2][0],
+                        if (req.body.resultType == 1) {
+                            response.data = {
+                                requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
+                                stages: result[1],
+                                converstionReport: result[2][0],
                                 turnAroundTime: result[3][0],
                                 firstCVResponse: result[4][0],
 
-                             }
                             }
-                             else if(req.body.resultType ==2){
-                                response.data={
-                                requirementReport:  result[0],
+                        }
+                        else if (req.body.resultType == 2) {
+                            response.data = {
+                                requirementReport: result[0],
                                 requirementReportTotalCount: result[1],
-                             }
                             }
+                        }
 
-                            else if(req.body.resultType ==3){
-                                response.data={
-                                    fullfilmentReport: result[0],
-                                    fullfilmentReportTotalCount: result[1],
-                             }
+                        else if (req.body.resultType == 3) {
+                            response.data = {
+                                fullfilmentReport: result[0],
+                                fullfilmentReportTotalCount: result[1],
                             }
+                        }
 
-                            else if(req.body.resultType ==4){
-                                response.data={
-                                    recruiterWiseReport: result[0],
-                                    stagewiseTurnAroundReport: result[1]
-                             }
+                        else if (req.body.resultType == 4) {
+                            response.data = {
+                                recruiterWiseReport: result[0],
+                                stagewiseTurnAroundReport: result[1]
                             }
+                        }
 
-                            // else if(req.body.resultType ==5){
-                            //     response.data={
-                            //         stagewiseTurnAroundReport: result[0]
-                            //  }
-                            // }
-                            else {
-                                response.data={
-                                    // recruiterWiseReport: result[0],
-                                    // stagewiseTurnAroundReport: result[1],
-                                    cvSourceReport: result[0],
-                                    cvSourceRecruiterReport: result[1],
-    
-    
-                                    totalCVCount: result[2][0].count,
-                                    filteredCVCount: result[3][0].count,
-                             }
+                        // else if(req.body.resultType ==5){
+                        //     response.data={
+                        //         stagewiseTurnAroundReport: result[0]
+                        //  }
+                        // }
+                        else if (req.body.resultType == 5) {
+                            response.data = {
+                                // recruiterWiseReport: result[0],
+                                // stagewiseTurnAroundReport: result[1],
+                                cvSourceReport: result[0],
+                                cvSourceRecruiterReport: result[1],
+
+
+                                totalCVCount: result[2][0].count,
+                                filteredCVCount: result[3][0].count,
                             }
-                         
+                        }
+
+                        else if (req.body.resultType == 6) {
+                            response.data = {
+                                skillReport: result[0] && result[0][0] ? result[0] : []
+                            }
+                        }
+                        
 
                         // response.data =
                         //     {
@@ -732,7 +738,7 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         //         // CandidatesInterviewedByClient_CandidatesOffered: result[12][0],
                         //         // CandidatesOffered_CandidatesJoined: result[13][0]
 
-                            // };
+                        // };
                         res.status(200).json(response);
                     }
 
@@ -2988,13 +2994,13 @@ paceUsersCtrl.getSourcedApplicants = function (req, res, next) {
                         //     result[0][i].cvSource=result[0][i].cvSource? JSON.parse(result[0][i].cvSource):{};
                         //     result[0][i].nationality=result[0][i].nationality? JSON.parse(result[0][i].nationality):{};
                         //     result[0][i].prefLocations=result[0][i].prefLocations? JSON.parse(result[0][i].prefLocations):{};
-                            
+
                         // }
 
-                            response.data =
-                                {
-                                    ApplicantsList: result[0] ? result[0] : []
-                                };
+                        response.data =
+                            {
+                                ApplicantsList: result[0] ? result[0] : []
+                            };
                         res.status(200).json(response);
                     }
 
@@ -3059,42 +3065,42 @@ paceUsersCtrl.logoutPortalUsers = function (req, res, next) {
     else {
         // req.st.validateToken(req.query.token, function (err, tokenResult) {
         //     if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.portalId),
-                    req.st.db.escape(req.query.userName)
-                ];
+        var inputs = [
+            req.st.db.escape(req.query.token),
+            req.st.db.escape(req.query.heMasterId),
+            req.st.db.escape(req.query.portalId),
+            req.st.db.escape(req.query.userName)
+        ];
 
-                var procQuery = 'CALL pace_portalLogOut( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    // console.log(result);
-                    if (!err && result && result[0] && result[0][0] && result[0][0].message) {
-                        response.status = true;
-                        response.message = result[0][0].message;
-                        response.error = null;
-                        response.data =null;
+        var procQuery = 'CALL pace_portalLogOut( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            // console.log(result);
+            if (!err && result && result[0] && result[0][0] && result[0][0].message) {
+                response.status = true;
+                response.message = result[0][0].message;
+                response.error = null;
+                response.data = null;
 
-                        res.status(200).json(response);
-                    }
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "Failed to log out";
-                        response.error = null;
-                        response.data = null;
-                        res.status(200).json(response);
-                    }
-                    else {
-                        response.status = false;
-                        response.message = "Error while logging from portal";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
+                res.status(200).json(response);
+            }
+            else if (!err) {
+                response.status = true;
+                response.message = "Failed to log out";
+                response.error = null;
+                response.data = null;
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while logging from portal";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
         //     }
         //     else {
         //         res.status(401).json(response);
@@ -3155,8 +3161,8 @@ paceUsersCtrl.getclientRequuirements = function (req, res, next) {
                         response.status = true;
                         response.message = "data loaded successfully";
                         response.error = null;
-                    
-                        response.data =result[0];
+
+                        response.data = result[0];
                         res.status(200).json(response);
                     }
 
