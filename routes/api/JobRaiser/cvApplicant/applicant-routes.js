@@ -110,5 +110,7 @@ router.post('/recruitersClientData',applicantCtrl.getRecruiterPerformanceByClien
 router.post('/recruitersReqData',applicantCtrl.getRecruiterPerformanceByRequirementWise);
 router.post('/recruitersReqApplicantData',applicantCtrl.getRecruiterPerformanceReqApplicantData);
 
+router.post('/applicantListWithColumnFilter',applicantCtrl.getreqApplicantsWithColumnFilter);
+
 module.exports = router;
 

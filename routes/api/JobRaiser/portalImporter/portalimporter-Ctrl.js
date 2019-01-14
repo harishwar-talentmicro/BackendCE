@@ -87,12 +87,17 @@ var removeExtraChars = function (params) {
     if (params && typeof (params) == 'string' && params != '') {
         params = params.replace(/<[a-zA-Z0-9=|\-|'|" \\|\/|_;&():#\.]*>/g, '');
         params = params.replace(/<\/[a-z]*>/g, '');
-        params = params.replace(/(\n)+/, '');
+        params = params.replace(/(\n)+/, ' ');
         params = params.replace(/not applicable/i, '');
+        params = params.replace(/Not Applicable/i, '');
         params = params.replace(/not disclosed/i, '');
+        params = params.replace(/Not Disclosed/i, '');
         params = params.replace(/(Verified)/i, '');
+        params = params.replace(/not mentioned/i, '');
         params = params.replace(/Not Mentioned/i, '');
-        params = params.replace(/[ ]{2}/g, '');
+        params = params.replace(/not specified/i, '');
+        params = params.replace(/Not Specified/i, '');
+        params = params.replace(/[ ]{2}/g, ' ');
         params = params.replace(/&amp;/g, '&');
         params = params.replace(/<!--[a-zA-Z0-9=|-|'|" \\|\/|_;&():#\.]*-->/g, '');
         params = params.replace(/[^\x00-\x7F]/g, "");
@@ -105,8 +110,15 @@ var removeExtraChars = function (params) {
     }
 }
 
+var removeUnicodeChars = function (param) {
+    param = param.replace(/[^\x00-\x7F]/g, "");
+    return param;
+}
+
 var dateConverter = function (params) {
     params = removeExtraChars(params);
+    params = params.replace('th', '');
+    params = params.replace(',', '');
     var dateStr = params;
     var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     var arr = dateStr.split(' ');
@@ -357,9 +369,9 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
         data: null,
         error: null
     };
-   
+
     try {
-       
+
         // var validationFlag = true;
         var portalId = 2;
 
@@ -376,7 +388,7 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
                 for (var i = 0; i < document.getElementsByClassName('resumeitem').length; i++) {
 
                     var name = document.getElementsByClassName('resumeitem')[i].getElementsByClassName('ritemheader')[0].getElementsByClassName('skname')[0].innerHTML;
-
+                    name = removeExtraChars(name);
                     var first_name = "";
                     var last_name = "";
 
@@ -438,8 +450,8 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
                         nationality = removeExtraChars(element.getElementsByClassName('skinfoitem nationality')[0].innerHTML);
 
                     var current_location;
-                    if (element.getElementsByClassName('skinfoitem info_loc') && element.getElementsByClassName('skinfoitem info_loc')[1] && element.getElementsByClassName('skinfoitem info_loc')[1].innerHTML)
-                        current_location = removeExtraChars(document.getElementsByClassName('skinfoitem info_loc')[1].innerHTML);
+                    if (element.getElementsByClassName('skinfoitem info_loc') && element.getElementsByClassName('skinfoitem info_loc')[0] && element.getElementsByClassName('skinfoitem info_loc')[0].innerHTML)
+                        current_location = removeExtraChars(element.getElementsByClassName('skinfoitem info_loc')[0].innerHTML);
 
                     var experience;
                     if (element.getElementsByClassName('basicinfo_h haspic') && element.getElementsByClassName('basicinfo_h haspic')[0] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1])
@@ -465,7 +477,35 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
                         jobTitle = removeExtraChars(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].getElementsByTagName('span')[0].innerHTML);
 
 
-                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 2, index: i, education: education, specialization: specialization, skills: skills, current_employer: current_employer, previous_employer: previous_employer, job_title: jobTitle, experience: experience });
+                    var lastModifiedDate;
+                    var uniqueID;
+
+                    try {
+                        var lu_uid_element = document.getElementsByClassName('bottombox')[i];
+
+                        if (lu_uid_element && lu_uid_element.getElementsByClassName('bottomboxtxt') && lu_uid_element.getElementsByClassName('bottomboxtxt')[0] && lu_uid_element.getElementsByClassName('bottomboxtxt')[0].innerHTML && lu_uid_element.getElementsByClassName('bottomboxtxt')[0].innerHTML.split('|') && lu_uid_element.getElementsByClassName('bottomboxtxt')[0].innerHTML.split('|').length) {
+                            var lu_uid_arr = lu_uid_element.getElementsByClassName('bottomboxtxt')[0].innerHTML.split('|');
+                            for (var x = 0; x < lu_uid_arr.length; x++) {
+                                if (lu_uid_arr[x] && lu_uid_arr[x].indexOf('Updated:') > -1) {
+                                    lastModifiedDate = dateConverter(lu_uid_arr[x].split('Updated: ')[1]);
+                                }
+                                else if (lu_uid_arr[x] && lu_uid_arr[x].indexOf('Resume ID: ') > -1) {
+                                    uniqueID = removeExtraChars(lu_uid_arr[x].split('Resume ID: ')[1]);
+                                    if (uniqueID) {
+                                        uniqueID = (uniqueID);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    catch (err) {
+                        console.log(err);
+                    }
+
+
+
+                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 2, index: i, education: education, specialization: specialization, skills: skills, current_employer: current_employer, previous_employer: previous_employer, job_title: jobTitle, experience: experience, current_location: current_location, nationality: nationality, lastModifiedDate: lastModifiedDate, uid: uniqueID });
                 }
 
             console.log("applicants", applicants);
@@ -540,8 +580,8 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
                         nationality = removeExtraChars(element.getElementsByClassName('skinfoitem nationality')[0].innerHTML);
 
                     var current_location;
-                    if (element.getElementsByClassName('skinfoitem info_loc') && element.getElementsByClassName('skinfoitem info_loc')[1] && element.getElementsByClassName('skinfoitem info_loc')[1].innerHTML)
-                        current_location = removeExtraChars(document.getElementsByClassName('skinfoitem info_loc')[1].innerHTML);
+                    if (element.getElementsByClassName('skinfoitem info_loc') && element.getElementsByClassName('skinfoitem info_loc')[0] && element.getElementsByClassName('skinfoitem info_loc')[0].innerHTML)
+                        current_location = removeExtraChars(element.getElementsByClassName('skinfoitem info_loc')[0].innerHTML);
 
                     var experience;
                     if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1]) {
@@ -565,7 +605,34 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
                         jobTitle = removeExtraChars(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].getElementsByTagName('span')[0].innerHTML);
 
 
-                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 2, index: selected_candidates[i], education: education, specialization: specialization, skills: skills, current_employer: current_employer, previous_employer: previous_employer, job_title: jobTitle, experience: experience });
+                    var lastModifiedDate;
+                    var uniqueID;
+                    try {
+
+
+                        var lu_uid_element = document.getElementsByClassName('bottombox')[selected_candidates[i]];
+
+                        if (lu_uid_element && lu_uid_element.getElementsByClassName('bottomboxtxt') && lu_uid_element.getElementsByClassName('bottomboxtxt')[0] && lu_uid_element.getElementsByClassName('bottomboxtxt')[0].innerHTML && lu_uid_element.getElementsByClassName('bottomboxtxt')[0].innerHTML.split('|') && lu_uid_element.getElementsByClassName('bottomboxtxt')[0].innerHTML.split('|').length) {
+                            var lu_uid_arr = lu_uid_element.getElementsByClassName('bottomboxtxt')[0].innerHTML.split('|');
+                            for (var x = 0; x < lu_uid_arr.length; x++) {
+                                if (lu_uid_arr[x] && lu_uid_arr[x].indexOf('Updated:') > -1) {
+                                    lastModifiedDate = dateConverter(lu_uid_arr[x].split('Updated: ')[1]);
+                                }
+                                else if (lu_uid_arr[x] && lu_uid_arr[x].indexOf('Resume ID: ') > -1) {
+                                    uniqueID = removeExtraChars(lu_uid_arr[x].split('Resume ID: ')[1]);
+                                    if (uniqueID) {
+                                        uniqueID = (uniqueID);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (err) {
+                        console.log(err);
+                    }
+
+
+                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 2, index: selected_candidates[i], education: education, specialization: specialization, skills: skills, current_employer: current_employer, previous_employer: previous_employer, job_title: jobTitle, experience: experience, current_location: current_location, nationality: nationality, lastModifiedDate: lastModifiedDate, uid: uniqueID });
                 }
         }
 
@@ -583,6 +650,8 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
                 json: true,
                 body: { applicants: applicants }
             }, function (error, resp, body) {
+                console.log("body", body);
+                console.log("error", error);
                 if (!error && body) {
                     response.status = true;
                     response.message = "Response from tallint DB";
@@ -593,7 +662,7 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
                     };
                     res.status(200).json(response);
                 }
-                else if (error) {
+                else {
                     response.status = false;
                     response.message = "Error from tallint DB";
                     response.error = null;
@@ -626,7 +695,7 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
         error: null
     };
     try {
-        
+
         var portalId = 2;   // monster
         var cvSourceId = 2;
         // var validationFlag = true;
@@ -638,16 +707,17 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
         // console.log('req.files.document',req.body.document);
 
         var tempName = document.getElementsByClassName('skname');
-        if (tempName && tempName[0] && tempName[0].innerHTML)
-            // details.firstName = document.getElementsByClassName('skname')[0].innerHTML.trim();
+        if (tempName && tempName[0] && tempName[0].innerHTML) {
             var fullName = document.getElementsByClassName('skname')[0].innerHTML.trim();
-
-        if (fullName && fullName.split(' ') && fullName.split(' ')[0])
-            details.firstName = removeExtraChars(fullName.split(' ')[0]);
-        if (fullName && fullName.split(' ') && fullName.split(' ')[1]) {
-            details.lastName = fullName.split(' ').splice(1).join(' ')
-            details.lastName = removeExtraChars(details.lastName.trim());
+            fullName = removeExtraChars(fullName);
+            if (fullName && fullName.split(' ') && fullName.split(' ')[0])
+                details.firstName = removeExtraChars(fullName.split(' ')[0]);
+            if (fullName && fullName.split(' ') && fullName.split(' ')[1]) {
+                details.lastName = fullName.split(' ').splice(1).join(' ')
+                details.lastName = removeExtraChars(details.lastName.trim());
+            }
         }
+        // details.firstName = document.getElementsByClassName('skname')[0].innerHTML.trim();
 
         var tempDetails = document.getElementsByClassName('skinfo hg_mtch');
         if (tempDetails && tempDetails[0] && tempDetails[0].innerHTML) {
@@ -687,7 +757,7 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
         }
 
         var isTallint = req.query.isTallint || 0;
-        details.resumeText = removeExtraChars(req.body.resume_text || "");
+        details.resumeText = removeUnicodeChars(req.body.resume_text || "");
 
 
         var arrWSI = [];
@@ -925,6 +995,8 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
                             for (var j = 0; j < experience.split(' ').length; j++) {
                                 if (experience.split(' ') && experience.split(' ')[j] && experience.split(' ')[j] > 0) {
                                     var exp_whole_number = (experience.split(' ')[j] / 12).toFixed(1);
+                                    if (typeof exp_whole_number == 'string')
+                                        exp_whole_number = parseFloat(exp_whole_number);
                                     skill_experience_detail.experience = exp_whole_number;
                                 }
                             }
@@ -970,6 +1042,71 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
                     }
                 }
             }
+        }
+
+
+        try {
+            var notice_period;
+            var notice_element = document.getElementsByClassName('matchd_wrap');
+
+            if (notice_element && notice_element[0] && notice_element[0].innerHTML && notice_element[0].innerHTML.indexOf('Notice Period') > -1) {
+                if (notice_element[0].innerHTML.split(': ') && notice_element[0].innerHTML.split(': ')[1] && notice_element[0].innerHTML.split(': ')[1].split('</div>') && notice_element[0].innerHTML.split(': ')[1].split('</div>')[0]) {
+                    var temp_notice_period = removeExtraChars(notice_element[0].innerHTML.split(': ')[1].split('</div>')[0]);
+                    if (temp_notice_period == 'Immediately') {
+                        notice_period = 15;
+                    }
+                    else if (temp_notice_period.indexOf('Days') > -1) {
+                        notice_period = temp_notice_period.split('Days')[0] * 1;
+                    }
+                    else if (temp_notice_period.indexOf('Month') > -1) {
+                        notice_period = temp_notice_period.split('Month')[0] * 30;
+                    }
+                    else if (temp_notice_period.indexOf('Months') > -1) {
+                        notice_period = temp_notice_period.split('Months')[0] * 30;
+                    }
+                }
+            }
+
+            details.noticePeriod = notice_period;
+        }
+
+        catch (err) {
+            console.log(err);
+            console.log('notice period err');
+        }
+
+
+        var uniqueID;
+        var lastModifiedDate;
+        try {
+            var lu_uid_element = document.getElementsByClassName('bottomboxwrap')[0];
+
+            if (lu_uid_element && lu_uid_element.getElementsByClassName('bottomboxtxt') && lu_uid_element.getElementsByClassName('bottomboxtxt')[0] && lu_uid_element.getElementsByClassName('bottomboxtxt')[0].innerHTML && lu_uid_element.getElementsByClassName('bottomboxtxt')[0].innerHTML.split('|') && lu_uid_element.getElementsByClassName('bottomboxtxt')[0].innerHTML.split('|').length) {
+                var lu_uid_arr = lu_uid_element.getElementsByClassName('bottomboxtxt')[0].innerHTML.split('|');
+                for (var x = 0; x < lu_uid_arr.length; x++) {
+                    if (lu_uid_arr[x] && lu_uid_arr[x].indexOf('Last Modified:') > -1) {
+                        lastModifiedDate = dateConverter(lu_uid_arr[x].split('Last Modified: ')[1]);
+                    }
+                    else if (lu_uid_arr[x] && lu_uid_arr[x].indexOf('Resume ID: ') > -1) {
+                        uniqueID = removeExtraChars(lu_uid_arr[x].split('Resume ID: ')[1]);
+                        if (uniqueID) {
+                            uniqueID = (uniqueID);
+                        }
+                    }
+                }
+            }
+
+            if (lastModifiedDate) {
+                details.lastModifiedDate = lastModifiedDate;
+            }
+
+            if (uniqueID) {
+                details.uid = uniqueID;
+            }
+        }
+
+        catch (err) {
+            console.log(err);
         }
 
 
@@ -1025,6 +1162,9 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
 
             details.portalId = portalId;
             request({
+                headers: {
+                    Authorization: 'Bearer ' + req.body.tallintToken
+                },
                 url: req.body.tallint_url,
                 method: "POST",
                 json: true,
@@ -1037,19 +1177,40 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
                     response.error = null;
                     response.data = {
                         resonseOfTallint: body,
-                        ourjson: details
+                        ourjson: {
+                            headers: {
+                                Authorization: 'Bearer ' + req.body.tallintToken
+                            },
+                            url: req.body.tallint_url,
+                            method: "POST",
+                            json: true,
+                            body: details
+                        }
                     };
-                    res.status(200).json(response);
+                    if (body.Code != 'ERR0001') {
+                        res.status(200).json(response);
+                    }
+                    else {
+                        res.status(500).json(response);
+                    }
                 }
-                else if (error) {
+                else {
                     response.status = false;
                     response.message = "Error from tallint DB";
                     response.error = null;
                     response.data = {
                         resonseOfTallint: error,
-                        ourjson: details
+                        ourjson: {
+                            headers: {
+                                Authorization: 'Bearer ' + req.body.tallintToken
+                            },
+                            url: req.body.tallint_url,
+                            method: "POST",
+                            json: true,
+                            body: details
+                        }
                     };
-                    res.status(200).json(response);
+                    res.status(500).json(response);
                 }
                 console.log(response);
                 console.log(error);
@@ -1096,6 +1257,7 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
             for (var i = 0; i < document.getElementsByClassName('tuple').length; i++) {
                 if (document.getElementsByClassName('tuple')[i].getAttribute('class').indexOf('viewed') == -1) {
                     var name = document.getElementsByClassName('tuple')[i].getElementsByClassName('tupCmtWrap')[0].getElementsByClassName('tupData')[0].getElementsByClassName('tupLeft')[0].getElementsByClassName('clFx')[0].getElementsByClassName('userName name')[0].innerHTML;
+                    name = removeExtraChars(name);
                     console.log(name);
                     var first_name = "";
                     var last_name = "";
@@ -1114,7 +1276,7 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                     }
                     var uniqueId = "";
                     if (uniqueIdArray && uniqueIdArray[0] && uniqueIdArray[0].split('= ') && uniqueIdArray[0].split('= ')[1] && uniqueIdArray[0].split('= ')[1].split('];') && uniqueIdArray[0].split('= ')[1].split('];')[0] && JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']') && JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[i] && JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[i].uniqueId) {
-                        uniqueId = JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[i].uniqueId;
+                        uniqueId = JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[i].key;
                     }
 
                     //experience
@@ -1123,10 +1285,10 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                     if (element && element.getElementsByClassName('exp') && element.getElementsByClassName('exp')[0] && element.getElementsByClassName('exp')[0].innerHTML) {
                         var temp_experience = 0;
                         if (element.getElementsByClassName('exp')[0].innerHTML.split('yr ') && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0] && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0] != 0 && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0] != '') {
-                            temp_experience += parseInt(document.getElementsByClassName('tuple')[0].getElementsByClassName('exp')[0].innerHTML.split('yr ')[0]);
+                            temp_experience += parseInt(element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0]);
                         }
                         if (element.getElementsByClassName('exp')[0].innerHTML.split('yr ') && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1] && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0] != 0 && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0] != '') {
-                            temp_experience += parseFloat(((document.getElementsByClassName('tuple')[0].getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0]) / 12).toFixed(1));
+                            temp_experience += parseFloat(((element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0]) / 12).toFixed(1));
                         }
                         if (temp_experience) {
                             experience = temp_experience;
@@ -1171,7 +1333,13 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                             skills[x] = removeExtraChars(skill_element[x].innerHTML);
                     }
 
-                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: i, lastModifiedDate: lastModifiedDate, uniqueId: uniqueId, current_location: current_location, current_employer: current_employer, job_title: job_title, previous_employer: previous_employer, skills: skills });
+
+                    var education;
+                    if (element && element.getElementsByClassName('desc eduInfo') && element.getElementsByClassName('desc eduInfo')[0] && element.getElementsByClassName('desc eduInfo')[0].innerHTML && element.getElementsByClassName('desc eduInfo')[0].innerHTML.split(' <')[0]) {
+                        education = element.getElementsByClassName('desc eduInfo')[0].innerHTML.split(' <')[0];
+                    }
+
+                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: i, lastModifiedDate: lastModifiedDate, uid: uniqueId, current_location: current_location, current_employer: current_employer, job_title: job_title, previous_employer: previous_employer, skills: skills, education: education });
                 }
             }
         console.log(JSON.stringify(applicants));
@@ -1201,7 +1369,7 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
 
                 var uniqueId = "";
                 if (uniqueIdArray && uniqueIdArray[0] && uniqueIdArray[0].split('= ') && uniqueIdArray[0].split('= ')[1] && uniqueIdArray[0].split('= ')[1].split('];') && uniqueIdArray[0].split('= ')[1].split('];')[0] && JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']') && JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[selected_candidates[i]] && JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[selected_candidates[i]].uniqueId) {
-                    uniqueId = JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[selected_candidates[i]].uniqueId;
+                    uniqueId = JSON.parse(uniqueIdArray[0].split('= ')[1].split('];')[0] + ']')[selected_candidates[i]].key;
                 }
 
                 //experience
@@ -1210,10 +1378,10 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                 if (element && element.getElementsByClassName('exp') && element.getElementsByClassName('exp')[0] && element.getElementsByClassName('exp')[0].innerHTML) {
                     var temp_experience = 0;
                     if (element.getElementsByClassName('exp')[0].innerHTML.split('yr ') && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0] && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0] != 0 && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0] != '') {
-                        temp_experience += parseInt(document.getElementsByClassName('tuple')[0].getElementsByClassName('exp')[0].innerHTML.split('yr ')[0]);
+                        temp_experience += parseInt(element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[0]);
                     }
                     if (element.getElementsByClassName('exp')[0].innerHTML.split('yr ') && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1] && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0] != 0 && element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0] != '') {
-                        temp_experience += parseFloat(((document.getElementsByClassName('tuple')[0].getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0]) / 12).toFixed(1));
+                        temp_experience += parseFloat(((element.getElementsByClassName('exp')[0].innerHTML.split('yr ')[1].split('m')[0]) / 12).toFixed(1));
                     }
                     if (temp_experience) {
                         experience = temp_experience;
@@ -1222,8 +1390,8 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
 
                 //present location
                 var current_location = '';
-                if (element && element.getElementsByClassName('loc') && element.getElementsByClassName('loc')[0] && element.getElementsByClassName('loc')[0].innerHTML && removeExtraChars(element.getElementsByClassName('loc')[0].innerHTML != '')) {
-                    location = removeExtraChars(document.getElementsByClassName('tuple')[0].getElementsByClassName('loc')[0].innerHTML);
+                if (element && element.getElementsByClassName('loc') && element.getElementsByClassName('loc')[0] && element.getElementsByClassName('loc')[0].innerHTML && removeExtraChars(element.getElementsByClassName('loc')[0].innerHTML) != '') {
+                    current_location = removeExtraChars(element.getElementsByClassName('loc')[0].innerHTML);
                 }
 
                 //current designation
@@ -1258,7 +1426,12 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                         skills[x] = removeExtraChars(skill_element[x].innerHTML);
                 }
 
-                applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: selected_candidates[i], lastModifiedDate: lastModifiedDate, uniqueId: uniqueId, current_location: current_location, current_employer: current_employer, job_title: job_title, previous_employer: previous_employer, skills: skills });
+                var education;
+                if (element && element.getElementsByClassName('desc eduInfo') && element.getElementsByClassName('desc eduInfo')[0] && element.getElementsByClassName('desc eduInfo')[0].innerHTML && element.getElementsByClassName('desc eduInfo')[0].innerHTML.split(' <')[0]) {
+                    education = element.getElementsByClassName('desc eduInfo')[0].innerHTML.split(' <')[0];
+                }
+
+                applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: selected_candidates[i], lastModifiedDate: lastModifiedDate, uid: uniqueId, current_location: current_location, current_employer: current_employer, job_title: job_title, previous_employer: previous_employer, skills: skills, education: education });
             }
     }
 
@@ -1287,7 +1460,7 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                 };
                 res.status(200).json(response);
             }
-            else if (error) {
+            else {
                 response.status = false;
                 response.message = "Error from tallint DB";
                 response.error = null;
@@ -1313,9 +1486,9 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
         data: null,
         error: null
     };
-    
+
     try {
-     
+
         var validationFlag = true;
         var portalId = 1;
         var cvSourceId = 1;
@@ -1330,6 +1503,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
         var tempName = document.getElementsByClassName('bkt4 name userName');
         if (tempName && tempName[0] && tempName[0].innerHTML) {
             var name = tempName[0].innerHTML.trim(' ');
+            name = removeExtraChars(name);
             if (name && name.split(' ')[0])
                 details.firstName = removeExtraChars(name.split(' ')[0]);
             if (name && name.split(' ')[1])
@@ -1374,6 +1548,9 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                 details.experience = 0;
             }
             details.experience = removeExtraChars(details.experience);
+            if (typeof details.experience == 'string') {
+                details.experience = parseInt(details.experience);
+            }
         }
 
         var tempDesignation = document.getElementsByClassName('bkt4 cDesig');
@@ -1556,13 +1733,23 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                     skill_experience.skill_name = removeExtraChars(document.getElementById('jump-it-skill').getElementsByTagName('tr')[i].getElementsByTagName('td')[0].innerHTML);
                 if (skill_experience_element[i] && skill_experience_element[i].getElementsByTagName('td') && skill_experience_element[i].getElementsByTagName('td')[0] && removeExtraChars(skill_experience_element[i].getElementsByTagName('td')[2].innerHTML) != '')
                     skill_experience.last_used = removeExtraChars(document.getElementById('jump-it-skill').getElementsByTagName('tr')[i].getElementsByTagName('td')[2].innerHTML);
+
+
                 if (skill_experience_element[i] && skill_experience_element[i].getElementsByTagName('td') && skill_experience_element[i].getElementsByTagName('td')[0] && removeExtraChars(skill_experience_element[i].getElementsByTagName('td')[3].innerHTML) != '') {
-                    skill_experience.experience = removeExtraChars(document.getElementById('jump-it-skill').getElementsByTagName('tr')[i].getElementsByTagName('td')[3].innerHTML);
-                    if (skill_experience.experience && skill_experience.experience.split(' Year(s) ')[0] && skill_experience.experience.split(' Year(s) ')[1] && skill_experience.experience.split(' Year(s) ')[1].split(' Month(s)')[0] && skill_experience.experience.split(' Year(s) ')[1].split(' Month(s)')[0] != '0')
-                        skill_experience.experience = parseFloat(removeExtraChars(skill_experience.experience.split(' Year(s) ')[0])) + parseFloat(parseFloat(removeExtraChars(skill_experience.experience.split(' Year(s) ')[1].split(' Month(s)')[0]) / 12).toFixed(1));
-                    else if (skill_experience.experience && skill_experience.experience.split(' Year(s) ')[0] && skill_experience.experience.split(' Year(s) ')[1] && skill_experience.experience.split(' Year(s) ')[1].split(' Month(s)')[0])
-                        skill_experience.experience = parseFloat(removeExtraChars(skill_experience.experience.split(' Year(s) ')[0]));
+                    var temp_element = removeExtraChars(document.getElementById('jump-it-skill').getElementsByTagName('tr')[i].getElementsByTagName('td')[3].innerHTML);
+                    var temp_experience = 0;
+                    if (temp_element && temp_element.indexOf(' Year(s)') > -1 && temp_element.split(' Year(s)') && temp_element.split(' Year(s)')[0]) {
+                        temp_experience += temp_element.split(' Year(s)')[0] * 1;
+                        temp_element = temp_element.split(' Year(s)')[1];
+                    }
+                    if (temp_element && temp_element.indexOf(' Month(s)') > -1 && temp_element.split(' Month(s)') && temp_element.split(' Month(s)')[0])
+                        temp_experience += parseFloat((temp_element.split(' Month(s)')[0] / 12).toFixed(1));
+
+                    if (temp_experience) {
+                        skill_experience.experience = temp_experience;
+                    }
                 }
+
                 skill_experiences.push(skill_experience);
             }
         }
@@ -1574,20 +1761,92 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
         var education_element = document.getElementsByClassName('education-inner');
         for (var x = 0; x < education_element.length; x++) {
             var education_object = {};
-            if (education_element[x] && education_element[x].getElementsByClassName('org bkt4') && education_element[x].getElementsByClassName('org bkt4')[0] && education_element[x].getElementsByClassName('org bkt4')[0].innerHTML)
-                education_object.institution = removeExtraChars(education_element[x].getElementsByClassName('org bkt4')[0].innerHTML);
-            if (education_element[x] && education_element[x].getElementsByClassName('detail') && education_element[x].getElementsByClassName('detail')[0] && education_element[x].getElementsByClassName('detail')[0].innerHTML && education_element[x].getElementsByClassName('detail')[0].innerHTML.split('</span>') && education_element[x].getElementsByClassName('detail')[0].innerHTML.split('</span>')[1] && education_element[x].getElementsByClassName('detail')[0].innerHTML.split('</span>')[1])
-                education_object.passing_year = removeExtraChars(education_element[x].getElementsByClassName('detail')[0].innerHTML.split('</span>')[1]);
+            if (education_element[x].innerHTML.indexOf('Other Qualifications') == -1) {
+                if (education_element[x] && education_element[x].getElementsByClassName('org bkt4') && education_element[x].getElementsByClassName('org bkt4')[0] && education_element[x].getElementsByClassName('org bkt4')[0].innerHTML)
+                    education_object.institution = removeExtraChars(education_element[x].getElementsByClassName('org bkt4')[0].innerHTML);
+                if (education_element[x] && education_element[x].getElementsByClassName('detail') && education_element[x].getElementsByClassName('detail')[0] && education_element[x].getElementsByClassName('detail')[0].innerHTML && education_element[x].getElementsByClassName('detail')[0].innerHTML.split('</span>') && education_element[x].getElementsByClassName('detail')[0].innerHTML.split('</span>')[1] && education_element[x].getElementsByClassName('detail')[0].innerHTML.split('</span>')[1])
+                    education_object.passing_year = removeExtraChars(education_element[x].getElementsByClassName('detail')[0].innerHTML.split('</span>')[1]);
 
-            if (education_element[x] && education_element[x].getElementsByClassName('detail') && education_element[x].getElementsByClassName('detail')[0] && education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg') && education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0] && education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML) {
-                education_object.education = removeExtraChars(education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML.split('(')[0]);
-                if (education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML.split('(')[1] && education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML.split('(')[1].split(')')[0])
-                    education_object.specialization = removeExtraChars(education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML.split('(')[1].split(')')[0]);
+                if (education_element[x] && education_element[x].getElementsByClassName('detail') && education_element[x].getElementsByClassName('detail')[0] && education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg') && education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0] && education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML) {
+                    education_object.education = removeExtraChars(education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML.split('(')[0]);
+                    if (education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML.split('(')[1] && education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML.split('(')[1].split(')')[0])
+                        education_object.specialization = removeExtraChars(education_element[x].getElementsByClassName('detail')[0].getElementsByClassName('deg')[0].innerHTML.split('(')[1].split(')')[0]);
+                }
+                if (education_object.education != '')
+                    education.push(education_object);
             }
-            education.push(education_object);
         }
 
         details.education = education;
+
+
+        try {
+            //notice period
+            var notice_period;
+            var notice_period_element = document.getElementsByClassName('innerDetailsCont clFx');
+            if (notice_period_element && notice_period_element[0] && notice_period_element[0].innerHTML && notice_period_element[0].innerHTML.indexOf('Notice Period') > -1) {
+                for (var i = 0; i < notice_period_element[0].getElementsByClassName('desc').length; i++) {
+                    var notice_element = notice_period_element[0].getElementsByClassName('desc')[i];
+                    if (notice_element.innerHTML.indexOf('Month') > -1) {
+                        notice_period = removeExtraChars(notice_element.innerHTML.split('Month')[0]) * 30;
+                    }
+                    else if (notice_element.innerHTML.indexOf('Days') > -1) {
+                        notice_period = removeExtraChars(notice_element.innerHTML.split('Days')[0]) * 1;
+                    }
+                    else if (notice_element.innerHTML.indexOf('Currently Serving') > -1) {
+                        notice_period = 15;
+                    }
+                }
+            }
+            details.noticePeriod = notice_period;
+        }
+
+        catch (err) {
+            console.log(err);
+            console.log('notice period error');
+        }
+
+        try {
+            var uniqueID;
+            var uniqueIdArray = req.body.xml_string.match(/var ukey = "[a-zA-Z0-9]*"/);
+            if (uniqueIdArray && uniqueIdArray.length && uniqueIdArray[0]) {
+                var temp_uid = uniqueIdArray[0].match(/"[a-zA-Z0-9]*"/);
+                if (temp_uid && temp_uid.length && temp_uid[0]) {
+                    uniqueID = temp_uid[0].replace(/"/g, '')
+                    if (uniqueID) {
+                        details.uid = uniqueID;
+                    }
+                }
+            }
+        }
+
+        catch (err) {
+            console.log(err);
+            console.log('UID error');
+        }
+
+        try {
+            var lu_date;
+            var lu_elements = document.getElementsByClassName('tupleFoot');
+            if (lu_elements && lu_elements[0]) {
+                var lu_element = lu_elements[0].getElementsByClassName('mr15');
+                if (lu_element && lu_element.length) {
+                    for (var x = 0; x < lu_element.length; x++) {
+                        if (lu_element[x].innerHTML.indexOf('Modified: ') > -1 && lu_element[x].innerHTML.split('Modified: ')[1]) {
+                            lu_date = removeExtraChars(lu_element[x].innerHTML.split('Modified: ')[1]);
+                            if (lu_date) {
+                                details.lastModifiedDate = dateConverter(lu_date);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (err) {
+            console.log(err);
+        }
+
+        details.resumeText = removeUnicodeChars(req.body.resume_text || "");
 
 
         var isTallint = req.query.isTallint || 0;
@@ -1599,6 +1858,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             // var portalId = 2;
 
             details.portalId = portalId;
+            details.token = req.body.tallintToken;
             if (req.body.attachment) {
                 var attachment1 = req.body.attachment.split(',');
                 console.log(attachment1);
@@ -1636,6 +1896,9 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             delete (details.resumeText);
 
             request({
+                headers: {
+                    Authorization: 'Bearer ' + req.body.tallintToken
+                },
                 url: req.body.tallint_url,
                 method: "POST",
                 json: true,
@@ -1646,20 +1909,41 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                     response.message = "Response from tallint DB";
                     response.error = null;
                     response.data = {
-                        ourjson: details,
+                        ourjson: {
+                            headers: {
+                                Authorization: 'Bearer ' + req.body.tallintToken
+                            },
+                            url: req.body.tallint_url,
+                            method: "POST",
+                            json: true,
+                            body: details
+                        },
                         resonseOfTallint: body
                     };
-                    res.status(200).json(response);
+                    if (body.Code != 'ERR0001') {
+                        res.status(200).json(response);
+                    }
+                    else {
+                        res.status(500).json(response);
+                    }
                 }
-                else if (error) {
+                else {
                     response.status = false;
                     response.message = "Error from tallint DB";
                     response.error = null;
                     response.data = {
-                        ourjson: details,
+                        ourjson: {
+                            headers: {
+                                Authorization: 'Bearer ' + req.body.tallintToken
+                            },
+                            url: req.body.tallint_url,
+                            method: "POST",
+                            json: true,
+                            body: details
+                        },
                         resonseOfTallint: error
                     };
-                    res.status(200).json(response);
+                    res.status(500).json(response);
                 }
 
             });
@@ -1673,6 +1957,8 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
 
     catch (ex) {
         console.log(ex);
+        response.data = ex;
+        res.status(500).json(response);
     }
 
 };
@@ -1804,7 +2090,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortal = function (req, res, nex
         data: null,
         error: null
     };
-    
+
     var validationFlag = true;
     var portalId = 3;   // timesjob portal
 
@@ -2084,7 +2370,11 @@ portalimporter.saveApplicantsFromShine = function (req, res, next) {
                 response.data = {
                     resonseOfTallint: body
                 };
-                res.status(200).json(response);
+                if (body.RID)
+                    res.status(200).json(response);
+                else
+                    res.status(500).json(response);
+
             }
             else if (error) {
                 response.status = false;

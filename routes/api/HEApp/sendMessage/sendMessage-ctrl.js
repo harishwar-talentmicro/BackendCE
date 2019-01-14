@@ -180,6 +180,8 @@ sendMessageCtrl.sendMessage = function (req, res, next) {
                         req.body.approverNotes = req.body.approverNotes != undefined ? req.body.approverNotes : '';
                         req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
                         req.body.textmsg = req.body.textmsg ? req.body.textmsg : '';
+                        
+                        var toUserId = userList && userList[0] && userList[0].HEUserId ? userList[0].HEUserId : 0;
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -210,8 +212,9 @@ sendMessageCtrl.sendMessage = function (req, res, next) {
                             req.st.db.escape(req.body.approverNotes),
                             req.st.db.escape(req.body.timestamp),
                             req.st.db.escape(req.body.createdTimeStamp),
-                            req.st.db.escape(req.body.textmsg)
-
+                            req.st.db.escape(req.body.textmsg),
+                            req.st.db.escape(req.body.announcementBatchTitleId),
+                            req.st.db.escape(toUserId)
                         ];
 
                         var announcementFormId = 1033;
@@ -1562,6 +1565,8 @@ sendMessageCtrl.saveAsDraft = function (req, res, next) {
                         req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
                         req.body.textmsg = req.body.textmsg ? req.body.textmsg : '';
 
+                        var toUserId = userList && userList[0] && userList[0].HEUserId ? userList[0].HEUserId : 0;
+
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.parentId),
@@ -1589,7 +1594,9 @@ sendMessageCtrl.saveAsDraft = function (req, res, next) {
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
                             req.st.db.escape(req.body.createdTimeStamp),
-                            req.st.db.escape(req.body.textmsg)
+                            req.st.db.escape(req.body.textmsg),
+                            req.st.db.escape(req.body.announcementBatchTitleId),
+                            req.st.db.escape(toUserId)
                         ];
 
                         var announcementFormId = 1033;
@@ -2103,6 +2110,7 @@ sendMessageCtrl.sendMessageTest = function (req, res, next) {
                         req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
                         req.body.textmsg = req.body.textmsg ? req.body.textmsg : '';
 
+                        var toUserId = userList && userList[0] && userList[0].HEUserId ? userList[0].HEUserId : 0;
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
@@ -2131,7 +2139,9 @@ sendMessageCtrl.sendMessageTest = function (req, res, next) {
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
                             req.st.db.escape(req.body.createdTimeStamp),
-                            req.st.db.escape(req.body.textmsg)
+                            req.st.db.escape(req.body.textmsg),
+                            req.st.db.escape(req.body.announcementBatchTitleId),
+                            req.st.db.escape(toUserId)
                         ];
                         var announcementFormId = 1033;
                         var keywordsParams = [

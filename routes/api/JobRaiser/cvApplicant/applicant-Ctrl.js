@@ -48,6 +48,7 @@ var DBSecretKey = CONFIG.DB.secretKey;
 //var attachFilePromise = attachFile;
 
 // For saving resume or updating resume   * mandatory fields token,heMasterId,firstName,mobileNumber,emailId
+
 applicantCtrl.saveApplicant = function (req, res, next) {
     // var cvKeywords = '';
 
@@ -225,249 +226,268 @@ applicantCtrl.saveApplicant = function (req, res, next) {
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-                // req.body.cvPath = (req.body.cvPath) ? req.body.cvPath : "";
-                var cvKeywords;
-                var cv = '';
-                var text = '';
-                var gs_url = '';
-                var storage_bucket = '';
-
-
-                if (req.body.cvKeywords && req.body.cvKeywords != '') {
-                    req.body.cvKeywords = req.body.cvKeywords.replace(/[^\x00-\x7F]/g, "");
-                }
-
-                req.query.isWeb = (req.body.isWeb) ? req.body.isWeb : 0;
-                // console.log("cvPath from attacment", req.body.cvKeywords);
-                if (attachmentList.length) //&& (req.body.cvKeywords == '') && req.body.cvKeywords == undefined && req.body.cvKeywords == null &&  req.body.cvKeywords == ' ') 
-                {
-                    cv = attachmentList[0].CDNPath;
-                }
-                gs_url = req.CONFIG.CONSTANT.GS_URL;
-                storage_bucket = req.CONFIG.CONSTANT.STORAGE_BUCKET;
-
-                console.log("cvPath from attacment", cv);
-
-                // var exec = require('child_process').exec;
-                // var environment = process.env;
-                // environment.ANTIWORDHOME = '/usr/share/antiword';
-                // exec(command, { env: environment }, function (err, stdout, stderr) {
-                //     console.log(stdout);
-                // });
-
-                return new Promise(function (resolve, reject) {
-                    if (cv != '') {
-                        cv = gs_url + storage_bucket + '/' + cv;
-                        console.log('cvPath complete', cv);
-                        http.get(cv, function (fileResponse) {
-                            var bufs = [];
-
-                            fileResponse.on('data', function (d) { bufs.push(d); });
-                            fileResponse.on('end', function () {
-                                var buf = Buffer.concat(bufs);
-                                process.env.ANTIWORDHOME = '/usr/share/antiword';
-                                textract.fromBufferWithName(cv, buf, function (error, txt) {
-                                    if (error) {
-                                        // var tempCVPath = cv.replace('docx', 'doc');
-                                        // textract.fromBufferWithName(tempCVPath, buf, function (error, txt) {
-                                        // text = txt;
-                                        console.log('error', error);
-                                        // console.log('text inside', text);
-                                        resolve(text);
-                                        // });
-                                    }
-                                    else {
-                                        text = txt;
-                                        console.log('error', error);
-                                        console.log('text inside', text);
-                                        resolve(text);
-
-                                    }
+        try {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    // req.body.cvPath = (req.body.cvPath) ? req.body.cvPath : "";
+                    var cvKeywords;
+                    var cv = '';
+                    var text = '';
+                    var gs_url = '';
+                    var storage_bucket = '';
+    
+    
+                    if (req.body.cvKeywords && req.body.cvKeywords != '') {
+                        req.body.cvKeywords = req.body.cvKeywords.replace(/[^\x00-\x7F]/g, "");
+                    }
+    
+                    req.query.isWeb = (req.body.isWeb) ? req.body.isWeb : 0;
+                    // console.log("cvPath from attacment", req.body.cvKeywords);
+                    if (attachmentList.length) //&& (req.body.cvKeywords == '') && req.body.cvKeywords == undefined && req.body.cvKeywords == null &&  req.body.cvKeywords == ' ') 
+                    {
+                        cv = attachmentList[0].CDNPath;
+                    }
+                    gs_url = req.CONFIG.CONSTANT.GS_URL;
+                    storage_bucket = req.CONFIG.CONSTANT.STORAGE_BUCKET;
+    
+                    console.log("cvPath from attacment", cv);
+    
+                    // var exec = require('child_process').exec;
+                    // var environment = process.env;
+                    // environment.ANTIWORDHOME = '/usr/share/antiword';
+                    // exec(command, { env: environment }, function (err, stdout, stderr) {
+                    //     console.log(stdout);
+                    // });
+    
+                    return new Promise(function (resolve, reject) {
+                        try {
+                            if (cv != '') {
+                                cv = gs_url + storage_bucket + '/' + cv;
+                                console.log('cvPath complete', cv);
+                                http.get(cv, function (fileResponse) {
+                                    var bufs = [];
+    
+                                    fileResponse.on('data', function (d) { bufs.push(d); });
+                                    fileResponse.on('end', function () {
+                                        var buf = Buffer.concat(bufs);
+                                        process.env.ANTIWORDHOME = '/usr/share/antiword';
+                                        try {
+                                            textract.fromBufferWithName(cv, buf, function (error, txt) {
+                                                if (error) {
+                                                    // var tempCVPath = cv.replace('docx', 'doc');
+                                                    // textract.fromBufferWithName(tempCVPath, buf, function (error, txt) {
+                                                    // text = txt;
+                                                    console.log('error', error);
+                                                    // console.log('text inside', text);
+                                                    resolve(text);
+                                                    // });
+                                                }
+                                                else {
+                                                    text = txt;
+                                                    console.log('error', error);
+                                                    console.log('text inside', text);
+                                                    resolve(text);
+    
+                                                }
+                                            });
+                                        }
+                                        catch (ex) {
+                                            console.log("ex", ex);
+                                            resolve('');
+                                        }
+                                    });
                                 });
-                            });
-                        });
-
-                    }
-                    else {
-                        resolve('');
-                    }
-                }).then(function (resp) {
-                    // console.log("response after promise", resp);
-                    if (1) {
-
-                        cvKeywords = text;
-                        if (cvKeywords) {
-                            cvKeywords = cvKeywords.replace(/[^\x00-\x7F]/g, "");
-                        }
-
-                        // console.log('text from promise', resp);
-                        // console.log('text data from promise ', text);
-
-                        req.body.applicantId = (req.body.applicantId) ? req.body.applicantId : 0;
-
-                        req.body.lastName = (req.body.lastName) ? req.body.lastName : "";
-                        req.body.phoneISD = (req.body.phoneISD) ? req.body.phoneISD : "";
-                        req.body.phoneNumber = (req.body.phoneNumber) ? req.body.phoneNumber : "";
-                        req.body.mobileISD = (req.body.mobileISD) ? req.body.mobileISD : "";
-                        req.body.address = (req.body.address) ? req.body.address : "";
-                        // req.body.latitude = (req.body.latitude) ? req.body.latitude : 0.0;
-                        // req.body.longitude = (req.body.longitude) ? req.body.longitude : 0.0;
-                        req.body.longitude = 0.0;
-                        req.body.latitude = 0.0;
-                        req.body.IDadhaarNumber = (req.body.IDadhaarNumber) ? req.body.IDadhaarNumber : "";
-                        req.body.passportNumber = (req.body.passportNumber) ? req.body.passportNumber : "";
-                        req.body.ppExpiryDate = (req.body.ppExpiryDate) ? req.body.ppExpiryDate : null;
-                        req.body.experience = (req.body.experience) ? req.body.experience : 0;
-                        req.body.employer = (req.body.employer) ? req.body.employer : "";
-                        req.body.noticePeriod = (req.body.noticePeriod) ? req.body.noticePeriod : 0;
-                        req.body.notes = (req.body.notes) ? req.body.notes : "";
-                        req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
-                        //req.body.originalCvId = (req.body.originalCvId) ? req.body.originalCvId : 0;
-                        req.body.status = (req.body.status) ? req.body.status : 0;
-                        req.body.blockingPeriod = (req.body.blockingPeriod) ? req.body.blockingPeriod : 0;
-                        req.body.affirmitive = (req.body.affirmitive) ? req.body.affirmitive : '';
-                        req.body.transactions = (req.body.transactions) ? req.body.transactions : '';
-                        req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
-                        req.body.imageUrl = req.body.imageUrl ? req.body.imageUrl : '';
-                        req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0;
-                        req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
-                        req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 0;
-                        req.body.referredBy = req.body.referredBy ? req.body.referredBy : "";
-                        req.body.emailId = req.body.emailId ? req.body.emailId : "";
-                        req.body.mobileNumber = req.body.mobileNumber ? req.body.mobileNumber : "";
-
-                        var educationKey = [];
-                        if (req.body.importerFlag == 1 && education.length){
-                            for (var i = 0; i < education.length; i++){
-                                // console.log("education[i].split('-')",education[i].split('-'),"education[i].split(' in ')",education[i].split(' in '));
-
-                                if (education[i].split('-').length == 1 &&  education[i].split(' in ').length == 1) {
-                                    educationKey.push({educationName : education[i].trim(),specializationName : "" });
-                                }
-                                else if (education[i].split('-').length == 1 &&  education[i].split(' in ').length > 1) {
-                                    educationKey.push({educationName : education[i].split(' in ')[0].trim(), specializationName : education[i].split(' in ')[1].trim()});
-                                }
-                                else if (education[i].split('-').length > 1 &&  education[i].split(' in ').length == 1){
-                                    educationKey.push({educationName : education[i].split('-')[0].trim(), specializationName : education[i].split('-')[1].trim()});
-                                }
-                            }
-                            console.log("educationKey",educationKey);
-                            education = educationKey;
-                        }
-                        
-                        var inputs = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.body.heMasterId),
-                            req.st.db.escape(req.body.applicantId),
-                            req.st.db.escape(req.body.firstName),
-                            req.st.db.escape(req.body.lastName),
-                            req.st.db.escape(req.body.phoneISD),
-                            req.st.db.escape(req.body.phoneNumber),
-                            req.st.db.escape(req.body.mobileISD),
-                            req.st.db.escape(req.body.mobileNumber),
-                            req.st.db.escape(req.body.emailId),
-                            req.st.db.escape(JSON.stringify(education)),
-                            req.st.db.escape(req.body.address),
-                            req.st.db.escape(req.body.latitude),
-                            req.st.db.escape(req.body.longitude),
-                            req.st.db.escape(req.body.IDadhaarNumber),
-                            req.st.db.escape(req.body.passportNumber),
-                            req.st.db.escape(req.body.ppExpiryDate),
-                            req.st.db.escape(req.body.experience),
-                            req.st.db.escape(req.body.employer),
-                            req.st.db.escape(JSON.stringify(jobTitle[0])),
-                            req.st.db.escape(req.body.noticePeriod),
-                            req.st.db.escape(JSON.stringify(expectedSalaryCurr)),
-                            req.st.db.escape(req.body.expectedSalary),
-                            req.st.db.escape(JSON.stringify(expectedSalaryScale)),
-                            req.st.db.escape(JSON.stringify(expectedSalaryPeriod)),
-                            req.st.db.escape(JSON.stringify(presentSalaryCurr)),
-                            req.st.db.escape(req.body.presentSalary),
-                            req.st.db.escape(JSON.stringify(presentSalaryScale)),
-                            req.st.db.escape(JSON.stringify(presentSalaryPeriod)),
-                            req.st.db.escape(JSON.stringify(primarySkills)),
-                            req.st.db.escape(JSON.stringify(secondarySkills)),
-                            req.st.db.escape(req.body.notes),
-                            req.st.db.escape(req.body.cvRating),
-                            req.st.db.escape(JSON.stringify(attachmentList)),
-                            req.st.db.escape(JSON.stringify(cvSource)),
-                            req.st.db.escape(req.body.gender || 3),
-                            req.st.db.escape(req.body.DOB || null),
-                            //req.st.db.escape(req.body.originalCvId),
-                            req.st.db.escape(req.body.blockingPeriod),
-                            req.st.db.escape(req.body.status),
-                            req.st.db.escape(JSON.stringify(prefLocations)),
-                            req.st.db.escape(JSON.stringify(industry)),
-                            req.st.db.escape(JSON.stringify(nationality)),
-                            req.st.db.escape(req.body.cvKeywords || cvKeywords || ""),
-                            req.st.db.escape(req.body.requirementId),
-                            req.st.db.escape(req.body.imageUrl),
-                            req.st.db.escape(req.body.htmlText),
-                            req.st.db.escape(req.body.reqAppId),
-                            req.st.db.escape(req.body.clientCvPath),
-                            req.st.db.escape(JSON.stringify(functionalAreas)),
-                            req.st.db.escape(req.body.importerFlag),
-                            req.st.db.escape(JSON.stringify(requirementArray)),
-                            req.st.db.escape(req.body.referredBy),
-                            req.st.db.escape(JSON.stringify(faceSheet)),
-                            req.st.db.escape(JSON.stringify(presentLocation)),
-                            req.st.db.escape(req.body.ppIssueDate || null),
-                            req.st.db.escape(req.body.gccExp || 0.0),
-                            req.st.db.escape(req.body.licenseOption || 0),
-                            req.st.db.escape(req.body.passportCategory || ""),
-                            req.st.db.escape(JSON.stringify(req.body.licenseData || [])),
-                            req.st.db.escape(JSON.stringify(req.body.document_attachments_list || [])),
-                            req.st.db.escape(req.body.importedFromFolder || 0),
-                            req.st.db.escape(req.body.importedFromExcel || 0)
-                        ];
-
-                        var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
-                        console.log(procQuery);
-
-                        req.db.query(procQuery, function (err, result) {
-                            console.log(err);
-
-                            if (!err && result && result[0] && result[0][0].applicantId) {
-
-                                response.status = true;
-                                response.message = "Resume Saved Successfully";
-                                response.error = null;
-                                response.data = {
-                                    applicantId: result[0][0].applicantId
-                                };
-                                res.status(200).json(response);
-
-                            }
-                            else if (!err && result && result[0] && result[0][0]._applicantExists) {
-
-                                response.status = false;
-                                response.message = "Resume already exists";
-                                response.error = null;
-                                response.data = {
-                                    applicantId: result[0][0]._applicantExists
-                                };
-                                response.duplicate = 1;
-                                res.status(200).json(response);
-
+    
                             }
                             else {
-                                response.status = false;
-                                response.message = "Error While Saving Resume";
-                                response.error = 1;
-                                console.log(err);
-                                res.status(500).json(response);
+                                resolve('');
                             }
-                        });
-                    }
-                });
-
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
+                        }
+                        catch (ex) {
+                            console.log(ex);
+                            resolve('');
+                        }
+    
+                    }).then(function (resp) {
+                        // console.log("response after promise", resp);
+                        if (1) {
+    
+                            cvKeywords = text;
+                            if (cvKeywords) {
+                                cvKeywords = cvKeywords.replace(/[^\x00-\x7F]/g, "");
+                            }
+    
+                            // console.log('text from promise', resp);
+                            // console.log('text data from promise ', text);
+    
+                            req.body.applicantId = (req.body.applicantId) ? req.body.applicantId : 0;
+    
+                            req.body.lastName = (req.body.lastName) ? req.body.lastName : "";
+                            req.body.phoneISD = (req.body.phoneISD) ? req.body.phoneISD : "";
+                            req.body.phoneNumber = (req.body.phoneNumber) ? req.body.phoneNumber : "";
+                            req.body.mobileISD = (req.body.mobileISD) ? req.body.mobileISD : "";
+                            req.body.address = (req.body.address) ? req.body.address : "";
+                            // req.body.latitude = (req.body.latitude) ? req.body.latitude : 0.0;
+                            // req.body.longitude = (req.body.longitude) ? req.body.longitude : 0.0;
+                            req.body.longitude = 0.0;
+                            req.body.latitude = 0.0;
+                            req.body.IDadhaarNumber = (req.body.IDadhaarNumber) ? req.body.IDadhaarNumber : "";
+                            req.body.passportNumber = (req.body.passportNumber) ? req.body.passportNumber : "";
+                            req.body.ppExpiryDate = (req.body.ppExpiryDate) ? req.body.ppExpiryDate : null;
+                            req.body.experience = (req.body.experience) ? req.body.experience : 0;
+                            req.body.employer = (req.body.employer) ? req.body.employer : "";
+                            req.body.noticePeriod = (req.body.noticePeriod) ? req.body.noticePeriod : 0;
+                            req.body.notes = (req.body.notes) ? req.body.notes : "";
+                            req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
+                            //req.body.originalCvId = (req.body.originalCvId) ? req.body.originalCvId : 0;
+                            req.body.status = (req.body.status) ? req.body.status : 0;
+                            req.body.blockingPeriod = (req.body.blockingPeriod) ? req.body.blockingPeriod : 0;
+                            req.body.affirmitive = (req.body.affirmitive) ? req.body.affirmitive : '';
+                            req.body.transactions = (req.body.transactions) ? req.body.transactions : '';
+                            req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
+                            req.body.imageUrl = req.body.imageUrl ? req.body.imageUrl : '';
+                            req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0;
+                            req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
+                            req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 0;
+                            req.body.referredBy = req.body.referredBy ? req.body.referredBy : "";
+                            req.body.emailId = req.body.emailId ? req.body.emailId : "";
+                            req.body.mobileNumber = req.body.mobileNumber ? req.body.mobileNumber : "";
+    
+                            var educationKey = [];
+                            if (req.body.importerFlag == 1 && education.length) {
+                                for (var i = 0; i < education.length; i++) {
+                                    // console.log("education[i].split('-')",education[i].split('-'),"education[i].split(' in ')",education[i].split(' in '));
+    
+                                    if (education[i].split('-').length == 1 && education[i].split(' in ').length == 1) {
+                                        educationKey.push({ educationName: education[i].trim(), specializationName: "" });
+                                    }
+                                    else if (education[i].split('-').length == 1 && education[i].split(' in ').length > 1) {
+                                        educationKey.push({ educationName: education[i].split(' in ')[0].trim(), specializationName: education[i].split(' in ')[1].trim() });
+                                    }
+                                    else if (education[i].split('-').length > 1 && education[i].split(' in ').length == 1) {
+                                        educationKey.push({ educationName: education[i].split('-')[0].trim(), specializationName: education[i].split('-')[1].trim() });
+                                    }
+                                }
+                                console.log("educationKey", educationKey);
+                                education = educationKey;
+                            }
+    
+                            var inputs = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.body.heMasterId),
+                                req.st.db.escape(req.body.applicantId),
+                                req.st.db.escape(req.body.firstName),
+                                req.st.db.escape(req.body.lastName),
+                                req.st.db.escape(req.body.phoneISD),
+                                req.st.db.escape(req.body.phoneNumber),
+                                req.st.db.escape(req.body.mobileISD),
+                                req.st.db.escape(req.body.mobileNumber),
+                                req.st.db.escape(req.body.emailId),
+                                req.st.db.escape(JSON.stringify(education)),
+                                req.st.db.escape(req.body.address),
+                                req.st.db.escape(req.body.latitude),
+                                req.st.db.escape(req.body.longitude),
+                                req.st.db.escape(req.body.IDadhaarNumber),
+                                req.st.db.escape(req.body.passportNumber),
+                                req.st.db.escape(req.body.ppExpiryDate),
+                                req.st.db.escape(req.body.experience),
+                                req.st.db.escape(req.body.employer),
+                                req.st.db.escape(JSON.stringify(jobTitle[0])),
+                                req.st.db.escape(req.body.noticePeriod),
+                                req.st.db.escape(JSON.stringify(expectedSalaryCurr)),
+                                req.st.db.escape(req.body.expectedSalary),
+                                req.st.db.escape(JSON.stringify(expectedSalaryScale)),
+                                req.st.db.escape(JSON.stringify(expectedSalaryPeriod)),
+                                req.st.db.escape(JSON.stringify(presentSalaryCurr)),
+                                req.st.db.escape(req.body.presentSalary),
+                                req.st.db.escape(JSON.stringify(presentSalaryScale)),
+                                req.st.db.escape(JSON.stringify(presentSalaryPeriod)),
+                                req.st.db.escape(JSON.stringify(primarySkills)),
+                                req.st.db.escape(JSON.stringify(secondarySkills)),
+                                req.st.db.escape(req.body.notes),
+                                req.st.db.escape(req.body.cvRating),
+                                req.st.db.escape(JSON.stringify(attachmentList)),
+                                req.st.db.escape(JSON.stringify(cvSource)),
+                                req.st.db.escape(req.body.gender || 3),
+                                req.st.db.escape(req.body.DOB || null),
+                                //req.st.db.escape(req.body.originalCvId),
+                                req.st.db.escape(req.body.blockingPeriod),
+                                req.st.db.escape(req.body.status),
+                                req.st.db.escape(JSON.stringify(prefLocations)),
+                                req.st.db.escape(JSON.stringify(industry)),
+                                req.st.db.escape(JSON.stringify(nationality)),
+                                req.st.db.escape(req.body.cvKeywords || cvKeywords || ""),
+                                req.st.db.escape(req.body.requirementId),
+                                req.st.db.escape(req.body.imageUrl),
+                                req.st.db.escape(req.body.htmlText),
+                                req.st.db.escape(req.body.reqAppId),
+                                req.st.db.escape(req.body.clientCvPath),
+                                req.st.db.escape(JSON.stringify(functionalAreas)),
+                                req.st.db.escape(req.body.importerFlag),
+                                req.st.db.escape(JSON.stringify(requirementArray)),
+                                req.st.db.escape(req.body.referredBy),
+                                req.st.db.escape(JSON.stringify(faceSheet)),
+                                req.st.db.escape(JSON.stringify(presentLocation)),
+                                req.st.db.escape(req.body.ppIssueDate || null),
+                                req.st.db.escape(req.body.gccExp || 0.0),
+                                req.st.db.escape(req.body.licenseOption || 0),
+                                req.st.db.escape(req.body.passportCategory || ""),
+                                req.st.db.escape(JSON.stringify(req.body.licenseData || [])),
+                                req.st.db.escape(JSON.stringify(req.body.document_attachments_list || [])),
+                                req.st.db.escape(req.body.importedFromFolder || 0),
+                                req.st.db.escape(req.body.importedFromExcel || 0)
+                            ];
+    
+                            var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
+                            console.log(procQuery);
+    
+                            req.db.query(procQuery, function (err, result) {
+                                console.log(err);
+    
+                                if (!err && result && result[0] && result[0][0].applicantId) {
+    
+                                    response.status = true;
+                                    response.message = "Resume Saved Successfully";
+                                    response.error = null;
+                                    response.data = {
+                                        applicantId: result[0][0].applicantId
+                                    };
+                                    res.status(200).json(response);
+    
+                                }
+                                else if (!err && result && result[0] && result[0][0]._applicantExists) {
+    
+                                    response.status = false;
+                                    response.message = "Resume already exists";
+                                    response.error = null;
+                                    response.data = {
+                                        applicantId: result[0][0]._applicantExists
+                                    };
+                                    response.duplicate = 1;
+                                    res.status(200).json(response);
+    
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error While Saving Resume";
+                                    response.error = 1;
+                                    console.log(err);
+                                    res.status(500).json(response);
+                                }
+                            });
+                        }
+                    });
+    
+                }
+                else {
+                    res.status(401).json(response);
+                }
+            });
+        }
+        catch(ex){
+            console.log(ex);
+            res.status(500).json(response);
+        }        
     }
 };
 
@@ -5371,7 +5391,7 @@ applicantCtrl.getRecruiterPerformanceByClientWise = function (req, res, next) {
 
                 ];
 
-                var procQuery = 'CALL pace_get_dashboardRecruiterPerformance( ' + inputs.join(',') + ')';
+                var procQuery = 'CALL pace_get_dashboardRecruiterPerformanceClientView( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
@@ -5467,7 +5487,7 @@ applicantCtrl.getRecruiterPerformanceByRequirementWise = function (req, res, nex
                     req.st.db.escape(DBSecretKey)
                 ];
 
-                var procQuery = 'CALL pace_get_dashboardRecruiterPerformance( ' + inputs.join(',') + ')';
+                var procQuery = 'CALL pace_get_dashboardRecruiterPerformanceRequirementView( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
@@ -5547,6 +5567,19 @@ applicantCtrl.getRecruiterPerformanceReqApplicantData = function (req, res, next
         validationFlag *= false;
     }
 
+    if (!req.body.userMasterId.length) {
+        error.to = 'Invalid userMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.body.heDepartmentId.length) {
+        error.to = 'Invalid heDepartmentId';
+        validationFlag *= false;
+    }
+    if (!req.body.requirementId.length) {
+        error.to = 'Invalid requirementId';
+        validationFlag *= false;
+    }
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -5569,7 +5602,7 @@ applicantCtrl.getRecruiterPerformanceReqApplicantData = function (req, res, next
                     req.st.db.escape(DBSecretKey)
                 ];
 
-                var procQuery = 'CALL pace_get_dashboardRecruiterPerformance( ' + inputs.join(',') + ')';
+                var procQuery = 'CALL pace_get_dashboardRecruiterPerformanceApplicantView( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
@@ -5609,6 +5642,230 @@ applicantCtrl.getRecruiterPerformanceReqApplicantData = function (req, res, next
             }
         });
     }
+};
+
+
+applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag = false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag = false;
+    }
+    var heDepartmentId = req.body.heDepartmentId;
+    if (!heDepartmentId) {
+        heDepartmentId = [];
+    }
+    else if (typeof (heDepartmentId) == "string") {
+        heDepartmentId = JSON.parse(heDepartmentId);
+    }
+
+
+    var jobTitleId = req.body.jobTitleId;
+    if (!jobTitleId) {
+        jobTitleId = [];
+    }
+    else if (typeof (jobTitleId) == "string") {
+        jobTitleId = JSON.parse(jobTitleId);
+    }
+
+
+    var stageId = req.body.stageId;
+    if (!stageId) {
+        stageId = [];
+    }
+    else if (typeof (stageId) == "string") {
+        stageId = JSON.parse(stageId);
+    }
+
+    var statusId = req.body.statusId;
+    if (!statusId) {
+        statusId = [];
+    }
+    else if (typeof (statusId) == "string") {
+        statusId = JSON.parse(statusId);
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
+                // req.body.jobTitleId = (req.body.jobTitleId) ? req.body.jobTitleId : [];
+                // req.body.stageId = (req.body.stageId) ? req.body.stageId : [];
+                // req.body.statusId = (req.body.statusId) ? req.body.statusId : 0;
+                req.body.startPage = (req.body.startPage) ? req.body.startPage : 0;
+                req.body.limit = (req.body.limit) ? req.body.limit : 12;
+                req.body.applicantId = (req.body.applicantId) || (req.body.applicantId == "") ? req.body.applicantId : 0;
+                req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
+                req.body.type = (req.body.type) ? req.body.type : 1;
+                req.body.name = (req.body.name) ? req.body.name.trim() : '';
+                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+
+                if(req.body.name != "") {
+                    req.body.name = req.body.name.split(',');
+                }
+                else{
+                    req.body.name = [];
+                }
+
+                var getStatus = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(JSON.stringify(heDepartmentId)),
+                    req.st.db.escape(JSON.stringify(jobTitleId)),
+                    // req.st.db.escape(req.query.heDepartmentId),
+                    // req.st.db.escape(req.query.jobTitleId),
+                    req.st.db.escape(req.body.applicantId),
+                    // req.st.db.escape(req.query.stageId),
+                    // req.st.db.escape(req.body.statusId),
+                    req.st.db.escape(JSON.stringify(stageId)),
+                    req.st.db.escape(JSON.stringify(statusId)),
+                    req.st.db.escape(req.body.startPage),
+                    req.st.db.escape(req.body.limit),
+                    req.st.db.escape(req.body.requirementId),
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.body.type),
+                    req.st.db.escape(JSON.stringify(req.body.name || [])),
+                    req.st.db.escape(req.body.from || null),
+                    req.st.db.escape(req.body.to || null),
+                    req.st.db.escape(req.body.userMasterId || 0),
+                    req.st.db.escape(req.query.isWeb || 0),
+                    req.st.db.escape(JSON.stringify(req.body.stageDetail || {})),
+                    req.st.db.escape(req.body.applicantName || ""),
+                    req.st.db.escape(req.body.emailId || ""),
+                    req.st.db.escape(req.body.mobileNumber || ""),
+                    req.st.db.escape(req.body.requirementJobTitle || ""),
+                    req.st.db.escape(req.body.jobCode || ""),
+                    req.st.db.escape(req.body.clientName || ""),
+                    req.st.db.escape(req.body.stageName || ""),
+                    req.st.db.escape(req.body.statusName || ""),
+                    req.st.db.escape(req.body.applicantJobTitle || ""),
+                    req.st.db.escape(req.body.employer || ""),
+                    req.st.db.escape(req.body.experience || ""),
+                    req.st.db.escape(req.body.stageStatusNotes || ""),
+                    req.st.db.escape(req.body.cvSource || ""),
+                    req.st.db.escape(req.body.primarySkills || ""),
+                    req.st.db.escape(req.body.secondarySkills || ""),
+                    req.st.db.escape(req.body.presentLocation || ""),
+                    req.st.db.escape(req.body.education || ""),
+                    req.st.db.escape(req.body.passportNumber || ""),
+                    req.st.db.escape(req.body.faceSheet || ""),
+                    req.st.db.escape(req.body.cvCreatedUserName || ""),
+                    req.st.db.escape(req.body.cvUpdatedUserName || ""),
+                    req.st.db.escape(req.body.reqCvCreatedUserName || ""),
+                    req.st.db.escape(req.body.reqCvUpdatedUserName || ""),
+                    req.st.db.escape(req.body.cvCreatedDate || null),
+                    req.st.db.escape(req.body.cvUpdatedDate || null),
+                    req.st.db.escape(req.body.reqCvCreatedDate || null),
+                    req.st.db.escape(req.body.reqCvUpdatedDate || null),
+                    req.st.db.escape(req.body.emigrationCheck || "")
+                ];
+
+                var procQuery = 'CALL wm_get_applicantsWithColumnFilter( ' + getStatus.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, Result) {
+                    console.log(err);
+                    if (!err && Result && Result[0] || Result[2] || Result[3]) {
+                        response.status = true;
+                        response.message = "Applicants loaded successfully";
+                        response.error = null;
+                        if (Result[0] && Result[0][0] && Result[0][0].reqApplicantId) {
+                            for (var i = 0; i < Result[0].length; i++) {
+                                Result[0][i].clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
+
+                                Result[0][i].faceSheetDetailWithAnswers = Result[0][i].faceSheetDetailWithAnswers ? JSON.parse(Result[0][i].faceSheetDetailWithAnswers) : [];
+
+                                var facesheet = [];
+                                for (var f = 0; f < Result[0][i].faceSheetDetailWithAnswers.length; f++) {
+                                    if (Result[0][i].faceSheetDetailWithAnswers[f].answer) {
+                                        var answer = Result[0][i].faceSheetDetailWithAnswers[f].answer;
+                                    }
+                                    else {
+                                        var answer = "Not Applicable";
+                                    }
+                                    var QandA = Result[0][i].faceSheetDetailWithAnswers[f].question + " - " + answer;
+                                    facesheet.push(QandA);
+                                }
+                                Result[0][i].faceSheetDetailWithAnswers = facesheet;
+                            }
+                        }
+                        var cvSearchMasterData = {};
+                        var offerMasterData = {};
+                        if(req.query.isWeb == 0 && Result[6] && Result[6][0] && Result[7] && Result[7][0]){
+                           cvSearchMasterData = {
+                                skillList : Result[6] ? Result[6] : [],
+                                roles : Result[7] ? Result[7] : [],
+                                industry : Result[8] ? Result[8] : [],
+                                cvSource : Result[9] ? Result[9] : [],
+                                functionalAreas : Result[10] ? Result[10] : [],
+                                nationality : Result[11] ? Result[11] : []                           
+
+                            }
+                            offerMasterData  = {
+                                currency: Result[2] ? Result[2] : [],
+                                scale: Result[3] ? Result[3] : [],
+                                duration: Result[4] ? Result[4] : [],
+                                attachment: Result[5] ? Result[5] : [],
+                                grade : Result[12] ? Result[12] : [],
+                                designation :  Result[7] ? Result[7] : []
+                            } 
+                        }
+
+                        response.data = {
+                            applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId ? Result[0] : [],
+                            count: Result[1][0].count,
+                            offerMasterData: offerMasterData,
+                            cvSearchMasterData : cvSearchMasterData
+                        };
+                        // console.log(response.data);
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "Applicants not found";
+                        response.error = null;
+                        response.data = {
+                            applicantlist: [],
+                            count: [],
+                            currency: [],
+                            scale: [],
+                            duration: [],
+                            attachment: []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading applicants";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
 };
 
 module.exports = applicantCtrl;

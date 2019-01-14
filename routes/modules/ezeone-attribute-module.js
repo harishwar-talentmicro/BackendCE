@@ -277,7 +277,7 @@ EzeoneAttrbt.prototype.WhatMateVersionCode = function(req,res,next){
             return;
             break;
     }
-
+    console.log(rtnMessage);
     res.status(200).json(rtnMessage);
 
 };
