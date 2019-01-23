@@ -5572,14 +5572,15 @@ applicantCtrl.getRecruiterPerformanceReqApplicantData = function (req, res, next
         validationFlag *= false;
     }
 
-    if (!req.body.heDepartmentId.length) {
-        error.to = 'Invalid heDepartmentId';
-        validationFlag *= false;
-    }
-    if (!req.body.requirementId.length) {
-        error.to = 'Invalid requirementId';
-        validationFlag *= false;
-    }
+    // if (!req.body.heDepartmentId.length) {
+    //     error.to = 'Invalid heDepartmentId';
+    //     validationFlag *= false;
+    // }
+    // if (!req.body.requirementId.length) {
+    //     error.to = 'Invalid requirementId';
+    //     validationFlag *= false;
+    // }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -5599,7 +5600,8 @@ applicantCtrl.getRecruiterPerformanceReqApplicantData = function (req, res, next
                     req.st.db.escape(JSON.stringify(req.body.userMasterId || [])),
                     req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
                     req.st.db.escape(JSON.stringify(req.body.requirementId || [])),
-                    req.st.db.escape(DBSecretKey)
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.body.stageId || 0)
                 ];
 
                 var procQuery = 'CALL pace_get_dashboardRecruiterPerformanceApplicantView( ' + inputs.join(',') + ')';
@@ -5775,7 +5777,10 @@ applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
                     req.st.db.escape(req.body.cvUpdatedDate || null),
                     req.st.db.escape(req.body.reqCvCreatedDate || null),
                     req.st.db.escape(req.body.reqCvUpdatedDate || null),
-                    req.st.db.escape(req.body.emigrationCheck || "")
+                    req.st.db.escape(req.body.emigrationCheck || ""),
+                    req.st.db.escape(req.body.DOB || null),
+                    req.st.db.escape(req.body.ppExpiryDate || null),
+                    req.st.db.escape(req.body.ppIssueDate || null)
                 ];
 
                 var procQuery = 'CALL wm_get_applicantsWithColumnFilter( ' + getStatus.join(',') + ')';

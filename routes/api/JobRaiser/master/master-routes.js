@@ -32,7 +32,7 @@ router.post('/clientLocation',masterCtrl.saveClientsBusinessLocation);
 router.post('/mstageStatus',masterCtrl.saveMasterStageStatus);
 
 router.post('/requirementView',masterCtrl.getRequirementView);
-router.get('/clientView',masterCtrl.getClientView);
+router.post('/clientView',masterCtrl.getClientView);
 
 router.post('/tagPreview',masterCtrl.mailTags);
 

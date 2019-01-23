@@ -1412,7 +1412,6 @@ masterCtrl.getRequirementView = function (req, res, next) {
         validationFlag *= false;
     }
 
-
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
@@ -1436,7 +1435,20 @@ masterCtrl.getRequirementView = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
                     req.st.db.escape(req.query.search || ""),
                     req.st.db.escape(JSON.stringify(req.body.webStatusFilter || [])),
-                    req.st.db.escape(req.query.isWeb || 0)
+                    req.st.db.escape(req.query.isWeb || 0),
+                    req.st.db.escape(req.body.departmentTitle || ""),
+                    req.st.db.escape(req.body.branchName || ""),
+                    req.st.db.escape(req.body.jobCode || ""),
+                    req.st.db.escape(req.body.jobTitle || ""),
+                    req.st.db.escape(req.body.positions || 0),
+                    req.st.db.escape(req.body.positionsFilled || 0),
+                    req.st.db.escape(req.body.requirementTeam || ""),
+                    req.st.db.escape(req.body.notes || ""),
+                    req.st.db.escape(req.body.offeredCTC || 0),
+                    req.st.db.escape(req.body.joiningDate || null),
+                    req.st.db.escape(req.body.jobType || 0),
+                    req.st.db.escape(req.body.creatorName || ""),
+                    req.st.db.escape(req.body.createdDate || null)
                 ];
 
                 var procQuery = 'CALL wm_get_requirementView( ' + inputs.join(',') + ')';
@@ -1556,9 +1568,15 @@ masterCtrl.getClientView = function (req, res, next) {
                     req.st.db.escape(req.query.type),
                     req.st.db.escape(req.query.startPage || 0),
                     req.st.db.escape(req.query.limit || 0),
-                    req.st.db.escape(req.query.search || "")
-
+                    req.st.db.escape(req.query.search || ""),
+                    req.st.db.escape(req.body.clientName || ""),
+                    req.st.db.escape(req.body.notes || ""),
+                    req.st.db.escape(req.body.status || ""),
+                    req.st.db.escape(req.body.followUpNotes || ""),
+                    req.st.db.escape(req.body.createdUserName || ""),
+                    req.st.db.escape(req.body.createdDate || null)
                 ];
+
                 var procQuery = 'CALL wm_get_clientView( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, results) {

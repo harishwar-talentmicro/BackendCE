@@ -192,7 +192,7 @@ EzeoneAttrbt.prototype.WhatMateVersionCode = function(req,res,next){
         data : null,
         error : null
     };
-
+    console.log("req.platform",req.platform);
     switch(req.platform){
         case 'ios':
             /**

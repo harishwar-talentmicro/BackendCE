@@ -5239,75 +5239,6 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
         versionMessage: "Your application is up to date"
     };
 
-    // switch(req.platform){
-    //     case 'ios':
-    //         /**
-    //          * If IOS version is not supported
-    //          */
-    //         if(req.CONFIG.VERSION_LIST.IOS[0].indexOf(parseInt(req.query.versionCode)) == -1 && req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1 ){
-    //             rtnMessage.versionStatus = 2;
-    //             rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-    //             res.send([rtnMessage]);
-    //             return;
-    //         }
-    //         else if(req.CONFIG.VERSION_LIST.IOS[1].indexOf(parseInt(req.query.versionCode)) == -1){
-    //
-    //             rtnMessage.versionStatus = 1;
-    //             rtnMessage.versionMessage = "New update available. Please update your application to latest version";
-    //             //res.send([rtnMessage]);
-    //             //return;
-    //         }
-    //         else{
-    //             rtnMessage.versionStatus = 0;
-    //             rtnMessage.versionMessage = "Applications is up to date";
-    //             //res.send([rtnMessage]);
-    //             //return;
-    //         }
-    //         break;
-    //     case 'android':
-    //         /**
-    //          * If Android version is not supported
-    //          */
-    //         if(req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) == -1){
-    //             console.log("===========coming to -1 block=============");
-    //             rtnMessage.versionStatus = 2;
-    //             rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-    //             res.send([rtnMessage]);
-    //             return;
-    //         }
-    //         else{
-    //             console.log("===========coming to +1 block=============");
-    //             rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.ANDROID.length ==
-    //             (req.CONFIG.VERSION_LIST.ANDROID.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
-    //             rtnMessage.versionMessage = (rtnMessage.versionStatus)
-    //                 ? "New update available. Please update your application to latest version" : rtnMessage.versionMessage;
-    //         }
-    //         break;
-    //     case 'web':
-    //         /**
-    //          * If Web version is not supported
-    //          */
-    //         if(req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) == -1){
-    //             rtnMessage.versionStatus = 2;
-    //             rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-    //             res.send([rtnMessage]);
-    //             return;
-    //         }
-    //         else{
-    //             rtnMessage.versionStatus = (req.CONFIG.VERSION_LIST.WEB.length ==
-    //             (req.CONFIG.VERSION_LIST.WEB.indexOf(parseInt(req.query.versionCode)) + 1)) ? 0 : 1;
-    //             rtnMessage.versionMessage = (rtnMessage.versionStatus)
-    //                 ? "New update available. Please update your application to latest version" : rtnMessage.versionMessage;
-    //         }
-    //         break;
-    //     default:
-    //         rtnMessage.versionStatus = 2;
-    //         rtnMessage.versionMessage = "Please update your application to latest version to continue using it";
-    //         res.send([rtnMessage]);
-    //         return;
-    //         break;
-    // }
-
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -5392,39 +5323,32 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
                                     else {
 
                                         response.status = true;
-                                        response.message = "User details sent successfully";
+                                        response.message = "No details found";
                                         response.error = null;
                                         response.data = null;
-                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                        zlib.gzip(buf, function (_, result) {
-                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        // zlib.gzip(buf, function (_, result) {
+                                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                             res.status(200).json(response);
-                                        });
+                                        // });
                                     }
                                 }
                                 else {
-
-
                                     console.log('FnGetUserDetails : tmaster: No User details found');
                                     response.status = true;
                                     response.message = "tmaster: No User details found";
                                     response.error = null;
                                     response.data = null;
-                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                    zlib.gzip(buf, function (_, result) {
-                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    // zlib.gzip(buf, function (_, result) {
+                                    //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                         res.status(200).json(response);
-                                    });
-
+                                    // });
 
                                 }
 
                             }
                             else {
-                                // res.json(null);
-                                // res.statusCode = 500;
-                                // console.log('FnGetUserDetails : tmaster:' + err);
-
                                 response.status = false;
                                 response.message = "FnGetUserDetails : tmaster:" + err;
                                 response.error = null;
@@ -5435,9 +5359,6 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
                         });
                     }
                     else {
-                        // console.log('FnGetUserDetails: Invalid token');
-                        // res.statusCode = 401;
-                        // res.json(null);
                         response.status = false;
                         response.message = "Invalid Token";
                         response.error = null;
@@ -5461,9 +5382,7 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
             response.message = "token is empty";
             response.error = null;
             response.data = null;
-
             res.status(400).json(response);
-            // console.log('FnGetUserDetails :  token is empty');
         }
     }
     catch (ex) {
