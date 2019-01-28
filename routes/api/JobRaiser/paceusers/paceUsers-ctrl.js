@@ -559,6 +559,23 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+
+    var requirement = req.body.requirement;
+    if (typeof (requirement) == "string") {
+        requirement = JSON.parse(requirement);
+    }
+    if (!requirement) {
+        requirement = [];
+    }
+
+    var client = req.body.client;
+    if (typeof (client) == "string") {
+        client = JSON.parse(client);
+    }
+    if (!client) {
+        client = [];
+    }
+
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -578,7 +595,10 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                     req.st.db.escape(req.query.type),
                     req.st.db.escape(req.body.from),
                     req.st.db.escape(req.body.to),
-                    req.st.db.escape(req.body.resultType || 0)
+                    req.st.db.escape(req.body.resultType || 0),
+                    req.st.db.escape(JSON.stringify(client)),
+                    req.st.db.escape(JSON.stringify(requirement))
+                    
                 ];
 
                 var procQuery = 'CALL wm_get_DashBoard( ' + inputs.join(',') + ')';
@@ -830,7 +850,8 @@ paceUsersCtrl.saveTrackerTemplate = function (req, res, next) {
                     req.st.db.escape(req.body.userMasterId),
                     req.st.db.escape(req.body.templateName),
                     req.st.db.escape(req.body.generatedFileName),
-                    req.st.db.escape(JSON.stringify(tagsJson))
+                    req.st.db.escape(JSON.stringify(tagsJson)),
+                    req.st.db.escape(JSON.stringify(req.body.customTags || []))
                 ];
 
                 var procQuery = 'CALL paceusers_tracker( ' + inputs.join(',') + ')';

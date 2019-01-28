@@ -1950,6 +1950,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
     var sendMailFlag = 0;
     var trackerTemplate = req.body.trackerTemplate;
     var trackerTags = [];
+    var customTags = [];
 
     var response = {
         status: false,
@@ -2007,10 +2008,16 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
         if (typeof (trackerTemplate.trackerTags) == 'string') {
             trackerTags = trackerTemplate && trackerTemplate.trackerTags && JSON.parse(trackerTemplate.trackerTags) ? JSON.parse(trackerTemplate.trackerTags) : [];
         }
+
+        if (typeof (trackerTemplate.customTags) == 'string') {
+            customTags = trackerTemplate && trackerTemplate.customTags && JSON.parse(trackerTemplate.customTags) ? JSON.parse(trackerTemplate.customTags) : [];
+        }
+
     }
     else {
         trackerTemplate = {};
         trackerTags = [];
+        customTags = [];
     }
 
 
@@ -2215,17 +2222,36 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                                 else
                                     ws_data += '"' + trackerTags[i].displayTagAs + '"';
                             }
+
+                            for (var j = 0; j < customTags.length; j++) {
+                                ws_data += ',"' + customTags[j] + '"';
+                            }
+
                             ws_data += "]";
 
                             // console.log(new Buffer(buffer).toString("base64"));
                             for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
                                 ws_data += ',[';
                                 for (var tagIndex = 0; tagIndex < trackerTags.length; tagIndex++) {
-                                    if (tagIndex < trackerTags.length - 1)
-                                        ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '",';
-                                    else
-                                        ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '"';
+                                    if (tagIndex < trackerTags.length - 1) {
+                                        if (result[0][applicantIndex][trackerTags[tagIndex].tagName] != undefined)
+                                            ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '",';
+                                        else
+                                            ws_data += '"' + "" + '",';
+
+                                    }
+                                    else {
+                                        if (result[0][applicantIndex][trackerTags[tagIndex].tagName] != undefined)
+                                            ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '"';
+                                        else
+                                            ws_data += '"' + "" + '"';
+                                    }
                                 }
+
+                                for (var j = 0; j < customTags.length; j++) {
+                                    ws_data += ',"' + "" + '"';
+                                }
+
                                 ws_data += ']';
                             }
                             ws_data += ']';
@@ -2338,6 +2364,8 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
     var isWeb = req.query.isWeb || 0;
     var mailerType = req.body.mailerType || 0;
     var userId = req.query.userId || 0;
+    var trackerTags = [];
+    var customTags = [];
 
     //html styling for table in submission mailer
 
@@ -2351,15 +2379,23 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
         validationFlag *= false;
     }
 
-    if (typeof (trackerTemplate) == "string") {
+    if (trackerTemplate && typeof (trackerTemplate) == "string") {
         trackerTemplate = JSON.parse(trackerTemplate);
     }
-    if (!trackerTemplate) {
-        trackerTemplate = {};
-        trackerTags = [];
+    if (trackerTemplate && trackerTemplate.trackerId) {
+        if (typeof (trackerTemplate.trackerTags) == 'string') {
+            trackerTags = trackerTemplate && trackerTemplate.trackerTags && JSON.parse(trackerTemplate.trackerTags) ? JSON.parse(trackerTemplate.trackerTags) : [];
+        }
+
+        if (typeof (trackerTemplate.customTags) == 'string') {
+            customTags = trackerTemplate && trackerTemplate.customTags && JSON.parse(trackerTemplate.customTags) ? JSON.parse(trackerTemplate.customTags) : [];
+        }
+
     }
     else {
-        trackerTags = JSON.parse(trackerTemplate.trackerTags);
+        trackerTemplate = {};
+        trackerTags = [];
+        customTags = [];
     }
 
     if (typeof (tags) == "string") {
@@ -2557,10 +2593,10 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                                 }
                                             tableContent += "</tr>";
                                         }
-    
+
                                     tableContent += "</table>";
                                     mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
-    
+
                                 }
 
                                 mailbody_array.push(mailBody);
@@ -2587,17 +2623,36 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                     else
                                         ws_data += '"' + trackerTags[i].displayTagAs + '"';
                                 }
+
+                                for (var j = 0; j < customTags.length; j++) {
+                                    ws_data += ',"' + "" + '"';
+                                }
+
                                 ws_data += "]";
 
                                 // console.log(new Buffer(buffer).toString("base64"));
                                 for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
                                     ws_data += ',[';
                                     for (var tagIndex = 0; tagIndex < trackerTags.length; tagIndex++) {
-                                        if (tagIndex < trackerTags.length - 1)
-                                            ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '",';
-                                        else
-                                            ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '"';
+                                        if (tagIndex < trackerTags.length - 1) {
+                                            if (result[0][applicantIndex][trackerTags[tagIndex].tagName] != undefined)
+                                                ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '",';
+                                            else
+                                                ws_data += '"' + "" + '",';
+    
+                                        }
+                                        else {
+                                            if (result[0][applicantIndex][trackerTags[tagIndex].tagName] != undefined)
+                                                ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '"';
+                                            else
+                                                ws_data += '"' + "" + '"';
+                                        }
                                     }
+
+                                    for (var j = 0; j < customTags.length; j++) {
+                                        ws_data += ',"' + "" + '"';
+                                    }
+
                                     ws_data += ']';
                                 }
                                 ws_data += ']';
