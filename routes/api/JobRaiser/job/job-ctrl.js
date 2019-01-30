@@ -181,7 +181,8 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                     req.st.db.escape(req.body.autoSourcingMail || ''),
                     req.st.db.escape(req.body.autoScreeningMail || ''),
                     req.st.db.escape(req.body.isGulf || 0),
-                    req.st.db.escape(req.body.isCareerPortal || 0)
+                    req.st.db.escape(req.body.isCareerPortal || 0),
+                    req.st.db.escape(req.body.reqOrGroup || 1)
                 ];
 
                 var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';

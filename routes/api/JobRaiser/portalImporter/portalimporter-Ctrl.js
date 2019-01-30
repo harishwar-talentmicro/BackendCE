@@ -117,7 +117,7 @@ var removeUnicodeChars = function (param) {
 
 var dateConverter = function (params) {
     params = removeExtraChars(params);
-    params = params.replace('th', '');
+    // params = params.replace('th', '');
     params = params.replace(',', '');
     var dateStr = params;
     var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -125,7 +125,13 @@ var dateConverter = function (params) {
     if (arr && arr[1]) {
         arr[1] = months.indexOf(arr[1]) + 1;
         arr = arr.reverse();
-        return arr.join('-');
+        var result = arr.join('-');
+        result = result.replace(/st/g, '');
+        result = result.replace(/th/g, '');
+        return result;
+    }
+    else {
+        return null;
     }
 }
 
@@ -584,7 +590,7 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
                         current_location = removeExtraChars(element.getElementsByClassName('skinfoitem info_loc')[0].innerHTML);
 
                     var experience;
-                    if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1]) {
+                    if (element.getElementsByClassName('basicinfo_h haspic') && element.getElementsByClassName('basicinfo_h haspic')[0] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1] && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ') && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1]) {
                         if (element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Years') > -1 && element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].indexOf('Months') > -1)
                             experience = parseFloat((element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split('Years ')[1].split(' Months')[0] / 12).toFixed(1)) + parseInt(element.getElementsByClassName('basicinfo_h haspic')[0].getElementsByClassName('skinfo')[0].innerHTML.split('</span>')[1].split('Exp. ')[1].split(' ')[0]);
 
@@ -1692,9 +1698,11 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             details.industry = removeExtraChars(document.getElementsByClassName('desc indInfo')[0].innerHTML).split(',');
         }
 
-        var tempFunctionArea = document.getElementsByClassName('desc faInfo')[0].innerHTML;
-        if (tempFunctionArea && tempFunctionArea[0] && tempFunctionArea[0].innerHTML && removeExtraChars(tempFunctionArea[0].innerHTML) != "") {
-            details.functionalAreas = removeExtraChars(document.getElementsByClassName('desc faInfo')[0].innerHTML).split(',');
+        if (document.getElementsByClassName('desc faInfo') && document.getElementsByClassName('desc faInfo')[0] && document.getElementsByClassName('desc faInfo')[0].innerHTML) {
+            var tempFunctionArea = document.getElementsByClassName('desc faInfo')[0].innerHTML;
+            if (tempFunctionArea && tempFunctionArea[0] && tempFunctionArea[0].innerHTML && removeExtraChars(tempFunctionArea[0].innerHTML) != "") {
+                details.functionalAreas = removeExtraChars(document.getElementsByClassName('desc faInfo')[0].innerHTML).split(',');
+            }
         }
 
         var work_histories = [];

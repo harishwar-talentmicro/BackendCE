@@ -49,7 +49,7 @@ masterCtrl.getReqMasterData = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.purpose)
+                    req.st.db.escape(req.query.purpose || 1)
                 ];
 
                 var procQuery = 'CALL wm_get_jobtype_curr_scale_duration( ' + inputs.join(',') + ')';
