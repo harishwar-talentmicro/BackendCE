@@ -261,47 +261,47 @@ applicantCtrl.saveApplicant = function (req, res, next) {
     
                     return new Promise(function (resolve, reject) {
                         try {
-                            if (cv != '') {
-                                cv = gs_url + storage_bucket + '/' + cv;
-                                console.log('cvPath complete', cv);
-                                http.get(cv, function (fileResponse) {
-                                    var bufs = [];
+                            // if (cv != '' && (!req.body.cvKeywords || req.body.cvKeywords == '')) {
+                            //     cv = gs_url + storage_bucket + '/' + cv;
+                            //     console.log('cvPath complete', cv);
+                            //     http.get(cv, function (fileResponse) {
+                            //         var bufs = [];
     
-                                    fileResponse.on('data', function (d) { bufs.push(d); });
-                                    fileResponse.on('end', function () {
-                                        var buf = Buffer.concat(bufs);
-                                        process.env.ANTIWORDHOME = '/usr/share/antiword';
-                                        try {
-                                            textract.fromBufferWithName(cv, buf, function (error, txt) {
-                                                if (error) {
-                                                    // var tempCVPath = cv.replace('docx', 'doc');
-                                                    // textract.fromBufferWithName(tempCVPath, buf, function (error, txt) {
-                                                    // text = txt;
-                                                    console.log('error', error);
-                                                    // console.log('text inside', text);
-                                                    resolve(text);
-                                                    // });
-                                                }
-                                                else {
-                                                    text = txt;
-                                                    console.log('error', error);
-                                                    console.log('text inside', text);
-                                                    resolve(text);
+                            //         fileResponse.on('data', function (d) { bufs.push(d); });
+                            //         fileResponse.on('end', function () {
+                            //             var buf = Buffer.concat(bufs);
+                            //             process.env.ANTIWORDHOME = '/usr/share/antiword';
+                            //             try {
+                            //                 textract.fromBufferWithName(cv, buf, function (error, txt) {
+                            //                     if (error) {
+                            //                         // var tempCVPath = cv.replace('docx', 'doc');
+                            //                         // textract.fromBufferWithName(tempCVPath, buf, function (error, txt) {
+                            //                         // text = txt;
+                            //                         console.log('error', error);
+                            //                         // console.log('text inside', text);
+                            //                         resolve(text);
+                            //                         // });
+                            //                     }
+                            //                     else {
+                            //                         text = txt;
+                            //                         console.log('error', error);
+                            //                         console.log('text inside', text);
+                            //                         resolve(text);
     
-                                                }
-                                            });
-                                        }
-                                        catch (ex) {
-                                            console.log("ex", ex);
-                                            resolve('');
-                                        }
-                                    });
-                                });
+                            //                     }
+                            //                 });
+                            //             }
+                            //             catch (ex) {
+                            //                 console.log("ex", ex);
+                            //                 resolve('');
+                            //             }
+                            //         });
+                            //     });
     
-                            }
-                            else {
+                            // }
+                            // else {
                                 resolve('');
-                            }
+                            // }
                         }
                         catch (ex) {
                             console.log(ex);
@@ -633,7 +633,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                 organizationJobTitles: result[55] && result[55][0] ? result[55] : []
                             },
                             typeView: result[56] ? result[56] : [],
-                            taskMembers :result[57] ? result[57] : []
+                            taskMembers :result[57] ? result[57] : [],
+                            requirementGroupList :result[58] ? result[58] : []
 
                         };
 
@@ -4964,9 +4965,6 @@ applicantCtrl.getMailerApplicants = function (req, res, next) {
         reqApplicants = JSON.parse(reqApplicants);
     }
 
-
-
-
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -4990,6 +4988,7 @@ applicantCtrl.getMailerApplicants = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(reqApplicants)),
                     req.st.db.escape(req.body.startPage),
                     req.st.db.escape(req.body.limit),
+                    req.st.db.escape(req.body.type || 1)  // take my self by default
                 ];
 
                 var procQuery = 'CALL wm_get_mailerApplicants( ' + getStatus.join(',') + ')';
@@ -5002,44 +5001,11 @@ applicantCtrl.getMailerApplicants = function (req, res, next) {
                         response.error = null;
                         var output = [];
                         for (var i = 0; i < Result[0].length; i++) {
-                            var res2 = {};
-                            res2.reqApplicantId = Result[0][i].reqAppId;
-                            res2.applicantId = Result[0][i].applicantId;
-                            res2.imageUrl = Result[0][i].imageUrl;
-                            res2.createdDate = Result[0][i].createdDate;
-                            res2.lastUpdatedDate = Result[0][i].lastUpdatedDate;
-                            res2.reqCvCreatedUserId = Result[0][i].reqCvCreatedUserId;
-                            res2.reqCvCreatedUserName = Result[0][i].reqCvCreatedUserName;
-                            res2.reqCvUpdatedUserId = Result[0][i].reqCvUpdatedUserId;
-                            res2.reqCvUpdatedUserName = Result[0][i].reqCvUpdatedUserName;
-                            res2.cvCreatedDate = Result[0][i].cvCreatedDate;
-                            res2.cvCreatedUSerId = Result[0][i].cvCreatedUSerId;
-                            res2.cvCreatedUserName = Result[0][i].cvCreatedUserName;
-                            res2.cvUpdatedDate = Result[0][i].cvUpdatedDate;
-                            res2.cvUpdatedUserId = Result[0][i].cvUpdatedUserId;
-                            res2.cvUpdatedUserName = Result[0][i].cvUpdatedUserName;
-                            res2.requirementId = Result[0][i].requirementId;
-                            res2.name = Result[0][i].name;
-                            res2.emailId = Result[0][i].emailId;
-                            res2.clientId = Result[0][i].clientId;
-                            res2.clientName = Result[0][i].clientname;
-                            res2.jobCode = Result[0][i].jobCode;
-                            res2.jobTitleId = Result[0][i].jobTitleId;
-                            res2.jobTitle = Result[0][i].title;
-                            res2.stageId = Result[0][i].stageId;
-                            res2.stage = Result[0][i].stageTitle;
-                            res2.stageTypeId = Result[0][i].stageTypeId;
-                            res2.colorCode = Result[0][i].colorCode;
-                            res2.statusId = Result[0][i].statusId;
-                            res2.status = Result[0][i].statusTitle;
-                            res2.statusTypeId = Result[0][i].statusTypeId;
-                            res2.clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
-                            output.push(res2);
+                            Result[0][i].clientContacts = Result[0][i] && Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
                         }
                         response.data = {
-                            applicantlist: output,
+                            applicantlist: Result[0] ? Result[0] : []
                         };
-                        // console.log(response.data);
                         res.status(200).json(response);
                     }
                     else if (!err) {
@@ -5047,7 +5013,7 @@ applicantCtrl.getMailerApplicants = function (req, res, next) {
                         response.message = "Applicants not found";
                         response.error = null;
                         response.data = {
-                            applicantlist: [],
+                            applicantlist: []
                         };
                         res.status(200).json(response);
                     }
@@ -5065,7 +5031,6 @@ applicantCtrl.getMailerApplicants = function (req, res, next) {
             }
         });
     }
-
 };
 
 applicantCtrl.ReqAppMapFromReqView = function (req, res, next) {

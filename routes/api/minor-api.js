@@ -21,7 +21,7 @@ var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 var request = require('request');
 // var Client = require('node-rest-client').Client;   // for interview scheduler hirecraft
 // var client = new Client();
-var fs = require('fs');
+var fs = require('fs')
 var Jimp = require('jimp');
 var gcloud = require('gcloud');
 
@@ -416,6 +416,8 @@ var gulfModule = require('./JobRaiser/gulf.js');
 var settings = require('./JobRaiser/settings.js');
 var billing = require('./JobRaiser/billing.js');
 var portal = require('./JobRaiser/portalImporter.js');
+var reqGroup = require('./JobRaiser/reqGroup.js');
+var dataMigration = require('./JobRaiser/dataMigration.js');
 
 
 router.use('/WM', jobModule);
@@ -428,6 +430,9 @@ router.use('/WM', gulfModule);
 router.use('/WM', settings);
 router.use('/WM', billing);
 router.use('/WM', portal);
+router.use('/WM', reqGroup);
+router.use('/WM', dataMigration);
+
 // cron
 // var taskScheduler = require('../api/HEApp/task/task-ctrl');
 cron.schedule('*/15 * * * *', function () {
