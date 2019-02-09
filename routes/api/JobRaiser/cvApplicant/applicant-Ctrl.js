@@ -5752,7 +5752,7 @@ applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, Result) {
                     console.log(err);
-                    if (!err && Result && Result[0] || Result[2] || Result[3]) {
+                    if (!err && Result && Result[0]) {
                         response.status = true;
                         response.message = "Applicants loaded successfully";
                         response.error = null;
@@ -5778,7 +5778,7 @@ applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
                         }
                         var cvSearchMasterData = {};
                         var offerMasterData = {};
-                        if(req.query.isWeb == 0 && Result[6] && Result[6][0] && Result[7] && Result[7][0]){
+                        if(req.query.isWeb == 0){
                            cvSearchMasterData = {
                                 skillList : Result[6] ? Result[6] : [],
                                 roles : Result[7] ? Result[7] : [],
@@ -5800,7 +5800,7 @@ applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
 
                         response.data = {
                             applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId ? Result[0] : [],
-                            count: Result[1][0].count,
+                            count: Result[1] && Result[1][0] ? Result[1][0].count : 0,
                             offerMasterData: offerMasterData,
                             cvSearchMasterData : cvSearchMasterData
                         };

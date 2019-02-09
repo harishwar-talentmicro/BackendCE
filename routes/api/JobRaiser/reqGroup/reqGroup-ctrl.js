@@ -35,15 +35,15 @@ reqGroup.saveRequirementGroup = function (req, res, next) {
         validationFlag *= false;
     }
 
-    if (!(req.body.branchList && req.body.branchList[0] && req.body.branchList[0].branchId)) {
-        error.branchList = 'Invalid branchList';
-        validationFlag *= false;
-    }
+    // if (!(req.body.branchList && req.body.branchList[0] && req.body.branchList[0].branchId)) {
+    //     error.branchList = 'Invalid branchList';
+    //     validationFlag *= false;
+    // }
 
-    if (!(req.body.contactList && req.body.contactList.length)) {
-        error.contactList = 'Invalid contactList';
-        validationFlag *= false;
-    }
+    // if (!(req.body.contactList && req.body.contactList.length)) {
+    //     error.contactList = 'Invalid contactList';
+    //     validationFlag *= false;
+    // }
 
     if (!(req.body.requirements && req.body.requirements.length)) {
         error.requirements = 'Invalid requirements';
@@ -88,7 +88,12 @@ reqGroup.saveRequirementGroup = function (req, res, next) {
                             req.st.db.escape(JSON.stringify(req.body.heDepartment)),
                             req.st.db.escape(JSON.stringify(req.body.branchList)),
                             req.st.db.escape(JSON.stringify(req.body.contactList)),
-                            req.st.db.escape(JSON.stringify(req.body.requirements))
+                            req.st.db.escape(JSON.stringify(req.body.requirements)),
+                            req.st.db.escape(JSON.stringify(req.body.members || [])),
+                            req.st.db.escape(JSON.stringify(req.body.memberInterviewRound || [])),
+                            req.st.db.escape(req.body.status || 1),
+                            req.st.db.escape(req.body.statusTitle),
+                            req.st.db.escape(req.body.statusNotes || "")
                         ];
 
                         var procQuery = 'CALL pace_save_requirementGroup( ' + procParams.join(',') + ')';
@@ -100,8 +105,17 @@ reqGroup.saveRequirementGroup = function (req, res, next) {
                                 response.status = true;
                                 response.message = requirementResult[0][0].message;
                                 response.error = null;
+
+                                // for (var i = 0; i < requirementResult[2].length; i++) {
+                                //     requirementResult[2][i].followUpNotes = (requirementResult[2] && requirementResult[2][i]) ? JSON.parse(requirementResult[2][i].followUpNotes) : [];
+                                // }
+
+                                
                                 response.data = {
-                                    reqGroupDetails: requirementResult[0][0]
+                                    reqGroupDetails: requirementResult[0][0],
+                                    reqGroupCompleteDetails: requirementResult[1][0] ? requirementResult[1][0] : null,
+                                    // followUpNotes: (requirementResult[2] && requirementResult[2][0]) ? requirementResult[2] : []
+                                    requirementGroupList :requirementResult[2] ? requirementResult[2] : []
                                 };
                                 res.status(200).json(response);
                             }
@@ -378,7 +392,10 @@ reqGroup.getRequirementViewGroup = function (req, res, next) {
                     req.st.db.escape(req.body.creatorName || ""),
                     req.st.db.escape(req.body.createdDate || null),
                     req.st.db.escape(req.body.reqGroupName || ""),
-                    req.st.db.escape(req.body.reqGroupJobCode || "")
+                    req.st.db.escape(req.body.reqGroupJobCode || ""),
+                    req.st.db.escape(req.body.reqGroupCreatedUserName || ""),
+                    req.st.db.escape(req.body.reqGroupCreatedDate || null)
+                    // req.st.db.escape(req.body.reqGroupStatusTitle || "")
                 ];
 
                 var procQuery = 'CALL pace_get_requirementViewGroup( ' + inputs.join(',') + ')';
@@ -394,7 +411,8 @@ reqGroup.getRequirementViewGroup = function (req, res, next) {
                         // for (var i = 0; i < results[0].length; i++) {
                         //     results[0][i].branchList = JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
                         //         results[0][i].contactList = JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
-                        //         results[0][i].reqGroupStageDetail = JSON.parse(results[0][i].reqGroupStageDetail) ? JSON.parse(results[0][i].reqGroupStageDetail) : []
+                        //         results[0][i].reqGroupStageDetail = JSON.parse(results[0][i].reqGroupStageDetail) ? JSON.parse(results[0][i].reqGroupStageDetail) : [],
+                        //         results[0][i].requirements = JSON.parse(results[0][i].requirements) ? JSON.parse(results[0][i].requirements) : []
                         // }
 
                         response.data = {
