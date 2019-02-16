@@ -634,7 +634,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             },
                             typeView: result[56] ? result[56] : [],
                             taskMembers :result[57] ? result[57] : [],
-                            requirementGroupList :result[58] ? result[58] : []
+                            requirementGroupList :result[58] ? result[58] : [],
+                            reqOrGroup : result[59] && result[59][0] && result[59][0].reqOrGroup ? result[59][0].reqOrGroup : 1
 
                         };
 

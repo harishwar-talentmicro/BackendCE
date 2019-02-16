@@ -704,7 +704,7 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
 
     var lastNameMaxWidth = 1000;
     var lastNameX = 300;
-    var lastNameY =300;
+    var lastNameY = 300;
 
     var validationFlag = true;
     if (!req.query.token) {
@@ -814,77 +814,78 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                             console.log(backGroundImage);
                         };
 
-                        var proc = "select a.picture from tmaster a,theusers b where  a.tId=b.userMasterId and b.employeeCode= '" + rewardRecognition[0].EmployeeCode + "' and b.heMasterId=" + req.body.heMasterId;
-                        console.log(proc);
-                        req.db.query(proc, function (err, results) {
-                            if (req.body.imageMandatory == 1) {
+                        if (resizeX > 0) {
+                            var proc = "select a.picture from tmaster a,theusers b where  a.tId=b.userMasterId and b.employeeCode= '" + rewardRecognition[0].EmployeeCode + "' and b.heMasterId=" + req.body.heMasterId;
+                            console.log(proc);
+                            req.db.query(proc, function (err, results) {
+                                if (req.body.imageMandatory == 1) {
 
-                                if (!err && results[0]) {
-                                    imageUrl = results[0].picture;
-                                    console.log("--=", imageUrl);
-                                }
-                                else if (!err) {
-                                    imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
-                                    console.log("dummy", imageUrl);
+                                    if (!err && results[0] && results[0].picture && results[0].picture != "") {
+                                        imageUrl = results[0].picture;
+                                        console.log("--=", imageUrl);
+                                    }
+                                    else if (!err) {
+                                        imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
+                                        console.log("dummy", imageUrl);
 
+                                    }
+                                    else {
+                                        imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
+                                        console.log(imageUrl);
+
+                                    };
                                 }
                                 else {
                                     imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
-                                    console.log(imageUrl);
+                                    console.log("no mandatory image", imageUrl);
+                                }
+                                Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png").then(function (image2) {
+                                    Jimp.read("https://storage.googleapis.com/ezeone/" + backGroundImage, function (err, lenna) {
 
-                                };
-                            }
-                            else {
-                                imageUrl = '3927ad80-aef7-4a1f-aad0-15aa3d6ead99.png';
-                                console.log("no mandatory image", imageUrl);
-                            }
-                            Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png").then(function (image2) {
-                                Jimp.read("https://storage.googleapis.com/ezeone/" + backGroundImage, function (err, lenna) {
+                                        var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + imageUrl).then(function (image1) {
 
-                                    var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + imageUrl).then(function (image1) {
+                                            var profile = image1;
+                                            var mask = image2;
+                                            var w = mask.bitmap.width; // the width of the image
+                                            var h = mask.bitmap.height;
+                                            // console.log(w, h);
+                                            profile.resize(w, h);
+                                            // console.log(h);
 
-                                        var profile = image1;
-                                        var mask = image2;
-                                        var w = mask.bitmap.width; // the width of the image
-                                        var h = mask.bitmap.height;
-                                        // console.log(w, h);
-                                        profile.resize(w, h);
-                                        // console.log(h);
+                                            profile.mask(mask, 0, 0)
+                                                .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function () {
+                                                    console.log('imposing profile picture over dummy');
+                                                    Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function (err, penna) {
+                                                        penna.resize(resizeX, resizeY);   //resizeX,resizeY
+                                                        console.log('reading edited profile picture');
+                                                        console.log('reading background image');
+                                                        if (err) throw err;
 
-                                        profile.mask(mask, 0, 0)
-                                            .write("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function () {
-                                                console.log('imposing profile picture over dummy');
-                                                Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/HEApp/greeting/lenna-circle" + timestamp + ".png", function (err, penna) {
-                                                    penna.resize(resizeX, resizeY);   //resizeX,resizeY
-                                                    console.log('reading edited profile picture');
-                                                    console.log('reading background image');
-                                                    if (err) throw err;
+                                                        var w = (lenna.bitmap.width); // the width of the image
+                                                        var h = lenna.bitmap.height;
+                                                        var name = title = type = title1 = title2 = '';
+                                                        var name = "";
 
-                                                    var w = (lenna.bitmap.width); // the width of the image
-                                                    var h = lenna.bitmap.height;
-                                                    var name = title = type = title1 = title2 = '';
-                                                    var name = "";
+                                                        var name = rewardRecognition[0].UserName;    //name on card
 
-                                                    var name = rewardRecognition[0].UserName;    //name on card
-                                                    
-                                                    if (name && name.split(' ')[0])
-                                                        firstName = name.split(' ')[0];
-                                                    if (name && name.split(' ')[1])
-                                                        lastName = name.split(' ')[1];
+                                                        if (name && name.split(' ')[0])
+                                                            firstName = name.split(' ')[0];
+                                                        if (name && name.split(' ')[1])
+                                                            lastName = name.split(' ')[1];
 
-                                                    var title = rewardRecognition[0].SubTitle;  // subtitle below main title
-                                                    var type = rewardRecognition[0].TitleoftheAward;   //mainTitle
-                                                    var title1 = rewardRecognition[0].Content;    //  below contentTitle
-                                                    var title2 = rewardRecognition[0].ContentTitle;  //below name
+                                                        var title = rewardRecognition[0].SubTitle;  // subtitle below main title
+                                                        var type = rewardRecognition[0].TitleoftheAward;   //mainTitle
+                                                        var title1 = rewardRecognition[0].Content;    //  below contentTitle
+                                                        var title2 = rewardRecognition[0].ContentTitle;  //below name
 
-                                                    var nameLength = (((name.length / 2)));
-                                                    var TypeLength = (((type.length / 2)));
-                                                    var titleLength = (((title.length / 2)));
+                                                        var nameLength = (((name.length / 2)));
+                                                        var TypeLength = (((type.length / 2)));
+                                                        var titleLength = (((title.length / 2)));
 
-                                                    lenna.quality(100)
-                                                    Jimp.loadFont(nameFunction).then(function (font) {
-                                                        lenna.print(font, nameX, nameY, name, nameMaxWidth)    //font->fontSize,  50 -X,490 -Y ,  nameX,nameY
-                                                        // Jimp.loadFont(lastNameFunction).then(function (font) {
+                                                        lenna.quality(100)
+                                                        Jimp.loadFont(nameFunction).then(function (font) {
+                                                            lenna.print(font, nameX, nameY, name, nameMaxWidth)    //font->fontSize,  50 -X,490 -Y ,  nameX,nameY
+                                                            // Jimp.loadFont(lastNameFunction).then(function (font) {
                                                             // lenna.print(font, lastNameX, lastNameY, lastName, lastNameMaxWidth)    //font->fontSize,  50 -X,490 -Y ,  lastNameX,lastNameX
                                                             Jimp.loadFont(typeFunction).then(function (font) {
                                                                 lenna.print(font, typeX, typeY, type)      // type // typeX ,typeY
@@ -987,7 +988,7 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                                                                                         if (!err && results && results[0]) {
                                                                                             senderGroupId = results[0][0].senderId;
 
-                                                                                            notifyMessages.getMessagesNeedToNotify();
+                                                                                            // notifyMessages.getMessagesNeedToNotify();
 
                                                                                             response.status = true;
                                                                                             response.message = "Greetings saved successfully";
@@ -1035,26 +1036,35 @@ greetingCtrl.saverewardAndrecognition = function (req, res, next) {
                                                                     });
                                                                 });
                                                             });
-                                                        // });
+                                                            // });
+                                                        });
+
                                                     });
-
                                                 });
-                                            });
-                                    })
-                                        .catch(function () {
-                                            response.status = false;
-                                            response.message = "Something went wrong! Please try again";
-                                            response.error = null;
-                                            response.data = null;
-                                            res.status(500).json(response);
-                                            console.log('error');
                                         })
+                                            .catch(function () {
+                                                response.status = false;
+                                                response.message = "Something went wrong! Please try again";
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(500).json(response);
+                                                console.log('error');
+                                            })
+                                    });
+
                                 });
+                                // .then(function (resp) {
 
-                            }).then(function (resp) {
-
+                                // });
                             });
-                        });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Invalid template! Template details not configured. Please select a different template";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
                     });
                 }
                 else {

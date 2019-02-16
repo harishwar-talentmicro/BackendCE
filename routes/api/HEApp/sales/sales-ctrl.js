@@ -1397,4 +1397,108 @@ salesCtrl.getSalesUserPerformanceByTimeLine = function (req, res, next) {
 
 };
 
+salesCtrl.saveTaskForSalesSupport = function (req, res, next) {
+    
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+                    if (!req.body.title) {
+                        error.title = 'Invalid title';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.taskType) {
+                        error.taskType = 'Invalid taskType';
+                        validationFlag *= false;
+                    }
+
+                    var validationFlag = true; 
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+                
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.taskId || 0),
+                            req.st.db.escape(req.body.title),
+                            req.st.db.escape(req.body.description || ""),
+                            req.st.db.escape(req.body.starts),
+                            req.st.db.escape(req.body.ends),
+                            req.st.db.escape(req.body.progress),
+                            req.st.db.escape(req.body.status),
+                            req.st.db.escape(req.body.notes || ""),
+                            req.st.db.escape(JSON.stringify(req.body.memberList || [])),
+                            req.st.db.escape(JSON.stringify(req.body.attachmentList || [])),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(req.body.type || 1),
+                            req.st.db.escape(req.body.alertType || 1),
+                            req.st.db.escape(JSON.stringify(req.body.sharedMemberList || [])),
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(JSON.stringify(req.body.expenseList || [])),
+                            req.st.db.escape(req.body.taskType)
+                        ];
+
+                        var procQuery = 'CALL he_save_taskForm_salesSupport( ' + procParams.join(',') +');';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, results) {
+                            if (!err && results && results[0] && results[0][0]) {                            
+                                response.status = true;
+                                response.message = "Task saved successfully";
+                                response.error = null;
+                                response.data = {
+                                   taskDetails : results[0] && results[0][0] ? results[0][0] : null
+                                };
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving Task";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
 module.exports = salesCtrl;

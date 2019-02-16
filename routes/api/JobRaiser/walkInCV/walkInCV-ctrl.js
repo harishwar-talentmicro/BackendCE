@@ -1932,6 +1932,12 @@ walkInCvCtrl.saveWalkInJobs = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+
+    if (!req.body.jobCode) {
+        error.jobCode = 'Invalid jobCode';
+        validationFlag *= false;
+    }
+
     var users = req.body.users;
     if (typeof (users) == "string") {
         users = JSON.parse(users);
@@ -1958,6 +1964,7 @@ walkInCvCtrl.saveWalkInJobs = function (req, res, next) {
                 req.body.DOBType = req.body.DOBType ? req.body.DOBType : "";
                 req.body.profilePic = req.body.profilePic ? req.body.profilePic : 1;
 
+                console.log(req.body);
                 var walkinJobCode = req.body.jobCode.replace(/<(.*)>/g, '');
 
                 var inputs = [
@@ -3662,6 +3669,16 @@ walkInCvCtrl.walkInPDfGeneration = function (req, res, next) {
 
     if (!req.body.heMasterId) {
         error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.body.startDate) {
+        error.startDate = 'Invalid startDate';
+        validationFlag *= false;
+    }
+
+    if (!req.body.endDate) {
+        error.endDate = 'Invalid endDate';
         validationFlag *= false;
     }
 

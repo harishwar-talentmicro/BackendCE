@@ -1530,7 +1530,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                         }
 
                         if (!branchList) {
-                            branchList = [];
+                            branchList = {};
                         }
 
                         var jobTitle = req.body.jobTitle;
@@ -1674,6 +1674,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                             req.body.jdAttachment = (req.body.jdAttachment) ? req.body.jdAttachment : '';
                             req.body.timestamp = (req.body.timestamp) ? req.body.timestamp : '';
                             req.body.postJobCareerPortal = (req.body.postJobCareerPortal) ? req.body.postJobCareerPortal : 0;
+
+                            branchList = [branchList];
 
                             var procParams = [
                                 req.st.db.escape(req.query.token),
@@ -2136,22 +2138,22 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                         response.message = "Requirement Details loaded successfully";
                         response.error = null;
 
-                        result[2][0].branchList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].branchList) : {};
-                        result[2][0].contactList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].contactList) : [];
-                        result[2][0].currency = (result[2] && result[2][0]) ? JSON.parse(result[2][0].currency) : {};
-                        result[2][0].duration = (result[2] && result[2][0]) ? JSON.parse(result[2][0].duration) : {};
-                        result[2][0].educationSpecialization = (result[2] && result[2][0]) ? JSON.parse(result[2][0].educationSpecialization) : [];
-                        result[2][0].heDepartment = (result[2] && result[2][0]) ? JSON.parse(result[2][0].heDepartment) : {};
-                        result[2][0].jobTitle = (result[2] && result[2][0]) ? JSON.parse(result[2][0].jobTitle) : {};
-                        result[2][0].jobType = (result[2] && result[2][0]) ? JSON.parse(result[2][0].jobType) : {};
-                        result[2][0].locationlist = (result[2] && result[2][0]) ? JSON.parse(result[2][0].locationlist) : [];
-                        result[2][0].memberInterviewRound = (result[2] && result[2][0]) ? JSON.parse(result[2][0].memberInterviewRound) : [];
-                        result[2][0].members = (result[2] && result[2][0]) ? JSON.parse(result[2][0].members) : [];
-                        result[2][0].primarySkills = (result[2] && result[2][0]) ? JSON.parse(result[2][0].primarySkills) : [];
-                        result[2][0].scale = (result[2] && result[2][0]) ? JSON.parse(result[2][0].scale) : {};
-                        result[2][0].secondarySkills = (result[2] && result[2][0]) ? JSON.parse(result[2][0].secondarySkills) : [];
-                        result[2][0].industry = (result[2] && result[2][0]) ? JSON.parse(result[2][0].industry) : [];
-                        result[2][0].attachmentList = (result[2] && result[2][0]) ? JSON.parse(result[2][0].attachmentList) : [];
+                        result[2][0].branchList = (result[2] && result[2][0]) && JSON.parse(result[2][0].branchList) ? JSON.parse(result[2][0].branchList) : {};
+                        result[2][0].contactList = (result[2] && result[2][0]) && JSON.parse(result[2][0].contactList) ? JSON.parse(result[2][0].contactList) : [];
+                        result[2][0].currency = (result[2] && result[2][0]) && JSON.parse(result[2][0].currency) ? JSON.parse(result[2][0].currency) : {};
+                        result[2][0].duration = (result[2] && result[2][0]) && JSON.parse(result[2][0].duration) ? JSON.parse(result[2][0].duration) : {};
+                        result[2][0].educationSpecialization = (result[2] && result[2][0]) && JSON.parse(result[2][0].educationSpecialization) ? JSON.parse(result[2][0].educationSpecialization) : [];
+                        result[2][0].heDepartment = (result[2] && result[2][0]) && JSON.parse(result[2][0].heDepartment) ? JSON.parse(result[2][0].heDepartment) : {};
+                        result[2][0].jobTitle = (result[2] && result[2][0]) && JSON.parse(result[2][0].jobTitle) ? JSON.parse(result[2][0].jobTitle) : {};
+                        result[2][0].jobType = (result[2] && result[2][0]) && JSON.parse(result[2][0].jobType) ? JSON.parse(result[2][0].jobType) : {};
+                        result[2][0].locationlist = (result[2] && result[2][0]) && JSON.parse(result[2][0].locationlist) ? JSON.parse(result[2][0].locationlist) : [];
+                        result[2][0].memberInterviewRound = (result[2] && result[2][0]) && JSON.parse(result[2][0].memberInterviewRound) ? JSON.parse(result[2][0].memberInterviewRound) : [];
+                        result[2][0].members = (result[2] && result[2][0]) && JSON.parse(result[2][0].members) ? JSON.parse(result[2][0].members) : [];
+                        result[2][0].primarySkills = (result[2] && result[2][0]) && JSON.parse(result[2][0].primarySkills) ? JSON.parse(result[2][0].primarySkills) : [];
+                        result[2][0].scale = (result[2] && result[2][0]) && JSON.parse(result[2][0].scale) ? JSON.parse(result[2][0].scale) : {};
+                        result[2][0].secondarySkills = (result[2] && result[2][0]) && JSON.parse(result[2][0].secondarySkills) ? JSON.parse(result[2][0].secondarySkills) : [];
+                        result[2][0].industry = (result[2] && result[2][0]) && JSON.parse(result[2][0].industry) ? JSON.parse(result[2][0].industry) : [];
+                        result[2][0].attachmentList = (result[2] && result[2][0]) && JSON.parse(result[2][0].attachmentList) ? JSON.parse(result[2][0].attachmentList) : [];
                         result[2][0].functionalAreas = (result[2] && result[2][0] && JSON.parse(result[2][0].functionalAreas)) ? JSON.parse(result[2][0].functionalAreas) : [];
 
                         for (var i = 0; i < result[3].length; i++) {

@@ -127,7 +127,8 @@ managerCtrl.saveUsers = function(req,res,next){
                     req.st.db.escape(req.body.adoptionReport),
                     req.st.db.escape(req.body.empDocuments),
                     req.st.db.escape(req.body.eventManager),
-                    req.st.db.escape(req.body.HRPayrollDocs || 0)
+                    req.st.db.escape(req.body.HRPayrollDocs || 0),
+                    req.st.db.escape(req.body.isShowAllWalkin || 0)
                 ];
                 /**
                  * Calling procedure to save deal

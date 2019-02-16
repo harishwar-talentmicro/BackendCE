@@ -2657,7 +2657,7 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                 }
                                 ws_data += ']';
                                 console.log(ws_data);
-                                buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]); // Returns a buffer
+                                buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]);
                             }
 
                             for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {

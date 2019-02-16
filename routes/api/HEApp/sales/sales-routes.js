@@ -22,6 +22,7 @@ router.get('/sales/userPerformance/probability',salesCtrl.getSalesUserPerformanc
 router.get('/sales/userPerformance/timeLine',salesCtrl.getSalesUserPerformanceByTimeLine);
 
 
+router.post('/saveTaskForSS',salesCtrl.saveTaskForSalesSupport);
 
 
 
