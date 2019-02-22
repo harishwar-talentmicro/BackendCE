@@ -19,7 +19,7 @@ var encryption = new AES_256_encryption();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
 var appConfig = require('../../../../ezeone-config.json');
-var DBSecretKey=appConfig.DB.secretKey;
+var DBSecretKey = appConfig.DB.secretKey;
 salesCtrl.getMasterData = function (req, res, next) {
     var response = {
         status: false,
@@ -52,7 +52,7 @@ salesCtrl.getMasterData = function (req, res, next) {
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.groupId),
-                    req.st.db.escape(DBSecretKey)                                                
+                    req.st.db.escape(DBSecretKey)
                 ];
                 /**
                  * Calling procedure to save form sales items
@@ -83,7 +83,12 @@ salesCtrl.getMasterData = function (req, res, next) {
                                 currencySymbol: (masterData[5] && masterData[5][0] && masterData[5][0].currencySymbol) ? masterData[5][0].currencySymbol : '',
                                 currencyId: (masterData[5] && masterData[5][0] && masterData[5][0].currencyId) ? masterData[5][0].currencyId : 0
                             },
-                            probability: masterData[6] ? masterData[6] : []
+                            probability: masterData[6] ? masterData[6] : [],
+                            enableValueField1: masterData[7] && masterData[7][0] && masterData[7][0].enableValueField1 ? masterData[7][0].enableValueField1 : 0,
+                            enableValueField2: masterData[7] && masterData[7][0] && masterData[7][0].enableValueField2 ? masterData[7][0].enableValueField2 : 0,
+                            valueFieldTitle1: masterData[7] && masterData[7][0] && masterData[7][0].valueFieldTitle1 ? masterData[7][0].valueFieldTitle1 : "",
+                            valueFieldTitle2: masterData[7] && masterData[7][0] && masterData[7][0].valueFieldTitle2 ? masterData[7][0].valueFieldTitle2 : "",
+                            isCompanyMandatory: masterData[7] && masterData[7][0] && masterData[7][0].isCompanyMandatory ? masterData[7][0].isCompanyMandatory : 0
                         };
                         response.error = null;
                         // res.status(200).json(response);
@@ -153,7 +158,7 @@ salesCtrl.saveSalesRequest = function (req, res, next) {
                 var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                    
+
                     // if (!req.body.requirement) {
                     //     error.requirement = 'Invalid requirement';
                     //     validationFlag *= false;
@@ -174,11 +179,11 @@ salesCtrl.saveSalesRequest = function (req, res, next) {
                     if (!items) {
                         items = [];
                     }
-                    var keywordList =req.body.keywordList;
-                    if(typeof(keywordList) == "string") {
+                    var keywordList = req.body.keywordList;
+                    if (typeof (keywordList) == "string") {
                         keywordList = JSON.parse(keywordList);
                     }
-                    if(!keywordList){
+                    if (!keywordList) {
                         keywordList = [];
                     }
 
@@ -276,14 +281,14 @@ salesCtrl.saveSalesRequest = function (req, res, next) {
                             req.st.db.escape(req.body.targetDate),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp)                             
+                            req.st.db.escape(req.body.createdTimeStamp)
                         ];
-                        var salesFormId=2000;
-                        var keywordsParams=[
+                        var salesFormId = 2000;
+                        var keywordsParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(salesFormId),
                             req.st.db.escape(JSON.stringify(keywordList)),
-                            req.st.db.escape(req.body.groupId)  
+                            req.st.db.escape(req.body.groupId)
                         ];
 
                         /**
@@ -291,7 +296,7 @@ salesCtrl.saveSalesRequest = function (req, res, next) {
                          * @type {string}
                          */
 
-                        var procQuery = 'CALL he_save_salesRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                        var procQuery = 'CALL he_save_salesRequest_new( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, results) {
                             console.log(results);
@@ -483,14 +488,14 @@ salesCtrl.assignToUser = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
                     if (!req.body.memberId) {
                         error.memberId = 'Invalid memberId';
                         validationFlag *= false;
                     }
-                
+
                     if (!req.body.groupId) {
                         error.groupId = 'Invalid groupId';
                         validationFlag *= false;
@@ -499,16 +504,16 @@ salesCtrl.assignToUser = function (req, res, next) {
                         error.parentId = 'Invalid parentId';
                         validationFlag *= false;
                     }
-                    var keywordList =req.body.keywordList;
-                    if(typeof(keywordList) == "string") {
+                    var keywordList = req.body.keywordList;
+                    if (typeof (keywordList) == "string") {
                         keywordList = JSON.parse(keywordList);
                     }
-                    if(!keywordList){
+                    if (!keywordList) {
                         keywordList = [];
                     }
-                
+
                     var senderGroupId;
-                
+
                     if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
@@ -524,28 +529,28 @@ salesCtrl.assignToUser = function (req, res, next) {
                             req.st.db.escape(req.body.groupId),
                             req.st.db.escape(req.body.parentId),
                             req.st.db.escape(req.body.assignedReason),
-                            req.st.db.escape(DBSecretKey)                            
+                            req.st.db.escape(DBSecretKey)
                         ];
-                        
-                        var salesFormId=2000;
-                        var keywordsParams=[
+
+                        var salesFormId = 2000;
+                        var keywordsParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(salesFormId),
                             req.st.db.escape(JSON.stringify(keywordList)),
-                            req.st.db.escape(req.body.groupId)  
+                            req.st.db.escape(req.body.groupId)
                         ];
                         /**
                          * Calling procedure for sales request
                          * @type {string}
                          */
-        
-                        var procQuery = 'CALL he_assign_sales( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+
+                        var procQuery = 'CALL he_assign_sales( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, results) {
                             console.log(results);
                             if (!err && results && results[0]) {
                                 console.log("results[0].senderName", results[0][0].senderName);
-        
+
                                 senderGroupId = results[0][0].senderId;
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message', {
                                 //     senderName: results[0][0].message
@@ -681,7 +686,7 @@ salesCtrl.findHECustomer = function (req, res, next) {
                     req.st.db.escape(req.query.groupId),
                     req.st.db.escape(req.query.keyword),
                     req.st.db.escape(req.query.isSupport),
-                    req.st.db.escape(DBSecretKey)                                                
+                    req.st.db.escape(DBSecretKey)
                 ];
 
                 /**
@@ -770,7 +775,7 @@ salesCtrl.saveSalesFeedback = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
                     if (!req.body.parentId) {
@@ -781,13 +786,13 @@ salesCtrl.saveSalesFeedback = function (req, res, next) {
                         error.formId = 'Invalid formId';
                         validationFlag *= false;
                     }
-                
+
                     if (!req.body.groupId) {
                         error.groupId = 'Invalid groupId';
                         validationFlag *= false;
                     }
                     var senderGroupId;
-                
+
                     if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
@@ -804,12 +809,12 @@ salesCtrl.saveSalesFeedback = function (req, res, next) {
                             req.st.db.escape(req.body.rating),
                             req.st.db.escape(req.body.formId)
                         ];
-        
+
                         /**
                          * Calling procedure for sales request
                          * @type {string}
                          */
-        
+
                         var procQuery = 'CALL he_save_Feedback( ' + procParams.join(',') + ')';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, results) {
@@ -976,7 +981,7 @@ salesCtrl.getSalesTracker = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
@@ -1008,12 +1013,12 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                         req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
                         req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
                         var startPage = 0;
-        
+
                         startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
 
                         req.body.userId = req.body.userId ? req.body.userId : 0;
-                        req.body.timeline = req.body.timeline ? req.body.timeline : "" ;
-        
+                        req.body.timeline = req.body.timeline ? req.body.timeline : "";
+
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.query.groupId),
@@ -1033,7 +1038,7 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, salesItems) {
                             if (!err && salesItems && salesItems[0]) {
-        
+
                                 response.status = true;
                                 response.message = "Sales tracker data loaded successfully";
                                 response.data = {
@@ -1042,15 +1047,15 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                                     count: salesItems[2][0].count,
                                     isSalesMember: salesItems[3][0].isSalesMember
                                 };
-        
+
                                 response.error = null;
-        
+
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
                                     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(response);
                                 });
-        
+
                             }
                             else if (!err) {
                                 response.status = true;
@@ -1059,10 +1064,10 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                                     chartData: [],
                                     transactionData: [],
                                     count: 0,
-                                    isSalesMember:0
+                                    isSalesMember: 0
                                 };
                                 response.error = null;
-        
+
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
                                     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -1234,7 +1239,7 @@ salesCtrl.getSalesUserPerformanceByProbability = function (req, res, next) {
                         for (var i = 0; i < salesItems[0].length; i++) {
                             var res1 = {};
                             res1.name = salesItems[0][i].name;
-                            res1.HEUserId=salesItems[0][i].HEUserId;
+                            res1.HEUserId = salesItems[0][i].HEUserId;
                             res1.probabilityData = salesItems[0][i].probabilityData ? JSON.parse(salesItems[0][i].probabilityData) : [];
                             output.push(res1);
                         }
@@ -1335,7 +1340,7 @@ salesCtrl.getSalesUserPerformanceByTimeLine = function (req, res, next) {
                 var procQuery = 'CALL he_get_salesUserByTimeLine( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, salesItems) {
-                    if (!err && salesItems && salesItems[0] ) {
+                    if (!err && salesItems && salesItems[0]) {
 
                         response.status = true;
                         response.message = "Sales tracker data loaded successfully";
@@ -1343,7 +1348,7 @@ salesCtrl.getSalesUserPerformanceByTimeLine = function (req, res, next) {
                         for (var i = 0; i < salesItems[0].length; i++) {
                             var res1 = {};
                             res1.name = salesItems[0][i].name;
-                            res1.HEUserId=salesItems[0][i].HEUserId;
+                            res1.HEUserId = salesItems[0][i].HEUserId;
                             res1.timeLineData = salesItems[0][i].timeLineData ? JSON.parse(salesItems[0][i].timeLineData) : [];
                             output.push(res1);
                         }
@@ -1398,7 +1403,7 @@ salesCtrl.getSalesUserPerformanceByTimeLine = function (req, res, next) {
 };
 
 salesCtrl.saveTaskForSalesSupport = function (req, res, next) {
-    
+
     var error = {};
     var response = {
         status: false,
@@ -1436,7 +1441,7 @@ salesCtrl.saveTaskForSalesSupport = function (req, res, next) {
                         validationFlag *= false;
                     }
 
-                    var validationFlag = true; 
+                    var validationFlag = true;
                     if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
@@ -1444,7 +1449,7 @@ salesCtrl.saveTaskForSalesSupport = function (req, res, next) {
                         console.log(response);
                     }
                     else {
-                
+
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.taskId || 0),
@@ -1466,15 +1471,15 @@ salesCtrl.saveTaskForSalesSupport = function (req, res, next) {
                             req.st.db.escape(req.body.taskType)
                         ];
 
-                        var procQuery = 'CALL he_save_taskForm_salesSupport( ' + procParams.join(',') +');';
+                        var procQuery = 'CALL he_save_taskForm_salesSupport( ' + procParams.join(',') + ');';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, results) {
-                            if (!err && results && results[0] && results[0][0]) {                            
+                            if (!err && results && results[0] && results[0][0]) {
                                 response.status = true;
                                 response.message = "Task saved successfully";
                                 response.error = null;
                                 response.data = {
-                                   taskDetails : results[0] && results[0][0] ? results[0][0] : null
+                                    taskDetails: results[0] && results[0][0] ? results[0][0] : null
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
@@ -1499,6 +1504,319 @@ salesCtrl.saveTaskForSalesSupport = function (req, res, next) {
             }
         });
     }
+};
+
+
+salesCtrl.getsalesupportCompanysearch = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.groupId) {
+        error.groupId = 'Invalid groupId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(req.query.keywords || ""),
+                    req.st.db.escape(req.query.start || 0),
+                    req.st.db.escape(req.query.limit || 0),
+                    req.st.db.escape(req.query.isSupport || 0)
+                ];
+
+                var procQuery = 'CALL wm_get_saleSupport_companySearch( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    if (!err && result && result[0]) {
+
+                        response.status = true;
+                        response.message = "Company List data loaded successfully";
+
+                        response.data = {
+                            companyList: result[0]
+                        };
+
+                        response.error = null;
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No data found";
+                        response.data = {
+                            companyList: []
+                        };
+                        response.error = null;
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting company List";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+salesCtrl.getMemberListForSaleSupport = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+
+                    if (!req.body.groupId) {
+                        error.groupId = 'Invalid groupId';
+                        validationFlag *= false;
+                    }
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.name || ''),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.starts || null),
+                            req.st.db.escape(JSON.stringify(req.body.selectedUsers || [])),
+                            req.st.db.escape(req.body.startPage || 1),
+                            req.st.db.escape(req.body.limit || 50),
+                            req.st.db.escape(req.body.isSupport || 0)  // 0 sale ,1-support
+                        ];
+
+                        var procQuery = 'CALL he_get_user_ForSaleSupport( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            if (!err && result && result[0] && result[0][0]) {
+
+                                response.status = true;
+                                response.message = "User List loaded successfully";
+                                response.error = null;
+
+                                for (var i = 0; i < result[0].length; i++) {
+                                    result[0][i].schedules = result[0][i] && result[0][i].schedules ? JSON.parse(result[0][i].schedules) : []
+                                }
+
+                                response.data = {
+                                    userList: result[0] ? result[0] : []
+                                };
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "No data found";
+                                response.data = {
+                                    userList: []
+                                };
+                                response.error = null;
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while getting user List";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+salesCtrl.findClientContactsMember = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+
+                    if (!req.body.groupId) {
+                        error.groupId = 'Invalid groupId';
+                        validationFlag *= false;
+                    }
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(req.body.keyword),
+                            req.st.db.escape(req.body.isSupport || 0),  // 0 sale ,1-support
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.startPage || 1),
+                            req.st.db.escape(req.body.limit || 100)
+                        ];
+
+                        var procQuery = 'CALL HE_find_customer_saleSupport( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            if (!err && result && result[0] && result[0][0]) {
+
+                                response.status = true;
+                                response.message = "User List loaded successfully";
+                                response.error = null;
+
+                                for (var i = 0; i < result[0].length; i++) {
+                                    result[0][i].companyDetails = result[0][i] && result[0][i].companyDetails && result[0][i].companyDetails!=null ? JSON.parse(result[0][i].companyDetails) :null
+                                }
+
+                                response.data = {
+                                    contactList: result[0] ? result[0] : []
+                                };
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "No data found";
+                                response.data = {
+                                    userList: []
+                                };
+                                response.error = null;
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while getting user List";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
 };
 
 module.exports = salesCtrl;

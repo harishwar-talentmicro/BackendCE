@@ -215,7 +215,8 @@ managerCtrl.getUserDetails = function(req,res,next){
                             empDocuments : result[1][0].empDocuments,
                             eventManager : result[1][0].eventManager,
                             HRPayrollDocs : result[1][0].HRPayrollDocs,
-                            formList : result[0][0].formList ? JSON.parse(result[0][0].formList) : null
+                            formList : result[0][0].formList ? JSON.parse(result[0][0].formList) : null,
+                            isShowAllWalkin: result[1][0].isShowAllWalkin
                         };
                         res.status(200).json(response);
                     }
@@ -527,6 +528,7 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                             empDocuments : result[1][0].empDocuments,
                             eventManager : result[1][0].eventManager,
                             HRPayrollDocs : result[1][0].HRPayrollDocs,
+                            isSaleSupport : result[1][0].isSaleSupport,
                             formList : output,
                             accessableFormList : result[2][0].formList ? JSON.parse(result[2][0].formList) : null
                         };

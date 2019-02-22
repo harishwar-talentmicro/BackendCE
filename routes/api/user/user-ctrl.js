@@ -1305,7 +1305,7 @@ UserCtrl.sendPasswordResetOTP = function (req, res, next) {
 
                 }
                 else if(!err && otpResult && otpResult[0] && otpResult[0][0].messageError){
-                    respMsg.status = true;
+                    respMsg.status = false;
                     respMsg.message = otpResult[0][0].messageError;
                     respMsg.data = null;
                     res.status(200).json(respMsg);

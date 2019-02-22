@@ -189,10 +189,8 @@ var onboardingctrl = require('./HEApp/onBoarding/onboarding-routes.js');
 
 var likeShareComment = require('./HEApp/likesharecomment.js');
 
-
 //var testInfoV1 =  require('./info/test_info.js');
 //var associationAPV1 =  require('./ap-module/association-ap/association-master-ap.js');
-
 
 router.use('/helloEZE', attendanceroaster);
 router.use('/helloEZE', quiz);
@@ -418,6 +416,7 @@ var billing = require('./JobRaiser/billing.js');
 var portal = require('./JobRaiser/portalImporter.js');
 var reqGroup = require('./JobRaiser/reqGroup.js');
 var dataMigration = require('./JobRaiser/dataMigration.js');
+var hris = require('./JobRaiser/hris.js');
 
 
 router.use('/WM', jobModule);
@@ -432,6 +431,7 @@ router.use('/WM', billing);
 router.use('/WM', portal);
 router.use('/WM', reqGroup);
 router.use('/WM', dataMigration);
+router.use('/WM', hris);
 
 // cron
 // var taskScheduler = require('../api/HEApp/task/task-ctrl');
@@ -744,62 +744,62 @@ if (cluster.isWorker) {
 }
 
 
-var cluster = require('cluster');
+// var cluster = require('cluster');
 
-// birthday notifier
-if (cluster.isWorker) {
+// // birthday notifier
+// if (cluster.isWorker) {
 
-    if (cluster.worker.id == 1) {
-        var cronJobgreeting = new CronJob({
-            cronTime: '* 14 * * *',     // to run in seconds 30 * * * * *
-            onTick: function () {
+//     if (cluster.worker.id == 1) {
+//         var cronJobgreeting = new CronJob({
+//             cronTime: '* 14 * * *',     // to run in seconds 30 * * * * *
+//             onTick: function () {
 
-                // console.log('running a notify messages');
-                // notifyMessages.getMessagesNeedToNotify();
-                cronjob = function (req, res, next) {
-                    console.log("====================================greeting cron");
-                    console.log("==================================== starts greeting cron");
+//                 // console.log('running a notify messages');
+//                 // notifyMessages.getMessagesNeedToNotify();
+//                 cronjob = function (req, res, next) {
+//                     console.log("====================================greeting cron");
+//                     console.log("==================================== starts greeting cron");
 
-                    var response = {
-                        status: false,
-                        message: "Invalid token",
-                        data: null,
-                        error: null
-                    };
+//                     var response = {
+//                         status: false,
+//                         message: "Invalid token",
+//                         data: null,
+//                         error: null
+//                     };
 
-                    var procQuery = 'CALL wm_get_todayDOBList("' + DBSecretKey + '")';
-                    console.log(procQuery);
-                    db.query(procQuery, function (err, results) {
+//                     var procQuery = 'CALL wm_get_todayDOBList("' + DBSecretKey + '")';
+//                     console.log(procQuery);
+//                     db.query(procQuery, function (err, results) {
 
-                        var count = 0;
+//                         var count = 0;
 
-                        if (!err && results && results[0] && results[1] && results[1][0]) {
-                            console.log("--------entered to loop")
-                            var timestamp=[];
-                            for (var i = 0; i < results[1].length;i++ ) {
+//                         if (!err && results && results[0] && results[1] && results[1][0]) {
+//                             console.log("--------entered to loop")
+//                             var timestamp=[];
+//                             for (var i = 0; i < results[1].length;i++ ) {
                            
-                           greetingsFunction(results,i);
+//                            greetingsFunction(results,i);
                             
-                            }
+//                             }
                        
 
 
-                        }
+//                         }
 
-                        else {
-                            console.log("error", err);
-                        }
-                    });
-                }
-                cronjob();
-            },
-            start: false,
-            timeZone: 'America/Los_Angeles'
+//                         else {
+//                             console.log("error", err);
+//                         }
+//                     });
+//                 }
+//                 cronjob();
+//             },
+//             start: false,
+//             timeZone: 'America/Los_Angeles'
 
-        });
-         cronJobgreeting.start();
-    }
-}
+//         });
+//          cronJobgreeting.start();
+//     }
+// }
 
 
 var cluster = require('cluster');

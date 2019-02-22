@@ -111,6 +111,19 @@ var removeExtraChars = function (params) {
     }
 }
 
+var processIntegers = function (param) {
+    if (param) {
+        param = param.replace(/[A-Za-z]/g, '');
+        param = param.replace(/\+/g, '');
+        param = param.replace(/\*/g, '');
+        param = param.replace(/\-/g, '');
+        param = param.replace(/\%/g, '');
+        param = param.replace(/ /g, '');
+        return param;
+    }
+    return null;
+}
+
 var removeUnicodeChars = function (param) {
     param = param.replace(/[^\x00-\x7F]/g, "");
     return param;
@@ -716,35 +729,48 @@ portalimporter.checkApplicantExistsFromMonsterPortal = function (req, res, next)
             // var heMasterId = req.query.heMasterId;
             var portalId = 2;
             console.log("tallint api hit");
-            request({
-                url: req.body.tallint_url,
-                method: "POST",
-                json: true,
-                body: { applicants: applicants }
-            }, function (error, resp, body) {
-                console.log("body", body);
-                console.log("error", error);
-                if (!error && body) {
-                    response.status = true;
-                    response.message = "Response from tallint DB";
-                    response.error = null;
-                    response.data = {
-                        ourjson: applicants,
-                        resonseOfTallint: body
-                    };
-                    res.status(200).json(response);
-                }
-                else {
-                    response.status = false;
-                    response.message = "Error from tallint DB";
-                    response.error = null;
-                    response.data = {
-                        ourjson: applicants,
-                        resonseOfTallint: error
-                    };
-                    res.status(500).json(response);
-                }
-            });
+            if (req.body.tallint_url && req.body.tallint_url.length > 1) {
+                request({
+                    url: req.body.tallint_url,
+                    method: "POST",
+                    json: true,
+                    body: { applicants: applicants }
+                }, function (error, resp, body) {
+                    console.log("body", body);
+                    console.log("error", error);
+                    if (!error && body) {
+                        response.status = true;
+                        response.message = "Response from tallint DB";
+                        response.error = null;
+                        response.data = {
+                            ourjson: applicants,
+                            resonseOfTallint: body
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error from tallint DB";
+                        response.error = null;
+                        response.data = {
+                            ourjson: applicants,
+                            resonseOfTallint: error
+                        };
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                response.status = false;
+                response.message = "Tallint error! Api url not found";
+                response.error = null;
+                response.data = {
+                    ourjson: applicants,
+                    resonseOfTallint: error
+                };
+                res.status(500).json(response);
+            }
+
         }
 
         else {
@@ -1233,60 +1259,81 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
 
 
             details.portalId = portalId;
-            request({
-                headers: {
-                    Authorization: 'Bearer ' + req.body.tallintToken
-                },
-                url: req.body.tallint_url,
-                method: "POST",
-                json: true,
-                body: details
-            }, function (error, resp, body) {
+            if (req.body.tallint_url && req.body.tallint_url.length > 1) {
+                request({
+                    headers: {
+                        Authorization: 'Bearer ' + req.body.tallintToken
+                    },
+                    url: req.body.tallint_url,
+                    method: "POST",
+                    json: true,
+                    body: details
+                }, function (error, resp, body) {
 
-                if (!error && body) {
-                    response.status = true;
-                    response.message = "Response from tallint DB";
-                    response.error = null;
-                    response.data = {
-                        resonseOfTallint: body,
-                        ourjson: {
-                            headers: {
-                                Authorization: 'Bearer ' + req.body.tallintToken
-                            },
-                            url: req.body.tallint_url,
-                            method: "POST",
-                            json: true,
-                            body: details
+                    if (!error && body) {
+                        response.status = true;
+                        response.message = "Response from tallint DB";
+                        response.error = null;
+                        response.data = {
+                            resonseOfTallint: body,
+                            ourjson: {
+                                headers: {
+                                    Authorization: 'Bearer ' + req.body.tallintToken
+                                },
+                                url: req.body.tallint_url,
+                                method: "POST",
+                                json: true,
+                                body: details
+                            }
+                        };
+                        if (body.Code != 'ERR0001') {
+                            res.status(200).json(response);
                         }
-                    };
-                    if (body.Code != 'ERR0001') {
-                        res.status(200).json(response);
+                        else {
+                            res.status(500).json(response);
+                        }
                     }
                     else {
+                        response.status = false;
+                        response.message = "Error from tallint DB";
+                        response.error = null;
+                        response.data = {
+                            resonseOfTallint: error,
+                            ourjson: {
+                                headers: {
+                                    Authorization: 'Bearer ' + req.body.tallintToken
+                                },
+                                url: req.body.tallint_url,
+                                method: "POST",
+                                json: true,
+                                body: details
+                            }
+                        };
                         res.status(500).json(response);
                     }
-                }
-                else {
-                    response.status = false;
-                    response.message = "Error from tallint DB";
-                    response.error = null;
-                    response.data = {
-                        resonseOfTallint: error,
-                        ourjson: {
-                            headers: {
-                                Authorization: 'Bearer ' + req.body.tallintToken
-                            },
-                            url: req.body.tallint_url,
-                            method: "POST",
-                            json: true,
-                            body: details
-                        }
-                    };
-                    res.status(500).json(response);
-                }
-                console.log(response);
-                console.log(error);
-            });
+                    console.log(response);
+                    console.log(error);
+                });
+            }
+            else {
+                response.status = false;
+                response.message = "Tallint error! Api url not found";
+                response.error = null;
+                response.data = {
+                    resonseOfTallint: error,
+                    ourjson: {
+                        headers: {
+                            Authorization: 'Bearer ' + req.body.tallintToken
+                        },
+                        url: req.body.tallint_url,
+                        method: "POST",
+                        json: true,
+                        body: details
+                    }
+                };
+                res.status(500).json(response);
+            }
+
         }
 
         else {
@@ -1515,34 +1562,45 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
         // var token = req.query.token;
         // var heMasterId = req.query.heMasterId;
         var portalId = 1;
-
-        request({
-            url: req.body.tallint_url,
-            method: "POST",
-            json: true,
-            body: { applicants: applicants }
-        }, function (error, resp, body) {
-            if (!error && body) {
-                response.status = true;
-                response.message = "Response from tallint DB";
-                response.error = null;
-                response.data = {
-                    ourjson: applicants,
-                    resonseOfTallint: body
-                };
-                res.status(200).json(response);
-            }
-            else {
-                response.status = false;
-                response.message = "Error from tallint DB";
-                response.error = null;
-                response.data = {
-                    ourjson: applicants,
-                    resonseOfTallint: error
-                };
-                res.status(500).json(response);
-            }
-        });
+        if (req.body.tallint_url && req.body.tallint_url.length > 1) {
+            request({
+                url: req.body.tallint_url,
+                method: "POST",
+                json: true,
+                body: { applicants: applicants }
+            }, function (error, resp, body) {
+                if (!error && body) {
+                    response.status = true;
+                    response.message = "Response from tallint DB";
+                    response.error = null;
+                    response.data = {
+                        ourjson: applicants,
+                        resonseOfTallint: body
+                    };
+                    res.status(200).json(response);
+                }
+                else {
+                    response.status = false;
+                    response.message = "Error from tallint DB";
+                    response.error = null;
+                    response.data = {
+                        ourjson: applicants,
+                        resonseOfTallint: error
+                    };
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else {
+            response.status = false;
+            response.message = "Tallint error! Api url not found";
+            response.error = null;
+            response.data = {
+                ourjson: applicants,
+                resonseOfTallint: error
+            };
+            res.status(500).json(response);
+        }
     }
     else {
         checkPortalApplicants(portalId, applicants, req, res);
@@ -1671,7 +1729,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             console.log("Entered salary");
             var amount = salaryDetails[0].innerHTML.replace('<em class="iconRup"></em>', '').trim().split(' ');
             if (amount && amount[0]) {
-                details.presentSalary = removeExtraChars(amount[0]);
+                details.presentSalary = processIntegers(removeExtraChars(amount[0]));
                 if (amount[1] && amount[1].indexOf('Lac') > -1) {
                     if (!isTallint)
                         details.presentSalaryScale = { scale: "Lakhs", scaleId: 4 }
@@ -1969,6 +2027,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             }
             delete (details.resumeText);
 
+            if (req.body.tallint_url && req.body.tallint_url.length > 1) {
             request({
                 headers: {
                     Authorization: 'Bearer ' + req.body.tallintToken
@@ -2021,6 +2080,25 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                 }
 
             });
+        }
+        else{
+            response.status = false;
+            response.message = "Tallint error! Api url not found";
+            response.error = null;
+            response.data = {
+                ourjson: {
+                    headers: {
+                        Authorization: 'Bearer ' + req.body.tallintToken
+                    },
+                    url: req.body.tallint_url,
+                    method: "POST",
+                    json: true,
+                    body: details
+                },
+                resonseOfTallint: error
+            };
+            res.status(500).json(response);
+        }
         }
 
         else {

@@ -21,8 +21,11 @@ router.get('/sales/summary',salesCtrl.getSalesSummary);
 router.get('/sales/userPerformance/probability',salesCtrl.getSalesUserPerformanceByProbability);
 router.get('/sales/userPerformance/timeLine',salesCtrl.getSalesUserPerformanceByTimeLine);
 
-
+// sales and support new module apis from here
 router.post('/saveTaskForSS',salesCtrl.saveTaskForSalesSupport);
+router.get('/companySearchForSaleSupport',salesCtrl.getsalesupportCompanysearch);
+router.post('/getMemberListForSS',salesCtrl.getMemberListForSaleSupport);
+router.post('/getContactMembers',salesCtrl.findClientContactsMember);
 
 
 
