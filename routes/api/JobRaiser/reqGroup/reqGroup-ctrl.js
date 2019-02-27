@@ -962,7 +962,9 @@ reqGroup.getRecruiterPerformanceByRequirementGroup = function (req, res, next) {
                         response.status = false;
                         response.message = "No results found";
                         response.error = null;
-                        response.data =null;
+                        response.data ={
+                            requirementGroupData : []
+                        };
                         res.status(200).json(response);
                     }
 
@@ -1046,7 +1048,7 @@ reqGroup.getclientRequirementGroup = function (req, res, next) {
                         response.status = true;
                         response.message = "No results found";
                         response.error = null;
-                        response.data = null;
+                        response.data = [];
                         res.status(200).json(response);
                     }
                     else {
@@ -1169,7 +1171,9 @@ reqGroup.getRecruiterPerformanceReqAppForRequirementGroups = function (req, res,
                         response.status = false;
                         response.message = "No results found";
                         response.error = null;
-                        response.data =null;
+                        response.data ={
+                            reqApplicantData:[]
+                        };
                         res.status(200).json(response);
                     }
 

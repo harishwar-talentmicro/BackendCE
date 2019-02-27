@@ -362,8 +362,8 @@ attendanceCtrl.attendanceReport=function(req,res,next){
                      req.st.db.escape(req.query.endDay),
                      req.st.db.escape(DBSecretKey),
                      req.st.db.escape(req.query.start || 1),
-                     req.st.db.escape(req.query.limit || 9999)
-                     
+                     req.st.db.escape(req.query.limit || 9999),
+                     req.st.db.escape(req.query.exportAll || 0)
                      
                 ];
                 /**

@@ -21,12 +21,31 @@ router.get('/sales/summary',salesCtrl.getSalesSummary);
 router.get('/sales/userPerformance/probability',salesCtrl.getSalesUserPerformanceByProbability);
 router.get('/sales/userPerformance/timeLine',salesCtrl.getSalesUserPerformanceByTimeLine);
 
-// sales and support new module apis from here
+// sales and support new module apis from here (Support is also done here)
 router.post('/saveTaskForSS',salesCtrl.saveTaskForSalesSupport);
 router.get('/companySearchForSaleSupport',salesCtrl.getsalesupportCompanysearch);
 router.post('/getMemberListForSS',salesCtrl.getMemberListForSaleSupport);
 router.post('/getContactMembers',salesCtrl.findClientContactsMember);
 
+router.post('/getMemberListForSSWithSelectedMembers',salesCtrl.getMemberListForSaleSupportWithSelectedMembers);
+router.post('/taskTrackerSS',salesCtrl.taskTrackerSaleSupport);
+router.post('/saleSupportTaskList',salesCtrl.taskListSaleSupport);
+
+router.post('/saveSaleRequestNew',salesCtrl.saveSalesRequestWithTaskNew);
+router.get('/saleSupportMailerTemplateList',salesCtrl.saleSupportMailerTemplateList);
+router.post('/saleSupportMailerPreview',salesCtrl.saleSupportMailerPreview);
+router.post('/saleSupportSendMail',salesCtrl.saleSupportMailerSendMail);
+router.post('/saleTargetPerformance',salesCtrl.salesTargetvsPerformance);
+router.get('/mailTemplateMasterData',salesCtrl.mailTemplateMasterData);
+router.post('/SaveMailTemplateSalesSupport',salesCtrl.SaveMailTemplateSalesSupport);
+router.post('/saleSupportExpenseTracker',salesCtrl.salesSupportExpenseList);
+router.get('/deleteSaleSupportTemplate',salesCtrl.deleteSaleSupportTemplate);
+
+// submit support request new
+router.post('/saveSupportRequestNew',salesCtrl.saveSupportRequestNew);
+router.post('/expensetrackerAll',salesCtrl.expensetrackerAll);
+router.post('/saveSalesTaxTemplate',salesCtrl.saveSalesTaxTemplate);
+router.get('/getSalesTaxTemplate',salesCtrl.getSalesTaxTemplate);
 
 
 module.exports = router;

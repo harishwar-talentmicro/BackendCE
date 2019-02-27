@@ -88,7 +88,9 @@ salesCtrl.getMasterData = function (req, res, next) {
                             enableValueField2: masterData[7] && masterData[7][0] && masterData[7][0].enableValueField2 ? masterData[7][0].enableValueField2 : 0,
                             valueFieldTitle1: masterData[7] && masterData[7][0] && masterData[7][0].valueFieldTitle1 ? masterData[7][0].valueFieldTitle1 : "",
                             valueFieldTitle2: masterData[7] && masterData[7][0] && masterData[7][0].valueFieldTitle2 ? masterData[7][0].valueFieldTitle2 : "",
-                            isCompanyMandatory: masterData[7] && masterData[7][0] && masterData[7][0].isCompanyMandatory ? masterData[7][0].isCompanyMandatory : 0
+                            isCompanyMandatory: masterData[7] && masterData[7][0] && masterData[7][0].isCompanyMandatory ? masterData[7][0].isCompanyMandatory : 0,
+                            expenseList: masterData[8] ? masterData[8] : [],
+                            templateList: masterData[9] ? masterData[9] : []
                         };
                         response.error = null;
                         // res.status(200).json(response);
@@ -106,7 +108,8 @@ salesCtrl.getMasterData = function (req, res, next) {
                             stageStatusList: [],
                             categoryList: [],
                             currencyList: [],
-                            memberList: []
+                            memberList: [],
+                            templateList: []
                         };
                         response.error = null;
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1045,7 +1048,8 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                                     chartData: salesItems[0],
                                     transactionData: salesItems[1],
                                     count: salesItems[2][0].count,
-                                    isSalesMember: salesItems[3][0].isSalesMember
+                                    isSalesMember: salesItems[3][0].isSalesMember,
+                                    isReportingManager: salesItems[4][0] && salesItems[4][0].isReportingManager ? salesItems[4][0].isReportingManager : 0
                                 };
 
                                 response.error = null;
@@ -1064,7 +1068,8 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                                     chartData: [],
                                     transactionData: [],
                                     count: 0,
-                                    isSalesMember: 0
+                                    isSalesMember: 0,
+                                    isReportingManager: 0
                                 };
                                 response.error = null;
 
@@ -1452,23 +1457,27 @@ salesCtrl.saveTaskForSalesSupport = function (req, res, next) {
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.body.taskId || 0),
+                            req.st.db.escape(req.body.parentId || 0),
                             req.st.db.escape(req.body.title),
                             req.st.db.escape(req.body.description || ""),
                             req.st.db.escape(req.body.starts),
-                            req.st.db.escape(req.body.ends),
-                            req.st.db.escape(req.body.progress),
+                            req.st.db.escape(req.body.durationHour || 0),
+                            req.st.db.escape(req.body.durationMinute || 0),
                             req.st.db.escape(req.body.status),
                             req.st.db.escape(req.body.notes || ""),
                             req.st.db.escape(JSON.stringify(req.body.memberList || [])),
                             req.st.db.escape(JSON.stringify(req.body.attachmentList || [])),
                             req.st.db.escape(req.body.groupId),
                             req.st.db.escape(req.body.type || 1),
-                            req.st.db.escape(req.body.alertType || 1),
-                            req.st.db.escape(JSON.stringify(req.body.sharedMemberList || [])),
+                            req.st.db.escape(req.body.latitude || 0),
+                            req.st.db.escape(req.body.longitude || 0),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(JSON.stringify(req.body.expenseList || [])),
-                            req.st.db.escape(req.body.taskType)
+                            req.st.db.escape(req.body.taskType),
+                            req.st.db.escape(req.body.changeLog || ""),
+                            req.st.db.escape(req.body.isReminderEnabled || 0),
+                            req.st.db.escape(req.body.reminder || 0),
+                            req.st.db.escape(req.body.address || "")
                         ];
 
                         var procQuery = 'CALL he_save_taskForm_salesSupport( ' + procParams.join(',') + ');';
@@ -1481,11 +1490,11 @@ salesCtrl.saveTaskForSalesSupport = function (req, res, next) {
                                 response.data = {
                                     taskDetails: results[0] && results[0][0] ? results[0][0] : null
                                 };
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
+                                // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                // zlib.gzip(buf, function (_, result) {
+                                //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                                // });
 
                             }
                             else {
@@ -1556,7 +1565,9 @@ salesCtrl.getsalesupportCompanysearch = function (req, res, next) {
                         response.message = "Company List data loaded successfully";
 
                         response.data = {
-                            companyList: result[0]
+                            companyList: result[0],
+                            count: result[1][0] && result[1][0].count ? result[1][0].count : 0
+
                         };
 
                         response.error = null;
@@ -1571,7 +1582,8 @@ salesCtrl.getsalesupportCompanysearch = function (req, res, next) {
                         response.status = true;
                         response.message = "No data found";
                         response.data = {
-                            companyList: []
+                            companyList: [],
+                            count: 0
                         };
                         response.error = null;
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1667,7 +1679,8 @@ salesCtrl.getMemberListForSaleSupport = function (req, res, next) {
                                 }
 
                                 response.data = {
-                                    userList: result[0] ? result[0] : []
+                                    userList: result[0] ? result[0] : [],
+                                    count: result[1][0] && result[1][0].count ? result[1][0].count : 0
                                 };
 
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1681,7 +1694,8 @@ salesCtrl.getMemberListForSaleSupport = function (req, res, next) {
                                 response.status = true;
                                 response.message = "No data found";
                                 response.data = {
-                                    userList: []
+                                    userList: [],
+                                    count: 0
                                 };
                                 response.error = null;
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1707,6 +1721,127 @@ salesCtrl.getMemberListForSaleSupport = function (req, res, next) {
         });
     }
 
+};
+
+
+salesCtrl.getMemberListForSaleSupportWithSelectedMembers = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+
+                    if (!req.body.groupId) {
+                        error.groupId = 'Invalid groupId';
+                        validationFlag *= false;
+                    }
+
+                    if (typeof (req.body.selectedUsers) == 'string')
+                        req.body.selectedUsers = req.body.selectedUsers ? JSON.parse(req.body.selectedUsers) : [];
+
+                    if (!req.body.selectedUsers.length) {
+                        error.selectedUsers = 'Invalid selectedUsers';
+                        validationFlag *= false;
+                    }
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.name || ''),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.starts || null),
+                            req.st.db.escape(JSON.stringify(req.body.selectedUsers || [])),
+                            req.st.db.escape(req.body.startPage || 1),
+                            req.st.db.escape(req.body.limit || 50),
+                            req.st.db.escape(req.body.isSupport || 0)  // 0 sale ,1-support
+                        ];
+
+                        var procQuery = 'CALL he_get_user_ForSaleSupportWithSelectedMembers( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            if (!err && result && result[0] && result[0][0]) {
+
+                                response.status = true;
+                                response.message = "User List loaded successfully";
+                                response.error = null;
+
+                                for (var i = 0; i < result[0].length; i++) {
+                                    result[0][i].schedules = result[0][i] && result[0][i].schedules ? JSON.parse(result[0][i].schedules) : []
+                                }
+
+                                response.data = {
+                                    userList: result[0] ? result[0] : [],
+                                    count: result[1][0] && result[1][0].count ? result[1][0].count : 0
+                                };
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "No data found";
+                                response.data = {
+                                    userList: [],
+                                    count: 0
+                                };
+                                response.error = null;
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while getting user List";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
 };
 
 
@@ -1773,11 +1908,12 @@ salesCtrl.findClientContactsMember = function (req, res, next) {
                                 response.error = null;
 
                                 for (var i = 0; i < result[0].length; i++) {
-                                    result[0][i].companyDetails = result[0][i] && result[0][i].companyDetails && result[0][i].companyDetails!=null ? JSON.parse(result[0][i].companyDetails) :null
+                                    result[0][i].companyDetails = result[0][i] && result[0][i].companyDetails && result[0][i].companyDetails != null ? JSON.parse(result[0][i].companyDetails) : null
                                 }
 
                                 response.data = {
-                                    contactList: result[0] ? result[0] : []
+                                    contactList: result[0] ? result[0] : [],
+                                    count: result[1][0] && result[1][0].count ? result[1][0].count : 0
                                 };
 
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1791,7 +1927,8 @@ salesCtrl.findClientContactsMember = function (req, res, next) {
                                 response.status = true;
                                 response.message = "No data found";
                                 response.data = {
-                                    userList: []
+                                    userList: [],
+                                    count: 0
                                 };
                                 response.error = null;
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1817,6 +1954,2129 @@ salesCtrl.findClientContactsMember = function (req, res, next) {
         });
     }
 
+};
+
+salesCtrl.taskTrackerSaleSupport = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+
+                    if (!req.body.groupId) {
+                        error.groupId = 'Invalid groupId';
+                        validationFlag *= false;
+                    }
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(req.body.status || 0),
+                            req.st.db.escape(req.body.startPage || 1),
+                            req.st.db.escape(req.body.limit || 100),
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.taskType || 0),  // 0 normal task ,1-sale,2-support,3-all
+                            req.st.db.escape(req.body.referenceId || 0)
+                        ];
+
+                        var procQuery = 'CALL HE_get_scheduledTaskList_WithSaleSupportTasks( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            if (!err && result && result[0] && result[0][0]) {
+
+                                response.status = true;
+                                response.message = "Task List loaded successfully";
+                                response.error = null;
+                                response.data = {
+                                    taskList: result[0] ? result[0] : [],
+                                    count: result[1][0] && result[1][0].count ? result[1][0].count : 0
+                                };
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "No data found";
+                                response.data = {
+                                    taskList: [],
+                                    count: 0
+                                };
+                                response.error = null;
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while getting task List";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+salesCtrl.taskListSaleSupport = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+
+                    if (!req.body.groupId) {
+                        error.groupId = 'Invalid groupId';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.taskIdList.length) {
+                        error.taskIdList = 'Invalid taskIdList';
+                        validationFlag *= false;
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                            req.st.db.escape(req.body.referenceId || 0),
+                            req.st.db.escape(DBSecretKey)
+                        ];
+
+                        var procQuery = 'CALL wm_get_saleSupport_taskList( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            if (!err && result && result[0] && result[0][0]) {
+
+                                response.status = true;
+                                response.message = "Task List loaded successfully";
+                                response.error = null;
+
+                                for (var i = 0; i < result[0].length; i++) {
+                                    result[0][i].memberList = result[0][i] && JSON.parse(result[0][i].memberList) ? JSON.parse(result[0][i].memberList) : [];
+                                    result[0][i].expenseList = result[0][i] && JSON.parse(result[0][i].expenseList) ? JSON.parse(result[0][i].expenseList) : [];
+
+                                    for (var j = 0; j < result[0][i].expenseList.length; j++) {
+                                        result[0][i].expenseList[j].attachmentList = result[0][i].expenseList[j] && JSON.parse(result[0][i].expenseList[j].attachmentList) ? JSON.parse(result[0][i].expenseList[j].attachmentList) : [];
+                                    }
+
+                                    result[0][i].attachmentList = result[0][i] && JSON.parse(result[0][i].attachmentList) ? JSON.parse(result[0][i].attachmentList) : [];
+                                }
+
+                                response.data = {
+                                    taskList: result[0] ? result[0] : []
+                                };
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "No data found";
+                                response.data = {
+                                    taskList: []
+                                };
+                                response.error = null;
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while getting task List";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                    // if (!req.body.requirement) {
+                    //     error.requirement = 'Invalid requirement';
+                    //     validationFlag *= false;
+                    // }
+
+                    var keywordList = req.body.keywordList;
+                    if (typeof (keywordList) == "string") {
+                        keywordList = JSON.parse(keywordList);
+                    }
+                    if (!keywordList) {
+                        keywordList = [];
+                    }
+
+                    var attachmentList = req.body.attachmentList;
+                    if (typeof (attachmentList) == "string") {
+                        attachmentList = JSON.parse(attachmentList);
+                    }
+                    if (!attachmentList) {
+                        attachmentList = [];
+                    }
+
+                    var items = req.body.items;
+                    if (typeof (items) == "string") {
+                        items = JSON.parse(items);
+                    }
+                    if (!items) {
+                        items = [];
+                    }
+
+                    if (!req.body.groupId) {
+                        error.groupId = 'Invalid groupId';
+                        validationFlag *= false;
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+
+                        if (req.body.phoneNo == "") {
+                            req.body.isdPhone = "";
+                        }
+                        var taskDetails;
+                        return new Promise(function (resolve, reject) {
+                            if (req.body.taskIdList && req.body.taskIdList.length > 0) {
+
+                                var taskDetailsInput = [
+                                    req.st.db.escape(req.query.token),
+                                    req.st.db.escape(req.body.groupId),
+                                    req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                                    req.st.db.escape(DBSecretKey)
+                                ];
+                                var taskDetailsInput = 'CALL wm_get_latest_taskDetails( ' + taskDetailsInput.join(',') + ')';
+                                req.db.query(taskDetailsInput, function (err, taskresults) {
+                                    console.log(err);
+                                    if (!err && taskresults && taskresults[0] && taskresults[0][0]) {
+
+                                        taskresults[0][0].memberList = taskresults[0][0] && JSON.parse(taskresults[0][0].memberList) ? JSON.parse(taskresults[0][0].memberList) : [];
+                                        taskresults[0][0].expenseList = taskresults[0][0] && JSON.parse(taskresults[0][0].expenseList) ? JSON.parse(taskresults[0][0].expenseList) : [];
+
+                                        for (var j = 0; j < taskresults[0][0].expenseList.length; j++) {
+                                            taskresults[0][0].expenseList[j].attachmentList = taskresults[0][0].expenseList[j] && JSON.parse(taskresults[0][0].expenseList[j].attachmentList) ? JSON.parse(taskresults[0][0].expenseList[j].attachmentList) : [];
+                                        }
+
+                                        taskresults[0][0].attachmentList = taskresults[0][0] && JSON.parse(taskresults[0][0].attachmentList) ? JSON.parse(taskresults[0][0].attachmentList) : [];
+
+                                        taskDetails = taskresults[0][0];
+                                        console.log("promise in");
+                                        resolve(taskDetails);
+                                    }
+                                    else {
+                                        resolve('');
+                                    }
+                                });
+                            }
+                            else {
+                                console.log("promise out");
+                                resolve('');
+                            }
+                        }).then(function (resp) {
+                            var procParams = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.body.parentId || 0),
+                                req.st.db.escape(req.body.categoryId || 0),
+                                req.st.db.escape(req.body.requirement || ""),
+                                req.st.db.escape(req.body.senderNotes || ""),
+                                req.st.db.escape(req.body.stage || 0),
+                                req.st.db.escape(req.body.status || 0),
+                                req.st.db.escape(req.body.reason || ""),
+                                req.st.db.escape(req.body.receiverNotes || ""),
+                                req.st.db.escape(req.body.currencyId || 0),
+                                req.st.db.escape(req.body.amount || 0),
+                                req.st.db.escape(req.body.probability || 0),
+                                req.st.db.escape(req.body.infoToSender || ""),
+                                req.st.db.escape(JSON.stringify(attachmentList || [])),
+                                req.st.db.escape(req.body.changeLog || ""),
+                                req.st.db.escape(req.body.groupId),
+                                req.st.db.escape(req.body.learnMessageId || 0),
+                                req.st.db.escape(req.body.accessUserType || 0),
+                                req.st.db.escape(req.body.categoryTitle || ""),
+                                req.st.db.escape(req.body.stageTitle || ""),
+                                req.st.db.escape(req.body.statusTitle || ""),
+                                req.st.db.escape(req.body.currencyTitle || ""),
+                                req.st.db.escape(req.body.isInfoToSenderChanged || 0),
+                                req.st.db.escape(req.body.discount || 0),
+                                req.st.db.escape(JSON.stringify(items || [])),
+                                req.st.db.escape(req.body.itemCurrencyId || 0),
+                                req.st.db.escape(req.body.itemCurrencySymbol || ""),
+                                req.st.db.escape(req.body.targetDate),
+                                req.st.db.escape(DBSecretKey),
+                                req.st.db.escape(req.body.timestamp),
+                                req.st.db.escape(req.body.createdTimeStamp),
+                                req.st.db.escape(JSON.stringify(req.body.contactDetails || {})),
+                                req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                                req.st.db.escape(req.body.forcastValue || 0),
+                                req.st.db.escape(JSON.stringify(taskDetails || null))
+                            ];
+
+                            var salesFormId = 2000;
+                            var keywordsParams = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(salesFormId),
+                                req.st.db.escape(JSON.stringify(keywordList)),
+                                req.st.db.escape(req.body.groupId)
+                            ];
+
+                            var procQuery = 'CALL he_save_salesRequest_WithTask_New( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, results) {
+                                console.log(err);
+                                if (!err && results && results[0] && results[0][0]) {
+                                    senderGroupId = results[0][0].senderId;
+
+                                    notifyMessages.getMessagesNeedToNotify();
+
+                                    if (results && results[2] && results[2][0] && results[2][0].receiverId) {
+                                        if (notificationTemplaterRes.parsedTpl) {
+                                            notification.publish(
+                                                results[2][0].receiverId,
+                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                results[0][0].senderId,
+                                                notificationTemplaterRes.parsedTpl,
+                                                41,
+                                                0, (results[2][0].iphoneId) ? (results[2][0].iphoneId) : '',
+                                                (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                                0,
+                                                0,
+                                                0,
+                                                0,
+                                                1,
+                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                '',
+                                                0,
+                                                0,
+                                                null,
+                                                '',
+                                                /** Data object property to be sent with notification **/
+                                                {
+                                                    parentId: results[2][0].parentId,
+                                                    groupId: results[2][0].groupId,
+                                                    requirement: results[2][0].requirement,
+                                                    feedback: results[2][0].feedback,
+                                                    rating: results[2][0].rating,
+                                                    updatedDate: results[2][0].updatedDate,
+                                                    status: results[2][0].status
+                                                },
+                                                null,
+                                                tokenResult[0].isWhatMate,
+                                                results[1][i].secretKey);
+                                            console.log('postNotification : notification for compose_message is sent successfully');
+                                        }
+                                        else {
+                                            console.log('Error in parsing notification compose_message template - ',
+                                                notificationTemplaterRes.error);
+                                            console.log('postNotification : notification for compose_message is sent successfully');
+                                        }
+                                    }
+
+                                    response.status = true;
+                                    response.message = "Sales query submitted successfully";
+                                    response.error = null;
+                                    response.data = {
+                                        messageList: {
+                                            messageId: results[0][0].messageId,
+                                            message: results[0][0].message,
+                                            messageLink: results[0][0].messageLink,
+                                            createdDate: results[0][0].createdDate,
+                                            messageType: results[0][0].messageType,
+                                            messageStatus: results[0][0].messageStatus,
+                                            priority: results[0][0].priority,
+                                            senderName: results[0][0].senderName,
+                                            senderId: results[0][0].senderId,
+                                            receiverId: results[0][0].receiverId,
+                                            transId: results[0][0].transId,
+                                            formId: results[0][0].formId,
+                                            groupId: req.body.groupId,
+                                            currentStatus: results[0][0].currentStatus,
+                                            currentTransId: results[0][0].currentTransId,
+                                            localMessageId: req.body.localMessageId,
+                                            parentId: results[0][0].parentId,
+                                            accessUserType: results[0][0].accessUserType,
+                                            heUserId: results[0][0].heUserId,
+                                            formData: JSON.parse(results[0][0].formDataJSON)
+                                        }
+                                    };
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while saving sales query";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+salesCtrl.saleSupportMailerTemplateList = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                //     console.log(req.body);
+
+                if (!req.query.groupId) {
+                    error.groupId = 'Invalid groupId';
+                    validationFlag *= false;
+                }
+                if (!req.query.taskType) {
+                    error.taskType = 'Invalid taskType';
+                    validationFlag *= false;
+                }
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.groupId),
+                        req.st.db.escape(req.query.taskType)
+                    ];
+
+                    var procQuery = 'CALL wm_get_salesMailTemplates( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result && result[0] && result[0][0]) {
+
+                            response.status = true;
+                            response.message = "Templates loaded successfully";
+                            response.error = null;
+                            response.data = {
+                                templateList: result[0] ? result[0] : []
+                            };
+
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = {
+                                templateList: []
+                            };
+                            response.error = null;
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while getting template List";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+salesCtrl.saleSupportMailerPreview = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+
+                    if (!req.body.groupId) {
+                        error.groupId = 'Invalid groupId';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.parentId) {
+                        error.parentId = 'Invalid parentId';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.templateId) {
+                        error.templateId = 'Invalid templateId';
+                        validationFlag *= false;
+                    }
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(req.body.parentId),
+                            req.st.db.escape(req.body.templateId),
+                            req.st.db.escape(req.body.isSupport || 0),
+                            req.st.db.escape(DBSecretKey)
+                        ];
+
+                        var procQuery = 'CALL wm_get_salesProposalMailer( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            if (!err && result && result[0] && result[0][0]) {
+
+                                var subject = result[0][0] && result[0][0].subject ? result[0][0].subject : "(no-subject)";
+                                var mailBody = result[0][0] && result[0][0].mailBody ? result[0][0].mailBody : "";
+                                var cc = result[0][0] && result[0][0].cc ? result[0][0].cc : [];
+                                var bcc = result[0][0] && result[0][0].bcc ? result[0][0].bcc : [];
+                                var templateId = result[0][0] && result[0][0].templateId ? result[0][0].templateId : 0;
+                                var tags = result[0][0] && result[0][0].tags && JSON.parse(result[0][0].tags) ? JSON.parse(result[0][0].tags) : [];
+                                var tableTags = result[0][0] && result[0][0].tableTags && JSON.parse(result[0][0].tableTags) ? JSON.parse(result[0][0].tableTags) : [];
+                                var attachmentName = result[0][0] && result[0][0].attachmentName ? result[0][0].attachmentName : "";
+                                var toEmailId = result[0][0] && result[0][0].contactEmailId ? result[0][0].contactEmailId : "";
+                                var fromEmailId = result[0][0] && result[0][0].fromEmailId ? result[0][0].fromEmailId : "";
+
+                                var isAttachment = result[0][0] && result[0][0].isAttachment ? result[0][0].isAttachment : 0;
+                                var itemList = result[1] && result[1][0] && JSON.parse(result[1][0].itemList) ? JSON.parse(result[1][0].itemList) : [];
+
+                                function escapeRegExp(string) {
+                                    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                                }
+
+                                function replaceAll(mailStrBody, tagTerm, replaceFromResult) {
+                                    return mailStrBody.replace(new RegExp(escapeRegExp(tagTerm), 'g'), replaceFromResult);
+                                }
+
+                                for (tagIndex = 0; tagIndex < tags.length; tagIndex++) {
+                                    if ((result[1][0][tags[tagIndex].tagName] && result[1][0][tags[tagIndex].tagName] != null && result[1][0][tags[tagIndex].tagName] != "") || result[1][0][tags[tagIndex].tagName] >= -1) {
+                                        mailBody = replaceAll(mailBody, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
+                                        subject = replaceAll(subject, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
+                                    }
+                                }
+
+                                if (tableTags.length > 0 && itemList.length > 0) {
+                                    var position = mailBody.indexOf('@table');
+                                    var tableContent = '';
+                                    mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
+                                    tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
+                                    // console.log(tableContent, 'mailbody');
+                                    for (var tagCount = 0; tagCount < tableTags.length; tagCount++) {
+                                        tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px; background:#c18e5963;">' + tableTags[tagCount].displayTagAs + "</th>";
+                                    }
+                                    tableContent += "</tr>";
+                                    for (var itemCount = 0; itemCount < itemList.length; itemCount++) {
+                                        tableContent += "<tr>";
+                                        for (var tagCount = 0; tagCount < tableTags.length; tagCount++) {
+                                            tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + itemList[itemCount][tableTags[tagCount].tagName] + "</td>";
+                                        }
+                                        tableContent += "</tr>";
+                                    }
+
+                                    tableContent += "</table>";
+                                    mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
+                                }
+
+
+                                response.status = true;
+                                response.message = "Mail Preview loaded successfully";
+                                response.error = null;
+                                response.data = {
+                                    mailBody: mailBody ? mailBody : "",
+                                    subject: subject ? subject : [],
+                                    fromEmailId: fromEmailId ? fromEmailId : "",
+                                    cc: cc ? cc : [],
+                                    bcc: bcc ? bcc : [],
+                                    toEmailId: toEmailId ? toEmailId : ""
+                                    // results: result
+                                };
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "No data found";
+                                response.data = {
+                                    mailBody: ""
+                                };
+                                response.error = null;
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while loading mail preview";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+salesCtrl.saleSupportMailerSendMail = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+
+                    if (!req.body.groupId) {
+                        error.groupId = 'Invalid groupId';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.parentId) {
+                        error.parentId = 'Invalid parentId';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.templateId) {
+                        error.templateId = 'Invalid templateId';
+                        validationFlag *= false;
+                    }
+
+                    // if (!req.body.fromEmailId) {
+                    //     error.fromEmailId = 'Invalid fromEmailId';
+                    //     validationFlag *= false;
+                    // }
+
+                    if (!req.body.toEmailId || !req.body.toEmailId.length) {
+                        error.toEmailId = 'Invalid toEmailId';
+                        validationFlag *= false;
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(req.body.parentId),
+                            req.st.db.escape(req.body.templateId),
+                            req.st.db.escape(req.body.isSupport || 0),
+                            req.st.db.escape(DBSecretKey)
+                        ];
+
+                        var procQuery = 'CALL wm_get_salesProposalMailer( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            if (!err && result && result[0] && result[0][0]) {
+
+                                var subject = result[0][0] && result[0][0].subject ? result[0][0].subject : "(no-subject)";
+                                var mailBody = result[0][0] && result[0][0].mailBody ? result[0][0].mailBody : "";
+                                var cc = req.body.cc ? req.body.cc : [];
+                                var bcc = req.body.bcc ? req.body.bcc : [];
+                                var tags = result[0][0] && result[0][0].tags && JSON.parse(result[0][0].tags) ? JSON.parse(result[0][0].tags) : [];
+                                var tableTags = result[0][0] && result[0][0].tableTags && JSON.parse(result[0][0].tableTags) ? JSON.parse(result[0][0].tableTags) : []; var attachmentName = result[0][0] && result[0][0].attachmentName ? result[0][0].attachmentName : "";
+                                var toEmailId = req.body.toEmailId;
+                                var fromEmailId = result[1] && result[1][0] && result[1][0].fromEmailId ? result[1][0].fromEmailId : "";
+                                var isAttachment = result[0][0] && result[0][0].isAttachment ? result[0][0].isAttachment : 0;
+                                var itemList = result[1] && result[1][0] && JSON.parse(result[1][0].itemList) ? JSON.parse(result[1][0].itemList) : [];
+
+                                function replaceAll(mailStrBody, tagTerm, replaceFromResult) {
+                                    return mailStrBody.replace(new RegExp(escapeRegExp(tagTerm), 'g'), replaceFromResult);
+                                }
+
+                                for (tagIndex = 0; tagIndex < tags.length; tagIndex++) {
+
+                                    if ((result[1][0][tags[tagIndex].tagName] && result[1][0][tags[tagIndex].tagName] != null && result[1][0][tags[tagIndex].tagName] != "") || result[1][0][tags[tagIndex].tagName] >= -1) {
+                                        mailBody = replaceAll(mailBody, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
+                                        subject = replaceAll(subject, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
+                                    }
+                                }
+
+
+                                if (tableTags.length > 0 && itemList.length > 0) {
+                                    var position = mailBody.indexOf('@table');
+                                    var tableContent = '';
+                                    mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
+                                    tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
+                                    console.log(tableContent, 'mailbody');
+                                    for (var tagCount = 0; tagCount < tableTags.length; tagCount++) {
+                                        tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px; background:#c18e5963;">' + tableTags[tagCount].displayTagAs + "</th>";
+                                    }
+                                    tableContent += "</tr>";
+                                    for (var itemCount = 0; itemCount < itemList.length; itemCount++) {
+                                        tableContent += "<tr>";
+                                        for (var tagCount = 0; tagCount < tableTags.length; tagCount++) {
+                                            tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + itemList[itemCount][tableTags[tagCount].tagName] + "</td>";
+                                        }
+                                        tableContent += "</tr>";
+                                    }
+
+                                    tableContent += "</table>";
+                                    mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
+                                }
+
+
+                                var mailOptions = {
+                                    from: fromEmailId,
+                                    to: toEmailId,
+                                    subject: subject,
+                                    html: mailBody,
+                                    cc: cc,
+                                    bcc: bcc
+                                };
+
+                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                var email = new sendgrid.Email();
+                                email.from = mailOptions.from;
+                                email.to = mailOptions.to;
+                                email.subject = mailOptions.subject;
+                                email.mbody = mailOptions.html;
+                                email.cc = mailOptions.cc;
+                                email.bcc = mailOptions.bcc;
+                                email.html = mailOptions.html;
+
+                                sendgrid.send(email, function (err, result) {
+                                    if (!err) {
+                                        response.status = true;
+                                        response.message = "Mail Sent successfully";
+                                        response.error = null;
+                                        response.data = null;
+                                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        // zlib.gzip(buf, function (_, result) {
+                                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                        // });
+                                    }
+                                    else {
+
+                                        if (!fromEmailId || fromEmailId == "")
+                                            response.message = "Invalid From MailID";
+                                        else
+                                            response.message = "Mail could not be sent";
+
+                                        response.status = false;
+                                        response.error = null;
+                                        response.data = null;
+                                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        // zlib.gzip(buf, function (_, result) {
+                                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                        // });
+                                    }
+                                });
+
+
+                            }
+
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "No data found";
+                                response.data = {
+                                    mailBody: ""
+                                };
+                                response.error = null;
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while loading mail preview";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+salesCtrl.salesTargetvsPerformance = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+
+                    if (!req.body.heMasterId) {
+                        error.heMasterId = 'Invalid heMasterId';
+                        validationFlag *= false;
+                    }
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.heMasterId),
+                            req.st.db.escape(req.body.fromDate || null),
+                            req.st.db.escape(req.body.toDate || null),
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.type || 1)
+                        ];
+
+                        var procQuery = 'CALL wm_get_SalesTargetPerformance( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            if (!err && result && result[0] && result[0][0]) {
+
+                                response.status = true;
+                                response.message = "Report loaded successfully";
+                                response.error = null;
+
+                                for (var i = 0; i < result[0].length; i++) {
+                                    result[0][i].targetList = result[0][i] && JSON.parse(result[0][i].targetList) ? JSON.parse(result[0][i].targetList) : [];
+                                }
+
+                                response.data = {
+                                    salesMemberList: result[0] ? result[0] : [],
+                                    fromDate: result[1][0] && result[1][0].fromDate ? result[1][0].fromDate : null,
+                                    toDate: result[1][0] && result[1][0].toDate ? result[1][0].toDate : null
+                                };
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "No data found";
+                                response.data = {
+                                    salesMemberList: [],
+                                    fromDate: null,
+                                    toDate: null
+                                };
+                                response.error = null;
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while getting report";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+salesCtrl.mailTemplateMasterData = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                //     console.log(req.body);
+
+                if (!req.query.heMasterId) {
+                    error.heMasterId = 'Invalid heMasterId';
+                    validationFlag *= false;
+                }
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId)
+                    ];
+
+                    var procQuery = 'CALL wm_get_salesSupportMailTemplateMaster( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result && result[0] && result[0][0]) {
+
+                            response.status = true;
+                            response.message = "Master Data loaded successfully";
+                            response.error = null;
+                            response.data = {
+                                mailTypes: result[0] ? result[0] : [],
+                                templateList: result[1] ? result[1] : [],
+                                tagList: {
+                                    sales: result[2] ? result[2] : []
+                                }
+                            };
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = {
+                                mailTypes: [],
+                                templateList: [],
+                                tagList: []
+                            };
+                            response.error = null;
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while getting data";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+salesCtrl.SaveMailTemplateSalesSupport = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                //     console.log(req.body);
+
+                if (!req.query.heMasterId) {
+                    error.heMasterId = 'Invalid heMasterId';
+                    validationFlag *= false;
+                }
+
+                if (!req.body.templateName) {
+                    error.templateName = 'Invalid templateName';
+                    validationFlag *= false;
+                }
+
+                if (!req.body.type) {
+                    error.type = 'Invalid type';
+                    validationFlag *= false;
+                }
+
+                if (!req.body.subject) {
+                    error.subject = 'Invalid subject';
+                    validationFlag *= false;
+                }
+
+                if (!req.body.mailBody) {
+                    error.mailBody = 'Invalid mailBody';
+                    validationFlag *= false;
+                }
+
+
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.body.templateId || 0),
+                        req.st.db.escape(req.body.templateName),
+                        req.st.db.escape(req.body.type),
+                        req.st.db.escape(JSON.stringify(req.body.cc || [])),
+                        req.st.db.escape(JSON.stringify(req.body.bcc || [])),
+                        req.st.db.escape(req.body.subject),
+                        req.st.db.escape(req.body.mailBody),
+                        req.st.db.escape(JSON.stringify(req.body.tags || [])),
+                        req.st.db.escape(JSON.stringify(req.body.tableTags || []))
+
+                    ];
+
+                    var procQuery = 'CALL wm_save_salesSupportmailTemplate( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result && result[0] && result[0][0]) {
+
+                            response.status = true;
+                            response.message = "Template saved successfully";
+                            response.error = null;
+                            response.data = {
+                                templateList: result[0] ? result[0] : []
+                            };
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = {
+                                templateList: []
+                            };
+                            response.error = null;
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while getting data";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+salesCtrl.salesSupportExpenseList = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+
+                    if (!req.body.groupId) {
+                        error.groupId = 'Invalid groupId';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.parentId) {
+                        error.parentId = 'Invalid parentId';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.taskType) {
+                        error.taskType = 'Invalid taskType';
+                        validationFlag *= false;
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(req.body.parentId),
+                            req.st.db.escape(req.body.taskType),
+                            req.st.db.escape(DBSecretKey)
+                        ];
+
+                        var procQuery = 'CALL wm_get_expenseTrackerSalesSupport( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            if (!err && result && result[0] && result[0][0]) {
+
+                                response.status = true;
+                                response.message = "Expense list loaded successfully";
+                                response.error = null;
+
+                                for (var i = 0; i < result[0].length; i++) {
+                                    result[0][i].attachmentList = result[0] && result[0][i] && JSON.parse(result[0][i].attachmentList) ? JSON.parse(result[0][i].attachmentList) : [];
+                                }
+
+                                response.data = {
+                                    expenseList: result[0] ? result[0] : []
+                                };
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "No data found";
+                                response.data = {
+                                    expenseList: []
+                                };
+                                response.error = null;
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while getting expense list";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+
+salesCtrl.deleteSaleSupportTemplate = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                //     console.log(req.body);
+
+                if (!req.query.heMasterId) {
+                    error.heMasterId = 'Invalid heMasterId';
+                    validationFlag *= false;
+                }
+
+                if (!req.query.templateId) {
+                    error.templateId = 'Invalid templateId';
+                    validationFlag *= false;
+                }
+
+
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.query.templateId)
+                    ];
+
+                    var procQuery = 'CALL wm_delete_salesSupportDeleteTemplate( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result && result[0] && result[0][0]) {
+
+                            response.status = true;
+                            response.message = "Template deleted successfully";
+                            response.error = null;
+
+                            response.data = {
+                                templateList: result[0] ? result[0] : []
+                            };
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "Templates deleted.Templates does not exist";
+                            response.data = {
+                                templateList: []
+                            };
+                            // response.error = null;
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error Occured";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+
+salesCtrl.saveSupportRequestNew = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                    var keywordList = req.body.keywordList;
+                    if (typeof (keywordList) == "string") {
+                        keywordList = JSON.parse(keywordList);
+                    }
+                    if (!keywordList) {
+                        keywordList = [];
+                    }
+
+                    var attachmentList = req.body.attachmentList;
+                    if (typeof (attachmentList) == "string") {
+                        attachmentList = JSON.parse(attachmentList);
+                    }
+                    if (!attachmentList) {
+                        attachmentList = [];
+                    }
+
+                    if (!req.body.groupId) {
+                        error.groupId = 'Invalid groupId';
+                        validationFlag *= false;
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+
+                        var taskDetails;
+                        return new Promise(function (resolve, reject) {
+                            if (req.body.taskIdList && req.body.taskIdList.length > 0) {
+
+                                var taskDetailsInput = [
+                                    req.st.db.escape(req.query.token),
+                                    req.st.db.escape(req.body.groupId),
+                                    req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                                    req.st.db.escape(DBSecretKey)
+                                ];
+                                var taskDetailsInput = 'CALL wm_get_latest_taskDetails( ' + taskDetailsInput.join(',') + ')';
+                                req.db.query(taskDetailsInput, function (err, taskresults) {
+                                    console.log(err);
+                                    if (!err && taskresults && taskresults[0] && taskresults[0][0]) {
+
+                                        taskresults[0][0].memberList = taskresults[0][0] && JSON.parse(taskresults[0][0].memberList) ? JSON.parse(taskresults[0][0].memberList) : [];
+                                        taskresults[0][0].expenseList = taskresults[0][0] && JSON.parse(taskresults[0][0].expenseList) ? JSON.parse(taskresults[0][0].expenseList) : [];
+
+                                        for (var j = 0; j < taskresults[0][0].expenseList.length; j++) {
+                                            taskresults[0][0].expenseList[j].attachmentList = taskresults[0][0].expenseList[j] && JSON.parse(taskresults[0][0].expenseList[j].attachmentList) ? JSON.parse(taskresults[0][0].expenseList[j].attachmentList) : [];
+                                        }
+
+                                        taskresults[0][0].attachmentList = taskresults[0][0] && JSON.parse(taskresults[0][0].attachmentList) ? JSON.parse(taskresults[0][0].attachmentList) : [];
+
+                                        taskDetails = taskresults[0][0];
+                                        console.log("promise in");
+                                        resolve(taskDetails);
+                                    }
+                                    else {
+                                        resolve('');
+                                    }
+                                });
+                            }
+                            else {
+                                console.log("promise out");
+                                resolve('');
+                            }
+                        }).then(function (resp) {
+                            var procParams = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.body.parentId || 0),
+                                req.st.db.escape(req.body.categoryId || 0),
+                                req.st.db.escape(req.body.description),
+                                req.st.db.escape(req.body.priority),
+                                req.st.db.escape(req.body.senderNotes || ""),
+                                req.st.db.escape(req.body.status || 3),
+                                req.st.db.escape(req.body.receiverNotes || ""),
+                                req.st.db.escape(req.body.infoToSender || ""),
+                                req.st.db.escape(JSON.stringify(attachmentList || [])),
+                                req.st.db.escape(req.body.changeLog || ""),
+                                req.st.db.escape(req.body.groupId),
+                                req.st.db.escape(req.body.learnMessageId || 0),
+                                req.st.db.escape(req.body.accessUserType || 0),
+                                req.st.db.escape(req.body.categoryTitle || ""),
+                                req.st.db.escape(req.body.isInfoToSenderChanged || 0),
+                                req.st.db.escape(DBSecretKey),
+                                req.st.db.escape(req.body.timestamp),
+                                req.st.db.escape(req.body.createdTimeStamp),
+                                req.st.db.escape(JSON.stringify(req.body.contactDetails || {})),
+                                req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                                req.st.db.escape(JSON.stringify(taskDetails || null))
+                            ];
+
+                            var salesFormId = 2000;
+                            var keywordsParams = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(salesFormId),
+                                req.st.db.escape(JSON.stringify(keywordList)),
+                                req.st.db.escape(req.body.groupId)
+                            ];
+
+                            var procQuery = 'CALL he_save_supportRequestWithTask_new( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, results) {
+                                console.log(err);
+                                if (!err && results && results[0] && results[0][0]) {
+                                    senderGroupId = results[0][0].senderId;
+
+                                    notifyMessages.getMessagesNeedToNotify();
+
+                                    if (results && results[2] && results[2][0] && results[2][0].receiverId) {
+                                        if (notificationTemplaterRes.parsedTpl) {
+                                            notification.publish(
+                                                results[2][0].receiverId,
+                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                results[0][0].senderId,
+                                                notificationTemplaterRes.parsedTpl,
+                                                41,
+                                                0, (results[2][0].iphoneId) ? (results[2][0].iphoneId) : '',
+                                                (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                                0,
+                                                0,
+                                                0,
+                                                0,
+                                                1,
+                                                moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                '',
+                                                0,
+                                                0,
+                                                null,
+                                                '',
+                                                /** Data object property to be sent with notification **/
+                                                {
+                                                    parentId: results[2][0].parentId,
+                                                    groupId: results[2][0].groupId,
+                                                    requirement: results[2][0].requirement,
+                                                    feedback: results[2][0].feedback,
+                                                    rating: results[2][0].rating,
+                                                    updatedDate: results[2][0].updatedDate,
+                                                    status: results[2][0].status
+                                                },
+                                                null,
+                                                tokenResult[0].isWhatMate,
+                                                results[1][i].secretKey);
+                                            console.log('postNotification : notification for compose_message is sent successfully');
+                                        }
+                                        else {
+                                            console.log('Error in parsing notification compose_message template - ',
+                                                notificationTemplaterRes.error);
+                                            console.log('postNotification : notification for compose_message is sent successfully');
+                                        }
+                                    }
+
+                                    response.status = true;
+                                    response.message = "Support query submitted successfully";
+                                    response.error = null;
+                                    response.data = {
+                                        messageList: {
+                                            messageId: results[0][0].messageId,
+                                            message: results[0][0].message,
+                                            messageLink: results[0][0].messageLink,
+                                            createdDate: results[0][0].createdDate,
+                                            messageType: results[0][0].messageType,
+                                            messageStatus: results[0][0].messageStatus,
+                                            priority: results[0][0].priority,
+                                            senderName: results[0][0].senderName,
+                                            senderId: results[0][0].senderId,
+                                            receiverId: results[0][0].receiverId,
+                                            transId: results[0][0].transId,
+                                            formId: results[0][0].formId,
+                                            groupId: req.body.groupId,
+                                            currentStatus: results[0][0].currentStatus,
+                                            currentTransId: results[0][0].currentTransId,
+                                            localMessageId: req.body.localMessageId,
+                                            parentId: results[0][0].parentId,
+                                            accessUserType: results[0][0].accessUserType,
+                                            heUserId: results[0][0].heUserId,
+                                            formData: JSON.parse(results[0][0].formDataJSON)
+                                        }
+                                    };
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while saving support query";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+salesCtrl.expensetrackerAll = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+
+                    if (!req.body.groupId) {
+                        error.groupId = 'Invalid groupId';
+                        validationFlag *= false;
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(req.body.taskType || 0),
+                            req.st.db.escape(req.body.status || 0),
+                            req.st.db.escape(req.body.startPage || 0),
+                            req.st.db.escape(req.body.limit || 0),
+                            req.st.db.escape(DBSecretKey)
+                        ];
+
+                        var procQuery = 'CALL wm_get_expenseTrackerAll( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            if (!err && result && result[0] && result[0][0]) {
+
+                                response.status = true;
+                                response.message = "Expense list loaded successfully";
+                                response.error = null;
+
+                                for (var i = 0; i < result[0].length; i++) {
+                                    result[0][i].attachmentList = result[0] && result[0][i] && JSON.parse(result[0][i].attachmentList) ? JSON.parse(result[0][i].attachmentList) : [];
+                                }
+
+                                response.data = {
+                                    expenseList: result[0] ? result[0] : [],
+                                    count: result[1][0] && result[1][0].count ? result[1][0].count : 0
+                                };
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "No data found";
+                                response.data = {
+                                    expenseList: [],
+                                    count:0
+                                };
+                                response.error = null;
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while getting expense list";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+salesCtrl.saveSalesTaxTemplate = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                //     console.log(req.body);
+
+                    if (!req.query.heMasterId) {
+                        error.heMasterId = 'Invalid heMasterId';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.templateName) {
+                        error.templateName = 'Invalid templateName';
+                        validationFlag *= false;
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(req.body.templateId || 0),
+                            req.st.db.escape(req.body.templateName),
+                            req.st.db.escape(JSON.stringify(req.body.taxCodes || []))
+                        ];
+
+                        var procQuery = 'CALL wm_save_salesTaxTemplate( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            if (!err && result && result[0] && result[0][0]) {
+
+                                response.status = true;
+                                response.message = "Tax templates saved successfully";
+                                response.error = null;
+
+                                for (var i = 0; i < result[0].length; i++) {
+                                    result[0][i].taxCodes = result[0] && result[0][i] && JSON.parse(result[0][i].taxCodes) ? JSON.parse(result[0][i].taxCodes) : [];
+                                }
+
+                                response.data = {
+                                    taxTemplateList: result[0] ? result[0] : []
+                                };
+
+                                // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                // zlib.gzip(buf, function (_, result) {
+                                //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                // });
+                            }
+
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "No data found";
+                                response.data = {
+                                    expenseList: [],
+                                    count:0
+                                };
+                                response.error = null;
+                                // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                // zlib.gzip(buf, function (_, result) {
+                                //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                // });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving tax template";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
+salesCtrl.getSalesTaxTemplate = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                //     console.log(req.body);
+
+                    if (!req.query.heMasterId) {
+                        error.heMasterId = 'Invalid heMasterId';
+                        validationFlag *= false;
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId)
+                        ];
+
+                        var procQuery = 'CALL wm_sales_get_taxTemplates( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            if (!err && result && result[0] || result[1]) {
+
+                                response.status = true;
+                                response.message = "Tax templates loaded successfully";
+                                response.error = null;
+
+                                for (var i = 0; i < result[0].length; i++) {
+                                    result[0][i].taxCodes = result[0] && result[0][i] && JSON.parse(result[0][i].taxCodes) ? JSON.parse(result[0][i].taxCodes) : [];
+                                }
+
+                                response.data = {
+                                    taxTemplateList: result[0] ? result[0] : [],
+                                    masterTaxCodes : result[1] ? result[1] : []
+                                };
+
+                                // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                // zlib.gzip(buf, function (_, result) {
+                                //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                // });
+                            }
+
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "No data found";
+                                response.data = {
+                                    taxTemplateList: [],
+                                    masterTaxCodes: []
+                                };
+                                response.error = null;
+                                // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                // zlib.gzip(buf, function (_, result) {
+                                //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                // });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while loading tax template";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
 };
 
 module.exports = salesCtrl;

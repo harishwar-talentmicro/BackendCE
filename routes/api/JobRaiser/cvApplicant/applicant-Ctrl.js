@@ -1449,7 +1449,9 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(req.body.cvSource || [])),
                     req.st.db.escape(JSON.stringify(req.body.cvStatus || [])),
                     req.st.db.escape(JSON.stringify(req.body.stageResume || [])),
-                    req.st.db.escape(req.body.uploadedUsers || "")
+                    req.st.db.escape(req.body.uploadedUsers || ""),
+                    req.st.db.escape(req.body.from || null),
+                    req.st.db.escape(req.body.to || null)
                 ];
 
                 var procQuery = 'CALL wd_resume_search_newAlgorithm( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -5374,7 +5376,9 @@ applicantCtrl.getRecruiterPerformanceByClientWise = function (req, res, next) {
                         response.status = false;
                         response.message = "No results found";
                         response.error = null;
-                        response.data =null;
+                        response.data ={
+                            clientWiseData:[]
+                        };
                         res.status(200).json(response);
                     }
 
@@ -5470,7 +5474,9 @@ applicantCtrl.getRecruiterPerformanceByRequirementWise = function (req, res, nex
                         response.status = false;
                         response.message = "No results found";
                         response.error = null;
-                        response.data =null;
+                        response.data ={
+                            requirementWiseData : []
+                        };
                         res.status(200).json(response);
                     }
 
@@ -5592,7 +5598,9 @@ applicantCtrl.getRecruiterPerformanceReqApplicantData = function (req, res, next
                         response.status = false;
                         response.message = "No results found";
                         response.error = null;
-                        response.data =null;
+                        response.data ={
+                            reqApplicantData:[]
+                        };
                         res.status(200).json(response);
                     }
 

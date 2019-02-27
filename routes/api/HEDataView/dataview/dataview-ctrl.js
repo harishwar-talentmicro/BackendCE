@@ -1162,7 +1162,9 @@ LoginCtrl.getAttendanceRegister = function (req, res, next) {
                     req.st.db.escape(req.query.gradeIds),
                     req.st.db.escape(req.query.departmentIds),
                     req.st.db.escape(req.query.workLocationIds),
-                    req.st.db.escape(DBSecretKey)
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.query.keywords || ""),
+                    req.st.db.escape(req.query.exportAll || 0)
 
                 ];
 

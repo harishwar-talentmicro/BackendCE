@@ -984,7 +984,8 @@ supportCtrl.getMasterData = function (req, res, next) {
                                 currencySymbol: (masterData[4] && masterData[4][0] && masterData[4][0].currencySymbol) ? masterData[4][0].currencySymbol : '',
                                 currencyId: (masterData[4] && masterData[4][0] && masterData[4][0].currencyId) ? masterData[4][0].currencyId : 0
                             },
-                            probability: masterData[5] ? masterData[5] : []
+                            probability: masterData[5] ? masterData[5] : [],
+                            templateList :masterData[6] ? masterData[6] : []
                         };
                         response.error = null;
                          // res.status(200).json(response);
@@ -1002,7 +1003,8 @@ supportCtrl.getMasterData = function (req, res, next) {
                             stageStatusList: [],
                             categoryList: [],
                             currencyList: [],
-                            memberList: []
+                            memberList: [],
+                            templateList : []
                         };
                         response.error = null;
                         // res.status(200).json(response);

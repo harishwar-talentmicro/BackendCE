@@ -64,7 +64,7 @@ meetingRoomCtrl.getMeetingRooms = function(req,res,next){
                 var procQuery = 'CALL he_get_app_meetingRooms( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,meetingRoomResult){
-                    if(!err && meetingRoomResult && meetingRoomResult[0] && meetingRoomResult[0][0].roomId){
+                    if(!err && meetingRoomResult && meetingRoomResult[0] && meetingRoomResult[0][0] && meetingRoomResult[0][0].roomId){
                         response.status = true;
                         response.message = "Meeting rooms loaded successfully";
                         response.error = null;
