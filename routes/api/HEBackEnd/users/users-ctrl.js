@@ -206,17 +206,20 @@ userCtrl.getMasterData = function(req,res,next){
                         response.message = "Master data loaded successfully";
                         response.error = null;
                         response.data = {
-                            jobTitleList : masterDataResult[0],
-                            departmentList : masterDataResult[1],
-                            locationList : masterDataResult[2],
-                            bankNameList : masterDataResult[3],
-                            workLocationList : masterDataResult[4],
-                            trackTemplateList : masterDataResult[5],
-                            formTemplateList : masterDataResult[6],
-                            gradeList : masterDataResult[7],
-                            docGroupList : masterDataResult[8],
-                            workGroupList : masterDataResult[9],
-                            RMGroupList : masterDataResult[10]
+                            jobTitleList : masterDataResult[0] ? masterDataResult[0] : [],
+                            departmentList : masterDataResult[1] ? masterDataResult[1] : [],
+                            locationList : masterDataResult[2] ? masterDataResult[2] : [],
+                            bankNameList : masterDataResult[3] ? masterDataResult[3] : [],
+                            workLocationList : masterDataResult[4] ? masterDataResult[4] : [],
+                            trackTemplateList : masterDataResult[5] ? masterDataResult[5] : [],
+                            formTemplateList : masterDataResult[6] ? masterDataResult[6] : [],
+                            gradeList : masterDataResult[7] ? masterDataResult[7] : [],
+                            docGroupList : masterDataResult[8] ? masterDataResult[8] : [],
+                            workGroupList : masterDataResult[9] ? masterDataResult[9]:[],
+                            RMGroupList : masterDataResult[10] ? masterDataResult[10]:[],
+                            salesMemberList : masterDataResult[11] ? masterDataResult[11] : [],
+                            companyCurrencyList : masterDataResult[12] ? masterDataResult[12] : [],
+                            salesFinanicalYearData : masterDataResult[13] && masterDataResult[13][0] ? masterDataResult[13][0] : null
                         };
                         res.status(200).json(response);
 

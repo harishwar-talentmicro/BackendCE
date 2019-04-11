@@ -10,6 +10,12 @@ var Notification = require('../../../modules/notification/notification-master.js
 var notification = new Notification();
 var fs = require('fs');
 
+var Notification_aws = require('../../../modules/notification/aws-sns-push');
+
+var _Notification_aws = new Notification_aws();
+
+
+
 var salesCtrl = {};
 var error = {};
 
@@ -75,7 +81,7 @@ salesCtrl.getMasterData = function (req, res, next) {
                         response.message = "Data loaded successfully";
                         response.data = {
                             stageStatusList: output,
-                            categoryList: masterData[1] ? masterData[1] : [],
+                            categoryList: masterData[1] && masterData[1][0] ? masterData[1] : [],
                             currencyList: masterData[2] ? masterData[2] : [],
                             memberList: masterData[3] ? masterData[3] : [],
                             salesType: masterData[4] ? masterData[4][0].salesDisplayFormat : 0,
@@ -89,8 +95,17 @@ salesCtrl.getMasterData = function (req, res, next) {
                             valueFieldTitle1: masterData[7] && masterData[7][0] && masterData[7][0].valueFieldTitle1 ? masterData[7][0].valueFieldTitle1 : "",
                             valueFieldTitle2: masterData[7] && masterData[7][0] && masterData[7][0].valueFieldTitle2 ? masterData[7][0].valueFieldTitle2 : "",
                             isCompanyMandatory: masterData[7] && masterData[7][0] && masterData[7][0].isCompanyMandatory ? masterData[7][0].isCompanyMandatory : 0,
+                            isTaskSchedules: masterData[7] && masterData[7][0] && masterData[7][0].isTaskSchedules ? masterData[7][0].isTaskSchedules : 0,
+                            isExpenseClaim: masterData[7] && masterData[7][0] && masterData[7][0].isExpenseClaim ? masterData[7][0].isExpenseClaim : 0,
+                            showForcastSection: masterData[7] && masterData[7][0] && masterData[7][0].showForcastSection ? masterData[7][0].showForcastSection : 0,
+                            targetPeriod: masterData[7] && masterData[7][0] && masterData[7][0].targetPeriod ? masterData[7][0].targetPeriod : 0,
+                            enableConsiderThisForForecast: masterData[7] && masterData[7][0] && masterData[7][0].enableConsiderThisForForecast ? masterData[7][0].enableConsiderThisForForecast : 0,
+                            isSendProposal: masterData[7] && masterData[7][0] && masterData[7][0].isSendProposal ? masterData[7][0].isSendProposal : 0,
+                            isTargetDate: masterData[7] && masterData[7][0] && masterData[7][0].isTargetDate ? masterData[7][0].isTargetDate : 0,
                             expenseList: masterData[8] ? masterData[8] : [],
-                            templateList: masterData[9] ? masterData[9] : []
+                            templateList: masterData[9] ? masterData[9] : [],
+                            isReportingManager: masterData[10][0] && masterData[10][0].isReportingManager ? masterData[10][0].isReportingManager : 0,
+                            isCompanyMember: masterData[10][0] && masterData[10][0].isCompanyMember ? masterData[10][0].isCompanyMember : 0
                         };
                         response.error = null;
                         // res.status(200).json(response);
@@ -907,6 +922,7 @@ salesCtrl.getSalesItems = function (req, res, next) {
                             res1.notes = salesItems[0][i].notes;
                             res1.UOM = salesItems[0][i].UOM;
                             res1.UOMTitle = salesItems[0][i].UOMTitle;
+                            res1.itemBanners = salesItems[0][i].itemBanners && JSON.parse(salesItems[0][i].itemBanners) ? JSON.parse(salesItems[0][i].itemBanners) : [];
                             output.push(res1);
                         }
 
@@ -1477,7 +1493,13 @@ salesCtrl.saveTaskForSalesSupport = function (req, res, next) {
                             req.st.db.escape(req.body.changeLog || ""),
                             req.st.db.escape(req.body.isReminderEnabled || 0),
                             req.st.db.escape(req.body.reminder || 0),
-                            req.st.db.escape(req.body.address || "")
+                            req.st.db.escape(req.body.address || ""),
+                            req.st.db.escape(req.body.meetingAddress || ""),
+                            req.st.db.escape(req.body.meetingAddLatitude || 0),
+                            req.st.db.escape(req.body.meetingAddLongitude || 0),
+                            req.st.db.escape(req.body.distanceBetweenLocations || 0),
+                            req.st.db.escape(req.body.isTravelAlert || 0),
+                            req.st.db.escape(req.body.travelTime || 0)
                         ];
 
                         var procQuery = 'CALL he_save_taskForm_salesSupport( ' + procParams.join(',') + ');';
@@ -1891,7 +1913,7 @@ salesCtrl.findClientContactsMember = function (req, res, next) {
                         var procParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.body.groupId),
-                            req.st.db.escape(req.body.keyword),
+                            req.st.db.escape(req.body.keyword || ""),
                             req.st.db.escape(req.body.isSupport || 0),  // 0 sale ,1-support
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.startPage || 1),
@@ -2210,7 +2232,7 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
                 var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-
+                    console.log(req.body);
                     // if (!req.body.requirement) {
                     //     error.requirement = 'Invalid requirement';
                     //     validationFlag *= false;
@@ -2268,6 +2290,7 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
                                     req.st.db.escape(DBSecretKey)
                                 ];
                                 var taskDetailsInput = 'CALL wm_get_latest_taskDetails( ' + taskDetailsInput.join(',') + ')';
+                                // console.log(taskDetailsInput);
                                 req.db.query(taskDetailsInput, function (err, taskresults) {
                                     console.log(err);
                                     if (!err && taskresults && taskresults[0] && taskresults[0][0]) {
@@ -2323,14 +2346,20 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
                                 req.st.db.escape(JSON.stringify(items || [])),
                                 req.st.db.escape(req.body.itemCurrencyId || 0),
                                 req.st.db.escape(req.body.itemCurrencySymbol || ""),
-                                req.st.db.escape(req.body.targetDate),
+                                req.st.db.escape(req.body.targetDate || null),
                                 req.st.db.escape(DBSecretKey),
-                                req.st.db.escape(req.body.timestamp),
-                                req.st.db.escape(req.body.createdTimeStamp),
+                                req.st.db.escape(req.body.timestamp || ""),
+                                req.st.db.escape(req.body.createdTimeStamp || null),
                                 req.st.db.escape(JSON.stringify(req.body.contactDetails || {})),
                                 req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
                                 req.st.db.escape(req.body.forcastValue || 0),
-                                req.st.db.escape(JSON.stringify(taskDetails || null))
+                                req.st.db.escape(JSON.stringify(taskDetails || null)),
+                                req.st.db.escape(req.body.isReportingManager || 0),
+                                req.st.db.escape(req.body.isTargetDate || 0),
+                                req.st.db.escape(req.body.isConsider || 0),
+                                req.st.db.escape(req.body.amount2 || 0),
+                                req.st.db.escape(req.body.currencyId2 || 0),
+                                req.st.db.escape(req.body.currencyTitle2 || "")
                             ];
 
                             var salesFormId = 2000;
@@ -2345,7 +2374,9 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
                             console.log(procQuery);
                             req.db.query(procQuery, function (err, results) {
                                 console.log(err);
+                                // console.log("results",results);
                                 if (!err && results && results[0] && results[0][0]) {
+
                                     senderGroupId = results[0][0].senderId;
 
                                     notifyMessages.getMessagesNeedToNotify();
@@ -2394,6 +2425,160 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
                                         }
                                     }
 
+                                    console.log("results[2]", results[2]);
+
+                                    // reminder alert
+                                    if (results[2] && results[2][0]){
+                                        for(var i=0; i < results[2].length; i++){
+                                            if (results[2] && results[2][i]) {
+                                                
+                                                var messagePayload = {
+                                                    message: "",
+                                                    alarmType: 4,
+                                                    type: 301,
+                                                    data: {
+                                                        eventList : results[2][i] && results[2][i].eventList && JSON.parse(results[2][i].eventList) ? JSON.parse(results[2][i].eventList) : []
+                                                    }
+                                                    // {
+                                                    //     taskId: results[2][i] && results[2][i].taskId ? results[2][i].taskId : 0,
+                                                    //     title: results[2][i] && results[2][i].title ? results[2][i].title : "",
+                                                    //     description: results[2][i] && results[2][i].description ? results[2][i].description : "",
+                                                    //     reminderTime: results[2][i] && results[2][i].reminderTime ? results[2][i].reminderTime : 0,
+                                                    //     meetingStartDate: results[2][i] && results[2][i].meetingStartDate ? results[2][i].meetingStartDate : null,
+        
+                                                    //     address: results[2][i] && results[2][i].address ? results[2][i].address : "",
+        
+                                                    //     duration: results[2][i] && results[2][i].duration ? results[2][i].duration : 0,
+                                                    //     latitude: results[2][i] && results[2][i].latitude ? results[2][i].latitude : 0,
+                                                    //     longitude: results[2][i] && results[2][i].longitude ? results[2][i].longitude : 0,
+                                                    //     fromLatitude: results[2][i] && results[2][i].fromLatitude ? results[2][i].fromLatitude : 0,
+                                                    //     fromLongitude: results[2][i] && results[2][i].fromLongitude ? results[2][i].fromLongitude : 0,
+                                                    //     andEventId: results[2][i] && results[2][i].andEventId ? results[2][i].andEventId : '0',
+                                                    //     iosEventId : results[2][i] && results[2][i].iosEventId ? results[2][i].iosEventId : '0'
+                                                    // }
+                                                }
+                                                console.log('messagePayload',messagePayload);
+        
+                                                if (results && results[2] && results[2][i] && results[2][i].APNS_Id) {
+                                                    console.log('IOS notification');
+                                                    _Notification_aws.publish_IOS(results[2][i].APNS_Id, messagePayload, 0);
+
+                                                }
+        
+                                                // if (results && results[2] && results[2][i] && results[2][i].creatorAPNS_Id) {
+                                                //     _Notification_aws.publish_IOS(results[2][i].creatorAPNS_Id, messagePayload, 0);
+                                                // }
+        
+        
+                                                if (results && results[2] && results[2][i] && results[2][i].GCM_Id) {
+                                                    _Notification_aws.publish_Android(results[2][i].GCM_Id, messagePayload);
+                                                }
+        
+                                                // if (results && results[2] && results[2][i] && results[2][i].creatorGCM_Id) {
+                                                //     console.log("reminder for creator");
+                                                //     console.log("messagePayload", messagePayload);
+                                                //     _Notification_aws.publish_Android(results[2][i].creatorGCM_Id, messagePayload, 0);
+                                                // }
+                                            }
+                                        }    
+                                    }
+                                   
+
+                                    // travel alert
+                                    // console.log('results[3]',results[3]);
+                                    // if (results[3] && results[3][0]){
+                                    //     for(var i=0; i < results[3].length; i++){
+                                    //         if (results[3] && results[3][i] && results[3][i].isTravelAlert && results[3][i].reminderTime) {
+                                    //             var messagePayload = {
+                                    //                 message: "",
+                                    //                 alarmType: 4,
+                                    //                 type: 301,
+                                    //                 data: {
+                                    //                     taskId: results[3][i] && results[3][i].taskId ? results[3][i].taskId : 0,
+                                    //                     title: results[3][i] && results[3][i].title ? results[3][i].title : "",
+                                    //                     description: results[3][i] && results[3][i].description ? results[3][i].description : "",
+                                    //                     reminderTime: results[3][i] && results[3][i].reminderTime ? results[3][i].reminderTime : 0,
+                                    //                     meetingStartDate: results[3][i] && results[3][i].meetingStartDate ? results[3][i].meetingStartDate : null,
+        
+                                    //                     address: results[3][i] && results[3][i].address ? results[3][i].address : "",
+        
+                                    //                     duration: results[3][i] && results[3][i].duration ? results[3][i].duration : 0,
+                                    //                     latitude: results[3][i] && results[3][i].latitude ? results[3][i].latitude : 0,
+                                    //                     longitude: results[3][i] && results[3][i].longitude ? results[3][i].longitude : 0,
+                                    //                     fromLatitude: results[3][i] && results[3][i].fromLatitude ? results[3][i].fromLatitude : 0,
+                                    //                     fromLongitude: results[3][i] && results[3][i].fromLongitude ? results[3][i].fromLongitude : 0,
+                                    //                     andEventId: results[3][i] && results[3][i].andEventId ? results[3][i].andEventId : '0',
+                                    //                     iosEventId : results[3][i] && results[3][i].iosEventId ? results[3][i].iosEventId : '0'
+                                    //                 }
+                                    //             }
+        
+                                    //             if (results && results[3] && results[3][i] && results[3][i].APNS_Id) {
+                                    //                 _Notification_aws.publish_IOS(results[3][i].APNS_Id, messagePayload, 0);
+                                    //             }
+        
+                                    //             // if (results && results[3] && results[3][i] && results[3][i].creatorAPNS_Id) {
+                                    //             //     _Notification_aws.publish_IOS(results[3][i].creatorAPNS_Id, messagePayload, 0);
+                                    //             // }
+        
+        
+                                    //             if (results && results[3] && results[3][i] && results[3][i].GCM_Id) {
+                                    //                 _Notification_aws.publish_Android(results[3][i].GCM_Id, messagePayload);
+                                    //             }
+        
+                                    //             // if (results && results[3] && results[3][i] && results[3][i].creatorGCM_Id) {
+                                    //             //     console.log("reminder for creator");
+                                    //             //     console.log("messagePayload", messagePayload);
+                                    //             //     _Notification_aws.publish_Android(results[3][i].creatorGCM_Id, messagePayload, 0);
+                                    //             // }
+                                    //         }
+                                    //     }    
+                                    // }
+
+                                    // old
+                                    // if (results[3] && results[3][0] && results[3][0].isTravelAlert && results[3][0].reminderTime) {
+                                    //     console.log('results[3][0]',results[3][0]);
+
+                                    //     var messagePayload = {
+                                    //         message: "",
+                                    //         alarmType: 4,
+                                    //         type: 301,
+                                    //         data: {
+                                    //             taskId: results[3][0] && results[3][0].taskId ? results[3][0].taskId : 0,
+                                    //             title: results[3][0] && results[3][0].title ? results[3][0].title : "",
+                                    //             description: results[3][0] && results[3][0].description ? results[3][0].description : "",
+                                    //             reminderTime: results[3][0] && results[3][0].reminderTime ? results[3][0].reminderTime : 0,
+                                    //             meetingStartDate: results[3][0] && results[3][0].meetingStartDate ? results[3][0].meetingStartDate : null,
+
+                                    //             address: results[3][0] && results[3][0].address ? results[3][0].address : "",
+
+                                    //             duration: results[3][0] && results[3][0].duration ? results[3][0].duration : 0,
+                                    //             latitude: results[3][0] && results[3][0].latitude ? results[3][0].latitude : 0,
+                                    //             longitude: results[3][0] && results[3][0].longitude ? results[3][0].longitude : 0,
+                                    //             fromLatitude: results[2][0] && results[2][0].fromLatitude ? results[2][0].fromLatitude : 0,
+                                    //             fromLongitude: results[2][0] && results[2][0].fromLongitude ? results[2][0].fromLongitude : 0
+                                    //         }
+                                    //     }
+
+                                    //     if (results && results[2] && results[2][0] && results[2][0].APNS_Id) {
+                                    //         _Notification_aws.publish_IOS(results[2][0].APNS_Id, messagePayload, 0);
+                                    //     }
+
+                                    //     if (results && results[2] && results[2][0] && results[2][0].creatorAPNS_Id) {
+                                    //         _Notification_aws.publish_IOS(results[2][0].creatorAPNS_Id, messagePayload, 0);
+                                    //     }
+
+
+                                    //     if (results && results[2] && results[2][0] && results[2][0].GCM_Id) {
+                                    //         _Notification_aws.publish_Android(results[2][0].GCM_Id, messagePayload);
+                                    //     }
+
+                                    //     if (results && results[2] && results[2][0] && results[2][0].creatorGCM_Id) {
+                                    //         console.log("reminder for creator");
+                                    //         console.log("messagePayload", messagePayload);
+                                    //         _Notification_aws.publish_Android(results[2][0].creatorGCM_Id, messagePayload, 0);
+                                    //     }
+                                    // }
+
                                     response.status = true;
                                     response.message = "Sales query submitted successfully";
                                     response.error = null;
@@ -2427,6 +2612,13 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
                                         res.status(200).json(response);
                                     });
 
+                                }
+                                else if(!err){
+                                    response.status = false;
+                                    response.message = "Failed to update sales query";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(200).json(response);
                                 }
                                 else {
                                     response.status = false;
@@ -2628,8 +2820,8 @@ salesCtrl.saleSupportMailerPreview = function (req, res, next) {
                                 var tags = result[0][0] && result[0][0].tags && JSON.parse(result[0][0].tags) ? JSON.parse(result[0][0].tags) : [];
                                 var tableTags = result[0][0] && result[0][0].tableTags && JSON.parse(result[0][0].tableTags) ? JSON.parse(result[0][0].tableTags) : [];
                                 var attachmentName = result[0][0] && result[0][0].attachmentName ? result[0][0].attachmentName : "";
-                                var toEmailId = result[0][0] && result[0][0].contactEmailId ? result[0][0].contactEmailId : "";
-                                var fromEmailId = result[0][0] && result[0][0].fromEmailId ? result[0][0].fromEmailId : "";
+                                var toEmailId = result[1][0] && result[1][0].contactEmailId ? result[1][0].contactEmailId : "";
+                                var fromEmailId = result[1][0] && result[1][0].fromEmailId ? result[1][0].fromEmailId : "";
 
                                 var isAttachment = result[0][0] && result[0][0].isAttachment ? result[0][0].isAttachment : 0;
                                 var itemList = result[1] && result[1][0] && JSON.parse(result[1][0].itemList) ? JSON.parse(result[1][0].itemList) : [];
@@ -2642,11 +2834,13 @@ salesCtrl.saleSupportMailerPreview = function (req, res, next) {
                                     return mailStrBody.replace(new RegExp(escapeRegExp(tagTerm), 'g'), replaceFromResult);
                                 }
 
-                                for (tagIndex = 0; tagIndex < tags.length; tagIndex++) {
-                                    if ((result[1][0][tags[tagIndex].tagName] && result[1][0][tags[tagIndex].tagName] != null && result[1][0][tags[tagIndex].tagName] != "") || result[1][0][tags[tagIndex].tagName] >= -1) {
-                                        mailBody = replaceAll(mailBody, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
-                                        subject = replaceAll(subject, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
-                                    }
+                                if(result[1] && result[1][0]){
+                                    for (tagIndex = 0; tagIndex < tags.length; tagIndex++) {
+                                        if ((result[1][0][tags[tagIndex].tagName] && result[1][0][tags[tagIndex].tagName] != null && result[1][0][tags[tagIndex].tagName] != "") || result[1][0][tags[tagIndex].tagName] >= -1) {
+                                            mailBody = replaceAll(mailBody, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
+                                            subject = replaceAll(subject, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
+                                        }
+                                    }    
                                 }
 
                                 if (tableTags.length > 0 && itemList.length > 0) {
@@ -2662,7 +2856,9 @@ salesCtrl.saleSupportMailerPreview = function (req, res, next) {
                                     for (var itemCount = 0; itemCount < itemList.length; itemCount++) {
                                         tableContent += "<tr>";
                                         for (var tagCount = 0; tagCount < tableTags.length; tagCount++) {
-                                            tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + itemList[itemCount][tableTags[tagCount].tagName] + "</td>";
+                                            if (itemList[itemCount][tableTags[tagCount].tagName] && itemList[itemCount][tableTags[tagCount].tagName] != "" && itemList[itemCount][tableTags[tagCount].tagName] != null) {
+                                                tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + itemList[itemCount][tableTags[tagCount].tagName] + "</td>";
+                                            }
                                         }
                                         tableContent += "</tr>";
                                     }
@@ -2814,16 +3010,23 @@ salesCtrl.saleSupportMailerSendMail = function (req, res, next) {
                                 var isAttachment = result[0][0] && result[0][0].isAttachment ? result[0][0].isAttachment : 0;
                                 var itemList = result[1] && result[1][0] && JSON.parse(result[1][0].itemList) ? JSON.parse(result[1][0].itemList) : [];
 
+                                function escapeRegExp(string) {
+                                    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                                }
+
                                 function replaceAll(mailStrBody, tagTerm, replaceFromResult) {
                                     return mailStrBody.replace(new RegExp(escapeRegExp(tagTerm), 'g'), replaceFromResult);
                                 }
 
-                                for (tagIndex = 0; tagIndex < tags.length; tagIndex++) {
 
-                                    if ((result[1][0][tags[tagIndex].tagName] && result[1][0][tags[tagIndex].tagName] != null && result[1][0][tags[tagIndex].tagName] != "") || result[1][0][tags[tagIndex].tagName] >= -1) {
-                                        mailBody = replaceAll(mailBody, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
-                                        subject = replaceAll(subject, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
-                                    }
+                                if(result[1] && result[1][0]){
+                                    for (tagIndex = 0; tagIndex < tags.length; tagIndex++) {
+
+                                        if ((result[1][0][tags[tagIndex].tagName] && result[1][0][tags[tagIndex].tagName] != null && result[1][0][tags[tagIndex].tagName] != "") || result[1][0][tags[tagIndex].tagName] >= -1) {
+                                            mailBody = replaceAll(mailBody, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
+                                            subject = replaceAll(subject, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
+                                        }
+                                    }    
                                 }
 
 
@@ -2840,7 +3043,9 @@ salesCtrl.saleSupportMailerSendMail = function (req, res, next) {
                                     for (var itemCount = 0; itemCount < itemList.length; itemCount++) {
                                         tableContent += "<tr>";
                                         for (var tagCount = 0; tagCount < tableTags.length; tagCount++) {
-                                            tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + itemList[itemCount][tableTags[tagCount].tagName] + "</td>";
+                                            if (itemList[itemCount][tableTags[tagCount].tagName] && itemList[itemCount][tableTags[tagCount].tagName] != null) {
+                                                tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + itemList[itemCount][tableTags[tagCount].tagName] + "</td>";
+                                            }
                                         }
                                         tableContent += "</tr>";
                                     }
@@ -2990,15 +3195,16 @@ salesCtrl.salesTargetvsPerformance = function (req, res, next) {
                         var procQuery = 'CALL wm_get_SalesTargetPerformance( ' + procParams.join(',') + ')';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, result) {
-                            if (!err && result && result[0] && result[0][0]) {
+                            console.log(err);
+                            if (!err && result) {
 
                                 response.status = true;
                                 response.message = "Report loaded successfully";
                                 response.error = null;
 
-                                for (var i = 0; i < result[0].length; i++) {
-                                    result[0][i].targetList = result[0][i] && JSON.parse(result[0][i].targetList) ? JSON.parse(result[0][i].targetList) : [];
-                                }
+                                // for (var i = 0; i < result[0].length; i++) {
+                                //     result[0][i].targetList = result[0][i] && JSON.parse(result[0][i].targetList) ? JSON.parse(result[0][i].targetList) : [];
+                                // }
 
                                 response.data = {
                                     salesMemberList: result[0] ? result[0] : [],
@@ -3093,7 +3299,9 @@ salesCtrl.mailTemplateMasterData = function (req, res, next) {
 
                     var procParams = [
                         req.st.db.escape(req.query.token),
-                        req.st.db.escape(req.query.heMasterId)
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.query.editFlag || 0),
+                        req.st.db.escape(req.query.isSendProposal || 0)
                     ];
 
                     var procQuery = 'CALL wm_get_salesSupportMailTemplateMaster( ' + procParams.join(',') + ')';
@@ -3109,7 +3317,8 @@ salesCtrl.mailTemplateMasterData = function (req, res, next) {
                                 templateList: result[1] ? result[1] : [],
                                 tagList: {
                                     sales: result[2] ? result[2] : []
-                                }
+                                },
+                                isSendProposal : result[3] && result[3][0] && result[3][0].isSendProposal ? result[3][0].isSendProposal : 0
                             };
 
                             // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -3629,7 +3838,8 @@ salesCtrl.saveSupportRequestNew = function (req, res, next) {
                                 req.st.db.escape(req.body.createdTimeStamp),
                                 req.st.db.escape(JSON.stringify(req.body.contactDetails || {})),
                                 req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
-                                req.st.db.escape(JSON.stringify(taskDetails || null))
+                                req.st.db.escape(JSON.stringify(taskDetails || null)),
+                                req.st.db.escape(req.body.isReportingManager || 0)
                             ];
 
                             var salesFormId = 2000;
@@ -3796,6 +4006,8 @@ salesCtrl.expensetrackerAll = function (req, res, next) {
                             req.st.db.escape(req.body.groupId),
                             req.st.db.escape(req.body.taskType || 0),
                             req.st.db.escape(req.body.status || 0),
+                            req.st.db.escape(req.body.expenseFromDate || null),
+                            req.st.db.escape(req.body.expenseToDate || null),
                             req.st.db.escape(req.body.startPage || 0),
                             req.st.db.escape(req.body.limit || 0),
                             req.st.db.escape(DBSecretKey)
@@ -3831,7 +4043,7 @@ salesCtrl.expensetrackerAll = function (req, res, next) {
                                 response.message = "No data found";
                                 response.data = {
                                     expenseList: [],
-                                    count:0
+                                    count: 0
                                 };
                                 response.error = null;
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -3890,79 +4102,80 @@ salesCtrl.saveSalesTaxTemplate = function (req, res, next) {
                 //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
                 //     console.log(req.body);
 
-                    if (!req.query.heMasterId) {
-                        error.heMasterId = 'Invalid heMasterId';
-                        validationFlag *= false;
-                    }
+                if (!req.query.heMasterId) {
+                    error.heMasterId = 'Invalid heMasterId';
+                    validationFlag *= false;
+                }
 
-                    if (!req.body.templateName) {
-                        error.templateName = 'Invalid templateName';
-                        validationFlag *= false;
-                    }
+                if (!req.body.templateName) {
+                    error.templateName = 'Invalid templateName';
+                    validationFlag *= false;
+                }
 
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
 
-                        var procParams = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(req.body.templateId || 0),
-                            req.st.db.escape(req.body.templateName),
-                            req.st.db.escape(JSON.stringify(req.body.taxCodes || []))
-                        ];
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.body.templateId || 0),
+                        req.st.db.escape(req.body.templateName),
+                        req.st.db.escape(JSON.stringify(req.body.taxCodes || [])),
+                        req.st.db.escape(req.body.status || 0)
+                    ];
 
-                        var procQuery = 'CALL wm_save_salesTaxTemplate( ' + procParams.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, result) {
-                            if (!err && result && result[0] && result[0][0]) {
+                    var procQuery = 'CALL wm_save_salesTaxTemplate( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result && result[0] && result[0][0]) {
 
-                                response.status = true;
-                                response.message = "Tax templates saved successfully";
-                                response.error = null;
+                            response.status = true;
+                            response.message = "Tax templates saved successfully";
+                            response.error = null;
 
-                                for (var i = 0; i < result[0].length; i++) {
-                                    result[0][i].taxCodes = result[0] && result[0][i] && JSON.parse(result[0][i].taxCodes) ? JSON.parse(result[0][i].taxCodes) : [];
-                                }
-
-                                response.data = {
-                                    taxTemplateList: result[0] ? result[0] : []
-                                };
-
-                                // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                // zlib.gzip(buf, function (_, result) {
-                                //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                // });
+                            for (var i = 0; i < result[0].length; i++) {
+                                result[0][i].taxCodes = result[0] && result[0][i] && JSON.parse(result[0][i].taxCodes) ? JSON.parse(result[0][i].taxCodes) : [];
                             }
 
-                            else if (!err) {
-                                response.status = true;
-                                response.message = "No data found";
-                                response.data = {
-                                    expenseList: [],
-                                    count:0
-                                };
-                                response.error = null;
-                                // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                // zlib.gzip(buf, function (_, result) {
-                                //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                // });
-                            }
-                            else {
-                                response.status = false;
-                                response.message = "Error while saving tax template";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
-                            }
-                        });
-                    }
+                            response.data = {
+                                taxTemplateList: result[0] ? result[0] : []
+                            };
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = {
+                                expenseList: [],
+                                count: 0
+                            };
+                            response.error = null;
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while saving tax template";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
                 // });
             }
             else {
@@ -4004,8 +4217,122 @@ salesCtrl.getSalesTaxTemplate = function (req, res, next) {
                 //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
                 //     console.log(req.body);
 
-                    if (!req.query.heMasterId) {
-                        error.heMasterId = 'Invalid heMasterId';
+                if (!req.query.heMasterId) {
+                    error.heMasterId = 'Invalid heMasterId';
+                    validationFlag *= false;
+                }
+
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId)
+                    ];
+
+                    var procQuery = 'CALL wm_sales_get_taxTemplates( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result && result[0] || result[1]) {
+
+                            response.status = true;
+                            response.message = "Tax templates loaded successfully";
+                            response.error = null;
+
+                            if (result[1].length) {
+                                for (var i = 0; i < result[1].length; i++) {
+                                    result[1][i].taxCodes = result[0] && result[1][i] && JSON.parse(result[1][i].taxCodes) ? JSON.parse(result[1][i].taxCodes) : [];
+                                }
+                            }
+
+                            response.data = {
+                                masterTaxCodes: result[0] ? result[0] : [],
+                                taxTemplateList: result[1] ? result[1] : []
+                            };
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = {
+                                taxTemplateList: [],
+                                masterTaxCodes: []
+                            };
+                            response.error = null;
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while loading tax template";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+salesCtrl.updateExpenseSS = function (req, res, next) {
+
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+
+                    if (!req.body.groupId) {
+                        error.groupId = 'Invalid groupId';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.expenseIds.length) {
+                        error.expenseIds = 'Invalid expenseIds';
                         validationFlag *= false;
                     }
 
@@ -4019,57 +4346,1079 @@ salesCtrl.getSalesTaxTemplate = function (req, res, next) {
 
                         var procParams = [
                             req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId)
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(req.body.status || 0),
+                            req.st.db.escape(JSON.stringify(req.body.expenseIds || []))
                         ];
 
-                        var procQuery = 'CALL wm_sales_get_taxTemplates( ' + procParams.join(',') + ')';
+                        var procQuery = 'CALL wm_update_expenseAllTypes( ' + procParams.join(',') + ')';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, result) {
-                            if (!err && result && result[0] || result[1]) {
+                            if (!err && result && result[0] && result[0][0]) {
 
                                 response.status = true;
-                                response.message = "Tax templates loaded successfully";
+                                response.message = "Expense updated successfully";
                                 response.error = null;
 
-                                for (var i = 0; i < result[0].length; i++) {
-                                    result[0][i].taxCodes = result[0] && result[0][i] && JSON.parse(result[0][i].taxCodes) ? JSON.parse(result[0][i].taxCodes) : [];
-                                }
-
                                 response.data = {
-                                    taxTemplateList: result[0] ? result[0] : [],
-                                    masterTaxCodes : result[1] ? result[1] : []
+                                    expenseStatus: result[0] ? result[0] : []
                                 };
 
-                                // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                // zlib.gzip(buf, function (_, result) {
-                                //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(response);
-                                // });
+                                });
                             }
 
                             else if (!err) {
                                 response.status = true;
                                 response.message = "No data found";
                                 response.data = {
-                                    taxTemplateList: [],
-                                    masterTaxCodes: []
+                                    expenseStatus: []
                                 };
                                 response.error = null;
-                                // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                // zlib.gzip(buf, function (_, result) {
-                                //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(response);
-                                // });
+                                });
                             }
                             else {
                                 response.status = false;
-                                response.message = "Error while loading tax template";
+                                response.message = "Error while updating expense";
                                 response.error = null;
                                 response.data = null;
                                 res.status(500).json(response);
                             }
                         });
                     }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+salesCtrl.salesTargetVsPerformanceSummary = function (req, res, next) {
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                //     console.log(req.body);
+
+                if (!req.query.heMasterId) {
+                    error.heMasterId = 'Invalid heMasterId';
+                    validationFlag *= false;
+                }
+
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.body.targetMonthFrom),
+                        req.st.db.escape(req.body.targetMonthTo),
+                        req.st.db.escape(req.body.type || 3),
+                        req.st.db.escape(req.body.exportAll || 0),
+                        req.st.db.escape(JSON.stringify(req.body.selectedUsers || [])),
+                        req.st.db.escape(req.query.startPage || 0),
+                        req.st.db.escape(req.query.limit || 0),
+                        req.st.db.escape(DBSecretKey)
+                    ];
+
+                    var procQuery = 'CALL wm_sales_targetvsPerformanceSummary( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result && result[0]) {
+
+                            response.status = true;
+                            response.message = "Sales summary loaded successfully";
+                            response.error = null;
+
+                            for (var i = 0; i < result[0].length; i++) {
+                                result[0][i].targetList = result[0][i] && JSON.parse(result[0][i].targetList) ? JSON.parse(result[0][i].targetList) : [];
+                            }
+
+                            response.data = {
+                                salesSummary: result[0] ? result[0] : [],
+                                count: result[1] && result[1][0] && result[1][0].count ? result[1][0].count : 0
+                            };
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = {
+                                salesSummary: [],
+                                count: 0
+                            };
+                            response.error = null;
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while loading sales summary";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+salesCtrl.salesSummaryDetailedView = function (req, res, next) {
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                //     console.log(req.body);
+
+                if (!req.query.heMasterId) {
+                    error.heMasterId = 'Invalid heMasterId';
+                    validationFlag *= false;
+                }
+
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.body.targetMonthFrom),
+                        req.st.db.escape(req.body.targetMonthTo),
+                        req.st.db.escape(req.body.type || 3),
+                        req.st.db.escape(req.body.exportAll || 0),
+                        req.st.db.escape(JSON.stringify(req.body.selectedUsers || [])),
+                        req.st.db.escape(req.query.startPage || 0),
+                        req.st.db.escape(req.query.limit || 0),
+                        req.st.db.escape(DBSecretKey)
+                    ];
+
+                    var procQuery = 'CALL wm_sales_targetvsPerformanceDetailedView( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result && result[0]) {
+
+                            response.status = true;
+                            response.message = "Sales detailed view loaded successfully";
+                            response.error = null;
+
+                            for (var i = 0; i < result[0].length; i++) {
+                                result[0][i].targetList = result[0][i] && JSON.parse(result[0][i].targetList) ? JSON.parse(result[0][i].targetList) : [];
+                            }
+
+                            response.data = {
+                                salesDetailedView: result[0] ? result[0] : [],
+                                count: result[1] && result[1][0] && result[1][0].count ? result[1][0].count : 0
+                            };
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = {
+                                salesDetailedView: [],
+                                count: 0
+                            };
+                            response.error = null;
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while loading sales detailed view";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+salesCtrl.monthlySalesView = function (req, res, next) {
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                //     console.log(req.body);
+
+                if (!req.query.heMasterId) {
+                    error.heMasterId = 'Invalid heMasterId';
+                    validationFlag *= false;
+                }
+
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.body.targetMonthFrom),
+                        req.st.db.escape(req.body.targetMonthTo),
+                        req.st.db.escape(req.body.type || 3),
+                        req.st.db.escape(req.body.exportAll || 0),
+                        req.st.db.escape(JSON.stringify(req.body.selectedUsers || [])),
+                        req.st.db.escape(req.query.startPage || 0),
+                        req.st.db.escape(req.query.limit || 0),
+                        req.st.db.escape(DBSecretKey)
+                    ];
+
+                    var procQuery = 'CALL wm_sales_monthlyWiseSalesView( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result && result[0]) {
+
+                            response.status = true;
+                            response.message = "Sales members monthly loaded successfully";
+                            response.error = null;
+
+                            response.data = {
+                                salesMemberList: result[0] ? result[0] : [],
+                                count: result[1] && result[1][0] && result[1][0].count ? result[1][0].count : 0
+                            };
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = {
+                                salesMemberList: [],
+                                count: 0
+                            };
+                            response.error = null;
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while loading sales data";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+salesCtrl.updatedUsersMonthlySalesTarget = function (req, res, next) {
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                console.log(req.body);
+
+                if (!req.query.heMasterId) {
+                    error.heMasterId = 'Invalid heMasterId';
+                    validationFlag *= false;
+                }
+
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(JSON.stringify(req.body.salesMembers || [])),
+                        req.st.db.escape(DBSecretKey)
+                    ];
+
+                    var procQuery = 'CALL wm_update_salesTargetForSaleMembers( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result && result[0]) {
+
+                            response.status = true;
+                            response.message = "Sales target updated successfully";
+                            response.error = null;
+
+                            response.data = {
+                                salesMemberList: result[1] ? result[1] : [],
+                                count: result[2] && result[2][0] && result[2][0].count ? result[2][0].count : 0
+                            };
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = null;
+                            response.error = {
+                                salesMemberList: [],
+                                count: 0
+                            };
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while updating sales data";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+salesCtrl.saveSalesConfiguration = function (req, res, next) {
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                console.log(req.body);
+
+                if (!req.query.heMasterId) {
+                    error.heMasterId = 'Invalid heMasterId';
+                    validationFlag *= false;
+                }
+
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.body.enableValueField1 || 0),
+                        req.st.db.escape(req.body.enableValueField2 || 0),
+                        req.st.db.escape(req.body.valueFieldTitle1 || ""),
+                        req.st.db.escape(req.body.valueFieldTitle2 || ""),
+                        req.st.db.escape(req.body.isCompanyMandatoryInSales || 0),
+                        req.st.db.escape(req.body.isCompanyMandatoryInSupport || 0),
+                        req.st.db.escape(req.body.isTaskSchedules || 0),
+                        req.st.db.escape(req.body.isExpenseClaim || 0),
+                        req.st.db.escape(req.body.showForcastSection || 0),
+                        req.st.db.escape(req.body.targetPeriod || 0),
+                        req.st.db.escape(DBSecretKey),
+                        req.st.db.escape(req.body.enableConsiderThisForForecast || 0),
+                        req.st.db.escape(req.body.isTargetDate || 0)
+                    ];
+
+                    var procQuery = 'CALL wm_save_sales_configurationNew( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result && result[0]) {
+
+                            response.status = true;
+                            response.message = "Sales configuration saved successfully";
+                            response.error = null;
+
+                            response.data = {
+                                configurationDetails: result[0][0] ? result[0][0] : null
+                            };
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = null;
+                            response.error = {
+                                configurationDetails: null
+                            };
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while saving sales configuration";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+salesCtrl.savesalesFinanicalYears = function (req, res, next) {
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                console.log(req.body);
+
+                if (!req.query.heMasterId) {
+                    error.heMasterId = 'Invalid heMasterId';
+                    validationFlag *= false;
+                }
+
+                if (!req.body.startYear || req.body.startYear == null) {
+                    error.startYear = 'Invalid start year';
+                    validationFlag *= false;
+                }
+
+                if (!req.body.endYear || req.body.endYear == null) {
+                    error.endYear = 'Invalid end year';
+                    validationFlag *= false;
+                }
+
+                if (req.body.startDay >= 31 || req.body.endDay >= 31) {
+                    error.startDay = 'Out of range value for start or end day';
+                    validationFlag *= false;
+                }
+
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.body.startYear || null),
+                        req.st.db.escape(req.body.endYear || null),
+                        req.st.db.escape(req.body.startDay || 1),
+                        req.st.db.escape(req.body.endDay || 28),
+                        req.st.db.escape(DBSecretKey),
+                        req.st.db.escape(req.body.status || 0),
+                        req.st.db.escape(req.body.fyId || 0)
+                    ];
+
+                    var procQuery = 'CALL wm_save_salesCompanyFinanicalYear( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result && result[0]) {
+
+                            response.status = true;
+                            response.message = "Sales finanical year saved successfully";
+                            response.error = null;
+
+                            response.data = {
+                                salesYearDetails: result[0] ? result[0] : [],
+                                startDay: result[0][0] && result[0][0].startDay ? result[0][0].startDay : 0,
+                                endDay: result[0][0] && result[0][0].endDay ? result[0][0].endDay : 0
+                            };
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = null;
+                            response.error = {
+                                salesYearDetails: null,
+                                startDay: 0,
+                                endDay: 0
+                            };
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while saving sales finanical year data";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+salesCtrl.getSalesCOnfigurationDetails = function (req, res, next) {
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                console.log(req.body);
+
+                if (!req.query.heMasterId) {
+                    error.heMasterId = 'Invalid heMasterId';
+                    validationFlag *= false;
+                }
+
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(DBSecretKey)
+                    ];
+
+                    var procQuery = 'CALL wm_get_salesConfigurationDetails( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result && result[0]) {
+
+                            response.status = true;
+                            response.message = "Sales data loaded successfully";
+                            response.error = null;
+
+                            response.data = {
+                                salesYearDetails: result[0] ? result[0] : [],
+                                startDay: result[0][0] && result[0][0].startDay ? result[0][0].startDay : 0,
+                                endDay: result[0][0] && result[0][0].endDay ? result[0][0].endDay : 0,
+                                configurationDetails: result[1] && result[1][0] ? result[1][0] : null
+
+                            };
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = null;
+                            response.error = {
+                                salesYearDetails: [],
+                                startDay: 0,
+                                endDay: 0,
+                                configurationDetails: null
+                            };
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while loading sales data";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+salesCtrl.salesSupportMeetingDistanceReport = function (req, res, next) {
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                console.log(req.body);
+
+                if (!req.query.heMasterId) {
+                    error.heMasterId = 'Invalid heMasterId';
+                    validationFlag *= false;
+                }
+
+
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.body.fromDate || null),
+                        req.st.db.escape(req.body.toDate || null),
+                        req.st.db.escape(req.body.type || 0),
+                        req.st.db.escape(req.body.exportAll || 0),
+                        req.st.db.escape(JSON.stringify(req.body.selectedUsers || [])),
+                        req.st.db.escape(req.body.startPage || 0),
+                        req.st.db.escape(req.body.limit || 0),
+                        req.st.db.escape(DBSecretKey),
+                        req.st.db.escape(req.body.taskType || 1)  // 1- sales,2-support
+                    ];
+
+                    var procQuery = 'CALL wm_get_salesSupportDistanceReport( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        console.log(err);
+                        if (!err && result && result[0]) {
+
+                            response.status = true;
+                            response.message = "Data loaded successfully";
+                            response.error = null;
+
+                            response.data = {
+                                meetingDistanceReport: result[0] ? result[0] : [],
+                                count: result[1][0] && result[1][0].count ? result[1][0].count : 0
+                            };
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = null;
+                            response.error = {
+                                meetingDistanceReport: [],
+                                count: 0
+                            };
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Something went wrong!";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+salesCtrl.updateEventsReminder = function (req, res, next) {
+    var error = {};
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.body.taskId) {
+        error.taskId = 'Invalid taskId';
+        validationFlag *= false;
+    }
+
+    // if (!req.body.eventList.length) {
+    //     error.eventList = 'Invalid eventList';
+    //     validationFlag *= false;
+    // }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                console.log(req.body);
+
+                // if (!req.query.heMasterId) {
+                //     error.heMasterId = 'Invalid heMasterId';
+                //     validationFlag *= false;
+                // }
+
+
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the errors';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.body.taskId),
+                        req.st.db.escape(JSON.stringify(req.body.eventList || [])),
+                        req.st.db.escape(req.body.isAndroid || 0)
+                    ];
+
+                    var procQuery = 'CALL wm_update_reminderNotifiedSS( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        console.log(err);
+                        if (!err && result) {
+
+                            if(result && result[0] && result[0][0]){
+                                var messagePayload = {
+                                    message: "",
+                                    alarmType: 4,
+                                    type: 302,
+                                    data: {
+                                        eventList : result[0][0] && result[0][0].eventList && JSON.parse(result[0][0].eventList) ? JSON.parse(result[0][0].eventList) : []
+                                    }
+                                }
+    
+                                if (result && result[0] && result[0][0] && result[0][0].APNS_Id) {
+                                    _Notification_aws.publish_IOS(result[0][0].APNS_Id, messagePayload, 0);
+                                }
+
+                                if (result && result[0] && result[0][0] && result[0][0].GCM_Id) {
+                                    _Notification_aws.publish_Android(result[0][0].GCM_Id, messagePayload);
+                                }
+                            }
+
+
+
+                            response.status = true;
+                            response.message = "event updated successfully";
+                            response.error = null;
+                            response.data = null;
+
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = null;
+                            response.error = null;
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Something went wrong!";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
                 // });
             }
             else {

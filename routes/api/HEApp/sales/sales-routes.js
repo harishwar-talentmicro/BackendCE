@@ -46,6 +46,20 @@ router.post('/saveSupportRequestNew',salesCtrl.saveSupportRequestNew);
 router.post('/expensetrackerAll',salesCtrl.expensetrackerAll);
 router.post('/saveSalesTaxTemplate',salesCtrl.saveSalesTaxTemplate);
 router.get('/getSalesTaxTemplate',salesCtrl.getSalesTaxTemplate);
+router.post('/updateExpenseSS',salesCtrl.updateExpenseSS);
 
+// web report sales and support
+router.post('/salesTargetVsPerformanceSummary',salesCtrl.salesTargetVsPerformanceSummary);
+router.post('/salesSummaryDetailedView',salesCtrl.salesSummaryDetailedView);
+router.post('/monthlySalesView',salesCtrl.monthlySalesView);
+router.post('/updateSalesTarget',salesCtrl.updatedUsersMonthlySalesTarget);
+
+// web sales confiuration
+router.post('/saveSalesConfiguration',salesCtrl.saveSalesConfiguration);
+router.post('/savesalesFinanicalYears',salesCtrl.savesalesFinanicalYears);
+router.get('/getSalesCOnfigurationDetails',salesCtrl.getSalesCOnfigurationDetails);
+
+router.post('/MeetingDistanceReportSS',salesCtrl.salesSupportMeetingDistanceReport);
+router.post('/updateEvent',salesCtrl.updateEventsReminder);
 
 module.exports = router;

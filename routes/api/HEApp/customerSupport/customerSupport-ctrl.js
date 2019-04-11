@@ -14,18 +14,18 @@ var supportCtrl = {};
 var error = {};
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
-var encryption = new  AES_256_encryption();
+var encryption = new AES_256_encryption();
 var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
 var appConfig = require('../../../../ezeone-config.json');
-var DBSecretKey=appConfig.DB.secretKey;
+var DBSecretKey = appConfig.DB.secretKey;
 
-supportCtrl.saveSupportRequest = function(req,res,next){
+supportCtrl.saveSupportRequest = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -36,45 +36,45 @@ supportCtrl.saveSupportRequest = function(req,res,next){
 
     var senderGroupId;
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
-    else{
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                        if (!req.body.description) {
-                            error.description = 'Invalid description';
-                            validationFlag *= false;
-                        }
+                    if (!req.body.description) {
+                        error.description = 'Invalid description';
+                        validationFlag *= false;
+                    }
 
-                        var attachmentList =req.body.attachmentList;
-                        if(typeof(attachmentList) == "string") {
-                            attachmentList = JSON.parse(attachmentList);
-                        }
-                        if(!attachmentList){
-                            attachmentList = [] ;
-                        }
-                    
-                        var keywordList =req.body.keywordList;
-                        if(typeof(keywordList) == "string") {
-                            keywordList = JSON.parse(keywordList);
-                        }
-                        if(!keywordList){
-                            keywordList = [];
-                        }
-                    if (!validationFlag){
+                    var attachmentList = req.body.attachmentList;
+                    if (typeof (attachmentList) == "string") {
+                        attachmentList = JSON.parse(attachmentList);
+                    }
+                    if (!attachmentList) {
+                        attachmentList = [];
+                    }
+
+                    var keywordList = req.body.keywordList;
+                    if (typeof (keywordList) == "string") {
+                        keywordList = JSON.parse(keywordList);
+                    }
+                    if (!keywordList) {
+                        keywordList = [];
+                    }
+                    if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
                         res.status(400).json(response);
                         console.log(response);
                     }
-                    else{
+                    else {
                         req.body.parentId = req.body.parentId ? req.body.parentId : 0;
                         req.body.clientId = req.body.clientId ? req.body.clientId : 0;
                         req.body.categoryId = req.body.categoryId ? req.body.categoryId : 0;
@@ -84,7 +84,7 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                         req.body.infoToSender = req.body.infoToSender ? req.body.infoToSender : '';
                         req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
                         req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
-                        req.body.accessUserType  = req.body.accessUserType  ? req.body.accessUserType  : 0;
+                        req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
                         req.body.localMessageId = req.body.localMessageId ? req.body.localMessageId : 0;
                         req.body.clientName = req.body.clientName ? req.body.clientName : "";
                         req.body.categoryTitle = req.body.categoryTitle ? req.body.categoryTitle : "";
@@ -95,14 +95,14 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                         req.body.clientCompany = req.body.clientCompany ? req.body.clientCompany : "";
                         req.body.clientJobTitle = req.body.clientJobTitle ? req.body.clientJobTitle : "";
                         req.body.priority = req.body.priority ? req.body.priority : 0;
-                        req.body.isdPhone  = req.body.isdPhone != undefined  ? req.body.isdPhone  : "";
-                        req.body.phoneNo  = req.body.phoneNo != undefined  ? req.body.phoneNo  : "";
-                        req.body.lastName  = req.body.lastName != undefined  ? req.body.lastName  : "";
-                        req.body.notes  = req.body.notes != undefined  ? req.body.notes  : "";
-                        req.body.contactId  = req.body.contactId != undefined  ? req.body.contactId  : 0;
+                        req.body.isdPhone = req.body.isdPhone != undefined ? req.body.isdPhone : "";
+                        req.body.phoneNo = req.body.phoneNo != undefined ? req.body.phoneNo : "";
+                        req.body.lastName = req.body.lastName != undefined ? req.body.lastName : "";
+                        req.body.notes = req.body.notes != undefined ? req.body.notes : "";
+                        req.body.contactId = req.body.contactId != undefined ? req.body.contactId : 0;
                         req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
 
-                        if(req.body.phoneNo == ""){
+                        if (req.body.phoneNo == "") {
                             req.body.isdPhone = "";
                         }
 
@@ -137,25 +137,25 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                             req.st.db.escape(req.body.contactId),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp)                                                        
+                            req.st.db.escape(req.body.createdTimeStamp)
                         ];
 
-                        var supportFormId=2001;
-                        var keywordsParams=[
+                        var supportFormId = 2001;
+                        var keywordsParams = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(supportFormId),
                             req.st.db.escape(JSON.stringify(keywordList)),
-                            req.st.db.escape(req.body.groupId)  
+                            req.st.db.escape(req.body.groupId)
                         ];
                         /**
                          * Calling procedure for sales request
                          * @type {string}
                          */
-                        var procQuery = 'CALL he_save_supportRequest_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                        var procQuery = 'CALL he_save_supportRequest_new( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                         console.log(procQuery);
-                        req.db.query(procQuery,function(err,results){
+                        req.db.query(procQuery, function (err, results) {
                             console.log(results);
-                            if(!err && results && results[0] ){
+                            if (!err && results && results[0]) {
                                 senderGroupId = results[0][0].senderId;
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                 //     senderName : results[0][0].message
@@ -239,16 +239,16 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                                         senderName: results[0][0].senderName,
                                         senderId: results[0][0].senderId,
                                         receiverId: results[0][0].receiverId,
-                                        transId : results[0][0].transId,
-                                        formId : results[0][0].formId,
+                                        transId: results[0][0].transId,
+                                        formId: results[0][0].formId,
                                         groupId: req.body.groupId,
-                                        currentStatus : results[0][0].currentStatus,
-                                        currentTransId : results[0][0].currentTransId,
-                                        localMessageId : req.body.localMessageId,
-                                        parentId : results[0][0].parentId,
-                                        accessUserType : results[0][0].accessUserType,
-                                        heUserId : results[0][0].heUserId,
-                                        formData : JSON.parse(results[0][0].formDataJSON)
+                                        currentStatus: results[0][0].currentStatus,
+                                        currentTransId: results[0][0].currentTransId,
+                                        localMessageId: req.body.localMessageId,
+                                        parentId: results[0][0].parentId,
+                                        accessUserType: results[0][0].accessUserType,
+                                        heUserId: results[0][0].heUserId,
+                                        formData: JSON.parse(results[0][0].formDataJSON)
                                         // formData : {
                                         //     stage : formDataJSON1.stage,
                                         //     amount : formDataJSON1.amount,
@@ -282,11 +282,11 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(response);
                                 });
                             }
-                            else{
+                            else {
                                 response.status = false;
                                 response.message = "Error while saving support request";
                                 response.error = null;
@@ -299,7 +299,7 @@ supportCtrl.saveSupportRequest = function(req,res,next){
                 }
                 );
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -307,12 +307,12 @@ supportCtrl.saveSupportRequest = function(req,res,next){
 
 };
 
-supportCtrl.assignToUser = function(req,res,next){
+supportCtrl.assignToUser = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -324,16 +324,16 @@ supportCtrl.assignToUser = function(req,res,next){
 
     var senderGroupId;
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
-    else{
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
                     if (!req.body.memberId) {
@@ -349,13 +349,13 @@ supportCtrl.assignToUser = function(req,res,next){
                         error.parentId = 'Invalid parentId';
                         validationFlag *= false;
                     }
-                    if (!validationFlag){
+                    if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
                         res.status(400).json(response);
                         console.log(response);
                     }
-                    else{
+                    else {
                         req.body.assignedReason = req.body.assignedReason ? req.body.assignedReason : "";
 
                         var procParams = [
@@ -364,7 +364,7 @@ supportCtrl.assignToUser = function(req,res,next){
                             req.st.db.escape(req.body.groupId),
                             req.st.db.escape(req.body.parentId),
                             req.st.db.escape(req.body.assignedReason),
-                            req.st.db.escape(DBSecretKey)                                                        
+                            req.st.db.escape(DBSecretKey)
                         ];
                         /**
                          * Calling procedure for assign sales request to another sales user
@@ -373,10 +373,10 @@ supportCtrl.assignToUser = function(req,res,next){
 
                         var procQuery = 'CALL he_assign_supportRequest( ' + procParams.join(',') + ')';
                         console.log(procQuery);
-                        req.db.query(procQuery,function(err,results){
+                        req.db.query(procQuery, function (err, results) {
                             console.log(results);
-                            if(!err && results && results[0] ){
-                                console.log("results[0].senderName",results[0][0].senderName);
+                            if (!err && results && results[0]) {
+                                console.log("results[0].senderName", results[0][0].senderName);
 
                                 senderGroupId = results[0][0].senderId;
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
@@ -450,18 +450,17 @@ supportCtrl.assignToUser = function(req,res,next){
                                 response.status = true;
                                 response.message = "Assigned successfully";
                                 response.error = null;
-                                response.data = null ;
+                                response.data = null;
                                 res.status(200).json(response);
                             }
-                            else if(!err)
-                            {
+                            else if (!err) {
                                 response.status = true;
                                 response.message = "Assigned successfully";
                                 response.error = null;
-                                response.data = null ;
+                                response.data = null;
                                 res.status(200).json(response);
                             }
-                            else{
+                            else {
                                 response.status = false;
                                 response.message = "Error while assigning to member";
                                 response.error = null;
@@ -475,7 +474,7 @@ supportCtrl.assignToUser = function(req,res,next){
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -483,12 +482,12 @@ supportCtrl.assignToUser = function(req,res,next){
 };
 
 
-supportCtrl.getSupportTracker = function(req,res,next){
+supportCtrl.getSupportTracker = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -502,16 +501,16 @@ supportCtrl.getSupportTracker = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
-    else{
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
-                var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
@@ -523,7 +522,7 @@ supportCtrl.getSupportTracker = function(req,res,next){
                         priority = [];
                     }
 
-                    if (!validationFlag){
+                    if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
                         res.status(400).json(response);
@@ -555,43 +554,44 @@ supportCtrl.getSupportTracker = function(req,res,next){
 
                         var procQuery = 'CALL HE_get_supportTracker1( ' + procParams.join(',') + ')';
                         console.log(procQuery);
-                        req.db.query(procQuery,function(err,results){
+                        req.db.query(procQuery, function (err, results) {
                             console.log(results);
-                            if(!err && results && results[0] ){
+                            if (!err && results && results[0]) {
                                 response.status = true;
                                 response.message = "support Tracker loaded successfully";
                                 response.error = null;
                                 response.data = {
-                                    chartData:results[0],
-                                    TransactionData:results[1],
-                                    count:results[2][0].count,
-                                    isSupportMember:results[3][0].isSupportMember
-                                } ;
+                                    chartData: results[0] ? results[0] : [],
+                                    TransactionData: results[1] ? results[1] : [],
+                                    count: results[2] && results[2][0] && results[2][0].count ? results[2][0].count : 0,
+                                    isSupportMember: results[3][0] && results[3][0].isSupportMember ? results[3][0].isSupportMember : 0,
+                                    isCompanyMember: results[4][0] && results[4][0].isCompanyMember ? results[4][0].isCompanyMember : 0
+                                };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
                                     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(response);
                                 });
                             }
-                            else if(!err)
-                            {
+                            else if (!err) {
                                 response.status = true;
                                 response.message = "support Tracker loaded successfully";
                                 response.error = null;
                                 response.data = {
-                                    chartData : [],
-                                    transactionData : [],
-                                    count : 0,
-                                    isSupportMember:0
+                                    chartData: [],
+                                    transactionData: [],
+                                    count: 0,
+                                    isSupportMember: 0,
+                                    isCompanyMember: 0
                                 };
 
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                     res.status(200).json(response);
                                 });
                             }
-                            else{
+                            else {
                                 response.status = false;
                                 response.message = "Error while loading support Tracker";
                                 response.error = null;
@@ -604,19 +604,19 @@ supportCtrl.getSupportTracker = function(req,res,next){
                 });
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 };
 
-supportCtrl.getSupportSummary = function(req,res,next){
+supportCtrl.getSupportSummary = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -625,39 +625,39 @@ supportCtrl.getSupportSummary = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.HEMasterId)
-    {
+    if (!req.query.HEMasterId) {
         error.groupId = 'Invalid groupId';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.HEMasterId)
+                    req.st.db.escape(req.query.HEMasterId),
+                    req.st.db.escape(req.query.type || 0)
                 ];
                 /**
                  * Calling procedure to save form sales items
                  */
                 var procQuery = 'CALL HE_get_supportSummary( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,supportSummary){
-                    if(!err && supportSummary && supportSummary[0]){
+                req.db.query(procQuery, function (err, supportSummary) {
+                    if (!err && supportSummary && supportSummary[0]) {
 
                         response.status = true;
                         response.message = "Support summary data loaded successfully";
                         response.data = {
-                            statusData : supportSummary[0],
-                            priorityData : (supportSummary[1] && supportSummary[1][0]) ? supportSummary[1] : []
+                            statusData: supportSummary[0],
+                            priorityData: (supportSummary[1] && supportSummary[1][0]) ? supportSummary[1] : []
                         };
 
                         response.error = null;
@@ -665,28 +665,28 @@ supportCtrl.getSupportSummary = function(req,res,next){
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
 
                     }
-                    else if (!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.data = {
-                            chartData : [],
-                            transactionData : [],
-                            count : 0
+                            chartData: [],
+                            transactionData: [],
+                            count: 0
                         };
                         response.error = null;
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting sales tracker";
                         response.error = null;
@@ -695,7 +695,7 @@ supportCtrl.getSupportSummary = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -703,12 +703,12 @@ supportCtrl.getSupportSummary = function(req,res,next){
 
 };
 
-supportCtrl.getSupportUsersByPriority = function(req,res,next){
+supportCtrl.getSupportUsersByPriority = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -717,21 +717,20 @@ supportCtrl.getSupportUsersByPriority = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.HEMasterId)
-    {
+    if (!req.query.HEMasterId) {
         error.HEMasterId = 'Invalid HEMasterId';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
                 req.query.type = req.query.type ? req.query.type : 0;
                 req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
                 req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
@@ -744,30 +743,31 @@ supportCtrl.getSupportUsersByPriority = function(req,res,next){
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.HEMasterId),
                     req.st.db.escape(startPage),
-                    req.st.db.escape(req.query.limit)
+                    req.st.db.escape(req.query.limit),
+                    req.st.db.escape(req.query.type || 0)
                 ];
                 /**
                  * Calling procedure to save form sales items
                  */
                 var procQuery = 'CALL he_get_supportUsersByPriority( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,supportPriorityData){
-                    if(!err && supportPriorityData && supportPriorityData[0] ){
+                req.db.query(procQuery, function (err, supportPriorityData) {
+                    if (!err && supportPriorityData && supportPriorityData[0]) {
 
                         response.status = true;
                         response.message = "Support tracker data loaded successfully";
                         var output = [];
-                        for(var i = 0; i < supportPriorityData[0].length; i++) {
+                        for (var i = 0; i < supportPriorityData[0].length; i++) {
                             var res1 = {};
                             res1.name = supportPriorityData[0][i].name;
-                            res1.HEUserId= supportPriorityData[0][i].HEUserId;
+                            res1.HEUserId = supportPriorityData[0][i].HEUserId;
                             res1.priorityData = supportPriorityData[0][i].probabilityData ? JSON.parse(supportPriorityData[0][i].probabilityData) : [];
                             output.push(res1);
                         }
 
                         response.data = {
-                            transactionData : output,
-                            count : supportPriorityData[1][0].count
+                            transactionData: output,
+                            count: supportPriorityData[1][0].count
                         };
 
                         response.error = null;
@@ -775,28 +775,28 @@ supportCtrl.getSupportUsersByPriority = function(req,res,next){
                         // res.status(200).json(response);
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
                     }
-                    else if (!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.data = {
-                            chartData : [],
-                            transactionData : [],
-                            count : 0
+                            chartData: [],
+                            transactionData: [],
+                            count: 0
                         };
                         response.error = null;
                         // res.status(200).json(response);
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting sales tracker";
                         response.error = null;
@@ -805,7 +805,7 @@ supportCtrl.getSupportUsersByPriority = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -814,12 +814,12 @@ supportCtrl.getSupportUsersByPriority = function(req,res,next){
 };
 
 
-supportCtrl.getUser = function(req,res,next){
+supportCtrl.getUser = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -828,21 +828,20 @@ supportCtrl.getUser = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.HEMasterId)
-    {
+    if (!req.query.HEMasterId) {
         error.HEMasterId = 'Invalid HEMasterId';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
                 req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
@@ -855,58 +854,59 @@ supportCtrl.getUser = function(req,res,next){
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.HEMasterId),
                     req.st.db.escape(startPage),
-                    req.st.db.escape(req.query.limit)
+                    req.st.db.escape(req.query.limit),
+                    req.st.db.escape(req.query.type || 0)
                 ];
                 /**
                  * Calling procedure to save form sales items
                  */
                 var procQuery = 'CALL he_get_Supportusersbystatus( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
-                    if(!err && result && result[0]){
+                req.db.query(procQuery, function (err, result) {
+                    if (!err && result && result[0]) {
 
                         response.status = true;
                         response.message = "Support tracker data loaded successfully";
                         var output = [];
-                        for(var i = 0; i < result[0].length; i++) {
+                        for (var i = 0; i < result[0].length; i++) {
                             var res1 = {};
                             res1.name = result[0][i].name;
-                            res1.HEUserId = result [0][i].HEUserId;
+                            res1.HEUserId = result[0][i].HEUserId;
                             res1.supportData = result[0][i].supportData ? JSON.parse(result[0][i].supportData) : [];
 
                             output.push(res1);
                         }
 
                         response.data = {
-                            transactionData : output,
-                            count : result[1][0].count
+                            transactionData: output,
+                            count: result[1][0].count
                         };
 
                         response.error = null;
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
-                       });
+                        });
 
                     }
-                    else if (!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.data = {
-                            transactionData : [],
-                            count : 0
+                            transactionData: [],
+                            count: 0
                         };
                         response.error = null;
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting Support tracker";
                         response.error = null;
@@ -915,7 +915,7 @@ supportCtrl.getUser = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -970,7 +970,7 @@ supportCtrl.getMasterData = function (req, res, next) {
                             res1.stageId = masterData[0][i].stageId;
                             res1.stageTitle = masterData[0][i].stageTitle;
                             res1.stageProgress = masterData[0][i].stageProgress;
-                            res1.statusList = (masterData[0][i].statusList) ? JSON.parse(masterData[0][i].statusList):[];
+                            res1.statusList = (masterData[0][i].statusList) ? JSON.parse(masterData[0][i].statusList) : [];
                             output.push(res1);
                         }
                         response.status = true;
@@ -985,10 +985,12 @@ supportCtrl.getMasterData = function (req, res, next) {
                                 currencyId: (masterData[4] && masterData[4][0] && masterData[4][0].currencyId) ? masterData[4][0].currencyId : 0
                             },
                             probability: masterData[5] ? masterData[5] : [],
-                            templateList :masterData[6] ? masterData[6] : []
+                            templateList: masterData[6] ? masterData[6] : [],
+                            isReportingManager: masterData[7][0] && masterData[7][0].isReportingManager ? masterData[7][0].isReportingManager : 0,
+                            isCompanyMember: masterData[7][0] && masterData[7][0].isCompanyMember ? masterData[7][0].isCompanyMember : 0
                         };
                         response.error = null;
-                         // res.status(200).json(response);
+                        // res.status(200).json(response);
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
@@ -1004,7 +1006,7 @@ supportCtrl.getMasterData = function (req, res, next) {
                             categoryList: [],
                             currencyList: [],
                             memberList: [],
-                            templateList : []
+                            templateList: []
                         };
                         response.error = null;
                         // res.status(200).json(response);

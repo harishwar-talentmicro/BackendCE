@@ -151,7 +151,7 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                             var procQuery = 'CALL HE_save_travelClaim_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                             console.log(procQuery);
                             req.db.query(procQuery,function(err,results){
-                                console.log(results);
+                                // console.log(results);
                                 if(!err && results && results[0] ){
                                     senderGroupId = results[0][0].senderId;
                                     // notificationTemplaterRes = notificationTemplater.parse('compose_message',{

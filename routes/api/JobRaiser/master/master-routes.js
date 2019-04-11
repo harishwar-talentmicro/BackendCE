@@ -34,7 +34,7 @@ router.post('/mstageStatus',masterCtrl.saveMasterStageStatus);
 router.post('/requirementView',masterCtrl.getRequirementView);
 router.post('/clientView',masterCtrl.getClientView);
 
-router.post('/tagPreview',masterCtrl.mailTags);
+router.post('/tagPreview',masterCtrl.mailTags);  // not used
 
 router.get('/clientBusinessContacts',masterCtrl.getClientLocationContacts);
 

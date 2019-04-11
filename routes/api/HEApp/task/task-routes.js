@@ -12,5 +12,6 @@ router.get('/',taskCtrl.getTask);
 router.post('/status',taskCtrl.updateTaskStatus);
 router.post('/test',taskCtrl.getStationary);
 // router.get('/mails',taskCtrl.getWebKey);
+router.post('/saveTaskNew',taskCtrl.saveTaskNew);
 
 module.exports = router;

@@ -8,6 +8,10 @@ router.get('/master',hrisctrl.masterData);
 router.post('/saveEmployeeData',hrisctrl.saveEmployeeData);
 router.get('/getEmployeeDetails',hrisctrl.employeeDetails);
 
-router.get('/employeeList',hrisctrl.employeeList);
+router.post('/employeeList',hrisctrl.employeeList);
+router.post('/saveEmployeeDocs',hrisctrl.SaveEmployeeDocuments);
+
+router.post('/saveHrisDocumentTemplates',hrisctrl.saveHrisDocumentTemplates);
+router.get('/getHrisDocumentTemplates',hrisctrl.getHrisDocumentTemplates);
 
 module.exports = router;

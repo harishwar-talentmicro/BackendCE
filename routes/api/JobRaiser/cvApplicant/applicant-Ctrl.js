@@ -64,160 +64,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.body.heMasterId) {
-        error.heMasterId = 'Invalid Company';
-        validationFlag *= false;
-    }
-    if (!req.body.firstName) {
-        error.firstName = 'First Name is Mandatory';
-        validationFlag *= false;
-    }
 
-    // if (!req.body.emailId || !req.body.mobileNumber) {   // any one is mandatory
-    //     error.emailId = 'EMail ID or Mobile Number is mandatory';
-    //     validationFlag *= false;
-    // }
-
-    // if (!req.body.mobileNumber) {
-    //     error.mobileNumber = 'Mobile Number is Mandatory';
-    //     validationFlag *= false;
-    // }
-    var education = req.body.education;
-    if (typeof (education) == "string") {
-        education = JSON.parse(education);
-    }
-    if (!education) {
-        education = [];
-    }
-    var jobTitle = req.body.jobTitle;
-    if (typeof (jobTitle) == "string") {
-        jobTitle = JSON.parse(jobTitle);
-    }
-    if (!jobTitle) {
-        jobTitle = {};
-    }
-    var primarySkills = req.body.primarySkills;
-    if (typeof (primarySkills) == "string") {
-        primarySkills = JSON.parse(primarySkills);
-    }
-    if (!primarySkills) {
-        primarySkills = [];
-    }
-    var secondarySkills = req.body.secondarySkills;
-    if (typeof (secondarySkills) == "string") {
-        secondarySkills = JSON.parse(secondarySkills);
-    }
-    if (!secondarySkills) {
-        secondarySkills = [];
-    }
-    var cvSource = req.body.cvSource;
-    if (typeof (cvSource) == "string") {
-        cvSource = JSON.parse(cvSource);
-    }
-    if (!cvSource) {
-        cvSource = {};
-    }
-    var prefLocations = req.body.prefLocations;
-    if (typeof (prefLocations) == "string") {
-        prefLocations = JSON.parse(prefLocations);
-    }
-    if (!prefLocations) {
-        prefLocations = [];
-    }
-    var industry = req.body.industry;
-    if (typeof (industry) == "string") {
-        industry = JSON.parse(industry);
-    }
-    if (!industry) {
-        industry = [];
-    }
-    var nationality = req.body.nationality;
-    if (typeof (nationality) == "string") {
-        nationality = JSON.parse(nationality);
-    }
-    if (!nationality) {
-        nationality = {};
-    }
-    var expectedSalaryCurr = req.body.expectedSalaryCurr;
-    if (typeof (expectedSalaryCurr) == "string") {
-        expectedSalaryCurr = JSON.parse(expectedSalaryCurr);
-    }
-    if (!expectedSalaryCurr) {
-        expectedSalaryCurr = {};
-    }
-
-    var expectedSalaryScale = req.body.expectedSalaryScale;
-    if (typeof (expectedSalaryScale) == "string") {
-        expectedSalaryScale = JSON.parse(expectedSalaryScale);
-    }
-    if (!expectedSalaryScale) {
-        expectedSalaryScale = {};
-    }
-    var expectedSalaryPeriod = req.body.expectedSalaryPeriod;
-    if (typeof (expectedSalaryPeriod) == "string") {
-        expectedSalaryPeriod = JSON.parse(expectedSalaryPeriod);
-    }
-    if (!expectedSalaryPeriod) {
-        expectedSalaryPeriod = {};
-    }
-    var presentSalaryCurr = req.body.presentSalaryCurr;
-    if (typeof (presentSalaryCurr) == "string") {
-        presentSalaryCurr = JSON.parse(presentSalaryCurr);
-    }
-    if (!presentSalaryCurr) {
-        presentSalaryCurr = {};
-    }
-    var presentSalaryScale = req.body.presentSalaryScale;
-    if (typeof (presentSalaryScale) == "string") {
-        presentSalaryScale = JSON.parse(presentSalaryScale);
-    }
-    if (!presentSalaryScale) {
-        presentSalaryScale = {};
-    }
-    var presentSalaryPeriod = req.body.presentSalaryPeriod;
-    if (typeof (presentSalaryPeriod) == "string") {
-        presentSalaryPeriod = JSON.parse(presentSalaryPeriod);
-    }
-    if (!presentSalaryPeriod) {
-        presentSalaryPeriod = {};
-    }
-    var attachmentList = req.body.attachmentList;
-    if (typeof (attachmentList) == "string") {
-        attachmentList = JSON.parse(attachmentList);
-    }
-    if (!attachmentList) {
-        attachmentList = [];
-    }
-    var functionalAreas = req.body.functionalAreas;
-    if (typeof (functionalAreas) == "string") {
-        functionalAreas = JSON.parse(functionalAreas);
-    }
-    if (!functionalAreas) {
-        functionalAreas = [];
-    }
-    var requirementArray = req.body.requirementArray;
-    if (typeof (requirementArray) == "string") {
-        requirementArray = JSON.parse(requirementArray);
-    }
-    if (!requirementArray) {
-        requirementArray = [];
-    }
-
-    var faceSheet = req.body.faceSheet;
-    if (typeof (faceSheet) == "string") {
-        faceSheet = JSON.parse(faceSheet);
-    }
-    if (!faceSheet) {
-        faceSheet = {};
-    }
-
-    var presentLocation = req.body.presentLocation;
-    if (typeof (presentLocation) == "string") {
-        presentLocation = JSON.parse(presentLocation);
-    }
-    if (!presentLocation) {
-        presentLocation = {};
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -229,265 +76,442 @@ applicantCtrl.saveApplicant = function (req, res, next) {
         try {
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if ((!err) && tokenResult) {
-                    // req.body.cvPath = (req.body.cvPath) ? req.body.cvPath : "";
-                    var cvKeywords;
-                    var cv = '';
-                    var text = '';
-                    var gs_url = '';
-                    var storage_bucket = '';
-    
-    
-                    if (req.body.cvKeywords && req.body.cvKeywords != '') {
-                        req.body.cvKeywords = req.body.cvKeywords.replace(/[^\x00-\x7F]/g, "");
-                    }
-    
-                    req.query.isWeb = (req.body.isWeb) ? req.body.isWeb : 0;
-                    // console.log("cvPath from attacment", req.body.cvKeywords);
-                    if (attachmentList.length) //&& (req.body.cvKeywords == '') && req.body.cvKeywords == undefined && req.body.cvKeywords == null &&  req.body.cvKeywords == ' ') 
-                    {
-                        cv = attachmentList[0].CDNPath;
-                    }
-                    gs_url = req.CONFIG.CONSTANT.GS_URL;
-                    storage_bucket = req.CONFIG.CONSTANT.STORAGE_BUCKET;
-    
-                    console.log("cvPath from attacment", cv);
-    
-                    // var exec = require('child_process').exec;
-                    // var environment = process.env;
-                    // environment.ANTIWORDHOME = '/usr/share/antiword';
-                    // exec(command, { env: environment }, function (err, stdout, stderr) {
-                    //     console.log(stdout);
-                    // });
-    
-                    return new Promise(function (resolve, reject) {
-                        try {
-                            // if (cv != '' && (!req.body.cvKeywords || req.body.cvKeywords == '')) {
-                            //     cv = gs_url + storage_bucket + '/' + cv;
-                            //     console.log('cvPath complete', cv);
-                            //     http.get(cv, function (fileResponse) {
-                            //         var bufs = [];
-    
-                            //         fileResponse.on('data', function (d) { bufs.push(d); });
-                            //         fileResponse.on('end', function () {
-                            //             var buf = Buffer.concat(bufs);
-                            //             process.env.ANTIWORDHOME = '/usr/share/antiword';
-                            //             try {
-                            //                 textract.fromBufferWithName(cv, buf, function (error, txt) {
-                            //                     if (error) {
-                            //                         // var tempCVPath = cv.replace('docx', 'doc');
-                            //                         // textract.fromBufferWithName(tempCVPath, buf, function (error, txt) {
-                            //                         // text = txt;
-                            //                         console.log('error', error);
-                            //                         // console.log('text inside', text);
-                            //                         resolve(text);
-                            //                         // });
-                            //                     }
-                            //                     else {
-                            //                         text = txt;
-                            //                         console.log('error', error);
-                            //                         console.log('text inside', text);
-                            //                         resolve(text);
-    
-                            //                     }
-                            //                 });
-                            //             }
-                            //             catch (ex) {
-                            //                 console.log("ex", ex);
-                            //                 resolve('');
-                            //             }
-                            //         });
-                            //     });
-    
-                            // }
-                            // else {
-                                resolve('');
-                            // }
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                        if (!req.body.heMasterId) {
+                            error.heMasterId = 'Invalid Company';
+                            validationFlag *= false;
                         }
-                        catch (ex) {
-                            console.log(ex);
-                            resolve('');
+                        if (!req.body.firstName) {
+                            error.firstName = 'First Name is Mandatory';
+                            validationFlag *= false;
                         }
-    
-                    }).then(function (resp) {
-                        // console.log("response after promise", resp);
-                        if (1) {
-    
-                            cvKeywords = text;
-                            if (cvKeywords) {
-                                cvKeywords = cvKeywords.replace(/[^\x00-\x7F]/g, "");
+
+                        // if (!req.body.emailId || !req.body.mobileNumber) {   // any one is mandatory
+                        //     error.emailId = 'EMail ID or Mobile Number is mandatory';
+                        //     validationFlag *= false;
+                        // }
+
+                        // if (!req.body.mobileNumber) {
+                        //     error.mobileNumber = 'Mobile Number is Mandatory';
+                        //     validationFlag *= false;
+                        // }
+                        var education = req.body.education;
+                        if (typeof (education) == "string") {
+                            education = JSON.parse(education);
+                        }
+                        if (!education) {
+                            education = [];
+                        }
+                        var jobTitle = req.body.jobTitle;
+                        if (typeof (jobTitle) == "string") {
+                            jobTitle = JSON.parse(jobTitle);
+                        }
+                        if (!jobTitle) {
+                            jobTitle = {};
+                        }
+                        var primarySkills = req.body.primarySkills;
+                        if (typeof (primarySkills) == "string") {
+                            primarySkills = JSON.parse(primarySkills);
+                        }
+                        if (!primarySkills) {
+                            primarySkills = [];
+                        }
+                        var secondarySkills = req.body.secondarySkills;
+                        if (typeof (secondarySkills) == "string") {
+                            secondarySkills = JSON.parse(secondarySkills);
+                        }
+                        if (!secondarySkills) {
+                            secondarySkills = [];
+                        }
+                        var cvSource = req.body.cvSource;
+                        if (typeof (cvSource) == "string") {
+                            cvSource = JSON.parse(cvSource);
+                        }
+                        if (!cvSource) {
+                            cvSource = {};
+                        }
+                        var prefLocations = req.body.prefLocations;
+                        if (typeof (prefLocations) == "string") {
+                            prefLocations = JSON.parse(prefLocations);
+                        }
+                        if (!prefLocations) {
+                            prefLocations = [];
+                        }
+                        var industry = req.body.industry;
+                        if (typeof (industry) == "string") {
+                            industry = JSON.parse(industry);
+                        }
+                        if (!industry) {
+                            industry = [];
+                        }
+                        var nationality = req.body.nationality;
+                        if (typeof (nationality) == "string") {
+                            nationality = JSON.parse(nationality);
+                        }
+                        if (!nationality) {
+                            nationality = {};
+                        }
+                        var expectedSalaryCurr = req.body.expectedSalaryCurr;
+                        if (typeof (expectedSalaryCurr) == "string") {
+                            expectedSalaryCurr = JSON.parse(expectedSalaryCurr);
+                        }
+                        if (!expectedSalaryCurr) {
+                            expectedSalaryCurr = {};
+                        }
+
+                        var expectedSalaryScale = req.body.expectedSalaryScale;
+                        if (typeof (expectedSalaryScale) == "string") {
+                            expectedSalaryScale = JSON.parse(expectedSalaryScale);
+                        }
+                        if (!expectedSalaryScale) {
+                            expectedSalaryScale = {};
+                        }
+                        var expectedSalaryPeriod = req.body.expectedSalaryPeriod;
+                        if (typeof (expectedSalaryPeriod) == "string") {
+                            expectedSalaryPeriod = JSON.parse(expectedSalaryPeriod);
+                        }
+                        if (!expectedSalaryPeriod) {
+                            expectedSalaryPeriod = {};
+                        }
+                        var presentSalaryCurr = req.body.presentSalaryCurr;
+                        if (typeof (presentSalaryCurr) == "string") {
+                            presentSalaryCurr = JSON.parse(presentSalaryCurr);
+                        }
+                        if (!presentSalaryCurr) {
+                            presentSalaryCurr = {};
+                        }
+                        var presentSalaryScale = req.body.presentSalaryScale;
+                        if (typeof (presentSalaryScale) == "string") {
+                            presentSalaryScale = JSON.parse(presentSalaryScale);
+                        }
+                        if (!presentSalaryScale) {
+                            presentSalaryScale = {};
+                        }
+                        var presentSalaryPeriod = req.body.presentSalaryPeriod;
+                        if (typeof (presentSalaryPeriod) == "string") {
+                            presentSalaryPeriod = JSON.parse(presentSalaryPeriod);
+                        }
+                        if (!presentSalaryPeriod) {
+                            presentSalaryPeriod = {};
+                        }
+                        var attachmentList = req.body.attachmentList;
+                        if (typeof (attachmentList) == "string") {
+                            attachmentList = JSON.parse(attachmentList);
+                        }
+                        if (!attachmentList) {
+                            attachmentList = [];
+                        }
+                        var functionalAreas = req.body.functionalAreas;
+                        if (typeof (functionalAreas) == "string") {
+                            functionalAreas = JSON.parse(functionalAreas);
+                        }
+                        if (!functionalAreas) {
+                            functionalAreas = [];
+                        }
+                        var requirementArray = req.body.requirementArray;
+                        if (typeof (requirementArray) == "string") {
+                            requirementArray = JSON.parse(requirementArray);
+                        }
+                        if (!requirementArray) {
+                            requirementArray = [];
+                        }
+
+                        var faceSheet = req.body.faceSheet;
+                        if (typeof (faceSheet) == "string") {
+                            faceSheet = JSON.parse(faceSheet);
+                        }
+                        if (!faceSheet) {
+                            faceSheet = {};
+                        }
+
+                        var presentLocation = req.body.presentLocation;
+                        if (typeof (presentLocation) == "string") {
+                            presentLocation = JSON.parse(presentLocation);
+                        }
+                        if (!presentLocation) {
+                            presentLocation = {};
+                        }
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please Check the Errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+
+                            // req.body.cvPath = (req.body.cvPath) ? req.body.cvPath : "";
+                            var cvKeywords;
+                            var cv = '';
+                            var text = '';
+                            var gs_url = '';
+                            var storage_bucket = '';
+
+
+                            if (req.body.cvKeywords && req.body.cvKeywords != '') {
+                                req.body.cvKeywords = req.body.cvKeywords.replace(/[^\x00-\x7F]/g, "");
                             }
-    
-                            // console.log('text from promise', resp);
-                            // console.log('text data from promise ', text);
-    
-                            req.body.applicantId = (req.body.applicantId) ? req.body.applicantId : 0;
-    
-                            req.body.lastName = (req.body.lastName) ? req.body.lastName : "";
-                            req.body.phoneISD = (req.body.phoneISD) ? req.body.phoneISD : "";
-                            req.body.phoneNumber = (req.body.phoneNumber) ? req.body.phoneNumber : "";
-                            req.body.mobileISD = (req.body.mobileISD) ? req.body.mobileISD : "";
-                            req.body.address = (req.body.address) ? req.body.address : "";
-                            // req.body.latitude = (req.body.latitude) ? req.body.latitude : 0.0;
-                            // req.body.longitude = (req.body.longitude) ? req.body.longitude : 0.0;
-                            req.body.longitude = 0.0;
-                            req.body.latitude = 0.0;
-                            req.body.IDadhaarNumber = (req.body.IDadhaarNumber) ? req.body.IDadhaarNumber : "";
-                            req.body.passportNumber = (req.body.passportNumber) ? req.body.passportNumber : "";
-                            req.body.ppExpiryDate = (req.body.ppExpiryDate) ? req.body.ppExpiryDate : null;
-                            req.body.experience = (req.body.experience) ? req.body.experience : 0;
-                            req.body.employer = (req.body.employer) ? req.body.employer : "";
-                            req.body.noticePeriod = (req.body.noticePeriod) ? req.body.noticePeriod : 0;
-                            req.body.notes = (req.body.notes) ? req.body.notes : "";
-                            req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
-                            //req.body.originalCvId = (req.body.originalCvId) ? req.body.originalCvId : 0;
-                            req.body.status = (req.body.status) ? req.body.status : 0;
-                            req.body.blockingPeriod = (req.body.blockingPeriod) ? req.body.blockingPeriod : 0;
-                            req.body.affirmitive = (req.body.affirmitive) ? req.body.affirmitive : '';
-                            req.body.transactions = (req.body.transactions) ? req.body.transactions : '';
-                            req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
-                            req.body.imageUrl = req.body.imageUrl ? req.body.imageUrl : '';
-                            req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0;
-                            req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
-                            req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 0;
-                            req.body.referredBy = req.body.referredBy ? req.body.referredBy : "";
-                            req.body.emailId = req.body.emailId ? req.body.emailId : "";
-                            req.body.mobileNumber = req.body.mobileNumber ? req.body.mobileNumber : "";
-    
-                            var educationKey = [];
-                            if (req.body.importerFlag == 1 && education.length) {
-                                for (var i = 0; i < education.length; i++) {
-                                    // console.log("education[i].split('-')",education[i].split('-'),"education[i].split(' in ')",education[i].split(' in '));
-    
-                                    if (education[i].split('-').length == 1 && education[i].split(' in ').length == 1) {
-                                        educationKey.push({ educationName: education[i].trim(), specializationName: "" });
-                                    }
-                                    else if (education[i].split('-').length == 1 && education[i].split(' in ').length > 1) {
-                                        educationKey.push({ educationName: education[i].split(' in ')[0].trim(), specializationName: education[i].split(' in ')[1].trim() });
-                                    }
-                                    else if (education[i].split('-').length > 1 && education[i].split(' in ').length == 1) {
-                                        educationKey.push({ educationName: education[i].split('-')[0].trim(), specializationName: education[i].split('-')[1].trim() });
-                                    }
-                                }
-                                console.log("educationKey", educationKey);
-                                education = educationKey;
+
+                            req.query.isWeb = (req.body.isWeb) ? req.body.isWeb : 0;
+                            // console.log("cvPath from attacment", req.body.cvKeywords);
+                            if (attachmentList.length) //&& (req.body.cvKeywords == '') && req.body.cvKeywords == undefined && req.body.cvKeywords == null &&  req.body.cvKeywords == ' ') 
+                            {
+                                cv = attachmentList[0].CDNPath;
                             }
-    
-                            var inputs = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(req.body.heMasterId),
-                                req.st.db.escape(req.body.applicantId),
-                                req.st.db.escape(req.body.firstName),
-                                req.st.db.escape(req.body.lastName),
-                                req.st.db.escape(req.body.phoneISD),
-                                req.st.db.escape(req.body.phoneNumber),
-                                req.st.db.escape(req.body.mobileISD),
-                                req.st.db.escape(req.body.mobileNumber),
-                                req.st.db.escape(req.body.emailId),
-                                req.st.db.escape(JSON.stringify(education)),
-                                req.st.db.escape(req.body.address),
-                                req.st.db.escape(req.body.latitude),
-                                req.st.db.escape(req.body.longitude),
-                                req.st.db.escape(req.body.IDadhaarNumber),
-                                req.st.db.escape(req.body.passportNumber),
-                                req.st.db.escape(req.body.ppExpiryDate),
-                                req.st.db.escape(req.body.experience),
-                                req.st.db.escape(req.body.employer),
-                                req.st.db.escape(JSON.stringify(jobTitle[0])),
-                                req.st.db.escape(req.body.noticePeriod),
-                                req.st.db.escape(JSON.stringify(expectedSalaryCurr)),
-                                req.st.db.escape(req.body.expectedSalary),
-                                req.st.db.escape(JSON.stringify(expectedSalaryScale)),
-                                req.st.db.escape(JSON.stringify(expectedSalaryPeriod)),
-                                req.st.db.escape(JSON.stringify(presentSalaryCurr)),
-                                req.st.db.escape(req.body.presentSalary),
-                                req.st.db.escape(JSON.stringify(presentSalaryScale)),
-                                req.st.db.escape(JSON.stringify(presentSalaryPeriod)),
-                                req.st.db.escape(JSON.stringify(primarySkills)),
-                                req.st.db.escape(JSON.stringify(secondarySkills)),
-                                req.st.db.escape(req.body.notes),
-                                req.st.db.escape(req.body.cvRating),
-                                req.st.db.escape(JSON.stringify(attachmentList)),
-                                req.st.db.escape(JSON.stringify(cvSource)),
-                                req.st.db.escape(req.body.gender || 3),
-                                req.st.db.escape(req.body.DOB || null),
-                                //req.st.db.escape(req.body.originalCvId),
-                                req.st.db.escape(req.body.blockingPeriod),
-                                req.st.db.escape(req.body.status),
-                                req.st.db.escape(JSON.stringify(prefLocations)),
-                                req.st.db.escape(JSON.stringify(industry)),
-                                req.st.db.escape(JSON.stringify(nationality)),
-                                req.st.db.escape(req.body.cvKeywords || cvKeywords || ""),
-                                req.st.db.escape(req.body.requirementId),
-                                req.st.db.escape(req.body.imageUrl),
-                                req.st.db.escape(req.body.htmlText),
-                                req.st.db.escape(req.body.reqAppId),
-                                req.st.db.escape(req.body.clientCvPath),
-                                req.st.db.escape(JSON.stringify(functionalAreas)),
-                                req.st.db.escape(req.body.importerFlag),
-                                req.st.db.escape(JSON.stringify(requirementArray)),
-                                req.st.db.escape(req.body.referredBy),
-                                req.st.db.escape(JSON.stringify(faceSheet)),
-                                req.st.db.escape(JSON.stringify(presentLocation)),
-                                req.st.db.escape(req.body.ppIssueDate || null),
-                                req.st.db.escape(req.body.gccExp || 0.0),
-                                req.st.db.escape(req.body.licenseOption || 0),
-                                req.st.db.escape(req.body.passportCategory || ""),
-                                req.st.db.escape(JSON.stringify(req.body.licenseData || [])),
-                                req.st.db.escape(JSON.stringify(req.body.document_attachments_list || [])),
-                                req.st.db.escape(req.body.importedFromFolder || 0),
-                                req.st.db.escape(req.body.importedFromExcel || 0)
-                            ];
-    
-                            var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
-                            console.log(procQuery);
-    
-                            req.db.query(procQuery, function (err, result) {
-                                console.log(err);
-    
-                                if (!err && result && result[0] && result[0][0].applicantId) {
-    
-                                    response.status = true;
-                                    response.message = "Resume Saved Successfully";
-                                    response.error = null;
-                                    response.data = {
-                                        applicantId: result[0][0].applicantId
-                                    };
-                                    res.status(200).json(response);
-    
+                            gs_url = req.CONFIG.CONSTANT.GS_URL;
+                            storage_bucket = req.CONFIG.CONSTANT.STORAGE_BUCKET;
+
+                            console.log("cvPath from attacment", cv);
+
+                            // var exec = require('child_process').exec;
+                            // var environment = process.env;
+                            // environment.ANTIWORDHOME = '/usr/share/antiword';
+                            // exec(command, { env: environment }, function (err, stdout, stderr) {
+                            //     console.log(stdout);
+                            // });
+
+                            return new Promise(function (resolve, reject) {
+                                try {
+                                    // if (cv != '' && (!req.body.cvKeywords || req.body.cvKeywords == '')) {
+                                    //     cv = gs_url + storage_bucket + '/' + cv;
+                                    //     console.log('cvPath complete', cv);
+                                    //     http.get(cv, function (fileResponse) {
+                                    //         var bufs = [];
+
+                                    //         fileResponse.on('data', function (d) { bufs.push(d); });
+                                    //         fileResponse.on('end', function () {
+                                    //             var buf = Buffer.concat(bufs);
+                                    //             process.env.ANTIWORDHOME = '/usr/share/antiword';
+                                    //             try {
+                                    //                 textract.fromBufferWithName(cv, buf, function (error, txt) {
+                                    //                     if (error) {
+                                    //                         // var tempCVPath = cv.replace('docx', 'doc');
+                                    //                         // textract.fromBufferWithName(tempCVPath, buf, function (error, txt) {
+                                    //                         // text = txt;
+                                    //                         console.log('error', error);
+                                    //                         // console.log('text inside', text);
+                                    //                         resolve(text);
+                                    //                         // });
+                                    //                     }
+                                    //                     else {
+                                    //                         text = txt;
+                                    //                         console.log('error', error);
+                                    //                         console.log('text inside', text);
+                                    //                         resolve(text);
+
+                                    //                     }
+                                    //                 });
+                                    //             }
+                                    //             catch (ex) {
+                                    //                 console.log("ex", ex);
+                                    //                 resolve('');
+                                    //             }
+                                    //         });
+                                    //     });
+
+                                    // }
+                                    // else {
+                                    resolve('');
+                                    // }
                                 }
-                                else if (!err && result && result[0] && result[0][0]._applicantExists) {
-    
-                                    response.status = false;
-                                    response.message = "Resume already exists";
-                                    response.error = null;
-                                    response.data = {
-                                        applicantId: result[0][0]._applicantExists
-                                    };
-                                    response.duplicate = 1;
-                                    res.status(200).json(response);
-    
+                                catch (ex) {
+                                    console.log(ex);
+                                    resolve('');
                                 }
-                                else {
-                                    response.status = false;
-                                    response.message = "Error While Saving Resume";
-                                    response.error = 1;
-                                    console.log(err);
-                                    res.status(500).json(response);
+
+                            }).then(function (resp) {
+                                // console.log("response after promise", resp);
+                                if (1) {
+
+                                    cvKeywords = text;
+                                    if (cvKeywords) {
+                                        cvKeywords = cvKeywords.replace(/[^\x00-\x7F]/g, "");
+                                    }
+
+                                    // console.log('text from promise', resp);
+                                    // console.log('text data from promise ', text);
+
+                                    req.body.applicantId = (req.body.applicantId) ? req.body.applicantId : 0;
+
+                                    req.body.lastName = (req.body.lastName) ? req.body.lastName : "";
+                                    req.body.phoneISD = (req.body.phoneISD) ? req.body.phoneISD : "";
+                                    req.body.phoneNumber = (req.body.phoneNumber) ? req.body.phoneNumber : "";
+                                    req.body.mobileISD = (req.body.mobileISD) ? req.body.mobileISD : "";
+                                    req.body.address = (req.body.address) ? req.body.address : "";
+                                    // req.body.latitude = (req.body.latitude) ? req.body.latitude : 0.0;
+                                    // req.body.longitude = (req.body.longitude) ? req.body.longitude : 0.0;
+                                    req.body.longitude = 0.0;
+                                    req.body.latitude = 0.0;
+                                    req.body.IDadhaarNumber = (req.body.IDadhaarNumber) ? req.body.IDadhaarNumber : "";
+                                    req.body.passportNumber = (req.body.passportNumber) ? req.body.passportNumber : "";
+                                    req.body.ppExpiryDate = (req.body.ppExpiryDate) ? req.body.ppExpiryDate : null;
+                                    req.body.experience = (req.body.experience) ? req.body.experience : 0;
+                                    req.body.employer = (req.body.employer) ? req.body.employer : "";
+                                    req.body.noticePeriod = (req.body.noticePeriod) ? req.body.noticePeriod : 0;
+                                    req.body.notes = (req.body.notes) ? req.body.notes : "";
+                                    req.body.DOB = (req.body.DOB) ? req.body.DOB : null;
+                                    //req.body.originalCvId = (req.body.originalCvId) ? req.body.originalCvId : 0;
+                                    req.body.status = (req.body.status) ? req.body.status : 0;
+                                    req.body.blockingPeriod = (req.body.blockingPeriod) ? req.body.blockingPeriod : 0;
+                                    req.body.affirmitive = (req.body.affirmitive) ? req.body.affirmitive : '';
+                                    req.body.transactions = (req.body.transactions) ? req.body.transactions : '';
+                                    req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
+                                    req.body.imageUrl = req.body.imageUrl ? req.body.imageUrl : '';
+                                    req.body.reqAppId = req.body.reqAppId ? req.body.reqAppId : 0;
+                                    req.body.clientCvPath = req.body.clientCvPath ? req.body.clientCvPath : "";
+                                    req.body.importerFlag = req.body.importerFlag ? req.body.importerFlag : 0;
+                                    req.body.referredBy = req.body.referredBy ? req.body.referredBy : "";
+                                    req.body.emailId = req.body.emailId ? req.body.emailId : "";
+                                    req.body.mobileNumber = req.body.mobileNumber ? req.body.mobileNumber : "";
+
+                                    var educationKey = [];
+                                    if (req.body.importerFlag == 1 && education.length) {
+                                        for (var i = 0; i < education.length; i++) {
+                                            // console.log("education[i].split('-')",education[i].split('-'),"education[i].split(' in ')",education[i].split(' in '));
+
+                                            if (education[i].split('-').length == 1 && education[i].split(' in ').length == 1) {
+                                                educationKey.push({ educationName: education[i].trim(), specializationName: "" });
+                                            }
+                                            else if (education[i].split('-').length == 1 && education[i].split(' in ').length > 1) {
+                                                educationKey.push({ educationName: education[i].split(' in ')[0].trim(), specializationName: education[i].split(' in ')[1].trim() });
+                                            }
+                                            else if (education[i].split('-').length > 1 && education[i].split(' in ').length == 1) {
+                                                educationKey.push({ educationName: education[i].split('-')[0].trim(), specializationName: education[i].split('-')[1].trim() });
+                                            }
+                                        }
+                                        console.log("educationKey", educationKey);
+                                        education = educationKey;
+                                    }
+
+                                    var inputs = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.body.heMasterId),
+                                        req.st.db.escape(req.body.applicantId),
+                                        req.st.db.escape(req.body.firstName),
+                                        req.st.db.escape(req.body.lastName),
+                                        req.st.db.escape(req.body.phoneISD),
+                                        req.st.db.escape(req.body.phoneNumber),
+                                        req.st.db.escape(req.body.mobileISD),
+                                        req.st.db.escape(req.body.mobileNumber),
+                                        req.st.db.escape(req.body.emailId),
+                                        req.st.db.escape(JSON.stringify(education)),
+                                        req.st.db.escape(req.body.address),
+                                        req.st.db.escape(req.body.latitude),
+                                        req.st.db.escape(req.body.longitude),
+                                        req.st.db.escape(req.body.IDadhaarNumber),
+                                        req.st.db.escape(req.body.passportNumber),
+                                        req.st.db.escape(req.body.ppExpiryDate),
+                                        req.st.db.escape(req.body.experience),
+                                        req.st.db.escape(req.body.employer),
+                                        req.st.db.escape(JSON.stringify(jobTitle[0])),
+                                        req.st.db.escape(req.body.noticePeriod),
+                                        req.st.db.escape(JSON.stringify(expectedSalaryCurr)),
+                                        req.st.db.escape(req.body.expectedSalary),
+                                        req.st.db.escape(JSON.stringify(expectedSalaryScale)),
+                                        req.st.db.escape(JSON.stringify(expectedSalaryPeriod)),
+                                        req.st.db.escape(JSON.stringify(presentSalaryCurr)),
+                                        req.st.db.escape(req.body.presentSalary),
+                                        req.st.db.escape(JSON.stringify(presentSalaryScale)),
+                                        req.st.db.escape(JSON.stringify(presentSalaryPeriod)),
+                                        req.st.db.escape(JSON.stringify(primarySkills)),
+                                        req.st.db.escape(JSON.stringify(secondarySkills)),
+                                        req.st.db.escape(req.body.notes),
+                                        req.st.db.escape(req.body.cvRating),
+                                        req.st.db.escape(JSON.stringify(attachmentList)),
+                                        req.st.db.escape(JSON.stringify(cvSource)),
+                                        req.st.db.escape(req.body.gender || 3),
+                                        req.st.db.escape(req.body.DOB || null),
+                                        //req.st.db.escape(req.body.originalCvId),
+                                        req.st.db.escape(req.body.blockingPeriod),
+                                        req.st.db.escape(req.body.status),
+                                        req.st.db.escape(JSON.stringify(prefLocations)),
+                                        req.st.db.escape(JSON.stringify(industry)),
+                                        req.st.db.escape(JSON.stringify(nationality)),
+                                        req.st.db.escape(req.body.cvKeywords || cvKeywords || ""),
+                                        req.st.db.escape(req.body.requirementId),
+                                        req.st.db.escape(req.body.imageUrl),
+                                        req.st.db.escape(req.body.htmlText),
+                                        req.st.db.escape(req.body.reqAppId),
+                                        req.st.db.escape(req.body.clientCvPath),
+                                        req.st.db.escape(JSON.stringify(functionalAreas)),
+                                        req.st.db.escape(req.body.importerFlag),
+                                        req.st.db.escape(JSON.stringify(requirementArray)),
+                                        req.st.db.escape(req.body.referredBy),
+                                        req.st.db.escape(JSON.stringify(faceSheet)),
+                                        req.st.db.escape(JSON.stringify(presentLocation)),
+                                        req.st.db.escape(req.body.ppIssueDate || null),
+                                        req.st.db.escape(req.body.gccExp || 0.0),
+                                        req.st.db.escape(req.body.licenseOption || 0),
+                                        req.st.db.escape(req.body.passportCategory || ""),
+                                        req.st.db.escape(JSON.stringify(req.body.licenseData || [])),
+                                        req.st.db.escape(JSON.stringify(req.body.document_attachments_list || [])),
+                                        req.st.db.escape(req.body.importedFromFolder || 0),
+                                        req.st.db.escape(req.body.importedFromExcel || 0),
+                                        req.st.db.escape(JSON.stringify(req.body.cvStatus || {}))
+                                    ];
+
+                                    var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
+                                    console.log(procQuery);
+
+                                    req.db.query(procQuery, function (err, result) {
+                                        console.log(err);
+
+                                        if (!err && result && result[0] && result[0][0].applicantId) {
+
+                                            response.status = true;
+                                            response.message = "Resume Saved Successfully";
+                                            response.error = null;
+                                            response.data = {
+                                                applicantId: result[0][0].applicantId
+                                            };
+                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(response);
+                                            });
+
+                                            // res.status(200).json(response);
+
+                                        }
+                                        else if (!err && result && result[0] && result[0][0]._applicantExists) {
+
+                                            response.status = false;
+                                            response.message = "Resume already exists";
+                                            response.error = null;
+                                            response.data = {
+                                                applicantId: result[0][0]._applicantExists
+                                            };
+                                            response.duplicate = 1;
+                                            res.status(200).json(response);
+
+                                        }
+                                        else {
+                                            response.status = false;
+                                            response.message = "Error While Saving Resume";
+                                            response.error = 1;
+                                            console.log(err);
+                                            res.status(500).json(response);
+                                        }
+                                    });
                                 }
                             });
+
                         }
+
                     });
-    
+
                 }
                 else {
                     res.status(401).json(response);
                 }
             });
         }
-        catch(ex){
+        catch (ex) {
             console.log(ex);
             res.status(500).json(response);
-        }        
+        }
     }
 };
 
@@ -627,15 +651,15 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             interviewModeList: result[49] ? result[49] : [],
                             billTo: result[50] ? result[50] : [],
                             organizationChart: {
-                                 organizationBranches: result[52] && result[52][0] ? result[52] : [],
+                                organizationBranches: result[52] && result[52][0] ? result[52] : [],
                                 organizationDepartments: result[53] && result[53][0] ? result[53] : [],
                                 organizationGrades: result[54] && result[54][0] ? result[54] : [],
                                 organizationJobTitles: result[55] && result[55][0] ? result[55] : []
                             },
                             typeView: result[56] ? result[56] : [],
-                            taskMembers :result[57] ? result[57] : [],
-                            requirementGroupList :result[58] ? result[58] : [],
-                            reqOrGroup : result[59] && result[59][0] && result[59][0].reqOrGroup ? result[59][0].reqOrGroup : 1
+                            taskMembers: result[57] ? result[57] : [],
+                            requirementGroupList: result[58] ? result[58] : [],
+                            reqOrGroup: result[59] && result[59][0] && result[59][0].reqOrGroup ? result[59][0].reqOrGroup : 1
 
                         };
 
@@ -983,10 +1007,10 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                 req.body.name = (req.body.name) ? req.body.name.trim() : '';
                 req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
-                if(req.body.name != "") {
+                if (req.body.name != "") {
                     req.body.name = req.body.name.split(',');
                 }
-                else{
+                else {
                     req.body.name = [];
                 }
 
@@ -1045,31 +1069,31 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                         }
                         var cvSearchMasterData = {};
                         var offerMasterData = {};
-                        if(req.query.isWeb == 0 && Result[6] && Result[6][0] && Result[7] && Result[7][0]){
-                           cvSearchMasterData = {
-                                skillList : Result[6] ? Result[6] : [],
-                                roles : Result[7] ? Result[7] : [],
-                                industry : Result[8] ? Result[8] : [],
-                                cvSource : Result[9] ? Result[9] : [],
-                                functionalAreas : Result[10] ? Result[10] : [],
-                                nationality : Result[11] ? Result[11] : []                           
+                        if (req.query.isWeb == 0 && Result[6] && Result[6][0] && Result[7] && Result[7][0]) {
+                            cvSearchMasterData = {
+                                skillList: Result[6] ? Result[6] : [],
+                                roles: Result[7] ? Result[7] : [],
+                                industry: Result[8] ? Result[8] : [],
+                                cvSource: Result[9] ? Result[9] : [],
+                                functionalAreas: Result[10] ? Result[10] : [],
+                                nationality: Result[11] ? Result[11] : []
 
                             }
-                            offerMasterData  = {
+                            offerMasterData = {
                                 currency: Result[2] ? Result[2] : [],
                                 scale: Result[3] ? Result[3] : [],
                                 duration: Result[4] ? Result[4] : [],
                                 attachment: Result[5] ? Result[5] : [],
-                                grade : Result[12] ? Result[12] : [],
-                                designation :  Result[7] ? Result[7] : []
-                            } 
+                                grade: Result[12] ? Result[12] : [],
+                                designation: Result[7] ? Result[7] : []
+                            }
                         }
 
                         response.data = {
                             applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId ? Result[0] : [],
                             count: Result[1][0].count,
                             offerMasterData: offerMasterData,
-                            cvSearchMasterData : cvSearchMasterData
+                            cvSearchMasterData: cvSearchMasterData
                         };
                         // console.log(response.data);
                         res.status(200).json(response);
@@ -1113,16 +1137,10 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
         data: null,
         error: null
     };
-
-    var reqApplicants = req.body.reqApplicants;
-    if (typeof (reqApplicants) == "string") {
-        reqApplicants = JSON.parse(reqApplicants);
-    }
-    if (!reqApplicants) {
-        reqApplicants = [];
-    }
-
     var validationFlag = true;
+
+
+
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
@@ -1141,54 +1159,83 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-                req.body.notes = (req.body.notes) ? req.body.notes : "";
-                req.body.stage = (req.body.stage) ? req.body.stage : 0;
-                req.body.status = (req.body.status) ? req.body.status : 0;
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                req.body.reasonId = (req.body.reasonId) ? req.body.reasonId : 0;
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var statusParams = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(JSON.stringify(reqApplicants)),
-                    req.st.db.escape(req.body.stage),
-                    req.st.db.escape(req.body.status),
-                    req.st.db.escape(req.body.notes),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(req.body.reason || {})),
-                    req.st.db.escape(DBSecretKey)
-                ];
+                    var reqApplicants = req.body.reqApplicants;
+                    if (typeof (reqApplicants) == "string") {
+                        reqApplicants = JSON.parse(reqApplicants);
+                    }
+                    if (!reqApplicants.length) {
+                        reqApplicants = [];
+                        error.token = 'Select applicants';
+                        validationFlag *= false;
+                    }
 
-                var statusQuery = 'CALL wm_save_reqStageStatus( ' + statusParams.join(',') + ')';
-                console.log(statusQuery);
-                req.db.query(statusQuery, function (err, statusResult) {
-                    console.log(err);
-
-                    if (!err && statusResult && statusResult[0] && statusResult[0][0]) {
-
-
-                        if (statusResult[1] && statusResult[1][0] && statusResult[1][0].count != 0) {
-                            response.status = false;
-                            response.message = statusResult[1][0].countMessage;
-                        }
-                        else {
-                            response.status = true;
-                            response.message = "Stage and status changed successfully";
-
-                        }
-                        response.error = null;
-
-                        // if (typeof (statusResult[0][0].message) == 'string') {
-                        //     statusResult[0][0].message = JSON.parse(statusResult[0][0].message);
-                        // }
-                        response.data = statusResult[0][0] ? statusResult[0][0] : {};
-                        response.reqAppList = statusResult[2] && statusResult[2][0] ? statusResult[2]: [];
-                        res.status(200).json(response);
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while changing stage and status";
-                        response.error = null;
-                        res.status(500).json(response);
+                        req.body.notes = (req.body.notes) ? req.body.notes : "";
+                        req.body.stage = (req.body.stage) ? req.body.stage : 0;
+                        req.body.status = (req.body.status) ? req.body.status : 0;
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                        req.body.reasonId = (req.body.reasonId) ? req.body.reasonId : 0;
+
+                        var statusParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(JSON.stringify(reqApplicants)),
+                            req.st.db.escape(req.body.stage),
+                            req.st.db.escape(req.body.status),
+                            req.st.db.escape(req.body.notes),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(JSON.stringify(req.body.reason || {})),
+                            req.st.db.escape(DBSecretKey)
+                        ];
+
+                        var statusQuery = 'CALL wm_save_reqStageStatus( ' + statusParams.join(',') + ')';
+                        console.log(statusQuery);
+                        req.db.query(statusQuery, function (err, statusResult) {
+                            console.log(err);
+
+                            if (!err && statusResult && statusResult[0] && statusResult[0][0]) {
+
+
+                                if (statusResult[1] && statusResult[1][0] && statusResult[1][0].count != 0) {
+                                    response.status = false;
+                                    response.message = statusResult[1][0].countMessage;
+                                }
+                                else {
+                                    response.status = true;
+                                    response.message = "Stage and status changed successfully";
+
+                                }
+                                response.error = null;
+
+                                // if (typeof (statusResult[0][0].reason) == 'string') {
+                                //     statusResult[0][0].reason = statusResult[0][0].reason && JSON.parse(statusResult[0][0].reason) && JSON.parse(statusResult[0][0].reason) !={} ? JSON.parse(statusResult[0][0].reason) : null;
+                                // }
+
+                                response.data = statusResult[0][0] ? statusResult[0][0] : {},
+                                    response.data.reqAppList = statusResult[2] && statusResult[2][0] ? statusResult[2] : []
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while changing stage and status";
+                                response.error = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
                 });
             }
@@ -1260,17 +1307,11 @@ applicantCtrl.getreqAppStageStatus = function (req, res, next) {
                             transactionHistory: statusResult[0] ? statusResult[0] : [],
                             currentScenario: statusResult[1][0] ? statusResult[1][0] : {}
                         };
-                        isWeb = req.query.isWeb;
-                        if (isWeb == 0) {
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                            zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                res.status(200).json(response);
-                            });
-                        }
-                        else {
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
-                        }
+                        });
                     }
                     else if (!err) {
                         response.status = true;
@@ -1280,16 +1321,12 @@ applicantCtrl.getreqAppStageStatus = function (req, res, next) {
                             transactionHistory: [],
                             currentScenario: []
                         };
-                        if (isWeb == 0) {
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                            zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                res.status(200).json(response);
-                            });
-                        }
-                        else {
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
-                        }
+                        });
+
                     }
                     else {
                         response.status = false;
@@ -1320,60 +1357,7 @@ applicantCtrl.resumeSearch = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.body.heMasterId) {
-        error.heMasterId = 'Invalid company';
-        validationFlag *= false;
-    }
-    var roles = req.body.roles;
-    if (typeof (roles) == "string") {
-        roles = JSON.parse(roles);
-    }
-    if (!roles) {
-        roles = [];
-    }
-    var skills = req.body.skills;
-    if (typeof (skills) == "string") {
-        skills = JSON.parse(skills);
-    }
-    if (!skills) {
-        skills = [];
-    }
-    var industryExpertise = req.body.industryExpertise;
-    if (typeof (industryExpertise) == "string") {
-        industryExpertise = JSON.parse(industryExpertise);
-    }
-    if (!industryExpertise) {
-        industryExpertise = [];
-    }
-    var locations = req.body.locations;
-    if (typeof (locations) == "string") {
-        locations = JSON.parse(locations);
-    }
-    if (!locations) {
-        locations = [];
-    }
-    var education = req.body.education;
-    if (typeof (education) == "string") {
-        education = JSON.parse(education);
-    }
-    if (!education) {
-        education = [];
-    }
-    var requiredNationalities = req.body.requiredNationalities;
-    if (typeof (requiredNationalities) == "string") {
-        requiredNationalities = JSON.parse(requiredNationalities);
-    }
-    if (!requiredNationalities) {
-        requiredNationalities = [];
-    }
 
-    var DOB = req.body.DOB;
-    if (typeof (DOB) == "string") {
-        DOB = JSON.parse(DOB);
-    }
-    if (!DOB) {
-        DOB = [];
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -1385,123 +1369,202 @@ applicantCtrl.resumeSearch = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                req.body.parentId = (req.body.parentId) ? req.body.parentId : 0;
-                req.body.expFrom = (req.body.expFrom) ? req.body.expFrom : -1;
-                req.body.expTo = (req.body.expTo) ? req.body.expTo : -1;
-                req.body.resumeDaysFreshness = (req.body.resumeDaysFreshness) ? req.body.resumeDaysFreshness : 1;
-                req.body.currency = (req.body.currency) ? req.body.currency : 0;
-                req.body.salaryFrom = (req.body.salaryFrom) ? req.body.salaryFrom : 0;
-                req.body.salaryTo = (req.body.salaryTo) ? req.body.salaryTo : 0;
-                req.body.salaryScale = (req.body.salaryScale) ? req.body.salaryScale : 0;
-                req.body.salaryDuration = (req.body.salaryDuration) ? req.body.salaryDuration : 0;
-                req.body.noticePeriodFrom = (req.body.noticePeriodFrom) ? req.body.noticePeriodFrom : 0;
-                req.body.noticePeriodTo = (req.body.noticePeriodTo) ? req.body.noticePeriodTo : 0;
-                req.body.workLocation = (req.body.workLocation) ? req.body.workLocation : '';
-                req.body.cvRating = req.body.cvRating ? req.body.cvRating : 0;
-                req.body.cvKeywords = req.body.cvKeywords ? req.body.cvKeywords : '';
-                req.body.searchResultsLimit = req.body.searchResultsLimit ? req.body.searchResultsLimit : 100;
-                req.body.includeJd = req.body.includeJd ? req.body.includeJd : 0;
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                req.body.start = req.body.start ? req.body.start : 1;
-                req.body.limit = (req.body.limit) ? req.body.limit : 50;
-
-                req.body.start = ((((req.body.start) * req.body.limit) + 1) - req.body.limit) - 1;
-
-
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.heMasterId),
-                    req.st.db.escape(req.body.parentId),
-                    req.st.db.escape(req.body.searchBy || 1),
-                    req.st.db.escape(JSON.stringify(skills)),
-                    req.st.db.escape(req.body.cvKeywords),
-                    //req.st.db.escape(req.body.functions),
-                    req.st.db.escape(JSON.stringify(roles)),
-                    req.st.db.escape(JSON.stringify(industryExpertise)),
-                    req.st.db.escape(req.body.expFrom),
-                    req.st.db.escape(req.body.expTo),
-                    req.st.db.escape(JSON.stringify(locations)),
-                    //req.st.db.escape(req.body.searchBy),
-                    req.st.db.escape(JSON.stringify(education)),
-                    req.st.db.escape(req.body.currency),
-                    req.st.db.escape(req.body.salaryFrom),
-                    req.st.db.escape(req.body.salaryTo),
-                    req.st.db.escape(req.body.salaryScale),
-                    req.st.db.escape(req.body.salaryDuration),
-                    req.st.db.escape(req.body.noticePeriodFrom),
-                    req.st.db.escape(req.body.noticePeriodTo),
-                    //req.st.db.escape(req.body.workLocation),
-                    req.st.db.escape(JSON.stringify(requiredNationalities)),
-                    req.st.db.escape(JSON.stringify(DOB)),
-                    req.st.db.escape(req.body.start),
-                    req.st.db.escape(req.body.limit),
-                    req.st.db.escape(req.body.cvRating),
-                    req.st.db.escape(req.body.searchResultsLimit),
-                    req.st.db.escape(req.body.includeJd),
-                    req.st.db.escape(req.body.applicantId || ""),
-                    req.st.db.escape(req.body.presentSalFrom ||  0),
-                    req.st.db.escape(req.body.presentSalTo || 0),
-                    req.st.db.escape(req.body.presentSalScale || 0),
-                    req.st.db.escape(req.body.presentSalDuration || 0),
-                    req.st.db.escape(req.body.presentSalCurrency || 0),
-                    req.st.db.escape(JSON.stringify(req.body.functionalAreas || [])),
-                    req.st.db.escape(JSON.stringify(req.body.cvSource || [])),
-                    req.st.db.escape(JSON.stringify(req.body.cvStatus || [])),
-                    req.st.db.escape(JSON.stringify(req.body.stageResume || [])),
-                    req.st.db.escape(req.body.uploadedUsers || ""),
-                    req.st.db.escape(req.body.from || null),
-                    req.st.db.escape(req.body.to || null)
-                ];
-
-                var procQuery = 'CALL wd_resume_search_newAlgorithm( ' + inputs.join(',') + ')';  // call procedure to save requirement data
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result && result[0]) {
-                        response.status = true;
-                        response.message = "Applicants list loaded successfully";
-                        response.error = null;
-
-                        for (var i = 0; i < result[0].length; i++) {
-                            if (result[0][i] && result[0][i].education) {
-                                result[0][i].education = JSON.parse(result[0][i].education) ? JSON.parse(result[0][i].education) : [];
-                            }
-                            if (result[0][i] && result[0][i].keySkills) {
-                                result[0][i].keySkills = JSON.parse(result[0][i].keySkills) ? JSON.parse(result[0][i].keySkills) : [];
-
-                            }
-                            if (result[0][i] && result[0][i].location) {
-                                result[0][i].location = JSON.parse(result[0][i].location) ? JSON.parse(result[0][i].location) : [];
-                            }
-                            result[0][i].requirementApplicantCount = result[0][i].requirementApplicantCount ? result[0][i].requirementApplicantCount : 0;
-                        }
-                        response.data = {
-                            applicantList: result[0],
-                            count: result[1][0].count,
-                            applicantIdArray: (result[2] && result[2][0] && JSON.parse(result[2][0].applicantIdArray)) ? JSON.parse(result[2][0].applicantIdArray) : []
-                        };
-                        res.status(200).json(response);
-
+                    if (!req.body.heMasterId) {
+                        error.heMasterId = 'Invalid company';
+                        validationFlag *= false;
                     }
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "Applicants not found";
-                        response.error = null;
-                        response.data = {
-                            applicantList: [],
-                            count: 0
-                        };
-                        res.status(200).json(response);
+                    var roles = req.body.roles;
+                    if (typeof (roles) == "string") {
+                        roles = JSON.parse(roles);
+                    }
+                    if (!roles) {
+                        roles = [];
+                    }
+                    var skills = req.body.skills;
+                    if (typeof (skills) == "string") {
+                        skills = JSON.parse(skills);
+                    }
+                    if (!skills) {
+                        skills = [];
+                    }
+                    var industryExpertise = req.body.industryExpertise;
+                    if (typeof (industryExpertise) == "string") {
+                        industryExpertise = JSON.parse(industryExpertise);
+                    }
+                    if (!industryExpertise) {
+                        industryExpertise = [];
+                    }
+                    var locations = req.body.locations;
+                    if (typeof (locations) == "string") {
+                        locations = JSON.parse(locations);
+                    }
+                    if (!locations) {
+                        locations = [];
+                    }
+                    var education = req.body.education;
+                    if (typeof (education) == "string") {
+                        education = JSON.parse(education);
+                    }
+                    if (!education) {
+                        education = [];
+                    }
+                    var requiredNationalities = req.body.requiredNationalities;
+                    if (typeof (requiredNationalities) == "string") {
+                        requiredNationalities = JSON.parse(requiredNationalities);
+                    }
+                    if (!requiredNationalities) {
+                        requiredNationalities = [];
+                    }
+
+                    var DOB = req.body.DOB;
+                    if (typeof (DOB) == "string") {
+                        DOB = JSON.parse(DOB);
+                    }
+                    if (!DOB) {
+                        DOB = [];
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while loading applicants list";
-                        response.error = null;
-                        console.log(err);
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                        req.body.parentId = (req.body.parentId) ? req.body.parentId : 0;
+                        req.body.expFrom = (req.body.expFrom) ? req.body.expFrom : -1;
+                        req.body.expTo = (req.body.expTo) ? req.body.expTo : -1;
+                        req.body.resumeDaysFreshness = (req.body.resumeDaysFreshness) ? req.body.resumeDaysFreshness : 1;
+                        req.body.currency = (req.body.currency) ? req.body.currency : 0;
+                        req.body.salaryFrom = (req.body.salaryFrom) ? req.body.salaryFrom : 0;
+                        req.body.salaryTo = (req.body.salaryTo) ? req.body.salaryTo : 0;
+                        req.body.salaryScale = (req.body.salaryScale) ? req.body.salaryScale : 0;
+                        req.body.salaryDuration = (req.body.salaryDuration) ? req.body.salaryDuration : 0;
+                        req.body.noticePeriodFrom = (req.body.noticePeriodFrom) ? req.body.noticePeriodFrom : 0;
+                        req.body.noticePeriodTo = (req.body.noticePeriodTo) ? req.body.noticePeriodTo : 0;
+                        req.body.workLocation = (req.body.workLocation) ? req.body.workLocation : '';
+                        req.body.cvRating = req.body.cvRating ? req.body.cvRating : 0;
+                        req.body.cvKeywords = req.body.cvKeywords ? req.body.cvKeywords : '';
+                        req.body.searchResultsLimit = req.body.searchResultsLimit ? req.body.searchResultsLimit : 100;
+                        req.body.includeJd = req.body.includeJd ? req.body.includeJd : 0;
+
+                        req.body.start = req.body.start ? req.body.start : 1;
+                        req.body.limit = (req.body.limit) ? req.body.limit : 50;
+
+                        req.body.start = ((((req.body.start) * req.body.limit) + 1) - req.body.limit) - 1;
+
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.heMasterId),
+                            req.st.db.escape(req.body.parentId),
+                            req.st.db.escape(req.body.searchBy || 1),
+                            req.st.db.escape(JSON.stringify(skills)),
+                            req.st.db.escape(req.body.cvKeywords),
+                            //req.st.db.escape(req.body.functions),
+                            req.st.db.escape(JSON.stringify(roles)),
+                            req.st.db.escape(JSON.stringify(industryExpertise)),
+                            req.st.db.escape(req.body.expFrom),
+                            req.st.db.escape(req.body.expTo),
+                            req.st.db.escape(JSON.stringify(locations)),
+                            //req.st.db.escape(req.body.searchBy),
+                            req.st.db.escape(JSON.stringify(education)),
+                            req.st.db.escape(req.body.currency),
+                            req.st.db.escape(req.body.salaryFrom),
+                            req.st.db.escape(req.body.salaryTo),
+                            req.st.db.escape(req.body.salaryScale),
+                            req.st.db.escape(req.body.salaryDuration),
+                            req.st.db.escape(req.body.noticePeriodFrom),
+                            req.st.db.escape(req.body.noticePeriodTo),
+                            //req.st.db.escape(req.body.workLocation),
+                            req.st.db.escape(JSON.stringify(requiredNationalities)),
+                            req.st.db.escape(JSON.stringify(DOB)),
+                            req.st.db.escape(req.body.start),
+                            req.st.db.escape(req.body.limit),
+                            req.st.db.escape(req.body.cvRating),
+                            req.st.db.escape(req.body.searchResultsLimit),
+                            req.st.db.escape(req.body.includeJd),
+                            req.st.db.escape(req.body.applicantId || ""),
+                            req.st.db.escape(req.body.presentSalFrom || 0),
+                            req.st.db.escape(req.body.presentSalTo || 0),
+                            req.st.db.escape(req.body.presentSalScale || 0),
+                            req.st.db.escape(req.body.presentSalDuration || 0),
+                            req.st.db.escape(req.body.presentSalCurrency || 0),
+                            req.st.db.escape(JSON.stringify(req.body.functionalAreas || [])),
+                            req.st.db.escape(JSON.stringify(req.body.cvSource || [])),
+                            req.st.db.escape(JSON.stringify(req.body.cvStatus || [])),
+                            req.st.db.escape(JSON.stringify(req.body.stageResume || [])),
+                            req.st.db.escape(req.body.uploadedUsers || ""),
+                            req.st.db.escape(req.body.from || null),
+                            req.st.db.escape(req.body.to || null)
+                        ];
+
+                        var procQuery = 'CALL wd_resume_search_newAlgorithm( ' + inputs.join(',') + ')';  // call procedure to save requirement data
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            if (!err && result && result[0]) {
+                                response.status = true;
+                                response.message = "Applicants list loaded successfully";
+                                response.error = null;
+
+                                for (var i = 0; i < result[0].length; i++) {
+                                    if (result[0][i] && result[0][i].education) {
+                                        result[0][i].education = JSON.parse(result[0][i].education) ? JSON.parse(result[0][i].education) : [];
+                                    }
+                                    if (result[0][i] && result[0][i].keySkills) {
+                                        result[0][i].keySkills = JSON.parse(result[0][i].keySkills) ? JSON.parse(result[0][i].keySkills) : [];
+
+                                    }
+                                    if (result[0][i] && result[0][i].location) {
+                                        result[0][i].location = JSON.parse(result[0][i].location) ? JSON.parse(result[0][i].location) : [];
+                                    }
+                                    result[0][i].requirementApplicantCount = result[0][i].requirementApplicantCount ? result[0][i].requirementApplicantCount : 0;
+                                }
+                                response.data = {
+                                    applicantList: result[0],
+                                    count: result[1][0].count,
+                                    applicantIdArray: (result[2] && result[2][0] && JSON.parse(result[2][0].applicantIdArray)) ? JSON.parse(result[2][0].applicantIdArray) : []
+                                };
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+
+                            }
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "Applicants not found";
+                                response.error = null;
+                                response.data = {
+                                    applicantList: [],
+                                    count: 0
+                                };
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while loading applicants list";
+                                response.error = null;
+                                console.log(err);
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
+
             }
             else {
                 res.status(401).json(response);
@@ -1554,9 +1617,13 @@ applicantCtrl.getrequirementList = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             requirementList: result[0] && result[0][0] ? result[0] : [],
-                            totalDBResumeCount : result[1] && result[1][0] && result[1][0].totalDBResumeCount ? result[1][0].totalDBResumeCount : 0
+                            totalDBResumeCount: result[1] && result[1][0] && result[1][0].totalDBResumeCount ? result[1][0].totalDBResumeCount : 0
                         }
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if (!err) {
                         response.status = true;
@@ -1564,9 +1631,13 @@ applicantCtrl.getrequirementList = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             requirementList: [],
-                            totalDBResumeCount : result[1] && result[1][0] && result[1][0].totalDBResumeCount ? result[1][0].totalDBResumeCount : 0
+                            totalDBResumeCount: result[1] && result[1][0] && result[1][0].totalDBResumeCount ? result[1][0].totalDBResumeCount : 0
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else {
                         response.status = false;
@@ -1601,17 +1672,6 @@ applicantCtrl.saveReqAppMapResult = function (req, res, next) {
         error.heMasterId = 'Invalid heMasterId';
         validationFlag *= false;
     }
-    if (!req.body.reqId) {
-        error.token = 'Invalid requirement';
-        validationFlag *= false;
-    }
-    var applicant = req.body.applicant;
-    if (typeof (applicant) == 'string') {
-        applicant = JSON.parse(applicant);
-    }
-    if (!applicant) {
-        applicant = [];
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -1622,49 +1682,79 @@ applicantCtrl.saveReqAppMapResult = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.reqId),
-                    req.st.db.escape(JSON.stringify(applicant)),
-                    req.st.db.escape(req.query.heMasterId)
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL wm_save_reqAppMap( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result && result[0] && result[0][0].error) {
-                        response.status = false;
-                        response.message = result[0][0].error;
-                        response.error = null;
-                        response.data = null;
-                        res.status(200).json(response);
+                    if (!req.body.reqId) {
+                        error.token = 'Invalid requirement';
+                        validationFlag *= false;
                     }
-                    else if (!err && result && result[0]) {
-                        response.status = false;
-                        response.message = "Requirement already mapped to the applicant";
-                        response.error = null;
-                        response.data = null;
-                        res.status(200).json(response);
+                    var applicant = req.body.applicant;
+                    if (typeof (applicant) == 'string') {
+                        applicant = JSON.parse(applicant);
+                    }
+                    if (!applicant) {
+                        applicant = [];
                     }
 
-                    else if (!err && result) {
-                        response.status = true;
-                        response.message = "Requirement applicant map data saved successfully";
-                        response.error = null;
-                        response.data = null;
-                        res.status(200).json(response);
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while saving requirement applicant map";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.reqId),
+                            req.st.db.escape(JSON.stringify(applicant)),
+                            req.st.db.escape(req.query.heMasterId)
+                        ];
+
+                        var procQuery = 'CALL wm_save_reqAppMap( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            if (!err && result && result[0] && result[0][0].error) {
+                                response.status = false;
+                                response.message = result[0][0].error;
+                                response.error = null;
+                                response.data = null;
+                                res.status(200).json(response);
+                            }
+                            else if (!err && result && result[0]) {
+                                response.status = false;
+                                response.message = "Requirement already mapped to the applicant";
+                                response.error = null;
+                                response.data = null;
+                                res.status(200).json(response);
+                            }
+
+                            else if (!err && result) {
+                                response.status = true;
+                                response.message = "Requirement applicant map data saved successfully";
+                                response.error = null;
+                                response.data = null;
+                                res.status(200).json(response);
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving requirement applicant map";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
+
             }
             else {
                 res.status(401).json(response);
@@ -1724,12 +1814,13 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         var temp_result = result[0][0] ? result[0][0] : {};
                         temp_result.education = JSON.parse(temp_result.education);
                         temp_result.cvSource = JSON.parse(temp_result.cvSource);
-                        temp_result.expectedSalaryCurr =temp_result.expectedSalaryCurr && JSON.parse(temp_result.expectedSalaryCurr).currencyId ? JSON.parse(temp_result.expectedSalaryCurr):{};
-                        temp_result.expectedSalaryPeriod = temp_result.expectedSalaryPeriod && JSON.parse(temp_result.expectedSalaryPeriod).durationId ? JSON.parse(temp_result.expectedSalaryPeriod) :{};
-                        temp_result.expectedSalaryScale = temp_result.expectedSalaryScale && JSON.parse(temp_result.expectedSalaryScale).scaleId ? JSON.parse(temp_result.expectedSalaryScale) :{};
+                        temp_result.cvStatus = JSON.parse(temp_result.cvStatus);
+                        temp_result.expectedSalaryCurr = temp_result.expectedSalaryCurr && JSON.parse(temp_result.expectedSalaryCurr).currencyId ? JSON.parse(temp_result.expectedSalaryCurr) : {};
+                        temp_result.expectedSalaryPeriod = temp_result.expectedSalaryPeriod && JSON.parse(temp_result.expectedSalaryPeriod).durationId ? JSON.parse(temp_result.expectedSalaryPeriod) : {};
+                        temp_result.expectedSalaryScale = temp_result.expectedSalaryScale && JSON.parse(temp_result.expectedSalaryScale).scaleId ? JSON.parse(temp_result.expectedSalaryScale) : {};
                         temp_result.industry = JSON.parse(temp_result.industry);
-                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle).jobtitleId ? JSON.parse(temp_result.jobTitle): {} ;
-                        temp_result.nationality = JSON.parse(temp_result.nationality).nationalityId ? JSON.parse(temp_result.nationality) :{};
+                        temp_result.jobTitle = JSON.parse(temp_result.jobTitle).jobtitleId ? JSON.parse(temp_result.jobTitle) : {};
+                        temp_result.nationality = JSON.parse(temp_result.nationality).nationalityId ? JSON.parse(temp_result.nationality) : {};
                         temp_result.prefLocations = JSON.parse(temp_result.prefLocations);
                         temp_result.presentSalaryCurr = temp_result.presentSalaryCurr && JSON.parse(temp_result.presentSalaryCurr).currencyId ? JSON.parse(temp_result.presentSalaryCurr) : {};
                         temp_result.presentSalaryPeriod = temp_result.presentSalaryPeriod && JSON.parse(temp_result.presentSalaryPeriod).durationId ? JSON.parse(temp_result.presentSalaryPeriod) : {};
@@ -1775,7 +1866,12 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                                 mailTransactions: result[5] ? result[5] : [],
                                 followUpNotes: result[6] && result[6][0] ? result[6] : []
                             };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
                     }
                     else if (!err) {
                         response.status = true;
@@ -1790,7 +1886,12 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                             mailTransactions: [],
                             followUpNotes: []
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
                     }
                     else {
                         response.status = false;
@@ -2049,90 +2150,6 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.body.heMasterId) {
-        error.heMasterId = 'Invalid heMasterId';
-        validationFlag *= false;
-    }
-    var documentAttachment = [];
-    documentAttachment = req.body.documentAttachment;
-    if (typeof (documentAttachment) == "string") {
-        documentAttachment = JSON.parse(documentAttachment);
-    }
-    if (!documentAttachment) {
-        documentAttachment = [];
-    }
-
-    var reqApp = [];
-    reqApp = req.body.reqApp;
-    if (typeof (reqApp) == "string") {
-        reqApp = JSON.parse(reqApp);
-    }
-    if (!reqApp) {
-        reqApp = [];
-    }
-
-    var billableCurrency = {};
-    billableCurrency = req.body.billableCurrency;
-    if (typeof (billableCurrency) == "string") {
-        billableCurrency = JSON.parse(billableCurrency);
-    }
-    if (!billableCurrency) {
-        billableCurrency = {};
-    }
-
-    var billableScale = {};
-    billableScale = req.body.billableScale;
-    if (typeof (billableScale) == "string") {
-        billableScale = JSON.parse(billableScale);
-    }
-    if (!billableScale) {
-        billableScale = {};
-    }
-
-    var billableDuration = {};
-    billableDuration = req.body.billableDuration;
-    if (typeof (billableDuration) == "string") {
-        billableDuration = JSON.parse(billableDuration);
-    }
-    if (!billableDuration) {
-        billableDuration = {};
-    }
-
-    var billingCurrency = {};
-    billingCurrency = req.body.billingCurrency;
-    if (typeof (billingCurrency) == "string") {
-        billingCurrency = JSON.parse(billingCurrency);
-    }
-    if (!billingCurrency) {
-        billingCurrency = {};
-    }
-
-    var billingScale = {};
-    billingScale = req.body.billingScale;
-    if (typeof (billingScale) == "string") {
-        billingScale = JSON.parse(billingScale);
-    }
-    if (!billingScale) {
-        billingScale = {};
-    }
-
-    var billingDuration = {};
-    billingDuration = req.body.billingDuration;
-    if (typeof (billingDuration) == "string") {
-        billingDuration = JSON.parse(billingDuration);
-    }
-    if (!billingDuration) {
-        billingDuration = {};
-    }
-
-    var offerAttachment = [];
-    offerAttachment = req.body.offerAttachment;
-    if (typeof (offerAttachment) == "string") {
-        offerAttachment = JSON.parse(offerAttachment);
-    }
-    if (!offerAttachment) {
-        offerAttachment = [];
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -2143,67 +2160,175 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                req.body.offerManagerId = req.body.offerManagerId ? req.body.offerManagerId : 0;
-                req.body.heDepartmentId = req.body.heDepartmentId ? req.body.heDepartmentId : 0;
-                req.body.grossCTCAmount = req.body.grossCTCAmount ? req.body.grossCTCAmount : 0;
-                req.body.grossCTCCurrency = req.body.grossCTCCurrency ? req.body.grossCTCCurrency : 0;
-                req.body.grossCTCScale = req.body.grossCTCScale ? req.body.grossCTCScale : 0;
-                req.body.grossCTCDuration = req.body.grossCTCDuration ? req.body.grossCTCDuration : 0;
-                req.body.expectedJoining = req.body.expectedJoining ? req.body.expectedJoining : null;
-                req.body.billableCTCAmount = req.body.billableCTCAmount ? req.body.billableCTCAmount : 0;
-                req.body.billingCTCAmount = req.body.billingCTCAmount ? req.body.billingCTCAmount : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.offerManagerId),
-                    req.st.db.escape(req.body.heMasterId),
-                    req.st.db.escape(req.body.heDepartmentId),
-                    req.st.db.escape(req.body.grossCTCAmount),
-                    req.st.db.escape(req.body.grossCTCCurrency),
-                    req.st.db.escape(req.body.grossCTCScale),
-                    req.st.db.escape(req.body.grossCTCDuration),
-                    req.st.db.escape(JSON.stringify(offerAttachment)),
-                    req.st.db.escape(JSON.stringify(reqApp)),
-                    req.st.db.escape(req.body.expectedJoining),
-                    req.st.db.escape(JSON.stringify(documentAttachment)),
-                    req.st.db.escape(JSON.stringify(billableCurrency)),
-                    req.st.db.escape(JSON.stringify(billableScale)),
-                    req.st.db.escape(JSON.stringify(billableDuration)),
-                    req.st.db.escape(req.body.billableCTCAmount),
-                    req.st.db.escape(JSON.stringify(billingCurrency)),
-                    req.st.db.escape(JSON.stringify(billingScale)),
-                    req.st.db.escape(JSON.stringify(billingDuration)),
-                    req.st.db.escape(req.body.billingCTCAmount),
-                    req.st.db.escape(req.body.offerExpiryDate || null),
-                    req.st.db.escape(req.body.noticePeriod || 0),
-                    req.st.db.escape(JSON.stringify(req.body.grade || {})),
-                    req.st.db.escape(req.body.employeeCode || ""),
-                    req.st.db.escape(JSON.stringify(req.body.designation || {}))
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL wm_save_offerManager( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result) {
-                        response.status = true;
-                        response.message = "Offer manager data saved successfully";
-                        response.error = null;
-                        response.data = {
-                            offerManagerId: result[0][0].offerManagerId,
-                            transactionHistory: (result[1] && result[1][0]) ? result[1] : []
-                        };
-                        res.status(200).json(response);
+                    if (!req.body.heMasterId) {
+                        error.heMasterId = 'Invalid heMasterId';
+                        validationFlag *= false;
+                    }
+                    var documentAttachment = [];
+                    documentAttachment = req.body.documentAttachment;
+                    if (typeof (documentAttachment) == "string") {
+                        documentAttachment = JSON.parse(documentAttachment);
+                    }
+                    if (!documentAttachment) {
+                        documentAttachment = [];
+                    }
+
+                    var reqApp = [];
+                    reqApp = req.body.reqApp;
+                    if (typeof (reqApp) == "string") {
+                        reqApp = JSON.parse(reqApp);
+                    }
+                    if (!reqApp) {
+                        reqApp = [];
+                    }
+
+                    var billableCurrency = {};
+                    billableCurrency = req.body.billableCurrency;
+                    if (typeof (billableCurrency) == "string") {
+                        billableCurrency = JSON.parse(billableCurrency);
+                    }
+                    if (!billableCurrency) {
+                        billableCurrency = {};
+                    }
+
+                    var billableScale = {};
+                    billableScale = req.body.billableScale;
+                    if (typeof (billableScale) == "string") {
+                        billableScale = JSON.parse(billableScale);
+                    }
+                    if (!billableScale) {
+                        billableScale = {};
+                    }
+
+                    var billableDuration = {};
+                    billableDuration = req.body.billableDuration;
+                    if (typeof (billableDuration) == "string") {
+                        billableDuration = JSON.parse(billableDuration);
+                    }
+                    if (!billableDuration) {
+                        billableDuration = {};
+                    }
+
+                    var billingCurrency = {};
+                    billingCurrency = req.body.billingCurrency;
+                    if (typeof (billingCurrency) == "string") {
+                        billingCurrency = JSON.parse(billingCurrency);
+                    }
+                    if (!billingCurrency) {
+                        billingCurrency = {};
+                    }
+
+                    var billingScale = {};
+                    billingScale = req.body.billingScale;
+                    if (typeof (billingScale) == "string") {
+                        billingScale = JSON.parse(billingScale);
+                    }
+                    if (!billingScale) {
+                        billingScale = {};
+                    }
+
+                    var billingDuration = {};
+                    billingDuration = req.body.billingDuration;
+                    if (typeof (billingDuration) == "string") {
+                        billingDuration = JSON.parse(billingDuration);
+                    }
+                    if (!billingDuration) {
+                        billingDuration = {};
+                    }
+
+                    var offerAttachment = [];
+                    offerAttachment = req.body.offerAttachment;
+                    if (typeof (offerAttachment) == "string") {
+                        offerAttachment = JSON.parse(offerAttachment);
+                    }
+                    if (!offerAttachment) {
+                        offerAttachment = [];
+                    }
+
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while saving offer manager";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                        req.body.offerManagerId = req.body.offerManagerId ? req.body.offerManagerId : 0;
+                        req.body.heDepartmentId = req.body.heDepartmentId ? req.body.heDepartmentId : 0;
+                        req.body.grossCTCAmount = req.body.grossCTCAmount ? req.body.grossCTCAmount : 0;
+                        req.body.grossCTCCurrency = req.body.grossCTCCurrency ? req.body.grossCTCCurrency : 0;
+                        req.body.grossCTCScale = req.body.grossCTCScale ? req.body.grossCTCScale : 0;
+                        req.body.grossCTCDuration = req.body.grossCTCDuration ? req.body.grossCTCDuration : 0;
+                        req.body.expectedJoining = req.body.expectedJoining ? req.body.expectedJoining : null;
+                        req.body.billableCTCAmount = req.body.billableCTCAmount ? req.body.billableCTCAmount : 0;
+                        req.body.billingCTCAmount = req.body.billingCTCAmount ? req.body.billingCTCAmount : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.offerManagerId),
+                            req.st.db.escape(req.body.heMasterId),
+                            req.st.db.escape(req.body.heDepartmentId),
+                            req.st.db.escape(req.body.grossCTCAmount),
+                            req.st.db.escape(req.body.grossCTCCurrency),
+                            req.st.db.escape(req.body.grossCTCScale),
+                            req.st.db.escape(req.body.grossCTCDuration),
+                            req.st.db.escape(JSON.stringify(offerAttachment)),
+                            req.st.db.escape(JSON.stringify(reqApp)),
+                            req.st.db.escape(req.body.expectedJoining),
+                            req.st.db.escape(JSON.stringify(documentAttachment)),
+                            req.st.db.escape(JSON.stringify(billableCurrency)),
+                            req.st.db.escape(JSON.stringify(billableScale)),
+                            req.st.db.escape(JSON.stringify(billableDuration)),
+                            req.st.db.escape(req.body.billableCTCAmount),
+                            req.st.db.escape(JSON.stringify(billingCurrency)),
+                            req.st.db.escape(JSON.stringify(billingScale)),
+                            req.st.db.escape(JSON.stringify(billingDuration)),
+                            req.st.db.escape(req.body.billingCTCAmount),
+                            req.st.db.escape(req.body.offerExpiryDate || null),
+                            req.st.db.escape(req.body.noticePeriod || 0),
+                            req.st.db.escape(JSON.stringify(req.body.grade || {})),
+                            req.st.db.escape(req.body.employeeCode || ""),
+                            req.st.db.escape(JSON.stringify(req.body.designation || {}))
+                        ];
+
+                        var procQuery = 'CALL wm_save_offerManager( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            if (!err && result) {
+                                response.status = true;
+                                response.message = "Offer manager data saved successfully";
+                                response.error = null;
+                                response.data = {
+                                    offerManagerId: result[0][0].offerManagerId,
+                                    transactionHistory: (result[1] && result[1][0]) ? result[1] : []
+                                };
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving offer manager";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
+
             }
             else {
                 res.status(401).json(response);
@@ -2266,7 +2391,7 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                             result[0][0].billingScale = result[0][0].billingScale ? JSON.parse(result[0][0].billingScale) : [];
                             result[0][0].billingDuration = result[0][0].billingDuration ? JSON.parse(result[0][0].billingDuration) : {};
                             result[0][0].grade = result[0][0] && result[0][0].grade && JSON.parse(result[0][0].grade).gradeId ? JSON.parse(result[0][0].grade) : {};
-                            result[0][0].designation = result[0][0] && result[0][0].designation && JSON.parse(result[0][0].designation).jobtitleId? JSON.parse(result[0][0].designation) : {};
+                            result[0][0].designation = result[0][0] && result[0][0].designation && JSON.parse(result[0][0].designation).jobtitleId ? JSON.parse(result[0][0].designation) : {};
 
                         }
 
@@ -2279,13 +2404,18 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                             offerTemplate: result[1] && result[1][0] ? result[1] : [],
                             offerBreakUpTemplate: result[2] && result[2][0] ? result[2] : []
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+
                     }
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "No results found";
                         response.error = null;
-                        response.data = {};
+                        response.data = null;
                         res.status(200).json(response);
                     }
                     else {
@@ -2372,6 +2502,7 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                             res2.panelMembers = JSON.parse(result[2][i].panelMembers) ? JSON.parse(result[2][i].panelMembers) : [];
                             res2.address = result[2][i].address ? result[2][i].address : '';
                             res2.interviewType = JSON.parse(result[2][i].interviewType).interviewModeId ? JSON.parse(result[2][i].interviewType) : {};
+                            res2.branchAddress = JSON.parse(result[2][i].interviewType).branchAddress ? JSON.parse(result[2][i].branchAddress) : {};
 
                             output.push(res2);
                         }
@@ -2383,21 +2514,17 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                                 interviewStageRounds: result[3] ? result[3] : [],
                                 assessmentDetail: JSON.stringify(result[4][0].assessment) ? JSON.stringify(result[4][0].assessment) : [],
                                 skillAssessment: JSON.parse(result[5][0].skillAssessment) ? JSON.parse(result[5][0].skillAssessment) : [],
-                                clientLocations: result[6][0] ? result[6][0] : {},
+                                clientLocations: result[6][0] ? result[6] : [],
                                 interviewMailerTemplate: (result[7] && result[7][0]) ? JSON.parse(result[7][0].formDataJson) : [],
-                                address: (result[8] && result[8][0]) ? result[8][0].address : ''
+                                branchAddress: (result[8] && result[8][0]) ? result[8][0] : null,
+                                address: result[8][0] && result[8][0].address ? result[8][0].address : ""
                             };
 
-                        if (req.query.isWeb == 0) {
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                            zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                res.status(200).json(response);
-                            });
-                        }
-                        else {
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
-                        }
+                        });
                     }
                     else if (!err) {
                         response.status = true;
@@ -2412,19 +2539,15 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                             skillAssessment: [],
                             clientLocations: {},
                             interviewMailerTemplate: {},
-                            address: ''
+                            address: '',
+                            branchLocationList: []
 
                         };
-                        if (req.query.isWeb == 0) {
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                            zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                res.status(200).json(response);
-                            });
-                        }
-                        else {
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
-                        }
+                        });
                     }
 
                     else {
@@ -2490,10 +2613,14 @@ applicantCtrl.getAssessmentTemplate = function (req, res, next) {
                             {
                                 AssessmentTemplateList: result[0]
                             };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
@@ -2644,78 +2771,7 @@ applicantCtrl.saveInterviewSchedulerNew = function (req, res, next) {
         validationFlag *= false;
     }
 
-    var assessmentTypeList = [];
-    assessmentTypeList = req.body.assessmentTypeList;
-    if (typeof (assessmentTypeList) == "string") {
-        assessmentTypeList = JSON.parse(assessmentTypeList);
-    }
-    if (!assessmentTypeList) {
-        assessmentTypeList = [];
-    }
 
-    var skillAssessment = [];
-    skillAssessment = req.body.skillAssessment;
-    if (typeof (skillAssessment) == "string") {
-        skillAssessment = JSON.parse(skillAssessment);
-    }
-    if (!skillAssessment) {
-        skillAssessment = [];
-    }
-
-    var applicantList = req.body.applicantList;
-    if (typeof (applicantList) == "string") {
-        applicantList = JSON.parse(applicantList);
-    }
-    if (!applicantList) {
-        applicantList = [];
-    }
-
-    var assessment = req.body.assessment;
-    if (typeof (assessment) == "string") {
-        assessment = JSON.parse(assessment);
-    }
-    if (!assessment) {
-        assessment = [];
-    }
-    var interviewRound = req.body.interviewRound;
-    if (typeof (interviewRound) == "string") {
-        interviewRound = JSON.parse(interviewRound);
-    }
-    if (!interviewRound) {
-        interviewRound = {};
-    }
-
-    var panelMembers = req.body.panelMembers;
-    if (typeof (panelMembers) == "string") {
-        panelMembers = JSON.parse(panelMembers);
-    }
-    if (!panelMembers) {
-        error.panelMembers = 'Invalid panels';
-        validationFlag *= false;
-    }
-    var interviewLocation = req.body.interviewLocation;
-    if (typeof (interviewLocation) == "string") {
-        interviewLocation = JSON.parse(interviewLocation);
-    }
-    if (!interviewLocation) {
-        interviewLocation = [];
-    }
-
-    var heDepartment = req.body.heDepartment;
-    if (typeof (heDepartment) == "string") {
-        heDepartment = JSON.parse(heDepartment);
-    }
-    if (!heDepartment) {
-        heDepartment = {};
-    }
-
-    var interviewType = req.body.interviewType;
-    if (typeof (interviewType) == "string") {
-        interviewType = JSON.parse(interviewType);
-    }
-    if (!interviewType) {
-        interviewType = {};
-    }
 
     var senderGroupId;
     if (!validationFlag) {
@@ -2726,197 +2782,469 @@ applicantCtrl.saveInterviewSchedulerNew = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                req.body.parentId = req.body.parentId ? req.body.parentId : 0;
-                req.body.status = req.body.status ? req.body.status : 1;
-                req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : '';
-                req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
-                req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
-                req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
-                req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
-                req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
-                req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
-                req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
-                req.body.notes = req.body.notes ? req.body.notes : "";
-                req.body.groupId = req.body.groupId ? req.body.groupId : 0;
-                req.body.address = req.body.address ? req.body.address : '';
+                if (req.query.isWeb = 1) {
 
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procParams = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.heMasterId),
-                    req.st.db.escape(req.body.parentId),
-                    req.st.db.escape(req.body.heDepartmentId),
-                    req.st.db.escape(req.body.requirementId),
-                    req.st.db.escape(JSON.stringify(interviewRound)),
-                    req.st.db.escape(req.body.reportingDateTime),
-                    req.st.db.escape(req.body.interviewDuration),
-                    req.st.db.escape(req.body.notes),
-                    req.st.db.escape(JSON.stringify(applicantList)),
-                    req.st.db.escape(JSON.stringify(panelMembers)),
-                    req.st.db.escape(JSON.stringify(assessment)),
-                    req.st.db.escape(req.body.senderNotes),
-                    req.st.db.escape(req.body.approverNotes),
-                    req.st.db.escape(req.body.receiverNotes),
-                    req.st.db.escape(req.body.changeLog),
-                    req.st.db.escape(req.body.groupId),
-                    req.st.db.escape(req.body.learnMessageId),
-                    req.st.db.escape(req.body.accessUserType),
-                    req.st.db.escape(req.body.approverCount),
-                    req.st.db.escape(req.body.receiverCount),
-                    req.st.db.escape(req.body.status),
-                    req.st.db.escape(JSON.stringify(assessmentTypeList)),
-                    req.st.db.escape(JSON.stringify(skillAssessment)),
-                    req.st.db.escape(JSON.stringify(interviewLocation)),
-                    req.st.db.escape(JSON.stringify(heDepartment)),
-                    req.st.db.escape(DBSecretKey),
-                    req.st.db.escape(req.body.address),
-                    req.st.db.escape(JSON.stringify(interviewType))
-                ];
-
-                var procQuery = 'CALL wm_save_interviewSchedular_new1( ' + procParams.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, results) {
-                    console.log(err);
-                    // console.log(results);
-                    var isWeb = req.query.isWeb;
-                    if (!err && results && results[0]) {
-                        senderGroupId = results[0][0].senderId;
-                        notificationTemplaterRes = notificationTemplater.parse('compose_message', {
-                            senderName: results[0][0].senderName
-                        });
-
-                        for (var i = 0; i < results[1].length; i++) {
-                            if (notificationTemplaterRes.parsedTpl) {
-                                notification.publish(
-                                    results[1][i].receiverId,
-                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                    results[0][0].senderId,
-                                    notificationTemplaterRes.parsedTpl,
-                                    31,
-                                    0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    1,
-                                    moment().format("YYYY-MM-DD HH:mm:ss"),
-                                    '',
-                                    0,
-                                    0,
-                                    null,
-                                    '',
-                                    /** Data object property to be sent with notification **/
-                                    {
-                                        messageList: {
-                                            messageId: results[1][i].messageId,
-                                            message: results[1][i].message,
-                                            messageLink: results[1][i].messageLink,
-                                            createdDate: results[1][i].createdDate,
-                                            messageType: results[1][i].messageType,
-                                            messageStatus: results[1][i].messageStatus,
-                                            priority: results[1][i].priority,
-                                            senderName: results[1][i].senderName,
-                                            senderId: results[1][i].senderId,
-                                            receiverId: results[1][i].receiverId,
-                                            groupId: results[1][i].groupId,
-                                            groupType: 2,
-                                            transId: results[1][i].transId,
-                                            formId: results[1][i].formId,
-                                            currentStatus: results[1][i].currentStatus,
-                                            currentTransId: results[1][i].currentTransId,
-                                            parentId: results[1][i].parentId,
-                                            accessUserType: results[1][i].accessUserType,
-                                            heUserId: results[1][i].heUserId,
-                                            formData: JSON.parse(results[1][i].formDataJSON)
-                                        }
-                                    },
-                                    null,
-                                    tokenResult[0].isWhatMate,
-                                    results[1][i].secretKey);
-                                console.log('postNotification : notification for compose_message is sent successfully');
-                            }
-                            else {
-                                console.log('Error in parsing notification compose_message template - ',
-                                    notificationTemplaterRes.error);
-                                console.log('postNotification : notification for compose_message is sent successfully');
-                            }
+                        var assessmentTypeList = [];
+                        assessmentTypeList = req.body.assessmentTypeList;
+                        if (typeof (assessmentTypeList) == "string") {
+                            assessmentTypeList = JSON.parse(assessmentTypeList);
                         }
-                        var output1 = [];
-                        for (var k = 0; k < results[0].length; k++) {
-                            var res2 = {};
-                            res2.messageId = results[0][k].messageId,
-                                res2.message = results[0][k].message,
-                                res2.messageLink = results[0][k].messageLink,
-                                res2.createdDate = results[0][k].createdDate,
-                                res2.messageType = results[0][k].messageType,
-                                res2.messageStatus = results[0][k].messageStatus,
-                                res2.priority = results[0][k].priority,
-                                res2.senderName = results[0][k].senderName,
-                                res2.senderId = results[0][k].senderId,
-                                res2.receiverId = results[0][k].receiverId,
-                                res2.transId = results[0][k].transId,
-                                res2.formId = results[0][k].formId,
-                                res2.groupId = results[0][k].groupId,
-                                res2.currentStatus = results[0][k].currentStatus,
-                                res2.currentTransId = results[0][k].currentTransId,
-                                res2.localMessageId = results[0][k].localMessageId,
-                                res2.parentId = results[0][k].parentId,
-                                res2.accessUserType = results[0][k].accessUserType,
-                                res2.heUserId = results[0][k].heUserId,
-                                formData = JSON.parse(results[0][k].formDataJSON)
-                            output1.push(res2);
-                        };
+                        if (!assessmentTypeList) {
+                            assessmentTypeList = [];
+                        }
 
-                        response.status = true;
-                        response.message = "Interview  is scheduled successfully";
-                        response.error = null;
-                        response.data = {
-                            messageList: output1
-                            // {
-                            //     messageId: results[0][0].messageId,
-                            //     message: results[0][0].message,
-                            //     messageLink: results[0][0].messageLink,
-                            //     createdDate: results[0][0].createdDate,
-                            //     messageType: results[0][0].messageType,
-                            //     messageStatus: results[0][0].messageStatus,
-                            //     priority: results[0][0].priority,
-                            //     senderName: results[0][0].senderName,
-                            //     senderId: results[0][0].senderId,
-                            //     receiverId: results[0][0].receiverId,
-                            //     transId : results[0][0].transId,
-                            //     formId : results[0][0].formId,
-                            //     groupId: req.body.groupId,
-                            //     currentStatus : results[0][0].currentStatus,
-                            //     currentTransId : results[0][0].currentTransId,
-                            //     localMessageId : req.body.localMessageId,
-                            //     parentId : results[0][0].parentId,
-                            //     accessUserType : results[0][0].accessUserType,
-                            //     heUserId : results[0][0].heUserId,
-                            //     formData : JSON.parse(results[0][0].formDataJSON)
-                            // }
-                        };
-                        if (isWeb == 0) {
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                            zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                res.status(200).json(response);
-                            });
+                        var skillAssessment = [];
+                        skillAssessment = req.body.skillAssessment;
+                        if (typeof (skillAssessment) == "string") {
+                            skillAssessment = JSON.parse(skillAssessment);
+                        }
+                        if (!skillAssessment) {
+                            skillAssessment = [];
+                        }
+
+                        var applicantList = req.body.applicantList;
+                        if (typeof (applicantList) == "string") {
+                            applicantList = JSON.parse(applicantList);
+                        }
+                        if (!applicantList) {
+                            applicantList = [];
+                        }
+
+                        var assessment = req.body.assessment;
+                        if (typeof (assessment) == "string") {
+                            assessment = JSON.parse(assessment);
+                        }
+                        if (!assessment) {
+                            assessment = [];
+                        }
+                        var interviewRound = req.body.interviewRound;
+                        if (typeof (interviewRound) == "string") {
+                            interviewRound = JSON.parse(interviewRound);
+                        }
+                        if (!interviewRound) {
+                            interviewRound = {};
+                        }
+
+                        var panelMembers = req.body.panelMembers;
+                        if (typeof (panelMembers) == "string") {
+                            panelMembers = JSON.parse(panelMembers);
+                        }
+                        if (!panelMembers) {
+                            error.panelMembers = 'Invalid panels';
+                            validationFlag *= false;
+                        }
+                        var interviewLocation = req.body.interviewLocation;
+                        if (typeof (interviewLocation) == "string") {
+                            interviewLocation = JSON.parse(interviewLocation);
+                        }
+                        if (!interviewLocation) {
+                            interviewLocation = [];
+                        }
+
+                        var heDepartment = req.body.heDepartment;
+                        if (typeof (heDepartment) == "string") {
+                            heDepartment = JSON.parse(heDepartment);
+                        }
+                        if (!heDepartment) {
+                            heDepartment = {};
+                        }
+
+                        var interviewType = req.body.interviewType;
+                        if (typeof (interviewType) == "string") {
+                            interviewType = JSON.parse(interviewType);
+                        }
+                        if (!interviewType) {
+                            interviewType = {};
+                        }
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
                         }
                         else {
-                            res.status(200).json(response);
+                            req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                            req.body.parentId = req.body.parentId ? req.body.parentId : 0;
+                            req.body.status = req.body.status ? req.body.status : 1;
+                            req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : '';
+                            req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
+                            req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
+                            req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
+                            req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
+                            req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
+                            req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
+                            req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                            req.body.notes = req.body.notes ? req.body.notes : "";
+                            req.body.groupId = req.body.groupId ? req.body.groupId : 0;
+                            req.body.address = req.body.address ? req.body.address : '';
+
+
+                            var procParams = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.body.heMasterId),
+                                req.st.db.escape(req.body.parentId),
+                                req.st.db.escape(req.body.heDepartmentId),
+                                req.st.db.escape(req.body.requirementId),
+                                req.st.db.escape(JSON.stringify(interviewRound)),
+                                req.st.db.escape(req.body.reportingDateTime),
+                                req.st.db.escape(req.body.interviewDuration),
+                                req.st.db.escape(req.body.notes),
+                                req.st.db.escape(JSON.stringify(applicantList)),
+                                req.st.db.escape(JSON.stringify(panelMembers)),
+                                req.st.db.escape(JSON.stringify(assessment)),
+                                req.st.db.escape(req.body.senderNotes),
+                                req.st.db.escape(req.body.approverNotes),
+                                req.st.db.escape(req.body.receiverNotes),
+                                req.st.db.escape(req.body.changeLog),
+                                req.st.db.escape(req.body.groupId),
+                                req.st.db.escape(req.body.learnMessageId),
+                                req.st.db.escape(req.body.accessUserType),
+                                req.st.db.escape(req.body.approverCount),
+                                req.st.db.escape(req.body.receiverCount),
+                                req.st.db.escape(req.body.status),
+                                req.st.db.escape(JSON.stringify(assessmentTypeList)),
+                                req.st.db.escape(JSON.stringify(skillAssessment)),
+                                req.st.db.escape(JSON.stringify(interviewLocation)),
+                                req.st.db.escape(JSON.stringify(heDepartment)),
+                                req.st.db.escape(DBSecretKey),
+                                req.st.db.escape(req.body.address),
+                                req.st.db.escape(JSON.stringify(interviewType)),
+                                req.st.db.escape(req.body.branchId || 0),
+                                req.st.db.escape(req.body.incrementalAllotment || 0)
+                            ];
+
+                            var procQuery = 'CALL wm_save_interviewSchedular_new1( ' + procParams.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, results) {
+                                console.log(err);
+                                var isWeb = req.query.isWeb;
+                                if (!err && results && results[0]) {
+                                    // senderGroupId = results[0][0].senderId;
+                                    // notificationTemplaterRes = notificationTemplater.parse('compose_message', {
+                                    //     senderName: results[0][0].senderName
+                                    // });
+
+                                    // for (var i = 0; i < results[1].length; i++) {
+                                    //     if (notificationTemplaterRes.parsedTpl) {
+                                    //         notification.publish(
+                                    //             results[1][i].receiverId,
+                                    //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                    //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                    //             results[0][0].senderId,
+                                    //             notificationTemplaterRes.parsedTpl,
+                                    //             31,
+                                    //             0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                    //             (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                    //             0,
+                                    //             0,
+                                    //             0,
+                                    //             0,
+                                    //             1,
+                                    //             moment().format("YYYY-MM-DD HH:mm:ss"),
+                                    //             '',
+                                    //             0,
+                                    //             0,
+                                    //             null,
+                                    //             '',
+                                    //             /** Data object property to be sent with notification **/
+                                    //             {
+                                    //                 messageList: {
+                                    //                     messageId: results[1][i].messageId,
+                                    //                     message: results[1][i].message,
+                                    //                     messageLink: results[1][i].messageLink,
+                                    //                     createdDate: results[1][i].createdDate,
+                                    //                     messageType: results[1][i].messageType,
+                                    //                     messageStatus: results[1][i].messageStatus,
+                                    //                     priority: results[1][i].priority,
+                                    //                     senderName: results[1][i].senderName,
+                                    //                     senderId: results[1][i].senderId,
+                                    //                     receiverId: results[1][i].receiverId,
+                                    //                     groupId: results[1][i].groupId,
+                                    //                     groupType: 2,
+                                    //                     transId: results[1][i].transId,
+                                    //                     formId: results[1][i].formId,
+                                    //                     currentStatus: results[1][i].currentStatus,
+                                    //                     currentTransId: results[1][i].currentTransId,
+                                    //                     parentId: results[1][i].parentId,
+                                    //                     accessUserType: results[1][i].accessUserType,
+                                    //                     heUserId: results[1][i].heUserId,
+                                    //                     formData: JSON.parse(results[1][i].formDataJSON)
+                                    //                 }
+                                    //             },
+                                    //             null,
+                                    //             tokenResult[0].isWhatMate,
+                                    //             results[1][i].secretKey);
+                                    //         console.log('postNotification : notification for compose_message is sent successfully');
+                                    //     }
+                                    //     else {
+                                    //         console.log('Error in parsing notification compose_message template - ',
+                                    //             notificationTemplaterRes.error);
+                                    //         console.log('postNotification : notification for compose_message is sent successfully');
+                                    //     }
+                                    // }
+                                    if (req.query.isWeb) {
+                                        var messageList = [];
+                                    }
+                                    else {
+                                        var output1 = [];
+                                        for (var k = 0; k < results.length - 1; k + 2) {
+                                            var res2 = {};
+                                            res2.messageId = results[k][0].messageId,
+                                                res2.message = results[k][0].message,
+                                                res2.messageLink = results[k][0].messageLink,
+                                                res2.createdDate = results[k][0].createdDate,
+                                                res2.messageType = results[k][0].messageType,
+                                                res2.messageStatus = results[k][0].messageStatus,
+                                                res2.priority = results[k][0].priority,
+                                                res2.senderName = results[k][0].senderName,
+                                                res2.senderId = results[k][0].senderId,
+                                                res2.senderId = results[k][0].senderId,
+                                                res2.senderId = results[k][0].senderId,
+                                                res2.senderId = results[k][0].senderId,
+                                                res2.senderId = results[k][0].senderId,
+                                                res2.senderId = results[k][0].senderId,
+                                                res2.senderId = results[k][0].senderId,
+                                                res2.senderId = results[k][0].senderId,
+                                                res2.receiverId = results[k][0].receiverId,
+                                                res2.transId = results[k][0].transId,
+                                                res2.formId = results[k][0].formId,
+                                                res2.groupId = results[k][0].groupId,
+                                                res2.currentStatus = results[k][0].currentStatus,
+                                                res2.currentTransId = results[k][0].currentTransId,
+                                                res2.localMessageId = results[k][0].localMessageId,
+                                                res2.parentId = results[k][0].parentId,
+                                                res2.accessUserType = results[k][0].accessUserType,
+                                                res2.heUserId = results[k][0].heUserId,
+                                                formData = JSON.parse(results[k][0].formDataJSON)
+                                            output1.push(res2);
+                                        };
+
+                                        var messageList = output1;
+                                    }
+
+                                    response.status = true;
+                                    response.message = "Interview  is scheduled successfully";
+                                    response.error = null;
+                                    response.data = {
+                                        messageList: messageList,
+                                        reqAppList: results[results.length - 2]  ? results[results.length-2] : []
+                                    };
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while scheduling interview";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            });
                         }
-                    }
-                    else {
-                        response.status = false;
-                        response.message = "Error while scheduling interview";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
+                    });
+                }
+                else {
+                    req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                    req.body.parentId = req.body.parentId ? req.body.parentId : 0;
+                    req.body.status = req.body.status ? req.body.status : 1;
+                    req.body.senderNotes = req.body.senderNotes ? req.body.senderNotes : '';
+                    req.body.approverNotes = req.body.approverNotes ? req.body.approverNotes : '';
+                    req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
+                    req.body.changeLog = req.body.changeLog ? req.body.changeLog : '';
+                    req.body.learnMessageId = req.body.learnMessageId ? req.body.learnMessageId : 0;
+                    req.body.accessUserType = req.body.accessUserType ? req.body.accessUserType : 0;
+                    req.body.approverCount = req.body.approverCount ? req.body.approverCount : 0;
+                    req.body.receiverCount = req.body.receiverCount ? req.body.receiverCount : 0;
+                    req.body.notes = req.body.notes ? req.body.notes : "";
+                    req.body.groupId = req.body.groupId ? req.body.groupId : 0;
+                    req.body.address = req.body.address ? req.body.address : '';
+
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.body.heMasterId),
+                        req.st.db.escape(req.body.parentId),
+                        req.st.db.escape(req.body.heDepartmentId),
+                        req.st.db.escape(req.body.requirementId),
+                        req.st.db.escape(JSON.stringify(interviewRound)),
+                        req.st.db.escape(req.body.reportingDateTime),
+                        req.st.db.escape(req.body.interviewDuration),
+                        req.st.db.escape(req.body.notes),
+                        req.st.db.escape(JSON.stringify(applicantList)),
+                        req.st.db.escape(JSON.stringify(panelMembers)),
+                        req.st.db.escape(JSON.stringify(assessment)),
+                        req.st.db.escape(req.body.senderNotes),
+                        req.st.db.escape(req.body.approverNotes),
+                        req.st.db.escape(req.body.receiverNotes),
+                        req.st.db.escape(req.body.changeLog),
+                        req.st.db.escape(req.body.groupId),
+                        req.st.db.escape(req.body.learnMessageId),
+                        req.st.db.escape(req.body.accessUserType),
+                        req.st.db.escape(req.body.approverCount),
+                        req.st.db.escape(req.body.receiverCount),
+                        req.st.db.escape(req.body.status),
+                        req.st.db.escape(JSON.stringify(assessmentTypeList)),
+                        req.st.db.escape(JSON.stringify(skillAssessment)),
+                        req.st.db.escape(JSON.stringify(interviewLocation)),
+                        req.st.db.escape(JSON.stringify(heDepartment)),
+                        req.st.db.escape(DBSecretKey),
+                        req.st.db.escape(req.body.address),
+                        req.st.db.escape(JSON.stringify(interviewType))
+                    ];
+
+                    var procQuery = 'CALL wm_save_interviewSchedular_new1( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, results) {
+                        console.log(err);
+                        // console.log(results);
+                        var isWeb = req.query.isWeb;
+                        if (!err && results && results[0]) {
+                            senderGroupId = results[0][0].senderId;
+                            notificationTemplaterRes = notificationTemplater.parse('compose_message', {
+                                senderName: results[0][0].senderName
+                            });
+
+                            for (var i = 0; i < results[1].length; i++) {
+                                if (notificationTemplaterRes.parsedTpl) {
+                                    notification.publish(
+                                        results[1][i].receiverId,
+                                        (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                        (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                        results[0][0].senderId,
+                                        notificationTemplaterRes.parsedTpl,
+                                        31,
+                                        0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
+                                        (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        1,
+                                        moment().format("YYYY-MM-DD HH:mm:ss"),
+                                        '',
+                                        0,
+                                        0,
+                                        null,
+                                        '',
+                                        /** Data object property to be sent with notification **/
+                                        {
+                                            messageList: {
+                                                messageId: results[1][i].messageId,
+                                                message: results[1][i].message,
+                                                messageLink: results[1][i].messageLink,
+                                                createdDate: results[1][i].createdDate,
+                                                messageType: results[1][i].messageType,
+                                                messageStatus: results[1][i].messageStatus,
+                                                priority: results[1][i].priority,
+                                                senderName: results[1][i].senderName,
+                                                senderId: results[1][i].senderId,
+                                                receiverId: results[1][i].receiverId,
+                                                groupId: results[1][i].groupId,
+                                                groupType: 2,
+                                                transId: results[1][i].transId,
+                                                formId: results[1][i].formId,
+                                                currentStatus: results[1][i].currentStatus,
+                                                currentTransId: results[1][i].currentTransId,
+                                                parentId: results[1][i].parentId,
+                                                accessUserType: results[1][i].accessUserType,
+                                                heUserId: results[1][i].heUserId,
+                                                formData: JSON.parse(results[1][i].formDataJSON)
+                                            }
+                                        },
+                                        null,
+                                        tokenResult[0].isWhatMate,
+                                        results[1][i].secretKey);
+                                    console.log('postNotification : notification for compose_message is sent successfully');
+                                }
+                                else {
+                                    console.log('Error in parsing notification compose_message template - ',
+                                        notificationTemplaterRes.error);
+                                    console.log('postNotification : notification for compose_message is sent successfully');
+                                }
+                            }
+                            var output1 = [];
+                            for (var k = 0; k < results[0].length; k++) {
+                                var res2 = {};
+                                res2.messageId = results[0][k].messageId,
+                                    res2.message = results[0][k].message,
+                                    res2.messageLink = results[0][k].messageLink,
+                                    res2.createdDate = results[0][k].createdDate,
+                                    res2.messageType = results[0][k].messageType,
+                                    res2.messageStatus = results[0][k].messageStatus,
+                                    res2.priority = results[0][k].priority,
+                                    res2.senderName = results[0][k].senderName,
+                                    res2.senderId = results[0][k].senderId,
+                                    res2.receiverId = results[0][k].receiverId,
+                                    res2.transId = results[0][k].transId,
+                                    res2.formId = results[0][k].formId,
+                                    res2.groupId = results[0][k].groupId,
+                                    res2.currentStatus = results[0][k].currentStatus,
+                                    res2.currentTransId = results[0][k].currentTransId,
+                                    res2.localMessageId = results[0][k].localMessageId,
+                                    res2.parentId = results[0][k].parentId,
+                                    res2.accessUserType = results[0][k].accessUserType,
+                                    res2.heUserId = results[0][k].heUserId,
+                                    formData = JSON.parse(results[0][k].formDataJSON)
+                                output1.push(res2);
+                            };
+
+                            response.status = true;
+                            response.message = "Interview  is scheduled successfully";
+                            response.error = null;
+                            response.data = {
+                                messageList: output1
+                                // {
+                                //     messageId: results[0][0].messageId,
+                                //     message: results[0][0].message,
+                                //     messageLink: results[0][0].messageLink,
+                                //     createdDate: results[0][0].createdDate,
+                                //     messageType: results[0][0].messageType,
+                                //     messageStatus: results[0][0].messageStatus,
+                                //     priority: results[0][0].priority,
+                                //     senderName: results[0][0].senderName,
+                                //     senderId: results[0][0].senderId,
+                                //     receiverId: results[0][0].receiverId,
+                                //     transId : results[0][0].transId,
+                                //     formId : results[0][0].formId,
+                                //     groupId: req.body.groupId,
+                                //     currentStatus : results[0][0].currentStatus,
+                                //     currentTransId : results[0][0].currentTransId,
+                                //     localMessageId : req.body.localMessageId,
+                                //     parentId : results[0][0].parentId,
+                                //     accessUserType : results[0][0].accessUserType,
+                                //     heUserId : results[0][0].heUserId,
+                                //     formData : JSON.parse(results[0][0].formDataJSON)
+                                // }
+                            };
+                            if (isWeb == 0) {
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                res.status(200).json(response);
+                            }
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while scheduling interview";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+
             }
             else {
                 res.status(401).json(response);
@@ -3668,155 +3996,6 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
         validationFlag *= false;
     }
 
-    if (!req.body.heMasterId) {
-        error.heMasterId = 'Invalid heMasterId';
-        validationFlag *= false;
-    }
-
-    var documentAttachment = [];
-    documentAttachment = req.body.documentAttachment;
-    if (typeof (documentAttachment) == "string") {
-        documentAttachment = JSON.parse(documentAttachment);
-    }
-    if (!documentAttachment) {
-        documentAttachment = [];
-    }
-
-    var applicant = [];
-    applicant = req.body.applicant;
-    if (typeof (applicant) == "string") {
-        applicant = JSON.parse(applicant);
-    }
-    if (!applicant) {
-        applicant = [];
-    }
-
-    var offerLocation = [];
-    offerLocation = req.body.offerLocation;
-    if (typeof (offerLocation) == "string") {
-        offerLocation = JSON.parse(offerLocation);
-    }
-    if (!offerLocation) {
-        offerLocation = [];
-    }
-
-    var offerCTCCurr = [];
-    offerCTCCurr = req.body.offerCTCCurr;
-    if (typeof (offerCTCCurr) == "string") {
-        offerCTCCurr = JSON.parse(offerCTCCurr);
-    }
-    if (!offerCTCCurr) {
-        offerCTCCurr = {};
-    }
-
-    var offerCTCScale = [];
-    offerCTCScale = req.body.offerCTCScale;
-    if (typeof (offerCTCScale) == "string") {
-        offerCTCScale = JSON.parse(offerCTCScale);
-    }
-    if (!offerCTCScale) {
-        offerCTCScale = {};
-    }
-
-    var offerCTCPeriod = [];
-    offerCTCPeriod = req.body.offerCTCPeriod;
-    if (typeof (offerCTCPeriod) == "string") {
-        offerCTCPeriod = JSON.parse(offerCTCPeriod);
-    }
-    if (!offerCTCPeriod) {
-        offerCTCPeriod = {};
-    }
-
-    var salaryCurr = [];
-    salaryCurr = req.body.salaryCurr;
-    if (typeof (salaryCurr) == "string") {
-        salaryCurr = JSON.parse(salaryCurr);
-    }
-    if (!salaryCurr) {
-        salaryCurr = {};
-    }
-
-    var salaryScale = [];
-    salaryScale = req.body.salaryScale;
-    if (typeof (salaryScale) == "string") {
-        salaryScale = JSON.parse(salaryScale);
-    }
-    if (!salaryScale) {
-        salaryScale = {};
-    }
-
-    var salaryPeriod = [];
-    salaryPeriod = req.body.salaryPeriod;
-    if (typeof (salaryPeriod) == "string") {
-        salaryPeriod = JSON.parse(salaryPeriod);
-    }
-    if (!salaryPeriod) {
-        salaryPeriod = {};
-    }
-
-    var billableCurrency = {};
-    billableCurrency = req.body.billableCurrency;
-    if (typeof (billableCurrency) == "string") {
-        billableCurrency = JSON.parse(billableCurrency);
-    }
-    if (!billableCurrency) {
-        billableCurrency = {};
-    }
-
-    var billableScale = {};
-    billableScale = req.body.billableScale;
-    if (typeof (billableScale) == "string") {
-        billableScale = JSON.parse(billableScale);
-    }
-    if (!billableScale) {
-        billableScale = {};
-    }
-
-    var billableDuration = {};
-    billableDuration = req.body.billableDuration;
-    if (typeof (billableDuration) == "string") {
-        billableDuration = JSON.parse(billableDuration);
-    }
-    if (!billableDuration) {
-        billableDuration = {};
-    }
-
-
-    var vendorCurrency = {};
-    vendorCurrency = req.body.vendorCurrency;
-    if (typeof (vendorCurrency) == "string") {
-        vendorCurrency = JSON.parse(vendorCurrency);
-    }
-    if (!vendorCurrency) {
-        vendorCurrency = {};
-    }
-
-    var vendorScale = {};
-    vendorScale = req.body.vendorScale;
-    if (typeof (vendorScale) == "string") {
-        vendorScale = JSON.parse(vendorScale);
-    }
-    if (!vendorScale) {
-        vendorScale = {};
-    }
-
-    var vendorDuration = {};
-    vendorDuration = req.body.vendorDuration;
-    if (typeof (vendorDuration) == "string") {
-        vendorDuration = JSON.parse(vendorDuration);
-    }
-    if (!vendorDuration) {
-        vendorDuration = {};
-    }
-
-    var designation = {};
-    designation = req.body.designation;
-    if (typeof (designation) == "string") {
-        designation = JSON.parse(designation);
-    }
-    if (!designation) {
-        designation = {};
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -3827,88 +4006,260 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                req.body.onBoardingId = req.body.onBoardingId ? req.body.onBoardingId : 0;
-                req.body.heDepartmentId = req.body.heDepartmentId ? req.body.heDepartmentId : 0;
-                req.body.jobTitleId = req.body.jobTitleId ? req.body.jobTitleId : 0;
-                req.body.jobTitle = req.body.jobTitle ? req.body.jobTitle : '';
-                req.body.contactId = req.body.contactId ? req.body.contactId : 0;
-                req.body.managerId = req.body.managerId ? req.body.managerId : 0;
-                req.body.offerJoiningDate = req.body.offerJoiningDate ? req.body.offerJoiningDate : null;
-                req.body.plannedJoiningDate = req.body.plannedJoiningDate ? req.body.plannedJoiningDate : null;
-                req.body.offerCTCCurrId = req.body.offerCTCCurrId ? req.body.offerCTCCurrId : 0;
-                req.body.offerCTCSalary = req.body.offerCTCSalary ? req.body.offerCTCSalary : 0;
-                req.body.offerCTCScaleId = req.body.offerCTCScaleId ? req.body.offerCTCScaleId : 0;
-                req.body.offerCTCPeriodId = req.body.offerCTCPeriodId ? req.body.offerCTCPeriodId : 0;
-                req.body.salaryCurrId = req.body.salaryCurrId ? req.body.salaryCurrId : 0;
-                req.body.salaryAmount = req.body.salaryAmount ? req.body.salaryAmount : 0;
-                req.body.salaryScaleId = req.body.salaryScaleId ? req.body.salaryScaleId : 0;
-                req.body.salaryPeriodId = req.body.salaryPeriodId ? req.body.salaryPeriodId : 0;
-                req.body.notes = req.body.notes ? req.body.notes : '';
-                req.body.workInMentionedShifts = req.body.workInMentionedShifts ? req.body.workInMentionedShifts : 0;
-                req.body.grade = req.body.grade ? req.body.grade : '';
-                req.body.actualJoiningDate = req.body.actualJoiningDate ? req.body.actualJoiningDate : null;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.onBoardingId),
-                    req.st.db.escape(req.body.heMasterId),
-                    req.st.db.escape(req.body.heDepartmentId),
-                    req.st.db.escape(JSON.stringify(applicant)),
-                    req.st.db.escape(req.body.jobTitleId),
-                    req.st.db.escape(req.body.jobTitle),
-                    req.st.db.escape(req.body.contactId),
-                    req.st.db.escape(req.body.managerId),
-                    req.st.db.escape(req.body.offerJoiningDate),
-                    req.st.db.escape(req.body.plannedJoiningDate),
-                    req.st.db.escape(req.body.actualJoiningDate),
-                    req.st.db.escape(JSON.stringify(offerCTCCurr)),
-                    req.st.db.escape(req.body.offerCTCSalary),
-                    req.st.db.escape(JSON.stringify(offerCTCScale)),
-                    req.st.db.escape(JSON.stringify(offerCTCPeriod)),
-                    req.st.db.escape(JSON.stringify(salaryCurr)),
-                    req.st.db.escape(req.body.salaryAmount),
-                    req.st.db.escape(JSON.stringify(salaryScale)),
-                    req.st.db.escape(JSON.stringify(salaryPeriod)),
-                    req.st.db.escape(req.body.notes),
-                    req.st.db.escape(req.body.workInMentionedShifts),
-                    req.st.db.escape(JSON.stringify(documentAttachment)),
-                    req.st.db.escape(JSON.stringify(offerLocation)),
-                    req.st.db.escape(req.body.grade),
-                    req.st.db.escape(JSON.stringify(billableCurrency)),
-                    req.st.db.escape(req.body.billableAmount),
-                    req.st.db.escape(JSON.stringify(billableScale)),
-                    req.st.db.escape(JSON.stringify(billableDuration)),
-                    req.st.db.escape(JSON.stringify(designation)),
-                    req.st.db.escape(req.body.empCode),
-                    req.st.db.escape(JSON.stringify(vendorCurrency)),
-                    req.st.db.escape(req.body.vendorAmount),
-                    req.st.db.escape(JSON.stringify(vendorScale)),
-                    req.st.db.escape(JSON.stringify(vendorDuration))
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL wm_save_onBoarding( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result) {
-                        response.status = true;
-                        response.message = "OnBoarding data saved successfully";
-                        response.error = null;
-                        response.data = {
-                            onBoardingId: (result[0] && result[0][0]) ? result[0][0].onBoardingId : 0,
-                            transactionHistory: (result[1] && result[1][0]) ? result[1] : []
-                        };
-                        res.status(200).json(response);
+                    if (!req.body.heMasterId) {
+                        error.heMasterId = 'Invalid heMasterId';
+                        validationFlag *= false;
+                    }
+
+                    var documentAttachment = [];
+                    documentAttachment = req.body.documentAttachment;
+                    if (typeof (documentAttachment) == "string") {
+                        documentAttachment = JSON.parse(documentAttachment);
+                    }
+                    if (!documentAttachment) {
+                        documentAttachment = [];
+                    }
+
+                    var applicant = [];
+                    applicant = req.body.applicant;
+                    if (typeof (applicant) == "string") {
+                        applicant = JSON.parse(applicant);
+                    }
+                    if (!applicant) {
+                        applicant = [];
+                    }
+
+                    var offerLocation = [];
+                    offerLocation = req.body.offerLocation;
+                    if (typeof (offerLocation) == "string") {
+                        offerLocation = JSON.parse(offerLocation);
+                    }
+                    if (!offerLocation) {
+                        offerLocation = [];
+                    }
+
+                    var offerCTCCurr = [];
+                    offerCTCCurr = req.body.offerCTCCurr;
+                    if (typeof (offerCTCCurr) == "string") {
+                        offerCTCCurr = JSON.parse(offerCTCCurr);
+                    }
+                    if (!offerCTCCurr) {
+                        offerCTCCurr = {};
+                    }
+
+                    var offerCTCScale = [];
+                    offerCTCScale = req.body.offerCTCScale;
+                    if (typeof (offerCTCScale) == "string") {
+                        offerCTCScale = JSON.parse(offerCTCScale);
+                    }
+                    if (!offerCTCScale) {
+                        offerCTCScale = {};
+                    }
+
+                    var offerCTCPeriod = [];
+                    offerCTCPeriod = req.body.offerCTCPeriod;
+                    if (typeof (offerCTCPeriod) == "string") {
+                        offerCTCPeriod = JSON.parse(offerCTCPeriod);
+                    }
+                    if (!offerCTCPeriod) {
+                        offerCTCPeriod = {};
+                    }
+
+                    var salaryCurr = [];
+                    salaryCurr = req.body.salaryCurr;
+                    if (typeof (salaryCurr) == "string") {
+                        salaryCurr = JSON.parse(salaryCurr);
+                    }
+                    if (!salaryCurr) {
+                        salaryCurr = {};
+                    }
+
+                    var salaryScale = [];
+                    salaryScale = req.body.salaryScale;
+                    if (typeof (salaryScale) == "string") {
+                        salaryScale = JSON.parse(salaryScale);
+                    }
+                    if (!salaryScale) {
+                        salaryScale = {};
+                    }
+
+                    var salaryPeriod = [];
+                    salaryPeriod = req.body.salaryPeriod;
+                    if (typeof (salaryPeriod) == "string") {
+                        salaryPeriod = JSON.parse(salaryPeriod);
+                    }
+                    if (!salaryPeriod) {
+                        salaryPeriod = {};
+                    }
+
+                    var billableCurrency = {};
+                    billableCurrency = req.body.billableCurrency;
+                    if (typeof (billableCurrency) == "string") {
+                        billableCurrency = JSON.parse(billableCurrency);
+                    }
+                    if (!billableCurrency) {
+                        billableCurrency = {};
+                    }
+
+                    var billableScale = {};
+                    billableScale = req.body.billableScale;
+                    if (typeof (billableScale) == "string") {
+                        billableScale = JSON.parse(billableScale);
+                    }
+                    if (!billableScale) {
+                        billableScale = {};
+                    }
+
+                    var billableDuration = {};
+                    billableDuration = req.body.billableDuration;
+                    if (typeof (billableDuration) == "string") {
+                        billableDuration = JSON.parse(billableDuration);
+                    }
+                    if (!billableDuration) {
+                        billableDuration = {};
+                    }
+
+
+                    var vendorCurrency = {};
+                    vendorCurrency = req.body.vendorCurrency;
+                    if (typeof (vendorCurrency) == "string") {
+                        vendorCurrency = JSON.parse(vendorCurrency);
+                    }
+                    if (!vendorCurrency) {
+                        vendorCurrency = {};
+                    }
+
+                    var vendorScale = {};
+                    vendorScale = req.body.vendorScale;
+                    if (typeof (vendorScale) == "string") {
+                        vendorScale = JSON.parse(vendorScale);
+                    }
+                    if (!vendorScale) {
+                        vendorScale = {};
+                    }
+
+                    var vendorDuration = {};
+                    vendorDuration = req.body.vendorDuration;
+                    if (typeof (vendorDuration) == "string") {
+                        vendorDuration = JSON.parse(vendorDuration);
+                    }
+                    if (!vendorDuration) {
+                        vendorDuration = {};
+                    }
+
+                    var designation = {};
+                    designation = req.body.designation;
+                    if (typeof (designation) == "string") {
+                        designation = JSON.parse(designation);
+                    }
+                    if (!designation) {
+                        designation = {};
+                    }
+
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while saving onBoarding data";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                        req.body.onBoardingId = req.body.onBoardingId ? req.body.onBoardingId : 0;
+                        req.body.heDepartmentId = req.body.heDepartmentId ? req.body.heDepartmentId : 0;
+                        req.body.jobTitleId = req.body.jobTitleId ? req.body.jobTitleId : 0;
+                        req.body.jobTitle = req.body.jobTitle ? req.body.jobTitle : '';
+                        req.body.contactId = req.body.contactId ? req.body.contactId : 0;
+                        req.body.managerId = req.body.managerId ? req.body.managerId : 0;
+                        req.body.offerJoiningDate = req.body.offerJoiningDate ? req.body.offerJoiningDate : null;
+                        req.body.plannedJoiningDate = req.body.plannedJoiningDate ? req.body.plannedJoiningDate : null;
+                        req.body.offerCTCCurrId = req.body.offerCTCCurrId ? req.body.offerCTCCurrId : 0;
+                        req.body.offerCTCSalary = req.body.offerCTCSalary ? req.body.offerCTCSalary : 0;
+                        req.body.offerCTCScaleId = req.body.offerCTCScaleId ? req.body.offerCTCScaleId : 0;
+                        req.body.offerCTCPeriodId = req.body.offerCTCPeriodId ? req.body.offerCTCPeriodId : 0;
+                        req.body.salaryCurrId = req.body.salaryCurrId ? req.body.salaryCurrId : 0;
+                        req.body.salaryAmount = req.body.salaryAmount ? req.body.salaryAmount : 0;
+                        req.body.salaryScaleId = req.body.salaryScaleId ? req.body.salaryScaleId : 0;
+                        req.body.salaryPeriodId = req.body.salaryPeriodId ? req.body.salaryPeriodId : 0;
+                        req.body.notes = req.body.notes ? req.body.notes : '';
+                        req.body.workInMentionedShifts = req.body.workInMentionedShifts ? req.body.workInMentionedShifts : 0;
+                        req.body.grade = req.body.grade ? req.body.grade : '';
+                        req.body.actualJoiningDate = req.body.actualJoiningDate ? req.body.actualJoiningDate : null;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.onBoardingId),
+                            req.st.db.escape(req.body.heMasterId),
+                            req.st.db.escape(req.body.heDepartmentId),
+                            req.st.db.escape(JSON.stringify(applicant)),
+                            req.st.db.escape(req.body.jobTitleId),
+                            req.st.db.escape(req.body.jobTitle),
+                            req.st.db.escape(req.body.contactId),
+                            req.st.db.escape(req.body.managerId),
+                            req.st.db.escape(req.body.offerJoiningDate),
+                            req.st.db.escape(req.body.plannedJoiningDate),
+                            req.st.db.escape(req.body.actualJoiningDate),
+                            req.st.db.escape(JSON.stringify(offerCTCCurr)),
+                            req.st.db.escape(req.body.offerCTCSalary),
+                            req.st.db.escape(JSON.stringify(offerCTCScale)),
+                            req.st.db.escape(JSON.stringify(offerCTCPeriod)),
+                            req.st.db.escape(JSON.stringify(salaryCurr)),
+                            req.st.db.escape(req.body.salaryAmount),
+                            req.st.db.escape(JSON.stringify(salaryScale)),
+                            req.st.db.escape(JSON.stringify(salaryPeriod)),
+                            req.st.db.escape(req.body.notes),
+                            req.st.db.escape(req.body.workInMentionedShifts),
+                            req.st.db.escape(JSON.stringify(documentAttachment)),
+                            req.st.db.escape(JSON.stringify(offerLocation)),
+                            req.st.db.escape(req.body.grade),
+                            req.st.db.escape(JSON.stringify(billableCurrency)),
+                            req.st.db.escape(req.body.billableAmount),
+                            req.st.db.escape(JSON.stringify(billableScale)),
+                            req.st.db.escape(JSON.stringify(billableDuration)),
+                            req.st.db.escape(JSON.stringify(designation)),
+                            req.st.db.escape(req.body.empCode),
+                            req.st.db.escape(JSON.stringify(vendorCurrency)),
+                            req.st.db.escape(req.body.vendorAmount),
+                            req.st.db.escape(JSON.stringify(vendorScale)),
+                            req.st.db.escape(JSON.stringify(vendorDuration))
+                        ];
+
+                        var procQuery = 'CALL wm_save_onBoarding( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            if (!err && result) {
+                                response.status = true;
+                                response.message = "OnBoarding data saved successfully";
+                                response.error = null;
+                                response.data = {
+                                    onBoardingId: (result[0] && result[0][0]) ? result[0][0].onBoardingId : 0,
+                                    transactionHistory: (result[1] && result[1][0]) ? result[1] : []
+                                };
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving onBoarding data";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
+
             }
             else {
                 res.status(401).json(response);
@@ -3993,10 +4344,14 @@ applicantCtrl.getOnBoarding = function (req, res, next) {
                             onBoarding: (result[0] && result[0][0]) ? result[0][0] : {},
                             offer: (result[1] && result[1][0]) ? result[1][0] : {}
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
@@ -4129,18 +4484,6 @@ applicantCtrl.faceSheetTemplate = function (req, res, next) {
         validationFlag *= false;
     }
 
-    if (!req.body.templateName) {
-        error.templateName = 'Invalid templateName';
-        validationFlag *= false;
-    }
-
-    var questions = req.body.questions;
-    if (typeof (questions) == "string") {
-        questions = JSON.parse(questions);
-    }
-    if (!questions) {
-        questions = []
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -4151,42 +4494,78 @@ applicantCtrl.faceSheetTemplate = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                req.body.templateId = req.body.templateId ? req.body.templateId : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.body.templateId),
-                    req.st.db.escape(req.body.templateName),
-                    req.st.db.escape(JSON.stringify(questions)),
-                    req.st.db.escape(req.body.customFaceSheet || ""),
-                    req.st.db.escape(req.body.isCustomTab || 0)
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL wm_save_paceFacesheetTemplate( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
 
-                    if (!err && result && result[0][0]) {
-                        response.status = true;
-                        response.message = "Facesheet Template saved sucessfully";
-                        response.error = null;
-                        response.data = {
-                            templateId: result[0][0] ? result[0][0].templateId : 0
-                        };
-                        res.status(200).json(response);
+                    if (!req.body.templateName) {
+                        error.templateName = 'Invalid templateName';
+                        validationFlag *= false;
                     }
 
+                    var questions = req.body.questions;
+                    if (typeof (questions) == "string") {
+                        questions = JSON.parse(questions);
+                    }
+                    if (!questions) {
+                        questions = []
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
                     else {
-                        response.status = false;
-                        response.message = "Error while saving Facesheet";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                        req.body.templateId = req.body.templateId ? req.body.templateId : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(req.body.templateId),
+                            req.st.db.escape(req.body.templateName),
+                            req.st.db.escape(JSON.stringify(questions)),
+                            req.st.db.escape(req.body.customFaceSheet || ""),
+                            req.st.db.escape(req.body.isCustomTab || 0)
+                        ];
+
+                        var procQuery = 'CALL wm_save_paceFacesheetTemplate( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+
+                            if (!err && result && result[0][0]) {
+                                response.status = true;
+                                response.message = "Facesheet Template saved sucessfully";
+                                response.error = null;
+                                response.data = {
+                                    templateId: result[0][0] ? result[0][0].templateId : 0
+                                };
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+
+                            }
+
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving Facesheet";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
                 });
+
+
             }
             else {
                 res.status(401).json(response);
@@ -4219,14 +4598,6 @@ applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
         validationFlag *= false;
     }
 
-    var faceSheet = req.body.faceSheet;
-    if (typeof (faceSheet) == "string") {
-        faceSheet = JSON.parse(faceSheet);
-    }
-    if (!faceSheet) {
-        faceSheet = []
-    }
-
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the error';
@@ -4236,52 +4607,83 @@ applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.applicantId)
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL wm_get_fillFaceSheet( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-
-                    if (!err && result && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "Facesheet Template loaded sucessfully";
-                        response.error = null;
-                        if (faceSheet.questions)
-                            for (var i = 0; i < faceSheet.questions.length; i++) {
-                                faceSheet.questions[i].answer = result[0][0][faceSheet.questions[i].type.tagName];
-                            }
-                        console.log("facesheet custom tags", faceSheet.customTags && faceSheet.customTags.length);
-                        if (faceSheet.customTags && faceSheet.customTags.length) {
-                            for (var customIndex = 0; customIndex < faceSheet.customTags.length; customIndex++) {
-                                console.log("resume", result[0][0][faceSheet.customTags[customIndex].tagName]);
-                                if (result[0][0] && result[0][0][faceSheet.customTags[customIndex].tagName]) {
-                                    faceSheet.customFaceSheet = faceSheet.customFaceSheet.replace('[facesheet.' + faceSheet.customTags[customIndex].tagName + ']', result[0][0][faceSheet.customTags[customIndex].tagName]);
-                                    console.log(faceSheet.customFaceSheet);
-                                }
-                            }
-                        }
-
-                        response.data = {
-                            faceSheet: faceSheet ? faceSheet : {}
-                        };
-                        res.status(200).json(response);
+                    var faceSheet = req.body.faceSheet;
+                    if (typeof (faceSheet) == "string") {
+                        faceSheet = JSON.parse(faceSheet);
+                    }
+                    if (!faceSheet) {
+                        faceSheet = []
                     }
 
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
                     else {
-                        response.status = false;
-                        response.message = "Error while loading Facesheet";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(req.query.applicantId)
+                        ];
+
+                        var procQuery = 'CALL wm_get_fillFaceSheet( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+
+                            if (!err && result && result[0] && result[0][0]) {
+                                response.status = true;
+                                response.message = "Facesheet Template loaded sucessfully";
+                                response.error = null;
+                                if (faceSheet.questions)
+                                    for (var i = 0; i < faceSheet.questions.length; i++) {
+                                        faceSheet.questions[i].answer = result[0][0][faceSheet.questions[i].type.tagName];
+                                    }
+                                console.log("facesheet custom tags", faceSheet.customTags && faceSheet.customTags.length);
+                                if (faceSheet.customTags && faceSheet.customTags.length) {
+                                    for (var customIndex = 0; customIndex < faceSheet.customTags.length; customIndex++) {
+                                        console.log("resume", result[0][0][faceSheet.customTags[customIndex].tagName]);
+                                        if (result[0][0] && result[0][0][faceSheet.customTags[customIndex].tagName]) {
+                                            faceSheet.customFaceSheet = faceSheet.customFaceSheet.replace('[facesheet.' + faceSheet.customTags[customIndex].tagName + ']', result[0][0][faceSheet.customTags[customIndex].tagName]);
+                                            console.log(faceSheet.customFaceSheet);
+                                        }
+                                    }
+                                }
+
+                                response.data = {
+                                    faceSheet: faceSheet ? faceSheet : {}
+                                };
+
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else {
+                                response.status = false;
+                                response.message = "Error while loading Facesheet";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
+
             }
             else {
                 res.status(401).json(response);
@@ -4903,11 +5305,15 @@ applicantCtrl.resumeSearchResultsByPage = function (req, res, next) {
                             applicantList: result[0] ? result[0] : [],
                             count: result[1][0].count
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
 
                     }
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "Applicants not found";
                         response.error = null;
                         response.data = {
@@ -4952,21 +5358,6 @@ applicantCtrl.getMailerApplicants = function (req, res, next) {
         validationFlag = false;
     }
 
-    var stageStatusId = req.body.stageStatusId;
-    if (!stageStatusId) {
-        stageStatusId = [];
-    }
-    else if (typeof (stageStatusId) == "string") {
-        stageStatusId = JSON.parse(stageStatusId);
-    }
-
-    var reqApplicants = req.body.reqApp;
-    if (!reqApplicants) {
-        reqApplicants = [];
-    }
-    else if (typeof (reqApplicants) == "string") {
-        reqApplicants = JSON.parse(reqApplicants);
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -4977,55 +5368,91 @@ applicantCtrl.getMailerApplicants = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
-                req.body.startPage = (req.body.startPage) ? req.body.startPage : 0;
-                req.body.limit = (req.body.limit) ? req.body.limit : 100;
+
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
 
-
-                var getStatus = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(stageStatusId)),
-                    req.st.db.escape(DBSecretKey),
-                    req.st.db.escape(JSON.stringify(reqApplicants)),
-                    req.st.db.escape(req.body.startPage),
-                    req.st.db.escape(req.body.limit),
-                    req.st.db.escape(req.body.type || 1)  // take my self by default
-                ];
-
-                var procQuery = 'CALL wm_get_mailerApplicants( ' + getStatus.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, Result) {
-                    console.log(err);
-                    if (!err && Result && Result[0] && Result[0][0]) {
-                        response.status = true;
-                        response.message = "Applicants loaded successfully";
-                        response.error = null;
-                        var output = [];
-                        for (var i = 0; i < Result[0].length; i++) {
-                            Result[0][i].clientContacts = Result[0][i] && Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
-                        }
-                        response.data = {
-                            applicantlist: Result[0] ? Result[0] : []
-                        };
-                        res.status(200).json(response);
+                    var stageStatusId = req.body.stageStatusId;
+                    if (!stageStatusId) {
+                        stageStatusId = [];
                     }
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "Applicants not found";
-                        response.error = null;
-                        response.data = {
-                            applicantlist: []
-                        };
-                        res.status(200).json(response);
+                    else if (typeof (stageStatusId) == "string") {
+                        stageStatusId = JSON.parse(stageStatusId);
+                    }
+
+                    var reqApplicants = req.body.reqApp;
+                    if (!reqApplicants) {
+                        reqApplicants = [];
+                    }
+                    else if (typeof (reqApplicants) == "string") {
+                        reqApplicants = JSON.parse(reqApplicants);
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while loading applicants";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+
+                        req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
+                        req.body.startPage = (req.body.startPage) ? req.body.startPage : 0;
+                        req.body.limit = (req.body.limit) ? req.body.limit : 100;
+
+
+
+                        var getStatus = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(JSON.stringify(stageStatusId)),
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(JSON.stringify(reqApplicants)),
+                            req.st.db.escape(req.body.startPage),
+                            req.st.db.escape(req.body.limit),
+                            req.st.db.escape(req.body.type || 1)  // take my self by default
+                        ];
+
+                        var procQuery = 'CALL wm_get_mailerApplicants( ' + getStatus.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, Result) {
+                            console.log(err);
+                            if (!err && Result && Result[0] && Result[0][0]) {
+                                response.status = true;
+                                response.message = "Applicants loaded successfully";
+                                response.error = null;
+                                var output = [];
+                                for (var i = 0; i < Result[0].length; i++) {
+                                    Result[0][i].clientContacts = Result[0][i] && Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
+                                }
+                                response.data = {
+                                    applicantlist: Result[0] ? Result[0] : []
+                                };
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else if (!err) {
+                                response.status = false;
+                                response.message = "Applicants not found";
+                                response.error = null;
+                                response.data = {
+                                    applicantlist: []
+                                };
+                                res.status(200).json(response);
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while loading applicants";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
                 });
             }
@@ -5053,22 +5480,6 @@ applicantCtrl.ReqAppMapFromReqView = function (req, res, next) {
         validationFlag *= false;
     }
 
-    var applicants = req.body.applicants;
-    if (typeof (applicants) == 'string') {
-        applicants = JSON.parse(applicants);
-    }
-    if (!applicants) {
-        applicants = [];
-    }
-
-    var requirements = req.body.requirements;
-    if (typeof (requirements) == 'string') {
-        requirements = JSON.parse(requirements);
-    }
-    if (!requirements) {
-        requirements = [];
-    }
-
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -5079,50 +5490,82 @@ applicantCtrl.ReqAppMapFromReqView = function (req, res, next) {
         try {
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if ((!err) && tokenResult) {
-                    req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-    
-                    var inputs = [
-                        req.st.db.escape(req.query.token),
-                        req.st.db.escape(req.query.heMasterId),
-                        req.st.db.escape(JSON.stringify(requirements)),
-                        req.st.db.escape(JSON.stringify(applicants))
-                    ];
-    
-                    var procQuery = 'CALL pace_save_reqAppMapFromReqView( ' + inputs.join(',') + ')';
-                    console.log(procQuery);
-                    req.db.query(procQuery, function (err, result) {
-                        console.log(err);
-                        if (!err && result && result[0] && result[0][0].message) {
-                            response.status = true;
-                            response.message = result[0][0].message;
-                            response.error = null;
-                            response.data = null;
-                            res.status(200).json(response);
+
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                        var applicants = req.body.applicants;
+                        if (typeof (applicants) == 'string') {
+                            applicants = JSON.parse(applicants);
                         }
-                        else if (!err && result && result[0] && result[0][0]._error) {
-                            response.status = false;
-                            response.message = result[0][0]._error;
-                            response.error = null;
-                            response.data = null;
-                            res.status(200).json(response);
+                        if (!applicants) {
+                            applicants = [];
                         }
-    
+
+                        var requirements = req.body.requirements;
+                        if (typeof (requirements) == 'string') {
+                            requirements = JSON.parse(requirements);
+                        }
+                        if (!requirements) {
+                            requirements = [];
+                        }
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
                         else {
-                            response.status = false;
-                            response.message = "Error while tagging applicant";
-                            response.error = null;
-                            response.data = null;
-                            res.status(500).json(response);
+                            req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                            var inputs = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.query.heMasterId),
+                                req.st.db.escape(JSON.stringify(requirements)),
+                                req.st.db.escape(JSON.stringify(applicants))
+                            ];
+
+                            var procQuery = 'CALL pace_save_reqAppMapFromReqView( ' + inputs.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, result) {
+                                console.log(err);
+                                if (!err && result && result[0] && result[0][0].message) {
+                                    response.status = true;
+                                    response.message = result[0][0].message;
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(200).json(response);
+                                }
+                                else if (!err && result && result[0] && result[0][0]._error) {
+                                    response.status = false;
+                                    response.message = result[0][0]._error;
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(200).json(response);
+                                }
+
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while tagging applicant";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            });
                         }
+
                     });
+
                 }
                 else {
                     res.status(401).json(response);
                 }
             });
         }
-        catch(ex){
-            console.log("exception",ex);
+        catch (ex) {
+            console.log("exception", ex);
             response.message = ex;
             response.status(500).json(response);
         }
@@ -5264,9 +5707,9 @@ applicantCtrl.getInterviewPanelMembersForMobile = function (req, res, next) {
                         response.message = "Interview Panel members loaded successfully";
                         response.error = null;
                         var output = [];
-                        response.data ={
-                                interviewPanel: result[0] ? result[0] : []                               
-                            };
+                        response.data = {
+                            interviewPanel: result[0] ? result[0] : []
+                        };
 
                         // if (req.query.isWeb == 0) {
                         //     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -5276,14 +5719,14 @@ applicantCtrl.getInterviewPanelMembersForMobile = function (req, res, next) {
                         //     });
                         // }
                         // else {
-                            res.status(200).json(response);
+                        res.status(200).json(response);
                         // }
                     }
                     else if (!err) {
                         response.status = false;
                         response.message = "No results found";
                         response.error = null;
-                        response.data =null;
+                        response.data = null;
                         res.status(200).json(response);
                     }
 
@@ -5326,15 +5769,6 @@ applicantCtrl.getRecruiterPerformanceByClientWise = function (req, res, next) {
     //     validationFlag *= false;
     // }
 
-    if (!req.body.from) {
-        error.from = 'Invalid from';
-        validationFlag *= false;
-    }
-
-    if (!req.body.to) {
-        error.to = 'Invalid to';
-        validationFlag *= false;
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -5345,51 +5779,86 @@ applicantCtrl.getRecruiterPerformanceByClientWise = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.body.from),
-                    req.st.db.escape(req.body.to),
-                    req.st.db.escape(JSON.stringify(req.body.userMasterId || [])),
-                    req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
-                    req.st.db.escape(JSON.stringify(req.body.requirementId || [])),
-                    req.st.db.escape(DBSecretKey)
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                ];
-
-                var procQuery = 'CALL pace_get_dashboardRecruiterPerformanceClientView( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "Data loaded successfully";
-                        response.error = null;
-                        response.data ={
-                                clientWiseData: result[0] ? result[0] : []                               
-                            };
-                            res.status(200).json(response);
-                    }
-                    else if (!err) {
-                        response.status = false;
-                        response.message = "No results found";
-                        response.error = null;
-                        response.data ={
-                            clientWiseData:[]
-                        };
-                        res.status(200).json(response);
+                    if (!req.body.from) {
+                        error.from = 'Invalid from';
+                        validationFlag *= false;
                     }
 
+                    if (!req.body.to) {
+                        error.to = 'Invalid to';
+                        validationFlag *= false;
+                    }
+
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
                     else {
-                        response.status = false;
-                        response.message = "Error while loading data";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(req.body.from),
+                            req.st.db.escape(req.body.to),
+                            req.st.db.escape(JSON.stringify(req.body.userMasterId || [])),
+                            req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
+                            req.st.db.escape(JSON.stringify(req.body.requirementId || [])),
+                            req.st.db.escape(DBSecretKey)
+
+                        ];
+
+                        var procQuery = 'CALL pace_get_dashboardRecruiterPerformanceClientView( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            if (!err && result && result[0] && result[0][0]) {
+                                response.status = true;
+                                response.message = "Data loaded successfully";
+                                response.error = null;
+                                response.data = {
+                                    clientWiseData: result[0] ? result[0] : []
+                                };
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else if (!err) {
+                                response.status = false;
+                                response.message = "No results found";
+                                response.error = null;
+                                response.data = {
+                                    clientWiseData: []
+                                };
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else {
+                                response.status = false;
+                                response.message = "Error while loading data";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
             }
             else {
                 res.status(401).json(response);
@@ -5426,15 +5895,6 @@ applicantCtrl.getRecruiterPerformanceByRequirementWise = function (req, res, nex
     //     error.heDepartmentId = 'Invalid heDepartmentId';
     //     validationFlag *= false;
     // }
-    if (!req.body.from) {
-        error.from = 'Invalid from';
-        validationFlag *= false;
-    }
-
-    if (!req.body.to) {
-        error.to = 'Invalid to';
-        validationFlag *= false;
-    }
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -5444,48 +5904,80 @@ applicantCtrl.getRecruiterPerformanceByRequirementWise = function (req, res, nex
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.body.from),
-                    req.st.db.escape(req.body.to),
-                    req.st.db.escape(JSON.stringify(req.body.userMasterId || [])),
-                    req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
-                    req.st.db.escape(JSON.stringify(req.body.requirementId || [])),
-                    req.st.db.escape(DBSecretKey)
-                ];
 
-                var procQuery = 'CALL pace_get_dashboardRecruiterPerformanceRequirementView( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "Data loaded successfully";
-                        response.error = null;
-                        response.data ={
-                                requirementWiseData: result[0] ? result[0] : []                               
-                            };
-                            res.status(200).json(response);
-                    }
-                    else if (!err) {
-                        response.status = false;
-                        response.message = "No results found";
-                        response.error = null;
-                        response.data ={
-                            requirementWiseData : []
-                        };
-                        res.status(200).json(response);
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                    if (!req.body.from) {
+                        error.from = 'Invalid from';
+                        validationFlag *= false;
                     }
 
+                    if (!req.body.to) {
+                        error.to = 'Invalid to';
+                        validationFlag *= false;
+                    }
+
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
                     else {
-                        response.status = false;
-                        response.message = "Error while loading data";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(req.body.from),
+                            req.st.db.escape(req.body.to),
+                            req.st.db.escape(JSON.stringify(req.body.userMasterId || [])),
+                            req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
+                            req.st.db.escape(JSON.stringify(req.body.requirementId || [])),
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.startPage || 1),
+                            req.st.db.escape(req.body.limit || 20),
+                            req.st.db.escape(req.body.isExport || 0)
+                        ];
+
+                        var procQuery = 'CALL pace_get_dashboardRecruiterPerformanceRequirementView( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            if (!err && result && result[0] && result[0][0]) {
+                                response.status = true;
+                                response.message = "Data loaded successfully";
+                                response.error = null;
+                                response.data = {
+                                    requirementWiseData: result[0] ? result[0] : []
+                                };
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else if (!err) {
+                                response.status = false;
+                                response.message = "No results found";
+                                response.error = null;
+                                response.data = {
+                                    requirementWiseData: []
+                                };
+                                res.status(200).json(response);
+                            }
+
+                            else {
+                                response.status = false;
+                                response.message = "Error while loading data";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
                 });
             }
@@ -5529,29 +6021,6 @@ applicantCtrl.getRecruiterPerformanceReqApplicantData = function (req, res, next
     //     error.requirementId = 'Invalid requirementId';
     //     validationFlag *= false;
     // }
-    if (!req.body.from) {
-        error.from = 'Invalid from';
-        validationFlag *= false;
-    }
-
-    if (!req.body.to) {
-        error.to = 'Invalid to';
-        validationFlag *= false;
-    }
-
-    if (!req.body.userMasterId.length) {
-        error.to = 'Invalid userMasterId';
-        validationFlag *= false;
-    }
-
-    // if (!req.body.heDepartmentId.length) {
-    //     error.to = 'Invalid heDepartmentId';
-    //     validationFlag *= false;
-    // }
-    // if (!req.body.requirementId.length) {
-    //     error.to = 'Invalid requirementId';
-    //     validationFlag *= false;
-    // }
 
     if (!validationFlag) {
         response.error = error;
@@ -5562,56 +6031,109 @@ applicantCtrl.getRecruiterPerformanceReqApplicantData = function (req, res, next
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.body.from),
-                    req.st.db.escape(req.body.to),
-                    req.st.db.escape(JSON.stringify(req.body.userMasterId || [])),
-                    req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
-                    req.st.db.escape(JSON.stringify(req.body.requirementId || [])),
-                    req.st.db.escape(DBSecretKey),
-                    req.st.db.escape(req.body.stageId || 0)
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL pace_get_dashboardRecruiterPerformanceApplicantView( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "Data loaded successfully";
-                        response.error = null;
-
-                        for (var i=0; i < result[0].length; i++){
-                            result[0][i].clientContacts = result[0][i] && result[0][i].clientContacts && JSON.parse(result[0][i].clientContacts) ? JSON.parse(result[0][i].clientContacts) : [];
-
-                        }
-                        response.data ={
-                                reqApplicantData: result[0] ? result[0] : []                               
-                            };
-                            res.status(200).json(response);
-                    }
-                    else if (!err) {
-                        response.status = false;
-                        response.message = "No results found";
-                        response.error = null;
-                        response.data ={
-                            reqApplicantData:[]
-                        };
-                        res.status(200).json(response);
+                    if (!req.body.from) {
+                        error.from = 'Invalid from';
+                        validationFlag *= false;
                     }
 
+                    if (!req.body.to) {
+                        error.to = 'Invalid to';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.userMasterId.length) {
+                        error.to = 'Invalid userMasterId';
+                        validationFlag *= false;
+                    }
+
+                    // if (!req.body.heDepartmentId.length) {
+                    //     error.to = 'Invalid heDepartmentId';
+                    //     validationFlag *= false;
+                    // }
+                    // if (!req.body.requirementId.length) {
+                    //     error.to = 'Invalid requirementId';
+                    //     validationFlag *= false;
+                    // }
+
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
                     else {
-                        response.status = false;
-                        response.message = "Error while loading data";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(req.body.from),
+                            req.st.db.escape(req.body.to),
+                            req.st.db.escape(JSON.stringify(req.body.userMasterId || [])),
+                            req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
+                            req.st.db.escape(JSON.stringify(req.body.requirementId || [])),
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.stageId || 0),
+                            req.st.db.escape(req.body.startPage || 1),
+                            req.st.db.escape(req.body.limit || 20),
+                            req.st.db.escape(req.body.limit || 20),
+                            req.st.db.escape(req.body.isExport || 0)
+                        ];
+
+                        var procQuery = 'CALL pace_get_dashboardRecruiterPerformanceApplicantView( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            if (!err && result && result[0] && result[0][0]) {
+                                response.status = true;
+                                response.message = "Data loaded successfully";
+                                response.error = null;
+
+                                for (var i = 0; i < result[0].length; i++) {
+                                    result[0][i].clientContacts = result[0][i] && result[0][i].clientContacts && JSON.parse(result[0][i].clientContacts) ? JSON.parse(result[0][i].clientContacts) : [];
+
+                                }
+                                response.data = {
+                                    reqApplicantData: result[0] ? result[0] : [],
+                                    count: result[1] && result[1][0] && result[1][0].count ? result[1][0].count : 0
+                                };
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else if (!err) {
+                                response.status = false;
+                                response.message = "No results found";
+                                response.error = null;
+                                response.data = {
+                                    reqApplicantData: [],
+                                    count: 0
+                                };
+                                res.status(200).json(response);
+                            }
+
+                            else {
+                                response.status = false;
+                                response.message = "Error while loading data";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
+
             }
             else {
                 res.status(401).json(response);
@@ -5638,40 +6160,6 @@ applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
         error.heMasterId = 'Invalid company';
         validationFlag = false;
     }
-    var heDepartmentId = req.body.heDepartmentId;
-    if (!heDepartmentId) {
-        heDepartmentId = [];
-    }
-    else if (typeof (heDepartmentId) == "string") {
-        heDepartmentId = JSON.parse(heDepartmentId);
-    }
-
-
-    var jobTitleId = req.body.jobTitleId;
-    if (!jobTitleId) {
-        jobTitleId = [];
-    }
-    else if (typeof (jobTitleId) == "string") {
-        jobTitleId = JSON.parse(jobTitleId);
-    }
-
-
-    var stageId = req.body.stageId;
-    if (!stageId) {
-        stageId = [];
-    }
-    else if (typeof (stageId) == "string") {
-        stageId = JSON.parse(stageId);
-    }
-
-    var statusId = req.body.statusId;
-    if (!statusId) {
-        statusId = [];
-    }
-    else if (typeof (statusId) == "string") {
-        statusId = JSON.parse(statusId);
-    }
-
 
     if (!validationFlag) {
         response.error = error;
@@ -5682,162 +6170,216 @@ applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                // req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
-                // req.body.jobTitleId = (req.body.jobTitleId) ? req.body.jobTitleId : [];
-                // req.body.stageId = (req.body.stageId) ? req.body.stageId : [];
-                // req.body.statusId = (req.body.statusId) ? req.body.statusId : 0;
-                req.body.startPage = (req.body.startPage) ? req.body.startPage : 0;
-                req.body.limit = (req.body.limit) ? req.body.limit : 12;
-                req.body.applicantId = (req.body.applicantId) || (req.body.applicantId == "") ? req.body.applicantId : 0;
-                req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
-                req.body.type = (req.body.type) ? req.body.type : 1;
-                req.body.name = (req.body.name) ? req.body.name.trim() : '';
-                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
-                if(req.body.name != "") {
-                    req.body.name = req.body.name.split(',');
-                }
-                else{
-                    req.body.name = [];
-                }
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var getStatus = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(heDepartmentId)),
-                    req.st.db.escape(JSON.stringify(jobTitleId)),
-                    // req.st.db.escape(req.query.heDepartmentId),
-                    // req.st.db.escape(req.query.jobTitleId),
-                    req.st.db.escape(req.body.applicantId),
-                    // req.st.db.escape(req.query.stageId),
-                    // req.st.db.escape(req.body.statusId),
-                    req.st.db.escape(JSON.stringify(stageId)),
-                    req.st.db.escape(JSON.stringify(statusId)),
-                    req.st.db.escape(req.body.startPage),
-                    req.st.db.escape(req.body.limit),
-                    req.st.db.escape(req.body.requirementId),
-                    req.st.db.escape(DBSecretKey),
-                    req.st.db.escape(req.body.type),
-                    req.st.db.escape(JSON.stringify(req.body.name || [])),
-                    req.st.db.escape(req.body.from || null),
-                    req.st.db.escape(req.body.to || null),
-                    req.st.db.escape(req.body.userMasterId || 0),
-                    req.st.db.escape(req.query.isWeb || 0),
-                    req.st.db.escape(JSON.stringify(req.body.stageDetail || {})),
-                    req.st.db.escape(req.body.applicantName || ""),
-                    req.st.db.escape(req.body.emailId || ""),
-                    req.st.db.escape(req.body.mobileNumber || ""),
-                    req.st.db.escape(req.body.requirementJobTitle || ""),
-                    req.st.db.escape(req.body.jobCode || ""),
-                    req.st.db.escape(req.body.clientName || ""),
-                    req.st.db.escape(req.body.stageName || ""),
-                    req.st.db.escape(req.body.statusName || ""),
-                    req.st.db.escape(req.body.applicantJobTitle || ""),
-                    req.st.db.escape(req.body.employer || ""),
-                    req.st.db.escape(req.body.experience || ""),
-                    req.st.db.escape(req.body.stageStatusNotes || ""),
-                    req.st.db.escape(req.body.cvSource || ""),
-                    req.st.db.escape(req.body.primarySkills || ""),
-                    req.st.db.escape(req.body.secondarySkills || ""),
-                    req.st.db.escape(req.body.presentLocation || ""),
-                    req.st.db.escape(req.body.education || ""),
-                    req.st.db.escape(req.body.passportNumber || ""),
-                    req.st.db.escape(req.body.faceSheet || ""),
-                    req.st.db.escape(req.body.cvCreatedUserName || ""),
-                    req.st.db.escape(req.body.cvUpdatedUserName || ""),
-                    req.st.db.escape(req.body.reqCvCreatedUserName || ""),
-                    req.st.db.escape(req.body.reqCvUpdatedUserName || ""),
-                    req.st.db.escape(req.body.cvCreatedDate || null),
-                    req.st.db.escape(req.body.cvUpdatedDate || null),
-                    req.st.db.escape(req.body.reqCvCreatedDate || null),
-                    req.st.db.escape(req.body.reqCvUpdatedDate || null),
-                    req.st.db.escape(req.body.emigrationCheck || ""),
-                    req.st.db.escape(req.body.DOB || null),
-                    req.st.db.escape(req.body.ppExpiryDate || null),
-                    req.st.db.escape(req.body.ppIssueDate || null)
-                ];
-
-                var procQuery = 'CALL wm_get_applicantsWithColumnFilter( ' + getStatus.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, Result) {
-                    console.log(err);
-                    if (!err && Result && Result[0]) {
-                        response.status = true;
-                        response.message = "Applicants loaded successfully";
-                        response.error = null;
-                        if (Result[0] && Result[0][0] && Result[0][0].reqApplicantId) {
-                            for (var i = 0; i < Result[0].length; i++) {
-                                Result[0][i].clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
-
-                                Result[0][i].faceSheetDetailWithAnswers = Result[0][i].faceSheetDetailWithAnswers ? JSON.parse(Result[0][i].faceSheetDetailWithAnswers) : [];
-
-                                var facesheet = [];
-                                for (var f = 0; f < Result[0][i].faceSheetDetailWithAnswers.length; f++) {
-                                    if (Result[0][i].faceSheetDetailWithAnswers[f].answer) {
-                                        var answer = Result[0][i].faceSheetDetailWithAnswers[f].answer;
-                                    }
-                                    else {
-                                        var answer = "Not Applicable";
-                                    }
-                                    var QandA = Result[0][i].faceSheetDetailWithAnswers[f].question + " - " + answer;
-                                    facesheet.push(QandA);
-                                }
-                                Result[0][i].faceSheetDetailWithAnswers = facesheet;
-                            }
-                        }
-                        var cvSearchMasterData = {};
-                        var offerMasterData = {};
-                        if(req.query.isWeb == 0){
-                           cvSearchMasterData = {
-                                skillList : Result[6] ? Result[6] : [],
-                                roles : Result[7] ? Result[7] : [],
-                                industry : Result[8] ? Result[8] : [],
-                                cvSource : Result[9] ? Result[9] : [],
-                                functionalAreas : Result[10] ? Result[10] : [],
-                                nationality : Result[11] ? Result[11] : []                           
-
-                            }
-                            offerMasterData  = {
-                                currency: Result[2] ? Result[2] : [],
-                                scale: Result[3] ? Result[3] : [],
-                                duration: Result[4] ? Result[4] : [],
-                                attachment: Result[5] ? Result[5] : [],
-                                grade : Result[12] ? Result[12] : [],
-                                designation :  Result[7] ? Result[7] : []
-                            } 
-                        }
-
-                        response.data = {
-                            applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId ? Result[0] : [],
-                            count: Result[1] && Result[1][0] ? Result[1][0].count : 0,
-                            offerMasterData: offerMasterData,
-                            cvSearchMasterData : cvSearchMasterData
-                        };
-                        // console.log(response.data);
-                        res.status(200).json(response);
+                    var heDepartmentId = req.body.heDepartmentId;
+                    if (!heDepartmentId) {
+                        heDepartmentId = [];
                     }
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "Applicants not found";
-                        response.error = null;
-                        response.data = {
-                            applicantlist: [],
-                            count: [],
-                            currency: [],
-                            scale: [],
-                            duration: [],
-                            attachment: []
-                        };
-                        res.status(200).json(response);
+                    else if (typeof (heDepartmentId) == "string") {
+                        heDepartmentId = JSON.parse(heDepartmentId);
+                    }
+
+
+                    var jobTitleId = req.body.jobTitleId;
+                    if (!jobTitleId) {
+                        jobTitleId = [];
+                    }
+                    else if (typeof (jobTitleId) == "string") {
+                        jobTitleId = JSON.parse(jobTitleId);
+                    }
+
+
+                    var stageId = req.body.stageId;
+                    if (!stageId) {
+                        stageId = [];
+                    }
+                    else if (typeof (stageId) == "string") {
+                        stageId = JSON.parse(stageId);
+                    }
+
+                    var statusId = req.body.statusId;
+                    if (!statusId) {
+                        statusId = [];
+                    }
+                    else if (typeof (statusId) == "string") {
+                        statusId = JSON.parse(statusId);
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while loading applicants";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        // req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
+                        // req.body.jobTitleId = (req.body.jobTitleId) ? req.body.jobTitleId : [];
+                        // req.body.stageId = (req.body.stageId) ? req.body.stageId : [];
+                        // req.body.statusId = (req.body.statusId) ? req.body.statusId : 0;
+                        req.body.startPage = (req.body.startPage) ? req.body.startPage : 0;
+                        req.body.limit = (req.body.limit) ? req.body.limit : 12;
+                        req.body.applicantId = (req.body.applicantId) || (req.body.applicantId == "") ? req.body.applicantId : 0;
+                        req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
+                        req.body.type = (req.body.type) ? req.body.type : 1;
+                        req.body.name = (req.body.name) ? req.body.name.trim() : '';
+                        req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+
+                        if (req.body.name != "") {
+                            req.body.name = req.body.name.split(',');
+                        }
+                        else {
+                            req.body.name = [];
+                        }
+
+                        var getStatus = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(JSON.stringify(heDepartmentId)),
+                            req.st.db.escape(JSON.stringify(jobTitleId)),
+                            // req.st.db.escape(req.query.heDepartmentId),
+                            // req.st.db.escape(req.query.jobTitleId),
+                            req.st.db.escape(req.body.applicantId),
+                            // req.st.db.escape(req.query.stageId),
+                            // req.st.db.escape(req.body.statusId),
+                            req.st.db.escape(JSON.stringify(stageId)),
+                            req.st.db.escape(JSON.stringify(statusId)),
+                            req.st.db.escape(req.body.startPage),
+                            req.st.db.escape(req.body.limit),
+                            req.st.db.escape(req.body.requirementId),
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.type),
+                            req.st.db.escape(JSON.stringify(req.body.name || [])),
+                            req.st.db.escape(req.body.from || null),
+                            req.st.db.escape(req.body.to || null),
+                            req.st.db.escape(req.body.userMasterId || 0),
+                            req.st.db.escape(req.query.isWeb || 0),
+                            req.st.db.escape(JSON.stringify(req.body.stageDetail || {})),
+                            req.st.db.escape(req.body.applicantName || ""),
+                            req.st.db.escape(req.body.emailId || ""),
+                            req.st.db.escape(req.body.mobileNumber || ""),
+                            req.st.db.escape(req.body.requirementJobTitle || ""),
+                            req.st.db.escape(req.body.jobCode || ""),
+                            req.st.db.escape(req.body.clientName || ""),
+                            req.st.db.escape(req.body.stageName || ""),
+                            req.st.db.escape(req.body.statusName || ""),
+                            req.st.db.escape(req.body.applicantJobTitle || ""),
+                            req.st.db.escape(req.body.employer || ""),
+                            req.st.db.escape(req.body.experience || ""),
+                            req.st.db.escape(req.body.stageStatusNotes || ""),
+                            req.st.db.escape(req.body.cvSource || ""),
+                            req.st.db.escape(req.body.primarySkills || ""),
+                            req.st.db.escape(req.body.secondarySkills || ""),
+                            req.st.db.escape(req.body.presentLocation || ""),
+                            req.st.db.escape(req.body.education || ""),
+                            req.st.db.escape(req.body.passportNumber || ""),
+                            req.st.db.escape(req.body.faceSheet || ""),
+                            req.st.db.escape(req.body.cvCreatedUserName || ""),
+                            req.st.db.escape(req.body.cvUpdatedUserName || ""),
+                            req.st.db.escape(req.body.reqCvCreatedUserName || ""),
+                            req.st.db.escape(req.body.reqCvUpdatedUserName || ""),
+                            req.st.db.escape(req.body.cvCreatedDate || null),
+                            req.st.db.escape(req.body.cvUpdatedDate || null),
+                            req.st.db.escape(req.body.reqCvCreatedDate || null),
+                            req.st.db.escape(req.body.reqCvUpdatedDate || null),
+                            req.st.db.escape(req.body.emigrationCheck || ""),
+                            req.st.db.escape(req.body.DOB || null),
+                            req.st.db.escape(req.body.ppExpiryDate || null),
+                            req.st.db.escape(req.body.ppIssueDate || null)
+                        ];
+
+                        var procQuery = 'CALL wm_get_applicantsWithColumnFilter( ' + getStatus.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, Result) {
+                            console.log(err);
+                            if (!err && Result && Result[0]) {
+                                response.status = true;
+                                response.message = "Applicants loaded successfully";
+                                response.error = null;
+                                if (Result[0] && Result[0][0] && Result[0][0].reqApplicantId) {
+                                    for (var i = 0; i < Result[0].length; i++) {
+                                        Result[0][i].clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
+
+                                        Result[0][i].faceSheetDetailWithAnswers = Result[0][i].faceSheetDetailWithAnswers ? JSON.parse(Result[0][i].faceSheetDetailWithAnswers) : [];
+
+                                        var facesheet = [];
+                                        for (var f = 0; f < Result[0][i].faceSheetDetailWithAnswers.length; f++) {
+                                            if (Result[0][i].faceSheetDetailWithAnswers[f].answer) {
+                                                var answer = Result[0][i].faceSheetDetailWithAnswers[f].answer;
+                                            }
+                                            else {
+                                                var answer = "Not Applicable";
+                                            }
+                                            var QandA = Result[0][i].faceSheetDetailWithAnswers[f].question + " - " + answer;
+                                            facesheet.push(QandA);
+                                        }
+                                        Result[0][i].faceSheetDetailWithAnswers = facesheet;
+                                    }
+                                }
+                                var cvSearchMasterData = {};
+                                var offerMasterData = {};
+                                if (req.query.isWeb == 0) {
+                                    cvSearchMasterData = {
+                                        skillList: Result[6] ? Result[6] : [],
+                                        roles: Result[7] ? Result[7] : [],
+                                        industry: Result[8] ? Result[8] : [],
+                                        cvSource: Result[9] ? Result[9] : [],
+                                        functionalAreas: Result[10] ? Result[10] : [],
+                                        nationality: Result[11] ? Result[11] : []
+
+                                    }
+                                    offerMasterData = {
+                                        currency: Result[2] ? Result[2] : [],
+                                        scale: Result[3] ? Result[3] : [],
+                                        duration: Result[4] ? Result[4] : [],
+                                        attachment: Result[5] ? Result[5] : [],
+                                        grade: Result[12] ? Result[12] : [],
+                                        designation: Result[7] ? Result[7] : []
+                                    }
+                                }
+
+                                response.data = {
+                                    applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId ? Result[0] : [],
+                                    count: Result[1] && Result[1][0] ? Result[1][0].count : 0,
+                                    offerMasterData: offerMasterData,
+                                    cvSearchMasterData: cvSearchMasterData
+                                };
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else if (!err) {
+                                response.status = false;
+                                response.message = "Applicants not found";
+                                response.error = null;
+                                response.data = {
+                                    applicantlist: [],
+                                    count: [],
+                                    currency: [],
+                                    scale: [],
+                                    duration: [],
+                                    attachment: []
+                                };
+                                res.status(200).json(response);
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while loading applicants";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+
                     }
+
                 });
+
             }
             else {
                 res.status(401).json(response);

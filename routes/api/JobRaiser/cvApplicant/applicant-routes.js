@@ -9,11 +9,11 @@ var sendgridCtrl = require('./sendgrid-ctrl');    // for send grid mailing
 router.post('/applicant',applicantCtrl.saveApplicant);
 router.get('/applicant',applicantCtrl.getApplicantMasterData);
 
-router.post('/reqapplicant',applicantCtrl.saveReqApplicant);
-router.get('/reqapplicant',applicantCtrl.getReqApplicantMasterData);
+router.post('/reqapplicant',applicantCtrl.saveReqApplicant);  // not used
+router.get('/reqapplicant',applicantCtrl.getReqApplicantMasterData); // not used
 
-router.post('/applicantList',applicantCtrl.getreqApplicants);
-router.get('/applicantDetails',applicantCtrl.getApplicantDetails);
+router.post('/applicantList',applicantCtrl.getreqApplicants);  // not used
+router.get('/applicantDetails',applicantCtrl.getApplicantDetails); 
 
 router.get('/stagestatus',applicantCtrl.getreqAppStageStatus);
 router.post('/stagestatus',applicantCtrl.saveApplicantStageStatus);
@@ -26,17 +26,17 @@ router.post('/reqappMap',applicantCtrl.saveReqAppMapResult);
 
 //router.get('/cvExtract',applicantCtrl.applicantExtractText);
 
-router.get('/names',applicantCtrl.getApplicantNames);
+router.get('/names',applicantCtrl.getApplicantNames); // not enc
 
-router.get('/interviewPanel',applicantCtrl.getInterviewPanel);
+router.get('/interviewPanel',applicantCtrl.getInterviewPanel);  // not enc
 
 router.post('/interviewSchedule',applicantCtrl.saveInterviewSchedulerNew);
-router.get('/getinterviewSchedule',applicantCtrl.getInterviewSchedule);
+router.get('/getinterviewSchedule',applicantCtrl.getInterviewSchedule);   // not enc
 
 router.post('/offerManager',applicantCtrl.saveOfferManager);
 router.get('/offerManager',applicantCtrl.getOfferManager);
 
-router.post('/sendmail',sendgridCtrl.saveSendMail);
+router.post('/sendmail',sendgridCtrl.saveSendMail);  // not used
 
 router.get('/interviewScheduler',applicantCtrl.getInterviewScheduler);
 router.get('/assessmentTemplate',applicantCtrl.getAssessmentTemplate);
@@ -44,11 +44,10 @@ router.get('/assessmentTemplate',applicantCtrl.getAssessmentTemplate);
 router.get('/resumeReferalMaster',applicantCtrl.getReferralResumeMaster);
 
 
-router.get('/interviewApplicants',applicantCtrl.getInterviewApplicantList);
-router.get('/interviewApplicantDetail',applicantCtrl.getInterviewApplicantDetail);
-router.get('/interviewApplicantDetailWeb',applicantCtrl.getInterviewApplicantDetailWeb);
-
-router.get('/masterInterviewScheduler',applicantCtrl.getMasterInterviewScheduler);
+router.get('/interviewApplicants',applicantCtrl.getInterviewApplicantList);  
+router.get('/interviewApplicantDetail',applicantCtrl.getInterviewApplicantDetail); 
+router.get('/interviewApplicantDetailWeb',applicantCtrl.getInterviewApplicantDetailWeb); 
+router.get('/masterInterviewScheduler',applicantCtrl.getMasterInterviewScheduler);  
 
 router.post('/interviewScheduleForDirectApplicant',applicantCtrl.saveInterviewSchedulerForApplicant);
 

@@ -1463,55 +1463,56 @@ jobPortalCtrl.generalMasterNoToken = function (req, res, next) {
         error: null
     };
     var countryCode = "";
-    var ip = req.connection.remoteAddress.split('f:')[1];
+
+    var ip = req.query.ip ? req.query.ip : req.connection.remoteAddress.split('f:')[1];
     console.log("ip address req.connection.remoteAddress",ip);
-    iplocation(ip)
-    .then((resp) => {
-        if (resp.countryCode == '') {
-            countryCode = geoip.lookup(ip).country;
-            console.log("geoip countryCode",countryCode);
-        }
-        else {
-            countryCode = resp.countryCode || "IN";
-        }
+    // iplocation(ip)
+    // .then((resp) => {
+    //     if (resp.countryCode == '') {
+    //         countryCode = geoip.lookup(ip).country;
+    //         console.log("geoip countryCode",countryCode);
+    //     }
+    //     else {
+    //         countryCode = resp.countryCode || "IN";
+    //     }
 
-        var procQuery = 'CALL wm_generalMasterDataNoToken('+req.st.db.escape(countryCode)+','+req.st.db.escape(req.query.heMasterId)+')';
-            console.log(procQuery);
-            req.db.query(procQuery, function (err, result) {
-                console.log(err);
+    //     var procQuery = 'CALL wm_generalMasterDataNoToken('+req.st.db.escape(countryCode)+','+req.st.db.escape(req.query.heMasterId)+')';
+    //         console.log(procQuery);
+    //         req.db.query(procQuery, function (err, result) {
+    //             console.log(err);
         
-                if (!err && result && result[0] && result[0][0]) {
-                    response.status = true;
-                    response.message = "Data loaded successfully";
-                    response.error = null;
+    //             if (!err && result && result[0] && result[0][0]) {
+    //                 response.status = true;
+    //                 response.message = "Data loaded successfully";
+    //                 response.error = null;
 
-                    if (result[4] && result[4][0]){
-                        result[4][0].attachments = result[4][0] && JSON.parse(result[4][0].attachments) ? JSON.parse(result[4][0].attachments) : [];
-                    }
-                    response.data = {
-                        countryList: result[0] ? result[0] : [],
-                        industryList: result[1] ? result[1] : [],
-                        locationList: result[2] ? result[2] : [],
-                        defaultIsdCode: result[3] && result[3][0] && result[3][0].isdCode ? result[3][0].isdCode : "",
-                        defaultCountryCode : countryCode,
-                        defaultCountry: result[3] && result[3][0] ? result[3][0]: {},
-                        adminContentAttachment : result[4] && result[4][0] ? result[4][0]: {}
-                    }
-                    res.status(200).json(response);
-                }
+    //                 if (result[4] && result[4][0]){
+    //                     result[4][0].attachments = result[4][0] && JSON.parse(result[4][0].attachments) ? JSON.parse(result[4][0].attachments) : [];
+    //                 }
+    //                 response.data = {
+    //                     countryList: result[0] ? result[0] : [],
+    //                     industryList: result[1] ? result[1] : [],
+    //                     locationList: result[2] ? result[2] : [],
+    //                     defaultIsdCode: result[3] && result[3][0] && result[3][0].isdCode ? result[3][0].isdCode : "",
+    //                     defaultCountryCode : countryCode,
+    //                     defaultCountry: result[3] && result[3][0] ? result[3][0]: {},
+    //                     adminContentAttachment : result[4] && result[4][0] ? result[4][0]: {}
+    //                 }
+    //                 res.status(200).json(response);
+    //             }
         
-                else {
-                    response.status = false;
-                    response.message = "Error while loading data";
-                    response.error = null;
-                    response.data = null;
-                    res.status(500).json(response);
-                }
-            });
+    //             else {
+    //                 response.status = false;
+    //                 response.message = "Error while loading data";
+    //                 response.error = null;
+    //                 response.data = null;
+    //                 res.status(500).json(response);
+    //             }
+    //         });
         
 
-    })
-    .catch(iperr => {
+    // })
+    // .catch(iperr => {
         console.log("at catch ipapi link");
         var ipApi = "https://ipapi.co/" + ip + "/country_calling_code/";
         request({
@@ -1532,12 +1533,13 @@ jobPortalCtrl.generalMasterNoToken = function (req, res, next) {
                         if (result[4] && result[4][0]){
                             result[4][0].attachments = result[4][0] && JSON.parse(result[4][0].attachments) ? JSON.parse(result[4][0].attachments) : [];
                         }
+                        console.log("body",body);
                         response.data = {
                             countryList: result[0] ? result[0] : [],
                             industryList: result[1] ? result[1] : [],
                             locationList: result[2] ? result[2] : [],
-                            defaultIsdCode: body,
-                            deafultCountryCode : "",
+                            defaultIsdCode: body && body !='Undefined' ? body : "+91",
+                            defaultCountryCode : "IN",
                             defaultCountry: result[3] && result[3][0] ? result[3][0]: {},
                             adminContentAttachment : result[4] && result[4][0] ? result[4][0]: {}
                         }
@@ -1584,13 +1586,10 @@ jobPortalCtrl.generalMasterNoToken = function (req, res, next) {
             // }
     
         });
-    });
-
-   
-
-   
+    // });
 
 };
+
 
 jobPortalCtrl.getCareerPortalRequirementList = function (req, res, next) {
     var response = {
@@ -1666,6 +1665,9 @@ jobPortalCtrl.getCareerPortalRequirementList = function (req, res, next) {
 
 
 jobPortalCtrl.portalreqAppMap = function (req, res, next) {
+
+    var error = {};
+    
     var response = {
         status: false,
         message: "Invalid token",

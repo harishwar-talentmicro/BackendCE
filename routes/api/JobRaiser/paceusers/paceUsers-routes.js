@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 
 var paceUsersCtrl = require('./paceUsers-ctrl');
+var paceAdmin = require('./paceAdmin-ctrl');
+
 
 router.get('/checkUser',paceUsersCtrl.checkUser);
 router.get('/validatePaceUser',paceUsersCtrl.paceLoginValidation);
@@ -26,7 +28,7 @@ router.get('/getJobPortalUsers',paceUsersCtrl.getJobPortalUsers);
 
 router.get('/freeJobPortalUsers',paceUsersCtrl.freeJobPortalUsers);
 
-router.post('/checkPortalApplicants',paceUsersCtrl.checkApplicantExists);
+router.post('/checkPortalApplicants',paceUsersCtrl.checkApplicantExists);  // not enc
 router.post('/deleteJobPortalUsers',paceUsersCtrl.deleteJobPortalUsers);
 
 router.get('/pacehcmTips',paceUsersCtrl.pacehcmTips);
@@ -42,7 +44,7 @@ router.post('/resetPasswordOtp',paceUsersCtrl.sendPasswordResetOTP);
 router.post('/resetPasswordverifyotp',paceUsersCtrl.passwordResetVerifyOtp);
 router.post('/resetPassword',paceUsersCtrl.paceresetPassword);
 
-router.post('/smsAppInfo',paceUsersCtrl.sendApplicantInfoToPhone);
+router.post('/smsAppInfo',paceUsersCtrl.sendApplicantInfoToPhone);  // not enc
 router.post('/notifyAppInfo',paceUsersCtrl.sendApplicantInfoAsNotification);
 
 router.get('/exportPlanner',paceUsersCtrl.getTaskPlannerForExport);
@@ -50,6 +52,11 @@ router.get('/applicants',paceUsersCtrl.getSourcedApplicants);
 
 router.get('/logoutPortalUsers',paceUsersCtrl.logoutPortalUsers);
 router.post('/requirements',paceUsersCtrl.getclientRequuirements);
+
+router.get('/smsTemplates',paceUsersCtrl.smsMailTemplates);
+
+router.post('/paceAdmin',paceAdmin.paceAdminDashboard);
+router.post('/savePaceAdminConfiguration',paceAdmin.paceSaveHeMasterConfiguration);
 
 
 module.exports = router;

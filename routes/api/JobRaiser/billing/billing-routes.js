@@ -11,7 +11,7 @@ router.get('/billingMaster',billingCtrl.billmasterTaxTypes);
 
 router.post('/invoiceTemplate',billingCtrl.billInvoiceTemplate);
 
-router.post('/invoicePreview',billingCtrl.invoiceMailerPreview);
+router.post('/invoicePreview',billingCtrl.invoiceMailerPreview);  // not used
 
 router.get('/generateInvoiceNumber',billingCtrl.InoviceNumberGeneration);
 

@@ -132,10 +132,14 @@ paceUsersCtrl.checkUser = function (req, res, next) {
                         response.message = "User check completed successfully";
                         response.error = null;
                         response.data = result[0];
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "No results found";
                         response.error = null;
                         response.data = null;
@@ -199,7 +203,11 @@ paceUsersCtrl.paceLoginValidation = function (req, res, next) {
                         response.message = "Valid Pace HCM User";
                         response.error = null;
                         response.data = result[0][0];
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if (!err) {
                         response.status = false;
@@ -307,7 +315,11 @@ paceUsersCtrl.getUsers = function (req, res, next) {
                             userDetail: result[0][0] ? result[0][0] : {},
                             reportingTo: result[1] && result[1][0] ? result[1][0] : []
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else {
                         response.status = false;
@@ -334,37 +346,9 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
     };
     var validationFlag = true;
 
-    if (!req.body.heMasterId) {
-        validationFlag = false;
-        error.heMasterId = "Invalid Company";
-    }
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
-    }
-
-    var venue = req.body.venue;
-    if (typeof (venue) == "string") {
-        venue = JSON.parse(venue);
-    }
-    if (!venue) {
-        venue = {};
-    }
-
-    var anchor = req.body.anchor;
-    if (typeof (anchor) == "string") {
-        anchor = JSON.parse(anchor);
-    }
-    if (!anchor) {
-        anchor = {};
-    }
-
-    var attachmentList = req.body.attachmentList;
-    if (typeof (attachmentList) == "string") {
-        attachmentList = JSON.parse(attachmentList);
-    }
-    if (!attachmentList) {
-        attachmentList = [];
     }
 
 
@@ -377,68 +361,119 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                req.body.taskId = req.body.taskId ? req.body.taskId : 0;
-                req.body.priority = req.body.priority ? req.body.priority : 0;
-                req.body.taskDateTime = req.body.taskDateTime ? req.body.taskDateTime : null;
-                req.body.taskEndDate = req.body.taskEndDate ? req.body.taskEndDate : null;
-                req.body.status = req.body.status ? req.body.status : 0;  // 0 pending ,1- completed
-                // req.body.eventAttachment = req.body.eventAttachment ? req.body.eventAttachment : '';
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.taskId),
-                    req.st.db.escape(req.body.heMasterId),
-                    req.st.db.escape(req.body.heDepartmentId),
-                    req.st.db.escape(req.body.taskTitle),
-                    req.st.db.escape(req.body.taskDescription),
-                    req.st.db.escape(req.body.taskDateTime),
-                    req.st.db.escape(req.body.priority),
-                    req.st.db.escape(req.body.taskEndDate),
-                    req.st.db.escape(JSON.stringify(venue)),
-                    req.st.db.escape(JSON.stringify(anchor)),
-                    req.st.db.escape(req.body.status),
-                    req.st.db.escape(JSON.stringify(attachmentList)),
-                    req.st.db.escape(JSON.stringify(req.body.taskMembers || [])),
-                    req.st.db.escape(req.body.eventFlag || 0),
-                    req.st.db.escape(req.body.address || "")
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL wm_save_pacePlanner( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    // console.log(result);
-                    if (!err && result && result[0] || result[1]) {
-                        response.status = true;
-                        response.message = "Task saved successfully";
-                        response.error = null;
-                        for (var i = 0; i < result[0].length; i++) {
-                            result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
-                            result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
-                            result[0][i].attachmentList = result[0][i].attachmentList ? JSON.parse(result[0][i].attachmentList) : [];
-                            result[0][i].taskMembers = result[0][i].taskMembers ? JSON.parse(result[0][i].taskMembers) : [];
-                        }
+                    if (!req.body.heMasterId) {
+                        validationFlag = false;
+                        error.heMasterId = "Invalid Company";
+                    }
+                
+                    var venue = req.body.venue;
+                    if (typeof (venue) == "string") {
+                        venue = JSON.parse(venue);
+                    }
+                    if (!venue) {
+                        venue = {};
+                    }
 
-                        for (var i = 0; i < result[1].length; i++) {
-                            result[1][i].anchor = result[1][i].anchor ? JSON.parse(result[1][i].anchor) : {};
-                            result[1][i].venue = result[1][i].venue ? JSON.parse(result[1][i].venue) : {};
-                            result[1][i].attachmentList = result[1][i].attachmentList ? JSON.parse(result[1][i].attachmentList) : [];
-                            result[1][i].taskMembers = result[1][i].taskMembers ? JSON.parse(result[1][i].taskMembers) : [];
-                        }
-                        response.data = {
-                            pendingTasks: result[0],
-                            tasks: result[1]
-                        }
-                        res.status(200).json(response);
+                    var anchor = req.body.anchor;
+                    if (typeof (anchor) == "string") {
+                        anchor = JSON.parse(anchor);
+                    }
+                    if (!anchor) {
+                        anchor = {};
+                    }
+
+                    var attachmentList = req.body.attachmentList;
+                    if (typeof (attachmentList) == "string") {
+                        attachmentList = JSON.parse(attachmentList);
+                    }
+                    if (!attachmentList) {
+                        attachmentList = [];
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while saving task";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                        req.body.taskId = req.body.taskId ? req.body.taskId : 0;
+                        req.body.priority = req.body.priority ? req.body.priority : 0;
+                        req.body.taskDateTime = req.body.taskDateTime ? req.body.taskDateTime : null;
+                        req.body.taskEndDate = req.body.taskEndDate ? req.body.taskEndDate : null;
+                        req.body.status = req.body.status ? req.body.status : 0;  // 0 pending ,1- completed
+                        // req.body.eventAttachment = req.body.eventAttachment ? req.body.eventAttachment : '';
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.taskId),
+                            req.st.db.escape(req.body.heMasterId),
+                            req.st.db.escape(req.body.heDepartmentId),
+                            req.st.db.escape(req.body.taskTitle),
+                            req.st.db.escape(req.body.taskDescription),
+                            req.st.db.escape(req.body.taskDateTime),
+                            req.st.db.escape(req.body.priority),
+                            req.st.db.escape(req.body.taskEndDate),
+                            req.st.db.escape(JSON.stringify(venue)),
+                            req.st.db.escape(JSON.stringify(anchor)),
+                            req.st.db.escape(req.body.status),
+                            req.st.db.escape(JSON.stringify(attachmentList)),
+                            req.st.db.escape(JSON.stringify(req.body.taskMembers || [])),
+                            req.st.db.escape(req.body.eventFlag || 0),
+                            req.st.db.escape(req.body.address || "")
+                        ];
+
+                        var procQuery = 'CALL wm_save_pacePlanner( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            // console.log(result);
+                            if (!err && result && result[0] || result[1]) {
+                                response.status = true;
+                                response.message = "Task saved successfully";
+                                response.error = null;
+                                for (var i = 0; i < result[0].length; i++) {
+                                    result[0][i].anchor = result[0][i].anchor ? JSON.parse(result[0][i].anchor) : {};
+                                    result[0][i].venue = result[0][i].venue ? JSON.parse(result[0][i].venue) : {};
+                                    result[0][i].attachmentList = result[0][i].attachmentList ? JSON.parse(result[0][i].attachmentList) : [];
+                                    result[0][i].taskMembers = result[0][i].taskMembers ? JSON.parse(result[0][i].taskMembers) : [];
+                                }
+
+                                for (var i = 0; i < result[1].length; i++) {
+                                    result[1][i].anchor = result[1][i].anchor ? JSON.parse(result[1][i].anchor) : {};
+                                    result[1][i].venue = result[1][i].venue ? JSON.parse(result[1][i].venue) : {};
+                                    result[1][i].attachmentList = result[1][i].attachmentList ? JSON.parse(result[1][i].attachmentList) : [];
+                                    result[1][i].taskMembers = result[1][i].taskMembers ? JSON.parse(result[1][i].taskMembers) : [];
+                                }
+                                response.data = {
+                                    pendingTasks: result[0],
+                                    tasks: result[1]
+                                }
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving task";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+
                     }
+
                 });
+
             }
             else {
                 res.status(401).json(response);
@@ -510,7 +545,23 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
                                 pendingTasks: result[0],
                                 tasks: result[1]
                             };
-                        res.status(200).json(response);
+                        console.log('secretKey', tokenResult[0].secretKey);
+                        if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != null) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
+                            response.status = true;
+                            response.message = "Could not encrypt response";
+                            response.error = 'Invalid Secret Key';
+                            response.data = null;
+                            res.status(400).json(response);
+                        }
+
+                        // res.status(200).json(response);
                     }
 
                     else if (!err) {
@@ -560,22 +611,6 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
         validationFlag *= false;
     }
 
-    var requirement = req.body.requirement;
-    if (typeof (requirement) == "string") {
-        requirement = JSON.parse(requirement);
-    }
-    if (!requirement) {
-        requirement = [];
-    }
-
-    var client = req.body.client;
-    if (typeof (client) == "string") {
-        client = JSON.parse(client);
-    }
-    if (!client) {
-        client = [];
-    }
-
     if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
@@ -585,220 +620,256 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.type = req.query.type ? req.query.type : 1;
-                req.body.resultType = req.body.resultType ? req.body.resultType : 1;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.userMasterId),
-                    req.st.db.escape(req.query.type),
-                    req.st.db.escape(req.body.from),
-                    req.st.db.escape(req.body.to),
-                    req.st.db.escape(req.body.resultType || 0),
-                    req.st.db.escape(JSON.stringify(client)),
-                    req.st.db.escape(JSON.stringify(requirement))
-                    
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL wm_get_DashBoard( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result && result[0]) {
-                        response.status = true;
-                        response.message = "data loaded successfully";
-                        response.error = null;
-                        var output = [];
-                        // for (var i = 0; i < result[1].length; i++) {
-                        //     var res2 = {};
-                        //     res2.stage = result[1][i].stage ? JSON.parse(result[1][i].stage) : {};
-                        //     output.push(res2);
-                        // }
-
-                        // var output1 = [];
-
-                        // for (var i = 0; i < result[2].length; i++) {
-                        //     var res3 = {};
-                        //     res3.name = result[2][i] ? result[2][i].name : "";
-                        //     res3.userMasterId = result[2] && result[2][i] ? result[2][i].userMasterId : 0;
-                        //     res3.stage = result[2][i].stage ? JSON.parse(result[2][i].stage) : [];
-                        //     output1.push(res3);
-                        // }
-
-                        // var output2 = [];
-                        // for (var i = 0; i < result[4].length; i++) {
-                        //     var res4 = {};
-                        //     res4.clientId = result[4][i].clientId;
-                        //     res4.clientName = result[4][i].clientName;
-                        //     res4.stage = result[4][i].stage ? JSON.parse(result[4][i].stage) : {};
-                        //     output2.push(res4);
-                        // }
-                        // if (result[9] && result[9][0]) {
-                        //     for (var i = 0; i < result[9].length; i++) {
-                        //         result[9][i].stageDetails = result[9][i].stageDetails ? JSON.parse(result[9][i].stageDetails) : [];
-                        //         for (var j = 0; j < result[9][i].stageDetails.length; j++) {
-                        //             result[9][i].stageDetails[j].details = result[9][i].stageDetails[j].details ? JSON.parse(result[9][i].stageDetails[j].details) : {};
-                        //         }
-                        //     }
-                        // }
-
-
-                        // if (result[11] && result[11][0]) {
-                        //     for (var i = 0; i < result[11].length; i++) {
-                        //         result[11][i].cvDetails = result[11][i].cvDetails ? JSON.parse(result[11][i].cvDetails) : [];
-
-                        //     }
-                        // }
-
-                        // console.log(result[9][0])
-                        // if (result[10] && result[10][0]) {
-                        //     for (var i = 0; i < result[10].length; i++) {
-                        //         result[10][i].countDetails = result[10][i].countDetails ? JSON.parse(result[10][i].countDetails) : [];
-                        //         for (var j = 0; j < result[10][i].countDetails.length; j++) {
-                        //             result[10][i].countDetails[j].details = result[10][i].countDetails[j].details ? JSON.parse(result[10][i].countDetails[j].details) : {};
-                        //         }
-                        //     }
-
-                        // }
-                        // if (result[12] && result[12][0]) {
-
-                        //     for (var i = 0; i < result[12].length; i++) {
-                        //         result[12][i].cvDetails = result[12][i].cvDetails ? JSON.parse(result[12][i].cvDetails) : [];
-
-                        //     }
-
-                        // }
-                        // for (var i = 0; i < result[7].length; i++) {
-                        //     result[7][i].reqAppDetails = result[7][i].reqAppDetails ? JSON.parse(result[7][i].reqAppDetails) : [];
-                        // }
-
-                        // for (var i = 0; i < result[8].length; i++) {
-                        //     result[8][i].reqAppDetails = result[8][i].reqAppDetails ? JSON.parse(result[8][i].reqAppDetails) : [];
-                        // }
-
-
-                        if (req.body.resultType == 1) {
-                            response.data = {
-                                requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
-                                stages: result[1],
-                                converstionReport: result[2][0],
-                                turnAroundTime: result[3][0],
-                                firstCVResponse: result[4][0],
-
-                            }
-                        }
-                        else if (req.body.resultType == 2) {
-                            response.data = {
-                                requirementReport: result[0],
-                                requirementReportTotalCount: result[1],
-                            }
-                        }
-
-                        else if (req.body.resultType == 3) {
-                            response.data = {
-                                fullfilmentReport: result[0],
-                                fullfilmentReportTotalCount: result[1],
-                            }
-                        }
-
-                        else if (req.body.resultType == 4) {
-                            response.data = {
-                                recruiterWiseReport: result[0],
-                                stagewiseTurnAroundReport: result[1]
-                            }
-                        }
-
-                        // else if(req.body.resultType ==5){
-                        //     response.data={
-                        //         stagewiseTurnAroundReport: result[0]
-                        //  }
-                        // }
-                        else if (req.body.resultType == 5) {
-                            response.data = {
-                                // recruiterWiseReport: result[0],
-                                // stagewiseTurnAroundReport: result[1],
-                                cvSourceReport: result[0],
-                                cvSourceRecruiterReport: result[1],
-
-
-                                totalCVCount: result[2][0].count,
-                                filteredCVCount: result[3][0].count,
-                            }
-                        }
-
-                        else if (req.body.resultType == 6) {
-                            response.data = {
-                                skillReport: result[0] && result[0][0] ? result[0] : []
-                            }
-                        }
-                        
-
-                        // response.data =
-                        //     {
-                        //         requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
-                        //         stages: output,
-                        //         requirementReport: output1,
-                        //         requirementReportTotalCount: result[3],
-                        //         fullfilmentReport: output2,
-                        //         fullfilmentReportTotalCount: result[5],
-                        //         converstionReport: result[6][0],
-                        //         turnAroundTime: result[7][0],
-                        //         firstCVResponse: result[8][0],
-                        //         recruiterWiseReport: result[9],
-                        //         stagewiseTurnAroundReport: result[10],
-                        //         cvSourceReport: result[11],
-                        //         cvSourceRecruiterReport: result[12],
-
-
-                        //         totalCVCount: result[13][0].count,
-                        //         filteredCVCount: result[14][0].count,
-                        //         // CVsSentToTheClient_CVsShortlistedByTheClient: result[10][0],
-                        //         // CVsShortlisted_CandidatesInterviewedByClient: result[11][0],
-                        //         // CandidatesInterviewedByClient_CandidatesOffered: result[12][0],
-                        //         // CandidatesOffered_CandidatesJoined: result[13][0]
-
-                        // };
-                        res.status(200).json(response);
+                    var requirement = req.body.requirement;
+                    if (typeof (requirement) == "string") {
+                        requirement = JSON.parse(requirement);
+                    }
+                    if (!requirement) {
+                        requirement = [];
                     }
 
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "No results found";
-                        response.error = null;
-                        response.data = {
-                            requirementStatus: {},
-                            stages: [],
-                            requirementReport: [],
-                            requirementReportTotalCount: [],
-                            fullfilmentReport: [],
-                            fullfilmentReportTotalCount: [],
-                            converstionReport: {},
-                            turnAroundTime: [],
-                            firstCVResponse: [],
-                            stageWiseReport: [],
-                            stagewiseTurnAroundReport: [],
-                            cvsourceReport: [],
-                            cvSourceRecruiterReport: [],
-                            totalCVCount: [],
-                            filteredCVCount: [],
-                            // CVsCalled_SentToTheClient:[],
-                            // CVsSentToTheClient_CVsShortlistedByTheClient: [],
-                            // CVsShortlisted_CandidatesInterviewedByClient: [],
-                            // CandidatesInterviewedByClient_CandidatesOffered: [],
-                            // CandidatesOffered_CandidatesJoined: []
+                    var client = req.body.client;
+                    if (typeof (client) == "string") {
+                        client = JSON.parse(client);
+                    }
+                    if (!client) {
+                        client = [];
+                    }
 
-                        };
-                        res.status(200).json(response);
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while loading dashobard data";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.type = req.query.type ? req.query.type : 1;
+                        req.body.resultType = req.body.resultType ? req.body.resultType : 1;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(req.query.userMasterId),
+                            req.st.db.escape(req.query.type),
+                            req.st.db.escape(req.body.from),
+                            req.st.db.escape(req.body.to),
+                            req.st.db.escape(req.body.resultType || 0),
+                            req.st.db.escape(JSON.stringify(client)),
+                            req.st.db.escape(JSON.stringify(requirement))
+
+                        ];
+
+                        var procQuery = 'CALL wm_get_DashBoard( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            if (!err && result && result[0]) {
+                                response.status = true;
+                                response.message = "data loaded successfully";
+                                response.error = null;
+                                var output = [];
+                                // for (var i = 0; i < result[1].length; i++) {
+                                //     var res2 = {};
+                                //     res2.stage = result[1][i].stage ? JSON.parse(result[1][i].stage) : {};
+                                //     output.push(res2);
+                                // }
+
+                                // var output1 = [];
+
+                                // for (var i = 0; i < result[2].length; i++) {
+                                //     var res3 = {};
+                                //     res3.name = result[2][i] ? result[2][i].name : "";
+                                //     res3.userMasterId = result[2] && result[2][i] ? result[2][i].userMasterId : 0;
+                                //     res3.stage = result[2][i].stage ? JSON.parse(result[2][i].stage) : [];
+                                //     output1.push(res3);
+                                // }
+
+                                // var output2 = [];
+                                // for (var i = 0; i < result[4].length; i++) {
+                                //     var res4 = {};
+                                //     res4.clientId = result[4][i].clientId;
+                                //     res4.clientName = result[4][i].clientName;
+                                //     res4.stage = result[4][i].stage ? JSON.parse(result[4][i].stage) : {};
+                                //     output2.push(res4);
+                                // }
+                                // if (result[9] && result[9][0]) {
+                                //     for (var i = 0; i < result[9].length; i++) {
+                                //         result[9][i].stageDetails = result[9][i].stageDetails ? JSON.parse(result[9][i].stageDetails) : [];
+                                //         for (var j = 0; j < result[9][i].stageDetails.length; j++) {
+                                //             result[9][i].stageDetails[j].details = result[9][i].stageDetails[j].details ? JSON.parse(result[9][i].stageDetails[j].details) : {};
+                                //         }
+                                //     }
+                                // }
+
+
+                                // if (result[11] && result[11][0]) {
+                                //     for (var i = 0; i < result[11].length; i++) {
+                                //         result[11][i].cvDetails = result[11][i].cvDetails ? JSON.parse(result[11][i].cvDetails) : [];
+
+                                //     }
+                                // }
+
+                                // console.log(result[9][0])
+                                // if (result[10] && result[10][0]) {
+                                //     for (var i = 0; i < result[10].length; i++) {
+                                //         result[10][i].countDetails = result[10][i].countDetails ? JSON.parse(result[10][i].countDetails) : [];
+                                //         for (var j = 0; j < result[10][i].countDetails.length; j++) {
+                                //             result[10][i].countDetails[j].details = result[10][i].countDetails[j].details ? JSON.parse(result[10][i].countDetails[j].details) : {};
+                                //         }
+                                //     }
+
+                                // }
+                                // if (result[12] && result[12][0]) {
+
+                                //     for (var i = 0; i < result[12].length; i++) {
+                                //         result[12][i].cvDetails = result[12][i].cvDetails ? JSON.parse(result[12][i].cvDetails) : [];
+
+                                //     }
+
+                                // }
+                                // for (var i = 0; i < result[7].length; i++) {
+                                //     result[7][i].reqAppDetails = result[7][i].reqAppDetails ? JSON.parse(result[7][i].reqAppDetails) : [];
+                                // }
+
+                                // for (var i = 0; i < result[8].length; i++) {
+                                //     result[8][i].reqAppDetails = result[8][i].reqAppDetails ? JSON.parse(result[8][i].reqAppDetails) : [];
+                                // }
+
+
+                                if (req.body.resultType == 1) {
+                                    response.data = {
+                                        requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
+                                        stages: result[1],
+                                        converstionReport: result[2][0],
+                                        turnAroundTime: result[3][0],
+                                        firstCVResponse: result[4][0],
+
+                                    }
+                                }
+                                else if (req.body.resultType == 2) {
+                                    response.data = {
+                                        requirementReport: result[0],
+                                        requirementReportTotalCount: result[1],
+                                    }
+                                }
+
+                                else if (req.body.resultType == 3) {
+                                    response.data = {
+                                        fullfilmentReport: result[0],
+                                        fullfilmentReportTotalCount: result[1],
+                                    }
+                                }
+
+                                else if (req.body.resultType == 4) {
+                                    response.data = {
+                                        recruiterWiseReport: result[0],
+                                        stagewiseTurnAroundReport: result[1]
+                                    }
+                                }
+
+                                // else if(req.body.resultType ==5){
+                                //     response.data={
+                                //         stagewiseTurnAroundReport: result[0]
+                                //  }
+                                // }
+                                else if (req.body.resultType == 5) {
+                                    response.data = {
+                                        // recruiterWiseReport: result[0],
+                                        // stagewiseTurnAroundReport: result[1],
+                                        cvSourceReport: result[0],
+                                        cvSourceRecruiterReport: result[1],
+
+
+                                        totalCVCount: result[2][0].count,
+                                        filteredCVCount: result[3][0].count,
+                                    }
+                                }
+
+                                else if (req.body.resultType == 6) {
+                                    response.data = {
+                                        skillReport: result[0] && result[0][0] ? result[0] : []
+                                    }
+                                }
+
+
+                                // response.data =
+                                //     {
+                                //         requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
+                                //         stages: output,
+                                //         requirementReport: output1,
+                                //         requirementReportTotalCount: result[3],
+                                //         fullfilmentReport: output2,
+                                //         fullfilmentReportTotalCount: result[5],
+                                //         converstionReport: result[6][0],
+                                //         turnAroundTime: result[7][0],
+                                //         firstCVResponse: result[8][0],
+                                //         recruiterWiseReport: result[9],
+                                //         stagewiseTurnAroundReport: result[10],
+                                //         cvSourceReport: result[11],
+                                //         cvSourceRecruiterReport: result[12],
+
+
+                                //         totalCVCount: result[13][0].count,
+                                //         filteredCVCount: result[14][0].count,
+                                //         // CVsSentToTheClient_CVsShortlistedByTheClient: result[10][0],
+                                //         // CVsShortlisted_CandidatesInterviewedByClient: result[11][0],
+                                //         // CandidatesInterviewedByClient_CandidatesOffered: result[12][0],
+                                //         // CandidatesOffered_CandidatesJoined: result[13][0]
+
+                                // };
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else if (!err) {
+                                response.status = false;
+                                response.message = "No results found";
+                                response.error = null;
+                                response.data = {
+                                    requirementStatus: {},
+                                    stages: [],
+                                    requirementReport: [],
+                                    requirementReportTotalCount: [],
+                                    fullfilmentReport: [],
+                                    fullfilmentReportTotalCount: [],
+                                    converstionReport: {},
+                                    turnAroundTime: [],
+                                    firstCVResponse: [],
+                                    stageWiseReport: [],
+                                    stagewiseTurnAroundReport: [],
+                                    cvsourceReport: [],
+                                    cvSourceRecruiterReport: [],
+                                    totalCVCount: [],
+                                    filteredCVCount: [],
+                                    // CVsCalled_SentToTheClient:[],
+                                    // CVsSentToTheClient_CVsShortlistedByTheClient: [],
+                                    // CVsShortlisted_CandidatesInterviewedByClient: [],
+                                    // CandidatesInterviewedByClient_CandidatesOffered: [],
+                                    // CandidatesOffered_CandidatesJoined: []
+
+                                };
+                                res.status(200).json(response);
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while loading dashobard data";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
             }
             else {
                 res.status(401).json(response);
@@ -824,13 +895,7 @@ paceUsersCtrl.saveTrackerTemplate = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    var tagsJson = req.body.tagsJson;
-    if (typeof (tagsJson) == "string") {
-        tagsJson = JSON.parse(tagsJson);
-    }
-    if (!tagsJson) {
-        tagsJson = [];
-    }
+
 
     if (!validationFlag) {
         response.error = error;
@@ -841,38 +906,68 @@ paceUsersCtrl.saveTrackerTemplate = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.body.heMasterId),
-                    req.st.db.escape(req.body.trackerId),
-                    req.st.db.escape(req.body.userMasterId),
-                    req.st.db.escape(req.body.templateName),
-                    req.st.db.escape(req.body.generatedFileName),
-                    req.st.db.escape(JSON.stringify(tagsJson)),
-                    req.st.db.escape(JSON.stringify(req.body.customTags || []))
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL paceusers_tracker( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    // console.log(result);
-                    if (!err && result && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "tracker saved successfully";
-                        response.error = null;
-                        response.data = result[0][0];
-                        res.status(200).json(response);
+                    var tagsJson = req.body.tagsJson;
+                    if (typeof (tagsJson) == "string") {
+                        tagsJson = JSON.parse(tagsJson);
+                    }
+                    if (!tagsJson) {
+                        tagsJson = [];
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while saving tracker template";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.heMasterId),
+                            req.st.db.escape(req.body.trackerId),
+                            req.st.db.escape(req.body.userMasterId),
+                            req.st.db.escape(req.body.templateName),
+                            req.st.db.escape(req.body.generatedFileName),
+                            req.st.db.escape(JSON.stringify(tagsJson)),
+                            req.st.db.escape(JSON.stringify(req.body.customTags || []))
+                        ];
+
+                        var procQuery = 'CALL paceusers_tracker( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            // console.log(result);
+                            if (!err && result && result[0] && result[0][0]) {
+                                response.status = true;
+                                response.message = "tracker saved successfully";
+                                response.error = null;
+                                response.data = result[0][0];
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving tracker template";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
+
             }
             else {
                 res.status(401).json(response);
@@ -1078,13 +1173,6 @@ paceUsersCtrl.saveLayout = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    var layout = req.body.layout;
-    if (typeof (layout) == "string") {
-        layout = JSON.parse(layout);
-    }
-    if (!layout) {
-        layout = [];
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -1095,34 +1183,61 @@ paceUsersCtrl.saveLayout = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(layout))
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+                    var layout = req.body.layout;
+                    if (typeof (layout) == "string") {
+                        layout = JSON.parse(layout);
+                    }
+                    if (!layout) {
+                        layout = [];
+                    }
 
-                var procQuery = 'CALL wm_save_pacelayout( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    // console.log(result);
-                    if (!err && result) {
-                        response.status = true;
-                        response.message = "Layout saved successfully";
-                        response.error = null;
-                        if (typeof (layout) == "string") {
-                            layout = JSON.parse(layout);
-                        }
-                        response.data = layout;
-                        res.status(200).json(response);
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while saving layout";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(JSON.stringify(layout))
+                        ];
+
+                        var procQuery = 'CALL wm_save_pacelayout( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            // console.log(result);
+                            if (!err && result) {
+                                response.status = true;
+                                response.message = "Layout saved successfully";
+                                response.error = null;
+                                if (typeof (layout) == "string") {
+                                    layout = JSON.parse(layout);
+                                }
+                                response.data = layout;
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving layout";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
                 });
             }
@@ -1185,11 +1300,15 @@ paceUsersCtrl.getMailDetails = function (req, res, next) {
                         response.message = "Mail details loaded successfully";
                         response.error = null;
                         response.data = JSON.parse(result[0][0].mailDetails);
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
 
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "No results found";
                         response.error = null;
                         response.data = null;
@@ -1229,13 +1348,6 @@ paceUsersCtrl.saveJobPortalUsers = function (req, res, next) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    var portalName = req.body.portalName;
-    if (typeof (portalName) == "string") {
-        portalName = JSON.parse(portalName);
-    }
-    if (!portalName) {
-        portalName = {};
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -1246,49 +1358,79 @@ paceUsersCtrl.saveJobPortalUsers = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                // var encryptPwd = '';
-                // if (req.body.password) {
-                //     encryptPwd = req.st.hashPassword(req.body.password);
-                // }
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(portalName)),
-                    req.st.db.escape(req.body.userName),
-                    req.st.db.escape(req.body.password)
-                ];
+                    var portalName = req.body.portalName;
+                    if (typeof (portalName) == "string") {
+                        portalName = JSON.parse(portalName);
+                    }
+                    if (!portalName) {
+                        portalName = {};
+                    }
 
-                //if (comparePassword(password, loginResult[0][0].Password)) {
 
-                var procQuery = 'CALL wm_save_jobPortalUsers( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    // console.log(result);
-                    if (!err && result && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "Job portal details saved successfully";
-                        response.error = null;
-
-                        for (var i = 0; i < result[0].length; i++) {
-                            result[0][i].portalName = result[0] ? JSON.parse(result[0][i].portalName) : {};
-                        }
-
-                        response.data = {
-                            portalUsersList: result[0] ? result[0] : []
-                        }
-                        res.status(200).json(response);
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while job portal details";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        // var encryptPwd = '';
+                        // if (req.body.password) {
+                        //     encryptPwd = req.st.hashPassword(req.body.password);
+                        // }
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(JSON.stringify(portalName)),
+                            req.st.db.escape(req.body.userName),
+                            req.st.db.escape(req.body.password)
+                        ];
+
+                        //if (comparePassword(password, loginResult[0][0].Password)) {
+
+                        var procQuery = 'CALL wm_save_jobPortalUsers( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            // console.log(result);
+                            if (!err && result && result[0] && result[0][0]) {
+                                response.status = true;
+                                response.message = "Job portal details saved successfully";
+                                response.error = null;
+
+                                for (var i = 0; i < result[0].length; i++) {
+                                    result[0][i].portalName = result[0] ? JSON.parse(result[0][i].portalName) : {};
+                                }
+
+                                response.data = {
+                                    portalUsersList: result[0] ? result[0] : []
+                                }
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while job portal details";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
+
             }
             else {
                 res.status(401).json(response);
@@ -1353,10 +1495,15 @@ paceUsersCtrl.getJobPortalUsers = function (req, res, next) {
                             portalUsersList: result[0] ? result[0] : [],
                             jobPortalList: result[1] ? result[1] : []
                         }
-                        res.status(200).json(response);
+
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "No result found";
                         response.error = null;
                         response.data = {
@@ -1456,10 +1603,14 @@ paceUsersCtrl.freeJobPortalUsers = function (req, res, next) {
                             freePortal: freePortal
 
                         }
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "No result found";
                         response.error = null;
                         response.data = {
@@ -1598,41 +1749,63 @@ paceUsersCtrl.deleteJobPortalUsers = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(req.body.portalUserId || []))
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL wm_delete_jobportaluserIds( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    // console.log(result);
-                    if (!err && result && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "Portal users deleted successfully";
-                        response.error = null;
-                        response.data = result[0][0];
 
-                        res.status(200).json(response);
-                    }
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "No result found";
-                        response.error = null;
-                        response.data = null;
-                        res.status(200).json(response);
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while deleting portal user";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(JSON.stringify(req.body.portalUserId || []))
+                        ];
+
+                        var procQuery = 'CALL wm_delete_jobportaluserIds( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            // console.log(result);
+                            if (!err && result && result[0] && result[0][0]) {
+                                response.status = true;
+                                response.message = "Portal users deleted successfully";
+                                response.error = null;
+                                response.data = result[0][0];
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else if (!err) {
+                                response.status = false;
+                                response.message = "No result found";
+                                response.error = null;
+                                response.data = null;
+                                res.status(200).json(response);
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while deleting portal user";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
             }
             else {
                 res.status(401).json(response);
@@ -1722,13 +1895,6 @@ paceUsersCtrl.saveOrgChartBranches = function (req, res, next) {
         validationFlag *= false;
     }
 
-    var branches = req.body.branches;
-    if (typeof (branches) == "string") {
-        branches = JSON.parse(branches);
-    }
-    if (!branches) {
-        branches = [];
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -1739,53 +1905,84 @@ paceUsersCtrl.saveOrgChartBranches = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(branches))
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL pace_save_orgchartBranches( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "Organization branches saved successfully";
-                        response.error = null;
-                        for (var i = 0; i < result[0].length; i++) {
-                            result[0][i].contactISD = result[0][i].contactISD ? JSON.parse(result[0][i].contactISD) : {};
-                            result[0][i].currency = result[0][i].currency && JSON.parse(result[0][i].currency).currencyId ? JSON.parse(result[0][i].currency) : {};
-                            result[0][i].duration = result[0][i].duration && JSON.parse(result[0][i].duration).durationId ? JSON.parse(result[0][i].duration) : {};
-                            result[0][i].scale = result[0][i].scale && JSON.parse(result[0][i].scale).scaleId ? JSON.parse(result[0][i].scale) : {};
-                        }
-
-                        response.data = {
-                            organizationBranches: result[0] && result[0][0] ? result[0] : []
-                        }
-                        res.status(200).json(response);
+                    var branches = req.body.branches;
+                    if (typeof (branches) == "string") {
+                        branches = JSON.parse(branches);
+                    }
+                    if (!branches) {
+                        branches = [];
                     }
 
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "Organization branches saved successfully";
-                        response.error = null;
-                        response.data = {
-                            organizationBranches: []
-                        };
-                        res.status(200).json(response);
-                    }
 
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
                     else {
-                        response.status = false;
-                        response.message = "Error while saving organization branches";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(JSON.stringify(branches))
+                        ];
+
+                        var procQuery = 'CALL pace_save_orgchartBranches( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            if (!err && result && result[0] && result[0][0]) {
+                                response.status = true;
+                                response.message = "Organization branches saved successfully";
+                                response.error = null;
+                                for (var i = 0; i < result[0].length; i++) {
+                                    result[0][i].contactISD = result[0][i].contactISD ? JSON.parse(result[0][i].contactISD) : {};
+                                    result[0][i].currency = result[0][i].currency && JSON.parse(result[0][i].currency).currencyId ? JSON.parse(result[0][i].currency) : {};
+                                    result[0][i].duration = result[0][i].duration && JSON.parse(result[0][i].duration).durationId ? JSON.parse(result[0][i].duration) : {};
+                                    result[0][i].scale = result[0][i].scale && JSON.parse(result[0][i].scale).scaleId ? JSON.parse(result[0][i].scale) : {};
+                                }
+
+                                response.data = {
+                                    organizationBranches: result[0] && result[0][0] ? result[0] : []
+                                }
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+
+                            }
+
+                            else if (!err) {
+                                response.status = false;
+                                response.message = "Organization branches saved successfully";
+                                response.error = null;
+                                response.data = {
+                                    organizationBranches: []
+                                };
+                                res.status(200).json(response);
+                            }
+
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving organization branches";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
+
             }
             else {
                 res.status(401).json(response);
@@ -1813,13 +2010,7 @@ paceUsersCtrl.saveOrgChartDepartments = function (req, res, next) {
         validationFlag *= false;
     }
 
-    var departments = req.body.departments;
-    if (typeof (departments) == "string") {
-        departments = JSON.parse(departments);
-    }
-    if (!departments) {
-        departments = [];
-    }
+
 
     if (!validationFlag) {
         response.error = error;
@@ -1830,46 +2021,76 @@ paceUsersCtrl.saveOrgChartDepartments = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(departments))
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL pace_save_departments( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "Organization departments saved successfully";
-                        response.error = null;
-                        response.data = {
-                            organizationDepartments: result[0] && result[0][0] ? result[0] : []
-                        }
-                        res.status(200).json(response);
+                    var departments = req.body.departments;
+                    if (typeof (departments) == "string") {
+                        departments = JSON.parse(departments);
+                    }
+                    if (!departments) {
+                        departments = [];
                     }
 
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "Organization departments saved successfully";
-                        response.error = null;
-                        response.data = {
-                            organizationDepartments: []
-                        };
-                        res.status(200).json(response);
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
-
                     else {
-                        response.status = false;
-                        response.message = "Error while saving organization departments";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(JSON.stringify(departments))
+                        ];
+
+                        var procQuery = 'CALL pace_save_departments( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            if (!err && result && result[0] && result[0][0]) {
+                                response.status = true;
+                                response.message = "Organization departments saved successfully";
+                                response.error = null;
+                                response.data = {
+                                    organizationDepartments: result[0] && result[0][0] ? result[0] : []
+                                }
+
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+
+                            }
+
+                            else if (!err) {
+                                response.status = false;
+                                response.message = "Organization departments saved successfully";
+                                response.error = null;
+                                response.data = {
+                                    organizationDepartments: []
+                                };
+                                res.status(200).json(response);
+                            }
+
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving organization departments";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
             }
             else {
                 res.status(401).json(response);
@@ -1897,13 +2118,6 @@ paceUsersCtrl.saveOrgChartGrades = function (req, res, next) {
         validationFlag *= false;
     }
 
-    var grades = req.body.grades;
-    if (typeof (grades) == "string") {
-        grades = JSON.parse(grades);
-    }
-    if (!grades) {
-        grades = [];
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -1914,46 +2128,75 @@ paceUsersCtrl.saveOrgChartGrades = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(grades))
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL pace_save_grade( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "Organization grades saved successfully";
-                        response.error = null;
-                        response.data = {
-                            organizationGrades: result[0] && result[0][0] ? result[0] : []
-                        }
-                        res.status(200).json(response);
+                    var grades = req.body.grades;
+                    if (typeof (grades) == "string") {
+                        grades = JSON.parse(grades);
+                    }
+                    if (!grades) {
+                        grades = [];
                     }
 
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "Organization grades saved successfully";
-                        response.error = null;
-                        response.data = {
-                            organizationGrades: []
-                        };
-                        res.status(200).json(response);
-                    }
 
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
                     else {
-                        response.status = false;
-                        response.message = "Error while saving organization grades";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(JSON.stringify(grades))
+                        ];
+
+                        var procQuery = 'CALL pace_save_grade( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            if (!err && result && result[0] && result[0][0]) {
+                                response.status = true;
+                                response.message = "Organization grades saved successfully";
+                                response.error = null;
+                                response.data = {
+                                    organizationGrades: result[0] && result[0][0] ? result[0] : []
+                                }
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else if (!err) {
+                                response.status = false;
+                                response.message = "Organization grades saved successfully";
+                                response.error = null;
+                                response.data = {
+                                    organizationGrades: []
+                                };
+                                res.status(200).json(response);
+                            }
+
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving organization grades";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
             }
             else {
                 res.status(401).json(response);
@@ -1981,13 +2224,6 @@ paceUsersCtrl.saveOrgChartJobtitles = function (req, res, next) {
         validationFlag *= false;
     }
 
-    var jobTitles = req.body.jobTitles;
-    if (jobTitles != "" && typeof (jobTitles) == "string") {
-        jobTitles = JSON.parse(jobTitles);
-    }
-    if (!jobTitles) {
-        jobTitles = [];
-    }
 
     if (!validationFlag) {
         response.error = error;
@@ -1998,46 +2234,75 @@ paceUsersCtrl.saveOrgChartJobtitles = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(jobTitles))
-                ];
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var procQuery = 'CALL pace_save_jobtitles( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "Organization jobtitles saved successfully";
-                        response.error = null;
-                        response.data = {
-                            organizationJobTitles: result[0] && result[0][0] ? result[0] : []
-                        }
-                        res.status(200).json(response);
+                    var jobTitles = req.body.jobTitles;
+                    if (jobTitles != "" && typeof (jobTitles) == "string") {
+                        jobTitles = JSON.parse(jobTitles);
+                    }
+                    if (!jobTitles) {
+                        jobTitles = [];
                     }
 
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "Organization jobtitles saved successfully";
-                        response.error = null;
-                        response.data = {
-                            organizationJobTitles: []
-                        };
-                        res.status(200).json(response);
-                    }
 
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
                     else {
-                        response.status = false;
-                        response.message = "Error while saving organization jobtitles";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(JSON.stringify(jobTitles))
+                        ];
+
+                        var procQuery = 'CALL pace_save_jobtitles( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            if (!err && result && result[0] && result[0][0]) {
+                                response.status = true;
+                                response.message = "Organization jobtitles saved successfully";
+                                response.error = null;
+                                response.data = {
+                                    organizationJobTitles: result[0] && result[0][0] ? result[0] : []
+                                }
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else if (!err) {
+                                response.status = false;
+                                response.message = "Organization jobtitles saved successfully";
+                                response.error = null;
+                                response.data = {
+                                    organizationJobTitles: []
+                                };
+                                res.status(200).json(response);
+                            }
+
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving organization jobtitles";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
                     }
+
                 });
+
             }
             else {
                 res.status(401).json(response);
@@ -2102,11 +2367,15 @@ paceUsersCtrl.getOrgChartData = function (req, res, next) {
                             organizationGrades: result[2] && result[2][0] ? result[2] : [],
                             organizationJobTitles: result[3] && result[3][0] ? result[3] : []
                         }
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
 
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "Organization data loaded successfully";
                         response.error = null;
                         response.data = {
@@ -2706,135 +2975,160 @@ paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
 
     if (status) {
         try {
-            var message = "";
-            message = message + applicantInfo.applicantName + ", " + applicantInfo.mobileIsd + applicantInfo.mobileNumber;
-            message = "Contact details: " + message + " --PaceHCM";
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
 
-            var query = [
-                req.st.db.escape(req.query.token),
-                req.st.db.escape(JSON.stringify(req.body.applicantInfo || {})),
-                req.st.db.escape(message),
-                req.st.db.escape(DBSecretKey)
-            ];
-
-            console.log('CALL pace_notifyApplicantInfo(' + query.join(',') + ')');
-            req.st.db.query('CALL pace_notifyApplicantInfo(' + query.join(',') + ')', function (err, userResult) {
-
-                console.log("error", err);
-
-                if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].mobile) {
-
-                    // if (userResult[0][0].isd && userResult[0][0].mobile) {
-                    //     if (userResult[0][0].isd == "+977") {
-                    //         request({
-                    //             url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                    //             qs: {
-                    //                 token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                    //                 to: userResult[0][0].mobile,
-                    //                 message: message,
-                    //                 sender: 'Techingen'
-                    //             },
-                    //             method: 'GET'
-
-                    //         }, function (error, response, body) {
-                    //             if (error) {
-                    //                 console.log(error, "SMS");
-                    //             }
-                    //             else {
-                    //                 console.log("SUCCESS", "SMS response");
-                    //             }
-
-                    //         });
-                    //     }
-                    //     else if (userResult[0][0].isd == "+91") {
-                    //         request({
-                    //             url: 'https://aikonsms.co.in/control/smsapi.php',
-                    //             qs: {
-                    //                 user_name: 'janardana@hirecraft.com',
-                    //                 password: 'Ezeid2015',
-                    //                 sender_id: 'WtMate',
-                    //                 service: 'TRANS',
-                    //                 mobile_no: userResult[0][0].mobile,
-                    //                 message: message,
-                    //                 method: 'send_sms'
-                    //             },
-                    //             method: 'GET'
-
-                    //         }, function (error, response, body) {
-                    //             if (error) {
-                    //                 console.log(error, "SMS");
-                    //             }
-                    //             else {
-                    //                 console.log("SUCCESS", "SMS response");
-                    //             }
-                    //         });
-
-                    //         var req = http.request(options, function (res) {
-                    //             var chunks = [];
-
-                    //             res.on("data", function (chunk) {
-                    //                 chunks.push(chunk);
-                    //             });
-
-                    //             res.on("end", function () {
-                    //                 var body = Buffer.concat(chunks);
-                    //                 console.log(body.toString());
-                    //             });
-                    //         });
-
-                    //         req.write(qs.stringify({
-                    //             userId: 'talentmicro',
-                    //             password: 'TalentMicro@123',
-                    //             senderId: 'WTMATE',
-                    //             sendMethod: 'simpleMsg',
-                    //             msgType: 'text',
-                    //             mobile: userResult[0][0].isd.replace("+", "") + userResult[0][0].mobile,
-                    //             msg: message,
-                    //             duplicateCheck: 'true',
-                    //             format: 'json'
-                    //         }));
-                    //         req.end();
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
 
-                    //     }
-                    //     else if (userResult[0][0].isd != "") {
-                    //         client.messages.create(
-                    //             {
-                    //                 body: message,
-                    //                 to: userResult[0][0].isd + userResult[0][0].mobile,
-                    //                 from: FromNumber
-                    //             },
-                    //             function (error, response) {
-                    //                 if (error) {
-                    //                     console.log(error, "SMS");
-                    //                 }
-                    //                 else {
-                    //                     console.log("SUCCESS", "SMS response");
-                    //                 }
-                    //             }
-                    //         );
-                    //     }
-                    // }
-                    respMsg.status = true;
-                    respMsg.message = 'Applicant details sent to whatmate.Please login into whatmate';
-                    respMsg.data = null;
-                    res.status(200).json(respMsg);
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            var message = "";
+                            message = message + applicantInfo.applicantName + ", " + applicantInfo.mobileIsd + applicantInfo.mobileNumber;
+                            message = "Contact details: " + message + " --PaceHCM";
 
-                }
-                else if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].loggedInWhatmateUser) {
+                            var query = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(JSON.stringify(req.body.applicantInfo || {})),
+                                req.st.db.escape(message),
+                                req.st.db.escape(DBSecretKey)
+                            ];
 
-                    notifyMessages.getMessagesNeedToNotify();
-                    respMsg.status = true;
-                    respMsg.message = userResult[0][0].loggedInWhatmateUser;
-                    respMsg.data = null;
-                    res.status(200).json(respMsg);
+                            console.log('CALL pace_notifyApplicantInfo(' + query.join(',') + ')');
+                            req.st.db.query('CALL pace_notifyApplicantInfo(' + query.join(',') + ')', function (err, userResult) {
+
+                                console.log("error", err);
+
+                                if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].mobile) {
+
+                                    // if (userResult[0][0].isd && userResult[0][0].mobile) {
+                                    //     if (userResult[0][0].isd == "+977") {
+                                    //         request({
+                                    //             url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                    //             qs: {
+                                    //                 token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                    //                 to: userResult[0][0].mobile,
+                                    //                 message: message,
+                                    //                 sender: 'Techingen'
+                                    //             },
+                                    //             method: 'GET'
+
+                                    //         }, function (error, response, body) {
+                                    //             if (error) {
+                                    //                 console.log(error, "SMS");
+                                    //             }
+                                    //             else {
+                                    //                 console.log("SUCCESS", "SMS response");
+                                    //             }
+
+                                    //         });
+                                    //     }
+                                    //     else if (userResult[0][0].isd == "+91") {
+                                    //         request({
+                                    //             url: 'https://aikonsms.co.in/control/smsapi.php',
+                                    //             qs: {
+                                    //                 user_name: 'janardana@hirecraft.com',
+                                    //                 password: 'Ezeid2015',
+                                    //                 sender_id: 'WtMate',
+                                    //                 service: 'TRANS',
+                                    //                 mobile_no: userResult[0][0].mobile,
+                                    //                 message: message,
+                                    //                 method: 'send_sms'
+                                    //             },
+                                    //             method: 'GET'
+
+                                    //         }, function (error, response, body) {
+                                    //             if (error) {
+                                    //                 console.log(error, "SMS");
+                                    //             }
+                                    //             else {
+                                    //                 console.log("SUCCESS", "SMS response");
+                                    //             }
+                                    //         });
+
+                                    //         var req = http.request(options, function (res) {
+                                    //             var chunks = [];
+
+                                    //             res.on("data", function (chunk) {
+                                    //                 chunks.push(chunk);
+                                    //             });
+
+                                    //             res.on("end", function () {
+                                    //                 var body = Buffer.concat(chunks);
+                                    //                 console.log(body.toString());
+                                    //             });
+                                    //         });
+
+                                    //         req.write(qs.stringify({
+                                    //             userId: 'talentmicro',
+                                    //             password: 'TalentMicro@123',
+                                    //             senderId: 'WTMATE',
+                                    //             sendMethod: 'simpleMsg',
+                                    //             msgType: 'text',
+                                    //             mobile: userResult[0][0].isd.replace("+", "") + userResult[0][0].mobile,
+                                    //             msg: message,
+                                    //             duplicateCheck: 'true',
+                                    //             format: 'json'
+                                    //         }));
+                                    //         req.end();
+
+
+                                    //     }
+                                    //     else if (userResult[0][0].isd != "") {
+                                    //         client.messages.create(
+                                    //             {
+                                    //                 body: message,
+                                    //                 to: userResult[0][0].isd + userResult[0][0].mobile,
+                                    //                 from: FromNumber
+                                    //             },
+                                    //             function (error, response) {
+                                    //                 if (error) {
+                                    //                     console.log(error, "SMS");
+                                    //                 }
+                                    //                 else {
+                                    //                     console.log("SUCCESS", "SMS response");
+                                    //                 }
+                                    //             }
+                                    //         );
+                                    //     }
+                                    // }
+                                    respMsg.status = true;
+                                    respMsg.message = 'Applicant details sent to whatmate.Please login into whatmate';
+                                    respMsg.data = null;
+                                    res.status(200).json(respMsg);
+
+                                }
+                                else if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].loggedInWhatmateUser) {
+
+                                    notifyMessages.getMessagesNeedToNotify();
+                                    respMsg.status = true;
+                                    respMsg.message = userResult[0][0].loggedInWhatmateUser;
+                                    respMsg.data = null;
+                                    res.status(200).json(respMsg);
+                                }
+                                else {
+                                    respMsg.status = false;
+                                    respMsg.message = 'Something went wrong';
+                                    res.status(500).json(respMsg);
+                                }
+                            });
+                        }
+
+                    });
                 }
                 else {
-                    respMsg.status = false;
-                    respMsg.message = 'Something went wrong';
-                    res.status(500).json(respMsg);
+                    res.status(401).json(response);
                 }
             });
+
+
         }
         catch (ex) {
             console.log('Error : FnSendOtp ' + ex);
@@ -2912,15 +3206,18 @@ paceUsersCtrl.getTaskPlannerForExport = function (req, res, next) {
                             result[0][i].attachmentList = result[0][i].attachmentList ? JSON.parse(result[0][i].attachmentList) : [];
 
                         }
-                        response.data =
-                            {
-                                tasks: result[0] ? result[0] : []
-                            };
-                        res.status(200).json(response);
+                        response.data = {
+                            tasks: result[0] ? result[0] : []
+                        };
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
 
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "No results found";
                         response.error = null;
                         response.data = null;
@@ -3022,11 +3319,15 @@ paceUsersCtrl.getSourcedApplicants = function (req, res, next) {
                             {
                                 ApplicantsList: result[0] ? result[0] : []
                             };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
 
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "No results found";
                         response.error = null;
                         response.data = null;
@@ -3144,10 +3445,6 @@ paceUsersCtrl.getclientRequuirements = function (req, res, next) {
         validationFlag = false;
     }
 
-    if (!req.body.heDepartmentId) {
-        error.heDepartmentId = "Invalid client";
-        validationFlag = false;
-    }
 
     if (!req.query.token) {
         error.token = 'Invalid token';
@@ -3162,41 +3459,144 @@ paceUsersCtrl.getclientRequuirements = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.type = req.query.type ? req.query.type : 1;
+
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                    if (!req.body.heDepartmentId) {
+                        error.heDepartmentId = "Invalid client";
+                        validationFlag = false;
+                    }
+
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+                        req.query.type = req.query.type ? req.query.type : 1;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
+                            req.st.db.escape(req.query.type),
+                            req.st.db.escape(req.body.from),
+                            req.st.db.escape(req.body.to)
+                        ];
+
+                        var procQuery = 'CALL wm_get_paceClientRequirements( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            // console.log(result);
+                            if (!err && result && result[0][0]) {
+                                response.status = true;
+                                response.message = "data loaded successfully";
+                                response.error = null;
+
+                                response.data = result[0];
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+
+                            else if (!err) {
+                                response.status = false;
+                                response.message = "No results found";
+                                response.error = null;
+                                response.data = null;
+                                res.status(200).json(response);
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while loading dashobard data";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+
+                });
+
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+paceUsersCtrl.smsMailTemplates = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        validationFlag *= false;
+        error.heMasterId = "Invalid Company";
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
-                    req.st.db.escape(req.query.type),
-                    req.st.db.escape(req.body.from),
-                    req.st.db.escape(req.body.to)
+                    req.st.db.escape(req.query.heMasterId)
                 ];
 
-                var procQuery = 'CALL wm_get_paceClientRequirements( ' + inputs.join(',') + ')';
+                var procQuery = 'CALL pace_mailer_smsTemplates( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    // console.log(result);
-                    if (!err && result && result[0][0]) {
+                    if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
-                        response.message = "data loaded successfully";
+                        response.message = "Template list loaded successfully";
                         response.error = null;
-
-                        response.data = result[0];
+                        response.data = {
+                            templateList: result[0] ? result[0] : []
+                        };
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                         res.status(200).json(response);
+                        // });
                     }
 
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = "No results found";
                         response.error = null;
-                        response.data = null;
+                        response.data = {
+                            templateList: []
+                        };
                         res.status(200).json(response);
                     }
                     else {
                         response.status = false;
-                        response.message = "Error while loading dashobard data";
+                        response.message = "Error while loading templateList";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);

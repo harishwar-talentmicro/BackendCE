@@ -128,7 +128,8 @@ managerCtrl.saveUsers = function(req,res,next){
                     req.st.db.escape(req.body.empDocuments),
                     req.st.db.escape(req.body.eventManager),
                     req.st.db.escape(req.body.HRPayrollDocs || 0),
-                    req.st.db.escape(req.body.isShowAllWalkin || 0)
+                    req.st.db.escape(req.body.isShowAllWalkin || 0),
+                    req.st.db.escape(req.body.sales || 0)
                 ];
                 /**
                  * Calling procedure to save deal
@@ -215,6 +216,7 @@ managerCtrl.getUserDetails = function(req,res,next){
                             empDocuments : result[1][0].empDocuments,
                             eventManager : result[1][0].eventManager,
                             HRPayrollDocs : result[1][0].HRPayrollDocs,
+                            sales : result[1][0].sales,
                             formList : result[0][0].formList ? JSON.parse(result[0][0].formList) : null,
                             isShowAllWalkin: result[1][0].isShowAllWalkin
                         };
@@ -489,6 +491,7 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                 var procQuery = 'CALL get_whatmate_dashboard1( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery,function(err,result){
+                    console.log(err);
                     if(!err && result && result[0] && result[0][0] && result[0][0].message){
                         response.status = false;
                         response.message = "Access denied";
@@ -496,20 +499,20 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                         response.data = null;
                         res.status(200).json(response);
                     }
-                    else if(!err && result && result[0] && result[0][0]&& result[2]&&result[2][0]){
+                    else if(!err && result){
                         var output = [];
-                        var dashboard = JSON.parse(result[0][0].data) ;
+                        var dashboard = result[0][0] && JSON.parse(result[0][0].data) ? JSON.parse(result[0][0].data) : [] ;
                         for(var i = 0; i < dashboard.length; i++) {
                             var res1 = {};
-                            res1.formName = dashboard[i].formName;
-                            res1.formId = dashboard[i].formId;
-                            res1.statusList = JSON.parse(dashboard[i].statusList);
+                            res1.formName = dashboard[i].formName ? dashboard[i].formName : '';
+                            res1.formId = dashboard[i].formId ? dashboard[i].formId : 0;
+                            res1.statusList = JSON.parse(dashboard[i].statusList) ? JSON.parse(dashboard[i].statusList) : [];
                             output.push(res1);
                         }
                       
                         if(result[3] && result[3][0] && result[3][0].helpDeskDEtails){
                             var help = JSON.parse(result[3][0].helpDeskDEtails) ;
-                            console.log(help);
+                            // console.log(help);
                                 help.statusList = JSON.parse(help.statusList);
                                 output.push(help);    
                         }
@@ -521,39 +524,23 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            userManager : result[1][0].userManager,
-                            masterConfiguration : result[1][0].masterConfiguration,
-                            attendanceRequest : result[1][0].attendanceRequest,
-                            adoptionReport : result[1][0].adoptionReport,
-                            empDocuments : result[1][0].empDocuments,
-                            eventManager : result[1][0].eventManager,
-                            HRPayrollDocs : result[1][0].HRPayrollDocs,
-                            isSaleSupport : result[1][0].isSaleSupport,
+                            userManager : result[1][0] && result[1][0].userManager ? result[1][0].userManager : 0,
+                            masterConfiguration : result[1][0] && result[1][0].masterConfiguration ? result[1][0].masterConfiguration : 0,
+                            attendanceRequest : result[1][0] && result[1][0].attendanceRequest ? result[1][0].attendanceRequest : 0,
+                            adoptionReport : result[1][0] && result[1][0].adoptionReport ? result[1][0].adoptionReport : 0,
+                            empDocuments : result[1][0] && result[1][0].empDocuments ? result[1][0].empDocuments : 0,
+                            eventManager : result[1][0] && result[1][0].eventManager ? result[1][0].eventManager : 0,
+                            HRPayrollDocs : result[1][0] && result[1][0].HRPayrollDocs ? result[1][0].HRPayrollDocs : 0,
+                            sales : result[1][0] && result[1][0].sales ? result[1][0].sales : 0,
                             formList : output,
                             accessableFormList : result[2][0].formList ? JSON.parse(result[2][0].formList) : null
                         };
                         res.status(200).json(response);
                     }
-                    else if(!err && result && result[1] && result[1][0]){
-                        response.status = true;
-                        response.message = "Data loaded successfully";
-                        response.error = null;
-                        response.data = {
-                            userManager : result[1][0].userManager,
-                            masterConfiguration : result[1][0].masterConfiguration,
-                            attendanceRequest : result[1][0].attendanceRequest,
-                            adoptionReport : result[1][0].adoptionReport,
-                            empDocuments : result[1][0].empDocuments,
-                            eventManager : result[1][0].eventManager,
-                            HRPayrollDocs : result[1][0].HRPayrollDocs,
-                            formList : [],
-                           accessableFormList : []
-                        };
-                        res.status(200).json(response);
-                    }
+                  
                     else if(!err ){
                         response.status = true;
-                        response.message = "Data loaded successfully";
+                        response.message = "No data found";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);

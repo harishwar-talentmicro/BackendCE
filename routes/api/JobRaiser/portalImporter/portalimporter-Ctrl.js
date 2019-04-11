@@ -820,7 +820,7 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
         var tempDetails = document.getElementsByClassName('skinfo hg_mtch');
         if (tempDetails && tempDetails[0] && tempDetails[0].innerHTML) {
             var emailid = tempDetails[0].innerHTML.trim();
-            var regularExp = /[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}/;   // include /s in the end
+            var regularExp = /[A-Za-z]+[A-Za-z0-9._]+@[A-Za-z]+\.[A-Za-z.]{2,5}/;   // include /s in the end
             console.log(emailid);
 
             if (regularExp.exec(emailid) && regularExp.exec(emailid)[0])
@@ -1756,24 +1756,31 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             details.presentLocation = removeExtraChars(presentLocation.trim());
         }
 
-        var tempPreferedLocation = document.getElementsByClassName('exp-sal-loc-box');
-        if (tempPreferedLocation && tempPreferedLocation[0] && tempPreferedLocation[0].innerHTML && tempPreferedLocation[0].innerHTML.split('>Pref </span') && tempPreferedLocation[0].innerHTML.split('>Pref </span')[1]) {
-            var prefLocations = document.getElementsByClassName('exp-sal-loc-box')[0].innerHTML.split('>Pref </span')[1];
+        try {
+            var tempPreferedLocation = document.getElementsByClassName('exp-sal-loc-box');
+            if (tempPreferedLocation && tempPreferedLocation[0] && tempPreferedLocation[0].innerHTML && tempPreferedLocation[0].innerHTML.split('>Pref </span') && tempPreferedLocation[0].innerHTML.split('>Pref </span')[1]) {
+                var prefLocations = document.getElementsByClassName('exp-sal-loc-box')[0].innerHTML.split('>Pref </span')[1];
 
-            if (details.prefLocations && details.prefLocations.split(',').length) {
-                details.prefLocations = details.prefLocations.split(',');
-                var spliceIndexes = [];
-                for (var i = 0; i < details.prefLocations.length; i++) {
-                    if (removeExtraChars(details.prefLocations[i].trim()) != '')
-                        details.prefLocations[i] = removeExtraChars(details.prefLocations[i].trim());
-                    else
-                        spliceIndexes.push(i);
-                }
-                for (var ind = 0; ind < spliceIndexes.length; ind++) {
-                    details.prefLocations.splice(spliceIndexes[ind], 1);
+                if (prefLocations && prefLocations.split(',').length) {
+                    details.prefLocations = prefLocations.split(',');
+                    var spliceIndexes = [];
+                    for (var i = 0; i < details.prefLocations.length; i++) {
+                        if (removeExtraChars(details.prefLocations[i].trim()) != '')
+                            details.prefLocations[i] = removeExtraChars(details.prefLocations[i].trim());
+                        else
+                            spliceIndexes.push(i);
+                    }
+                    for (var ind = 0; ind < spliceIndexes.length; ind++) {
+                        details.prefLocations.splice(spliceIndexes[ind], 1);
+                    }
                 }
             }
         }
+
+        catch (err) {
+            console.log(err);
+        }
+
 
 
         var tempGDOB = document.getElementsByClassName('clFx details-box');
@@ -2028,65 +2035,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             delete (details.resumeText);
 
             if (req.body.tallint_url && req.body.tallint_url.length > 1) {
-            request({
-                headers: {
-                    Authorization: 'Bearer ' + req.body.tallintToken
-                },
-                url: req.body.tallint_url,
-                method: "POST",
-                json: true,
-                body: details
-            }, function (error, resp, body) {
-                if (!error && body) {
-                    response.status = true;
-                    response.message = "Response from tallint DB";
-                    response.error = null;
-                    response.data = {
-                        ourjson: {
-                            headers: {
-                                Authorization: 'Bearer ' + req.body.tallintToken
-                            },
-                            url: req.body.tallint_url,
-                            method: "POST",
-                            json: true,
-                            body: details
-                        },
-                        resonseOfTallint: body
-                    };
-                    if (body.Code != 'ERR0001') {
-                        res.status(200).json(response);
-                    }
-                    else {
-                        res.status(500).json(response);
-                    }
-                }
-                else {
-                    response.status = false;
-                    response.message = "Error from tallint DB";
-                    response.error = null;
-                    response.data = {
-                        ourjson: {
-                            headers: {
-                                Authorization: 'Bearer ' + req.body.tallintToken
-                            },
-                            url: req.body.tallint_url,
-                            method: "POST",
-                            json: true,
-                            body: details
-                        },
-                        resonseOfTallint: error
-                    };
-                    res.status(500).json(response);
-                }
-
-            });
-        }
-        else{
-            response.status = false;
-            response.message = "Tallint error! Api url not found";
-            response.error = null;
-            response.data = {
-                ourjson: {
+                request({
                     headers: {
                         Authorization: 'Bearer ' + req.body.tallintToken
                     },
@@ -2094,11 +2043,69 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                     method: "POST",
                     json: true,
                     body: details
-                },
-                resonseOfTallint: error
-            };
-            res.status(500).json(response);
-        }
+                }, function (error, resp, body) {
+                    if (!error && body) {
+                        response.status = true;
+                        response.message = "Response from tallint DB";
+                        response.error = null;
+                        response.data = {
+                            ourjson: {
+                                headers: {
+                                    Authorization: 'Bearer ' + req.body.tallintToken
+                                },
+                                url: req.body.tallint_url,
+                                method: "POST",
+                                json: true,
+                                body: details
+                            },
+                            resonseOfTallint: body
+                        };
+                        if (body.Code != 'ERR0001') {
+                            res.status(200).json(response);
+                        }
+                        else {
+                            res.status(500).json(response);
+                        }
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error from tallint DB";
+                        response.error = null;
+                        response.data = {
+                            ourjson: {
+                                headers: {
+                                    Authorization: 'Bearer ' + req.body.tallintToken
+                                },
+                                url: req.body.tallint_url,
+                                method: "POST",
+                                json: true,
+                                body: details
+                            },
+                            resonseOfTallint: error
+                        };
+                        res.status(500).json(response);
+                    }
+
+                });
+            }
+            else {
+                response.status = false;
+                response.message = "Tallint error! Api url not found";
+                response.error = null;
+                response.data = {
+                    ourjson: {
+                        headers: {
+                            Authorization: 'Bearer ' + req.body.tallintToken
+                        },
+                        url: req.body.tallint_url,
+                        method: "POST",
+                        json: true,
+                        body: details
+                    },
+                    resonseOfTallint: error
+                };
+                res.status(500).json(response);
+            }
         }
 
         else {
@@ -2398,7 +2405,7 @@ portalimporter.saveApplicantsFromShine = function (req, res, next) {
         if (tempEmailId && tempEmailId[0] && tempEmailId[0].innerHTML) {
 
             var emailid = tempEmailId[0].innerHTML.trim();
-            var regularExp = /[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}/;   // include /s in the end
+            var regularExp = /[A-Za-z]+[A-Za-z0-9._]+@[A-Za-z]+\.[A-Za-z.]{2,5}/;   // include /s in the end
             console.log(emailid);
             // console.log("using match all",matchAll(emailid,regularExp).toArray());
             console.log('match all here', regularExp.exec(emailid));
@@ -2582,7 +2589,7 @@ portalimporter.saveApplicantsFromTimesjobs = function (req, res, next) {
     var tempDetails = document.getElementsByClassName('candidate-contact lft');
     if (tempDetails && tempDetails[0] && tempDetails[0].getElementsByTagName('a') && tempDetails[0].getElementsByTagName('a')[1] && tempDetails[0].getElementsByTagName('a')[1].innerHTML) {
         var emailid = tempDetails[0].getElementsByTagName('a')[1].innerHTML.trim();
-        var regularExp = /[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}/;   // include /s in the end
+        var regularExp = /[A-Za-z]+[A-Za-z0-9._]+@[A-Za-z]+\.[A-Za-z.]{2,5}/;   // include /s in the end
         console.log('match all here', regularExp.exec(emailid));
         if (regularExp.exec(emailid) && regularExp.exec(emailid)[0])
             details.emailId = removeExtraChars(regularExp.exec(emailid)[0].trim());
@@ -2743,7 +2750,7 @@ portalimporter.savePortalApplicantsLinkedIn = function (req, res, next) {
     if (contact.getElementsByClassName('pv-contact-info__contact-type ci-email') && contact.getElementsByClassName('pv-contact-info__contact-type ci-email')[0] && contact.getElementsByClassName('pv-contact-info__contact-type ci-email')[0].getElementsByClassName('pv-contact-info__contact-link') && contact.getElementsByClassName('pv-contact-info__contact-type ci-email')[0].getElementsByClassName('pv-contact-info__contact-link')[0] && contact.getElementsByClassName('pv-contact-info__contact-type ci-email')[0].getElementsByClassName('pv-contact-info__contact-link')[0].innerHTML) {
         var emailId = contact.getElementsByClassName('pv-contact-info__contact-type ci-email')[0].getElementsByClassName('pv-contact-info__contact-link')[0].innerHTML;
 
-        var regularExp = /[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}/;   // include /s in the end
+        var regularExp = /[A-Za-z]+[A-Za-z0-9._]+@[A-Za-z]+\.[A-Za-z.]{2,5}/;   // include /s in the end
         if (regularExp.exec(emailId) && regularExp.exec(emailId)[0]) {
             details.emailId = removeExtraChars(regularExp.exec(emailId)[0].trim());
         }

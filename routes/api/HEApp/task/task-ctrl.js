@@ -389,7 +389,7 @@ taskCtrl.saveTask = function (req, res, next) {
                             req.st.db.escape(req.body.senderNotes),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp) 
+                            req.st.db.escape(req.body.createdTimeStamp)
 
                         ];
 
@@ -881,6 +881,182 @@ taskCtrl.getMails = function (req, res, next) {
 
 };
 
+
+taskCtrl.saveTaskNew = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    var senderGroupId;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    console.log(req.body);
+
+                    if (!req.body.title) {
+                        error.token = 'Invalid title';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.memberList.length) {
+                        error.memberList = 'Please add atleast one member';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.starts) {
+                        error.token = 'Invalid start date';
+                        validationFlag *= false;
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+                        var keywordList = req.body.keywordList;
+                        if (typeof (keywordList) == "string") {
+                            keywordList = JSON.parse(keywordList);
+                        }
+                        if (!keywordList) {
+                            keywordList = [];
+                        }
+
+                        if (req.body.ends == "") {
+                            req.body.ends = null
+                        }
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.parentId || 0),
+                            req.st.db.escape(req.body.title),
+                            req.st.db.escape(req.body.description || ""),
+                            req.st.db.escape(req.body.starts),
+                            req.st.db.escape(req.body.durationHour || 0),
+                            req.st.db.escape(req.body.durationMinute || 0),
+                            req.st.db.escape(req.body.status),
+                            req.st.db.escape(req.body.notes || ""),
+                            req.st.db.escape(JSON.stringify(req.body.memberList || [])),
+                            req.st.db.escape(JSON.stringify(req.body.attachmentList || [])),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(req.body.type || 1),
+                            req.st.db.escape(req.body.latitude || 0),
+                            req.st.db.escape(req.body.longitude || 0),
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(JSON.stringify(req.body.expenseList || [])),
+                            req.st.db.escape(req.body.taskType || 0),
+                            req.st.db.escape(req.body.changeLog || ""),
+                            req.st.db.escape(req.body.isReminderEnabled || 0),
+                            req.st.db.escape(req.body.reminder || 0),
+                            req.st.db.escape(req.body.address || ""),
+                            req.st.db.escape(req.body.meetingAddress || ""),
+                            req.st.db.escape(req.body.meetingAddLatitude || 0),
+                            req.st.db.escape(req.body.meetingAddLongitude || 0),
+                            req.st.db.escape(req.body.distanceBetweenLocations || 0),
+                            req.st.db.escape(req.body.isTravelAlert || 0),
+                            req.st.db.escape(req.body.learnMessageId),
+                            req.st.db.escape(req.body.approverCount),
+                            req.st.db.escape(req.body.receiverCount),
+                            req.st.db.escape(req.body.senderNotes || ""),
+                            req.st.db.escape(req.body.timestamp || ""),
+                            req.st.db.escape(req.body.createdTimeStamp || null),
+                            req.st.db.escape(req.body.receiverStatus || 0),
+                            req.st.db.escape(req.body.receiverNotes || ""),
+                            req.st.db.escape(req.body.progress || 0)
+                        ];
+
+                        var taskFormId = 1000;
+                        var keywordsParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(taskFormId),
+                            req.st.db.escape(JSON.stringify(keywordList)),
+                            req.st.db.escape(req.body.groupId)
+                        ];
+                        /**
+                         * Calling procedure to save form template
+                         * @type {string}
+                         */
+                        var procQuery = 'CALL he_save_taskForm_Normal_New( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, results) {
+                            console.log(results);
+                            if (!err && results && results[0]) {
+                                senderGroupId = results[0][0].senderId;
+
+                                notifyMessages.getMessagesNeedToNotify();
+                                response.status = true;
+                                response.message = "Task saved successfully";
+                                response.error = null;
+                                response.data = {
+                                    messageList: {
+                                        messageId: results[0][0].messageId,
+                                        message: results[0][0].message,
+                                        messageLink: results[0][0].messageLink,
+                                        createdDate: results[0][0].createdDate,
+                                        messageType: results[0][0].messageType,
+                                        messageStatus: results[0][0].messageStatus,
+                                        priority: results[0][0].priority,
+                                        senderName: results[0][0].senderName,
+                                        senderId: results[0][0].senderId,
+                                        groupId: req.body.groupId,
+                                        receiverId: results[0][0].receiverId,
+                                        transId: results[0][0].transId,
+                                        formId: results[0][0].formId,
+                                        currentStatus: results[0][0].currentStatus,
+                                        currentTransId: results[0][0].currentTransId,
+                                        localMessageId: req.body.localMessageId,
+                                        parentId: results[0][0].parentId,
+                                        accessUserType: results[0][0].accessUserType,
+                                        heUserId: results[0][0].heUserId,
+                                        formData: JSON.parse(results[0][0].formDataJSON)
+                                    }
+                                };
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while saving task";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+
+                });
+
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
 
 
 module.exports = taskCtrl;
