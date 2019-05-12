@@ -22,6 +22,8 @@ router.post('/offerGeneration',settingsCtrl.offerGeneration);
 
 router.get('/temporary',settingsCtrl.temporary);
 router.get('/imapFinally',settingsCtrl.imapFinally);
+router.get('/autoSourcingMaster',settingsCtrl.autoSourcingMasterData);
+router.post('/saveAutoSourcedApplicant',settingsCtrl.saveAutosourcedApplicant);
 
 router.post('/fetchOutlookMails',settingsCtrl.fetchoutLook);
 

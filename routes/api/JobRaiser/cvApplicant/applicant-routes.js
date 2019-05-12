@@ -4,7 +4,7 @@ var router = express.Router();
 
 var applicantCtrl = require('./applicant-Ctrl');
 var sendgridCtrl = require('./sendgrid-ctrl');    // for send grid mailing
-
+var resumeMaskingCtrl = require('./resume-masking/resume-masking');
 
 router.post('/applicant',applicantCtrl.saveApplicant);
 router.get('/applicant',applicantCtrl.getApplicantMasterData);
@@ -110,5 +110,11 @@ router.post('/recruitersReqData',applicantCtrl.getRecruiterPerformanceByRequirem
 router.post('/recruitersReqApplicantData',applicantCtrl.getRecruiterPerformanceReqApplicantData);
 
 router.post('/applicantView',applicantCtrl.getreqApplicantsWithColumnFilter);
+router.get('/paceMaster',applicantCtrl.paceMasterNew);
+
+
+router.post('/resume-preparation', resumeMaskingCtrl.resume_masking)
+router.post('/moveOrCopyTaggedTransactions',applicantCtrl.moveOrCopyTaggedTransactions);
+router.post('/sendSmsToCandidates',sendgridCtrl.sendSMSToCandidates);
 
 module.exports = router;

@@ -449,7 +449,10 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                                         req.st.db.escape(JSON.stringify(req.body.document_attachments_list || [])),
                                         req.st.db.escape(req.body.importedFromFolder || 0),
                                         req.st.db.escape(req.body.importedFromExcel || 0),
-                                        req.st.db.escape(JSON.stringify(req.body.cvStatus || {}))
+                                        req.st.db.escape(JSON.stringify(req.body.cvStatus || {})),
+                                        req.st.db.escape(JSON.stringify(req.body.employmentHistory || [])),
+                                        req.st.db.escape(JSON.stringify(req.body.salutation || {}))
+
                                     ];
 
                                     var procQuery = 'CALL wm_save_applicant( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -659,7 +662,9 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             typeView: result[56] ? result[56] : [],
                             taskMembers: result[57] ? result[57] : [],
                             requirementGroupList: result[58] ? result[58] : [],
-                            reqOrGroup: result[59] && result[59][0] && result[59][0].reqOrGroup ? result[59][0].reqOrGroup : 1
+                            reqOrGroup: result[59] && result[59][0] && result[59][0].reqOrGroup ? result[59][0].reqOrGroup : 1,
+                            salutation: result[60] && result[60][0] ? result[60] : [],
+                            clientBirthdayList: result[61] && result[61][0] ? result[61] : []
 
                         };
 
@@ -732,7 +737,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                             paceUserDetails: {},
                             stageStatusMapList: [],
                             interviewModeList: [],
-                            billTo: []
+                            billTo: [],
+                            clientBirthdayList : []
                         };
                         if (req.query.isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1036,10 +1042,41 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                     req.st.db.escape(req.body.to || null),
                     req.st.db.escape(req.body.userMasterId || 0),
                     req.st.db.escape(req.query.isWeb || 0),
-                    req.st.db.escape(JSON.stringify(req.body.stageDetail || {}))
+                    req.st.db.escape(JSON.stringify(req.body.stageDetail || {})),
+                    req.st.db.escape(req.body.applicantName || ""),
+                    req.st.db.escape(req.body.emailId || ""),
+                    req.st.db.escape(req.body.mobileNumber || ""),
+                    req.st.db.escape(req.body.requirementJobTitle || ""),
+                    req.st.db.escape(req.body.jobCode || ""),
+                    req.st.db.escape(req.body.clientName || ""),
+                    req.st.db.escape(req.body.stageName || ""),
+                    req.st.db.escape(req.body.statusName || ""),
+                    req.st.db.escape(req.body.applicantJobTitle || ""),
+                    req.st.db.escape(req.body.employer || ""),
+                    req.st.db.escape(req.body.experience || ""),
+                    req.st.db.escape(req.body.stageStatusNotes || ""),
+                    req.st.db.escape(req.body.cvSource || ""),
+                    req.st.db.escape(req.body.primarySkills || ""),
+                    req.st.db.escape(req.body.secondarySkills || ""),
+                    req.st.db.escape(req.body.presentLocation || ""),
+                    req.st.db.escape(req.body.education || ""),
+                    req.st.db.escape(req.body.passportNumber || ""),
+                    req.st.db.escape(req.body.faceSheet || ""),
+                    req.st.db.escape(req.body.cvCreatedUserName || ""),
+                    req.st.db.escape(req.body.cvUpdatedUserName || ""),
+                    req.st.db.escape(req.body.reqCvCreatedUserName || ""),
+                    req.st.db.escape(req.body.reqCvUpdatedUserName || ""),
+                    req.st.db.escape(req.body.cvCreatedDate || null),
+                    req.st.db.escape(req.body.cvUpdatedDate || null),
+                    req.st.db.escape(req.body.reqCvCreatedDate || null),
+                    req.st.db.escape(req.body.reqCvUpdatedDate || null),
+                    req.st.db.escape(req.body.emigrationCheck || ""),
+                    req.st.db.escape(req.body.DOB || null),
+                    req.st.db.escape(req.body.ppExpiryDate || null),
+                    req.st.db.escape(req.body.ppIssueDate || null)
                 ];
 
-                var procQuery = 'CALL wm_get_applicants( ' + getStatus.join(',') + ')';
+                var procQuery = 'CALL wm_get_applicantsWithColumnFilter( ' + getStatus.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, Result) {
                     console.log(err);
@@ -1368,11 +1405,204 @@ applicantCtrl.resumeSearch = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
+                req.query.isWeb = 1;
+                if (req.query.isWeb) {
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                        if (!req.body.heMasterId) {
+                            error.heMasterId = 'Invalid company';
+                            validationFlag *= false;
+                        }
+                        var roles = req.body.roles;
+                        if (typeof (roles) == "string") {
+                            roles = JSON.parse(roles);
+                        }
+                        if (!roles) {
+                            roles = [];
+                        }
+                        var skills = req.body.skills;
+                        if (typeof (skills) == "string") {
+                            skills = JSON.parse(skills);
+                        }
+                        if (!skills) {
+                            skills = [];
+                        }
+                        var industryExpertise = req.body.industryExpertise;
+                        if (typeof (industryExpertise) == "string") {
+                            industryExpertise = JSON.parse(industryExpertise);
+                        }
+                        if (!industryExpertise) {
+                            industryExpertise = [];
+                        }
+                        var locations = req.body.locations;
+                        if (typeof (locations) == "string") {
+                            locations = JSON.parse(locations);
+                        }
+                        if (!locations) {
+                            locations = [];
+                        }
+                        var education = req.body.education;
+                        if (typeof (education) == "string") {
+                            education = JSON.parse(education);
+                        }
+                        if (!education) {
+                            education = [];
+                        }
+                        var requiredNationalities = req.body.requiredNationalities;
+                        if (typeof (requiredNationalities) == "string") {
+                            requiredNationalities = JSON.parse(requiredNationalities);
+                        }
+                        if (!requiredNationalities) {
+                            requiredNationalities = [];
+                        }
 
+                        var DOB = req.body.DOB;
+                        if (typeof (DOB) == "string") {
+                            DOB = JSON.parse(DOB);
+                        }
+                        if (!DOB) {
+                            DOB = [];
+                        }
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                            req.body.parentId = (req.body.parentId) ? req.body.parentId : 0;
+                            req.body.expFrom = (req.body.expFrom) ? req.body.expFrom : -1;
+                            req.body.expTo = (req.body.expTo) ? req.body.expTo : -1;
+                            req.body.resumeDaysFreshness = (req.body.resumeDaysFreshness) ? req.body.resumeDaysFreshness : 1;
+                            req.body.currency = (req.body.currency) ? req.body.currency : 0;
+                            req.body.salaryFrom = (req.body.salaryFrom) ? req.body.salaryFrom : 0;
+                            req.body.salaryTo = (req.body.salaryTo) ? req.body.salaryTo : 0;
+                            req.body.salaryScale = (req.body.salaryScale) ? req.body.salaryScale : 0;
+                            req.body.salaryDuration = (req.body.salaryDuration) ? req.body.salaryDuration : 0;
+                            req.body.noticePeriodFrom = (req.body.noticePeriodFrom) ? req.body.noticePeriodFrom : 0;
+                            req.body.noticePeriodTo = (req.body.noticePeriodTo) ? req.body.noticePeriodTo : 0;
+                            req.body.workLocation = (req.body.workLocation) ? req.body.workLocation : '';
+                            req.body.cvRating = req.body.cvRating ? req.body.cvRating : 0;
+                            req.body.cvKeywords = req.body.cvKeywords ? req.body.cvKeywords : '';
+                            req.body.searchResultsLimit = req.body.searchResultsLimit ? req.body.searchResultsLimit : 100;
+                            req.body.includeJd = req.body.includeJd ? req.body.includeJd : 0;
+
+                            req.body.start = req.body.start ? req.body.start : 1;
+                            req.body.limit = (req.body.limit) ? req.body.limit : 50;
+
+                            req.body.start = ((((req.body.start) * req.body.limit) + 1) - req.body.limit) - 1;
+
+
+                            var inputs = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.body.heMasterId),
+                                req.st.db.escape(req.body.parentId),
+                                req.st.db.escape(req.body.searchBy || 1),
+                                req.st.db.escape(JSON.stringify(skills)),
+                                req.st.db.escape(req.body.cvKeywords),
+                                //req.st.db.escape(req.body.functions),
+                                req.st.db.escape(JSON.stringify(roles)),
+                                req.st.db.escape(JSON.stringify(industryExpertise)),
+                                req.st.db.escape(req.body.expFrom),
+                                req.st.db.escape(req.body.expTo),
+                                req.st.db.escape(JSON.stringify(locations)),
+                                //req.st.db.escape(req.body.searchBy),
+                                req.st.db.escape(JSON.stringify(education)),
+                                req.st.db.escape(req.body.currency),
+                                req.st.db.escape(req.body.salaryFrom),
+                                req.st.db.escape(req.body.salaryTo),
+                                req.st.db.escape(req.body.salaryScale),
+                                req.st.db.escape(req.body.salaryDuration),
+                                req.st.db.escape(req.body.noticePeriodFrom),
+                                req.st.db.escape(req.body.noticePeriodTo),
+                                //req.st.db.escape(req.body.workLocation),
+                                req.st.db.escape(JSON.stringify(requiredNationalities)),
+                                req.st.db.escape(JSON.stringify(DOB)),
+                                req.st.db.escape(req.body.start),
+                                req.st.db.escape(req.body.limit),
+                                req.st.db.escape(req.body.cvRating),
+                                req.st.db.escape(req.body.searchResultsLimit),
+                                req.st.db.escape(req.body.includeJd),
+                                req.st.db.escape(req.body.applicantId || ""),
+                                req.st.db.escape(req.body.presentSalFrom || 0),
+                                req.st.db.escape(req.body.presentSalTo || 0),
+                                req.st.db.escape(req.body.presentSalScale || 0),
+                                req.st.db.escape(req.body.presentSalDuration || 0),
+                                req.st.db.escape(req.body.presentSalCurrency || 0),
+                                req.st.db.escape(JSON.stringify(req.body.functionalAreas || [])),
+                                req.st.db.escape(JSON.stringify(req.body.cvSource || [])),
+                                req.st.db.escape(JSON.stringify(req.body.cvStatus || [])),
+                                req.st.db.escape(JSON.stringify(req.body.stageResume || [])),
+                                req.st.db.escape(req.body.uploadedUsers || ""),
+                                req.st.db.escape(req.body.from || null),
+                                req.st.db.escape(req.body.to || null)
+                            ];
+
+                            var procQuery = 'CALL wd_resume_search_newAlgorithm( ' + inputs.join(',') + ')';  // call procedure to save requirement data
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, result) {
+                                console.log(err);
+                                if (!err && result && result[0]) {
+                                    response.status = true;
+                                    response.message = "Applicants list loaded successfully";
+                                    response.error = null;
+
+                                    for (var i = 0; i < result[0].length; i++) {
+                                        if (result[0][i] && result[0][i].education) {
+                                            result[0][i].education = JSON.parse(result[0][i].education) ? JSON.parse(result[0][i].education) : [];
+                                        }
+                                        if (result[0][i] && result[0][i].keySkills) {
+                                            result[0][i].keySkills = JSON.parse(result[0][i].keySkills) ? JSON.parse(result[0][i].keySkills) : [];
+
+                                        }
+                                        if (result[0][i] && result[0][i].location) {
+                                            result[0][i].location = JSON.parse(result[0][i].location) ? JSON.parse(result[0][i].location) : [];
+                                        }
+                                        result[0][i].requirementApplicantCount = result[0][i].requirementApplicantCount ? result[0][i].requirementApplicantCount : 0;
+                                    }
+                                    response.data = {
+                                        applicantList: result[0],
+                                        count: result[1][0].count,
+                                        applicantIdArray: (result[2] && result[2][0] && JSON.parse(result[2][0].applicantIdArray)) ? JSON.parse(result[2][0].applicantIdArray) : []
+                                    };
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+
+                                }
+                                else if (!err) {
+                                    response.status = true;
+                                    response.message = "Applicants not found";
+                                    response.error = null;
+                                    response.data = {
+                                        applicantList: [],
+                                        count: 0
+                                    };
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while loading applicants list";
+                                    response.error = null;
+                                    console.log(err);
+                                    res.status(500).json(response);
+                                }
+                            });
+                        }
+
+                    });
+                }
+                else {
                     if (!req.body.heMasterId) {
                         error.heMasterId = 'Invalid company';
                         validationFlag *= false;
@@ -1561,8 +1791,8 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                             }
                         });
                     }
+                }
 
-                });
 
 
             }
@@ -1683,10 +1913,79 @@ applicantCtrl.saveReqAppMapResult = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                if (req.query.isWeb) {
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
+                        if (!req.body.reqId) {
+                            error.token = 'Invalid requirement';
+                            validationFlag *= false;
+                        }
+                        var applicant = req.body.applicant;
+                        if (typeof (applicant) == 'string') {
+                            applicant = JSON.parse(applicant);
+                        }
+                        if (!applicant) {
+                            applicant = [];
+                        }
+
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                            var inputs = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.body.reqId),
+                                req.st.db.escape(JSON.stringify(applicant)),
+                                req.st.db.escape(req.query.heMasterId)
+                            ];
+
+                            var procQuery = 'CALL wm_save_reqAppMap( ' + inputs.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, result) {
+                                console.log(err);
+                                if (!err && result && result[0] && result[0][0].error) {
+                                    response.status = false;
+                                    response.message = result[0][0].error;
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(200).json(response);
+                                }
+                                else if (!err && result && result[0]) {
+                                    response.status = false;
+                                    response.message = "Requirement already mapped to the applicant";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(200).json(response);
+                                }
+
+                                else if (!err && result) {
+                                    response.status = true;
+                                    response.message = "Requirement applicant map data saved successfully";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(200).json(response);
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while saving requirement applicant map";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            });
+                        }
+
+                    });
+                }
+                else {
                     if (!req.body.reqId) {
                         error.token = 'Invalid requirement';
                         validationFlag *= false;
@@ -1751,9 +2050,7 @@ applicantCtrl.saveReqAppMapResult = function (req, res, next) {
                             }
                         });
                     }
-
-                });
-
+                }
 
             }
             else {
@@ -1831,6 +2128,8 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         temp_result.presentLocation = JSON.parse(temp_result.presentLocation).locationId ? JSON.parse(temp_result.presentLocation) : {};
                         temp_result.licenseData = JSON.parse(temp_result.licenseData);
                         temp_result.document_attachments_list = JSON.parse(temp_result.document_attachments_list);
+                        temp_result.employmentHistory = JSON.parse(temp_result.employmentHistory);
+                        temp_result.salutation = JSON.parse(temp_result.salutation);
 
 
                         if (typeof (result[5] && result[5][0] && result[5][0].cc) == 'string') {
@@ -1854,8 +2153,6 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                         response.status = true;
                         response.message = "Applicant data loaded successfully";
                         response.error = null;
-
-
                         response.data =
                             {
                                 applicantDetails: temp_result ? temp_result : {},
@@ -2307,7 +2604,8 @@ applicantCtrl.saveOfferManager = function (req, res, next) {
                                 response.error = null;
                                 response.data = {
                                     offerManagerId: result[0][0].offerManagerId,
-                                    transactionHistory: (result[1] && result[1][0]) ? result[1] : []
+                                    reqAppList: (result[1] && result[1][0]) ? result[1] : [],
+                                    transactionHistory: (result[2] && result[2][0]) ? result[2] : []
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
@@ -2402,7 +2700,8 @@ applicantCtrl.getOfferManager = function (req, res, next) {
                         response.data = {
                             offerDetails: result[0] && result[0][0] && result[0][0].offerManagerId ? result[0][0] : {},
                             offerTemplate: result[1] && result[1][0] ? result[1] : [],
-                            offerBreakUpTemplate: result[2] && result[2][0] ? result[2] : []
+                            offerBreakUpTemplate: result[2] && result[2][0] ? result[2] : [],
+                            requirementJobTitle : result[3] && result[3][0] ? result[3][0] : {}
                         };
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
@@ -3032,7 +3331,7 @@ applicantCtrl.saveInterviewSchedulerNew = function (req, res, next) {
                                     response.error = null;
                                     response.data = {
                                         messageList: messageList,
-                                        reqAppList: results[results.length - 2]  ? results[results.length-2] : []
+                                        reqAppList: results[results.length - 2] ? results[results.length - 2] : []
                                     };
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                     zlib.gzip(buf, function (_, result) {
@@ -4239,7 +4538,9 @@ applicantCtrl.saveOnBoarding = function (req, res, next) {
                                 response.error = null;
                                 response.data = {
                                     onBoardingId: (result[0] && result[0][0]) ? result[0][0].onBoardingId : 0,
-                                    transactionHistory: (result[1] && result[1][0]) ? result[1] : []
+                                    reqAppList: (result[1] && result[1][0]) ? result[1] : [],
+                                    transactionHistory: (result[2] && result[2][0]) ? result[2] : []
+
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
@@ -5185,7 +5486,6 @@ applicantCtrl.saveApplicantForImporter = function (req, res, next) {
                             req.st.db.escape(req.body.referredBy),
                             req.st.db.escape(JSON.stringify(faceSheet)),
                             req.st.db.escape(JSON.stringify(presentLocation))
-
                         ];
 
                         var procQuery = 'CALL wm_save_applicantForImporter( ' + inputs.join(',') + ')';  // call procedure to save requirement data
@@ -5940,7 +6240,8 @@ applicantCtrl.getRecruiterPerformanceByRequirementWise = function (req, res, nex
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.startPage || 1),
                             req.st.db.escape(req.body.limit || 20),
-                            req.st.db.escape(req.body.isExport || 0)
+                            req.st.db.escape(req.body.isExport || 0),
+                            req.st.db.escape(req.body.customRange || 0)
                         ];
 
                         var procQuery = 'CALL pace_get_dashboardRecruiterPerformanceRequirementView( ' + inputs.join(',') + ')';
@@ -5952,7 +6253,8 @@ applicantCtrl.getRecruiterPerformanceByRequirementWise = function (req, res, nex
                                 response.message = "Data loaded successfully";
                                 response.error = null;
                                 response.data = {
-                                    requirementWiseData: result[0] ? result[0] : []
+                                    requirementWiseData: result[0] ? result[0] : [],
+                                    requirementWiseDataForExport: result[1] && result[1][0] ? result[1] : []
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
@@ -5965,6 +6267,7 @@ applicantCtrl.getRecruiterPerformanceByRequirementWise = function (req, res, nex
                                 response.message = "No results found";
                                 response.error = null;
                                 response.data = {
+                                    requirementWiseDataForExport: [],
                                     requirementWiseData: []
                                 };
                                 res.status(200).json(response);
@@ -6082,8 +6385,8 @@ applicantCtrl.getRecruiterPerformanceReqApplicantData = function (req, res, next
                             req.st.db.escape(req.body.stageId || 0),
                             req.st.db.escape(req.body.startPage || 1),
                             req.st.db.escape(req.body.limit || 20),
-                            req.st.db.escape(req.body.limit || 20),
-                            req.st.db.escape(req.body.isExport || 0)
+                            req.st.db.escape(req.body.isExport || 0),
+                            req.st.db.escape(req.body.customRange || 0)
                         ];
 
                         var procQuery = 'CALL pace_get_dashboardRecruiterPerformanceApplicantView( ' + inputs.join(',') + ')';
@@ -6097,11 +6400,19 @@ applicantCtrl.getRecruiterPerformanceReqApplicantData = function (req, res, next
 
                                 for (var i = 0; i < result[0].length; i++) {
                                     result[0][i].clientContacts = result[0][i] && result[0][i].clientContacts && JSON.parse(result[0][i].clientContacts) ? JSON.parse(result[0][i].clientContacts) : [];
-
                                 }
+
+                                if (result[2] && result[2][0]) {
+                                    for (var i = 0; i < result[2].length; i++) {
+                                        result[2][i].clientContacts = result[2][i] && result[2][i].clientContacts && JSON.parse(result[2][i].clientContacts) ? JSON.parse(result[2][i].clientContacts) : [];
+                                    }
+                                }
+
                                 response.data = {
                                     reqApplicantData: result[0] ? result[0] : [],
-                                    count: result[1] && result[1][0] && result[1][0].count ? result[1][0].count : 0
+                                    count: result[1] && result[1][0] && result[1][0].count ? result[1][0].count : 0,
+                                    reqApplicantDataForExport: result[2] ? result[2] : [],
+                                    countForExport: result[3] && result[3][0] && result[3][0].count ? result[3][0].count : 0
                                 };
 
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -6116,7 +6427,9 @@ applicantCtrl.getRecruiterPerformanceReqApplicantData = function (req, res, next
                                 response.error = null;
                                 response.data = {
                                     reqApplicantData: [],
-                                    count: 0
+                                    count: 0,
+                                    reqApplicantDataForExport: [],
+                                    countForExport: 0
                                 };
                                 res.status(200).json(response);
                             }
@@ -6288,7 +6601,9 @@ applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
                             req.st.db.escape(req.body.emigrationCheck || ""),
                             req.st.db.escape(req.body.DOB || null),
                             req.st.db.escape(req.body.ppExpiryDate || null),
-                            req.st.db.escape(req.body.ppIssueDate || null)
+                            req.st.db.escape(req.body.ppIssueDate || null),
+                            req.st.db.escape(req.body.isExport || 0),
+                            req.st.db.escape(req.body.customRange || 0)
                         ];
 
                         var procQuery = 'CALL wm_get_applicantsWithColumnFilter( ' + getStatus.join(',') + ')';
@@ -6302,6 +6617,7 @@ applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
                                 if (Result[0] && Result[0][0] && Result[0][0].reqApplicantId) {
                                     for (var i = 0; i < Result[0].length; i++) {
                                         Result[0][i].clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
+                                        Result[0][i].followUpNotes = Result[0][i].followUpNotes ? JSON.parse(Result[0][i].followUpNotes) : [];
 
                                         Result[0][i].faceSheetDetailWithAnswers = Result[0][i].faceSheetDetailWithAnswers ? JSON.parse(Result[0][i].faceSheetDetailWithAnswers) : [];
 
@@ -6319,6 +6635,28 @@ applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
                                         Result[0][i].faceSheetDetailWithAnswers = facesheet;
                                     }
                                 }
+
+                                if (Result[13] && Result[13][0] && Result[13][0].reqApplicantId) {
+                                    for (var i = 0; i < Result[13].length; i++) {
+                                        Result[13][i].clientContacts = Result[13][i].clientContacts ? JSON.parse(Result[13][i].clientContacts) : [];
+
+                                        Result[13][i].faceSheetDetailWithAnswers = Result[13][i].faceSheetDetailWithAnswers ? JSON.parse(Result[13][i].faceSheetDetailWithAnswers) : [];
+
+                                        var facesheet = [];
+                                        for (var f = 0; f < Result[13][i].faceSheetDetailWithAnswers.length; f++) {
+                                            if (Result[13][i].faceSheetDetailWithAnswers[f].answer) {
+                                                var answer = Result[13][i].faceSheetDetailWithAnswers[f].answer;
+                                            }
+                                            else {
+                                                var answer = "Not Applicable";
+                                            }
+                                            var QandA = Result[13][i].faceSheetDetailWithAnswers[f].question + " - " + answer;
+                                            facesheet.push(QandA);
+                                        }
+                                        Result[13][i].faceSheetDetailWithAnswers = facesheet;
+                                    }
+                                }
+
                                 var cvSearchMasterData = {};
                                 var offerMasterData = {};
                                 if (req.query.isWeb == 0) {
@@ -6341,12 +6679,16 @@ applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
                                     }
                                 }
 
+
+
                                 response.data = {
                                     applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId ? Result[0] : [],
                                     count: Result[1] && Result[1][0] ? Result[1][0].count : 0,
                                     offerMasterData: offerMasterData,
-                                    cvSearchMasterData: cvSearchMasterData
+                                    cvSearchMasterData: cvSearchMasterData,
+                                    applicantlistForExport: Result[13] && Result[13][0] && Result[13][0].reqApplicantId ? Result[13] : []
                                 };
+
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
                                     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -6387,6 +6729,243 @@ applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
         });
     }
 
+};
+
+
+// token and heMasterId is mandatory
+applicantCtrl.paceMasterNew = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid Token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                req.query.userMasterId = req.query.userMasterId ? req.query.userMasterId : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL pace_get_paceMaster_new( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result) {
+                        response.status = true;
+                        response.message = "Master data loaded successfully";
+                        response.error = null;
+                        for (var j = 0; j < result[3].length; j++) {
+                            result[3][j].specialization = result[3][j].specialization ? JSON.parse(result[3][j].specialization) : [];
+                        }
+
+                        response.data = {
+                            jobtitle: result[0] ? result[0] : [],
+                            industry: result[1] ? result[1] : [],
+                            skills: result[2] ? result[2] : [],
+                            educationList: result[3] ? result[3] : [],
+                            roles: result[4] ? result[4] : [],
+                            functionalAreas: result[5] ? result[5] : []
+                        };
+
+                        if (req.query.isWeb == 0) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
+                            res.status(200).json(response);
+                        }
+
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "no results found";
+                        response.error = null;
+                        response.data = {
+                            jobtitle: [],
+                            industry: [],
+                            skills: [],
+                            educationList: [],
+                            roles: [],
+                            functionalAreas: []
+                        };
+                        if (req.query.isWeb == 0) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
+                            res.status(200).json(response);
+                        }
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting master data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+applicantCtrl.moveOrCopyTaggedTransactions = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid Token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                    if (!req.body.moveOrCopy) {
+                        error.moveOrCopy = 'Invalid moveOrCopy';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.moveOrCopyToReqId.length) {
+                        error.moveOrCopyToReqId = 'Invalid moveOrCopyToReqId';
+                        validationFlag *= false;
+                    }
+
+                    if (!req.body.reqApp.length) {
+                        error.reqApp = 'Invalid reqApp';
+                        validationFlag *= false;
+                    }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
+                    }
+                    else {
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(JSON.stringify(req.body.reqApp || [])),
+                            req.st.db.escape(req.body.stageId || 0),
+                            req.st.db.escape(req.body.statusId || 0),
+                            req.st.db.escape(req.body.notes || ""),
+                            req.st.db.escape(JSON.stringify(req.body.reason || {})),
+                            req.st.db.escape(DBSecretKey),
+                            req.st.db.escape(req.body.moveOrCopy),
+                            req.st.db.escape(JSON.stringify(req.body.moveOrCopyToReqId)),   //send to req id
+                            req.st.db.escape(req.body.keepAtCurrentStage || 0)
+                        ];
+
+                        var procQuery = 'CALL pace_save_moveCopyReqAppTo( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            console.log(err);
+                            if (!err && result && result[0] && result[0][0]) {
+                                response.status = true;
+                                response.message = "Transaction updated successfully";
+                                response.error = null;
+
+                                response.data = {
+                                    reqAppList: result[0]
+                                };
+
+                                // if (req.query.isWeb == 0) {
+                                //     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                //     zlib.gzip(buf, function (_, result) {
+                                //         response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                //     });
+                                // }
+                                // else {
+                                //     res.status(200).json(response);
+                                // }
+
+                            }
+                            else if (!err) {
+                                response.status = true;
+                                response.message = "no results found";
+                                response.error = null;
+                                response.data = {
+                                    reqAppList: []
+                                };
+                                // if (req.query.isWeb == 0) {
+                                //     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                //     zlib.gzip(buf, function (_, result) {
+                                //         response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                //     });
+                                // }
+                                // else {
+                                //     res.status(200).json(response);
+                                // }
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "Error while getting update";
+                                response.error = null;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        });
+                    }
+                // });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
 };
 
 module.exports = applicantCtrl;

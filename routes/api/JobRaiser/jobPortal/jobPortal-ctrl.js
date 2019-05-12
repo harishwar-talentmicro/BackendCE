@@ -1872,7 +1872,7 @@ jobPortalCtrl.portalApplicantHistory = function (req, res, next) {
 
                     }
                     else if (!err) {
-                        response.status = true;
+                        response.status = false;
                         response.message = 'Applied jobs not found';
                         response.error = null;
                         response.data = null;

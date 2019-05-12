@@ -15,9 +15,13 @@ router.post('/savePortalApplicantsNaukri',portalimporter.saveApplicantsFromNaukr
 router.post('/checkPortalApplicantsShine',portalimporter.checkApplicantExistsFromShinePortal);
 
 router.post('/checkPortalApplicantsTimesJobs',portalimporter.checkApplicantExistsFromTimesJobsPortal);
+router.post('/checkPortalApplicantsTotalJobs',portalimporter.checkApplicantExistsFromTotalJobsPortal);
+router.post('/checkPortalApplicantsReed',portalimporter.checkApplicantExistsFromReed);
 
 router.post('/savePortalApplicantsShine',portalimporter.saveApplicantsFromShine);
 router.post('/savePortalApplicantsTimesJobs',portalimporter.saveApplicantsFromTimesjobs);
+router.post('/savePortalApplicantsTotalJobs',portalimporter.saveApplicantsFromTotalJobs);
+router.post('/savePortalApplicantsReed',portalimporter.saveApplicantsFromReed);
 
 router.post('/savePortalApplicantsLinkedIn',portalimporter.savePortalApplicantsLinkedIn);
 

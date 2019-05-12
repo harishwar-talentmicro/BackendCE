@@ -65,7 +65,9 @@ salesCtrl.saveItems = function (req, res, next) {
                     req.st.db.escape(req.body.maxQuantity),
                     req.st.db.escape(req.body.itemRate),
                     req.st.db.escape(req.body.itemImage),
-                    req.st.db.escape(req.body.notes)
+                    req.st.db.escape(req.body.notes),
+                    req.st.db.escape(JSON.stringify(req.body.itemBanners  || [])),
+                    req.st.db.escape(JSON.stringify(req.body.itemBannersWeb  || []))
                 ];
                 /**
                  * Calling procedure to save form sales items
@@ -86,7 +88,9 @@ salesCtrl.saveItems = function (req, res, next) {
                             status: req.body.status,
                             minQuantity: req.body.minQuantity,
                             maxQuantity: req.body.maxQuantity,
-                            notes: req.body.notes
+                            notes: req.body.notes,
+                            itemBanners : req.body.itemBanners,
+                            itemBannersWeb : req.body.itemBannersWeb
                         };
                         response.error = null;
                         res.status(200).json(response);
@@ -159,6 +163,12 @@ salesCtrl.getSalesItems = function (req, res, next) {
                         response.status = true;
                         response.message = "Sales items loaded successfully";
                         response.error = null;
+
+                        for(var i=0;i < salesItems[0].length;i++){
+                            salesItems[0][i].itemBanners = JSON.parse(salesItems[0][i].itemBanners);
+                            salesItems[0][i].itemBannersWeb = JSON.parse(salesItems[0][i].itemBannersWeb);
+                        }
+
                         response.data = {
                             salesItemList: salesItems[0]
                         };
@@ -1065,6 +1075,8 @@ salesCtrl.getSalesItemDetails = function (req, res, next) {
                             updatedBy: salesItems[0][0].updatedBy,
                             itemRate: salesItems[0][0].itemRate,
                             notes: salesItems[0][0].notes,
+                            itemBanners : salesItems[0][0].itemBanners ? JSON.parse(salesItems[0][0].itemBanners) :[],
+                            itemBannersWeb : salesItems[0][0].itemBannersWeb ? JSON.parse(salesItems[0][0].itemBannersWeb) :[],
                             itemImage: (salesItems[0][0].itemImage) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + salesItems[0][0].itemImage) : ""
                         };
                         res.status(200).json(response);

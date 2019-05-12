@@ -10,6 +10,10 @@ var Notification = require('../../../modules/notification/notification-master.js
 var notification = new Notification();
 var fs = require('fs');
 
+var Notification_aws = require('../../../modules/notification/aws-sns-push');
+
+var _Notification_aws = new Notification_aws();
+
 var taskCtrl = {};
 
 var zlib = require('zlib');
@@ -982,7 +986,8 @@ taskCtrl.saveTaskNew = function (req, res, next) {
                             req.st.db.escape(req.body.createdTimeStamp || null),
                             req.st.db.escape(req.body.receiverStatus || 0),
                             req.st.db.escape(req.body.receiverNotes || ""),
-                            req.st.db.escape(req.body.progress || 0)
+                            req.st.db.escape(req.body.progress || 0),
+                            req.st.db.escape(req.body.travelTime || 0)
                         ];
 
                         var taskFormId = 1000;
@@ -1004,6 +1009,34 @@ taskCtrl.saveTaskNew = function (req, res, next) {
                                 senderGroupId = results[0][0].senderId;
 
                                 notifyMessages.getMessagesNeedToNotify();
+
+                                 // reminder alert
+                                 if (results[1] && results[1][0]){
+                                    for(var i=0; i < results[1].length; i++){
+                                        if (results[1] && results[1][i]) {
+                                            
+                                            var messagePayload = {
+                                                message: "",
+                                                alarmType: 4,
+                                                type: 301,
+                                                data: {
+                                                    eventList : results[1][i] && results[1][i].eventList && JSON.parse(results[1][i].eventList) ? JSON.parse(results[1][i].eventList) : []
+                                                }
+                                            }
+                                            console.log('messagePayload',messagePayload);
+    
+                                            if (results && results[1] && results[1][i] && results[1][i].APNS_Id) {
+                                                console.log('IOS notification');
+                                                _Notification_aws.publish_IOS(results[1][i].APNS_Id, messagePayload, 0);
+                                            }    
+    
+                                            if (results && results[1] && results[1][i] && results[1][i].GCM_Id) {
+                                                _Notification_aws.publish_Android(results[1][i].GCM_Id, messagePayload);
+                                            }    
+                                        }
+                                    }    
+                                }                                
+
                                 response.status = true;
                                 response.message = "Task saved successfully";
                                 response.error = null;

@@ -267,7 +267,7 @@ masterCtrl.saveClients = function (req, res, next) {
                 var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-
+                    console.log(req.body);
 
                     var heDepartment = req.body.heDepartment;
                     if (typeof (heDepartment) == "string") {
@@ -393,9 +393,7 @@ masterCtrl.saveClients = function (req, res, next) {
                             }
 
                         });
-
                     }
-
                 });
 
             }
@@ -1477,11 +1475,131 @@ masterCtrl.getRequirementView = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                if (req.query.isWeb) {
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
 
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+                            req.query.status = (req.query.status) ? req.query.status : 0;
+                            req.query.type = (req.query.type) ? req.query.type : 0;
+
+                            var inputs = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.query.status),
+                                req.st.db.escape(req.query.heMasterId),
+                                req.st.db.escape(req.query.type),
+                                req.st.db.escape(req.query.startPage || 0),
+                                req.st.db.escape(req.query.limit || 0),
+                                req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
+                                req.st.db.escape(req.query.search || ""),
+                                req.st.db.escape(JSON.stringify(req.body.webStatusFilter || [])),
+                                req.st.db.escape(req.query.isWeb || 0),
+                                req.st.db.escape(req.body.departmentTitle || ""),
+                                req.st.db.escape(req.body.branchName || ""),
+                                req.st.db.escape(req.body.jobCode || ""),
+                                req.st.db.escape(req.body.jobTitle || ""),
+                                req.st.db.escape(req.body.positions || 0),
+                                req.st.db.escape(req.body.positionsFilled || 0),
+                                req.st.db.escape(req.body.requirementTeam || ""),
+                                req.st.db.escape(req.body.notes || ""),
+                                req.st.db.escape(req.body.offeredCTC || 0),
+                                req.st.db.escape(req.body.joiningDate || null),
+                                req.st.db.escape(req.body.jobType || 0),
+                                req.st.db.escape(req.body.creatorName || ""),
+                                req.st.db.escape(req.body.createdDate || null)
+                            ];
+
+                            var procQuery = 'CALL wm_get_requirementView( ' + inputs.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, results) {
+                                console.log(err);
+
+                                if (!err && results && (results[0] || results[1])) {
+                                    response.status = true;
+                                    response.message = " Requirement View loaded sucessfully";
+                                    response.error = null;
+                                    var output = [];
+                                    for (var i = 0; i < results[0].length; i++) {
+                                        results[0][i].branchList = JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
+                                            results[0][i].contactList = JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
+                                            results[0][i].stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
+                                            results[0][i].followUpNotes = JSON.parse(results[0][i].followUpNotes) ? JSON.parse(results[0][i].followUpNotes) : []
+                                    }
+
+                                    for (var i = 0; i < results[2].length; i++) {
+                                        results[2][i].status = results[2] && results[2][i] && JSON.parse(results[2][i].status) ? JSON.parse(results[2][i].status) : [];
+                                    }
+
+                                    response.data = {
+                                        requirementView: results[0] ? results[0] : [],
+                                        requirementCount: (results[1] && results[1][0] && results[1][0].requirementCount) ? results[1][0].requirementCount : 0,
+                                        stageList: results[2] && results[2][0] ? results[2] : []
+                                    };
+
+                                    if (req.query.isWeb == 0) {
+                                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        // zlib.gzip(buf, function (_, result) {
+                                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                        //});
+                                    }
+                                    else {
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        });
+                                    }
+
+                                }
+                                else if (!err) {
+                                    response.status = true;
+                                    response.message = " Requirement View is empty";
+                                    response.error = null;
+                                    response.data = {
+                                        requirementView: [],
+                                        stageList: (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList) : []
+
+                                    };
+                                    if (req.query.isWeb == 0) {
+                                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        // zlib.gzip(buf, function (_, result) {
+                                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                        // });
+                                    }
+                                    else {
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        });
+                                    }
+
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while loading Requirement View";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+
+                            });
+                        }
+
+                    });
+                }
+                else {
                     if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
@@ -1584,7 +1702,6 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                         res.status(200).json(response);
                                     });
                                 }
-
                             }
                             else {
                                 response.status = false;
@@ -1593,13 +1710,9 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                 response.data = null;
                                 res.status(500).json(response);
                             }
-
                         });
                     }
-
-                });
-
-
+                }
             }
             else {
                 res.status(401).json(response);
@@ -1682,6 +1795,7 @@ masterCtrl.getClientView = function (req, res, next) {
                                     results[0][i].stageDetail = results[0][i].stageDetail ? JSON.parse(results[0][i].stageDetail) : [],
                                         results[0][i].clientContacts = results[0][i] && JSON.parse(results[0][i].clientContacts) ? JSON.parse(results[0][i].clientContacts) : [];
                                     results[0][i].branchList = results[0][i] && JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [];
+                                    results[0][i].followUpNotes = results[0][i] && JSON.parse(results[0][i].followUpNotes) ? JSON.parse(results[0][i].followUpNotes) : [];
 
                                 }
                                 response.data = {

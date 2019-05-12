@@ -1060,6 +1060,11 @@ salesCtrl.getSalesTracker = function (req, res, next) {
 
                                 response.status = true;
                                 response.message = "Sales tracker data loaded successfully";
+
+                                for (var i = 0; i < salesItems[1].length; i++) {
+                                    salesItems[1][i].itemList = salesItems[1][i] && salesItems[1][i].itemList && JSON.parse(salesItems[1][i].itemList) ? JSON.parse(salesItems[1][i].itemList) : [];
+                                }
+
                                 response.data = {
                                     chartData: salesItems[0],
                                     transactionData: salesItems[1],
@@ -2428,16 +2433,16 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
                                     console.log("results[2]", results[2]);
 
                                     // reminder alert
-                                    if (results[2] && results[2][0]){
-                                        for(var i=0; i < results[2].length; i++){
+                                    if (results[2] && results[2][0]) {
+                                        for (var i = 0; i < results[2].length; i++) {
                                             if (results[2] && results[2][i]) {
-                                                
+
                                                 var messagePayload = {
                                                     message: "",
                                                     alarmType: 4,
                                                     type: 301,
                                                     data: {
-                                                        eventList : results[2][i] && results[2][i].eventList && JSON.parse(results[2][i].eventList) ? JSON.parse(results[2][i].eventList) : []
+                                                        eventList: results[2][i] && results[2][i].eventList && JSON.parse(results[2][i].eventList) ? JSON.parse(results[2][i].eventList) : []
                                                     }
                                                     // {
                                                     //     taskId: results[2][i] && results[2][i].taskId ? results[2][i].taskId : 0,
@@ -2445,9 +2450,9 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
                                                     //     description: results[2][i] && results[2][i].description ? results[2][i].description : "",
                                                     //     reminderTime: results[2][i] && results[2][i].reminderTime ? results[2][i].reminderTime : 0,
                                                     //     meetingStartDate: results[2][i] && results[2][i].meetingStartDate ? results[2][i].meetingStartDate : null,
-        
+
                                                     //     address: results[2][i] && results[2][i].address ? results[2][i].address : "",
-        
+
                                                     //     duration: results[2][i] && results[2][i].duration ? results[2][i].duration : 0,
                                                     //     latitude: results[2][i] && results[2][i].latitude ? results[2][i].latitude : 0,
                                                     //     longitude: results[2][i] && results[2][i].longitude ? results[2][i].longitude : 0,
@@ -2457,32 +2462,32 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
                                                     //     iosEventId : results[2][i] && results[2][i].iosEventId ? results[2][i].iosEventId : '0'
                                                     // }
                                                 }
-                                                console.log('messagePayload',messagePayload);
-        
+                                                console.log('messagePayload', messagePayload);
+
                                                 if (results && results[2] && results[2][i] && results[2][i].APNS_Id) {
                                                     console.log('IOS notification');
                                                     _Notification_aws.publish_IOS(results[2][i].APNS_Id, messagePayload, 0);
 
                                                 }
-        
+
                                                 // if (results && results[2] && results[2][i] && results[2][i].creatorAPNS_Id) {
                                                 //     _Notification_aws.publish_IOS(results[2][i].creatorAPNS_Id, messagePayload, 0);
                                                 // }
-        
-        
+
+
                                                 if (results && results[2] && results[2][i] && results[2][i].GCM_Id) {
                                                     _Notification_aws.publish_Android(results[2][i].GCM_Id, messagePayload);
                                                 }
-        
+
                                                 // if (results && results[2] && results[2][i] && results[2][i].creatorGCM_Id) {
                                                 //     console.log("reminder for creator");
                                                 //     console.log("messagePayload", messagePayload);
                                                 //     _Notification_aws.publish_Android(results[2][i].creatorGCM_Id, messagePayload, 0);
                                                 // }
                                             }
-                                        }    
+                                        }
                                     }
-                                   
+
 
                                     // travel alert
                                     // console.log('results[3]',results[3]);
@@ -2499,9 +2504,9 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
                                     //                     description: results[3][i] && results[3][i].description ? results[3][i].description : "",
                                     //                     reminderTime: results[3][i] && results[3][i].reminderTime ? results[3][i].reminderTime : 0,
                                     //                     meetingStartDate: results[3][i] && results[3][i].meetingStartDate ? results[3][i].meetingStartDate : null,
-        
+
                                     //                     address: results[3][i] && results[3][i].address ? results[3][i].address : "",
-        
+
                                     //                     duration: results[3][i] && results[3][i].duration ? results[3][i].duration : 0,
                                     //                     latitude: results[3][i] && results[3][i].latitude ? results[3][i].latitude : 0,
                                     //                     longitude: results[3][i] && results[3][i].longitude ? results[3][i].longitude : 0,
@@ -2511,20 +2516,20 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
                                     //                     iosEventId : results[3][i] && results[3][i].iosEventId ? results[3][i].iosEventId : '0'
                                     //                 }
                                     //             }
-        
+
                                     //             if (results && results[3] && results[3][i] && results[3][i].APNS_Id) {
                                     //                 _Notification_aws.publish_IOS(results[3][i].APNS_Id, messagePayload, 0);
                                     //             }
-        
+
                                     //             // if (results && results[3] && results[3][i] && results[3][i].creatorAPNS_Id) {
                                     //             //     _Notification_aws.publish_IOS(results[3][i].creatorAPNS_Id, messagePayload, 0);
                                     //             // }
-        
-        
+
+
                                     //             if (results && results[3] && results[3][i] && results[3][i].GCM_Id) {
                                     //                 _Notification_aws.publish_Android(results[3][i].GCM_Id, messagePayload);
                                     //             }
-        
+
                                     //             // if (results && results[3] && results[3][i] && results[3][i].creatorGCM_Id) {
                                     //             //     console.log("reminder for creator");
                                     //             //     console.log("messagePayload", messagePayload);
@@ -2613,7 +2618,7 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
                                     });
 
                                 }
-                                else if(!err){
+                                else if (!err) {
                                     response.status = false;
                                     response.message = "Failed to update sales query";
                                     response.error = null;
@@ -2834,13 +2839,13 @@ salesCtrl.saleSupportMailerPreview = function (req, res, next) {
                                     return mailStrBody.replace(new RegExp(escapeRegExp(tagTerm), 'g'), replaceFromResult);
                                 }
 
-                                if(result[1] && result[1][0]){
+                                if (result[1] && result[1][0]) {
                                     for (tagIndex = 0; tagIndex < tags.length; tagIndex++) {
                                         if ((result[1][0][tags[tagIndex].tagName] && result[1][0][tags[tagIndex].tagName] != null && result[1][0][tags[tagIndex].tagName] != "") || result[1][0][tags[tagIndex].tagName] >= -1) {
                                             mailBody = replaceAll(mailBody, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
                                             subject = replaceAll(subject, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
                                         }
-                                    }    
+                                    }
                                 }
 
                                 if (tableTags.length > 0 && itemList.length > 0) {
@@ -3019,14 +3024,14 @@ salesCtrl.saleSupportMailerSendMail = function (req, res, next) {
                                 }
 
 
-                                if(result[1] && result[1][0]){
+                                if (result[1] && result[1][0]) {
                                     for (tagIndex = 0; tagIndex < tags.length; tagIndex++) {
 
                                         if ((result[1][0][tags[tagIndex].tagName] && result[1][0][tags[tagIndex].tagName] != null && result[1][0][tags[tagIndex].tagName] != "") || result[1][0][tags[tagIndex].tagName] >= -1) {
                                             mailBody = replaceAll(mailBody, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
                                             subject = replaceAll(subject, '[' + tags[tagIndex].tagName + ']', result[1][0][tags[tagIndex].tagName]);
                                         }
-                                    }    
+                                    }
                                 }
 
 
@@ -3076,6 +3081,7 @@ salesCtrl.saleSupportMailerSendMail = function (req, res, next) {
 
                                 sendgrid.send(email, function (err, result) {
                                     if (!err) {
+                                        console.log("Mail sent", result);
                                         response.status = true;
                                         response.message = "Mail Sent successfully";
                                         response.error = null;
@@ -3318,7 +3324,7 @@ salesCtrl.mailTemplateMasterData = function (req, res, next) {
                                 tagList: {
                                     sales: result[2] ? result[2] : []
                                 },
-                                isSendProposal : result[3] && result[3][0] && result[3][0].isSendProposal ? result[3][0].isSendProposal : 0
+                                isSendProposal: result[3] && result[3][0] && result[3][0].isSendProposal ? result[3][0].isSendProposal : 0
                             };
 
                             // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -5366,16 +5372,16 @@ salesCtrl.updateEventsReminder = function (req, res, next) {
                         console.log(err);
                         if (!err && result) {
 
-                            if(result && result[0] && result[0][0]){
+                            if (result && result[0] && result[0][0]) {
                                 var messagePayload = {
                                     message: "",
                                     alarmType: 4,
                                     type: 302,
                                     data: {
-                                        eventList : result[0][0] && result[0][0].eventList && JSON.parse(result[0][0].eventList) ? JSON.parse(result[0][0].eventList) : []
+                                        eventList: result[0][0] && result[0][0].eventList && JSON.parse(result[0][0].eventList) ? JSON.parse(result[0][0].eventList) : []
                                     }
                                 }
-    
+
                                 if (result && result[0] && result[0][0] && result[0][0].APNS_Id) {
                                     _Notification_aws.publish_IOS(result[0][0].APNS_Id, messagePayload, 0);
                                 }

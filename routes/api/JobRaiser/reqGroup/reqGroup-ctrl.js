@@ -1354,7 +1354,8 @@ reqGroup.getRecruiterPerformanceReqAppForRequirementGroups = function (req, res,
                             req.st.db.escape(req.body.stageId || 0),
                             req.st.db.escape(req.body.startPage || 1),
                             req.st.db.escape(req.body.limit || 20),
-                            req.st.db.escape(req.body.isExport || 0)
+                            req.st.db.escape(req.body.isExport || 0),
+                            req.st.db.escape(req.body.customRange || 0)
                         ];
 
                         var procQuery = 'CALL pace_get_dashboardRecruiterPerformanceAppViewReqGroups( ' + inputs.join(',') + ')';
@@ -1372,7 +1373,9 @@ reqGroup.getRecruiterPerformanceReqAppForRequirementGroups = function (req, res,
                                 // }
                                 response.data = {
                                     reqApplicantData: result[0] ? result[0] : [],
-                                    count : result[1][0] && result[1][0].count ? result[1][0].count : 0
+                                    count : result[1][0] && result[1][0].count ? result[1][0].count : 0,
+                                    reqApplicantDataForExport: result[2] && result[2][0] ? result[2] : [],
+                                    countForExport : result[3] && result[3][0] && result[3][0].count ? result[3][0].count : 0                                    
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {

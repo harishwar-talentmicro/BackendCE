@@ -52,10 +52,6 @@ gulfCtrl.saveMedical = function (req, res, next) {
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                    if (!req.body.reqApplicantId) {
-                        error.reqApplicantId = 'Invalid reqApplicantId';
-                        validationFlag = false;
-                    }
                     var currency = req.body.currency;
                     if (typeof (currency) == "string") {
                         currency = JSON.parse(currency);
@@ -95,6 +91,11 @@ gulfCtrl.saveMedical = function (req, res, next) {
                         medicalNotes = {};
                     }
 
+                    if (!req.body.reqApp.length) {
+                        error.reqApp = 'Invalid reqApp';
+                        validationFlag = false;
+                    }
+
                     if (!validationFlag) {
                         response.error = error;
                         response.message = 'Please check the errors';
@@ -116,31 +117,28 @@ gulfCtrl.saveMedical = function (req, res, next) {
 
                         var getStatus = [
                             req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.body.medicalId),
+                            req.st.db.escape(req.body.medicalId || 0),
                             req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(req.body.reqApplicantId),
-                            req.st.db.escape(req.body.heDepartmentId),
-                            req.st.db.escape(req.body.applicantId),
-                            req.st.db.escape(req.body.billTo),
-                            req.st.db.escape(req.body.amount),
-                            req.st.db.escape(JSON.stringify(currency)),
-                            req.st.db.escape(JSON.stringify(scale)),
+                            req.st.db.escape(JSON.stringify(req.body.reqApp)),
+                            req.st.db.escape(req.body.heDepartmentId || 0),
+                            req.st.db.escape(req.body.billTo || 0),
+                            req.st.db.escape(req.body.amount || 0),
+                            req.st.db.escape(JSON.stringify(currency || {})),
+                            req.st.db.escape(JSON.stringify(scale || {})),
                             req.st.db.escape(req.body.receivedDate),
                             req.st.db.escape(req.body.sentDate),
                             req.st.db.escape(req.body.date),
-                            req.st.db.escape(req.body.tokenNumber),
-                            req.st.db.escape(req.body.MOFANumber),
+                            req.st.db.escape(req.body.tokenNumber || ""),
+                            req.st.db.escape(req.body.MOFANumber || ""),
                             req.st.db.escape(req.body.medicalStatus),
-                            req.st.db.escape(JSON.stringify(medicalNotes)),
-                            req.st.db.escape(req.body.notes),
-                            req.st.db.escape(req.body.reMedical),
-                            req.st.db.escape(req.body.medicalStage),
-                            req.st.db.escape(JSON.stringify(gamcaMedicalCentre)),
-                            req.st.db.escape(JSON.stringify(cdnFilePath)),
-                            req.st.db.escape(req.body.isGamca),
-                            req.st.db.escape(req.body.clinicName || ""),
-                            req.st.db.escape(req.body.clinicAddress || "")
-
+                            req.st.db.escape(JSON.stringify(medicalNotes || "")),
+                            req.st.db.escape(req.body.notes || ""),
+                            req.st.db.escape(req.body.reMedical || 0),
+                            req.st.db.escape(req.body.medicalStage || 0),
+                            req.st.db.escape(JSON.stringify(gamcaMedicalCentre || {})),
+                            req.st.db.escape(JSON.stringify(cdnFilePath || [])),
+                            req.st.db.escape(req.body.isGamca || 0),
+                            req.st.db.escape(JSON.stringify(req.body.clinic || {}))
                         ];
 
                         var procQuery = 'CALL wm_save_1010_medical( ' + getStatus.join(',') + ')';
@@ -153,7 +151,9 @@ gulfCtrl.saveMedical = function (req, res, next) {
                                 response.error = null;
                                 response.data = {
                                     medicalId: Result[0][0].medicalId,
-                                    transactionHistory: (Result[1] && Result[1][0]) ? Result[1] : []
+                                    reqAppList: (Result[1] && Result[1][0]) ? Result[1] : [],
+                                    transactionHistory: (Result[2] && Result[2][0]) ? Result[2] : [],
+                                    medicalHistory: Result[3] && Result[3][0] && Result[3][0].medicalHistory ? JSON.parse(Result[3][0].medicalHistory) : []
                                 };
 
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -230,9 +230,7 @@ gulfCtrl.getMedical = function (req, res, next) {
                 req.db.query(procQuery, function (err, Result) {
                     console.log(err);
                     if (!err && Result[0] || Result[1] || Result[2]) {
-                        response.status = true;
-                        response.message = "Medical data loaded successfully";
-                        response.error = null;
+
 
                         if (Result[0][0]) {
                             Result[0][0].currency = (Result[0] && Result[0][0] && JSON.parse(Result[0][0].currency).currencyId) ? JSON.parse(Result[0][0].currency) : {};
@@ -245,6 +243,8 @@ gulfCtrl.getMedical = function (req, res, next) {
 
                             Result[0][0].medicalNotes = (Result[0] && Result[0][0] && Result[0] && Result[0][0].medicalNotes) ? JSON.parse(Result[0][0].medicalNotes) : {};
 
+                            Result[0][0].clinic = (Result[0] && Result[0][0] && Result[0] && Result[0][0].clinic) ? JSON.parse(Result[0][0].clinic) : {};
+
                         }
 
                         for (var i = 0; i < Result[2].length; i++) {
@@ -253,15 +253,17 @@ gulfCtrl.getMedical = function (req, res, next) {
                             for (var j = 0; j < Result[2][i].stateWiseList.length; j++) {
                                 Result[2][i].stateWiseList[j].medicalCentreList = (Result[2][i].stateWiseList[j]) ? JSON.parse(Result[2][i].stateWiseList[j].medicalCentreList) : [];
                             }
-
                         }
-
-
+                        response.status = true;
+                        response.message = "Medical loaded successfully";
+                        response.error = null;
                         response.data = {
-                            medicalDetails: Result[0][0],
                             medicalNotes: Result[1],
                             allMedicalCentreList: Result[2] ? Result[2] : [],
-                            medicalHistory: Result[3] && Result[3][0] && Result[3][0].medicalHistory ? JSON.parse(Result[3][0].medicalHistory) : []
+                            medicalHistory: Result[3] && Result[3][0] && Result[3][0].medicalHistory ? JSON.parse(Result[3][0].medicalHistory) : [],
+                            clinicList: Result[4] ? Result[4] : [],
+                            medicalDetails: Result[0] && Result[0][0] ? Result[0][0] : {},
+                            applicantName: Result[5] && Result[5][0] && Result[5][0].applicantName ? Result[5][0].applicantName : ""
                         };
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -276,10 +278,10 @@ gulfCtrl.getMedical = function (req, res, next) {
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            medicalDetails: {},
+                            currentMedicalDetails: {},
                             medicalNotes: [],
-                            allMedicalCentreList: []
-
+                            allMedicalCentreList: [],
+                            clinicList: []
                         };
                         res.status(200).json(response);
                     }
@@ -424,15 +426,15 @@ gulfCtrl.saveDeparture = function (req, res, next) {
                                 response.message = "Departure data saved sucessfully";
                                 response.error = null;
 
-                                for(var i=0; i < results[0].length;i++){
+                                for (var i = 0; i < results[0].length; i++) {
                                     results[0][i].departureCurrency = results[0][i].departureCurrency ? JSON.parse(results[0][i].departureCurrency) : {};
                                     results[0][i].departureCurrencyScale = results[0][i].departureCurrencyScale ? JSON.parse(results[0][i].departureCurrencyScale) : {};
                                 }
 
                                 response.data = {
                                     // departureDetails: (results[0] && results[0][0]) ? results[0][0] : {},
-                                    departureHistory : results[0] && results[0][0] ? results[0] : [],
-                                    reqAppList : results[1] && results[1][0] ? results[1] : [],
+                                    departureHistory: results[0] && results[0][0] ? results[0] : [],
+                                    reqAppList: results[1] && results[1][0] ? results[1] : [],
                                     transactionHistory: results[2] && results[2][0] ? results[2] : []
                                 }
 
@@ -518,15 +520,15 @@ gulfCtrl.getDeparture = function (req, res, next) {
                         response.message = "Departure data loaded successfully";
                         response.error = null;
 
-                        for(var i=0; i < result[0].length;i++){
+                        for (var i = 0; i < result[0].length; i++) {
                             result[0][i].departureCurrency = result[0][i].departureCurrency ? JSON.parse(result[0][i].departureCurrency) : {};
-                            result[0][i].departureCurrencyScale = result[0][i].departureCurrencyScale ? JSON.parse(result[0][i].departureCurrencyScale) : {};    
+                            result[0][i].departureCurrencyScale = result[0][i].departureCurrencyScale ? JSON.parse(result[0][i].departureCurrencyScale) : {};
                         }
                         // response.data = (result && result[0] && result[0][0]) ? result[0][0] : {};
-                        response.data ={
-                            departureId : result[0] && result[0][0] && result[0][0].departureHistoryId ? result[0][0].departureHistoryId : 0,
-                            departureHistory : result[0] && result[0][0] ? result[0] : []
-                        } 
+                        response.data = {
+                            departureId: result[0] && result[0][0] && result[0][0].departureHistoryId ? result[0][0].departureHistoryId : 0,
+                            departureHistory: result[0] && result[0][0] ? result[0] : []
+                        }
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
@@ -718,7 +720,8 @@ gulfCtrl.saveVisa = function (req, res, next) {
 
                                 response.data = {
                                     visaDetails: (result[0] && result[0][0]) ? result[0][0] : {},
-                                    transactionHistory: (result[1] && result[1][0]) ? result[1] : []
+                                    reqAppList: (result[1] && result[1][0]) ? result[1] : [],
+                                    transactionHistory: (result[2] && result[2][0]) ? result[2] : []
                                 }
 
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -935,7 +938,8 @@ gulfCtrl.saveAttestation = function (req, res, next) {
                                 }
                                 response.data = {
                                     attestationDetails: (result[0] && result[0][0]) ? result[0][0] : {},
-                                    transactionHistory: (result[1] && result[1][0]) ? result[1] : []
+                                    reqAppList: (result[1] && result[1][0]) ? result[1] : [],
+                                    transactionHistory: (result[2] && result[2][0]) ? result[2] : []
                                 }
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {

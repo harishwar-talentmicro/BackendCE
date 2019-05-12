@@ -1193,7 +1193,7 @@ paceUsersCtrl.saveLayout = function (req, res, next) {
                         layout = JSON.parse(layout);
                     }
                     if (!layout) {
-                        layout = [];
+                        layout = {};
                     }
 
 
@@ -1209,7 +1209,7 @@ paceUsersCtrl.saveLayout = function (req, res, next) {
                         var inputs = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(JSON.stringify(layout))
+                            req.st.db.escape(JSON.stringify(layout || {}))
                         ];
 
                         var procQuery = 'CALL wm_save_pacelayout( ' + inputs.join(',') + ')';
@@ -3257,12 +3257,12 @@ paceUsersCtrl.getSourcedApplicants = function (req, res, next) {
         validationFlag *= false;
     }
 
-    if (!req.query.from) {
+    if (!req.body.from) {
         error.from = 'Invalid from Date';
         validationFlag *= false;
     }
 
-    if (!req.query.to) {
+    if (!req.body.to) {
         error.to = 'Invalid To Date';
         validationFlag *= false;
     }
@@ -3278,46 +3278,30 @@ paceUsersCtrl.getSourcedApplicants = function (req, res, next) {
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.recruiterId),
+                    req.st.db.escape(req.body.recruiterId),
                     req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.sourceId),
-                    req.st.db.escape(req.query.from),
-                    req.st.db.escape(req.query.to),
-                    req.st.db.escape(DBSecretKey)
-
+                    req.st.db.escape(req.body.sourceId),
+                    req.st.db.escape(req.body.from),
+                    req.st.db.escape(req.body.to),
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.body.startPage || 1),
+                    req.st.db.escape(req.body.limit || 20),
+                    req.st.db.escape(req.body.isExport || 0),
+                    req.st.db.escape(req.body.customRange || 0)
                 ];
 
                 var procQuery = 'CALL wm_get_sourceApplicants( ' + inputs.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0]) {
                         response.status = true;
                         response.message = "Applicants data loaded successfully";
                         response.error = null;
-                        // for (var i = 0; i < result[0].length; i++){
-                        //     result[0][i].jobTitle=result[0][i].jobTitle? JSON.parse(result[0][i].jobTitle):{};
-                        //     result[0][i].expectedSalaryCurr=result[0][i].expectedSalaryCurr? JSON.parse(result[0][i].expectedSalaryCurr):{};
-                        //     result[0][i].expectedSalaryScale=result[0][i].expectedSalaryScale? JSON.parse(result[0][i].expectedSalaryScale):{};
-                        //     result[0][i].expectedSalaryPeriod=result[0][i].expectedSalaryPeriod? JSON.parse(result[0][i].expectedSalaryPeriod):{};
-                        //     result[0][i].presentSalaryCurr=result[0][i].presentSalaryCurr? JSON.parse(result[0][i].presentSalaryCurr):{};
-                        //     result[0][i].presentSalaryScale=result[0][i].presentSalaryScale? JSON.parse(result[0][i].presentSalaryScale):{};
-                        //     result[0][i].presentSalaryPeriod=result[0][i].presentSalaryPeriod? JSON.parse(result[0][i].presentSalaryPeriod):{};
-                        //     result[0][i].education=result[0][i].education? JSON.parse(result[0][i].education):[];
-                        //     result[0][i].primarySkills=result[0][i].primarySkills? JSON.parse(result[0][i].primarySkills):[];
-                        //     result[0][i].secondarySkills=result[0][i].secondarySkills? JSON.parse(result[0][i].secondarySkills):[];
-                        //     result[0][i].functionalAreas=result[0][i].functionalAreas? JSON.parse(result[0][i].functionalAreas):[];
-                        //     result[0][i].document_attachments_list=result[0][i].document_attachments_list? JSON.parse(result[0][i].document_attachments_list):[];
-                        //     result[0][i].industry=result[0][i].industry? JSON.parse(result[0][i].industry):{};
-                        //     result[0][i].cvSource=result[0][i].cvSource? JSON.parse(result[0][i].cvSource):{};
-                        //     result[0][i].nationality=result[0][i].nationality? JSON.parse(result[0][i].nationality):{};
-                        //     result[0][i].prefLocations=result[0][i].prefLocations? JSON.parse(result[0][i].prefLocations):{};
-
-                        // }
-
-                        response.data =
-                            {
-                                ApplicantsList: result[0] ? result[0] : []
+                        response.data ={
+                                ApplicantsList: result[0] ? result[0] : [],
+                                count : result[1][0] && result[1][0].count ? result[1][0].count : 0,
+                                ApplicantsListForExport : result[2] ? result[2] : []
                             };
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
@@ -3330,7 +3314,11 @@ paceUsersCtrl.getSourcedApplicants = function (req, res, next) {
                         response.status = false;
                         response.message = "No results found";
                         response.error = null;
-                        response.data = null;
+                        response.data = {
+                            ApplicantsList : [],
+                            count:0,
+                            ApplicantsListForExport:[]
+                        };
                         res.status(200).json(response);
                     }
                     else {

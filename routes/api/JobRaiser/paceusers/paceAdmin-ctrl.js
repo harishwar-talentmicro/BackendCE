@@ -1,6 +1,7 @@
 var paceAdmin = {};
 var error = {};
-
+var paceReport = require('../pacehcmCron');
+var paceReportFunction = new paceReport();
 
 paceAdmin.paceAdminDashboard = function (req, res, next) {
     var response = {
@@ -55,9 +56,9 @@ paceAdmin.paceAdminDashboard = function (req, res, next) {
                     transactionData: result[2] && result[2][0] ? result[2][0] : null,
                     transactionHistoryData: result[3] && result[3][0] ? result[3][0] : null,
                     requirementHistoryData: result[4] && result[4][0] ? result[4][0] : null,
-                    requirementGroupHistoryData : result[5] && result[5][0] ? result[5][0] : null,
-                    clientHistoryData : result[6] && result[6][0] ? result[6][0] : null,
-                    heMasterList : result[7] && result[7][0] ? result[7] : []
+                    requirementGroupHistoryData: result[5] && result[5][0] ? result[5][0] : null,
+                    clientHistoryData: result[6] && result[6][0] ? result[6][0] : null,
+                    heMasterList: result[7] && result[7][0] ? result[7] : []
                 };
 
                 res.status(200).json(response);
@@ -120,7 +121,7 @@ paceAdmin.paceSaveHeMasterConfiguration = function (req, res, next) {
                 response.error = null;
 
                 response.data = {
-                    heMasterList : result[0] && result[0][0] ? result[0] : []
+                    heMasterList: result[0] && result[0][0] ? result[0] : []
                 };
 
                 res.status(200).json(response);
@@ -148,5 +149,50 @@ paceAdmin.paceSaveHeMasterConfiguration = function (req, res, next) {
     }
 };
 
+paceAdmin.PeepalReport = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if(!req.query.heMasterId){
+        error.heMasterId="Invalid heMasterId";
+        validationFlag = false;
+    } 
+    
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+        try {
+            paceReportFunction.PeepalReport(req);
+
+            response.status = true;
+            response.message = "Report sent successfully";
+            res.status(200).json(response);
+
+        } catch (ex) {
+            response.status = false;
+            response.error = ex.toString();
+            response.message = "Some Error occured";
+            res.status(500).json(response);
+        }
+
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+        // });
+    }
+};
 
 module.exports = paceAdmin;

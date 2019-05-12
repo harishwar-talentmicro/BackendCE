@@ -223,7 +223,7 @@ module.exports = function(favoriteBook,done) {
                                 messageIds = messageIds + "," + results[i].messageUserId ;
                             }
 
-                            uploader(i+1);
+                            return uploader(i+1);
                         }
                         else {
                             // Send notifications
@@ -235,7 +235,7 @@ module.exports = function(favoriteBook,done) {
                                     else {
                                         messageIds = messageIds + "," + results[i].messageUserId ;
                                     }
-                                    uploader(i+1);
+                                    return uploader(i+1);
                                 }
                                 else {
 
@@ -245,7 +245,7 @@ module.exports = function(favoriteBook,done) {
                                     else {
                                         messageIds = messageIds + "," + results[i].messageUserId ;
                                     }
-                                    uploader(i+1);
+                                    return uploader(i+1);
                                 }
 
                             });
@@ -279,7 +279,7 @@ module.exports = function(favoriteBook,done) {
                                 else {
                                     messageIds = messageIds + "," + results[i].messageUserId ;
                                 }
-                                uploader(i+1);
+                                return uploader(i+1);
                             }
                             else {
                                 ANDROID_SNS.sendMessage(endpointArn, params, function(err, messageId) {
@@ -292,7 +292,7 @@ module.exports = function(favoriteBook,done) {
                                             messageIds = messageIds + "," + results[i].messageUserId ;
                                         }
 
-                                        uploader(i+1);
+                                        return uploader(i+1);
                                     } else {
                                         if(messageIds == ""){
                                             messageIds = results[i].messageUserId ;
@@ -302,7 +302,7 @@ module.exports = function(favoriteBook,done) {
                                         }
 
                                         console.log('Successfully sent a message to device %s. MessageID was %s', messageId);
-                                        uploader(i+1);
+                                        return uploader(i+1);
                                     }
                                 });
                             }
@@ -317,7 +317,7 @@ module.exports = function(favoriteBook,done) {
                         messageIds = messageIds + "," + results[i].messageUserId ;
                     }
 
-                    uploader(i+1);
+                    return uploader(i+1);
                 }
 
             });

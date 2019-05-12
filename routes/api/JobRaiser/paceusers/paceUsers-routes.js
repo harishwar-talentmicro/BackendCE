@@ -48,7 +48,7 @@ router.post('/smsAppInfo',paceUsersCtrl.sendApplicantInfoToPhone);  // not enc
 router.post('/notifyAppInfo',paceUsersCtrl.sendApplicantInfoAsNotification);
 
 router.get('/exportPlanner',paceUsersCtrl.getTaskPlannerForExport);
-router.get('/applicants',paceUsersCtrl.getSourcedApplicants);
+router.post('/sourcedApplicants',paceUsersCtrl.getSourcedApplicants);
 
 router.get('/logoutPortalUsers',paceUsersCtrl.logoutPortalUsers);
 router.post('/requirements',paceUsersCtrl.getclientRequuirements);
@@ -57,6 +57,8 @@ router.get('/smsTemplates',paceUsersCtrl.smsMailTemplates);
 
 router.post('/paceAdmin',paceAdmin.paceAdminDashboard);
 router.post('/savePaceAdminConfiguration',paceAdmin.paceSaveHeMasterConfiguration);
+
+router.get('/peepalReport',paceAdmin.PeepalReport);
 
 
 module.exports = router;

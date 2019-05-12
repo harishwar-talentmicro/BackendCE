@@ -115,10 +115,10 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                    console.log(req.body);
+                // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                //     console.log(req.body);
                     if (!req.body.heMasterId) {
                         error.heMasterId = 'Invalid tenant';
                         validationFlag *= false;
@@ -264,7 +264,17 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                             req.st.db.escape(req.body.autoScreeningMail || ''),
                             req.st.db.escape(req.body.isGulf || 0),
                             req.st.db.escape(req.body.isCareerPortal || 0),
-                            req.st.db.escape(req.body.reqOrGroup || 1)
+                            req.st.db.escape(req.body.reqOrGroup || 1),
+                            req.st.db.escape(req.body.notifyClientBirthday || 0),
+                            req.st.db.escape(req.body.clientCVHeader || ""),
+                            req.st.db.escape(req.body.clientCVFooter || ""),
+                            req.st.db.escape(req.body.isClientCVHeader || 0),
+                            req.st.db.escape(req.body.isClientCVFooter || 0),
+                            req.st.db.escape(req.body.clientCVMaskMobileNo || 0),
+                            req.st.db.escape(req.body.clientCVMaskEmail || 0),
+                            req.st.db.escape(req.body.clientResumeLogoAttach || 0),
+                            req.st.db.escape(req.body.homePageLogo || "")
+                        
                         ];
 
                         var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
@@ -280,11 +290,11 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                                     defaultData: (results[1] && results[1][0] && results[1][0].defaultFormData) ? JSON.parse(results[1][0].defaultFormData) : {}
                                 };
                                 if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != null) {
-                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                    zlib.gzip(buf, function (_, result) {
-                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    // zlib.gzip(buf, function (_, result) {
+                                    //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                         res.status(200).json(response);
-                                    });
+                                    // });
                                 }
                                 else {
                                     response.status = true;
@@ -306,7 +316,7 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
 
                         });
                     }
-                });
+                // });
             }
             else {
                 res.status(401).json(response);
@@ -733,11 +743,11 @@ jobCtrl.getJobDefaults = function (req, res, next) {
                         response.data = results[0][0].defaultFormData ? JSON.parse(results[0][0].defaultFormData) : {};
 
                         if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != null) {
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                            zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                 res.status(200).json(response);
-                            });
+                            // });
                         }
                         else {
                             response.status = true;
@@ -1561,7 +1571,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 req.st.db.escape(req.body.timestamp),
                                 req.st.db.escape(req.body.currentTimeStamp),
                                 req.st.db.escape(JSON.stringify(functionalAreas)),
-                                req.st.db.escape(req.body.postJobCareerPortal)
+                                req.st.db.escape(req.body.postJobCareerPortal || 0),
+                                req.st.db.escape(JSON.stringify(req.body.jobLocation || {}))
                             ];
 
                             var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
@@ -1863,7 +1874,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 req.st.db.escape(req.body.timestamp),
                                 req.st.db.escape(req.body.currentTimeStamp),
                                 req.st.db.escape(JSON.stringify(functionalAreas)),
-                                req.st.db.escape(req.body.postJobCareerPortal)
+                                req.st.db.escape(req.body.postJobCareerPortal),
+                                req.st.db.escape(JSON.stringify(req.body.jobLocation || {}))
                             ];
 
                             var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
@@ -2289,6 +2301,8 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                         result[2][0].industry = (result[2] && result[2][0]) && JSON.parse(result[2][0].industry) ? JSON.parse(result[2][0].industry) : [];
                         result[2][0].attachmentList = (result[2] && result[2][0]) && JSON.parse(result[2][0].attachmentList) ? JSON.parse(result[2][0].attachmentList) : [];
                         result[2][0].functionalAreas = (result[2] && result[2][0] && JSON.parse(result[2][0].functionalAreas)) ? JSON.parse(result[2][0].functionalAreas) : [];
+                        result[2][0].jobLocation = (result[2] && result[2][0] && JSON.parse(result[2][0].jobLocation)) ? JSON.parse(result[2][0].jobLocation) : [];
+
 
                         for (var i = 0; i < result[3].length; i++) {
                             result[3][i].followUpNotes = (result[3] && result[3][i]) ? JSON.parse(result[3][i].followUpNotes) : [];
@@ -2508,6 +2522,8 @@ jobCtrl.getJdTemplateDetails = function (req, res, next) {
                         result[0][0].industry = (result[0] && result[0][0]) ? JSON.parse(result[0][0].industry) : [];
                         result[0][0].attachmentList = (result[0] && result[0][0]) ? JSON.parse(result[0][0].attachmentList) : [];
                         result[0][0].functionalAreas = (result[0] && result[0][0]) ? JSON.parse(result[0][0].functionalAreas) : [];
+                        result[0][0].jobLocation = (result[0] && result[0][0]) ? JSON.parse(result[0][0].jobLocation) : {};
+
 
                         response.data = {
                             jdTemplateDetails: (result[0] && result[0][0]) ? result[0][0] : []
