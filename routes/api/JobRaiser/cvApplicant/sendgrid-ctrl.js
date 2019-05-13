@@ -28,7 +28,7 @@ const accountSid = 'AC62cf5e4f884a28b6ad9e2da511d24f4d';  //'ACcf64b25bcacbac0b6
 const authToken = 'ff62486827ce8b68c70c1b8f7cef9748';   //'3abf04f536ede7f6964919936a35e614';  //'ff62486827ce8b68c70c1b8f7cef9748';//
 const FromNumber = CONFIG.DB.FromNumber || '+16012286363';
 const client = require('twilio')(accountSid, authToken);
-var logger = require('../../error-logger/error-log.js');
+var logger = require('../error-logger/error-log.js');
 
 var qs = require("querystring");
 var options = {
@@ -8634,7 +8634,7 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                                             qs: {
                                                 user_name: 'janardana@hirecraft.com',
                                                 password: 'Ezeid2015',
-                                                sender_id: 'WtMate',
+                                                sender_id: 'PCEHCM',
                                                 service: 'TRANS',
                                                 mobile_no: mobileNo,
                                                 message: message,
@@ -8674,7 +8674,7 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                                             }
                                             else {
                                                 sentSMS = 1;
-                                                console.log("SUCCESS", "SMS response");
+                                                console.log("SUCCESS aikon", "SMS response "+sentSMS);
                                             }
                                         });
                                     }
@@ -8727,10 +8727,10 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
 
                             response.status = true;
 
-                            if (sentSMS)
+                            // if (sentSMS)
                                 response.message = "Sms sent successfully";
-                            else
-                                response.message = "message not sent";
+                            // else
+                            //     response.message = "message not sent";
 
                             response.error = null;
                             response.data = null;
