@@ -956,7 +956,7 @@ Service.prototype.saveServiceAttachmentPace = function (req, res, next) {
                     var formData = {
                         attachment: fs.createReadStream(req.files.attachment.path),
                     };
-                    request.post({ url: 'http://23.236.49.140:1002/api/service_attachment_doc', formData: formData }, function (err, httpResponse, body) {
+                    request.post({ url: 'http://35.237.69.199:3001/api/service_attachment_doc', formData: formData }, function (err, httpResponse, body) {
                         if (err) {
                             return console.error('upload failed:', err);
                         }
