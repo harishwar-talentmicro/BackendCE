@@ -273,8 +273,8 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                             req.st.db.escape(req.body.clientCVMaskMobileNo || 0),
                             req.st.db.escape(req.body.clientCVMaskEmail || 0),
                             req.st.db.escape(req.body.clientResumeLogoAttach || 0),
-                            req.st.db.escape(req.body.homePageLogo || "")
-                        
+                            req.st.db.escape(req.body.homePageLogo || ""),
+                            req.st.db.escape(JSON.stringify(req.body.notifyClientBirthdayFor || {}))
                         ];
 
                         var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';

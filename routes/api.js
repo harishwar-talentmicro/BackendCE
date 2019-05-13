@@ -533,6 +533,9 @@ router.post('/service_pic',serviceModule.saveServicePic);
 router.post('/service_attachment',serviceModule.saveServiceAttachment);
 router.post('/service_attachment_pacehcm',serviceModule.saveServiceAttachmentForPacehcm);
 
+router.post('/service_attachment_pace',serviceModule.saveServiceAttachmentPace);
+
+router.post('/service_attachment_doc',serviceModule.saveServiceAttachmentDoc);
 
 router.post('/service_video',serviceModule.saveServiceVideo);
 

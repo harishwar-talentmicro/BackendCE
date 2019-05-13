@@ -1529,20 +1529,20 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                     response.error = null;
                                     var output = [];
                                     for (var i = 0; i < results[0].length; i++) {
-                                        results[0][i].branchList = JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
-                                            results[0][i].contactList = JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
-                                            results[0][i].stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
-                                            results[0][i].followUpNotes = JSON.parse(results[0][i].followUpNotes) ? JSON.parse(results[0][i].followUpNotes) : []
+                                        results[0][i].branchList = results[0][i].branchList && JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
+                                            results[0][i].contactList = results[0][i].contactList && JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
+                                            results[0][i].stageDetail = results[0][i].stageDetail && JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
+                                            results[0][i].followUpNotes = results[0][i].followUpNotes && JSON.parse(results[0][i].followUpNotes) ? JSON.parse(results[0][i].followUpNotes) : []
                                     }
 
-                                    for (var i = 0; i < results[2].length; i++) {
-                                        results[2][i].status = results[2] && results[2][i] && JSON.parse(results[2][i].status) ? JSON.parse(results[2][i].status) : [];
+                                    for (var i = 0; i < results[3].length; i++) {
+                                        results[3][i].status = results[3] && results[3][i] && JSON.parse(results[3][i].status) ? JSON.parse(results[3][i].status) : [];
                                     }
 
                                     response.data = {
                                         requirementView: results[0] ? results[0] : [],
-                                        requirementCount: (results[1] && results[1][0] && results[1][0].requirementCount) ? results[1][0].requirementCount : 0,
-                                        stageList: results[2] && results[2][0] ? results[2] : []
+                                        requirementCount: (results[2] && results[2][0] && results[2][0].requirementCount) ? results[2][0].requirementCount : 0,
+                                        stageList: results[3] && results[3][0] ? results[3] : []
                                     };
 
                                     if (req.query.isWeb == 0) {
@@ -1567,7 +1567,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                     response.error = null;
                                     response.data = {
                                         requirementView: [],
-                                        stageList: (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList) : []
+                                        stageList: (results && results[2] && results[2][0]) && results[2][0].stageList ? JSON.parse(results[2][0].stageList) : []
 
                                     };
                                     if (req.query.isWeb == 0) {
