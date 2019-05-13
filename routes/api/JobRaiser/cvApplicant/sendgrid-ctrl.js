@@ -28,6 +28,7 @@ const accountSid = 'AC62cf5e4f884a28b6ad9e2da511d24f4d';  //'ACcf64b25bcacbac0b6
 const authToken = 'ff62486827ce8b68c70c1b8f7cef9748';   //'3abf04f536ede7f6964919936a35e614';  //'ff62486827ce8b68c70c1b8f7cef9748';//
 const FromNumber = CONFIG.DB.FromNumber || '+16012286363';
 const client = require('twilio')(accountSid, authToken);
+var logger = require('../../error-logger/error-log.js');
 
 var qs = require("querystring");
 var options = {
@@ -58,2534 +59,2395 @@ function replaceAll(mailStrBody, tagTerm, replaceFromResult) {
 
 
 sendgridCtrl.saveSendMail = function (req, res, next) {
-
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-
-    var emailReceivers;                //emailReceivers to store the recipients
-    var mailbody_array = [];    //array to store all mailbody after replacing tags
-    var emailId = [];
-    var validationFlag = true;
-    var fromEmailID;
-    var toEmailID = [];
-
-    //request parameters
-    var updateFlag = req.body.updateFlag || 0;
-    var overWrite = req.body.overWrite || 0;
-    var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
-    var templateId = req.body.template ? req.body.template.templateId : undefined;
-    var trackerTemplate = req.body.trackerTemplate || {};
-    var tags = req.body.tags || {};
-    var cc = req.body.cc || [];
-    var toMail = req.body.toMail || [];
-    var bcc = req.body.bcc || [];
-    var stage = req.body.stage || [];
-    var attachment = req.body.attachment || [];
-    var reqApplicants = req.body.reqApplicants || [];
-    var applicants = req.body.applicantId || [];
-    var client = req.body.clientId || [];
-    var tableTags = req.body.tableTags || {};
-    var clientContacts = req.body.clientContacts || [];
-    var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
-    var mailBody = req.body.mailBody || '';
-    var isWeb = req.query.isWeb || 0;
-    var mailerType = req.body.mailerType || 0;
-    var userId = req.query.userId || 0;
-
-    //html styling for table in submission mailer
-    var tableStyle = '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>';
-    var tableHeadingStyle = '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">';
-    var tableDataStyle = '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">';
-
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'invalid tenant';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
 
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+    var error_logger = {
+        details: 'sendgridCtrl.saveSendMail'
     }
 
-    if (typeof (trackerTemplate) == "string") {
-        trackerTemplate = JSON.parse(trackerTemplate);
-    }
-    if (!trackerTemplate) {
-        trackerTemplate = {};
-        trackerTags = [];
-    }
-    else {
-        trackerTags = JSON.parse(trackerTemplate.trackerTags);
-    }
-
-    if (typeof (tags) == "string") {
-        tags = JSON.parse(tags);
-    }
-
-    if (typeof (cc) == "string") {
-        cc = JSON.parse(cc);
-    }
-
-    if (typeof (toMail) == "string") {
-        toMail = JSON.parse(toMail);
-    }
-
-    if (typeof (bcc) == "string") {
-        bcc = JSON.parse(bcc);
-    }
-
-    if (typeof (stage) == "string") {
-        stage = JSON.parse(stage);
-    }
-
-    if (typeof (attachment) == "string") {
-        attachment = JSON.parse(attachment);
-    }
-
-    if (typeof (reqApplicants) == "string") {
-        reqApplicants = JSON.parse(reqApplicants);
-    }
-
-    if (typeof (applicants) == "string") {
-        applicants = JSON.parse(applicants);
-    }
-
-    if (typeof (client) == "string") {
-        client = JSON.parse(client);
-    }
-
-    if (typeof (clientContacts) == "string") {
-        clientContacts = JSON.parse(clientContacts);
-    }
-
-    if (typeof (tableTags) == "string") {
-        tableTags = JSON.parse(tableTags);
-    }
+    try {
 
 
-    //check for mail type and assign the recipients
-    if (mailerType == 1 || mailerType == 2) {
-        emailReceivers = reqApplicants;
-    }
-    else if (mailerType == 3) {
-        emailReceivers = applicants;
-    }
-    else {
-        emailReceivers = client;
-    }
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-                if (emailReceivers.length > 0) {				//for checking if the mailer is just a template
+        var emailReceivers;                //emailReceivers to store the recipients
+        var mailbody_array = [];    //array to store all mailbody after replacing tags
+        var emailId = [];
+        var validationFlag = true;
+        var fromEmailID;
+        var toEmailID = [];
 
-                    var inputs = [
-                        req.st.db.escape(req.query.token),
-                        req.st.db.escape(req.query.heMasterId),
-                        req.st.db.escape(JSON.stringify(tags)),
-                        req.st.db.escape(JSON.stringify(reqApplicants)),
-                        req.st.db.escape(JSON.stringify(applicants)),
-                        req.st.db.escape(JSON.stringify(client)),
-                        req.st.db.escape(userId),
-                        req.st.db.escape(mailerType),
-                        req.st.db.escape(JSON.stringify(tableTags)),
-                        req.st.db.escape(JSON.stringify(clientContacts)),
-                        req.st.db.escape((trackerTemplate.trackerTags))
-                    ];
+        //request parameters
+        var updateFlag = req.body.updateFlag || 0;
+        var overWrite = req.body.overWrite || 0;
+        var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
+        var templateId = req.body.template ? req.body.template.templateId : undefined;
+        var trackerTemplate = req.body.trackerTemplate || {};
+        var tags = req.body.tags || {};
+        var cc = req.body.cc || [];
+        var toMail = req.body.toMail || [];
+        var bcc = req.body.bcc || [];
+        var stage = req.body.stage || [];
+        var attachment = req.body.attachment || [];
+        var reqApplicants = req.body.reqApplicants || [];
+        var applicants = req.body.applicantId || [];
+        var client = req.body.clientId || [];
+        var tableTags = req.body.tableTags || {};
+        var clientContacts = req.body.clientContacts || [];
+        var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
+        var mailBody = req.body.mailBody || '';
+        var isWeb = req.query.isWeb || 0;
+        var mailerType = req.body.mailerType || 0;
+        var userId = req.query.userId || 0;
 
-                    var procQuery = 'CALL wm_get_detailsByTags1( ' + inputs.join(',') + ')';
-                    console.log(procQuery);
-                    req.db.query(procQuery, function (err, result) {
-                        console.log(err);
-                        if (!err && result) {
-                            var temp = mailBody;
-                            //if mailer type is not submission mailer, recipients are applicants
-                            if (mailerType != 2) {
-                                //replacing all tags present in the mail body
-                                for (var applicantIndex = 0; applicantIndex < emailReceivers.length; applicantIndex++) {
-                                    for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                    }
-                                    for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[1][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                    }
+        //html styling for table in submission mailer
+        var tableStyle = '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>';
+        var tableHeadingStyle = '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">';
+        var tableDataStyle = '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">';
 
-                                    for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[2][applicantIndex][tags.client[tagIndex].tagName]);
-                                    }
-                                    mailbody_array.push(mailBody);
-                                    fromEmailID = result[4][0].fromemailId;
-                                    toEmailID.push(result[3][applicantIndex].emailId);
-                                    mailBody = temp;
-                                }
-                            }
-                            //end of if
-                            //if mailer type is submission mailer, recipients are client contacts
-                            else {
-                                console.log('tags', tags);
-                                for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
-                                    for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
-                                        //replacing all tags present in the mail body
-                                        for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-                                            mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                        }
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'invalid tenant';
+            validationFlag *= false;
+        }
 
-                                        for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-                                            mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[1][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                        }
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
 
-                                        for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-                                            mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[2][applicantIndex][tags.client[tagIndex].tagName]);
-                                        }
-                                    }
-                                    for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
-                                        mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[8][clientIndex][tags.clientContacts[tagIndex].tagName]);
-                                    }
-                                    //Replacing table tags with html table
-                                    if (tableTags.applicant.length > 0) {
-                                        var position = mailBody.indexOf('@table');
-                                        var tableContent = '';
-                                        mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
-                                        tableContent += tableStyle;
-                                        console.log(tableContent, 'mailbody');
-                                        for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                            tableContent += tableHeadingStyle + tableTags.applicant[tagCount].displayTagAs + "</th>";
-                                        }
-                                        tableContent += "</tr>";
-                                        for (var candidateCount = 0; candidateCount < result[5].length; candidateCount++) {
-                                            tableContent += "<tr>";
-                                            for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                                tableContent += tableDataStyle + result[5][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+        if (typeof (trackerTemplate) == "string") {
+            trackerTemplate = JSON.parse(trackerTemplate);
+        }
+        if (!trackerTemplate) {
+            trackerTemplate = {};
+            trackerTags = [];
+        }
+        else {
+            trackerTags = JSON.parse(trackerTemplate.trackerTags);
+        }
+
+        if (typeof (tags) == "string") {
+            tags = JSON.parse(tags);
+        }
+
+        if (typeof (cc) == "string") {
+            cc = JSON.parse(cc);
+        }
+
+        if (typeof (toMail) == "string") {
+            toMail = JSON.parse(toMail);
+        }
+
+        if (typeof (bcc) == "string") {
+            bcc = JSON.parse(bcc);
+        }
+
+        if (typeof (stage) == "string") {
+            stage = JSON.parse(stage);
+        }
+
+        if (typeof (attachment) == "string") {
+            attachment = JSON.parse(attachment);
+        }
+
+        if (typeof (reqApplicants) == "string") {
+            reqApplicants = JSON.parse(reqApplicants);
+        }
+
+        if (typeof (applicants) == "string") {
+            applicants = JSON.parse(applicants);
+        }
+
+        if (typeof (client) == "string") {
+            client = JSON.parse(client);
+        }
+
+        if (typeof (clientContacts) == "string") {
+            clientContacts = JSON.parse(clientContacts);
+        }
+
+        if (typeof (tableTags) == "string") {
+            tableTags = JSON.parse(tableTags);
+        }
+
+
+        //check for mail type and assign the recipients
+        if (mailerType == 1 || mailerType == 2) {
+            emailReceivers = reqApplicants;
+        }
+        else if (mailerType == 3) {
+            emailReceivers = applicants;
+        }
+        else {
+            emailReceivers = client;
+        }
+
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
+                        if (emailReceivers.length > 0) {				//for checking if the mailer is just a template
+
+                            var inputs = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.query.heMasterId),
+                                req.st.db.escape(JSON.stringify(tags)),
+                                req.st.db.escape(JSON.stringify(reqApplicants)),
+                                req.st.db.escape(JSON.stringify(applicants)),
+                                req.st.db.escape(JSON.stringify(client)),
+                                req.st.db.escape(userId),
+                                req.st.db.escape(mailerType),
+                                req.st.db.escape(JSON.stringify(tableTags)),
+                                req.st.db.escape(JSON.stringify(clientContacts)),
+                                req.st.db.escape((trackerTemplate.trackerTags))
+                            ];
+
+                            var procQuery = 'CALL wm_get_detailsByTags1( ' + inputs.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, result) {
+                                try {
+                                    console.log(err);
+                                    if (!err && result) {
+                                        var temp = mailBody;
+                                        //if mailer type is not submission mailer, recipients are applicants
+                                        if (mailerType != 2) {
+                                            //replacing all tags present in the mail body
+                                            for (var applicantIndex = 0; applicantIndex < emailReceivers.length; applicantIndex++) {
+                                                for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                                    mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                }
+                                                for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+                                                    mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[1][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                                }
+
+                                                for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+                                                    mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[2][applicantIndex][tags.client[tagIndex].tagName]);
+                                                }
+                                                mailbody_array.push(mailBody);
+                                                fromEmailID = result[4][0].fromemailId;
+                                                toEmailID.push(result[3][applicantIndex].emailId);
+                                                mailBody = temp;
                                             }
-                                            tableContent += "</tr>";
+                                        }
+                                        //end of if
+                                        //if mailer type is submission mailer, recipients are client contacts
+                                        else {
+                                            console.log('tags', tags);
+                                            for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
+                                                for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
+                                                    //replacing all tags present in the mail body
+                                                    for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                                        mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                    }
+
+                                                    for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+                                                        mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[1][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                                    }
+
+                                                    for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+                                                        mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[2][applicantIndex][tags.client[tagIndex].tagName]);
+                                                    }
+                                                }
+                                                for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+                                                    mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[8][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                                }
+                                                //Replacing table tags with html table
+                                                if (tableTags.applicant.length > 0) {
+                                                    var position = mailBody.indexOf('@table');
+                                                    var tableContent = '';
+                                                    mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
+                                                    tableContent += tableStyle;
+                                                    console.log(tableContent, 'mailbody');
+                                                    for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                                        tableContent += tableHeadingStyle + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                                                    }
+                                                    tableContent += "</tr>";
+                                                    for (var candidateCount = 0; candidateCount < result[5].length; candidateCount++) {
+                                                        tableContent += "<tr>";
+                                                        for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                                            tableContent += tableDataStyle + result[5][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                                        }
+                                                        tableContent += "</tr>";
+                                                    }
+
+                                                    tableContent += "</table>";
+                                                    mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
+
+                                                }
+
+                                                mailbody_array.push(mailBody);
+                                                fromEmailID = result[4][0].fromemailId;
+                                                toEmailID.push(result[8][clientIndex].emailId);
+                                                mailBody = temp;
+                                            }
+                                        }
+                                        //end of else (mailertype if)                           
+                                        var buffer;
+                                        if (trackerTemplate) {
+                                            var ws_data = '[[';
+                                            // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
+                                            for (var i = 0; i < trackerTags.length; i++) {
+                                                if (i != trackerTags.length - 1)
+                                                    ws_data += '"' + trackerTags[i].displayTagAs + '",';
+                                                else
+                                                    ws_data += '"' + trackerTags[i].displayTagAs + '"';
+                                            }
+                                            ws_data += "]";
+
+                                            // console.log(new Buffer(buffer).toString("base64"));
+                                            for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
+                                                ws_data += ',[';
+                                                for (var tagIndex = 0; tagIndex < trackerTags.length; tagIndex++) {
+                                                    if (tagIndex < trackerTags.length - 1)
+                                                        ws_data += '"' + result[9][applicantIndex][trackerTags[tagIndex].tagName] + '",';
+                                                    else
+                                                        ws_data += '"' + result[9][applicantIndex][trackerTags[tagIndex].tagName] + '"';
+                                                }
+                                                ws_data += ']';
+                                            }
+                                            ws_data += ']';
+                                            console.log(ws_data);
+                                            buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]); // Returns a buffer
+                                        }
+                                        //for sending mails
+                                        for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
+                                            var mailOptions = {
+                                                from: fromEmailID,
+                                                to: toEmailID[receiverIndex],
+                                                subject: subject,
+                                                html: mailbody_array[receiverIndex]
+                                            };
+
+                                            mailOptions.cc = [];
+
+                                            for (var j = 0; j < cc.length; j++) {
+                                                mailOptions.cc.push(cc[j].email);
+                                            }
+                                            mailOptions.bcc = [];
+
+                                            for (var j = 0; j < bcc.length; j++) {
+                                                mailOptions.bcc.push(bcc[j].email);
+                                            }
+
+                                            var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                            var email = new sendgrid.Email();
+                                            email.from = mailOptions.from;
+                                            email.to = mailOptions.to;
+                                            email.subject = mailOptions.subject;
+                                            email.mbody = mailOptions.html;
+                                            email.cc = mailOptions.cc;
+                                            email.bcc = mailOptions.bcc;
+                                            email.html = mailOptions.html;
+                                            //if 1 or more attachments are present
+                                            for (var file = 0; file < attachment.length; file++) {
+                                                email.addFile({
+                                                    filename: attachment[file].fileName,
+                                                    content: new Buffer(attachment[file].binaryFile, 'base64'),
+                                                    contentType: attachment[file].fileType
+                                                });
+                                            }
+                                            if (trackerTemplate) {
+                                                email.addFile({
+                                                    filename: trackerTemplate.templateName + '.xlsx',
+                                                    content: new Buffer(new Buffer(buffer).toString("base64"), 'base64'),
+                                                    contentType: 'application/*'
+                                                });
+                                            }
+
+                                            var saveMails = [
+                                                req.st.db.escape(req.query.token),
+                                                req.st.db.escape(req.query.heMasterId),
+                                                req.st.db.escape(req.body.heDepartmentId),
+                                                req.st.db.escape(userId),
+                                                req.st.db.escape(mailerType),
+                                                req.st.db.escape(mailOptions.from),
+                                                req.st.db.escape(mailOptions.to),
+                                                req.st.db.escape(mailOptions.subject),
+                                                req.st.db.escape(mailOptions.html),    // contains mail body
+                                                req.st.db.escape(JSON.stringify(cc)),
+                                                req.st.db.escape(JSON.stringify(bcc)),
+                                                req.st.db.escape(JSON.stringify(attachment)),
+                                                req.st.db.escape(req.body.replyMailId),
+                                                req.st.db.escape(req.body.priority),
+                                                req.st.db.escape(req.body.stageId),
+                                                req.st.db.escape(req.body.statusId),
+                                                req.st.db.escape(req.body.smsMsg),
+                                                req.st.db.escape(req.body.whatmateMsg)
+
+                                            ];
+
+                                            sendgrid.send(email, function (err, result) {
+                                                try {
+                                                    if (!err) {
+                                                        //saving the mail after sending it
+                                                        var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                                        console.log(saveMailHistory);
+                                                        req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                            try {
+                                                                console.log(mailHistoryErr);
+                                                                console.log(mailHistoryResult);
+                                                                if (!mailHistoryErr && mailHistoryResult) {
+                                                                    console.log('sent mails saved successfully');
+                                                                }
+                                                                else {
+                                                                    error_logger.error = mailHistoryErr;
+                                                                    error_logger.proc_call = saveMailHistory;
+                                                                    logger(req, error_logger);
+                                                                    res.status(500).json(error_response);
+                                                                }
+                                                            }
+                                                            catch (ex) {
+                                                                error_logger.error = ex;
+                                                                error_logger.proc_call = saveMailHistory;
+                                                                logger(req, error_logger);
+                                                                res.status(500).json(error_response);
+                                                            }
+                                                        });
+                                                        console.log('Mail sent now save sent history');
+                                                    }
+                                                    else {
+                                                        console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+                                                        error_logger.error = err;
+                                                        error_logger.proc_call = procQuery;
+                                                        logger(req, error_logger);
+                                                        res.status(500).json(error_response);
+                                                    }
+                                                }
+                                                catch (ex) {
+                                                    error_logger.error = ex;
+                                                    error_logger.proc_call = procQuery;
+                                                    logger(req, error_logger);
+                                                    res.status(500).json(error_response);
+                                                }
+                                            });
                                         }
 
-                                        tableContent += "</table>";
-                                        mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
-
+                                        response.status = true;
+                                        response.message = "mail sent successfully";
+                                        response.error = null;
+                                        if (!(templateId == 0 || overWrite))
+                                            res.status(200).json(response);
                                     }
-
-                                    mailbody_array.push(mailBody);
-                                    fromEmailID = result[4][0].fromemailId;
-                                    toEmailID.push(result[8][clientIndex].emailId);
-                                    mailBody = temp;
-                                }
-                            }
-                            //end of else (mailertype if)                           
-                            var buffer;
-                            if (trackerTemplate) {
-                                var ws_data = '[[';
-                                // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
-                                for (var i = 0; i < trackerTags.length; i++) {
-                                    if (i != trackerTags.length - 1)
-                                        ws_data += '"' + trackerTags[i].displayTagAs + '",';
-                                    else
-                                        ws_data += '"' + trackerTags[i].displayTagAs + '"';
-                                }
-                                ws_data += "]";
-
-                                // console.log(new Buffer(buffer).toString("base64"));
-                                for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
-                                    ws_data += ',[';
-                                    for (var tagIndex = 0; tagIndex < trackerTags.length; tagIndex++) {
-                                        if (tagIndex < trackerTags.length - 1)
-                                            ws_data += '"' + result[9][applicantIndex][trackerTags[tagIndex].tagName] + '",';
-                                        else
-                                            ws_data += '"' + result[9][applicantIndex][trackerTags[tagIndex].tagName] + '"';
-                                    }
-                                    ws_data += ']';
-                                }
-                                ws_data += ']';
-                                console.log(ws_data);
-                                buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]); // Returns a buffer
-                            }
-                            //for sending mails
-                            for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
-                                var mailOptions = {
-                                    from: fromEmailID,
-                                    to: toEmailID[receiverIndex],
-                                    subject: subject,
-                                    html: mailbody_array[receiverIndex]
-                                };
-
-                                mailOptions.cc = [];
-
-                                for (var j = 0; j < cc.length; j++) {
-                                    mailOptions.cc.push(cc[j].email);
-                                }
-                                mailOptions.bcc = [];
-
-                                for (var j = 0; j < bcc.length; j++) {
-                                    mailOptions.bcc.push(bcc[j].email);
-                                }
-
-                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                var email = new sendgrid.Email();
-                                email.from = mailOptions.from;
-                                email.to = mailOptions.to;
-                                email.subject = mailOptions.subject;
-                                email.mbody = mailOptions.html;
-                                email.cc = mailOptions.cc;
-                                email.bcc = mailOptions.bcc;
-                                email.html = mailOptions.html;
-                                //if 1 or more attachments are present
-                                for (var file = 0; file < attachment.length; file++) {
-                                    email.addFile({
-                                        filename: attachment[file].fileName,
-                                        content: new Buffer(attachment[file].binaryFile, 'base64'),
-                                        contentType: attachment[file].fileType
-                                    });
-                                }
-                                if (trackerTemplate) {
-                                    email.addFile({
-                                        filename: trackerTemplate.templateName + '.xlsx',
-                                        content: new Buffer(new Buffer(buffer).toString("base64"), 'base64'),
-                                        contentType: 'application/*'
-                                    });
-                                }
-
-                                var saveMails = [
-                                    req.st.db.escape(req.query.token),
-                                    req.st.db.escape(req.query.heMasterId),
-                                    req.st.db.escape(req.body.heDepartmentId),
-                                    req.st.db.escape(userId),
-                                    req.st.db.escape(mailerType),
-                                    req.st.db.escape(mailOptions.from),
-                                    req.st.db.escape(mailOptions.to),
-                                    req.st.db.escape(mailOptions.subject),
-                                    req.st.db.escape(mailOptions.html),    // contains mail body
-                                    req.st.db.escape(JSON.stringify(cc)),
-                                    req.st.db.escape(JSON.stringify(bcc)),
-                                    req.st.db.escape(JSON.stringify(attachment)),
-                                    req.st.db.escape(req.body.replyMailId),
-                                    req.st.db.escape(req.body.priority),
-                                    req.st.db.escape(req.body.stageId),
-                                    req.st.db.escape(req.body.statusId),
-                                    req.st.db.escape(req.body.smsMsg),
-                                    req.st.db.escape(req.body.whatmateMsg)
-
-                                ];
-
-                                sendgrid.send(email, function (err, result) {
-                                    if (!err) {
-                                        //saving the mail after sending it
-                                        var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
-                                        console.log(saveMailHistory);
-                                        req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
-                                            console.log(mailHistoryErr);
-                                            console.log(mailHistoryResult);
-                                            if (!mailHistoryErr && mailHistoryResult) {
-                                                console.log('sent mails saved successfully');
-                                            }
-                                            else {
-                                                console.log('mails could not be saved');
-                                            }
-                                        });
-                                        console.log('Mail sent now save sent history');
-                                    }
+                                    //end of if(sendgrid sent mail successfully)
+                                    //if mail is not sent
                                     else {
-                                        console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+                                        response.status = false;
+                                        response.message = "Error while sending mail";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(500).json(response);
+                                        return;
                                     }
-                                });
-                            }
+                                    //end of else(sendgrid send mail)
+                                }
+                                catch (ex) {
+                                    error_logger.error = ex;
+                                    error_logger.proc_call = procQuery;
+                                    logger(req, error_logger);
+                                    res.status(500).json(error_response);
+                                }
+                            });
 
-                            response.status = true;
-                            response.message = "mail sent successfully";
-                            response.error = null;
-                            if (!(templateId == 0 || overWrite))
-                                res.status(200).json(response);
                         }
-                        //end of if(sendgrid sent mail successfully)
-                        //if mail is not sent
-                        else {
-                            response.status = false;
-                            response.message = "Error while sending mail";
-                            response.error = null;
-                            response.data = null;
-                            res.status(500).json(response);
-                            return;
-                        }
-                        //end of else(sendgrid send mail)
-                    });
 
+                        //save it as a template if flag is true or template id is 0
+                        if (templateId == 0 || overWrite) {
+                            req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
+                            req.body.type = req.body.type ? req.body.type : 0;
+                            req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
+                            req.body.subject = req.body.subject ? req.body.subject : '';
+                            req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
+                            req.body.replymailId = req.body.replymailId ? req.body.replymailId : '';
+                            req.body.priority = req.body.priority ? req.body.priority : 0;
+                            req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
+                            req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
+                            req.body.SMSMessage = req.body.SMSMessage ? req.body.SMSMessage : '';
+                            req.body.whatmateMessage = req.body.whatmateMessage ? req.body.whatmateMessage : '';
+                            var templateInputs = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(templateId),
+                                req.st.db.escape(req.query.heMasterId),
+                                req.st.db.escape(req.body.templateName),
+                                req.st.db.escape(req.body.type),
+                                req.st.db.escape(JSON.stringify(toMail)),
+                                req.st.db.escape(JSON.stringify(cc)),
+                                req.st.db.escape(JSON.stringify(bcc)),
+                                req.st.db.escape(req.body.subject),
+                                req.st.db.escape(req.body.mailBody),
+                                req.st.db.escape(req.body.replymailId),
+                                req.st.db.escape(req.body.priority),
+                                req.st.db.escape(req.body.updateFlag),
+                                req.st.db.escape(req.body.SMSMessage),
+                                req.st.db.escape(req.body.whatmateMessage),
+                                req.st.db.escape(JSON.stringify(attachment)),
+                                req.st.db.escape(JSON.stringify(tags)),
+                                req.st.db.escape(JSON.stringify(stage)),
+                                req.st.db.escape(req.body.mailerType),
+                                req.st.db.escape(JSON.stringify(tableTags)),
+                                req.st.db.escape(req.body.sendSMS || 0),
+                                req.st.db.escape(req.body.attachJD || 0),
+                                req.st.db.escape(req.body.attachResume || 0),
+                                req.st.db.escape(req.body.interviewerFlag || 0),
+                                req.st.db.escape(req.body.resumeFileName || ''),
+                                req.st.db.escape(req.body.attachResumeFlag || 0)
+
+                            ];
+                            var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
+                            console.log(saveTemplateQuery);
+                            req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
+                                try {
+                                    console.log(tempSaveErr);
+                                    if (!tempSaveErr && tempSaveResult) {
+                                        // console.log(tempSaveResult);
+                                        response.status = true;
+                                        //check if there are any receivers, if yes sent and saved
+                                        if (emailReceivers.length != 0)
+                                            response.message = "Sent and Saved successfully";
+                                        //else saved
+                                        else
+                                            response.message = "Template saved successfully";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(200).json(response);
+                                    }
+                                }
+                                catch (ex) {
+                                    error_logger.error = ex;
+                                    error_logger.proc_call = saveTemplateQuery;
+                                    logger(req, error_logger);
+                                    res.status(500).json(error_response);
+                                }
+                            });
+                        }
+                    }
+                    //end of if(token validation)
+                    //else invalid token
+                    else {
+                        res.status(401).json(response);
+                    }
+                    //end of else (token validation)
                 }
-
-                //save it as a template if flag is true or template id is 0
-                if (templateId == 0 || overWrite) {
-                    req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
-                    req.body.type = req.body.type ? req.body.type : 0;
-                    req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
-                    req.body.subject = req.body.subject ? req.body.subject : '';
-                    req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
-                    req.body.replymailId = req.body.replymailId ? req.body.replymailId : '';
-                    req.body.priority = req.body.priority ? req.body.priority : 0;
-                    req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
-                    req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
-                    req.body.SMSMessage = req.body.SMSMessage ? req.body.SMSMessage : '';
-                    req.body.whatmateMessage = req.body.whatmateMessage ? req.body.whatmateMessage : '';
-                    var templateInputs = [
-                        req.st.db.escape(req.query.token),
-                        req.st.db.escape(templateId),
-                        req.st.db.escape(req.query.heMasterId),
-                        req.st.db.escape(req.body.templateName),
-                        req.st.db.escape(req.body.type),
-                        req.st.db.escape(JSON.stringify(toMail)),
-                        req.st.db.escape(JSON.stringify(cc)),
-                        req.st.db.escape(JSON.stringify(bcc)),
-                        req.st.db.escape(req.body.subject),
-                        req.st.db.escape(req.body.mailBody),
-                        req.st.db.escape(req.body.replymailId),
-                        req.st.db.escape(req.body.priority),
-                        req.st.db.escape(req.body.updateFlag),
-                        req.st.db.escape(req.body.SMSMessage),
-                        req.st.db.escape(req.body.whatmateMessage),
-                        req.st.db.escape(JSON.stringify(attachment)),
-                        req.st.db.escape(JSON.stringify(tags)),
-                        req.st.db.escape(JSON.stringify(stage)),
-                        req.st.db.escape(req.body.mailerType),
-                        req.st.db.escape(JSON.stringify(tableTags)),
-                        req.st.db.escape(req.body.sendSMS || 0),
-                        req.st.db.escape(req.body.attachJD || 0),
-                        req.st.db.escape(req.body.attachResume || 0),
-                        req.st.db.escape(req.body.interviewerFlag || 0),
-                        req.st.db.escape(req.body.resumeFileName || ''),
-                        req.st.db.escape(req.body.attachResumeFlag || 0)
-
-                    ];
-                    var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
-                    console.log(saveTemplateQuery);
-                    req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
-                        console.log(tempSaveErr);
-                        if (!tempSaveErr && tempSaveResult) {
-                            // console.log(tempSaveResult);
-                            response.status = true;
-                            //check if there are any receivers, if yes sent and saved
-                            if (emailReceivers.length != 0)
-                                response.message = "Sent and Saved successfully";
-                            //else saved
-                            else
-                                response.message = "Template saved successfully";
-                            response.error = null;
-                            response.data = null;
-                            res.status(200).json(response);
-                        }
-                    });
+                catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
                 }
-            }
-            //end of if(token validation)
-            //else invalid token
-            else {
-                res.status(401).json(response);
-            }
-            //end of else (token validation)
-        });
+            });
+        }
+    }
+    catch (ex) {
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 
 sendgridCtrl.jobSeekerMailer = function (req, res, next) {
-    var validationFlag = true;
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-
-    var sentMailFlag = 1;
-
-    var isSendgrid;
-    var isSMS;
-
-    var emailReceivers;                //emailReceivers to store the recipients
-    var mailbody_array = [];    //array to store all mailbody after replacing tags
-    var subject_array = [];
-    var smsMsg_array = [];
-
-    var transactions = [];
-
-    var emailId = [];
-    var fromEmailID;
-    var toEmailID = [];
-    var MobileISD = [];
-    var MobileNumber = [];
-    var isdMobile = '';
-    var mobileNo = '';
-    var message = '';
-
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+    var error_logger = {
+        details: 'sendgridCtrl.jobSeekerMailer'
+    }
 
-                    //request parameters
-                    var updateFlag = req.body.updateFlag || 0;
-                    var overWrite = req.body.overWrite || 0;
-                    var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
-                    var templateId = req.body.template ? req.body.template.templateId : undefined;
-                    var trackerTemplate = req.body.trackerTemplate || {};
-                    var tags = req.body.tags || {};
-                    var cc = req.body.cc || [];
-                    var toMail = req.body.toMail || [];
-                    var bcc = req.body.bcc || [];
-                    var stage = req.body.stage || [];
-                    var attachment = req.body.attachment || [];
-                    var reqApplicants = req.body.reqApplicants || [];
-                    var applicants = req.body.applicantId || [];
-                    var client = req.body.clientId || [];
-                    var tableTags = req.body.tableTags || {};
-                    var clientContacts = req.body.clientContacts || [];
-                    var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
-                    var mailBody = req.body.mailBody || '';
+    try {
+        var validationFlag = true;
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
 
-                    var whatmateMessage = req.body.whatmateMessage || '';
-                    var smsMsg = req.body.smsMsg || '';
-                    var smsFlag = req.body.smsFlag || 0;
+        var sentMailFlag = 1;
 
-                    var isWeb = req.query.isWeb || 0;
-                    var mailerType = req.body.mailerType || 0;
-                    var userId = req.query.userId || 0;
+        var isSendgrid;
+        var isSMS;
 
-                    var attachJD = req.body.attachJD || 0;
-                    var attachResume = req.body.attachResume || 0;
-                    var interviewerFlag = req.body.interviewerFlag || 0;
-                    var resumeFileName = req.body.resumeFileName || 0;
+        var emailReceivers;                //emailReceivers to store the recipients
+        var mailbody_array = [];    //array to store all mailbody after replacing tags
+        var subject_array = [];
+        var smsMsg_array = [];
 
-                    //html styling for table in submission mailer
+        var transactions = [];
 
-                    if (!req.query.heMasterId) {
-                        error.heMasterId = 'Invalid tenant';
-                        validationFlag *= false;
-                    }
+        var emailId = [];
+        var fromEmailID;
+        var toEmailID = [];
+        var MobileISD = [];
+        var MobileNumber = [];
+        var isdMobile = '';
+        var mobileNo = '';
+        var message = '';
 
-                    if (!req.query.token) {
-                        error.token = 'Invalid token';
-                        validationFlag *= false;
-                    }
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
 
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            try {
+                                req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                    if (typeof (tags) == "string") {
-                        tags = JSON.parse(tags);
-                    }
+                                //request parameters
+                                var updateFlag = req.body.updateFlag || 0;
+                                var overWrite = req.body.overWrite || 0;
+                                var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
+                                var templateId = req.body.template ? req.body.template.templateId : undefined;
+                                var trackerTemplate = req.body.trackerTemplate || {};
+                                var tags = req.body.tags || {};
+                                var cc = req.body.cc || [];
+                                var toMail = req.body.toMail || [];
+                                var bcc = req.body.bcc || [];
+                                var stage = req.body.stage || [];
+                                var attachment = req.body.attachment || [];
+                                var reqApplicants = req.body.reqApplicants || [];
+                                var applicants = req.body.applicantId || [];
+                                var client = req.body.clientId || [];
+                                var tableTags = req.body.tableTags || {};
+                                var clientContacts = req.body.clientContacts || [];
+                                var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
+                                var mailBody = req.body.mailBody || '';
 
-                    if (typeof (cc) == "string") {
-                        cc = JSON.parse(cc);
-                    }
+                                var whatmateMessage = req.body.whatmateMessage || '';
+                                var smsMsg = req.body.smsMsg || '';
+                                var smsFlag = req.body.smsFlag || 0;
 
-                    if (typeof (toMail) == "string") {
-                        toMail = JSON.parse(toMail);
-                    }
+                                var isWeb = req.query.isWeb || 0;
+                                var mailerType = req.body.mailerType || 0;
+                                var userId = req.query.userId || 0;
 
-                    if (typeof (bcc) == "string") {
-                        bcc = JSON.parse(bcc);
-                    }
+                                var attachJD = req.body.attachJD || 0;
+                                var attachResume = req.body.attachResume || 0;
+                                var interviewerFlag = req.body.interviewerFlag || 0;
+                                var resumeFileName = req.body.resumeFileName || 0;
 
-                    if (typeof (stage) == "string") {
-                        stage = JSON.parse(stage);
-                    }
+                                //html styling for table in submission mailer
 
-                    if (typeof (attachment) == "string") {
-                        attachment = JSON.parse(attachment);
-                    }
-
-                    if (typeof (client) == "string") {
-                        client = JSON.parse(client);
-                    }
-
-                    if (typeof (clientContacts) == "string") {
-                        clientContacts = JSON.parse(clientContacts);
-                    }
-
-                    if (typeof (tableTags) == "string") {
-                        tableTags = JSON.parse(tableTags);
-                    }
-
-                    //check for mail type and assign the recipients
-                    emailReceivers = applicants;
-                    var recipients = applicants;
-                    // emailReceivers.sort(function(a,b){return a-b});
-
-
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-
-                        if (emailReceivers.length > 0) {				//for checking if the mailer is just a template
-
-                            var inputs = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(req.query.heMasterId),
-                                req.st.db.escape(JSON.stringify(applicants)),
-                                req.st.db.escape(sentMailFlag)
-
-                            ];
-
-                            var procQuery = 'CALL wm_paceMailerJobseeker( ' + inputs.join(',') + ')';
-                            console.log(procQuery);
-                            req.db.query(procQuery, function (err, result) {
-                                console.log(err);
-
-                                if (result[2] && result[2][0]) {
-                                    isSendgrid = result[2][0].isSendgrid ? result[2][0].isSendgrid : 0,
-                                        isSMS = result[2][0].isSMS ? result[2][0].isSMS : 0
+                                if (!req.query.heMasterId) {
+                                    error.heMasterId = 'Invalid tenant';
+                                    validationFlag *= false;
                                 }
 
-                                if (!err && result && result[0] && result[0][0]) {
+                                if (!req.query.token) {
+                                    error.token = 'Invalid token';
+                                    validationFlag *= false;
+                                }
 
-                                    var temp = mailBody;
-                                    var temp1 = subject;
-                                    var temp2 = smsMsg;
-                                    // console.log('result of pacemailer procedure', result[0]);
-                                    for (var applicantIndex = 0; applicantIndex < emailReceivers.length; applicantIndex++) {
 
-                                        for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                if (typeof (tags) == "string") {
+                                    tags = JSON.parse(tags);
+                                }
 
-                                            if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+                                if (typeof (cc) == "string") {
+                                    cc = JSON.parse(cc);
+                                }
 
-                                                mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (toMail) == "string") {
+                                    toMail = JSON.parse(toMail);
+                                }
 
-                                                subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (bcc) == "string") {
+                                    bcc = JSON.parse(bcc);
+                                }
 
-                                                smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (stage) == "string") {
+                                    stage = JSON.parse(stage);
+                                }
 
-                                                // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (attachment) == "string") {
+                                    attachment = JSON.parse(attachment);
+                                }
 
-                                                // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (client) == "string") {
+                                    client = JSON.parse(client);
+                                }
 
-                                                // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                            }
-                                        }
+                                if (typeof (clientContacts) == "string") {
+                                    clientContacts = JSON.parse(clientContacts);
+                                }
 
-                                        mailbody_array.push(mailBody);
-                                        subject_array.push(subject);
-                                        smsMsg_array.push(smsMsg);
+                                if (typeof (tableTags) == "string") {
+                                    tableTags = JSON.parse(tableTags);
+                                }
 
-                                        fromEmailID = result[1][0].fromEmailId;
-                                        toEmailID.push(result[0][applicantIndex].EmailId);
-                                        MobileISD.push(result[0][applicantIndex].MobileISD);
-                                        MobileNumber.push(result[0][applicantIndex].MobileNo);
-                                        mailBody = temp;
-                                        subject = temp1;
-                                        smsMsg = temp2;
-                                    }
+                                //check for mail type and assign the recipients
+                                emailReceivers = applicants;
+                                var recipients = applicants;
+                                // emailReceivers.sort(function(a,b){return a-b});
 
-                                    for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
-                                        var mailOptions = {
-                                            from: fromEmailID,
-                                            to: toEmailID[receiverIndex],
-                                            subject: subject_array[receiverIndex],
-                                            html: mailbody_array[receiverIndex]
-                                        };
 
-                                        mailOptions.cc = [];
+                                if (!validationFlag) {
+                                    response.error = error;
+                                    response.message = 'Please check the errors';
+                                    res.status(400).json(response);
+                                    console.log(response);
+                                }
+                                else {
 
-                                        for (var j = 0; j < cc.length; j++) {
-                                            mailOptions.cc.push(cc[j].emailId);
-                                        }
-                                        mailOptions.bcc = [];
+                                    if (emailReceivers.length > 0) {				//for checking if the mailer is just a template
 
-                                        for (var j = 0; j < bcc.length; j++) {
-                                            mailOptions.bcc.push(bcc[j].emailId);
-                                        }
+                                        var inputs = [
+                                            req.st.db.escape(req.query.token),
+                                            req.st.db.escape(req.query.heMasterId),
+                                            req.st.db.escape(JSON.stringify(applicants)),
+                                            req.st.db.escape(sentMailFlag)
 
-                                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                        var email = new sendgrid.Email();
-                                        email.from = mailOptions.from;
-                                        email.to = mailOptions.to;
-                                        email.subject = mailOptions.subject;
-                                        email.mbody = mailOptions.html;
-                                        email.cc = mailOptions.cc;
-                                        email.bcc = mailOptions.bcc;
-                                        email.html = mailOptions.html;
-                                        //if 1 or more attachments are present
-                                        for (var file = 0; file < attachment.length; file++) {
-                                            email.addFile({
-                                                filename: attachment[file].fileName,
-                                                content: new Buffer(attachment[file].binaryFile, 'base64'),
-                                                contentType: attachment[file].fileType
-                                            });
-                                        }
+                                        ];
 
-                                        // assign mobile no and isdMobile to send sms
-                                        isdMobile = MobileISD[receiverIndex];
-                                        mobileNo = MobileNumber[receiverIndex];
-                                        message = smsMsg_array[receiverIndex];
+                                        var procQuery = 'CALL wm_paceMailerJobseeker( ' + inputs.join(',') + ')';
+                                        console.log(procQuery);
+                                        req.db.query(procQuery, function (err, result) {
+                                            try {
+                                                console.log(err);
 
-                                        // to send normal sms
-                                        if (isSMS) {
-                                            if (smsFlag) {
-                                                if (isdMobile == "+977") {
-                                                    request({
-                                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                                        qs: {
-                                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                                            to: mobileNo,
-                                                            message: message,
-                                                            sender: 'Techingen'
-                                                        },
-                                                        method: 'GET'
-
-                                                    }, function (error, response, body) {
-                                                        if (error) {
-                                                            console.log(error, "SMS");
-                                                        }
-                                                        else {
-                                                            console.log("SUCCESS", "SMS response");
-                                                        }
-
-                                                    });
+                                                if (result[2] && result[2][0]) {
+                                                    isSendgrid = result[2][0].isSendgrid ? result[2][0].isSendgrid : 0,
+                                                        isSMS = result[2][0].isSMS ? result[2][0].isSMS : 0
                                                 }
-                                                else if (isdMobile == "+91") {
-                                                    console.log('inside send sms');
-                                                    console.log(isdMobile, ' ', mobileNo);
-                                                    request({
-                                                        url: 'https://aikonsms.co.in/control/smsapi.php',
-                                                        qs: {
-                                                            user_name: 'janardana@hirecraft.com',
-                                                            password: 'Ezeid2015',
-                                                            sender_id: 'WtMate',
-                                                            service: 'TRANS',
-                                                            mobile_no: mobileNo,
-                                                            message: message,
-                                                            method: 'send_sms'
-                                                        },
-                                                        method: 'GET'
 
-                                                    }, function (error, response, body) {
-                                                        if (error) {
-                                                            console.log(error, "SMS");
+                                                if (!err && result && result[0] && result[0][0]) {
+
+                                                    var temp = mailBody;
+                                                    var temp1 = subject;
+                                                    var temp2 = smsMsg;
+                                                    // console.log('result of pacemailer procedure', result[0]);
+                                                    for (var applicantIndex = 0; applicantIndex < emailReceivers.length; applicantIndex++) {
+
+                                                        for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+
+                                                            if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+
+                                                                mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                            }
                                                         }
-                                                        else {
-                                                            console.log("SUCCESS", "SMS response");
+
+                                                        mailbody_array.push(mailBody);
+                                                        subject_array.push(subject);
+                                                        smsMsg_array.push(smsMsg);
+
+                                                        fromEmailID = result[1][0].fromEmailId;
+                                                        toEmailID.push(result[0][applicantIndex].EmailId);
+                                                        MobileISD.push(result[0][applicantIndex].MobileISD);
+                                                        MobileNumber.push(result[0][applicantIndex].MobileNo);
+                                                        mailBody = temp;
+                                                        subject = temp1;
+                                                        smsMsg = temp2;
+                                                    }
+
+                                                    for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
+                                                        var mailOptions = {
+                                                            from: fromEmailID,
+                                                            to: toEmailID[receiverIndex],
+                                                            subject: subject_array[receiverIndex],
+                                                            html: mailbody_array[receiverIndex]
+                                                        };
+
+                                                        mailOptions.cc = [];
+
+                                                        for (var j = 0; j < cc.length; j++) {
+                                                            mailOptions.cc.push(cc[j].emailId);
                                                         }
-                                                    });
+                                                        mailOptions.bcc = [];
 
-                                                    var req1 = http.request(options, function (res1) {
-                                                        var chunks = [];
+                                                        for (var j = 0; j < bcc.length; j++) {
+                                                            mailOptions.bcc.push(bcc[j].emailId);
+                                                        }
 
-                                                        res1.on("data", function (chunk) {
-                                                            chunks.push(chunk);
-                                                        });
+                                                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                                        var email = new sendgrid.Email();
+                                                        email.from = mailOptions.from;
+                                                        email.to = mailOptions.to;
+                                                        email.subject = mailOptions.subject;
+                                                        email.mbody = mailOptions.html;
+                                                        email.cc = mailOptions.cc;
+                                                        email.bcc = mailOptions.bcc;
+                                                        email.html = mailOptions.html;
+                                                        //if 1 or more attachments are present
+                                                        for (var file = 0; file < attachment.length; file++) {
+                                                            email.addFile({
+                                                                filename: attachment[file].fileName,
+                                                                content: new Buffer(attachment[file].binaryFile, 'base64'),
+                                                                contentType: attachment[file].fileType
+                                                            });
+                                                        }
 
-                                                        res1.on("end", function () {
-                                                            var body = Buffer.concat(chunks);
-                                                            console.log(body.toString());
-                                                        });
-                                                    });
+                                                        // assign mobile no and isdMobile to send sms
+                                                        isdMobile = MobileISD[receiverIndex];
+                                                        mobileNo = MobileNumber[receiverIndex];
+                                                        message = smsMsg_array[receiverIndex];
 
-                                                    req1.write(qs.stringify({
-                                                        userId: 'talentmicro',
-                                                        password: 'TalentMicro@123',
-                                                        senderId: 'WTMATE',
-                                                        sendMethod: 'simpleMsg',
-                                                        msgType: 'text',
-                                                        mobile: isdMobile.replace("+", "") + mobileNo,
-                                                        msg: message,
-                                                        duplicateCheck: 'true',
-                                                        format: 'json'
-                                                    }));
-                                                    req1.end();
-                                                }
-                                                else if (isdMobile != "") {
-                                                    console.log('inside without isd', isdMobile, ' ', mobileNo);
-                                                    client.messages.create(
-                                                        {
-                                                            body: message,
-                                                            to: isdMobile + mobileNo,
-                                                            from: FromNumber
-                                                        },
-                                                        function (error, response) {
-                                                            if (error) {
-                                                                console.log(error, "SMS");
+                                                        // to send normal sms
+                                                        if (isSMS) {
+                                                            if (smsFlag) {
+                                                                if (isdMobile == "+977") {
+                                                                    request({
+                                                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                                        qs: {
+                                                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                                            to: mobileNo,
+                                                                            message: message,
+                                                                            sender: 'Techingen'
+                                                                        },
+                                                                        method: 'GET'
+
+                                                                    }, function (error, response, body) {
+                                                                        try {
+                                                                            if (error) {
+                                                                                console.log(error, "SMS");
+                                                                            }
+                                                                            else {
+                                                                                console.log("SUCCESS", "SMS response");
+                                                                            }
+                                                                        }
+                                                                        catch (ex) {
+                                                                            error_logger.error = ex;
+                                                                            logger(req, error_logger);
+                                                                            res.status(500).json(error_response);
+                                                                        }
+
+                                                                    });
+                                                                }
+                                                                else if (isdMobile == "+91") {
+                                                                    console.log('inside send sms');
+                                                                    console.log(isdMobile, ' ', mobileNo);
+                                                                    request({
+                                                                        url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                                        qs: {
+                                                                            user_name: 'janardana@hirecraft.com',
+                                                                            password: 'Ezeid2015',
+                                                                            sender_id: 'WtMate',
+                                                                            service: 'TRANS',
+                                                                            mobile_no: mobileNo,
+                                                                            message: message,
+                                                                            method: 'send_sms'
+                                                                        },
+                                                                        method: 'GET'
+
+                                                                    }, function (error, response, body) {
+                                                                        try {
+                                                                            if (error) {
+                                                                                console.log(error, "SMS");
+                                                                            }
+                                                                            else {
+                                                                                console.log("SUCCESS", "SMS response");
+                                                                            }
+                                                                        }
+                                                                        catch (ex) {
+                                                                            error_logger.error = ex;
+                                                                            logger(req, error_logger);
+                                                                            res.status(500).json(error_response);
+                                                                        }
+                                                                    });
+
+                                                                    var req1 = http.request(options, function (res1) {
+                                                                        var chunks = [];
+
+                                                                        res1.on("data", function (chunk) {
+                                                                            chunks.push(chunk);
+                                                                        });
+
+                                                                        res1.on("end", function () {
+                                                                            var body = Buffer.concat(chunks);
+                                                                            console.log(body.toString());
+                                                                        });
+                                                                    });
+
+                                                                    req1.write(qs.stringify({
+                                                                        userId: 'talentmicro',
+                                                                        password: 'TalentMicro@123',
+                                                                        senderId: 'WTMATE',
+                                                                        sendMethod: 'simpleMsg',
+                                                                        msgType: 'text',
+                                                                        mobile: isdMobile.replace("+", "") + mobileNo,
+                                                                        msg: message,
+                                                                        duplicateCheck: 'true',
+                                                                        format: 'json'
+                                                                    }));
+                                                                    req1.end();
+                                                                }
+                                                                else if (isdMobile != "") {
+                                                                    console.log('inside without isd', isdMobile, ' ', mobileNo);
+                                                                    client.messages.create(
+                                                                        {
+                                                                            body: message,
+                                                                            to: isdMobile + mobileNo,
+                                                                            from: FromNumber
+                                                                        },
+                                                                        function (error, response) {
+                                                                            try {
+                                                                                if (error) {
+                                                                                    console.log(error, "SMS");
+                                                                                }
+                                                                                else {
+                                                                                    console.log("SUCCESS", "SMS response");
+                                                                                }
+                                                                            }
+                                                                            catch (ex) {
+                                                                                error_logger.error = ex;
+                                                                                logger(req, error_logger);
+                                                                                res.status(500).json(error_response);
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                }
+                                                            }
+                                                        }
+
+
+                                                        if (isSendgrid && email.subject != '') {
+                                                            sendgrid.send(email, function (err, result) {
+                                                                try {
+                                                                    if (!err) {
+
+                                                                        var saveMails = [
+                                                                            req.st.db.escape(req.query.token),
+                                                                            req.st.db.escape(req.query.heMasterId),
+                                                                            req.st.db.escape(req.body.heDepartmentId),
+                                                                            req.st.db.escape(userId),
+                                                                            req.st.db.escape(mailerType),
+                                                                            req.st.db.escape(mailOptions.from),
+                                                                            req.st.db.escape(mailOptions.to),
+                                                                            req.st.db.escape(mailOptions.subject),
+                                                                            req.st.db.escape(mailOptions.html),    // contains mail body
+                                                                            req.st.db.escape(JSON.stringify(cc)),
+                                                                            req.st.db.escape(JSON.stringify(bcc)),
+                                                                            req.st.db.escape(JSON.stringify(attachment)),
+                                                                            req.st.db.escape(req.body.replyMailId),
+                                                                            req.st.db.escape(req.body.priority),
+                                                                            req.st.db.escape(req.body.stageId),
+                                                                            req.st.db.escape(req.body.statusId),
+                                                                            req.st.db.escape(message),    // sms message
+                                                                            req.st.db.escape(whatmateMessage),
+                                                                            req.st.db.escape(recipients[0]),   // in procedure only reAppId is stored
+                                                                            req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
+                                                                            req.st.db.escape(req.body.interviewerFlag || 0)
+                                                                        ];
+
+                                                                        //saving the mail after sending it
+                                                                        var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                                                        console.log(saveMailHistory);
+                                                                        req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                                            try {
+                                                                                console.log(mailHistoryErr);
+                                                                                console.log(mailHistoryResult);
+                                                                                if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
+                                                                                    console.log('sent mails saved successfully');
+                                                                                }
+                                                                                else {
+                                                                                    console.log('mails could not be saved');
+                                                                                }
+                                                                            }
+                                                                            catch (ex) {
+                                                                                error_logger.error = ex;
+                                                                                error_logger.proc_call = saveMailHistory;
+                                                                                logger(req, error_logger);
+                                                                                res.status(500).json(error_response);
+                                                                            }
+                                                                        });
+                                                                        console.log('Mail sent now save sent history');
+                                                                    } //end of if(sendgrid sent mail successfully)
+                                                                    //if mail is not sent
+                                                                    else {
+                                                                        console.log('Mail not Sent Successfully' + err);
+                                                                    }
+                                                                }
+                                                                catch (ex) {
+                                                                    error_logger.error = ex;
+                                                                    logger(req, error_logger);
+                                                                    res.status(500).json(error_response);
+                                                                }
+                                                            });
+                                                        }
+
+                                                    }
+                                                    if (!(templateId == 0 || overWrite)) {
+                                                        response.status = true;
+
+                                                        if (isSendgrid && isSMS) {  // making changes here reminder
+                                                            if (subject != '') {
+                                                                if (smsMsg != '' && smsFlag) {
+                                                                    response.message = "Mail and SMS sent successfully";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
+                                                                else {
+                                                                    response.message = "Mail sent successfully";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
+                                                            }
+
+                                                            else if (subject == '') {
+                                                                if (smsMsg != '' && smsFlag) {
+                                                                    response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
+                                                                else {
+                                                                    response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
                                                             }
                                                             else {
-                                                                console.log("SUCCESS", "SMS response");
+                                                                response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
                                                             }
                                                         }
-                                                    );
-                                                }
-                                            }
-                                        }
+                                                        else if (isSendgrid && !isSMS) {
 
-
-                                        if (isSendgrid && email.subject != '') {
-                                            sendgrid.send(email, function (err, result) {
-                                                if (!err) {
-
-                                                    var saveMails = [
-                                                        req.st.db.escape(req.query.token),
-                                                        req.st.db.escape(req.query.heMasterId),
-                                                        req.st.db.escape(req.body.heDepartmentId),
-                                                        req.st.db.escape(userId),
-                                                        req.st.db.escape(mailerType),
-                                                        req.st.db.escape(mailOptions.from),
-                                                        req.st.db.escape(mailOptions.to),
-                                                        req.st.db.escape(mailOptions.subject),
-                                                        req.st.db.escape(mailOptions.html),    // contains mail body
-                                                        req.st.db.escape(JSON.stringify(cc)),
-                                                        req.st.db.escape(JSON.stringify(bcc)),
-                                                        req.st.db.escape(JSON.stringify(attachment)),
-                                                        req.st.db.escape(req.body.replyMailId),
-                                                        req.st.db.escape(req.body.priority),
-                                                        req.st.db.escape(req.body.stageId),
-                                                        req.st.db.escape(req.body.statusId),
-                                                        req.st.db.escape(message),    // sms message
-                                                        req.st.db.escape(whatmateMessage),
-                                                        req.st.db.escape(recipients[0]),   // in procedure only reAppId is stored
-                                                        req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
-                                                        req.st.db.escape(req.body.interviewerFlag || 0)
-                                                    ];
-
-                                                    //saving the mail after sending it
-                                                    var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
-                                                    console.log(saveMailHistory);
-                                                    req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
-                                                        console.log(mailHistoryErr);
-                                                        console.log(mailHistoryResult);
-                                                        if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
-                                                            console.log('sent mails saved successfully');
+                                                            if (subject != '') {
+                                                                response.message = "Mail sent successfully";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else if (subject == '') {
+                                                                response.message = "Mail subject is empty, mail cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                        }
+                                                        else if (isSMS && !isSendgrid) {
+                                                            if (smsMsg != '' && smsFlag) {
+                                                                response.message = "SMS sent successfully";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else if (smsMsg == '' && smsFlag) {
+                                                                response.message = "SMS field is empty, SMS cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else {
+                                                                response.message = "SMS flag is not enabled, SMS cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
                                                         }
                                                         else {
-                                                            console.log('mails could not be saved');
+                                                            response.message = "Sendgrid or SMS is not configured. Please contact the admin";
+                                                            response.data = null;
                                                         }
-                                                    });
-                                                    console.log('Mail sent now save sent history');
-                                                } //end of if(sendgrid sent mail successfully)
-                                                //if mail is not sent
-                                                else {
-                                                    console.log('Mail not Sent Successfully' + err);
-                                                }
-                                            });
-                                        }
 
+                                                        response.error = null;
+                                                        res.status(200).json(response);
+                                                    }
+                                                }
+
+                                                else {
+                                                    response.status = false;
+                                                    response.message = "Error while sending mail";
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(500).json(response);
+                                                    return;
+                                                }
+                                            }
+                                            catch (ex) {
+                                                error_logger.error = ex;
+                                                error_logger.proc_call = procQuery;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
                                     }
-                                    if (!(templateId == 0 || overWrite)) {
-                                        response.status = true;
+                                    // else if(!templateId && !overWrite){
+                                    //     response.status = false;
+                                    //     response.message = "To mail is empty. Mail not sent";
+                                    //     response.error = null;
+                                    //     response.data = null;
+                                    //     res.status(200).json(response);
+                                    //     return;
+                                    // }
 
-                                        if (isSendgrid && isSMS) {  // making changes here reminder
-                                            if (subject != '') {
-                                                if (smsMsg != '' && smsFlag) {
-                                                    response.message = "Mail and SMS sent successfully";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                                else {
-                                                    response.message = "Mail sent successfully";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                            }
-
-                                            else if (subject == '') {
-                                                if (smsMsg != '' && smsFlag) {
-                                                    response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                                else {
-                                                    response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                            }
-                                            else {
-                                                response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else if (isSendgrid && !isSMS) {
-
-                                            if (subject != '') {
-                                                response.message = "Mail sent successfully";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else if (subject == '') {
-                                                response.message = "Mail subject is empty, mail cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else if (isSMS && !isSendgrid) {
-                                            if (smsMsg != '' && smsFlag) {
-                                                response.message = "SMS sent successfully";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else if (smsMsg == '' && smsFlag) {
-                                                response.message = "SMS field is empty, SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else {
-                                                response.message = "SMS flag is not enabled, SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else {
-                                            response.message = "Sendgrid or SMS is not configured. Please contact the admin";
-                                            response.data = null;
-                                        }
-
+                                    else if (templateId && !overWrite && !emailReceivers.length) {
+                                        response.status = false;
+                                        response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
                                         response.error = null;
+                                        response.data = null;
                                         res.status(200).json(response);
+                                        return;
+                                    }
+                                    //save it as a template if flag is true or template id is 0
+                                    if (templateId == 0 || overWrite) {
+                                        req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
+                                        req.body.type = req.body.type ? req.body.type : 0;
+                                        req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
+                                        req.body.subject = req.body.subject ? req.body.subject : '';
+                                        req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
+                                        req.body.replymailId = req.body.replymailId ? req.body.replymailId : '';
+                                        req.body.priority = req.body.priority ? req.body.priority : 0;
+                                        req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
+                                        req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
+
+                                        var templateInputs = [
+                                            req.st.db.escape(req.query.token),
+                                            req.st.db.escape(templateId),
+                                            req.st.db.escape(req.query.heMasterId),
+                                            req.st.db.escape(req.body.templateName),
+                                            req.st.db.escape(req.body.type),
+                                            req.st.db.escape(JSON.stringify(toMail)),
+                                            req.st.db.escape(JSON.stringify(cc)),
+                                            req.st.db.escape(JSON.stringify(bcc)),
+                                            req.st.db.escape(req.body.subject),
+                                            req.st.db.escape(req.body.mailBody),
+                                            req.st.db.escape(req.body.replymailId),
+                                            req.st.db.escape(req.body.priority),
+                                            req.st.db.escape(req.body.updateFlag),
+                                            req.st.db.escape(smsMsg),
+                                            req.st.db.escape(whatmateMessage),
+                                            req.st.db.escape(JSON.stringify(attachment)),
+                                            req.st.db.escape(JSON.stringify(tags)),
+                                            req.st.db.escape(JSON.stringify(stage)),
+                                            req.st.db.escape(req.body.mailerType),
+                                            req.st.db.escape(JSON.stringify(tableTags)),
+                                            req.st.db.escape(req.body.sendSMS || 0),
+                                            req.st.db.escape(req.body.attachJD || 0),
+                                            req.st.db.escape(req.body.attachResume || 0),
+                                            req.st.db.escape(req.body.interviewerFlag || 0),
+                                            req.st.db.escape(req.body.resumeFileName || ''),
+                                            req.st.db.escape(req.body.attachResumeFlag || 0),
+                                            req.st.db.escape(JSON.stringify(trackerTemplate))
+                                        ];
+                                        var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
+                                        console.log(saveTemplateQuery);
+                                        req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
+                                            try {
+                                                console.log(tempSaveErr);
+                                                if (!tempSaveErr && tempSaveResult) {
+                                                    // console.log(tempSaveResult);
+                                                    response.status = true;
+                                                    //check if there are any receivers, if yes sent and saved
+                                                    if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
+                                                        if (isSendgrid && isSMS) {
+                                                            response.message = "Mail and SMS Sent and Template Saved successfully";
+                                                        }
+                                                        else if (!isSendgrid && isSMS) {
+                                                            response.message = "SMS is Sent and Template Saved successfully";
+                                                        }
+                                                        else if (isSendgrid && !isSMS) {
+                                                            response.message = "Mail is Sent and Template Saved successfully";
+                                                        }
+                                                        else {
+                                                            response.message = "Template saved successfully";
+                                                        }
+                                                    }
+                                                    //else saved
+                                                    else {
+                                                        response.message = "Template saved successfully";
+                                                    }
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(200).json(response);
+                                                }
+                                            }
+                                            catch (ex) {
+                                                error_logger.error = ex;
+                                                error_logger.proc_call = saveTemplateQuery;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
                                     }
                                 }
+                            }
+                            catch (ex) {
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
+                            }
+                        });
 
-                                else {
-                                    response.status = false;
-                                    response.message = "Error while sending mail";
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(500).json(response);
-                                    return;
-                                }
-                            });
-                        }
-                        // else if(!templateId && !overWrite){
-                        //     response.status = false;
-                        //     response.message = "To mail is empty. Mail not sent";
-                        //     response.error = null;
-                        //     response.data = null;
-                        //     res.status(200).json(response);
-                        //     return;
-                        // }
 
-                        else if (templateId && !overWrite && !emailReceivers.length) {
-                            response.status = false;
-                            response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
-                            response.error = null;
-                            response.data = null;
-                            res.status(200).json(response);
-                            return;
-                        }
-                        //save it as a template if flag is true or template id is 0
-                        if (templateId == 0 || overWrite) {
-                            req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
-                            req.body.type = req.body.type ? req.body.type : 0;
-                            req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
-                            req.body.subject = req.body.subject ? req.body.subject : '';
-                            req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
-                            req.body.replymailId = req.body.replymailId ? req.body.replymailId : '';
-                            req.body.priority = req.body.priority ? req.body.priority : 0;
-                            req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
-                            req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
-
-                            var templateInputs = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(templateId),
-                                req.st.db.escape(req.query.heMasterId),
-                                req.st.db.escape(req.body.templateName),
-                                req.st.db.escape(req.body.type),
-                                req.st.db.escape(JSON.stringify(toMail)),
-                                req.st.db.escape(JSON.stringify(cc)),
-                                req.st.db.escape(JSON.stringify(bcc)),
-                                req.st.db.escape(req.body.subject),
-                                req.st.db.escape(req.body.mailBody),
-                                req.st.db.escape(req.body.replymailId),
-                                req.st.db.escape(req.body.priority),
-                                req.st.db.escape(req.body.updateFlag),
-                                req.st.db.escape(smsMsg),
-                                req.st.db.escape(whatmateMessage),
-                                req.st.db.escape(JSON.stringify(attachment)),
-                                req.st.db.escape(JSON.stringify(tags)),
-                                req.st.db.escape(JSON.stringify(stage)),
-                                req.st.db.escape(req.body.mailerType),
-                                req.st.db.escape(JSON.stringify(tableTags)),
-                                req.st.db.escape(req.body.sendSMS || 0),
-                                req.st.db.escape(req.body.attachJD || 0),
-                                req.st.db.escape(req.body.attachResume || 0),
-                                req.st.db.escape(req.body.interviewerFlag || 0),
-                                req.st.db.escape(req.body.resumeFileName || ''),
-                                req.st.db.escape(req.body.attachResumeFlag || 0),
-                                req.st.db.escape(JSON.stringify(trackerTemplate))
-                            ];
-                            var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
-                            console.log(saveTemplateQuery);
-                            req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
-                                console.log(tempSaveErr);
-                                if (!tempSaveErr && tempSaveResult) {
-                                    // console.log(tempSaveResult);
-                                    response.status = true;
-                                    //check if there are any receivers, if yes sent and saved
-                                    if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
-                                        if (isSendgrid && isSMS) {
-                                            response.message = "Mail and SMS Sent and Template Saved successfully";
-                                        }
-                                        else if (!isSendgrid && isSMS) {
-                                            response.message = "SMS is Sent and Template Saved successfully";
-                                        }
-                                        else if (isSendgrid && !isSMS) {
-                                            response.message = "Mail is Sent and Template Saved successfully";
-                                        }
-                                        else {
-                                            response.message = "Template saved successfully";
-                                        }
-                                    }
-                                    //else saved
-                                    else {
-                                        response.message = "Template saved successfully";
-                                    }
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(200).json(response);
-                                }
-                            });
-                        }
                     }
-
-                });
-
-
-            }
-            //end of if(token validation)
-            //else invalid token
-            else {
-                res.status(401).json(response);
-            }
-            //end of else (token validation)
-        });
+                    //end of if(token validation)
+                    //else invalid token
+                    else {
+                        res.status(401).json(response);
+                    }
+                    //end of else (token validation)
+                }
+                catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+    catch (ex) {
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 
 sendgridCtrl.jobSeekerPreview = function (req, res, next) {
-    var validationFlag = true;
-
-
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
 
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid company';
-        validationFlag *= false;
+    var error_logger = {
+        details: 'sendgridCtrl.jobSeekerPreview'
     }
 
+    try {
+        var validationFlag = true;
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                    var mailBody = req.body.mailBody ? req.body.mailBody : '';
-                    var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
-                    var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
-                    var isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                    var sentMailFlag = 0;
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
 
-                    var tags = req.body.tags;
-                    if (typeof (tags) == "string") {
-                        tags = JSON.parse(tags);
-                    }
-                    if (!tags) {
-                        tags = [];
-                    }
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
 
-                    var applicants = req.body.applicantId;
-                    if (typeof (applicants) == "string") {
-                        applicants = JSON.parse(applicants);
-                    }
-                    if (!applicants) {
-                        applicants = [];
-                    }
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid company';
+            validationFlag *= false;
+        }
 
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        var inputs = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(JSON.stringify(applicants)),
-                            req.st.db.escape(sentMailFlag)
-                        ];
-                        var idArray;
-                        idArray = applicants;
-                        // idArray.sort(function(a,b){return a-b});
 
-                        var mailbody_array = [];
-                        var subject_array = [];
-                        var smsMsg_array = [];
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
 
-                        var procQuery;
-                        procQuery = 'CALL wm_paceMailerJobseeker( ' + inputs.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, result) {
-                            console.log(err);
-                            console.log(result);
-                            if (!err && result) {
-                                var temp = mailBody;
-                                var temp1 = subject;
-                                var temp2 = smsMsg;
-                                var applicantData = [];
-                                for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
-                                    console.log('applicantIndex=', applicantIndex);
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            try {
+                                req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                                var mailBody = req.body.mailBody ? req.body.mailBody : '';
+                                var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
+                                var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
+                                var isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                                var sentMailFlag = 0;
 
-                                    for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-
-                                        if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
-
-                                            mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                            subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                            smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                            // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                            // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                            // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                        }
-                                    }
-
-                                    applicantData.push(result[0][applicantIndex].EmailId);
-                                    mailbody_array.push(mailBody);
-                                    subject_array.push(subject);
-                                    smsMsg_array.push(smsMsg);
-                                    mailBody = temp;
-                                    subject = temp1;
-                                    smsMsg = temp2;
+                                var tags = req.body.tags;
+                                if (typeof (tags) == "string") {
+                                    tags = JSON.parse(tags);
+                                }
+                                if (!tags) {
+                                    tags = [];
                                 }
 
-                                response.status = true;
-                                response.message = "Tags replaced successfully";
-                                response.error = null;
-                                response.data = {
-                                    tagsPreview: mailbody_array,
-                                    subjectPreview: subject_array,
-                                    smsMsgPreview: smsMsg_array,
-                                    receiverData: applicantData
-                                };
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
-                            }
+                                var applicants = req.body.applicantId;
+                                if (typeof (applicants) == "string") {
+                                    applicants = JSON.parse(applicants);
+                                }
+                                if (!applicants) {
+                                    applicants = [];
+                                }
 
-                            else if (!err) {
-                                response.status = false;
-                                response.message = "No result found";
-                                response.error = null;
-                                response.data = {
-                                    tagsPreview: [],
-                                    subjectPreview: [],
-                                    smsMsgPreview: [],
-                                    receiverData: []
-                                };
-                                res.status(200).json(response);
-                            }
+                                if (!validationFlag) {
+                                    response.error = error;
+                                    response.message = 'Please check the errors';
+                                    res.status(400).json(response);
+                                    console.log(response);
+                                }
+                                else {
+                                    var inputs = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.query.heMasterId),
+                                        req.st.db.escape(JSON.stringify(applicants)),
+                                        req.st.db.escape(sentMailFlag)
+                                    ];
+                                    var idArray;
+                                    idArray = applicants;
+                                    // idArray.sort(function(a,b){return a-b});
 
-                            else {
-                                response.status = false;
-                                response.message = "Error while replacing tags";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
+                                    var mailbody_array = [];
+                                    var subject_array = [];
+                                    var smsMsg_array = [];
+
+                                    var procQuery;
+                                    procQuery = 'CALL wm_paceMailerJobseeker( ' + inputs.join(',') + ')';
+                                    console.log(procQuery);
+                                    req.db.query(procQuery, function (err, result) {
+                                        try {
+                                            console.log(err);
+                                            console.log(result);
+                                            if (!err && result) {
+                                                var temp = mailBody;
+                                                var temp1 = subject;
+                                                var temp2 = smsMsg;
+                                                var applicantData = [];
+                                                for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+                                                    console.log('applicantIndex=', applicantIndex);
+
+                                                    for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+
+                                                        if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+
+                                                            mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                            subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                            smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                            // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                            // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                            // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                        }
+                                                    }
+
+                                                    applicantData.push(result[0][applicantIndex].EmailId);
+                                                    mailbody_array.push(mailBody);
+                                                    subject_array.push(subject);
+                                                    smsMsg_array.push(smsMsg);
+                                                    mailBody = temp;
+                                                    subject = temp1;
+                                                    smsMsg = temp2;
+                                                }
+
+                                                response.status = true;
+                                                response.message = "Tags replaced successfully";
+                                                response.error = null;
+                                                response.data = {
+                                                    tagsPreview: mailbody_array,
+                                                    subjectPreview: subject_array,
+                                                    smsMsgPreview: smsMsg_array,
+                                                    receiverData: applicantData
+                                                };
+                                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                zlib.gzip(buf, function (_, result) {
+                                                    try {
+                                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                        res.status(200).json(response);
+                                                    }
+                                                    catch (ex) {
+                                                        error_logger.error = ex;
+                                                        logger(req, error_logger);
+                                                        res.status(500).json(error_response);
+                                                    }
+                                                });
+                                            }
+
+                                            else if (!err) {
+                                                response.status = false;
+                                                response.message = "No result found";
+                                                response.error = null;
+                                                response.data = {
+                                                    tagsPreview: [],
+                                                    subjectPreview: [],
+                                                    smsMsgPreview: [],
+                                                    receiverData: []
+                                                };
+                                                res.status(200).json(response);
+                                            }
+
+                                            else {
+                                                response.status = false;
+                                                response.message = "Error while replacing tags";
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(500).json(response);
+                                            }
+                                        }
+                                        catch (ex) {
+                                            error_logger.error = ex;
+                                            error_logger.proc_call = procQuery;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
+                                        }
+                                    });
+                                }
+                            }
+                            catch (ex) {
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
                             }
                         });
+
+
                     }
-
-                });
-
-
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
+                    else {
+                        res.status(401).json(response);
+                    }
+                }
+                catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+    catch (ex) {
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 
 sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
-
-
-    var validationFlag = true;
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
 
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid company';
-        validationFlag *= false;
+    var error_logger = {
+        details: 'sendgridCtrl.ScreeningMailerPreview'
     }
 
+    try {
+
+        var validationFlag = true;
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
+
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid company';
+            validationFlag *= false;
+        }
 
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
 
-                    var mailBody = req.body.mailBody ? req.body.mailBody : '';
-                    var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
-                    var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
-                    var isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                    var sendMailFlag = 0;
-                    var attachJD = req.body.attachJD != undefined ? req.body.attachJD : 0;
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            try {
+                                req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-
-                    var tags = req.body.tags;
-                    if (typeof (tags) == "string") {
-                        tags = JSON.parse(tags);
-                    }
-                    if (!tags) {
-                        tags = [];
-                    }
-
-                    var reqApplicants = req.body.reqApplicants;
-                    if (typeof (reqApplicants) == "string") {
-                        reqApplicants = JSON.parse(reqApplicants);
-                    }
-                    if (!reqApplicants) {
-                        reqApplicants = [];
-                    }
-
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        var inputs = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(JSON.stringify(reqApplicants)),
-                            req.st.db.escape(sendMailFlag)
-                        ];
-                        var idArray;
-                        idArray = reqApplicants;
-                        // idArray.sort(function(a,b){return a-b});
-                        var mailbody_array = [];
-                        var subject_array = [];
-                        var smsMsg_array = [];
-
-                        var procQuery;
-                        procQuery = 'CALL wm_paceScreeningMailer( ' + inputs.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, result) {
-                            console.log(err);
-                            // console.log(result);
-                            if (!err && result && result[0] && result[0][0]) {
-                                var temp = mailBody;
-                                var temp1 = subject;
-                                var temp2 = smsMsg;
-                                var applicantData = [];
-                                var JDAttachment = [];
-                                for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
-                                    // console.log('applicantIndex=', applicantIndex);
-
-                                    for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-                                        //
-                                        if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
-
-                                            // str.replace(/[^\x00-\x7F]/g, "");
-
-                                            mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                            subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                            smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                            // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                            // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                            // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                        }
-                                    }
-
-                                    for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-                                        // 
-                                        if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
-
-                                            mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                            subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                            smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                            // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                            // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                            // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                        }
-                                    }
+                                var mailBody = req.body.mailBody ? req.body.mailBody : '';
+                                var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
+                                var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
+                                var isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                                var sendMailFlag = 0;
+                                var attachJD = req.body.attachJD != undefined ? req.body.attachJD : 0;
 
 
-                                    applicantData.push(result[0][applicantIndex].EmailId);
-                                    JDAttachment.push(result[0][applicantIndex].JDAttachment);
-                                    mailbody_array.push(mailBody);
-                                    subject_array.push(subject);
-                                    smsMsg_array.push(smsMsg);
-                                    mailBody = temp;
-                                    subject = temp1;
-                                    smsMsg = temp2;
+                                var tags = req.body.tags;
+                                if (typeof (tags) == "string") {
+                                    tags = JSON.parse(tags);
+                                }
+                                if (!tags) {
+                                    tags = [];
                                 }
 
-                                response.status = true;
-                                response.message = "Tags replaced successfully";
-                                response.error = null;
-                                response.data = {
-                                    tagsPreview: mailbody_array,
-                                    subjectPreview: subject_array,
-                                    smsMsgPreview: smsMsg_array,
-                                    applicantData: applicantData,
-                                    JDAttachment: JDAttachment
-                                };
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
-                            }
+                                var reqApplicants = req.body.reqApplicants;
+                                if (typeof (reqApplicants) == "string") {
+                                    reqApplicants = JSON.parse(reqApplicants);
+                                }
+                                if (!reqApplicants) {
+                                    reqApplicants = [];
+                                }
 
-                            else if (!err) {
-                                response.status = false;
-                                response.message = "No result found";
-                                response.error = null;
-                                response.data = {
-                                    tagsPreview: [],
-                                    subjectPreview: [],
-                                    smsMsgPreview: [],
-                                    applicantData: [],
-                                    JDAttachment: []
-                                };
-                                res.status(200).json(response);
-                            }
+                                if (!validationFlag) {
+                                    response.error = error;
+                                    response.message = 'Please check the errors';
+                                    res.status(400).json(response);
+                                    console.log(response);
+                                }
+                                else {
+                                    var inputs = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.query.heMasterId),
+                                        req.st.db.escape(JSON.stringify(reqApplicants)),
+                                        req.st.db.escape(sendMailFlag)
+                                    ];
+                                    var idArray;
+                                    idArray = reqApplicants;
+                                    // idArray.sort(function(a,b){return a-b});
+                                    var mailbody_array = [];
+                                    var subject_array = [];
+                                    var smsMsg_array = [];
 
-                            else {
-                                response.status = false;
-                                response.message = "Error while replacing tags";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
+                                    var procQuery;
+                                    procQuery = 'CALL wm_paceScreeningMailer( ' + inputs.join(',') + ')';
+                                    console.log(procQuery);
+                                    req.db.query(procQuery, function (err, result) {
+                                        try {
+                                            console.log(err);
+                                            // console.log(result);
+                                            if (!err && result && result[0] && result[0][0]) {
+                                                var temp = mailBody;
+                                                var temp1 = subject;
+                                                var temp2 = smsMsg;
+                                                var applicantData = [];
+                                                var JDAttachment = [];
+                                                for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+                                                    // console.log('applicantIndex=', applicantIndex);
+
+                                                    for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                                        //
+                                                        if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+
+                                                            // str.replace(/[^\x00-\x7F]/g, "");
+
+                                                            mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                            subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                            smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                            // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                            // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                            // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                        }
+                                                    }
+
+                                                    for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+                                                        // 
+                                                        if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
+
+                                                            mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                            subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                            smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                            // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                            // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                            // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                                        }
+                                                    }
+
+
+                                                    applicantData.push(result[0][applicantIndex].EmailId);
+                                                    JDAttachment.push(result[0][applicantIndex].JDAttachment);
+                                                    mailbody_array.push(mailBody);
+                                                    subject_array.push(subject);
+                                                    smsMsg_array.push(smsMsg);
+                                                    mailBody = temp;
+                                                    subject = temp1;
+                                                    smsMsg = temp2;
+                                                }
+
+                                                response.status = true;
+                                                response.message = "Tags replaced successfully";
+                                                response.error = null;
+                                                response.data = {
+                                                    tagsPreview: mailbody_array,
+                                                    subjectPreview: subject_array,
+                                                    smsMsgPreview: smsMsg_array,
+                                                    applicantData: applicantData,
+                                                    JDAttachment: JDAttachment
+                                                };
+                                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                zlib.gzip(buf, function (_, result) {
+                                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                    res.status(200).json(response);
+                                                });
+                                            }
+
+                                            else if (!err) {
+                                                response.status = false;
+                                                response.message = "No result found";
+                                                response.error = null;
+                                                response.data = {
+                                                    tagsPreview: [],
+                                                    subjectPreview: [],
+                                                    smsMsgPreview: [],
+                                                    applicantData: [],
+                                                    JDAttachment: []
+                                                };
+                                                res.status(200).json(response);
+                                            }
+
+                                            else {
+                                                response.status = false;
+                                                response.message = "Error while replacing tags";
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(500).json(response);
+                                            }
+                                        }
+                                        catch (ex) {
+                                            error_logger.error = ex;
+                                            error_logger.proc_call = procQuery;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
+                                        }
+                                    });
+                                }
+                            }
+                            catch (ex) {
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
                             }
                         });
+
+
                     }
-
-                });
-
-
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
+                    else {
+                        res.status(401).json(response);
+                    }
+                }
+                catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+    catch (ex) {
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 //send Screening Mailer
 sendgridCtrl.screeningMailer = function (req, res, next) {
-
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-    var sendMailFlag = 1;
-    var emailReceivers;                //emailReceivers to store the recipients
-    var mailbody_array = [];    //array to store all mailbody after replacing tags
-    var subject_array = [];
-    var smsMsg_array = [];
-
-    var isSendgrid;
-    var isSMS;
-
-    var transactions = [];
-
-    var emailId = [];
-    var validationFlag = true;
-    var fromEmailID;
-    var toEmailID = [];
-    var JDAttachment = [];
-    var MobileISD = [];
-    var MobileNumber = [];
-    var isdMobile = '';
-    var mobileNo = '';
-    var message = '';
-
-
-    //html styling for table in submission mailer
-
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid tenant';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
 
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+    var error_logger = {
+        details: 'sendgridCtrl.screeningMailer'
     }
 
+    try {
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
+        var sendMailFlag = 1;
+        var emailReceivers;                //emailReceivers to store the recipients
+        var mailbody_array = [];    //array to store all mailbody after replacing tags
+        var subject_array = [];
+        var smsMsg_array = [];
+
+        var isSendgrid;
+        var isSMS;
+
+        var transactions = [];
+
+        var emailId = [];
+        var validationFlag = true;
+        var fromEmailID;
+        var toEmailID = [];
+        var JDAttachment = [];
+        var MobileISD = [];
+        var MobileNumber = [];
+        var isdMobile = '';
+        var mobileNo = '';
+        var message = '';
 
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
+        //html styling for table in submission mailer
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid tenant';
+            validationFlag *= false;
+        }
 
-                    //request parameters
-                    var attachJD = req.body.attachJD != undefined ? req.body.attachJD : 0;
-                    var updateFlag = req.body.updateFlag || 0;
-                    var overWrite = req.body.overWrite || 0;
-                    var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
-                    var templateId = req.body.template ? req.body.template.templateId : undefined;
-                    var trackerTemplate = req.body.trackerTemplate || {};
-                    var tags = req.body.tags || {};
-                    var cc = req.body.cc || [];
-                    var toMail = req.body.toMail || [];
-                    var bcc = req.body.bcc || [];
-                    var stage = req.body.stage || [];
-                    var attachment = req.body.attachment || [];
-                    var reqApplicants = req.body.reqApplicants || [];
-                    var applicants = req.body.applicantId || [];
-                    var client = req.body.clientId || [];
-                    var tableTags = req.body.tableTags || {};
-                    var clientContacts = req.body.clientContacts || [];
-                    var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
-                    var mailBody = req.body.mailBody || '';
-
-                    var whatmateMessage = req.body.whatmateMessage || '';
-                    var smsMsg = req.body.smsMsg || '';
-                    var smsFlag = req.body.smsFlag || 0;
-
-                    var isWeb = req.query.isWeb || 0;
-                    var mailerType = req.body.mailerType || 0;
-                    var userId = req.query.userId || 0;
-
-                    if (typeof (tags) == "string") {
-                        tags = JSON.parse(tags);
-                    }
-
-                    if (typeof (cc) == "string") {
-                        cc = JSON.parse(cc);
-                    }
-
-                    if (typeof (toMail) == "string") {
-                        toMail = JSON.parse(toMail);
-                    }
-
-                    if (typeof (bcc) == "string") {
-                        bcc = JSON.parse(bcc);
-                    }
-
-                    if (typeof (stage) == "string") {
-                        stage = JSON.parse(stage);
-                    }
-
-                    if (typeof (attachment) == "string") {
-                        attachment = JSON.parse(attachment);
-                    }
-
-                    if (typeof (client) == "string") {
-                        client = JSON.parse(client);
-                    }
-
-                    if (typeof (clientContacts) == "string") {
-                        clientContacts = JSON.parse(clientContacts);
-                    }
-
-                    if (typeof (tableTags) == "string") {
-                        tableTags = JSON.parse(tableTags);
-                    }
-
-                    if (typeof (reqApplicants) == "string") {
-                        reqApplicants = JSON.parse(reqApplicants);
-                    }
-
-                    //check for mail type and assign the recipients
-                    emailReceivers = reqApplicants;
-                    var recipients = reqApplicants;
-                    // emailReceivers.sort(function(a,b){return a-b});
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
 
 
 
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
 
-                        if (emailReceivers.length > 0) {				//for checking if the mailer is just a template
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            try {
+                                req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                            var inputs = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(req.query.heMasterId),
-                                req.st.db.escape(JSON.stringify(reqApplicants)),
-                                req.st.db.escape(sendMailFlag)
-                            ];
+                                //request parameters
+                                var attachJD = req.body.attachJD != undefined ? req.body.attachJD : 0;
+                                var updateFlag = req.body.updateFlag || 0;
+                                var overWrite = req.body.overWrite || 0;
+                                var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
+                                var templateId = req.body.template ? req.body.template.templateId : undefined;
+                                var trackerTemplate = req.body.trackerTemplate || {};
+                                var tags = req.body.tags || {};
+                                var cc = req.body.cc || [];
+                                var toMail = req.body.toMail || [];
+                                var bcc = req.body.bcc || [];
+                                var stage = req.body.stage || [];
+                                var attachment = req.body.attachment || [];
+                                var reqApplicants = req.body.reqApplicants || [];
+                                var applicants = req.body.applicantId || [];
+                                var client = req.body.clientId || [];
+                                var tableTags = req.body.tableTags || {};
+                                var clientContacts = req.body.clientContacts || [];
+                                var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
+                                var mailBody = req.body.mailBody || '';
 
-                            var procQuery = 'CALL wm_paceScreeningMailer( ' + inputs.join(',') + ')';
-                            console.log(procQuery);
-                            req.db.query(procQuery, function (err, result) {
-                                console.log(err);
+                                var whatmateMessage = req.body.whatmateMessage || '';
+                                var smsMsg = req.body.smsMsg || '';
+                                var smsFlag = req.body.smsFlag || 0;
 
+                                var isWeb = req.query.isWeb || 0;
+                                var mailerType = req.body.mailerType || 0;
+                                var userId = req.query.userId || 0;
 
-                                if (result[2] && result[2][0] && result[2][0].transactions) {
-                                    transactions = JSON.parse(result[2][0].transactions);
+                                if (typeof (tags) == "string") {
+                                    tags = JSON.parse(tags);
                                 }
 
-
-                                if (result[3] && result[3][0]) {
-                                    isSendgrid = result[3][0].isSendgrid ? result[3][0].isSendgrid : 0,
-                                        isSMS = result[3][0].isSMS ? result[3][0].isSMS : 0
+                                if (typeof (cc) == "string") {
+                                    cc = JSON.parse(cc);
                                 }
-                                console.log('isSendgrid and isSMS', isSendgrid, isSMS);
 
-                                if (!err && result && result[0] && result[0][0]) {
-                                    var temp = mailBody;
-                                    var temp1 = subject;
-                                    var temp2 = smsMsg;
+                                if (typeof (toMail) == "string") {
+                                    toMail = JSON.parse(toMail);
+                                }
 
-                                    for (var applicantIndex = 0; applicantIndex < emailReceivers.length; applicantIndex++) {
+                                if (typeof (bcc) == "string") {
+                                    bcc = JSON.parse(bcc);
+                                }
 
-                                        for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-                                            // 
-                                            if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+                                if (typeof (stage) == "string") {
+                                    stage = JSON.parse(stage);
+                                }
 
-                                                mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (attachment) == "string") {
+                                    attachment = JSON.parse(attachment);
+                                }
 
-                                                subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (client) == "string") {
+                                    client = JSON.parse(client);
+                                }
 
-                                                smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (clientContacts) == "string") {
+                                    clientContacts = JSON.parse(clientContacts);
+                                }
 
-                                                // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (tableTags) == "string") {
+                                    tableTags = JSON.parse(tableTags);
+                                }
 
-                                                // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (reqApplicants) == "string") {
+                                    reqApplicants = JSON.parse(reqApplicants);
+                                }
 
-                                                // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                            }
-                                        }
-
-                                        for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-
-                                            if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
-
-                                                mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                            }
-                                        }
-
-                                        mailbody_array.push(mailBody);
-                                        subject_array.push(subject);
-                                        smsMsg_array.push(smsMsg);
-
-                                        fromEmailID = result[1][0].fromEmailId;
-                                        // JDAttachment.push("http://storage.googleapis.com/ezeone/"+result[0][applicantIndex].JDAttachment);
-                                        toEmailID.push(result[0][applicantIndex].EmailId);
-                                        MobileISD.push(result[0][applicantIndex].MobileISD);
-                                        MobileNumber.push(result[0][applicantIndex].MobileNo);
-                                        mailBody = temp;
-                                        subject = temp1;
-                                        smsMsg = temp2;
-                                    }
-
-                                    for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
-                                        var mailOptions = {
-                                            from: fromEmailID,
-                                            to: toEmailID[receiverIndex],
-                                            subject: subject_array[receiverIndex],
-                                            html: mailbody_array[receiverIndex]
-                                        };
-
-                                        mailOptions.cc = [];
-
-                                        for (var j = 0; j < cc.length; j++) {
-                                            mailOptions.cc.push(cc[j].emailId);
-                                        }
-                                        mailOptions.bcc = [];
-
-                                        for (var j = 0; j < bcc.length; j++) {
-                                            mailOptions.bcc.push(bcc[j].emailId);
-                                        }
-
-                                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                        var email = new sendgrid.Email();
-                                        email.from = mailOptions.from;
-                                        email.to = mailOptions.to;
-                                        email.subject = mailOptions.subject;
-                                        email.mbody = mailOptions.html;
-                                        email.cc = mailOptions.cc;
-                                        email.bcc = mailOptions.bcc;
-                                        email.html = mailOptions.html;
-                                        //if 1 or more attachments are present
-                                        for (var file = 0; file < attachment.length; file++) {
-                                            email.addFile({
-                                                filename: attachment[file].fileName,
-                                                content: new Buffer(attachment[file].binaryFile, 'base64'),
-                                                contentType: attachment[file].fileType
-                                            });
-                                        }
-
-                                        // assign mobile no and isdMobile to send sms
-                                        isdMobile = MobileISD[receiverIndex];
-                                        mobileNo = MobileNumber[receiverIndex];
-                                        message = smsMsg_array[receiverIndex];
-
-                                        // to send normal sms
-                                        if (isSMS) {
-                                            if (smsFlag) {
-                                                if (isdMobile == "+977") {
-                                                    request({
-                                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                                        qs: {
-                                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                                            to: mobileNo,
-                                                            message: message,
-                                                            sender: 'Techingen'
-                                                        },
-                                                        method: 'GET'
-
-                                                    }, function (error, response, body) {
-                                                        if (error) {
-                                                            console.log(error, "SMS");
-                                                        }
-                                                        else {
-                                                            console.log("SUCCESS", "SMS response");
-                                                        }
-
-                                                    });
-                                                }
-                                                else if (isdMobile == "+91") {
-                                                    console.log('inside send sms');
-                                                    console.log(isdMobile, ' ', mobileNo);
-                                                    request({
-                                                        url: 'https://aikonsms.co.in/control/smsapi.php',
-                                                        qs: {
-                                                            user_name: 'janardana@hirecraft.com',
-                                                            password: 'Ezeid2015',
-                                                            sender_id: 'WtMate',
-                                                            service: 'TRANS',
-                                                            mobile_no: mobileNo,
-                                                            message: message,
-                                                            method: 'send_sms'
-                                                        },
-                                                        method: 'GET'
-
-                                                    }, function (error, response, body) {
-                                                        if (error) {
-                                                            console.log(error, "SMS");
-                                                        }
-                                                        else {
-                                                            console.log("SUCCESS", "SMS response");
-                                                        }
-                                                    });
-
-                                                    var req1 = http.request(options, function (res1) {
-                                                        var chunks = [];
-
-                                                        res1.on("data", function (chunk) {
-                                                            chunks.push(chunk);
-                                                        });
-
-                                                        res1.on("end", function () {
-                                                            var body = Buffer.concat(chunks);
-                                                            console.log(body.toString());
-                                                        });
-                                                    });
-
-                                                    req1.write(qs.stringify({
-                                                        userId: 'talentmicro',
-                                                        password: 'TalentMicro@123',
-                                                        senderId: 'WTMATE',
-                                                        sendMethod: 'simpleMsg',
-                                                        msgType: 'text',
-                                                        mobile: isdMobile.replace("+", "") + mobileNo,
-                                                        msg: message,
-                                                        duplicateCheck: 'true',
-                                                        format: 'json'
-                                                    }));
-                                                    req1.end();
-                                                }
-                                                else if (isdMobile != "") {
-                                                    client.messages.create(
-                                                        {
-                                                            body: message,
-                                                            to: isdMobile + mobileNo,
-                                                            from: FromNumber
-                                                        },
-                                                        function (error, response) {
-                                                            if (error) {
-                                                                console.log(error, "SMS");
-                                                            }
-                                                            else {
-                                                                console.log("SUCCESS", "SMS response");
-                                                            }
-                                                        }
-                                                    );
-                                                }
-                                            }
-                                        }
+                                //check for mail type and assign the recipients
+                                emailReceivers = reqApplicants;
+                                var recipients = reqApplicants;
+                                // emailReceivers.sort(function(a,b){return a-b});
 
 
-                                        if (isSendgrid && email.subject != '') {
-                                            sendgrid.send(email, function (err, sendGridResult) {
-                                                if (!err) {
 
-                                                    var saveMails = [
-                                                        req.st.db.escape(req.query.token),
-                                                        req.st.db.escape(req.query.heMasterId),
-                                                        req.st.db.escape(req.body.heDepartmentId),
-                                                        req.st.db.escape(userId),
-                                                        req.st.db.escape(mailerType),
-                                                        req.st.db.escape(mailOptions.from),
-                                                        req.st.db.escape(mailOptions.to),
-                                                        req.st.db.escape(mailOptions.subject),
-                                                        req.st.db.escape(mailOptions.html),    // contains mail body
-                                                        req.st.db.escape(JSON.stringify(cc)),
-                                                        req.st.db.escape(JSON.stringify(bcc)),
-                                                        req.st.db.escape(JSON.stringify(attachment)),
-                                                        req.st.db.escape(req.body.replyMailId),
-                                                        req.st.db.escape(req.body.priority),
-                                                        req.st.db.escape(req.body.stageId),
-                                                        req.st.db.escape(req.body.statusId),
-                                                        req.st.db.escape(message),    // sms message
-                                                        req.st.db.escape(whatmateMessage),
-                                                        req.st.db.escape(recipients[0]),
-                                                        req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
-                                                        req.st.db.escape(req.body.interviewerFlag || 0)
-                                                    ];
-
-                                                    //saving the mail after sending it
-                                                    var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
-                                                    console.log(saveMailHistory);
-                                                    req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
-                                                        console.log("error of save mail", mailHistoryErr);
-                                                        console.log("result of mail save", mailHistoryResult[0]);
-                                                        if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
-                                                            console.log('Sent mails saved successfully');
-                                                        }
-                                                        else {
-                                                            console.log('Mails could not be saved');
-                                                        }
-                                                    });
-                                                    console.log('Mail sent now save sent history');
-                                                } //end of if(sendgrid sent mail successfully)
-                                                //if mail is not sent
-                                                else {
-                                                    console.log('Mail not Sent Successfully' + err);
-                                                }
-                                            });
-                                        }
-
-                                    }
-                                    if (!(templateId == 0 || overWrite)) {
-                                        response.status = true;
-
-                                        if (isSendgrid && isSMS) {  // making changes here reminder
-                                            if (subject != '') {
-                                                if (smsMsg != '' && smsFlag) {
-                                                    response.message = "Mail and SMS sent successfully";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                                else {
-                                                    response.message = "Mail sent successfully";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                            }
-
-                                            else if (subject == '') {
-                                                if (smsMsg != '' && smsFlag) {
-                                                    response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                                else {
-                                                    response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                            }
-                                            else {
-                                                response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else if (isSendgrid && !isSMS) {
-
-                                            if (subject != '') {
-                                                response.message = "Mail sent successfully";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else if (subject == '') {
-                                                response.message = "Mail subject is empty, mail cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else if (isSMS && !isSendgrid) {
-                                            if (smsMsg != '' && smsFlag) {
-                                                response.message = "SMS sent successfully";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else if (smsMsg == '' && smsFlag) {
-                                                response.message = "SMS field is empty, SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else {
-                                                response.message = "SMS flag is not enabled, SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else {
-                                            response.message = "Sendgrid or SMS is not configured. Please contact the admin";
-                                            response.data = null;
-                                        }
-
-                                        response.error = null;
-                                        res.status(200).json(response);
-                                    }
+                                if (!validationFlag) {
+                                    response.error = error;
+                                    response.message = 'Please check the errors';
+                                    res.status(400).json(response);
+                                    console.log(response);
                                 }
                                 else {
-                                    response.status = false;
-                                    response.message = "Error while sending mail";
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(500).json(response);
-                                    return;
-                                }
-                            });
-                        }
-                        // else if(!templateId && !overWrite){
-                        //     response.status = false;
-                        //     response.message = "To mail is empty. Mail not sent";
-                        //     response.error = null;
-                        //     response.data = null;
-                        //     res.status(200).json(response);
-                        //     return;
-                        // }
 
-                        else if (templateId && !overWrite && !emailReceivers.length) {
-                            response.status = false;
-                            response.message = "To mail is empty. Mail not sent. TemplateId exists, Please set overwrite to update template";
-                            response.error = null;
-                            response.data = null;
-                            res.status(200).json(response);
-                            return;
-                        }
-                        //save it as a template if flag is true or template id is 0
-                        if (templateId == 0 || overWrite) {
-                            req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
-                            req.body.type = req.body.type ? req.body.type : 0;
-                            req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
-                            req.body.subject = req.body.subject ? req.body.subject : '';
-                            req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
-                            req.body.replymailId = req.body.replymailId ? req.body.replymailId : '';
-                            req.body.priority = req.body.priority ? req.body.priority : 0;
-                            req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
-                            req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
+                                    if (emailReceivers.length > 0) {				//for checking if the mailer is just a template
 
-                            var templateInputs = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(templateId),
-                                req.st.db.escape(req.query.heMasterId),
-                                req.st.db.escape(req.body.templateName),
-                                req.st.db.escape(req.body.type),
-                                req.st.db.escape(JSON.stringify(toMail)),
-                                req.st.db.escape(JSON.stringify(cc)),
-                                req.st.db.escape(JSON.stringify(bcc)),
-                                req.st.db.escape(req.body.subject),
-                                req.st.db.escape(req.body.mailBody),
-                                req.st.db.escape(req.body.replymailId),
-                                req.st.db.escape(req.body.priority),
-                                req.st.db.escape(req.body.updateFlag),
-                                req.st.db.escape(smsMsg),
-                                req.st.db.escape(whatmateMessage),
-                                req.st.db.escape(JSON.stringify(attachment)),
-                                req.st.db.escape(JSON.stringify(tags)),
-                                req.st.db.escape(JSON.stringify(stage)),
-                                req.st.db.escape(req.body.mailerType),
-                                req.st.db.escape(JSON.stringify(tableTags)),
-                                req.st.db.escape(req.body.sendSMS || 0),
-                                req.st.db.escape(req.body.attachJD || 0),
-                                req.st.db.escape(req.body.attachResume || 0),
-                                req.st.db.escape(req.body.interviewerFlag || 0),
-                                req.st.db.escape(req.body.resumeFileName || ''),
-                                req.st.db.escape(req.body.attachResumeFlag || 0),
-                                req.st.db.escape(JSON.stringify(trackerTemplate))
+                                        var inputs = [
+                                            req.st.db.escape(req.query.token),
+                                            req.st.db.escape(req.query.heMasterId),
+                                            req.st.db.escape(JSON.stringify(reqApplicants)),
+                                            req.st.db.escape(sendMailFlag)
+                                        ];
 
-                            ];
-                            var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
-                            console.log(saveTemplateQuery);
-                            req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
-                                console.log(tempSaveErr);
-                                if (!tempSaveErr && tempSaveResult) {
-                                    // console.log(tempSaveResult);
-                                    response.status = true;
-                                    //check if there are any receivers, if yes sent and saved
-                                    if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
-                                        if (isSendgrid && isSMS) {
-                                            response.message = "Mail and SMS Sent and Template Saved successfully";
-                                        }
-                                        else if (!isSendgrid && isSMS) {
-                                            response.message = "SMS is Sent and Template Saved successfully";
-                                        }
-                                        else if (isSendgrid && !isSMS) {
-                                            response.message = "Mail is Sent and Template Saved successfully";
-                                        }
-                                        else {
-                                            response.message = "Template saved successfully";
-                                        }
+                                        var procQuery = 'CALL wm_paceScreeningMailer( ' + inputs.join(',') + ')';
+                                        console.log(procQuery);
+                                        req.db.query(procQuery, function (err, result) {
+                                            try {
+                                                console.log(err);
+
+
+                                                if (result[2] && result[2][0] && result[2][0].transactions) {
+                                                    transactions = JSON.parse(result[2][0].transactions);
+                                                }
+
+
+                                                if (result[3] && result[3][0]) {
+                                                    isSendgrid = result[3][0].isSendgrid ? result[3][0].isSendgrid : 0,
+                                                        isSMS = result[3][0].isSMS ? result[3][0].isSMS : 0
+                                                }
+                                                console.log('isSendgrid and isSMS', isSendgrid, isSMS);
+
+                                                if (!err && result && result[0] && result[0][0]) {
+                                                    var temp = mailBody;
+                                                    var temp1 = subject;
+                                                    var temp2 = smsMsg;
+
+                                                    for (var applicantIndex = 0; applicantIndex < emailReceivers.length; applicantIndex++) {
+
+                                                        for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                                            // 
+                                                            if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+
+                                                                mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                            }
+                                                        }
+
+                                                        for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+
+                                                            if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
+
+                                                                mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                                            }
+                                                        }
+
+                                                        mailbody_array.push(mailBody);
+                                                        subject_array.push(subject);
+                                                        smsMsg_array.push(smsMsg);
+
+                                                        fromEmailID = result[1][0].fromEmailId;
+                                                        // JDAttachment.push("http://storage.googleapis.com/ezeone/"+result[0][applicantIndex].JDAttachment);
+                                                        toEmailID.push(result[0][applicantIndex].EmailId);
+                                                        MobileISD.push(result[0][applicantIndex].MobileISD);
+                                                        MobileNumber.push(result[0][applicantIndex].MobileNo);
+                                                        mailBody = temp;
+                                                        subject = temp1;
+                                                        smsMsg = temp2;
+                                                    }
+
+                                                    for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
+                                                        var mailOptions = {
+                                                            from: fromEmailID,
+                                                            to: toEmailID[receiverIndex],
+                                                            subject: subject_array[receiverIndex],
+                                                            html: mailbody_array[receiverIndex]
+                                                        };
+
+                                                        mailOptions.cc = [];
+
+                                                        for (var j = 0; j < cc.length; j++) {
+                                                            mailOptions.cc.push(cc[j].emailId);
+                                                        }
+                                                        mailOptions.bcc = [];
+
+                                                        for (var j = 0; j < bcc.length; j++) {
+                                                            mailOptions.bcc.push(bcc[j].emailId);
+                                                        }
+
+                                                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                                        var email = new sendgrid.Email();
+                                                        email.from = mailOptions.from;
+                                                        email.to = mailOptions.to;
+                                                        email.subject = mailOptions.subject;
+                                                        email.mbody = mailOptions.html;
+                                                        email.cc = mailOptions.cc;
+                                                        email.bcc = mailOptions.bcc;
+                                                        email.html = mailOptions.html;
+                                                        //if 1 or more attachments are present
+                                                        for (var file = 0; file < attachment.length; file++) {
+                                                            email.addFile({
+                                                                filename: attachment[file].fileName,
+                                                                content: new Buffer(attachment[file].binaryFile, 'base64'),
+                                                                contentType: attachment[file].fileType
+                                                            });
+                                                        }
+
+                                                        // assign mobile no and isdMobile to send sms
+                                                        isdMobile = MobileISD[receiverIndex];
+                                                        mobileNo = MobileNumber[receiverIndex];
+                                                        message = smsMsg_array[receiverIndex];
+
+                                                        // to send normal sms
+                                                        if (isSMS) {
+                                                            if (smsFlag) {
+                                                                if (isdMobile == "+977") {
+                                                                    request({
+                                                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                                        qs: {
+                                                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                                            to: mobileNo,
+                                                                            message: message,
+                                                                            sender: 'Techingen'
+                                                                        },
+                                                                        method: 'GET'
+
+                                                                    }, function (error, response, body) {
+                                                                        if (error) {
+                                                                            console.log(error, "SMS");
+                                                                        }
+                                                                        else {
+                                                                            console.log("SUCCESS", "SMS response");
+                                                                        }
+
+                                                                    });
+                                                                }
+                                                                else if (isdMobile == "+91") {
+                                                                    console.log('inside send sms');
+                                                                    console.log(isdMobile, ' ', mobileNo);
+                                                                    request({
+                                                                        url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                                        qs: {
+                                                                            user_name: 'janardana@hirecraft.com',
+                                                                            password: 'Ezeid2015',
+                                                                            sender_id: 'WtMate',
+                                                                            service: 'TRANS',
+                                                                            mobile_no: mobileNo,
+                                                                            message: message,
+                                                                            method: 'send_sms'
+                                                                        },
+                                                                        method: 'GET'
+
+                                                                    }, function (error, response, body) {
+                                                                        if (error) {
+                                                                            console.log(error, "SMS");
+                                                                        }
+                                                                        else {
+                                                                            console.log("SUCCESS", "SMS response");
+                                                                        }
+                                                                    });
+
+                                                                    var req1 = http.request(options, function (res1) {
+                                                                        var chunks = [];
+
+                                                                        res1.on("data", function (chunk) {
+                                                                            chunks.push(chunk);
+                                                                        });
+
+                                                                        res1.on("end", function () {
+                                                                            var body = Buffer.concat(chunks);
+                                                                            console.log(body.toString());
+                                                                        });
+                                                                    });
+
+                                                                    req1.write(qs.stringify({
+                                                                        userId: 'talentmicro',
+                                                                        password: 'TalentMicro@123',
+                                                                        senderId: 'WTMATE',
+                                                                        sendMethod: 'simpleMsg',
+                                                                        msgType: 'text',
+                                                                        mobile: isdMobile.replace("+", "") + mobileNo,
+                                                                        msg: message,
+                                                                        duplicateCheck: 'true',
+                                                                        format: 'json'
+                                                                    }));
+                                                                    req1.end();
+                                                                }
+                                                                else if (isdMobile != "") {
+                                                                    client.messages.create(
+                                                                        {
+                                                                            body: message,
+                                                                            to: isdMobile + mobileNo,
+                                                                            from: FromNumber
+                                                                        },
+                                                                        function (error, response) {
+                                                                            try {
+                                                                                if (error) {
+                                                                                    console.log(error, "SMS");
+                                                                                }
+                                                                                else {
+                                                                                    console.log("SUCCESS", "SMS response");
+                                                                                }
+                                                                            }
+                                                                            catch (ex) {
+                                                                                error_logger.error = ex;
+                                                                                logger(req, error_logger);
+                                                                                res.status(500).json(error_response);
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                }
+                                                            }
+                                                        }
+
+
+                                                        if (isSendgrid && email.subject != '') {
+                                                            sendgrid.send(email, function (err, sendGridResult) {
+                                                                try {
+                                                                    if (!err) {
+
+                                                                        var saveMails = [
+                                                                            req.st.db.escape(req.query.token),
+                                                                            req.st.db.escape(req.query.heMasterId),
+                                                                            req.st.db.escape(req.body.heDepartmentId),
+                                                                            req.st.db.escape(userId),
+                                                                            req.st.db.escape(mailerType),
+                                                                            req.st.db.escape(mailOptions.from),
+                                                                            req.st.db.escape(mailOptions.to),
+                                                                            req.st.db.escape(mailOptions.subject),
+                                                                            req.st.db.escape(mailOptions.html),    // contains mail body
+                                                                            req.st.db.escape(JSON.stringify(cc)),
+                                                                            req.st.db.escape(JSON.stringify(bcc)),
+                                                                            req.st.db.escape(JSON.stringify(attachment)),
+                                                                            req.st.db.escape(req.body.replyMailId),
+                                                                            req.st.db.escape(req.body.priority),
+                                                                            req.st.db.escape(req.body.stageId),
+                                                                            req.st.db.escape(req.body.statusId),
+                                                                            req.st.db.escape(message),    // sms message
+                                                                            req.st.db.escape(whatmateMessage),
+                                                                            req.st.db.escape(recipients[0]),
+                                                                            req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
+                                                                            req.st.db.escape(req.body.interviewerFlag || 0)
+                                                                        ];
+
+                                                                        //saving the mail after sending it
+                                                                        var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                                                        console.log(saveMailHistory);
+                                                                        req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                                            try {
+                                                                                console.log("error of save mail", mailHistoryErr);
+                                                                                console.log("result of mail save", mailHistoryResult[0]);
+                                                                                if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
+                                                                                    console.log('Sent mails saved successfully');
+                                                                                }
+                                                                                else {
+                                                                                    console.log('Mails could not be saved');
+                                                                                }
+                                                                            }
+                                                                            catch (ex) {
+                                                                                error_logger.error = ex;
+                                                                                logger(req, error_logger);
+                                                                                res.status(500).json(error_response);
+                                                                            }
+                                                                        });
+                                                                        console.log('Mail sent now save sent history');
+                                                                    } //end of if(sendgrid sent mail successfully)
+                                                                    //if mail is not sent
+                                                                    else {
+                                                                        console.log('Mail not Sent Successfully' + err);
+                                                                    }
+                                                                }
+                                                                catch (ex) {
+                                                                    error_logger.error = ex;
+                                                                    logger(req, error_logger);
+                                                                    res.status(500).json(error_response);
+                                                                }
+                                                            });
+                                                        }
+
+                                                    }
+                                                    if (!(templateId == 0 || overWrite)) {
+                                                        response.status = true;
+
+                                                        if (isSendgrid && isSMS) {  // making changes here reminder
+                                                            if (subject != '') {
+                                                                if (smsMsg != '' && smsFlag) {
+                                                                    response.message = "Mail and SMS sent successfully";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
+                                                                else {
+                                                                    response.message = "Mail sent successfully";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
+                                                            }
+
+                                                            else if (subject == '') {
+                                                                if (smsMsg != '' && smsFlag) {
+                                                                    response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
+                                                                else {
+                                                                    response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
+                                                            }
+                                                            else {
+                                                                response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                        }
+                                                        else if (isSendgrid && !isSMS) {
+
+                                                            if (subject != '') {
+                                                                response.message = "Mail sent successfully";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else if (subject == '') {
+                                                                response.message = "Mail subject is empty, mail cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                        }
+                                                        else if (isSMS && !isSendgrid) {
+                                                            if (smsMsg != '' && smsFlag) {
+                                                                response.message = "SMS sent successfully";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else if (smsMsg == '' && smsFlag) {
+                                                                response.message = "SMS field is empty, SMS cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else {
+                                                                response.message = "SMS flag is not enabled, SMS cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                        }
+                                                        else {
+                                                            response.message = "Sendgrid or SMS is not configured. Please contact the admin";
+                                                            response.data = null;
+                                                        }
+
+                                                        response.error = null;
+                                                        res.status(200).json(response);
+                                                    }
+                                                }
+                                                else {
+                                                    response.status = false;
+                                                    response.message = "Error while sending mail";
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(500).json(response);
+                                                    return;
+                                                }
+                                            }
+                                            catch (ex) {
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
                                     }
-                                    //else saved
-                                    else {
-                                        response.message = "Template saved successfully";
+                                    // else if(!templateId && !overWrite){
+                                    //     response.status = false;
+                                    //     response.message = "To mail is empty. Mail not sent";
+                                    //     response.error = null;
+                                    //     response.data = null;
+                                    //     res.status(200).json(response);
+                                    //     return;
+                                    // }
+
+                                    else if (templateId && !overWrite && !emailReceivers.length) {
+                                        response.status = false;
+                                        response.message = "To mail is empty. Mail not sent. TemplateId exists, Please set overwrite to update template";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(200).json(response);
+                                        return;
                                     }
-                                    response.error = null;
-                                    response.data = tempSaveResult[0][0];
-                                    res.status(200).json(response);
+                                    //save it as a template if flag is true or template id is 0
+                                    if (templateId == 0 || overWrite) {
+                                        req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
+                                        req.body.type = req.body.type ? req.body.type : 0;
+                                        req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
+                                        req.body.subject = req.body.subject ? req.body.subject : '';
+                                        req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
+                                        req.body.replymailId = req.body.replymailId ? req.body.replymailId : '';
+                                        req.body.priority = req.body.priority ? req.body.priority : 0;
+                                        req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
+                                        req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
+
+                                        var templateInputs = [
+                                            req.st.db.escape(req.query.token),
+                                            req.st.db.escape(templateId),
+                                            req.st.db.escape(req.query.heMasterId),
+                                            req.st.db.escape(req.body.templateName),
+                                            req.st.db.escape(req.body.type),
+                                            req.st.db.escape(JSON.stringify(toMail)),
+                                            req.st.db.escape(JSON.stringify(cc)),
+                                            req.st.db.escape(JSON.stringify(bcc)),
+                                            req.st.db.escape(req.body.subject),
+                                            req.st.db.escape(req.body.mailBody),
+                                            req.st.db.escape(req.body.replymailId),
+                                            req.st.db.escape(req.body.priority),
+                                            req.st.db.escape(req.body.updateFlag),
+                                            req.st.db.escape(smsMsg),
+                                            req.st.db.escape(whatmateMessage),
+                                            req.st.db.escape(JSON.stringify(attachment)),
+                                            req.st.db.escape(JSON.stringify(tags)),
+                                            req.st.db.escape(JSON.stringify(stage)),
+                                            req.st.db.escape(req.body.mailerType),
+                                            req.st.db.escape(JSON.stringify(tableTags)),
+                                            req.st.db.escape(req.body.sendSMS || 0),
+                                            req.st.db.escape(req.body.attachJD || 0),
+                                            req.st.db.escape(req.body.attachResume || 0),
+                                            req.st.db.escape(req.body.interviewerFlag || 0),
+                                            req.st.db.escape(req.body.resumeFileName || ''),
+                                            req.st.db.escape(req.body.attachResumeFlag || 0),
+                                            req.st.db.escape(JSON.stringify(trackerTemplate))
+
+                                        ];
+                                        var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
+                                        console.log(saveTemplateQuery);
+                                        req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
+                                            try {
+                                                console.log(tempSaveErr);
+                                                if (!tempSaveErr && tempSaveResult) {
+                                                    // console.log(tempSaveResult);
+                                                    response.status = true;
+                                                    //check if there are any receivers, if yes sent and saved
+                                                    if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
+                                                        if (isSendgrid && isSMS) {
+                                                            response.message = "Mail and SMS Sent and Template Saved successfully";
+                                                        }
+                                                        else if (!isSendgrid && isSMS) {
+                                                            response.message = "SMS is Sent and Template Saved successfully";
+                                                        }
+                                                        else if (isSendgrid && !isSMS) {
+                                                            response.message = "Mail is Sent and Template Saved successfully";
+                                                        }
+                                                        else {
+                                                            response.message = "Template saved successfully";
+                                                        }
+                                                    }
+                                                    //else saved
+                                                    else {
+                                                        response.message = "Template saved successfully";
+                                                    }
+                                                    response.error = null;
+                                                    response.data = tempSaveResult[0][0];
+                                                    res.status(200).json(response);
+                                                }
+                                            }
+                                            catch (ex) {
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
+                                    }
                                 }
-                            });
-                        }
+                            }
+                            catch (ex) {
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
+                            }
+                        });
+
+
                     }
-
-                });
-
-
-            }
-            //end of if(token validation)
-            //else invalid token
-            else {
-                res.status(401).json(response);
-            }
-            //end of else (token validation)
-        });
+                    //end of if(token validation)
+                    //else invalid token
+                    else {
+                        res.status(401).json(response);
+                    }
+                    //end of else (token validation) 
+                }
+                catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+    catch (ex) {
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 
 
 sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
-
-    var validationFlag = true;
-
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
 
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid company';
-        validationFlag *= false;
+    var error_logger = {
+        details: 'sendgridCtrl.ScreeningMailerPreview'
     }
 
+    try {
 
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
+        var validationFlag = true;
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
 
-                    var mailBody = req.body.mailBody ? req.body.mailBody : '';
-                    var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
-                    var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
-                    var isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                    var sendMailFlag = 0;
-                    var trackerTemplate = req.body.trackerTemplate;
-                    var trackerTags = [];
-                    var customTags = [];
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid company';
+            validationFlag *= false;
+        }
 
 
-                    var tags = req.body.tags;
-                    if (typeof (tags) == "string") {
-                        tags = JSON.parse(tags);
-                    }
-                    if (!tags) {
-                        tags = [];
-                    }
 
-                    var reqApplicants = req.body.reqApplicants;
-                    if (typeof (reqApplicants) == "string") {
-                        reqApplicants = JSON.parse(reqApplicants);
-                    }
-                    if (!reqApplicants) {
-                        reqApplicants = [];
-                    }
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
 
-                    var clientContacts = req.body.clientContacts;
-                    if (typeof (clientContacts) == "string") {
-                        clientContacts = JSON.parse(clientContacts);
-                        // clientContacts.sort(function(a,b){return a-b});
-                    }
-                    if (!clientContacts) {
-                        clientContacts = [];
-                    }
-                    var tableTags = req.body.tableTags;
-                    if (typeof (tableTags) == "string") {
-                        tableTags = JSON.parse(tableTags);
-                    }
-                    if (!tableTags) {
-                        tableTags = [];
-                    }
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                    if (trackerTemplate && typeof (trackerTemplate) == "string") {
-                        trackerTemplate = JSON.parse(trackerTemplate);
-                    }
-                    if (trackerTemplate && trackerTemplate.trackerId) {
-                        if (typeof (trackerTemplate.trackerTags) == 'string') {
-                            trackerTags = trackerTemplate && trackerTemplate.trackerTags && JSON.parse(trackerTemplate.trackerTags) ? JSON.parse(trackerTemplate.trackerTags) : [];
+                        var mailBody = req.body.mailBody ? req.body.mailBody : '';
+                        var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
+                        var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
+                        var isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                        var sendMailFlag = 0;
+                        var trackerTemplate = req.body.trackerTemplate;
+                        var trackerTags = [];
+                        var customTags = [];
+
+
+                        var tags = req.body.tags;
+                        if (typeof (tags) == "string") {
+                            tags = JSON.parse(tags);
+                        }
+                        if (!tags) {
+                            tags = [];
                         }
 
-                        if (typeof (trackerTemplate.customTags) == 'string') {
-                            customTags = trackerTemplate && trackerTemplate.customTags && JSON.parse(trackerTemplate.customTags) ? JSON.parse(trackerTemplate.customTags) : [];
+                        var reqApplicants = req.body.reqApplicants;
+                        if (typeof (reqApplicants) == "string") {
+                            reqApplicants = JSON.parse(reqApplicants);
+                        }
+                        if (!reqApplicants) {
+                            reqApplicants = [];
                         }
 
-                    }
-                    else {
-                        trackerTemplate = {};
-                        trackerTags = [];
-                        customTags = [];
-                    }
+                        var clientContacts = req.body.clientContacts;
+                        if (typeof (clientContacts) == "string") {
+                            clientContacts = JSON.parse(clientContacts);
+                            // clientContacts.sort(function(a,b){return a-b});
+                        }
+                        if (!clientContacts) {
+                            clientContacts = [];
+                        }
+                        var tableTags = req.body.tableTags;
+                        if (typeof (tableTags) == "string") {
+                            tableTags = JSON.parse(tableTags);
+                        }
+                        if (!tableTags) {
+                            tableTags = [];
+                        }
 
-
-
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-
-                        var inputs = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(JSON.stringify(reqApplicants)),
-                            req.st.db.escape(JSON.stringify(clientContacts)),
-                            req.st.db.escape(sendMailFlag)
-                        ];
-                        var idArray;
-                        idArray = reqApplicants;
-                        // idArray.sort(function(a,b){return a-b});
-                        var mailbody_array = [];
-                        var subject_array = [];
-                        var smsMsg_array = [];
-                        var resumeFileNameArray = [];
-                        var resumeFileName = req.body.resumeFileName;
-
-                        var procQuery;
-                        procQuery = 'CALL wm_paceSubmissionMailer( ' + inputs.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, result) {
-                            console.log(err);
-                            if (!err && result && result[0] && result[0][0] && result[1] && result[1][0]) {
-                                var temp = mailBody;
-                                var temp1 = subject;
-                                var temp2 = smsMsg;
-                                var clientData = [];
-
-
-                                for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
-                                    for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
-                                        var tempFileName = resumeFileName;
-
-                                        for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-
-                                            if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
-
-                                                mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                tempFileName = tempFileName.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                            }
-                                        }
-
-                                        for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-
-                                            if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
-
-                                                mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                tempFileName = replaceAll(tempFileName, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                // tempFileName = tempFileName.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                            }
-                                        }
-
-                                        for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-
-                                            if ((result[0][applicantIndex][tags.client[tagIndex].tagName] && result[0][applicantIndex][tags.client[tagIndex].tagName] != null && result[0][applicantIndex][tags.client[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.client[tagIndex].tagName] != '') || result[0][applicantIndex][tags.client[tagIndex].tagName] >= 0) {
-
-                                                mailBody = replaceAll(mailBody, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
-
-                                                subject = replaceAll(subject, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
-
-                                                smsMsg = replaceAll(smsMsg, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
-
-                                                tempFileName = replaceAll(tempFileName, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
-
-                                                // mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
-
-                                                // subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
-
-                                                // smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
-
-                                                // tempFileName = tempFileName.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
-                                            }
-
-                                        }
-                                        resumeFileNameArray.push(tempFileName);
-
-                                    }
-                                    for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
-
-                                        if ((result[1][clientIndex][tags.clientContacts[tagIndex].tagName] && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != null && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != 'null' && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != '') || result[1][clientIndex][tags.clientContacts[tagIndex].tagName] >= 0) {
-
-                                            mailBody = replaceAll(mailBody, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                            subject = replaceAll(subject, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                            smsMsg = replaceAll(smsMsg, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                            // mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                            // subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                            // smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-                                        }
-                                    }
-
-                                    if (tableTags.applicant.length > 0 || tableTags.requirement.length > 0 || tableTags.client.length > 0) {
-                                        var position = mailBody.indexOf('@table');
-                                        var tableContent = '';
-                                        mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
-                                        tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
-                                        console.log(tableContent, 'mailbody');
-                                        if (tableTags && tableTags.applicant && tableTags.applicant.length)
-                                            for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
-                                            }
-                                        if (tableTags && tableTags.requirement && tableTags.requirement.length)
-                                            for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
-                                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.requirement[tagCount].displayTagAs + "</th>";
-                                            }
-                                        if (tableTags && tableTags.client && tableTags.client.length)
-                                            for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
-                                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.client[tagCount].displayTagAs + "</th>";
-                                            }
-                                        tableContent += "</tr>";
-                                        if (tableTags && tableTags.applicant && tableTags.applicant.length)
-                                            for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
-                                                tableContent += "<tr>";
-                                                for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                                    tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
-                                                }
-                                                if (tableTags && tableTags.requirement && tableTags.requirement.length)
-                                                    for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
-                                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.requirement[tagCount].tagName] + "</td>";
-                                                    }
-                                                if (tableTags && tableTags.client && tableTags.client.length)
-                                                    for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
-                                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.client[tagCount].tagName] + "</td>";
-                                                    }
-                                                tableContent += "</tr>";
-                                            }
-
-                                        tableContent += "</table>";
-                                        mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
-
-                                    }
-                                    clientData.push(result[1][clientIndex].EmailId);
-                                    mailbody_array.push(mailBody);
-                                    subject_array.push(subject);
-                                    smsMsg_array.push(smsMsg);
-                                    mailBody = temp;
-                                    subject = temp1;
-                                    smsMsg = temp2;
-                                }
-                                // console.log(mailbody_array);
-
-                                var originalCVArray = [];
-                                var clientCVArray = [];
-                                if (idArray.length == result[0].length) {
-                                    for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
-                                        originalCVArray.push(result[0][applicantIndex].originalCVPath);
-                                        clientCVArray.push(result[0][applicantIndex].clientCVPath);
-                                    }
-                                }
-
-                                var buffer;
-                                var ws_data;
-                                if (trackerTemplate && trackerTemplate.trackerId) {
-                                    console.log('tracker', trackerTemplate.trackerId);
-                                    ws_data = '[[';
-                                    // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
-                                    for (var i = 0; i < trackerTags.length; i++) {
-                                        if (i != trackerTags.length - 1)
-                                            ws_data += '"' + trackerTags[i].displayTagAs + '",';
-                                        else
-                                            ws_data += '"' + trackerTags[i].displayTagAs + '"';
-                                    }
-
-                                    for (var j = 0; j < customTags.length; j++) {
-                                        ws_data += ',"' + customTags[j] + '"';
-                                    }
-
-                                    ws_data += "]";
-
-                                    // console.log(new Buffer(buffer).toString("base64"));
-                                    for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
-                                        ws_data += ',[';
-                                        for (var tagIndex = 0; tagIndex < trackerTags.length; tagIndex++) {
-                                            if (tagIndex < trackerTags.length - 1) {
-                                                if (result[0][applicantIndex][trackerTags[tagIndex].tagName] != undefined)
-                                                    ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '",';
-                                                else
-                                                    ws_data += '"' + "" + '",';
-
-                                            }
-                                            else {
-                                                if (result[0][applicantIndex][trackerTags[tagIndex].tagName] != undefined)
-                                                    ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '"';
-                                                else
-                                                    ws_data += '"' + "" + '"';
-                                            }
-                                        }
-
-                                        for (var j = 0; j < customTags.length; j++) {
-                                            ws_data += ',"' + "" + '"';
-                                        }
-
-                                        ws_data += ']';
-                                    }
-                                    ws_data += ']';
-                                    console.log(ws_data);
-                                    // buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]); // Returns a buffer
-                                }
-
-                                response.status = true;
-                                response.message = "Tags replaced successfully";
-                                response.error = null;
-                                response.data = {
-                                    tagsPreview: mailbody_array,
-                                    subjectPreview: subject_array,
-                                    smsMsgPreview: smsMsg_array,
-                                    clientData: clientData,
-                                    originalCVArray: originalCVArray,
-                                    clientCVArray: clientCVArray,
-                                    resumeFileName: resumeFileNameArray,
-                                    trackerData: ws_data || ""
-                                };
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
+                        if (trackerTemplate && typeof (trackerTemplate) == "string") {
+                            trackerTemplate = JSON.parse(trackerTemplate);
+                        }
+                        if (trackerTemplate && trackerTemplate.trackerId) {
+                            if (typeof (trackerTemplate.trackerTags) == 'string') {
+                                trackerTags = trackerTemplate && trackerTemplate.trackerTags && JSON.parse(trackerTemplate.trackerTags) ? JSON.parse(trackerTemplate.trackerTags) : [];
                             }
 
-                            else if (!err) {
-                                response.status = false;
-                                response.message = "No recipients found";
-                                response.error = null;
-                                response.data = {
-                                    tagsPreview: [],
-                                    subjectPreview: [],
-                                    smsMsgPreview: [],
-                                    clientData: [],
-                                    originalCVArray: [],
-                                    clientCVArray: [],
-                                    resumeFileName: [],
-                                    trackerData: []
-                                };
-                                res.status(200).json(response);
+                            if (typeof (trackerTemplate.customTags) == 'string') {
+                                customTags = trackerTemplate && trackerTemplate.customTags && JSON.parse(trackerTemplate.customTags) ? JSON.parse(trackerTemplate.customTags) : [];
                             }
 
-                            else {
-                                response.status = false;
-                                response.message = "Error while replacing tags";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
-                            }
-                        });
-                    }
-
-                });
-
-
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
-    }
-};
-
-
-// send submission mailer
-sendgridCtrl.submissionMailer = function (req, res, next) {
-
-    var response = {
-        status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-    var sendMailFlag = 1;
-    var isSendgrid;
-    var isSMS;
-
-    var emailReceivers;                //emailReceivers to store the recipients
-    var mailbody_array = [];    //array to store all mailbody after replacing tags
-    var subject_array = [];
-    var smsMsg_array = [];
-    var transactions = [];
-
-    var emailId = [];
-    var validationFlag = true;
-    var fromEmailID;
-    var toEmailID = [];
-    var MobileISD = [];
-    var MobileNumber = [];
-    var isdMobile = '';
-    var mobileNo = '';
-    var message = '';
-
-    //html styling for table in submission mailer
-
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid tenant';
-        validationFlag *= false;
-    }
-
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-
-
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-
-
-                    //request parameters
-                    var updateFlag = req.body.updateFlag || 0;
-                    var overWrite = req.body.overWrite || 0;
-                    var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
-                    var templateId = req.body.template ? req.body.template.templateId : undefined;
-                    var trackerTemplate = req.body.trackerTemplate;
-                    var tags = req.body.tags || {};
-                    var cc = req.body.cc || [];
-                    var toMail = req.body.toMail || [];
-                    var bcc = req.body.bcc || [];
-                    var stage = req.body.stage || [];
-                    var attachment = req.body.attachment || [];
-                    var reqApplicants = req.body.reqApplicants || [];
-                    var applicants = req.body.applicantId || [];
-                    var client = req.body.clientId || [];
-                    var tableTags = req.body.tableTags || {};
-                    var clientContacts = req.body.clientContacts || [];
-                    var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
-                    var mailBody = req.body.mailBody || '';
-
-                    var whatmateMessage = req.body.whatmateMessage || '';
-                    var smsMsg = req.body.smsMsg || '';
-                    var smsFlag = req.body.smsFlag || 0;
-
-                    var isWeb = req.query.isWeb || 0;
-                    var mailerType = req.body.mailerType || 0;
-                    var userId = req.query.userId || 0;
-                    var trackerTags = [];
-                    var customTags = [];
-
-
-                    if (trackerTemplate && typeof (trackerTemplate) == "string") {
-                        trackerTemplate = JSON.parse(trackerTemplate);
-                    }
-                    if (trackerTemplate && trackerTemplate.trackerId) {
-                        if (typeof (trackerTemplate.trackerTags) == 'string') {
-                            trackerTags = trackerTemplate && trackerTemplate.trackerTags && JSON.parse(trackerTemplate.trackerTags) ? JSON.parse(trackerTemplate.trackerTags) : [];
+                        }
+                        else {
+                            trackerTemplate = {};
+                            trackerTags = [];
+                            customTags = [];
                         }
 
-                        if (typeof (trackerTemplate.customTags) == 'string') {
-                            customTags = trackerTemplate && trackerTemplate.customTags && JSON.parse(trackerTemplate.customTags) ? JSON.parse(trackerTemplate.customTags) : [];
+
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
                         }
-
-                    }
-                    else {
-                        trackerTemplate = {};
-                        trackerTags = [];
-                        customTags = [];
-                    }
-
-                    if (typeof (tags) == "string") {
-                        tags = JSON.parse(tags);
-                    }
-
-                    if (typeof (cc) == "string") {
-                        cc = JSON.parse(cc);
-                    }
-
-                    if (typeof (toMail) == "string") {
-                        toMail = JSON.parse(toMail);
-                    }
-
-                    if (typeof (bcc) == "string") {
-                        bcc = JSON.parse(bcc);
-                    }
-
-                    if (typeof (stage) == "string") {
-                        stage = JSON.parse(stage);
-                    }
-
-                    if (typeof (attachment) == "string") {
-                        attachment = JSON.parse(attachment);
-                    }
-
-                    if (typeof (client) == "string") {
-                        client = JSON.parse(client);
-                    }
-
-                    if (typeof (clientContacts) == "string") {
-                        clientContacts = JSON.parse(clientContacts);
-                    }
-
-                    if (typeof (tableTags) == "string") {
-                        tableTags = JSON.parse(tableTags);
-                    }
-
-                    if (typeof (reqApplicants) == "string") {
-                        reqApplicants = JSON.parse(reqApplicants);
-                        // reqApplicants.sort(function(a,b){return a-b});
-                    }
-
-                    //check for mail type and assign the recipients
-                    emailReceivers = clientContacts;
-                    var recipients = clientContacts;
-                    // emailReceivers.sort(function(a,b){return a-b});
-
-
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        if (emailReceivers.length > 0) {				//for checking if the mailer is just a template
+                        else {
 
                             var inputs = [
                                 req.st.db.escape(req.query.token),
@@ -2594,29 +2456,30 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                 req.st.db.escape(JSON.stringify(clientContacts)),
                                 req.st.db.escape(sendMailFlag)
                             ];
+                            var idArray;
+                            idArray = reqApplicants;
+                            // idArray.sort(function(a,b){return a-b});
+                            var mailbody_array = [];
+                            var subject_array = [];
+                            var smsMsg_array = [];
+                            var resumeFileNameArray = [];
+                            var resumeFileName = req.body.resumeFileName;
 
-                            var procQuery = 'CALL wm_paceSubmissionMailer( ' + inputs.join(',') + ')';
+                            var procQuery;
+                            procQuery = 'CALL wm_paceSubmissionMailer( ' + inputs.join(',') + ')';
                             console.log(procQuery);
                             req.db.query(procQuery, function (err, result) {
                                 console.log(err);
-
-                                if (result[3] && result[3][0] && result[3][0].transactions) {
-                                    transactions = JSON.parse(result[3][0].transactions);
-                                }
-
-
-                                if (result[4] && result[4][0]) {
-                                    isSendgrid = result[4][0].isSendgrid ? result[4][0].isSendgrid : 0,
-                                        isSMS = result[4][0].isSMS ? result[4][0].isSMS : 0
-                                }
-
-                                if (!err && result && result[0] && result[0][0]) {
+                                if (!err && result && result[0] && result[0][0] && result[1] && result[1][0]) {
                                     var temp = mailBody;
                                     var temp1 = subject;
                                     var temp2 = smsMsg;
+                                    var clientData = [];
 
-                                    for (var clientIndex = 0; clientIndex < emailReceivers.length; clientIndex++) {
-                                        for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
+
+                                    for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
+                                        for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+                                            var tempFileName = resumeFileName;
 
                                             for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
 
@@ -2626,13 +2489,16 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
 
                                                     subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
 
-                                                    mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                    smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
 
                                                     // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
 
                                                     // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
 
                                                     // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                    tempFileName = tempFileName.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
                                                 }
                                             }
 
@@ -2646,11 +2512,16 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
 
                                                     smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
 
+                                                    tempFileName = replaceAll(tempFileName, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
                                                     // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
 
                                                     // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
 
                                                     // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                    // tempFileName = tempFileName.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
                                                 }
                                             }
 
@@ -2664,14 +2535,20 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
 
                                                     smsMsg = replaceAll(smsMsg, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
 
+                                                    tempFileName = replaceAll(tempFileName, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
                                                     // mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
 
                                                     // subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
 
                                                     // smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                                    // tempFileName = tempFileName.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
                                                 }
 
                                             }
+                                            resumeFileNameArray.push(tempFileName);
+
                                         }
                                         for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
 
@@ -2731,24 +2608,30 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                             mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
 
                                         }
-
+                                        clientData.push(result[1][clientIndex].EmailId);
                                         mailbody_array.push(mailBody);
                                         subject_array.push(subject);
                                         smsMsg_array.push(smsMsg);
-
-                                        fromEmailID = result[2][0].fromEmailId;
-                                        toEmailID.push(result[1][clientIndex].EmailId);
-                                        MobileISD.push(result[1][clientIndex].MobileISD);
-                                        MobileNumber.push(result[1][clientIndex].MobileNo);
                                         mailBody = temp;
                                         subject = temp1;
                                         smsMsg = temp2;
                                     }
+                                    // console.log(mailbody_array);
+
+                                    var originalCVArray = [];
+                                    var clientCVArray = [];
+                                    if (idArray.length == result[0].length) {
+                                        for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+                                            originalCVArray.push(result[0][applicantIndex].originalCVPath);
+                                            clientCVArray.push(result[0][applicantIndex].clientCVPath);
+                                        }
+                                    }
 
                                     var buffer;
-                                    if (trackerTemplate.trackerId) {
+                                    var ws_data;
+                                    if (trackerTemplate && trackerTemplate.trackerId) {
                                         console.log('tracker', trackerTemplate.trackerId);
-                                        var ws_data = '[[';
+                                        ws_data = '[[';
                                         // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
                                         for (var i = 0; i < trackerTags.length; i++) {
                                             if (i != trackerTags.length - 1)
@@ -2758,13 +2641,13 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                         }
 
                                         for (var j = 0; j < customTags.length; j++) {
-                                            ws_data += ',"' + "" + '"';
+                                            ws_data += ',"' + customTags[j] + '"';
                                         }
 
                                         ws_data += "]";
 
                                         // console.log(new Buffer(buffer).toString("base64"));
-                                        for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
+                                        for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
                                             ws_data += ',[';
                                             for (var tagIndex = 0; tagIndex < trackerTags.length; tagIndex++) {
                                                 if (tagIndex < trackerTags.length - 1) {
@@ -2790,2500 +2673,3245 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                         }
                                         ws_data += ']';
                                         console.log(ws_data);
-                                        buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]);
+                                        // buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]); // Returns a buffer
                                     }
 
-                                    for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
-                                        var mailOptions = {
-                                            from: fromEmailID,
-                                            to: toEmailID[receiverIndex],
-                                            subject: subject_array[receiverIndex],
-                                            html: mailbody_array[receiverIndex]
-                                        };
-
-                                        mailOptions.cc = [];
-
-                                        for (var j = 0; j < cc.length; j++) {
-                                            mailOptions.cc.push(cc[j].emailId);
-                                        }
-                                        mailOptions.bcc = [];
-
-                                        for (var j = 0; j < bcc.length; j++) {
-                                            mailOptions.bcc.push(bcc[j].emailId);
-                                        }
-
-                                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                        var email = new sendgrid.Email();
-                                        email.from = mailOptions.from;
-                                        email.to = mailOptions.to;
-                                        email.subject = mailOptions.subject;
-                                        email.mbody = mailOptions.html;
-                                        email.cc = mailOptions.cc;
-                                        email.bcc = mailOptions.bcc;
-                                        email.html = mailOptions.html;
-                                        //if 1 or more attachments are present
-                                        for (var file = 0; file < attachment.length; file++) {
-                                            if (attachment[file].binaryFile) {
-                                                email.addFile({
-                                                    filename: attachment[file].fileName,
-                                                    content: new Buffer(attachment[file].binaryFile, 'base64'),
-                                                    contentType: attachment[file].fileType
-                                                });
-                                            }
-                                        }
-
-                                        if (trackerTemplate.trackerId) {
-                                            console.log('trackerTemplate send mail attach', trackerTemplate.trackerId);
-                                            email.addFile({
-                                                filename: trackerTemplate.templateName + '.xlsx',
-                                                content: new Buffer(new Buffer(buffer).toString("base64"), 'base64'),
-                                                contentType: 'application/*'
-                                            });
-                                        }
-
-                                        // assign mobile no and isdMobile to send sms
-                                        isdMobile = MobileISD[receiverIndex];
-                                        mobileNo = MobileNumber[receiverIndex];
-                                        message = smsMsg_array[receiverIndex];
-
-                                        // to send normal sms
-                                        if (isSMS) {
-                                            if (smsFlag) {
-                                                if (isdMobile == "+977") {
-                                                    request({
-                                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                                        qs: {
-                                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                                            to: mobileNo,
-                                                            message: message,
-                                                            sender: 'Techingen'
-                                                        },
-                                                        method: 'GET'
-
-                                                    }, function (error, response, body) {
-                                                        if (error) {
-                                                            console.log(error, "SMS");
-                                                        }
-                                                        else {
-                                                            console.log("SUCCESS", "SMS response");
-                                                        }
-
-                                                    });
-                                                }
-                                                else if (isdMobile == "+91") {
-                                                    console.log('inside send sms');
-                                                    console.log(isdMobile, ' ', mobileNo);
-                                                    request({
-                                                        url: 'https://aikonsms.co.in/control/smsapi.php',
-                                                        qs: {
-                                                            user_name: 'janardana@hirecraft.com',
-                                                            password: 'Ezeid2015',
-                                                            sender_id: 'WtMate',
-                                                            service: 'TRANS',
-                                                            mobile_no: mobileNo,
-                                                            message: message,
-                                                            method: 'send_sms'
-                                                        },
-                                                        method: 'GET'
-
-                                                    }, function (error, response, body) {
-                                                        if (error) {
-                                                            console.log(error, "SMS");
-                                                        }
-                                                        else {
-                                                            console.log("SUCCESS", "SMS response");
-                                                        }
-                                                    });
-
-                                                    var req1 = http.request(options, function (res1) {
-                                                        var chunks = [];
-
-                                                        res1.on("data", function (chunk) {
-                                                            chunks.push(chunk);
-                                                        });
-
-                                                        res1.on("end", function () {
-                                                            var body = Buffer.concat(chunks);
-                                                            console.log(body.toString());
-                                                        });
-                                                    });
-
-                                                    req1.write(qs.stringify({
-                                                        userId: 'talentmicro',
-                                                        password: 'TalentMicro@123',
-                                                        senderId: 'WTMATE',
-                                                        sendMethod: 'simpleMsg',
-                                                        msgType: 'text',
-                                                        mobile: isdMobile.replace("+", "") + mobileNo,
-                                                        msg: message,
-                                                        duplicateCheck: 'true',
-                                                        format: 'json'
-                                                    }));
-                                                    req1.end();
-                                                }
-                                                else if (isdMobile != "") {
-                                                    console.log('inside without isd', isdMobile, ' ', mobileNo);
-                                                    client.messages.create(
-                                                        {
-                                                            body: message,
-                                                            to: isdMobile + mobileNo,
-                                                            from: FromNumber
-                                                        },
-                                                        function (error, response) {
-                                                            if (error) {
-                                                                console.log(error, "SMS");
-                                                            }
-                                                            else {
-                                                                console.log("SUCCESS", "SMS response");
-                                                            }
-                                                        }
-                                                    );
-                                                }
-                                            }
-                                        }
-
-                                        if (isSendgrid) {
-                                            sendgrid.send(email, function (err, result) {
-                                                if (!err) {
-
-                                                    var saveMails = [
-                                                        req.st.db.escape(req.query.token),
-                                                        req.st.db.escape(req.query.heMasterId),
-                                                        req.st.db.escape(req.body.heDepartmentId || 0),
-                                                        req.st.db.escape(userId),
-                                                        req.st.db.escape(mailerType),
-                                                        req.st.db.escape(mailOptions.from),
-                                                        req.st.db.escape(mailOptions.to),
-                                                        req.st.db.escape(mailOptions.subject),
-                                                        req.st.db.escape(mailOptions.html),    // contains mail body
-                                                        req.st.db.escape(JSON.stringify(cc)),
-                                                        req.st.db.escape(JSON.stringify(bcc)),
-                                                        req.st.db.escape(JSON.stringify(attachment)),
-                                                        req.st.db.escape(req.body.replyMailId),
-                                                        req.st.db.escape(req.body.priority || 0),
-                                                        req.st.db.escape(req.body.stageId || 0),
-                                                        req.st.db.escape(req.body.statusId || 0),
-                                                        req.st.db.escape(message),    // sms message
-                                                        req.st.db.escape(whatmateMessage),
-                                                        req.st.db.escape(recipients[0]),   // submission mailer save client contactid
-                                                        req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
-                                                        req.st.db.escape(req.body.interviewerFlag || 0)
-                                                    ];
-
-                                                    //saving the mail after sending it
-                                                    var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
-                                                    console.log(saveMailHistory);
-                                                    req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
-                                                        console.log(mailHistoryErr);
-                                                        console.log(mailHistoryResult);
-                                                        if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
-                                                            console.log('sent mails saved successfully');
-                                                        }
-                                                        else {
-                                                            console.log('mails could not be saved');
-                                                        }
-                                                    });
-                                                    console.log('Mail sent now save sent history');
-                                                } //end of if(sendgrid sent mail successfully)
-                                                //if mail is not sent
-                                                else {
-                                                    console.log('Mail not Sent Successfully' + err);
-                                                }
-                                            });
-                                        }
-
-                                    }
-
-                                    if (!(templateId == 0 || overWrite)) {
-                                        response.status = true;
-
-                                        if (isSendgrid && isSMS) {  // making changes here reminder
-                                            if (subject != '') {
-                                                if (smsMsg != '' && smsFlag) {
-                                                    response.message = "Mail and SMS sent successfully";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                                else {
-                                                    response.message = "Mail sent successfully";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                            }
-
-                                            else if (subject == '') {
-                                                if (smsMsg != '' && smsFlag) {
-                                                    response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                                else {
-                                                    response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                            }
-                                            else {
-                                                response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else if (isSendgrid && !isSMS) {
-
-                                            if (subject != '') {
-                                                response.message = "Mail sent successfully";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else if (subject == '') {
-                                                response.message = "Mail subject is empty, mail cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else if (isSMS && !isSendgrid) {
-                                            if (smsMsg != '' && smsFlag) {
-                                                response.message = "SMS sent successfully";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else if (smsMsg == '' && smsFlag) {
-                                                response.message = "SMS field is empty, SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else {
-                                                response.message = "SMS flag is not enabled, SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else {
-                                            response.message = "Sendgrid or SMS is not configured. Please contact the admin";
-                                            response.data = null;
-                                        }
-
-                                        response.error = null;
+                                    response.status = true;
+                                    response.message = "Tags replaced successfully";
+                                    response.error = null;
+                                    response.data = {
+                                        tagsPreview: mailbody_array,
+                                        subjectPreview: subject_array,
+                                        smsMsgPreview: smsMsg_array,
+                                        clientData: clientData,
+                                        originalCVArray: originalCVArray,
+                                        clientCVArray: clientCVArray,
+                                        resumeFileName: resumeFileNameArray,
+                                        trackerData: ws_data || ""
+                                    };
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                         res.status(200).json(response);
-                                    }
+                                    });
+                                }
+
+                                else if (!err) {
+                                    response.status = false;
+                                    response.message = "No recipients found";
+                                    response.error = null;
+                                    response.data = {
+                                        tagsPreview: [],
+                                        subjectPreview: [],
+                                        smsMsgPreview: [],
+                                        clientData: [],
+                                        originalCVArray: [],
+                                        clientCVArray: [],
+                                        resumeFileName: [],
+                                        trackerData: []
+                                    };
+                                    res.status(200).json(response);
                                 }
 
                                 else {
                                     response.status = false;
-                                    response.message = "Error while sending mail";
+                                    response.message = "Error while replacing tags";
                                     response.error = null;
                                     response.data = null;
                                     res.status(500).json(response);
-                                    return;
                                 }
                             });
                         }
-                        // else if(!templateId && !overWrite){
-                        //     response.status = false;
-                        //     response.message = "To mail is empty. Mail not sent";
-                        //     response.error = null;
-                        //     response.data = null;
-                        //     res.status(200).json(response);
-                        //     return;
-                        // }
 
-                        else if (templateId && !overWrite && !emailReceivers.length) {
-                            response.status = false;
-                            response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
-                            response.error = null;
-                            response.data = null;
-                            res.status(200).json(response);
-                            return;
-                        }
-                        //save it as a template if flag is true or template id is 0
-                        if (templateId == 0 || overWrite) {
-                            req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
-                            req.body.type = req.body.type ? req.body.type : 0;
-                            req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
-                            req.body.subject = req.body.subject ? req.body.subject : '';
-                            req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
-                            req.body.replymailId = req.body.replymailId ? req.body.replymailId : '';
-                            req.body.priority = req.body.priority ? req.body.priority : 0;
-                            req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
-                            req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
+                    });
 
-                            var templateInputs = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(templateId),
-                                req.st.db.escape(req.query.heMasterId),
-                                req.st.db.escape(req.body.templateName),
-                                req.st.db.escape(req.body.type),
-                                req.st.db.escape(JSON.stringify(toMail)),
-                                req.st.db.escape(JSON.stringify(cc)),
-                                req.st.db.escape(JSON.stringify(bcc)),
-                                req.st.db.escape(req.body.subject),
-                                req.st.db.escape(req.body.mailBody),
-                                req.st.db.escape(req.body.replymailId),
-                                req.st.db.escape(req.body.priority),
-                                req.st.db.escape(req.body.updateFlag),
-                                req.st.db.escape(smsMsg),
-                                req.st.db.escape(whatmateMessage),
-                                req.st.db.escape(JSON.stringify(attachment)),
-                                req.st.db.escape(JSON.stringify(tags)),
-                                req.st.db.escape(JSON.stringify(stage)),
-                                req.st.db.escape(req.body.mailerType),
-                                req.st.db.escape(JSON.stringify(tableTags)),
-                                req.st.db.escape(req.body.sendSMS || 0),
-                                req.st.db.escape(req.body.attachJD || 0),
-                                req.st.db.escape(req.body.attachResume || 0),
-                                req.st.db.escape(req.body.interviewerFlag || 0),
-                                req.st.db.escape(req.body.resumeFileName || ''),
-                                req.st.db.escape(req.body.attachResumeFlag || 0),
-                                req.st.db.escape(JSON.stringify(trackerTemplate))
 
-                            ];
-                            var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
-                            console.log(saveTemplateQuery);
-                            req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
-                                console.log(tempSaveErr);
-                                if (!tempSaveErr && tempSaveResult) {
-                                    // console.log(tempSaveResult);
-                                    response.status = true;
-                                    //check if there are any receivers, if yes sent and saved
-                                    if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
-                                        if (isSendgrid && isSMS) {
-                                            response.message = "Mail and SMS Sent and Template Saved successfully";
+                }
+                else {
+                    res.status(401).json(response);
+                }
+            });
+        }
+    }
+    catch (ex) {
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
+    }
+};
+
+
+// send submission mailer
+sendgridCtrl.submissionMailer = function (req, res, next) {
+    var error_response = {
+        status: false,
+        message: "Some error occurred!",
+        error: null,
+        data: null
+    }
+
+    var error_logger = {
+        details: 'sendgridCtrl.ScreeningMailerPreview'
+    }
+
+    try {
+
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
+        var sendMailFlag = 1;
+        var isSendgrid;
+        var isSMS;
+
+        var emailReceivers;                //emailReceivers to store the recipients
+        var mailbody_array = [];    //array to store all mailbody after replacing tags
+        var subject_array = [];
+        var smsMsg_array = [];
+        var transactions = [];
+
+        var emailId = [];
+        var validationFlag = true;
+        var fromEmailID;
+        var toEmailID = [];
+        var MobileISD = [];
+        var MobileNumber = [];
+        var isdMobile = '';
+        var mobileNo = '';
+        var message = '';
+
+        //html styling for table in submission mailer
+
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid tenant';
+            validationFlag *= false;
+        }
+
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+
+
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        try {
+                            req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+
+                            //request parameters
+                            var updateFlag = req.body.updateFlag || 0;
+                            var overWrite = req.body.overWrite || 0;
+                            var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
+                            var templateId = req.body.template ? req.body.template.templateId : undefined;
+                            var trackerTemplate = req.body.trackerTemplate;
+                            var tags = req.body.tags || {};
+                            var cc = req.body.cc || [];
+                            var toMail = req.body.toMail || [];
+                            var bcc = req.body.bcc || [];
+                            var stage = req.body.stage || [];
+                            var attachment = req.body.attachment || [];
+                            var reqApplicants = req.body.reqApplicants || [];
+                            var applicants = req.body.applicantId || [];
+                            var client = req.body.clientId || [];
+                            var tableTags = req.body.tableTags || {};
+                            var clientContacts = req.body.clientContacts || [];
+                            var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
+                            var mailBody = req.body.mailBody || '';
+
+                            var whatmateMessage = req.body.whatmateMessage || '';
+                            var smsMsg = req.body.smsMsg || '';
+                            var smsFlag = req.body.smsFlag || 0;
+
+                            var isWeb = req.query.isWeb || 0;
+                            var mailerType = req.body.mailerType || 0;
+                            var userId = req.query.userId || 0;
+                            var trackerTags = [];
+                            var customTags = [];
+
+
+                            if (trackerTemplate && typeof (trackerTemplate) == "string") {
+                                trackerTemplate = JSON.parse(trackerTemplate);
+                            }
+                            if (trackerTemplate && trackerTemplate.trackerId) {
+                                if (typeof (trackerTemplate.trackerTags) == 'string') {
+                                    trackerTags = trackerTemplate && trackerTemplate.trackerTags && JSON.parse(trackerTemplate.trackerTags) ? JSON.parse(trackerTemplate.trackerTags) : [];
+                                }
+
+                                if (typeof (trackerTemplate.customTags) == 'string') {
+                                    customTags = trackerTemplate && trackerTemplate.customTags && JSON.parse(trackerTemplate.customTags) ? JSON.parse(trackerTemplate.customTags) : [];
+                                }
+
+                            }
+                            else {
+                                trackerTemplate = {};
+                                trackerTags = [];
+                                customTags = [];
+                            }
+
+                            if (typeof (tags) == "string") {
+                                tags = JSON.parse(tags);
+                            }
+
+                            if (typeof (cc) == "string") {
+                                cc = JSON.parse(cc);
+                            }
+
+                            if (typeof (toMail) == "string") {
+                                toMail = JSON.parse(toMail);
+                            }
+
+                            if (typeof (bcc) == "string") {
+                                bcc = JSON.parse(bcc);
+                            }
+
+                            if (typeof (stage) == "string") {
+                                stage = JSON.parse(stage);
+                            }
+
+                            if (typeof (attachment) == "string") {
+                                attachment = JSON.parse(attachment);
+                            }
+
+                            if (typeof (client) == "string") {
+                                client = JSON.parse(client);
+                            }
+
+                            if (typeof (clientContacts) == "string") {
+                                clientContacts = JSON.parse(clientContacts);
+                            }
+
+                            if (typeof (tableTags) == "string") {
+                                tableTags = JSON.parse(tableTags);
+                            }
+
+                            if (typeof (reqApplicants) == "string") {
+                                reqApplicants = JSON.parse(reqApplicants);
+                                // reqApplicants.sort(function(a,b){return a-b});
+                            }
+
+                            //check for mail type and assign the recipients
+                            emailReceivers = clientContacts;
+                            var recipients = clientContacts;
+                            // emailReceivers.sort(function(a,b){return a-b});
+
+
+                            if (!validationFlag) {
+                                response.error = error;
+                                response.message = 'Please check the errors';
+                                res.status(400).json(response);
+                                console.log(response);
+                            }
+                            else {
+                                if (emailReceivers.length > 0) {				//for checking if the mailer is just a template
+
+                                    var inputs = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.query.heMasterId),
+                                        req.st.db.escape(JSON.stringify(reqApplicants)),
+                                        req.st.db.escape(JSON.stringify(clientContacts)),
+                                        req.st.db.escape(sendMailFlag)
+                                    ];
+
+                                    var procQuery = 'CALL wm_paceSubmissionMailer( ' + inputs.join(',') + ')';
+                                    console.log(procQuery);
+                                    req.db.query(procQuery, function (err, result) {
+                                        try {
+                                            console.log(err);
+
+                                            if (result[3] && result[3][0] && result[3][0].transactions) {
+                                                transactions = JSON.parse(result[3][0].transactions);
+                                            }
+
+
+                                            if (result[4] && result[4][0]) {
+                                                isSendgrid = result[4][0].isSendgrid ? result[4][0].isSendgrid : 0,
+                                                    isSMS = result[4][0].isSMS ? result[4][0].isSMS : 0
+                                            }
+
+                                            if (!err && result && result[0] && result[0][0]) {
+                                                var temp = mailBody;
+                                                var temp1 = subject;
+                                                var temp2 = smsMsg;
+
+                                                for (var clientIndex = 0; clientIndex < emailReceivers.length; clientIndex++) {
+                                                    for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
+
+                                                        for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+
+                                                            if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+
+                                                                mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                            }
+                                                        }
+
+                                                        for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+
+                                                            if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
+
+                                                                mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                                            }
+                                                        }
+
+                                                        for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+
+                                                            if ((result[0][applicantIndex][tags.client[tagIndex].tagName] && result[0][applicantIndex][tags.client[tagIndex].tagName] != null && result[0][applicantIndex][tags.client[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.client[tagIndex].tagName] != '') || result[0][applicantIndex][tags.client[tagIndex].tagName] >= 0) {
+
+                                                                mailBody = replaceAll(mailBody, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                                                subject = replaceAll(subject, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                                                smsMsg = replaceAll(smsMsg, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                                                // mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                                                // subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                                                // smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                                            }
+
+                                                        }
+                                                    }
+                                                    for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+
+                                                        if ((result[1][clientIndex][tags.clientContacts[tagIndex].tagName] && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != null && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != 'null' && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != '') || result[1][clientIndex][tags.clientContacts[tagIndex].tagName] >= 0) {
+
+                                                            mailBody = replaceAll(mailBody, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                            subject = replaceAll(subject, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                            smsMsg = replaceAll(smsMsg, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                            // mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                            // subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                            // smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                                        }
+                                                    }
+
+                                                    if (tableTags.applicant.length > 0 || tableTags.requirement.length > 0 || tableTags.client.length > 0) {
+                                                        var position = mailBody.indexOf('@table');
+                                                        var tableContent = '';
+                                                        mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
+                                                        tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
+                                                        console.log(tableContent, 'mailbody');
+                                                        if (tableTags && tableTags.applicant && tableTags.applicant.length)
+                                                            for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                                                            }
+                                                        if (tableTags && tableTags.requirement && tableTags.requirement.length)
+                                                            for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
+                                                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.requirement[tagCount].displayTagAs + "</th>";
+                                                            }
+                                                        if (tableTags && tableTags.client && tableTags.client.length)
+                                                            for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
+                                                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.client[tagCount].displayTagAs + "</th>";
+                                                            }
+                                                        tableContent += "</tr>";
+                                                        if (tableTags && tableTags.applicant && tableTags.applicant.length)
+                                                            for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
+                                                                tableContent += "<tr>";
+                                                                for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                                                    tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                                                }
+                                                                if (tableTags && tableTags.requirement && tableTags.requirement.length)
+                                                                    for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
+                                                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.requirement[tagCount].tagName] + "</td>";
+                                                                    }
+                                                                if (tableTags && tableTags.client && tableTags.client.length)
+                                                                    for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
+                                                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.client[tagCount].tagName] + "</td>";
+                                                                    }
+                                                                tableContent += "</tr>";
+                                                            }
+
+                                                        tableContent += "</table>";
+                                                        mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
+
+                                                    }
+
+                                                    mailbody_array.push(mailBody);
+                                                    subject_array.push(subject);
+                                                    smsMsg_array.push(smsMsg);
+
+                                                    fromEmailID = result[2][0].fromEmailId;
+                                                    toEmailID.push(result[1][clientIndex].EmailId);
+                                                    MobileISD.push(result[1][clientIndex].MobileISD);
+                                                    MobileNumber.push(result[1][clientIndex].MobileNo);
+                                                    mailBody = temp;
+                                                    subject = temp1;
+                                                    smsMsg = temp2;
+                                                }
+
+                                                var buffer;
+                                                if (trackerTemplate.trackerId) {
+                                                    console.log('tracker', trackerTemplate.trackerId);
+                                                    var ws_data = '[[';
+                                                    // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
+                                                    for (var i = 0; i < trackerTags.length; i++) {
+                                                        if (i != trackerTags.length - 1)
+                                                            ws_data += '"' + trackerTags[i].displayTagAs + '",';
+                                                        else
+                                                            ws_data += '"' + trackerTags[i].displayTagAs + '"';
+                                                    }
+
+                                                    for (var j = 0; j < customTags.length; j++) {
+                                                        ws_data += ',"' + "" + '"';
+                                                    }
+
+                                                    ws_data += "]";
+
+                                                    // console.log(new Buffer(buffer).toString("base64"));
+                                                    for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
+                                                        ws_data += ',[';
+                                                        for (var tagIndex = 0; tagIndex < trackerTags.length; tagIndex++) {
+                                                            if (tagIndex < trackerTags.length - 1) {
+                                                                if (result[0][applicantIndex][trackerTags[tagIndex].tagName] != undefined)
+                                                                    ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '",';
+                                                                else
+                                                                    ws_data += '"' + "" + '",';
+
+                                                            }
+                                                            else {
+                                                                if (result[0][applicantIndex][trackerTags[tagIndex].tagName] != undefined)
+                                                                    ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '"';
+                                                                else
+                                                                    ws_data += '"' + "" + '"';
+                                                            }
+                                                        }
+
+                                                        for (var j = 0; j < customTags.length; j++) {
+                                                            ws_data += ',"' + "" + '"';
+                                                        }
+
+                                                        ws_data += ']';
+                                                    }
+                                                    ws_data += ']';
+                                                    console.log(ws_data);
+                                                    buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]);
+                                                }
+
+                                                for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
+                                                    var mailOptions = {
+                                                        from: fromEmailID,
+                                                        to: toEmailID[receiverIndex],
+                                                        subject: subject_array[receiverIndex],
+                                                        html: mailbody_array[receiverIndex]
+                                                    };
+
+                                                    mailOptions.cc = [];
+
+                                                    for (var j = 0; j < cc.length; j++) {
+                                                        mailOptions.cc.push(cc[j].emailId);
+                                                    }
+                                                    mailOptions.bcc = [];
+
+                                                    for (var j = 0; j < bcc.length; j++) {
+                                                        mailOptions.bcc.push(bcc[j].emailId);
+                                                    }
+
+                                                    var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                                    var email = new sendgrid.Email();
+                                                    email.from = mailOptions.from;
+                                                    email.to = mailOptions.to;
+                                                    email.subject = mailOptions.subject;
+                                                    email.mbody = mailOptions.html;
+                                                    email.cc = mailOptions.cc;
+                                                    email.bcc = mailOptions.bcc;
+                                                    email.html = mailOptions.html;
+                                                    //if 1 or more attachments are present
+                                                    for (var file = 0; file < attachment.length; file++) {
+                                                        if (attachment[file].binaryFile) {
+                                                            email.addFile({
+                                                                filename: attachment[file].fileName,
+                                                                content: new Buffer(attachment[file].binaryFile, 'base64'),
+                                                                contentType: attachment[file].fileType
+                                                            });
+                                                        }
+                                                    }
+
+                                                    if (trackerTemplate.trackerId) {
+                                                        console.log('trackerTemplate send mail attach', trackerTemplate.trackerId);
+                                                        email.addFile({
+                                                            filename: trackerTemplate.templateName + '.xlsx',
+                                                            content: new Buffer(new Buffer(buffer).toString("base64"), 'base64'),
+                                                            contentType: 'application/*'
+                                                        });
+                                                    }
+
+                                                    // assign mobile no and isdMobile to send sms
+                                                    isdMobile = MobileISD[receiverIndex];
+                                                    mobileNo = MobileNumber[receiverIndex];
+                                                    message = smsMsg_array[receiverIndex];
+
+                                                    // to send normal sms
+                                                    if (isSMS) {
+                                                        if (smsFlag) {
+                                                            if (isdMobile == "+977") {
+                                                                request({
+                                                                    url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                                    qs: {
+                                                                        token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                                        to: mobileNo,
+                                                                        message: message,
+                                                                        sender: 'Techingen'
+                                                                    },
+                                                                    method: 'GET'
+
+                                                                }, function (error, response, body) {
+                                                                    if (error) {
+                                                                        console.log(error, "SMS");
+                                                                    }
+                                                                    else {
+                                                                        console.log("SUCCESS", "SMS response");
+                                                                    }
+
+                                                                });
+                                                            }
+                                                            else if (isdMobile == "+91") {
+                                                                console.log('inside send sms');
+                                                                console.log(isdMobile, ' ', mobileNo);
+                                                                request({
+                                                                    url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                                    qs: {
+                                                                        user_name: 'janardana@hirecraft.com',
+                                                                        password: 'Ezeid2015',
+                                                                        sender_id: 'WtMate',
+                                                                        service: 'TRANS',
+                                                                        mobile_no: mobileNo,
+                                                                        message: message,
+                                                                        method: 'send_sms'
+                                                                    },
+                                                                    method: 'GET'
+
+                                                                }, function (error, response, body) {
+                                                                    try {
+
+                                                                        if (error) {
+                                                                            console.log(error, "SMS");
+                                                                        }
+                                                                        else {
+                                                                            console.log("SUCCESS", "SMS response");
+                                                                        }
+
+                                                                    }
+                                                                    catch (ex) {
+                                                                        error_logger.error = ex;
+                                                                        logger(req, error_logger);
+                                                                        res.status(500).json(error_response);
+                                                                    }
+                                                                });
+
+                                                                var req1 = http.request(options, function (res1) {
+                                                                    var chunks = [];
+
+                                                                    res1.on("data", function (chunk) {
+                                                                        chunks.push(chunk);
+                                                                    });
+
+                                                                    res1.on("end", function () {
+                                                                        var body = Buffer.concat(chunks);
+                                                                        console.log(body.toString());
+                                                                    });
+                                                                });
+
+                                                                req1.write(qs.stringify({
+                                                                    userId: 'talentmicro',
+                                                                    password: 'TalentMicro@123',
+                                                                    senderId: 'WTMATE',
+                                                                    sendMethod: 'simpleMsg',
+                                                                    msgType: 'text',
+                                                                    mobile: isdMobile.replace("+", "") + mobileNo,
+                                                                    msg: message,
+                                                                    duplicateCheck: 'true',
+                                                                    format: 'json'
+                                                                }));
+                                                                req1.end();
+                                                            }
+                                                            else if (isdMobile != "") {
+                                                                console.log('inside without isd', isdMobile, ' ', mobileNo);
+                                                                client.messages.create(
+                                                                    {
+                                                                        body: message,
+                                                                        to: isdMobile + mobileNo,
+                                                                        from: FromNumber
+                                                                    },
+                                                                    function (error, response) {
+                                                                        try {
+                                                                            if (error) {
+                                                                                console.log(error, "SMS");
+                                                                            }
+                                                                            else {
+                                                                                console.log("SUCCESS", "SMS response");
+                                                                            }
+                                                                        }
+                                                                        catch (ex) {
+                                                                            error_logger.error = ex;
+                                                                            logger(req, error_logger);
+                                                                            res.status(500).json(error_response);
+                                                                        }
+                                                                    }
+                                                                );
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if (isSendgrid) {
+                                                        sendgrid.send(email, function (err, result) {
+                                                            try {
+                                                                if (!err) {
+
+                                                                    var saveMails = [
+                                                                        req.st.db.escape(req.query.token),
+                                                                        req.st.db.escape(req.query.heMasterId),
+                                                                        req.st.db.escape(req.body.heDepartmentId || 0),
+                                                                        req.st.db.escape(userId),
+                                                                        req.st.db.escape(mailerType),
+                                                                        req.st.db.escape(mailOptions.from),
+                                                                        req.st.db.escape(mailOptions.to),
+                                                                        req.st.db.escape(mailOptions.subject),
+                                                                        req.st.db.escape(mailOptions.html),    // contains mail body
+                                                                        req.st.db.escape(JSON.stringify(cc)),
+                                                                        req.st.db.escape(JSON.stringify(bcc)),
+                                                                        req.st.db.escape(JSON.stringify(attachment)),
+                                                                        req.st.db.escape(req.body.replyMailId),
+                                                                        req.st.db.escape(req.body.priority || 0),
+                                                                        req.st.db.escape(req.body.stageId || 0),
+                                                                        req.st.db.escape(req.body.statusId || 0),
+                                                                        req.st.db.escape(message),    // sms message
+                                                                        req.st.db.escape(whatmateMessage),
+                                                                        req.st.db.escape(recipients[0]),   // submission mailer save client contactid
+                                                                        req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
+                                                                        req.st.db.escape(req.body.interviewerFlag || 0)
+                                                                    ];
+
+                                                                    //saving the mail after sending it
+                                                                    var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                                                    console.log(saveMailHistory);
+                                                                    req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                                        try {
+                                                                            console.log(mailHistoryErr);
+                                                                            console.log(mailHistoryResult);
+                                                                            if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
+                                                                                console.log('sent mails saved successfully');
+                                                                            }
+                                                                            else {
+                                                                                console.log('mails could not be saved');
+                                                                            }
+                                                                        }
+                                                                        catch (ex) {
+                                                                            error_logger.error = ex;
+                                                                            logger(req, error_logger);
+                                                                            res.status(500).json(error_response);
+                                                                        }
+                                                                    });
+                                                                    console.log('Mail sent now save sent history');
+                                                                } //end of if(sendgrid sent mail successfully)
+                                                                //if mail is not sent
+                                                                else {
+                                                                    console.log('Mail not Sent Successfully' + err);
+                                                                }
+                                                            }
+                                                            catch (ex) {
+                                                                error_logger.error = ex;
+                                                                logger(req, error_logger);
+                                                                res.status(500).json(error_response);
+                                                            }
+                                                        });
+                                                    }
+
+                                                }
+
+                                                if (!(templateId == 0 || overWrite)) {
+                                                    response.status = true;
+
+                                                    if (isSendgrid && isSMS) {  // making changes here reminder
+                                                        if (subject != '') {
+                                                            if (smsMsg != '' && smsFlag) {
+                                                                response.message = "Mail and SMS sent successfully";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else {
+                                                                response.message = "Mail sent successfully";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                        }
+
+                                                        else if (subject == '') {
+                                                            if (smsMsg != '' && smsFlag) {
+                                                                response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else {
+                                                                response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                        }
+                                                        else {
+                                                            response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
+                                                            response.data = transactions[0] ? transactions[0] : [];
+                                                        }
+                                                    }
+                                                    else if (isSendgrid && !isSMS) {
+
+                                                        if (subject != '') {
+                                                            response.message = "Mail sent successfully";
+                                                            response.data = transactions[0] ? transactions[0] : [];
+                                                        }
+                                                        else if (subject == '') {
+                                                            response.message = "Mail subject is empty, mail cannot be sent";
+                                                            response.data = transactions[0] ? transactions[0] : [];
+                                                        }
+                                                    }
+                                                    else if (isSMS && !isSendgrid) {
+                                                        if (smsMsg != '' && smsFlag) {
+                                                            response.message = "SMS sent successfully";
+                                                            response.data = transactions[0] ? transactions[0] : [];
+                                                        }
+                                                        else if (smsMsg == '' && smsFlag) {
+                                                            response.message = "SMS field is empty, SMS cannot be sent";
+                                                            response.data = transactions[0] ? transactions[0] : [];
+                                                        }
+                                                        else {
+                                                            response.message = "SMS flag is not enabled, SMS cannot be sent";
+                                                            response.data = transactions[0] ? transactions[0] : [];
+                                                        }
+                                                    }
+                                                    else {
+                                                        response.message = "Sendgrid or SMS is not configured. Please contact the admin";
+                                                        response.data = null;
+                                                    }
+
+                                                    response.error = null;
+                                                    res.status(200).json(response);
+                                                }
+                                            }
+
+                                            else {
+                                                response.status = false;
+                                                response.message = "Error while sending mail";
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(500).json(response);
+                                                return;
+                                            }
                                         }
-                                        else if (!isSendgrid && isSMS) {
-                                            response.message = "SMS is Sent and Template Saved successfully";
+                                        catch (ex) {
+                                            error_logger.error = ex;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
                                         }
-                                        else if (isSendgrid && !isSMS) {
-                                            response.message = "Mail is Sent and Template Saved successfully";
-                                        }
-                                        else {
-                                            response.message = "Template saved successfully";
-                                        }
-                                    }
-                                    //else saved
-                                    else {
-                                        response.message = "Template saved successfully";
-                                    }
+                                    });
+                                }
+                                // else if(!templateId && !overWrite){
+                                //     response.status = false;
+                                //     response.message = "To mail is empty. Mail not sent";
+                                //     response.error = null;
+                                //     response.data = null;
+                                //     res.status(200).json(response);
+                                //     return;
+                                // }
+
+                                else if (templateId && !overWrite && !emailReceivers.length) {
+                                    response.status = false;
+                                    response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
                                     response.error = null;
                                     response.data = null;
                                     res.status(200).json(response);
+                                    return;
                                 }
-                            });
+                                //save it as a template if flag is true or template id is 0
+                                if (templateId == 0 || overWrite) {
+                                    req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
+                                    req.body.type = req.body.type ? req.body.type : 0;
+                                    req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
+                                    req.body.subject = req.body.subject ? req.body.subject : '';
+                                    req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
+                                    req.body.replymailId = req.body.replymailId ? req.body.replymailId : '';
+                                    req.body.priority = req.body.priority ? req.body.priority : 0;
+                                    req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
+                                    req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
+
+                                    var templateInputs = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(templateId),
+                                        req.st.db.escape(req.query.heMasterId),
+                                        req.st.db.escape(req.body.templateName),
+                                        req.st.db.escape(req.body.type),
+                                        req.st.db.escape(JSON.stringify(toMail)),
+                                        req.st.db.escape(JSON.stringify(cc)),
+                                        req.st.db.escape(JSON.stringify(bcc)),
+                                        req.st.db.escape(req.body.subject),
+                                        req.st.db.escape(req.body.mailBody),
+                                        req.st.db.escape(req.body.replymailId),
+                                        req.st.db.escape(req.body.priority),
+                                        req.st.db.escape(req.body.updateFlag),
+                                        req.st.db.escape(smsMsg),
+                                        req.st.db.escape(whatmateMessage),
+                                        req.st.db.escape(JSON.stringify(attachment)),
+                                        req.st.db.escape(JSON.stringify(tags)),
+                                        req.st.db.escape(JSON.stringify(stage)),
+                                        req.st.db.escape(req.body.mailerType),
+                                        req.st.db.escape(JSON.stringify(tableTags)),
+                                        req.st.db.escape(req.body.sendSMS || 0),
+                                        req.st.db.escape(req.body.attachJD || 0),
+                                        req.st.db.escape(req.body.attachResume || 0),
+                                        req.st.db.escape(req.body.interviewerFlag || 0),
+                                        req.st.db.escape(req.body.resumeFileName || ''),
+                                        req.st.db.escape(req.body.attachResumeFlag || 0),
+                                        req.st.db.escape(JSON.stringify(trackerTemplate))
+
+                                    ];
+                                    var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
+                                    console.log(saveTemplateQuery);
+                                    req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
+                                        try {
+                                            console.log(tempSaveErr);
+                                            if (!tempSaveErr && tempSaveResult) {
+                                                // console.log(tempSaveResult);
+                                                response.status = true;
+                                                //check if there are any receivers, if yes sent and saved
+                                                if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
+                                                    if (isSendgrid && isSMS) {
+                                                        response.message = "Mail and SMS Sent and Template Saved successfully";
+                                                    }
+                                                    else if (!isSendgrid && isSMS) {
+                                                        response.message = "SMS is Sent and Template Saved successfully";
+                                                    }
+                                                    else if (isSendgrid && !isSMS) {
+                                                        response.message = "Mail is Sent and Template Saved successfully";
+                                                    }
+                                                    else {
+                                                        response.message = "Template saved successfully";
+                                                    }
+                                                }
+                                                //else saved
+                                                else {
+                                                    response.message = "Template saved successfully";
+                                                }
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(200).json(response);
+                                            }
+                                        }
+                                        catch (ex) {
+                                            error_logger.error = ex;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
+                                        }
+                                    });
+                                }
+
+                            }
+
                         }
+                        catch (ex) {
+                            error_logger.error = ex;
+                            logger(req, error_logger);
+                            res.status(500).json(error_response);
+                        }
+                    });
 
-                    }
 
-                });
-
-
-            }
-            //end of if(token validation)
-            //else invalid token
-            else {
-                res.status(401).json(response);
-            }
-            //end of else (token validation)
-        });
+                }
+                //end of if(token validation)
+                //else invalid token
+                else {
+                    res.status(401).json(response);
+                }
+                //end of else (token validation)
+            });
+        }
+    }
+    catch (ex) {
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 
 sendgridCtrl.clientMailerPreview = function (req, res, next) {
-
-    var validationFlag = true;
-
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
 
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid company';
-        validationFlag *= false;
+    var error_logger = {
+        details: 'sendgridCtrl.clientMailerPreview'
     }
 
+    try {
+        var validationFlag = true;
+
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
+
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid company';
+            validationFlag *= false;
+        }
 
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
 
-                    var mailBody = req.body.mailBody ? req.body.mailBody : '';
-                    var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
-                    var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
-                    var isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            try {
+                                req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                    var tags = req.body.tags;
-                    if (typeof (tags) == "string") {
-                        tags = JSON.parse(tags);
-                    }
-                    if (!tags) {
-                        tags = [];
-                    }
+                                var mailBody = req.body.mailBody ? req.body.mailBody : '';
+                                var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
+                                var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
+                                var isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                    var clientContacts = req.body.clientContacts;
-                    if (typeof (clientContacts) == "string") {
-                        clientContacts = JSON.parse(clientContacts);
-                    }
-                    if (!clientContacts) {
-                        clientContacts = [];
-                    }
-
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        var inputs = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(JSON.stringify(clientContacts))
-                        ];
-                        var idArray;
-                        idArray = clientContacts;
-                        // idArray.sort(function(a,b){return a-b});
-                        var mailbody_array = [];
-                        var subject_array = [];
-                        var smsMsg_array = [];
-
-                        var procQuery;
-                        procQuery = 'CALL wm_paceClientMailer( ' + inputs.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, result) {
-                            console.log(err);
-                            // console.log(result);
-                            if (!err && result && result[0] && result[0][0]) {
-                                var temp = mailBody;
-                                var temp1 = subject;
-                                var temp2 = smsMsg;
-                                var clientData = [];
-
-                                for (var clientIndex = 0; clientIndex < idArray.length; clientIndex++) {
-
-                                    for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
-
-                                        if ((result[0][clientIndex][tags.clientContacts[tagIndex].tagName] && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] != null && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] != 'null' && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] != '') || result[0][clientIndex][tags.clientContacts[tagIndex].tagName] >= 0) {
-
-                                            mailBody = replaceAll(mailBody, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                            subject = replaceAll(subject, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                            smsMsg = replaceAll(smsMsg, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                            // mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                            // subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                            // smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
-                                        }
-                                    }
-
-                                    for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
-
-                                        if ((result[0][clientIndex][tags.client[tagIndex].tagName] && result[0][clientIndex][tags.client[tagIndex].tagName] != null && result[0][clientIndex][tags.client[tagIndex].tagName] != 'null' && result[0][clientIndex][tags.client[tagIndex].tagName] != '') || result[0][clientIndex][tags.client[tagIndex].tagName] >= 0) {
-
-                                            mailBody = replaceAll(mailBody, '[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
-
-                                            subject = replaceAll(subject, '[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
-
-                                            smsMsg = replaceAll(smsMsg, '[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
-
-                                            // mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
-
-                                            // subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
-
-                                            // smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
-                                        }
-                                    }
-
-                                    clientData.push(result[0][clientIndex].EmailId);
-                                    mailbody_array.push(mailBody);
-                                    subject_array.push(subject);
-                                    smsMsg_array.push(smsMsg);
-                                    mailBody = temp;
-                                    subject = temp1;
-                                    smsMsg = temp2;
+                                var tags = req.body.tags;
+                                if (typeof (tags) == "string") {
+                                    tags = JSON.parse(tags);
+                                }
+                                if (!tags) {
+                                    tags = [];
                                 }
 
-                                response.status = true;
-                                response.message = "Tags replaced successfully";
-                                response.error = null;
-                                response.data = {
-                                    tagsPreview: mailbody_array,
-                                    subjectPreview: subject_array,
-                                    smsMsgPreview: smsMsg_array,
-                                    clientData: clientData
-                                };
+                                var clientContacts = req.body.clientContacts;
+                                if (typeof (clientContacts) == "string") {
+                                    clientContacts = JSON.parse(clientContacts);
+                                }
+                                if (!clientContacts) {
+                                    clientContacts = [];
+                                }
 
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
+                                if (!validationFlag) {
+                                    response.error = error;
+                                    response.message = 'Please check the errors';
+                                    res.status(400).json(response);
+                                    console.log(response);
+                                }
+                                else {
+                                    var inputs = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.query.heMasterId),
+                                        req.st.db.escape(JSON.stringify(clientContacts))
+                                    ];
+                                    var idArray;
+                                    idArray = clientContacts;
+                                    // idArray.sort(function(a,b){return a-b});
+                                    var mailbody_array = [];
+                                    var subject_array = [];
+                                    var smsMsg_array = [];
+
+                                    var procQuery;
+                                    procQuery = 'CALL wm_paceClientMailer( ' + inputs.join(',') + ')';
+                                    console.log(procQuery);
+                                    req.db.query(procQuery, function (err, result) {
+                                        try {
+                                            console.log(err);
+                                            // console.log(result);
+                                            if (!err && result && result[0] && result[0][0]) {
+                                                var temp = mailBody;
+                                                var temp1 = subject;
+                                                var temp2 = smsMsg;
+                                                var clientData = [];
+
+                                                for (var clientIndex = 0; clientIndex < idArray.length; clientIndex++) {
+
+                                                    for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+
+                                                        if ((result[0][clientIndex][tags.clientContacts[tagIndex].tagName] && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] != null && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] != 'null' && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] != '') || result[0][clientIndex][tags.clientContacts[tagIndex].tagName] >= 0) {
+
+                                                            mailBody = replaceAll(mailBody, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                            subject = replaceAll(subject, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                            smsMsg = replaceAll(smsMsg, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                            // mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                            // subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                            // smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                                        }
+                                                    }
+
+                                                    for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+
+                                                        if ((result[0][clientIndex][tags.client[tagIndex].tagName] && result[0][clientIndex][tags.client[tagIndex].tagName] != null && result[0][clientIndex][tags.client[tagIndex].tagName] != 'null' && result[0][clientIndex][tags.client[tagIndex].tagName] != '') || result[0][clientIndex][tags.client[tagIndex].tagName] >= 0) {
+
+                                                            mailBody = replaceAll(mailBody, '[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+
+                                                            subject = replaceAll(subject, '[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+
+                                                            smsMsg = replaceAll(smsMsg, '[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+
+                                                            // mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+
+                                                            // subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+
+                                                            // smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+                                                        }
+                                                    }
+
+                                                    clientData.push(result[0][clientIndex].EmailId);
+                                                    mailbody_array.push(mailBody);
+                                                    subject_array.push(subject);
+                                                    smsMsg_array.push(smsMsg);
+                                                    mailBody = temp;
+                                                    subject = temp1;
+                                                    smsMsg = temp2;
+                                                }
+
+                                                response.status = true;
+                                                response.message = "Tags replaced successfully";
+                                                response.error = null;
+                                                response.data = {
+                                                    tagsPreview: mailbody_array,
+                                                    subjectPreview: subject_array,
+                                                    smsMsgPreview: smsMsg_array,
+                                                    clientData: clientData
+                                                };
+
+                                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                zlib.gzip(buf, function (_, result) {
+                                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                    res.status(200).json(response);
+                                                });
+                                            }
+
+                                            else if (!err) {
+                                                response.status = false;
+                                                response.message = "No result found";
+                                                response.error = null;
+                                                response.data = {
+                                                    tagsPreview: [],
+                                                    subjectPreview: [],
+                                                    smsMsgPreview: [],
+                                                    clientData: []
+                                                };
+                                                res.status(200).json(response);
+                                            }
+
+                                            else {
+                                                response.status = false;
+                                                response.message = "Error while replacing tags";
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(500).json(response);
+                                            }
+                                        }
+                                        catch (ex) {
+                                            error_logger.error = ex;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
+                                        }
+                                    });
+                                }
                             }
-
-                            else if (!err) {
-                                response.status = false;
-                                response.message = "No result found";
-                                response.error = null;
-                                response.data = {
-                                    tagsPreview: [],
-                                    subjectPreview: [],
-                                    smsMsgPreview: [],
-                                    clientData: []
-                                };
-                                res.status(200).json(response);
-                            }
-
-                            else {
-                                response.status = false;
-                                response.message = "Error while replacing tags";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
+                            catch (ex) {
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
                             }
                         });
+
+
                     }
-                });
-
-
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
+                    else {
+                        res.status(401).json(response);
+                    }
+                }
+                catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+    catch (ex) {
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 // send client mailer
 
 sendgridCtrl.clientMailer = function (req, res, next) {
-
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-
-    var isSendgrid;
-    var isSMS;
-
-    var emailReceivers;                //emailReceivers to store the recipients
-    var mailbody_array = [];    //array to store all mailbody after replacing tags
-    var subject_array = [];
-    var smsMsg_array = [];
-
-    var transactions = [];
-    var emailId = [];
-    var validationFlag = true;
-    var fromEmailID;
-    var toEmailID = [];
-    var MobileISD = [];
-    var MobileNumber = [];
-    var isdMobile = '';
-    var mobileNo = '';
-    var message = '';
-
-    //html styling for table in submission mailer
-
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid tenant';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
 
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+    var error_logger = {
+        details: 'sendgridCtrl.ScreeningMailerPreview'
     }
 
+    try {
+
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
+
+        var isSendgrid;
+        var isSMS;
+
+        var emailReceivers;                //emailReceivers to store the recipients
+        var mailbody_array = [];    //array to store all mailbody after replacing tags
+        var subject_array = [];
+        var smsMsg_array = [];
+
+        var transactions = [];
+        var emailId = [];
+        var validationFlag = true;
+        var fromEmailID;
+        var toEmailID = [];
+        var MobileISD = [];
+        var MobileNumber = [];
+        var isdMobile = '';
+        var mobileNo = '';
+        var message = '';
+
+        //html styling for table in submission mailer
+
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid tenant';
+            validationFlag *= false;
+        }
+
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
 
 
-    //check for mail type and assign the recipients
-    // emailReceivers.sort(function(a,b){return a-b});
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
+        //check for mail type and assign the recipients
+        // emailReceivers.sort(function(a,b){return a-b});
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
 
-                    //request parameters
-                    var updateFlag = req.body.updateFlag || 0;
-                    var overWrite = req.body.overWrite || 0;
-                    var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
-                    var templateId = req.body.template ? req.body.template.templateId : undefined;
-                    var trackerTemplate = req.body.trackerTemplate || {};
-                    var tags = req.body.tags || {};
-                    var cc = req.body.cc || [];
-                    var toMail = req.body.toMail || [];
-                    var bcc = req.body.bcc || [];
-                    var stage = req.body.stage || [];
-                    var attachment = req.body.attachment || [];
-                    var reqApplicants = req.body.reqApplicants || [];
-                    var applicants = req.body.applicantId || [];
-                    var clientContacts = req.body.clientContacts || [];
-                    emailReceivers = clientContacts;
-                    var recipients = clientContacts; // for saving in mailer history
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            try {
+                                req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                    var tableTags = req.body.tableTags || {};
-                    var clientContacts = req.body.clientContacts || [];
-                    var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
-                    var mailBody = req.body.mailBody || '';
+                                //request parameters
+                                var updateFlag = req.body.updateFlag || 0;
+                                var overWrite = req.body.overWrite || 0;
+                                var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
+                                var templateId = req.body.template ? req.body.template.templateId : undefined;
+                                var trackerTemplate = req.body.trackerTemplate || {};
+                                var tags = req.body.tags || {};
+                                var cc = req.body.cc || [];
+                                var toMail = req.body.toMail || [];
+                                var bcc = req.body.bcc || [];
+                                var stage = req.body.stage || [];
+                                var attachment = req.body.attachment || [];
+                                var reqApplicants = req.body.reqApplicants || [];
+                                var applicants = req.body.applicantId || [];
+                                var clientContacts = req.body.clientContacts || [];
+                                emailReceivers = clientContacts;
+                                var recipients = clientContacts; // for saving in mailer history
 
-                    var whatmateMessage = req.body.whatmateMessage || '';
-                    var smsMsg = req.body.smsMsg || '';
-                    var smsFlag = req.body.smsFlag || 0;
+                                var tableTags = req.body.tableTags || {};
+                                var clientContacts = req.body.clientContacts || [];
+                                var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
+                                var mailBody = req.body.mailBody || '';
 
-                    var isWeb = req.query.isWeb || 0;
-                    var mailerType = req.body.mailerType || 0;
-                    var userId = req.query.userId || 0;
+                                var whatmateMessage = req.body.whatmateMessage || '';
+                                var smsMsg = req.body.smsMsg || '';
+                                var smsFlag = req.body.smsFlag || 0;
 
-
-                    if (typeof (tags) == "string") {
-                        tags = JSON.parse(tags);
-                    }
-
-                    if (typeof (cc) == "string") {
-                        cc = JSON.parse(cc);
-                    }
-
-                    if (typeof (toMail) == "string") {
-                        toMail = JSON.parse(toMail);
-                    }
-
-                    if (typeof (bcc) == "string") {
-                        bcc = JSON.parse(bcc);
-                    }
-
-                    if (typeof (stage) == "string") {
-                        stage = JSON.parse(stage);
-                    }
-
-                    if (typeof (attachment) == "string") {
-                        attachment = JSON.parse(attachment);
-                    }
-
-                    if (typeof (clientContacts) == "string") {
-                        clientContacts = JSON.parse(clientContacts);
-                    }
-
-                    // if (typeof (clientContacts) == "string") {
-                    //     clientContacts = JSON.parse(clientContacts);
-                    // }
-
-                    if (typeof (tableTags) == "string") {
-                        tableTags = JSON.parse(tableTags);
-                    }
+                                var isWeb = req.query.isWeb || 0;
+                                var mailerType = req.body.mailerType || 0;
+                                var userId = req.query.userId || 0;
 
 
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        if (emailReceivers.length > 0) {				//for checking if the mailer is just a template
-
-                            var inputs = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(req.query.heMasterId),
-                                req.st.db.escape(JSON.stringify(clientContacts))
-
-                            ];
-
-                            var procQuery = 'CALL wm_paceClientMailer( ' + inputs.join(',') + ')';
-                            console.log(procQuery);
-                            req.db.query(procQuery, function (err, result) {
-                                console.log(err);
-
-                                if (result[2] && result[2][0]) {
-                                    isSendgrid = result[2][0].isSendgrid ? result[2][0].isSendgrid : 0,
-                                        isSMS = result[2][0].isSMS ? result[2][0].isSMS : 0
+                                if (typeof (tags) == "string") {
+                                    tags = JSON.parse(tags);
                                 }
 
-                                if (!err && result && result[0]) {
-                                    var temp = mailBody;
-                                    var temp1 = subject;
-                                    var temp2 = smsMsg;
-                                    // console.log('result of pacemailer procedure', result[0]);
-                                    for (var clientIndex = 0; clientIndex < emailReceivers.length; clientIndex++) {
+                                if (typeof (cc) == "string") {
+                                    cc = JSON.parse(cc);
+                                }
 
-                                        for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+                                if (typeof (toMail) == "string") {
+                                    toMail = JSON.parse(toMail);
+                                }
 
-                                            if ((result[0][clientIndex][tags.clientContacts[tagIndex].tagName] && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] != null && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] != 'null' && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] != '') || result[0][clientIndex][tags.clientContacts[tagIndex].tagName] >= 0) {
+                                if (typeof (bcc) == "string") {
+                                    bcc = JSON.parse(bcc);
+                                }
 
-                                                mailBody = replaceAll(mailBody, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                if (typeof (stage) == "string") {
+                                    stage = JSON.parse(stage);
+                                }
 
-                                                subject = replaceAll(subject, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                if (typeof (attachment) == "string") {
+                                    attachment = JSON.parse(attachment);
+                                }
 
-                                                smsMsg = replaceAll(smsMsg, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                if (typeof (clientContacts) == "string") {
+                                    clientContacts = JSON.parse(clientContacts);
+                                }
 
-                                                // mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                // if (typeof (clientContacts) == "string") {
+                                //     clientContacts = JSON.parse(clientContacts);
+                                // }
 
-                                                // subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                if (typeof (tableTags) == "string") {
+                                    tableTags = JSON.parse(tableTags);
+                                }
 
-                                                // smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
-                                            }
-                                        }
 
-                                        for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+                                if (!validationFlag) {
+                                    response.error = error;
+                                    response.message = 'Please check the errors';
+                                    res.status(400).json(response);
+                                    console.log(response);
+                                }
+                                else {
+                                    if (emailReceivers.length > 0) {				//for checking if the mailer is just a template
 
-                                            if ((result[0][clientIndex][tags.client[tagIndex].tagName] && result[0][clientIndex][tags.client[tagIndex].tagName] != null && result[0][clientIndex][tags.client[tagIndex].tagName] != 'null' && result[0][clientIndex][tags.client[tagIndex].tagName] != '') || result[0][clientIndex][tags.client[tagIndex].tagName] >= 0) {
+                                        var inputs = [
+                                            req.st.db.escape(req.query.token),
+                                            req.st.db.escape(req.query.heMasterId),
+                                            req.st.db.escape(JSON.stringify(clientContacts))
 
-                                                mailBody = replaceAll(mailBody, '[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+                                        ];
 
-                                                subject = replaceAll(subject, '[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+                                        var procQuery = 'CALL wm_paceClientMailer( ' + inputs.join(',') + ')';
+                                        console.log(procQuery);
+                                        req.db.query(procQuery, function (err, result) {
+                                            try {
+                                                console.log(err);
 
-                                                smsMsg = replaceAll(smsMsg, '[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
-
-                                                // mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
-
-                                                // subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
-
-                                                // smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
-                                            }
-                                        }
-
-                                        mailbody_array.push(mailBody);
-                                        subject_array.push(subject);
-                                        smsMsg_array.push(smsMsg);
-
-                                        fromEmailID = result[1][0].fromEmailId;
-                                        toEmailID.push(result[0][clientIndex].EmailId);
-                                        MobileISD.push(result[0][clientIndex].MobileISD);
-                                        MobileNumber.push(result[0][clientIndex].MobileNo);
-                                        mailBody = temp;
-                                        subject = temp1;
-                                        smsMsg = temp2;
-                                    }
-
-                                    for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
-                                        var mailOptions = {
-                                            from: fromEmailID,
-                                            to: toEmailID[receiverIndex],
-                                            subject: subject_array[receiverIndex],
-                                            html: mailbody_array[receiverIndex]
-                                        };
-
-                                        mailOptions.cc = [];
-
-                                        for (var j = 0; j < cc.length; j++) {
-                                            mailOptions.cc.push(cc[j].emailId);
-                                        }
-                                        mailOptions.bcc = [];
-
-                                        for (var j = 0; j < bcc.length; j++) {
-                                            mailOptions.bcc.push(bcc[j].emailId);
-                                        }
-
-                                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                        var email = new sendgrid.Email();
-                                        email.from = mailOptions.from;
-                                        email.to = mailOptions.to;
-                                        email.subject = mailOptions.subject;
-                                        email.mbody = mailOptions.html;
-                                        email.cc = mailOptions.cc;
-                                        email.bcc = mailOptions.bcc;
-                                        email.html = mailOptions.html;
-                                        //if 1 or more attachments are present
-                                        for (var file = 0; file < attachment.length; file++) {
-                                            email.addFile({
-                                                filename: attachment[file].fileName,
-                                                content: new Buffer(attachment[file].binaryFile, 'base64'),
-                                                contentType: attachment[file].fileType
-                                            });
-                                        }
-
-                                        // assign mobile no and isdMobile to send sms
-                                        isdMobile = MobileISD[receiverIndex];
-                                        mobileNo = MobileNumber[receiverIndex];
-                                        message = smsMsg_array[receiverIndex];
-
-                                        // to send normal sms
-                                        if (isSMS) {
-                                            if (smsFlag) {
-                                                if (isdMobile == "+977") {
-                                                    request({
-                                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                                        qs: {
-                                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                                            to: mobileNo,
-                                                            message: message,
-                                                            sender: 'Techingen'
-                                                        },
-                                                        method: 'GET'
-
-                                                    }, function (error, response, body) {
-                                                        if (error) {
-                                                            console.log(error, "SMS");
-                                                        }
-                                                        else {
-                                                            console.log("SUCCESS", "SMS response");
-                                                        }
-
-                                                    });
+                                                if (result[2] && result[2][0]) {
+                                                    isSendgrid = result[2][0].isSendgrid ? result[2][0].isSendgrid : 0,
+                                                        isSMS = result[2][0].isSMS ? result[2][0].isSMS : 0
                                                 }
-                                                else if (isdMobile == "+91") {
-                                                    console.log('inside send sms');
-                                                    console.log(isdMobile, ' ', mobileNo);
-                                                    request({
-                                                        url: 'https://aikonsms.co.in/control/smsapi.php',
-                                                        qs: {
-                                                            user_name: 'janardana@hirecraft.com',
-                                                            password: 'Ezeid2015',
-                                                            sender_id: 'WtMate',
-                                                            service: 'TRANS',
-                                                            mobile_no: mobileNo,
-                                                            message: message,
-                                                            method: 'send_sms'
-                                                        },
-                                                        method: 'GET'
 
-                                                    }, function (error, response, body) {
-                                                        if (error) {
-                                                            console.log(error, "SMS");
+                                                if (!err && result && result[0]) {
+                                                    var temp = mailBody;
+                                                    var temp1 = subject;
+                                                    var temp2 = smsMsg;
+                                                    // console.log('result of pacemailer procedure', result[0]);
+                                                    for (var clientIndex = 0; clientIndex < emailReceivers.length; clientIndex++) {
+
+                                                        for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+
+                                                            if ((result[0][clientIndex][tags.clientContacts[tagIndex].tagName] && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] != null && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] != 'null' && result[0][clientIndex][tags.clientContacts[tagIndex].tagName] != '') || result[0][clientIndex][tags.clientContacts[tagIndex].tagName] >= 0) {
+
+                                                                mailBody = replaceAll(mailBody, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                                subject = replaceAll(subject, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                                smsMsg = replaceAll(smsMsg, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                                // mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                                // subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                                // smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[0][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                                            }
                                                         }
-                                                        else {
-                                                            console.log("SUCCESS", "SMS response");
+
+                                                        for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+
+                                                            if ((result[0][clientIndex][tags.client[tagIndex].tagName] && result[0][clientIndex][tags.client[tagIndex].tagName] != null && result[0][clientIndex][tags.client[tagIndex].tagName] != 'null' && result[0][clientIndex][tags.client[tagIndex].tagName] != '') || result[0][clientIndex][tags.client[tagIndex].tagName] >= 0) {
+
+                                                                mailBody = replaceAll(mailBody, '[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+
+                                                                subject = replaceAll(subject, '[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+
+                                                                smsMsg = replaceAll(smsMsg, '[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+
+                                                                // mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+
+                                                                // subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+
+                                                                // smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][clientIndex][tags.client[tagIndex].tagName]);
+                                                            }
                                                         }
-                                                    });
 
-                                                    var req1 = http.request(options, function (res1) {
-                                                        var chunks = [];
+                                                        mailbody_array.push(mailBody);
+                                                        subject_array.push(subject);
+                                                        smsMsg_array.push(smsMsg);
 
-                                                        res1.on("data", function (chunk) {
-                                                            chunks.push(chunk);
-                                                        });
+                                                        fromEmailID = result[1][0].fromEmailId;
+                                                        toEmailID.push(result[0][clientIndex].EmailId);
+                                                        MobileISD.push(result[0][clientIndex].MobileISD);
+                                                        MobileNumber.push(result[0][clientIndex].MobileNo);
+                                                        mailBody = temp;
+                                                        subject = temp1;
+                                                        smsMsg = temp2;
+                                                    }
 
-                                                        res1.on("end", function () {
-                                                            var body = Buffer.concat(chunks);
-                                                            console.log(body.toString());
-                                                        });
-                                                    });
+                                                    for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
+                                                        var mailOptions = {
+                                                            from: fromEmailID,
+                                                            to: toEmailID[receiverIndex],
+                                                            subject: subject_array[receiverIndex],
+                                                            html: mailbody_array[receiverIndex]
+                                                        };
 
-                                                    req1.write(qs.stringify({
-                                                        userId: 'talentmicro',
-                                                        password: 'TalentMicro@123',
-                                                        senderId: 'WTMATE',
-                                                        sendMethod: 'simpleMsg',
-                                                        msgType: 'text',
-                                                        mobile: isdMobile.replace("+", "") + mobileNo,
-                                                        msg: message,
-                                                        duplicateCheck: 'true',
-                                                        format: 'json'
-                                                    }));
-                                                    req1.end();
-                                                }
-                                                else if (isdMobile != "") {
-                                                    console.log('inside without isd', isdMobile, ' ', mobileNo);
-                                                    client.messages.create(
-                                                        {
-                                                            body: message,
-                                                            to: isdMobile + mobileNo,
-                                                            from: FromNumber
-                                                        },
-                                                        function (error, response) {
-                                                            if (error) {
-                                                                console.log(error, "SMS");
+                                                        mailOptions.cc = [];
+
+                                                        for (var j = 0; j < cc.length; j++) {
+                                                            mailOptions.cc.push(cc[j].emailId);
+                                                        }
+                                                        mailOptions.bcc = [];
+
+                                                        for (var j = 0; j < bcc.length; j++) {
+                                                            mailOptions.bcc.push(bcc[j].emailId);
+                                                        }
+
+                                                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                                        var email = new sendgrid.Email();
+                                                        email.from = mailOptions.from;
+                                                        email.to = mailOptions.to;
+                                                        email.subject = mailOptions.subject;
+                                                        email.mbody = mailOptions.html;
+                                                        email.cc = mailOptions.cc;
+                                                        email.bcc = mailOptions.bcc;
+                                                        email.html = mailOptions.html;
+                                                        //if 1 or more attachments are present
+                                                        for (var file = 0; file < attachment.length; file++) {
+                                                            email.addFile({
+                                                                filename: attachment[file].fileName,
+                                                                content: new Buffer(attachment[file].binaryFile, 'base64'),
+                                                                contentType: attachment[file].fileType
+                                                            });
+                                                        }
+
+                                                        // assign mobile no and isdMobile to send sms
+                                                        isdMobile = MobileISD[receiverIndex];
+                                                        mobileNo = MobileNumber[receiverIndex];
+                                                        message = smsMsg_array[receiverIndex];
+
+                                                        // to send normal sms
+                                                        if (isSMS) {
+                                                            if (smsFlag) {
+                                                                if (isdMobile == "+977") {
+                                                                    request({
+                                                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                                        qs: {
+                                                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                                            to: mobileNo,
+                                                                            message: message,
+                                                                            sender: 'Techingen'
+                                                                        },
+                                                                        method: 'GET'
+
+                                                                    }, function (error, response, body) {
+                                                                        if (error) {
+                                                                            console.log(error, "SMS");
+                                                                        }
+                                                                        else {
+                                                                            console.log("SUCCESS", "SMS response");
+                                                                        }
+
+                                                                    });
+                                                                }
+                                                                else if (isdMobile == "+91") {
+                                                                    console.log('inside send sms');
+                                                                    console.log(isdMobile, ' ', mobileNo);
+                                                                    request({
+                                                                        url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                                        qs: {
+                                                                            user_name: 'janardana@hirecraft.com',
+                                                                            password: 'Ezeid2015',
+                                                                            sender_id: 'WtMate',
+                                                                            service: 'TRANS',
+                                                                            mobile_no: mobileNo,
+                                                                            message: message,
+                                                                            method: 'send_sms'
+                                                                        },
+                                                                        method: 'GET'
+
+                                                                    }, function (error, response, body) {
+                                                                        if (error) {
+                                                                            console.log(error, "SMS");
+                                                                        }
+                                                                        else {
+                                                                            console.log("SUCCESS", "SMS response");
+                                                                        }
+                                                                    });
+
+                                                                    var req1 = http.request(options, function (res1) {
+                                                                        var chunks = [];
+
+                                                                        res1.on("data", function (chunk) {
+                                                                            chunks.push(chunk);
+                                                                        });
+
+                                                                        res1.on("end", function () {
+                                                                            var body = Buffer.concat(chunks);
+                                                                            console.log(body.toString());
+                                                                        });
+                                                                    });
+
+                                                                    req1.write(qs.stringify({
+                                                                        userId: 'talentmicro',
+                                                                        password: 'TalentMicro@123',
+                                                                        senderId: 'WTMATE',
+                                                                        sendMethod: 'simpleMsg',
+                                                                        msgType: 'text',
+                                                                        mobile: isdMobile.replace("+", "") + mobileNo,
+                                                                        msg: message,
+                                                                        duplicateCheck: 'true',
+                                                                        format: 'json'
+                                                                    }));
+                                                                    req1.end();
+                                                                }
+                                                                else if (isdMobile != "") {
+                                                                    console.log('inside without isd', isdMobile, ' ', mobileNo);
+                                                                    client.messages.create(
+                                                                        {
+                                                                            body: message,
+                                                                            to: isdMobile + mobileNo,
+                                                                            from: FromNumber
+                                                                        },
+                                                                        function (error, response) {
+                                                                            if (error) {
+                                                                                console.log(error, "SMS");
+                                                                            }
+                                                                            else {
+                                                                                console.log("SUCCESS", "SMS response");
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if (isSendgrid) {
+                                                            sendgrid.send(email, function (err, result) {
+                                                                if (!err) {
+
+                                                                    var saveMails = [
+                                                                        req.st.db.escape(req.query.token),
+                                                                        req.st.db.escape(req.query.heMasterId),
+                                                                        req.st.db.escape(req.body.heDepartmentId),
+                                                                        req.st.db.escape(userId),
+                                                                        req.st.db.escape(mailerType),
+                                                                        req.st.db.escape(mailOptions.from),
+                                                                        req.st.db.escape(mailOptions.to),
+                                                                        req.st.db.escape(mailOptions.subject),
+                                                                        req.st.db.escape(mailOptions.html),    // contains mail body
+                                                                        req.st.db.escape(JSON.stringify(cc)),
+                                                                        req.st.db.escape(JSON.stringify(bcc)),
+                                                                        req.st.db.escape(JSON.stringify(attachment)),
+                                                                        req.st.db.escape(req.body.replyMailId),
+                                                                        req.st.db.escape(req.body.priority),
+                                                                        req.st.db.escape(req.body.stageId || 0),
+                                                                        req.st.db.escape(req.body.statusId || 0),
+                                                                        req.st.db.escape(message),    // sms message
+                                                                        req.st.db.escape(whatmateMessage),
+                                                                        req.st.db.escape(recipients[0]),
+                                                                        req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
+                                                                        req.st.db.escape(req.body.interviewerFlag || 0)
+                                                                    ];
+
+                                                                    //saving the mail after sending it
+                                                                    var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                                                    console.log(saveMailHistory);
+                                                                    req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                                        console.log(mailHistoryErr);
+                                                                        console.log(mailHistoryResult);
+                                                                        if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
+                                                                            console.log('sent mails saved successfully');
+                                                                        }
+                                                                        else {
+                                                                            console.log('mails could not be saved');
+                                                                        }
+                                                                    });
+                                                                    console.log('Mail sent now save sent history');
+                                                                } //end of if(sendgrid sent mail successfully)
+                                                                //if mail is not sent
+                                                                else {
+                                                                    console.log('Mail not Sent Successfully' + err);
+                                                                }
+                                                            });
+                                                        }
+
+                                                    }
+
+                                                    if (!(templateId == 0 || overWrite)) {
+                                                        response.status = true;
+
+                                                        if (isSendgrid && isSMS) {  // making changes here reminder
+                                                            if (subject != '') {
+                                                                if (smsMsg != '' && smsFlag) {
+                                                                    response.message = "Mail and SMS sent successfully";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
+                                                                else {
+                                                                    response.message = "Mail sent successfully";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
+                                                            }
+
+                                                            else if (subject == '') {
+                                                                if (smsMsg != '' && smsFlag) {
+                                                                    response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
+                                                                else {
+                                                                    response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
                                                             }
                                                             else {
-                                                                console.log("SUCCESS", "SMS response");
+                                                                response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
                                                             }
                                                         }
-                                                    );
-                                                }
-                                            }
-                                        }
+                                                        else if (isSendgrid && !isSMS) {
 
-                                        if (isSendgrid) {
-                                            sendgrid.send(email, function (err, result) {
-                                                if (!err) {
-
-                                                    var saveMails = [
-                                                        req.st.db.escape(req.query.token),
-                                                        req.st.db.escape(req.query.heMasterId),
-                                                        req.st.db.escape(req.body.heDepartmentId),
-                                                        req.st.db.escape(userId),
-                                                        req.st.db.escape(mailerType),
-                                                        req.st.db.escape(mailOptions.from),
-                                                        req.st.db.escape(mailOptions.to),
-                                                        req.st.db.escape(mailOptions.subject),
-                                                        req.st.db.escape(mailOptions.html),    // contains mail body
-                                                        req.st.db.escape(JSON.stringify(cc)),
-                                                        req.st.db.escape(JSON.stringify(bcc)),
-                                                        req.st.db.escape(JSON.stringify(attachment)),
-                                                        req.st.db.escape(req.body.replyMailId),
-                                                        req.st.db.escape(req.body.priority),
-                                                        req.st.db.escape(req.body.stageId || 0),
-                                                        req.st.db.escape(req.body.statusId || 0),
-                                                        req.st.db.escape(message),    // sms message
-                                                        req.st.db.escape(whatmateMessage),
-                                                        req.st.db.escape(recipients[0]),
-                                                        req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
-                                                        req.st.db.escape(req.body.interviewerFlag || 0)
-                                                    ];
-
-                                                    //saving the mail after sending it
-                                                    var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
-                                                    console.log(saveMailHistory);
-                                                    req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
-                                                        console.log(mailHistoryErr);
-                                                        console.log(mailHistoryResult);
-                                                        if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
-                                                            console.log('sent mails saved successfully');
+                                                            if (subject != '') {
+                                                                response.message = "Mail sent successfully";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else if (subject == '') {
+                                                                response.message = "Mail subject is empty, mail cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                        }
+                                                        else if (isSMS && !isSendgrid) {
+                                                            if (smsMsg != '' && smsFlag) {
+                                                                response.message = "SMS sent successfully";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else if (smsMsg == '' && smsFlag) {
+                                                                response.message = "SMS field is empty, SMS cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else {
+                                                                response.message = "SMS flag is not enabled, SMS cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
                                                         }
                                                         else {
-                                                            console.log('mails could not be saved');
+                                                            response.message = "Sendgrid or SMS is not configured. Please contact the admin";
+                                                            response.data = null;
                                                         }
-                                                    });
-                                                    console.log('Mail sent now save sent history');
-                                                } //end of if(sendgrid sent mail successfully)
-                                                //if mail is not sent
-                                                else {
-                                                    console.log('Mail not Sent Successfully' + err);
-                                                }
-                                            });
-                                        }
 
+                                                        response.error = null;
+                                                        res.status(200).json(response);
+                                                    }
+                                                }
+
+                                                else {
+                                                    response.status = false;
+                                                    response.message = "Error while sending mail";
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(500).json(response);
+                                                    return;
+                                                }
+
+                                            }
+                                            catch (ex) {
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
                                     }
+                                    // else if(!templateId && !overWrite){
+                                    //     response.status = false;
+                                    //     response.message = "To mail is empty. Mail not sent";
+                                    //     response.error = null;
+                                    //     response.data = null;
+                                    //     res.status(200).json(response);
+                                    //     return;
+                                    // }
 
-                                    if (!(templateId == 0 || overWrite)) {
-                                        response.status = true;
-
-                                        if (isSendgrid && isSMS) {  // making changes here reminder
-                                            if (subject != '') {
-                                                if (smsMsg != '' && smsFlag) {
-                                                    response.message = "Mail and SMS sent successfully";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                                else {
-                                                    response.message = "Mail sent successfully";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                            }
-
-                                            else if (subject == '') {
-                                                if (smsMsg != '' && smsFlag) {
-                                                    response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                                else {
-                                                    response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                            }
-                                            else {
-                                                response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else if (isSendgrid && !isSMS) {
-
-                                            if (subject != '') {
-                                                response.message = "Mail sent successfully";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else if (subject == '') {
-                                                response.message = "Mail subject is empty, mail cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else if (isSMS && !isSendgrid) {
-                                            if (smsMsg != '' && smsFlag) {
-                                                response.message = "SMS sent successfully";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else if (smsMsg == '' && smsFlag) {
-                                                response.message = "SMS field is empty, SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else {
-                                                response.message = "SMS flag is not enabled, SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else {
-                                            response.message = "Sendgrid or SMS is not configured. Please contact the admin";
-                                            response.data = null;
-                                        }
-
+                                    else if (templateId && !overWrite && !emailReceivers.length) {
+                                        response.status = false;
+                                        response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
                                         response.error = null;
+                                        response.data = null;
                                         res.status(200).json(response);
+                                        return;
+                                    }
+                                    //save it as a template if flag is true or template id is 0
+                                    if (templateId == 0 || overWrite) {
+                                        req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
+                                        req.body.type = req.body.type ? req.body.type : 0;
+                                        req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
+                                        req.body.subject = req.body.subject ? req.body.subject : '';
+                                        req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
+                                        req.body.replymailId = req.body.replymailId ? req.body.replymailId : '';
+                                        req.body.priority = req.body.priority ? req.body.priority : 0;
+                                        req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
+                                        req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
+
+                                        var templateInputs = [
+                                            req.st.db.escape(req.query.token),
+                                            req.st.db.escape(templateId),
+                                            req.st.db.escape(req.query.heMasterId),
+                                            req.st.db.escape(req.body.templateName),
+                                            req.st.db.escape(req.body.type),
+                                            req.st.db.escape(JSON.stringify(toMail)),
+                                            req.st.db.escape(JSON.stringify(cc)),
+                                            req.st.db.escape(JSON.stringify(bcc)),
+                                            req.st.db.escape(req.body.subject),
+                                            req.st.db.escape(req.body.mailBody),
+                                            req.st.db.escape(req.body.replymailId),
+                                            req.st.db.escape(req.body.priority),
+                                            req.st.db.escape(req.body.updateFlag),
+                                            req.st.db.escape(smsMsg),
+                                            req.st.db.escape(whatmateMessage),
+                                            req.st.db.escape(JSON.stringify(attachment)),
+                                            req.st.db.escape(JSON.stringify(tags)),
+                                            req.st.db.escape(JSON.stringify(stage)),
+                                            req.st.db.escape(req.body.mailerType),
+                                            req.st.db.escape(JSON.stringify(tableTags)),
+                                            req.st.db.escape(req.body.sendSMS || 0),
+                                            req.st.db.escape(req.body.attachJD || 0),
+                                            req.st.db.escape(req.body.attachResume || 0),
+                                            req.st.db.escape(req.body.interviewerFlag || 0),
+                                            req.st.db.escape(req.body.resumeFileName || ''),
+                                            req.st.db.escape(req.body.attachResumeFlag || 0),
+                                            req.st.db.escape(JSON.stringify(trackerTemplate))
+
+                                        ];
+                                        var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
+                                        console.log(saveTemplateQuery);
+                                        req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
+                                            try {
+                                                console.log(tempSaveErr);
+                                                if (!tempSaveErr && tempSaveResult) {
+                                                    // console.log(tempSaveResult);
+                                                    response.status = true;
+                                                    //check if there are any receivers, if yes sent and saved
+                                                    if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
+                                                        if (isSendgrid && isSMS) {
+                                                            response.message = "Mail and SMS Sent and Template Saved successfully";
+                                                        }
+                                                        else if (!isSendgrid && isSMS) {
+                                                            response.message = "SMS is Sent and Template Saved successfully";
+                                                        }
+                                                        else if (isSendgrid && !isSMS) {
+                                                            response.message = "Mail is Sent and Template Saved successfully";
+                                                        }
+                                                        else {
+                                                            response.message = "Template saved successfully";
+                                                        }
+                                                    }
+                                                    //else saved
+                                                    else {
+                                                        response.message = "Template saved successfully";
+                                                    }
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(200).json(response);
+                                                }
+
+                                            }
+                                            catch (ex) {
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
                                     }
                                 }
 
-                                else {
-                                    response.status = false;
-                                    response.message = "Error while sending mail";
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(500).json(response);
-                                    return;
-                                }
-                            });
-                        }
-                        // else if(!templateId && !overWrite){
-                        //     response.status = false;
-                        //     response.message = "To mail is empty. Mail not sent";
-                        //     response.error = null;
-                        //     response.data = null;
-                        //     res.status(200).json(response);
-                        //     return;
-                        // }
 
-                        else if (templateId && !overWrite && !emailReceivers.length) {
-                            response.status = false;
-                            response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
-                            response.error = null;
-                            response.data = null;
-                            res.status(200).json(response);
-                            return;
-                        }
-                        //save it as a template if flag is true or template id is 0
-                        if (templateId == 0 || overWrite) {
-                            req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
-                            req.body.type = req.body.type ? req.body.type : 0;
-                            req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
-                            req.body.subject = req.body.subject ? req.body.subject : '';
-                            req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
-                            req.body.replymailId = req.body.replymailId ? req.body.replymailId : '';
-                            req.body.priority = req.body.priority ? req.body.priority : 0;
-                            req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
-                            req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
+                            }
+                            catch (ex) {
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
+                            }
+                        });
 
-                            var templateInputs = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(templateId),
-                                req.st.db.escape(req.query.heMasterId),
-                                req.st.db.escape(req.body.templateName),
-                                req.st.db.escape(req.body.type),
-                                req.st.db.escape(JSON.stringify(toMail)),
-                                req.st.db.escape(JSON.stringify(cc)),
-                                req.st.db.escape(JSON.stringify(bcc)),
-                                req.st.db.escape(req.body.subject),
-                                req.st.db.escape(req.body.mailBody),
-                                req.st.db.escape(req.body.replymailId),
-                                req.st.db.escape(req.body.priority),
-                                req.st.db.escape(req.body.updateFlag),
-                                req.st.db.escape(smsMsg),
-                                req.st.db.escape(whatmateMessage),
-                                req.st.db.escape(JSON.stringify(attachment)),
-                                req.st.db.escape(JSON.stringify(tags)),
-                                req.st.db.escape(JSON.stringify(stage)),
-                                req.st.db.escape(req.body.mailerType),
-                                req.st.db.escape(JSON.stringify(tableTags)),
-                                req.st.db.escape(req.body.sendSMS || 0),
-                                req.st.db.escape(req.body.attachJD || 0),
-                                req.st.db.escape(req.body.attachResume || 0),
-                                req.st.db.escape(req.body.interviewerFlag || 0),
-                                req.st.db.escape(req.body.resumeFileName || ''),
-                                req.st.db.escape(req.body.attachResumeFlag || 0),
-                                req.st.db.escape(JSON.stringify(trackerTemplate))
 
-                            ];
-                            var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
-                            console.log(saveTemplateQuery);
-                            req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
-                                console.log(tempSaveErr);
-                                if (!tempSaveErr && tempSaveResult) {
-                                    // console.log(tempSaveResult);
-                                    response.status = true;
-                                    //check if there are any receivers, if yes sent and saved
-                                    if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
-                                        if (isSendgrid && isSMS) {
-                                            response.message = "Mail and SMS Sent and Template Saved successfully";
-                                        }
-                                        else if (!isSendgrid && isSMS) {
-                                            response.message = "SMS is Sent and Template Saved successfully";
-                                        }
-                                        else if (isSendgrid && !isSMS) {
-                                            response.message = "Mail is Sent and Template Saved successfully";
-                                        }
-                                        else {
-                                            response.message = "Template saved successfully";
-                                        }
-                                    }
-                                    //else saved
-                                    else {
-                                        response.message = "Template saved successfully";
-                                    }
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(200).json(response);
-                                }
-                            });
-                        }
                     }
+                    //end of if(token validation)
+                    //else invalid token
+                    else {
+                        res.status(401).json(response);
+                    }
+                    //end of else (token validation)
 
-                });
+                }
+                catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
 
-
-            }
-            //end of if(token validation)
-            //else invalid token
-            else {
-                res.status(401).json(response);
-            }
-            //end of else (token validation)
-        });
+    }
+    catch (ex) {
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 
 sendgridCtrl.interviewMailerPreview = function (req, res, next) {
-
-    var validationFlag = true;
-
-
-    var sendMailFlag = 0;
-    var originalCVArray = [];
-    var clientCVArray = [];
-
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
 
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid company';
-        validationFlag *= false;
+    var error_logger = {
+        details: 'sendgridCtrl.ScreeningMailerPreview'
     }
 
+    try {
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
+        var validationFlag = true;
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                    var mailBody = req.body.mailBody ? req.body.mailBody : '';
-                    var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
-                    var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
-                    var isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                    var interviewerFlag = req.body.interviewerFlag ? req.body.interviewerFlag : 0;  // if 0 mail is for  applicants if 1- mail is for client contacts
+        var sendMailFlag = 0;
+        var originalCVArray = [];
+        var clientCVArray = [];
 
-                    var tags = req.body.tags;
-                    if (typeof (tags) == "string") {
-                        tags = JSON.parse(tags);
-                    }
-                    if (!tags) {
-                        tags = [];
-                    }
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
 
-                    var reqApplicants = req.body.reqApplicants;
-                    if (typeof (reqApplicants) == "string") {
-                        reqApplicants = JSON.parse(reqApplicants);
-                    }
-                    if (!reqApplicants) {
-                        reqApplicants = [];
-                    }
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
 
-                    var clientContacts = req.body.clientContacts;
-                    if (typeof (clientContacts) == "string") {
-                        clientContacts = JSON.parse(clientContacts);
-                        // clientContacts.sort(function(a,b){return a-b});
-                    }
-                    if (!clientContacts) {
-                        clientContacts = [];
-                    }
-                    var tableTags = req.body.tableTags;
-                    if (typeof (tableTags) == "string") {
-                        tableTags = JSON.parse(tableTags);
-                    }
-                    if (!tableTags) {
-                        tableTags = [];
-                    }
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid company';
+            validationFlag *= false;
+        }
 
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        var inputs = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(JSON.stringify(reqApplicants)),
-                            req.st.db.escape(JSON.stringify(clientContacts)),
-                            req.st.db.escape(sendMailFlag)
-                        ];
-                        var idArray;
-                        idArray = reqApplicants;
-                        var resumeFileNameArray = [];
-                        var resumeFileName = req.body.resumeFileName;
-                        // idArray.sort(function(a,b){return a-b});
-                        var mailbody_array = [];
-                        var subject_array = [];
-                        var smsMsg_array = [];
 
-                        var procQuery;
-                        procQuery = 'CALL wm_paceInterviewMailer( ' + inputs.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, result) {
-                            console.log(err);
-                            if (!err && result && result[0] && result[0][0] || result[1] || result[1][0]) {
-                                var temp = mailBody;
-                                var temp1 = subject;
-                                var temp2 = smsMsg;
-                                var clientData = [];
-                                var applicantData = [];
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            try {
+                                req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                                if (interviewerFlag) {
-                                    console.log("interviewer mailer", interviewerFlag);
-                                    for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
-                                        for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
-                                            var tempFileName = resumeFileName;
+                                var mailBody = req.body.mailBody ? req.body.mailBody : '';
+                                var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
+                                var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
+                                var isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                                var interviewerFlag = req.body.interviewerFlag ? req.body.interviewerFlag : 0;  // if 0 mail is for  applicants if 1- mail is for client contacts
 
-                                            for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                var tags = req.body.tags;
+                                if (typeof (tags) == "string") {
+                                    tags = JSON.parse(tags);
+                                }
+                                if (!tags) {
+                                    tags = [];
+                                }
 
-                                                if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+                                var reqApplicants = req.body.reqApplicants;
+                                if (typeof (reqApplicants) == "string") {
+                                    reqApplicants = JSON.parse(reqApplicants);
+                                }
+                                if (!reqApplicants) {
+                                    reqApplicants = [];
+                                }
 
-                                                    mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                var clientContacts = req.body.clientContacts;
+                                if (typeof (clientContacts) == "string") {
+                                    clientContacts = JSON.parse(clientContacts);
+                                    // clientContacts.sort(function(a,b){return a-b});
+                                }
+                                if (!clientContacts) {
+                                    clientContacts = [];
+                                }
+                                var tableTags = req.body.tableTags;
+                                if (typeof (tableTags) == "string") {
+                                    tableTags = JSON.parse(tableTags);
+                                }
+                                if (!tableTags) {
+                                    tableTags = [];
+                                }
 
-                                                    subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                    smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                    // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                    // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                    // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                                    tempFileName = tempFileName.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                }
-                                            }
-
-                                            for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-
-                                                if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
-
-                                                    mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                    subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                    smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                    // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                    // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                    // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                                    tempFileName = tempFileName.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                }
-                                            }
-
-                                            for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
-
-                                                if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
-
-                                                    mailBody = replaceAll(mailBody, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                    subject = replaceAll(subject, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                    smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                    // mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                    // subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                    // smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-                                                    tempFileName = tempFileName.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                }
-                                            }
-                                            resumeFileNameArray.push(tempFileName);
-
-                                        }
-                                        for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
-
-                                            if ((result[1][clientIndex][tags.clientContacts[tagIndex].tagName] && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != null && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != 'null' && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != '') || result[1][clientIndex][tags.clientContacts[tagIndex].tagName] >= 0) {
-
-                                                mailBody = replaceAll(mailBody, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                                subject = replaceAll(subject, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                                smsMsg = replaceAll(smsMsg, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                                // mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                                // subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                                // smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-
-                                            }
-                                        }
-
-                                        if (tableTags.applicant.length > 0) {
-                                            var position = mailBody.indexOf('@table');
-                                            var tableContent = '';
-                                            mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
-                                            tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
-                                            console.log(tableContent, 'mailbody');
-                                            for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
-                                            }
-                                            tableContent += "</tr>";
-                                            for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
-                                                tableContent += "<tr>";
-                                                for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                                    tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
-                                                }
-                                                tableContent += "</tr>";
-                                            }
-
-                                            tableContent += "</table>";
-                                            mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
-
-                                        }
-
-                                        clientData.push(result[1][clientIndex].EmailId);
-                                        mailbody_array.push(mailBody);
-                                        subject_array.push(subject);
-                                        smsMsg_array.push(smsMsg);
-                                        mailBody = temp;
-                                        subject = temp1;
-                                        smsMsg = temp2;
-                                    }
-
-                                    if (idArray.length == result[0].length) {
-                                        for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
-                                            originalCVArray.push(result[0][applicantIndex].originalCVPath);
-                                            clientCVArray.push(result[0][applicantIndex].clientCVPath);
-                                        }
-                                    }
-
+                                if (!validationFlag) {
+                                    response.error = error;
+                                    response.message = 'Please check the errors';
+                                    res.status(400).json(response);
+                                    console.log(response);
                                 }
                                 else {
-                                    console.log('applicants interview mail', interviewerFlag);
-                                    for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+                                    var inputs = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.query.heMasterId),
+                                        req.st.db.escape(JSON.stringify(reqApplicants)),
+                                        req.st.db.escape(JSON.stringify(clientContacts)),
+                                        req.st.db.escape(sendMailFlag)
+                                    ];
+                                    var idArray;
+                                    idArray = reqApplicants;
+                                    var resumeFileNameArray = [];
+                                    var resumeFileName = req.body.resumeFileName;
+                                    // idArray.sort(function(a,b){return a-b});
+                                    var mailbody_array = [];
+                                    var subject_array = [];
+                                    var smsMsg_array = [];
 
-                                        for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                    var procQuery;
+                                    procQuery = 'CALL wm_paceInterviewMailer( ' + inputs.join(',') + ')';
+                                    console.log(procQuery);
+                                    req.db.query(procQuery, function (err, result) {
+                                        try {
+                                            console.log(err);
+                                            if (!err && result && result[0] && result[0][0] || result[1] || result[1][0]) {
+                                                var temp = mailBody;
+                                                var temp1 = subject;
+                                                var temp2 = smsMsg;
+                                                var clientData = [];
+                                                var applicantData = [];
 
-                                            if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+                                                if (interviewerFlag) {
+                                                    console.log("interviewer mailer", interviewerFlag);
+                                                    for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
+                                                        for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+                                                            var tempFileName = resumeFileName;
 
-                                                mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                            for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+
+                                                                if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+
+                                                                    mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                    subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                    smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                    // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                    // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                    // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                                    tempFileName = tempFileName.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                }
+                                                            }
+
+                                                            for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+
+                                                                if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
+
+                                                                    mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                    subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                    smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                    // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                    // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                    // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                                                    tempFileName = tempFileName.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                }
+                                                            }
+
+                                                            for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+
+                                                                if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
+
+                                                                    mailBody = replaceAll(mailBody, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                    subject = replaceAll(subject, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                    smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                    // mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                    // subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                    // smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                                                    tempFileName = tempFileName.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                }
+                                                            }
+                                                            resumeFileNameArray.push(tempFileName);
+
+                                                        }
+                                                        for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+
+                                                            if ((result[1][clientIndex][tags.clientContacts[tagIndex].tagName] && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != null && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != 'null' && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != '') || result[1][clientIndex][tags.clientContacts[tagIndex].tagName] >= 0) {
+
+                                                                mailBody = replaceAll(mailBody, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                                subject = replaceAll(subject, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                                smsMsg = replaceAll(smsMsg, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                                // mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                                // subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                                // smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+
+                                                            }
+                                                        }
+
+                                                        if (tableTags.applicant.length > 0) {
+                                                            var position = mailBody.indexOf('@table');
+                                                            var tableContent = '';
+                                                            mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
+                                                            tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
+                                                            console.log(tableContent, 'mailbody');
+                                                            for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                                                            }
+                                                            tableContent += "</tr>";
+                                                            for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
+                                                                tableContent += "<tr>";
+                                                                for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                                                    tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                                                }
+                                                                tableContent += "</tr>";
+                                                            }
+
+                                                            tableContent += "</table>";
+                                                            mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
+
+                                                        }
+
+                                                        clientData.push(result[1][clientIndex].EmailId);
+                                                        mailbody_array.push(mailBody);
+                                                        subject_array.push(subject);
+                                                        smsMsg_array.push(smsMsg);
+                                                        mailBody = temp;
+                                                        subject = temp1;
+                                                        smsMsg = temp2;
+                                                    }
+
+                                                    if (idArray.length == result[0].length) {
+                                                        for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+                                                            originalCVArray.push(result[0][applicantIndex].originalCVPath);
+                                                            clientCVArray.push(result[0][applicantIndex].clientCVPath);
+                                                        }
+                                                    }
+
+                                                }
+                                                else {
+                                                    console.log('applicants interview mail', interviewerFlag);
+                                                    for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+
+                                                        for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+
+                                                            if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+
+                                                                mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
 
 
-                                                subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                                subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
 
-                                                smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                                smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
 
-                                                // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                                // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
 
-                                                // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                                // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
 
-                                                // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                                // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                            }
+                                                        }
+
+                                                        for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+
+                                                            if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
+
+                                                                mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                                            }
+                                                        }
+
+                                                        for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+
+                                                            if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
+
+                                                                mailBody = replaceAll(mailBody, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                subject = replaceAll(subject, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                // mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                // subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                // smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                                            }
+                                                        }
+                                                        applicantData.push(result[0][applicantIndex].EmailId);
+
+                                                        mailbody_array.push(mailBody);
+                                                        subject_array.push(subject);
+                                                        smsMsg_array.push(smsMsg);
+                                                        mailBody = temp;
+                                                        subject = temp1;
+                                                        smsMsg = temp2;
+                                                    }
+
+
+                                                }
+                                                // console.log(mailbody_array);
+
+                                                response.status = true;
+                                                response.message = "Tags replaced successfully";
+                                                response.error = null;
+                                                response.data = {
+                                                    tagsPreview: mailbody_array,
+                                                    subjectPreview: subject_array,
+                                                    smsMsgPreview: smsMsg_array,
+                                                    applicants: result[0],
+                                                    clientContacts: result[1],
+                                                    clientData: clientData,
+                                                    applicantData: applicantData,
+                                                    originalCVArray: originalCVArray,
+                                                    clientCVArray: clientCVArray,
+                                                    resumeFileName: resumeFileNameArray
+                                                };
+                                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                zlib.gzip(buf, function (_, result) {
+                                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                    res.status(200).json(response);
+                                                });
+                                            }
+
+                                            else if (!err) {
+                                                response.status = false;
+                                                response.message = "No result found";
+                                                response.error = null;
+                                                response.data = {
+                                                    tagsPreview: [],
+                                                    subjectPreview: [],
+                                                    smsMsgPreview: [],
+                                                    clientData: [],
+                                                    applicantData: [],
+                                                    originalCVArray: [],
+                                                    clientCVArray: [],
+                                                    resumeFileName: []
+                                                };
+                                                res.status(200).json(response);
+                                            }
+
+                                            else {
+                                                response.status = false;
+                                                response.message = "Error while replacing tags";
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(500).json(response);
                                             }
                                         }
-
-                                        for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-
-                                            if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
-
-                                                mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                            }
+                                        catch (ex) {
+                                            error_logger.error = ex;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
                                         }
-
-                                        for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
-
-                                            if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
-
-                                                mailBody = replaceAll(mailBody, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                subject = replaceAll(subject, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                // mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                // subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                // smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-                                            }
-                                        }
-                                        applicantData.push(result[0][applicantIndex].EmailId);
-
-                                        mailbody_array.push(mailBody);
-                                        subject_array.push(subject);
-                                        smsMsg_array.push(smsMsg);
-                                        mailBody = temp;
-                                        subject = temp1;
-                                        smsMsg = temp2;
-                                    }
-
-
+                                    });
                                 }
-                                // console.log(mailbody_array);
-
-                                response.status = true;
-                                response.message = "Tags replaced successfully";
-                                response.error = null;
-                                response.data = {
-                                    tagsPreview: mailbody_array,
-                                    subjectPreview: subject_array,
-                                    smsMsgPreview: smsMsg_array,
-                                    applicants: result[0],
-                                    clientContacts: result[1],
-                                    clientData: clientData,
-                                    applicantData: applicantData,
-                                    originalCVArray: originalCVArray,
-                                    clientCVArray: clientCVArray,
-                                    resumeFileName: resumeFileNameArray
-                                };
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
                             }
-
-                            else if (!err) {
-                                response.status = false;
-                                response.message = "No result found";
-                                response.error = null;
-                                response.data = {
-                                    tagsPreview: [],
-                                    subjectPreview: [],
-                                    smsMsgPreview: [],
-                                    clientData: [],
-                                    applicantData: [],
-                                    originalCVArray: [],
-                                    clientCVArray: [],
-                                    resumeFileName: []
-                                };
-                                res.status(200).json(response);
-                            }
-
-                            else {
-                                response.status = false;
-                                response.message = "Error while replacing tags";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
+                            catch (ex) {
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
                             }
                         });
+
+
+                    }
+                    else {
+                        res.status(401).json(response);
                     }
 
-                });
+                }
+                catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
 
-
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
+    }
+    catch (ex) {
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 
 sendgridCtrl.interviewMailer = function (req, res, next) {
-
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-    var sendMailFlag = 1;
-
-    var transactions = [];
-
-    var isSendgrid;
-    var isSMS;
-
-    var emailReceivers;                //emailReceivers to store the recipients
-    var mailbody_array = [];    //array to store all mailbody after replacing tags
-    var subject_array = [];
-    var smsMsg_array = [];
-
-    var emailId = [];
-    var validationFlag = true;
-    var fromEmailID;
-    var toEmailID = [];
-    var MobileISD = [];
-    var MobileNumber = [];
-    var isdMobile = '';
-    var mobileNo = '';
-    var message = '';
-
-
-    //html styling for table in submission mailer
-
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid tenant';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
 
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+    var error_logger = {
+        details: 'sendgridCtrl.ScreeningMailerPreview'
     }
 
+    try {
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
+        var sendMailFlag = 1;
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+        var transactions = [];
 
-                    //request parameters
-                    var interviewerFlag = req.body.interviewerFlag ? req.body.interviewerFlag : 0;  // if 0 mail is for  applicants if 1- mail is for client contacts
-                    var updateFlag = req.body.updateFlag || 0;
-                    var overWrite = req.body.overWrite || 0;
-                    var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
-                    var templateId = req.body.template ? req.body.template.templateId : 0;
-                    var trackerTemplate = req.body.trackerTemplate || {};
-                    var tags = req.body.tags || {};
-                    var cc = req.body.cc || [];
-                    var toMail = req.body.toMail || [];
-                    var bcc = req.body.bcc || [];
-                    var stage = req.body.stage || [];
-                    var attachment = req.body.attachment || [];
-                    var reqApplicants = req.body.reqApplicants || [];
-                    var applicants = req.body.applicantId || [];
-                    var client = req.body.clientId || [];
-                    var tableTags = req.body.tableTags || {};
-                    var clientContacts = req.body.clientContacts || [];
-                    var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
-                    var mailBody = req.body.mailBody || '';
+        var isSendgrid;
+        var isSMS;
 
-                    var whatmateMessage = req.body.whatmateMessage || '';
-                    var smsMsg = req.body.smsMsg || '';
-                    var smsFlag = req.body.smsFlag || 0;
+        var emailReceivers;                //emailReceivers to store the recipients
+        var mailbody_array = [];    //array to store all mailbody after replacing tags
+        var subject_array = [];
+        var smsMsg_array = [];
 
-                    var isWeb = req.query.isWeb || 0;
-                    var mailerType = req.body.mailerType || 0;
-                    var userId = req.query.userId || 0;
+        var emailId = [];
+        var validationFlag = true;
+        var fromEmailID;
+        var toEmailID = [];
+        var MobileISD = [];
+        var MobileNumber = [];
+        var isdMobile = '';
+        var mobileNo = '';
+        var message = '';
 
-                    if (typeof (tags) == "string") {
-                        tags = JSON.parse(tags);
-                    }
 
-                    if (typeof (cc) == "string") {
-                        cc = JSON.parse(cc);
-                    }
+        //html styling for table in submission mailer
 
-                    if (typeof (toMail) == "string") {
-                        toMail = JSON.parse(toMail);
-                    }
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid tenant';
+            validationFlag *= false;
+        }
 
-                    if (typeof (bcc) == "string") {
-                        bcc = JSON.parse(bcc);
-                    }
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
 
-                    if (typeof (stage) == "string") {
-                        stage = JSON.parse(stage);
-                    }
 
-                    if (typeof (attachment) == "string") {
-                        attachment = JSON.parse(attachment);
-                    }
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
 
-                    if (typeof (client) == "string") {
-                        client = JSON.parse(client);
-                    }
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            try {
+                                req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                    if (typeof (clientContacts) == "string") {
-                        clientContacts = JSON.parse(clientContacts);
-                    }
+                                //request parameters
+                                var interviewerFlag = req.body.interviewerFlag ? req.body.interviewerFlag : 0;  // if 0 mail is for  applicants if 1- mail is for client contacts
+                                var updateFlag = req.body.updateFlag || 0;
+                                var overWrite = req.body.overWrite || 0;
+                                var saveTemplate = req.body.saveTemplate || 0;       //flag to check whether to save template or not
+                                var templateId = req.body.template ? req.body.template.templateId : 0;
+                                var trackerTemplate = req.body.trackerTemplate || {};
+                                var tags = req.body.tags || {};
+                                var cc = req.body.cc || [];
+                                var toMail = req.body.toMail || [];
+                                var bcc = req.body.bcc || [];
+                                var stage = req.body.stage || [];
+                                var attachment = req.body.attachment || [];
+                                var reqApplicants = req.body.reqApplicants || [];
+                                var applicants = req.body.applicantId || [];
+                                var client = req.body.clientId || [];
+                                var tableTags = req.body.tableTags || {};
+                                var clientContacts = req.body.clientContacts || [];
+                                var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
+                                var mailBody = req.body.mailBody || '';
 
-                    if (typeof (tableTags) == "string") {
-                        tableTags = JSON.parse(tableTags);
-                    }
+                                var whatmateMessage = req.body.whatmateMessage || '';
+                                var smsMsg = req.body.smsMsg || '';
+                                var smsFlag = req.body.smsFlag || 0;
 
-                    if (typeof (reqApplicants) == "string") {
-                        reqApplicants = JSON.parse(reqApplicants);
-                        // reqApplicants.sort(function(a,b){return a-b});
-                    }
+                                var isWeb = req.query.isWeb || 0;
+                                var mailerType = req.body.mailerType || 0;
+                                var userId = req.query.userId || 0;
 
-                    //check for mail type and assign the recipients
-                    if (interviewerFlag) {
-                        emailReceivers = clientContacts;
-                        var recipients = clientContacts;
-                        // emailReceivers.sort(function(a,b){return a-b});
-                    }
-                    else {
-                        emailReceivers = reqApplicants;
-                        var recipients = reqApplicants;
-                        // emailReceivers.sort(function(a,b){return a-b});
-                    }
-
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        if (emailReceivers.length > 0) {				//for checking if the mailer is just a template
-
-                            var inputs = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(req.query.heMasterId),
-                                req.st.db.escape(JSON.stringify(reqApplicants)),
-                                req.st.db.escape(JSON.stringify(clientContacts)),
-                                req.st.db.escape(sendMailFlag)
-                            ];
-
-                            var procQuery = 'CALL wm_paceInterviewMailer( ' + inputs.join(',') + ')';
-                            console.log(procQuery);
-                            req.db.query(procQuery, function (err, result) {
-                                console.log(err);
-                                if (result[3] && result[3][0] && result[3][0].transactions) {
-                                    transactions = JSON.parse(result[3][0].transactions);
+                                if (typeof (tags) == "string") {
+                                    tags = JSON.parse(tags);
                                 }
 
-                                if (result[4] && result[4][0]) {
-                                    isSendgrid = result[4][0].isSendgrid ? result[4][0].isSendgrid : 0,
-                                        isSMS = result[4][0].isSMS ? result[4][0].isSMS : 0
+                                if (typeof (cc) == "string") {
+                                    cc = JSON.parse(cc);
                                 }
 
-                                if (!err && result && result[0] && result[0][0]) {
-                                    var temp = mailBody;
-                                    var temp1 = subject;
-                                    var temp2 = smsMsg;
+                                if (typeof (toMail) == "string") {
+                                    toMail = JSON.parse(toMail);
+                                }
 
-                                    if (interviewerFlag) {
-                                        for (var clientIndex = 0; clientIndex < emailReceivers.length; clientIndex++) {
-                                            for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
+                                if (typeof (bcc) == "string") {
+                                    bcc = JSON.parse(bcc);
+                                }
 
-                                                for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                if (typeof (stage) == "string") {
+                                    stage = JSON.parse(stage);
+                                }
 
-                                                    if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+                                if (typeof (attachment) == "string") {
+                                    attachment = JSON.parse(attachment);
+                                }
 
-                                                        mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (client) == "string") {
+                                    client = JSON.parse(client);
+                                }
 
-                                                        subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (clientContacts) == "string") {
+                                    clientContacts = JSON.parse(clientContacts);
+                                }
 
-                                                        smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (tableTags) == "string") {
+                                    tableTags = JSON.parse(tableTags);
+                                }
 
-                                                        // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                if (typeof (reqApplicants) == "string") {
+                                    reqApplicants = JSON.parse(reqApplicants);
+                                    // reqApplicants.sort(function(a,b){return a-b});
+                                }
 
-                                                        // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                //check for mail type and assign the recipients
+                                if (interviewerFlag) {
+                                    emailReceivers = clientContacts;
+                                    var recipients = clientContacts;
+                                    // emailReceivers.sort(function(a,b){return a-b});
+                                }
+                                else {
+                                    emailReceivers = reqApplicants;
+                                    var recipients = reqApplicants;
+                                    // emailReceivers.sort(function(a,b){return a-b});
+                                }
 
-                                                        // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                                    }
+                                if (!validationFlag) {
+                                    response.error = error;
+                                    response.message = 'Please check the errors';
+                                    res.status(400).json(response);
+                                    console.log(response);
+                                }
+                                else {
+                                    if (emailReceivers.length > 0) {				//for checking if the mailer is just a template
 
+                                        var inputs = [
+                                            req.st.db.escape(req.query.token),
+                                            req.st.db.escape(req.query.heMasterId),
+                                            req.st.db.escape(JSON.stringify(reqApplicants)),
+                                            req.st.db.escape(JSON.stringify(clientContacts)),
+                                            req.st.db.escape(sendMailFlag)
+                                        ];
+
+                                        var procQuery = 'CALL wm_paceInterviewMailer( ' + inputs.join(',') + ')';
+                                        console.log(procQuery);
+                                        req.db.query(procQuery, function (err, result) {
+                                            try {
+                                                console.log(err);
+                                                if (result[3] && result[3][0] && result[3][0].transactions) {
+                                                    transactions = JSON.parse(result[3][0].transactions);
                                                 }
 
-                                                for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-
-                                                    if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
-
-                                                        mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                        subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                        smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                        // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                        // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                        // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                                    }
+                                                if (result[4] && result[4][0]) {
+                                                    isSendgrid = result[4][0].isSendgrid ? result[4][0].isSendgrid : 0,
+                                                        isSMS = result[4][0].isSMS ? result[4][0].isSMS : 0
                                                 }
 
-                                                for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+                                                if (!err && result && result[0] && result[0][0]) {
+                                                    var temp = mailBody;
+                                                    var temp1 = subject;
+                                                    var temp2 = smsMsg;
 
-                                                    if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
+                                                    if (interviewerFlag) {
+                                                        for (var clientIndex = 0; clientIndex < emailReceivers.length; clientIndex++) {
+                                                            for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
 
-                                                        mailBody = replaceAll(mailBody, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                                                for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
 
-                                                        subject = replaceAll(subject, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                                                    if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
 
-                                                        smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                                                        mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                        subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                        smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                        // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                        // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                        // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                                    }
+
+                                                                }
+
+                                                                for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+
+                                                                    if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
+
+                                                                        mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                        subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                        smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                        // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                        // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                        // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                                                    }
+                                                                }
+
+                                                                for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+
+                                                                    if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
+
+                                                                        mailBody = replaceAll(mailBody, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                        subject = replaceAll(subject, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                        smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
 
 
-                                                        // mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                                                        // mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
 
-                                                        // subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                                                        // subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
 
-                                                        // smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                                                        // smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
 
-                                                    }
+                                                                    }
 
-                                                }
-                                            }
-                                            for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
+                                                                }
+                                                            }
+                                                            for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
 
-                                                if ((result[1][clientIndex][tags.clientContacts[tagIndex].tagName] && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != null && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != 'null' && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != '') || result[1][clientIndex][tags.clientContacts[tagIndex].tagName] >= 0) {
+                                                                if ((result[1][clientIndex][tags.clientContacts[tagIndex].tagName] && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != null && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != 'null' && result[1][clientIndex][tags.clientContacts[tagIndex].tagName] != '') || result[1][clientIndex][tags.clientContacts[tagIndex].tagName] >= 0) {
 
-                                                    mailBody = replaceAll(mailBody, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                                                    mailBody = replaceAll(mailBody, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
 
-                                                    subject = replaceAll(subject, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                                                    subject = replaceAll(subject, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
 
-                                                    smsMsg = replaceAll(smsMsg, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                                                    smsMsg = replaceAll(smsMsg, '[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
 
-                                                    // mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                                                    // mailBody = mailBody.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
 
-                                                    // subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                                                    // subject = subject.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
 
-                                                    // smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
-                                                }
-                                            }
+                                                                    // smsMsg = smsMsg.replace('[contact.' + tags.clientContacts[tagIndex].tagName + ']', result[1][clientIndex][tags.clientContacts[tagIndex].tagName]);
+                                                                }
+                                                            }
 
-                                            if (tableTags.applicant.length > 0) {
-                                                var position = mailBody.indexOf('@table');
-                                                var tableContent = '';
-                                                mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
-                                                tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
-                                                console.log(tableContent, 'mailbody');
-                                                for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
-                                                }
-                                                tableContent += "</tr>";
-                                                for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
-                                                    tableContent += "<tr>";
-                                                    for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
-                                                    }
-                                                    tableContent += "</tr>";
-                                                }
+                                                            if (tableTags.applicant.length > 0) {
+                                                                var position = mailBody.indexOf('@table');
+                                                                var tableContent = '';
+                                                                mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
+                                                                tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
+                                                                console.log(tableContent, 'mailbody');
+                                                                for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                                                                }
+                                                                tableContent += "</tr>";
+                                                                for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
+                                                                    tableContent += "<tr>";
+                                                                    for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                                                    }
+                                                                    tableContent += "</tr>";
+                                                                }
 
-                                                tableContent += "</table>";
-                                                mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
+                                                                tableContent += "</table>";
+                                                                mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
 
-                                            }
+                                                            }
 
-                                            mailbody_array.push(mailBody);
-                                            subject_array.push(subject);
-                                            smsMsg_array.push(smsMsg);
-                                            fromEmailID = result[2][0].fromEmailId;
-                                            toEmailID.push(result[1][clientIndex].EmailId);
-                                            MobileISD.push(result[1][clientIndex].MobileISD);
-                                            MobileNumber.push(result[1][clientIndex].MobileNo);
-                                            mailBody = temp;
-                                            subject = temp1;
-                                            smsMsg = temp2;
-                                        }
-
-                                        var buffer;
-                                        if (trackerTemplate.trackerId) {
-                                            var ws_data = '[[';
-                                            // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
-                                            for (var i = 0; i < trackerTags.length; i++) {
-                                                if (i != trackerTags.length - 1)
-                                                    ws_data += '"' + trackerTags[i].displayTagAs + '",';
-                                                else
-                                                    ws_data += '"' + trackerTags[i].displayTagAs + '"';
-                                            }
-                                            ws_data += "]";
-
-                                            // console.log(new Buffer(buffer).toString("base64"));
-                                            for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
-                                                ws_data += ',[';
-                                                for (var tagIndex = 0; tagIndex < trackerTags.length; tagIndex++) {
-                                                    if (tagIndex < trackerTags.length - 1)
-                                                        ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '",';
-                                                    else
-                                                        ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '"';
-                                                }
-                                                ws_data += ']';
-                                            }
-                                            ws_data += ']';
-                                            // console.log(ws_data);
-                                            buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]); // Returns a buffer
-                                        }
-                                    }
-                                    else {
-                                        for (var applicantIndex = 0; applicantIndex < emailReceivers.length; applicantIndex++) {
-
-                                            for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
-
-                                                if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
-
-                                                    mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                    subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                    smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                    // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                    // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-
-                                                    // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
-                                                }
-                                            }
-
-                                            for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-
-                                                if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
-
-                                                    mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                    subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                    smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                    // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                    // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-
-                                                    // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
-                                                }
-                                            }
-
-                                            for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
-
-                                                if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
-
-                                                    mailBody = replaceAll(mailBody, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                    subject = replaceAll(subject, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                    smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                    // mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                    // subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-
-                                                    // smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
-                                                }
-                                            }
-
-                                            mailbody_array.push(mailBody);
-                                            subject_array.push(subject);
-                                            smsMsg_array.push(smsMsg);
-                                            fromEmailID = result[2][0].fromEmailId;
-                                            toEmailID.push(result[0][applicantIndex].EmailId);
-                                            MobileISD.push(result[0][applicantIndex].MobileISD);
-                                            MobileNumber.push(result[0][applicantIndex].MobileNo);
-                                            mailBody = temp;
-                                            subject = temp1;
-                                            smsMsg = temp2;
-                                        }
-                                    }
-
-                                    for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
-                                        var mailOptions = {
-                                            from: fromEmailID,
-                                            to: toEmailID[receiverIndex],
-                                            subject: subject_array[receiverIndex],
-                                            html: mailbody_array[receiverIndex]
-                                        };
-
-                                        mailOptions.cc = [];
-
-                                        for (var j = 0; j < cc.length; j++) {
-                                            mailOptions.cc.push(cc[j].emailId);
-                                        }
-                                        mailOptions.bcc = [];
-
-                                        for (var j = 0; j < bcc.length; j++) {
-                                            mailOptions.bcc.push(bcc[j].emailId);
-                                        }
-
-                                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                        var email = new sendgrid.Email();
-                                        email.from = mailOptions.from;
-                                        email.to = mailOptions.to;
-                                        email.subject = mailOptions.subject;
-                                        email.mbody = mailOptions.html;
-                                        email.cc = mailOptions.cc;
-                                        email.bcc = mailOptions.bcc;
-                                        email.html = mailOptions.html;
-                                        //if 1 or more attachments are present
-                                        for (var file = 0; file < attachment.length; file++) {
-                                            email.addFile({
-                                                filename: attachment[file].fileName,
-                                                content: new Buffer(attachment[file].binaryFile, 'base64'),
-                                                contentType: attachment[file].fileType
-                                            });
-                                        }
-
-                                        if (trackerTemplate.trackerId) {
-                                            email.addFile({
-                                                filename: trackerTemplate.templateName + '.xlsx',
-                                                content: new Buffer(new Buffer(buffer).toString("base64"), 'base64'),
-                                                contentType: 'application/*'
-                                            });
-                                        }
-
-                                        // assign mobile no and isdMobile to send sms
-                                        isdMobile = MobileISD[receiverIndex];
-                                        mobileNo = MobileNumber[receiverIndex];
-                                        message = smsMsg_array[receiverIndex];
-
-                                        // to send normal sms
-                                        if (isSMS) {
-                                            if (smsFlag) {
-                                                if (isdMobile == "+977") {
-                                                    request({
-                                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
-                                                        qs: {
-                                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
-                                                            to: mobileNo,
-                                                            message: message,
-                                                            sender: 'Techingen'
-                                                        },
-                                                        method: 'GET'
-
-                                                    }, function (error, response, body) {
-                                                        if (error) {
-                                                            console.log(error, "SMS");
-                                                        }
-                                                        else {
-                                                            console.log("SUCCESS", "SMS response");
+                                                            mailbody_array.push(mailBody);
+                                                            subject_array.push(subject);
+                                                            smsMsg_array.push(smsMsg);
+                                                            fromEmailID = result[2][0].fromEmailId;
+                                                            toEmailID.push(result[1][clientIndex].EmailId);
+                                                            MobileISD.push(result[1][clientIndex].MobileISD);
+                                                            MobileNumber.push(result[1][clientIndex].MobileNo);
+                                                            mailBody = temp;
+                                                            subject = temp1;
+                                                            smsMsg = temp2;
                                                         }
 
-                                                    });
-                                                }
-                                                else if (isdMobile == "+91") {
-                                                    console.log('inside send sms');
-                                                    console.log(isdMobile, ' ', mobileNo);
-                                                    request({
-                                                        url: 'https://aikonsms.co.in/control/smsapi.php',
-                                                        qs: {
-                                                            user_name: 'janardana@hirecraft.com',
-                                                            password: 'Ezeid2015',
-                                                            sender_id: 'WtMate',
-                                                            service: 'TRANS',
-                                                            mobile_no: mobileNo,
-                                                            message: message,
-                                                            method: 'send_sms'
-                                                        },
-                                                        method: 'GET'
+                                                        var buffer;
+                                                        if (trackerTemplate.trackerId) {
+                                                            var ws_data = '[[';
+                                                            // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
+                                                            for (var i = 0; i < trackerTags.length; i++) {
+                                                                if (i != trackerTags.length - 1)
+                                                                    ws_data += '"' + trackerTags[i].displayTagAs + '",';
+                                                                else
+                                                                    ws_data += '"' + trackerTags[i].displayTagAs + '"';
+                                                            }
+                                                            ws_data += "]";
 
-                                                    }, function (error, response, body) {
-                                                        if (error) {
-                                                            console.log(error, "SMS");
+                                                            // console.log(new Buffer(buffer).toString("base64"));
+                                                            for (var applicantIndex = 0; applicantIndex < reqApplicants.length; applicantIndex++) {
+                                                                ws_data += ',[';
+                                                                for (var tagIndex = 0; tagIndex < trackerTags.length; tagIndex++) {
+                                                                    if (tagIndex < trackerTags.length - 1)
+                                                                        ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '",';
+                                                                    else
+                                                                        ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '"';
+                                                                }
+                                                                ws_data += ']';
+                                                            }
+                                                            ws_data += ']';
+                                                            // console.log(ws_data);
+                                                            buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]); // Returns a buffer
                                                         }
-                                                        else {
-                                                            console.log("SUCCESS", "SMS response");
+                                                    }
+                                                    else {
+                                                        for (var applicantIndex = 0; applicantIndex < emailReceivers.length; applicantIndex++) {
+
+                                                            for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+
+                                                                if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+
+                                                                    mailBody = replaceAll(mailBody, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                    subject = replaceAll(subject, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                    smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                    // mailBody = mailBody.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                    // subject = subject.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+
+                                                                    // smsMsg = smsMsg.replace('[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                                                }
+                                                            }
+
+                                                            for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+
+                                                                if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
+
+                                                                    mailBody = replaceAll(mailBody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                    subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                    smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                    // mailBody = mailBody.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                    // subject = subject.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+
+                                                                    // smsMsg = smsMsg.replace('[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                                                }
+                                                            }
+
+                                                            for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+
+                                                                if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
+
+                                                                    mailBody = replaceAll(mailBody, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                    subject = replaceAll(subject, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                    smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                    // mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                    // subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+
+                                                                    // smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                                                }
+                                                            }
+
+                                                            mailbody_array.push(mailBody);
+                                                            subject_array.push(subject);
+                                                            smsMsg_array.push(smsMsg);
+                                                            fromEmailID = result[2][0].fromEmailId;
+                                                            toEmailID.push(result[0][applicantIndex].EmailId);
+                                                            MobileISD.push(result[0][applicantIndex].MobileISD);
+                                                            MobileNumber.push(result[0][applicantIndex].MobileNo);
+                                                            mailBody = temp;
+                                                            subject = temp1;
+                                                            smsMsg = temp2;
                                                         }
-                                                    });
+                                                    }
 
-                                                    var req1 = http.request(options, function (res1) {
-                                                        var chunks = [];
+                                                    for (var receiverIndex = 0; receiverIndex < toEmailID.length; receiverIndex++) {
+                                                        var mailOptions = {
+                                                            from: fromEmailID,
+                                                            to: toEmailID[receiverIndex],
+                                                            subject: subject_array[receiverIndex],
+                                                            html: mailbody_array[receiverIndex]
+                                                        };
 
-                                                        res1.on("data", function (chunk) {
-                                                            chunks.push(chunk);
-                                                        });
+                                                        mailOptions.cc = [];
 
-                                                        res1.on("end", function () {
-                                                            var body = Buffer.concat(chunks);
-                                                            console.log(body.toString());
-                                                        });
-                                                    });
+                                                        for (var j = 0; j < cc.length; j++) {
+                                                            mailOptions.cc.push(cc[j].emailId);
+                                                        }
+                                                        mailOptions.bcc = [];
 
-                                                    req1.write(qs.stringify({
-                                                        userId: 'talentmicro',
-                                                        password: 'TalentMicro@123',
-                                                        senderId: 'WTMATE',
-                                                        sendMethod: 'simpleMsg',
-                                                        msgType: 'text',
-                                                        mobile: isdMobile.replace("+", "") + mobileNo,
-                                                        msg: message,
-                                                        duplicateCheck: 'true',
-                                                        format: 'json'
-                                                    }));
-                                                    req1.end();
-                                                }
-                                                else if (isdMobile != "") {
-                                                    console.log('inside without isd', isdMobile, ' ', mobileNo);
-                                                    client.messages.create(
-                                                        {
-                                                            body: message,
-                                                            to: isdMobile + mobileNo,
-                                                            from: FromNumber
-                                                        },
-                                                        function (error, response) {
-                                                            if (error) {
-                                                                console.log(error, "SMS");
+                                                        for (var j = 0; j < bcc.length; j++) {
+                                                            mailOptions.bcc.push(bcc[j].emailId);
+                                                        }
+
+                                                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                                        var email = new sendgrid.Email();
+                                                        email.from = mailOptions.from;
+                                                        email.to = mailOptions.to;
+                                                        email.subject = mailOptions.subject;
+                                                        email.mbody = mailOptions.html;
+                                                        email.cc = mailOptions.cc;
+                                                        email.bcc = mailOptions.bcc;
+                                                        email.html = mailOptions.html;
+                                                        //if 1 or more attachments are present
+                                                        for (var file = 0; file < attachment.length; file++) {
+                                                            email.addFile({
+                                                                filename: attachment[file].fileName,
+                                                                content: new Buffer(attachment[file].binaryFile, 'base64'),
+                                                                contentType: attachment[file].fileType
+                                                            });
+                                                        }
+
+                                                        if (trackerTemplate.trackerId) {
+                                                            email.addFile({
+                                                                filename: trackerTemplate.templateName + '.xlsx',
+                                                                content: new Buffer(new Buffer(buffer).toString("base64"), 'base64'),
+                                                                contentType: 'application/*'
+                                                            });
+                                                        }
+
+                                                        // assign mobile no and isdMobile to send sms
+                                                        isdMobile = MobileISD[receiverIndex];
+                                                        mobileNo = MobileNumber[receiverIndex];
+                                                        message = smsMsg_array[receiverIndex];
+
+                                                        // to send normal sms
+                                                        if (isSMS) {
+                                                            if (smsFlag) {
+                                                                if (isdMobile == "+977") {
+                                                                    request({
+                                                                        url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                                                        qs: {
+                                                                            token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                                                            to: mobileNo,
+                                                                            message: message,
+                                                                            sender: 'Techingen'
+                                                                        },
+                                                                        method: 'GET'
+
+                                                                    }, function (error, response, body) {
+                                                                        try {
+                                                                            if (error) {
+                                                                                console.log(error, "SMS");
+                                                                            }
+                                                                            else {
+                                                                                console.log("SUCCESS", "SMS response");
+                                                                            }
+                                                                        }
+
+                                                                        catch (ex) {
+                                                                            error_logger.error = ex;
+                                                                            logger(req, error_logger);
+                                                                            res.status(500).json(error_response);
+                                                                        }
+
+                                                                    });
+                                                                }
+                                                                else if (isdMobile == "+91") {
+                                                                    console.log('inside send sms');
+                                                                    console.log(isdMobile, ' ', mobileNo);
+                                                                    request({
+                                                                        url: 'https://aikonsms.co.in/control/smsapi.php',
+                                                                        qs: {
+                                                                            user_name: 'janardana@hirecraft.com',
+                                                                            password: 'Ezeid2015',
+                                                                            sender_id: 'WtMate',
+                                                                            service: 'TRANS',
+                                                                            mobile_no: mobileNo,
+                                                                            message: message,
+                                                                            method: 'send_sms'
+                                                                        },
+                                                                        method: 'GET'
+
+                                                                    }, function (error, response, body) {
+                                                                        try {
+                                                                            if (error) {
+                                                                                console.log(error, "SMS");
+                                                                            }
+                                                                            else {
+                                                                                console.log("SUCCESS", "SMS response");
+                                                                            }
+                                                                        }
+                                                                        catch (ex) {
+                                                                            error_logger.error = ex;
+                                                                            logger(req, error_logger);
+                                                                            res.status(500).json(error_response);
+                                                                        }
+                                                                    });
+
+                                                                    var req1 = http.request(options, function (res1) {
+                                                                        var chunks = [];
+
+                                                                        res1.on("data", function (chunk) {
+                                                                            chunks.push(chunk);
+                                                                        });
+
+                                                                        res1.on("end", function () {
+                                                                            var body = Buffer.concat(chunks);
+                                                                            console.log(body.toString());
+                                                                        });
+                                                                    });
+
+                                                                    req1.write(qs.stringify({
+                                                                        userId: 'talentmicro',
+                                                                        password: 'TalentMicro@123',
+                                                                        senderId: 'WTMATE',
+                                                                        sendMethod: 'simpleMsg',
+                                                                        msgType: 'text',
+                                                                        mobile: isdMobile.replace("+", "") + mobileNo,
+                                                                        msg: message,
+                                                                        duplicateCheck: 'true',
+                                                                        format: 'json'
+                                                                    }));
+                                                                    req1.end();
+                                                                }
+                                                                else if (isdMobile != "") {
+                                                                    console.log('inside without isd', isdMobile, ' ', mobileNo);
+                                                                    client.messages.create(
+                                                                        {
+                                                                            body: message,
+                                                                            to: isdMobile + mobileNo,
+                                                                            from: FromNumber
+                                                                        },
+                                                                        function (error, response) {
+                                                                            try {
+                                                                                if (error) {
+                                                                                    console.log(error, "SMS");
+                                                                                }
+                                                                                else {
+                                                                                    console.log("SUCCESS", "SMS response");
+                                                                                }
+                                                                            }
+                                                                            catch (ex) {
+                                                                                error_logger.error = ex;
+                                                                                logger(req, error_logger);
+                                                                                res.status(500).json(error_response);
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if (isSendgrid) {
+                                                            sendgrid.send(email, function (err, result) {
+                                                                if (!err) {
+
+                                                                    var saveMails = [
+                                                                        req.st.db.escape(req.query.token),
+                                                                        req.st.db.escape(req.query.heMasterId),
+                                                                        req.st.db.escape(req.body.heDepartmentId),
+                                                                        req.st.db.escape(userId),
+                                                                        req.st.db.escape(mailerType),
+                                                                        req.st.db.escape(mailOptions.from),
+                                                                        req.st.db.escape(mailOptions.to),
+                                                                        req.st.db.escape(mailOptions.subject),
+                                                                        req.st.db.escape(mailOptions.html),    // contains mail body
+                                                                        req.st.db.escape(JSON.stringify(cc)),
+                                                                        req.st.db.escape(JSON.stringify(bcc)),
+                                                                        req.st.db.escape(JSON.stringify(attachment)),
+                                                                        req.st.db.escape(req.body.replyMailId),
+                                                                        req.st.db.escape(req.body.priority),
+                                                                        req.st.db.escape(req.body.stageId),
+                                                                        req.st.db.escape(req.body.statusId),
+                                                                        req.st.db.escape(message),    // sms message
+                                                                        req.st.db.escape(whatmateMessage),
+                                                                        req.st.db.escape(recipients[0]),
+                                                                        req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
+                                                                        req.st.db.escape(req.body.interviewerFlag || 0)
+                                                                    ];
+
+                                                                    //saving the mail after sending it
+                                                                    var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
+                                                                    console.log(saveMailHistory);
+                                                                    req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
+                                                                        try {
+                                                                            console.log(mailHistoryErr);
+                                                                            // console.log(mailHistoryResult);
+                                                                            if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
+                                                                                console.log('sent mails saved successfully');
+                                                                            }
+                                                                            else {
+                                                                                console.log('mails could not be saved');
+                                                                            }
+                                                                        }
+                                                                        catch (ex) {
+                                                                            error_logger.error = ex;
+                                                                            logger(req, error_logger);
+                                                                            res.status(500).json(error_response);
+                                                                        }
+                                                                    });
+                                                                    console.log('Mail sent now save sent history');
+                                                                } //end of if(sendgrid sent mail successfully)
+                                                                //if mail is not sent
+                                                                else {
+                                                                    console.log('Mail not Sent Successfully' + err);
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+
+                                                    if (!(templateId == 0 || overWrite)) {
+                                                        response.status = true;
+
+                                                        if (isSendgrid && isSMS) {  // making changes here reminder
+                                                            if (subject != '') {
+                                                                if (smsMsg != '' && smsFlag) {
+                                                                    response.message = "Mail and SMS sent successfully";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
+                                                                else {
+                                                                    response.message = "Mail sent successfully";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
+                                                            }
+
+                                                            else if (subject == '') {
+                                                                if (smsMsg != '' && smsFlag) {
+                                                                    response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
+                                                                else {
+                                                                    response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
+                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                }
                                                             }
                                                             else {
-                                                                console.log("SUCCESS", "SMS response");
+                                                                response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
                                                             }
                                                         }
-                                                    );
-                                                }
-                                            }
-                                        }
+                                                        else if (isSendgrid && !isSMS) {
 
-                                        if (isSendgrid) {
-                                            sendgrid.send(email, function (err, result) {
-                                                if (!err) {
-
-                                                    var saveMails = [
-                                                        req.st.db.escape(req.query.token),
-                                                        req.st.db.escape(req.query.heMasterId),
-                                                        req.st.db.escape(req.body.heDepartmentId),
-                                                        req.st.db.escape(userId),
-                                                        req.st.db.escape(mailerType),
-                                                        req.st.db.escape(mailOptions.from),
-                                                        req.st.db.escape(mailOptions.to),
-                                                        req.st.db.escape(mailOptions.subject),
-                                                        req.st.db.escape(mailOptions.html),    // contains mail body
-                                                        req.st.db.escape(JSON.stringify(cc)),
-                                                        req.st.db.escape(JSON.stringify(bcc)),
-                                                        req.st.db.escape(JSON.stringify(attachment)),
-                                                        req.st.db.escape(req.body.replyMailId),
-                                                        req.st.db.escape(req.body.priority),
-                                                        req.st.db.escape(req.body.stageId),
-                                                        req.st.db.escape(req.body.statusId),
-                                                        req.st.db.escape(message),    // sms message
-                                                        req.st.db.escape(whatmateMessage),
-                                                        req.st.db.escape(recipients[0]),
-                                                        req.st.db.escape(JSON.stringify(transactions ? transactions : [])),
-                                                        req.st.db.escape(req.body.interviewerFlag || 0)
-                                                    ];
-
-                                                    //saving the mail after sending it
-                                                    var saveMailHistory = 'CALL wm_save_sentMailHistory( ' + saveMails.join(',') + ')';
-                                                    console.log(saveMailHistory);
-                                                    req.db.query(saveMailHistory, function (mailHistoryErr, mailHistoryResult) {
-                                                        console.log(mailHistoryErr);
-                                                        // console.log(mailHistoryResult);
-                                                        if (!mailHistoryErr && mailHistoryResult && mailHistoryResult[0] && mailHistoryResult[0][0]) {
-                                                            console.log('sent mails saved successfully');
+                                                            if (subject != '') {
+                                                                response.message = "Mail sent successfully";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else if (subject == '') {
+                                                                response.message = "Mail subject is empty, mail cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                        }
+                                                        else if (isSMS && !isSendgrid) {
+                                                            if (smsMsg != '' && smsFlag) {
+                                                                response.message = "SMS sent successfully";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else if (smsMsg == '' && smsFlag) {
+                                                                response.message = "SMS field is empty, SMS cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
+                                                            else {
+                                                                response.message = "SMS flag is not enabled, SMS cannot be sent";
+                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                            }
                                                         }
                                                         else {
-                                                            console.log('mails could not be saved');
+                                                            response.message = "Sendgrid or SMS is not configured. Please contact the admin";
+                                                            response.data = null;
                                                         }
-                                                    });
-                                                    console.log('Mail sent now save sent history');
-                                                } //end of if(sendgrid sent mail successfully)
-                                                //if mail is not sent
-                                                else {
-                                                    console.log('Mail not Sent Successfully' + err);
+
+                                                        response.error = null;
+                                                        res.status(200).json(response);
+                                                    }
                                                 }
-                                            });
-                                        }
+
+                                                else {
+                                                    response.status = false;
+                                                    response.message = "Error while sending mail";
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(500).json(response);
+                                                    return;
+                                                }
+                                            }
+                                            catch (ex) {
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
                                     }
+                                    // else if(!templateId && !overWrite){
+                                    //     response.status = false;
+                                    //     response.message = "To mail is empty. Mail not sent";
+                                    //     response.error = null;
+                                    //     response.data = null;
+                                    //     res.status(200).json(response);
+                                    //     return;
+                                    // }
 
-                                    if (!(templateId == 0 || overWrite)) {
-                                        response.status = true;
-
-                                        if (isSendgrid && isSMS) {  // making changes here reminder
-                                            if (subject != '') {
-                                                if (smsMsg != '' && smsFlag) {
-                                                    response.message = "Mail and SMS sent successfully";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                                else {
-                                                    response.message = "Mail sent successfully";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                            }
-
-                                            else if (subject == '') {
-                                                if (smsMsg != '' && smsFlag) {
-                                                    response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                                else {
-                                                    response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
-                                                    response.data = transactions[0] ? transactions[0] : [];
-                                                }
-                                            }
-                                            else {
-                                                response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else if (isSendgrid && !isSMS) {
-
-                                            if (subject != '') {
-                                                response.message = "Mail sent successfully";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else if (subject == '') {
-                                                response.message = "Mail subject is empty, mail cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else if (isSMS && !isSendgrid) {
-                                            if (smsMsg != '' && smsFlag) {
-                                                response.message = "SMS sent successfully";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else if (smsMsg == '' && smsFlag) {
-                                                response.message = "SMS field is empty, SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                            else {
-                                                response.message = "SMS flag is not enabled, SMS cannot be sent";
-                                                response.data = transactions[0] ? transactions[0] : [];
-                                            }
-                                        }
-                                        else {
-                                            response.message = "Sendgrid or SMS is not configured. Please contact the admin";
-                                            response.data = null;
-                                        }
-
+                                    else if (templateId && !overWrite && !emailReceivers.length) {
+                                        response.status = false;
+                                        response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
                                         response.error = null;
+                                        response.data = null;
                                         res.status(200).json(response);
+
+                                    }
+                                    // else {
+                                    //     response.status = true;
+                                    //     response.message = "Something went wrong";
+                                    //     res.status(200).json(response);
+
+                                    // }
+                                    console.log("last if", templateId, overWrite);
+                                    //save it as a template if flag is true or template id is 0
+                                    if (templateId == 0 || overWrite) {
+                                        req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
+                                        req.body.type = req.body.type ? req.body.type : 0;
+                                        req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
+                                        req.body.subject = req.body.subject ? req.body.subject : '';
+                                        req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
+                                        req.body.replymailId = req.body.replymailId ? req.body.replymailId : '';
+                                        req.body.priority = req.body.priority ? req.body.priority : 0;
+                                        req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
+                                        req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
+
+                                        var templateInputs = [
+                                            req.st.db.escape(req.query.token),
+                                            req.st.db.escape(templateId),
+                                            req.st.db.escape(req.query.heMasterId),
+                                            req.st.db.escape(req.body.templateName),
+                                            req.st.db.escape(req.body.type),
+                                            req.st.db.escape(JSON.stringify(toMail)),
+                                            req.st.db.escape(JSON.stringify(cc)),
+                                            req.st.db.escape(JSON.stringify(bcc)),
+                                            req.st.db.escape(req.body.subject),
+                                            req.st.db.escape(req.body.mailBody),
+                                            req.st.db.escape(req.body.replymailId),
+                                            req.st.db.escape(req.body.priority),
+                                            req.st.db.escape(req.body.updateFlag),
+                                            req.st.db.escape(smsMsg),
+                                            req.st.db.escape(whatmateMessage),
+                                            req.st.db.escape(JSON.stringify(attachment)),
+                                            req.st.db.escape(JSON.stringify(tags)),
+                                            req.st.db.escape(JSON.stringify(stage)),
+                                            req.st.db.escape(req.body.mailerType),
+                                            req.st.db.escape(JSON.stringify(tableTags)),
+                                            req.st.db.escape(req.body.sendSMS || 0),
+                                            req.st.db.escape(req.body.attachJD || 0),
+                                            req.st.db.escape(req.body.attachResume || 0),
+                                            req.st.db.escape(req.body.interviewerFlag || 0),
+                                            req.st.db.escape(req.body.resumeFileName || ''),
+                                            req.st.db.escape(req.body.attachResumeFlag || 0),
+                                            req.st.db.escape(JSON.stringify(trackerTemplate))
+
+                                        ];
+                                        var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
+                                        console.log(saveTemplateQuery);
+                                        req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
+                                            try {
+                                                console.log(tempSaveErr);
+                                                if (!tempSaveErr && tempSaveResult) {
+                                                    // console.log(tempSaveResult);
+                                                    response.status = true;
+                                                    //check if there are any receivers, if yes sent and saved
+                                                    if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
+                                                        if (isSendgrid && isSMS) {
+                                                            response.message = "Mail and SMS Sent and Template Saved successfully";
+                                                        }
+                                                        else if (!isSendgrid && isSMS) {
+                                                            response.message = "SMS is Sent and Template Saved successfully";
+                                                        }
+                                                        else if (isSendgrid && !isSMS) {
+                                                            response.message = "Mail is Sent and Template Saved successfully";
+                                                        }
+                                                        else {
+                                                            response.message = "Template saved successfully";
+                                                        }
+                                                    }
+                                                    //else saved
+                                                    else {
+                                                        response.message = "Template saved successfully";
+                                                    }
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(200).json(response);
+                                                }
+                                            }
+                                            catch (ex) {
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
                                     }
                                 }
 
-                                else {
-                                    response.status = false;
-                                    response.message = "Error while sending mail";
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(500).json(response);
-                                    return;
-                                }
-                            });
-                        }
-                        // else if(!templateId && !overWrite){
-                        //     response.status = false;
-                        //     response.message = "To mail is empty. Mail not sent";
-                        //     response.error = null;
-                        //     response.data = null;
-                        //     res.status(200).json(response);
-                        //     return;
-                        // }
+                            }
+                            catch (ex) {
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
+                            }
+                        });
 
-                        else if (templateId && !overWrite && !emailReceivers.length) {
-                            response.status = false;
-                            response.message = "To mail is empty. Mail not sent. TemplateId exists but no overWrite Flag";
-                            response.error = null;
-                            response.data = null;
-                            res.status(200).json(response);
 
-                        }
-                        // else {
-                        //     response.status = true;
-                        //     response.message = "Something went wrong";
-                        //     res.status(200).json(response);
-
-                        // }
-                        console.log("last if", templateId, overWrite);
-                        //save it as a template if flag is true or template id is 0
-                        if (templateId == 0 || overWrite) {
-                            req.body.templateName = req.body.template.templateName ? req.body.template.templateName : '';
-                            req.body.type = req.body.type ? req.body.type : 0;
-                            req.body.mailerType = req.body.mailerType ? req.body.mailerType : 0;
-                            req.body.subject = req.body.subject ? req.body.subject : '';
-                            req.body.mailBody = req.body.mailBody ? req.body.mailBody : '';
-                            req.body.replymailId = req.body.replymailId ? req.body.replymailId : '';
-                            req.body.priority = req.body.priority ? req.body.priority : 0;
-                            req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
-                            req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
-
-                            var templateInputs = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(templateId),
-                                req.st.db.escape(req.query.heMasterId),
-                                req.st.db.escape(req.body.templateName),
-                                req.st.db.escape(req.body.type),
-                                req.st.db.escape(JSON.stringify(toMail)),
-                                req.st.db.escape(JSON.stringify(cc)),
-                                req.st.db.escape(JSON.stringify(bcc)),
-                                req.st.db.escape(req.body.subject),
-                                req.st.db.escape(req.body.mailBody),
-                                req.st.db.escape(req.body.replymailId),
-                                req.st.db.escape(req.body.priority),
-                                req.st.db.escape(req.body.updateFlag),
-                                req.st.db.escape(smsMsg),
-                                req.st.db.escape(whatmateMessage),
-                                req.st.db.escape(JSON.stringify(attachment)),
-                                req.st.db.escape(JSON.stringify(tags)),
-                                req.st.db.escape(JSON.stringify(stage)),
-                                req.st.db.escape(req.body.mailerType),
-                                req.st.db.escape(JSON.stringify(tableTags)),
-                                req.st.db.escape(req.body.sendSMS || 0),
-                                req.st.db.escape(req.body.attachJD || 0),
-                                req.st.db.escape(req.body.attachResume || 0),
-                                req.st.db.escape(req.body.interviewerFlag || 0),
-                                req.st.db.escape(req.body.resumeFileName || ''),
-                                req.st.db.escape(req.body.attachResumeFlag || 0),
-                                req.st.db.escape(JSON.stringify(trackerTemplate))
-
-                            ];
-                            var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
-                            console.log(saveTemplateQuery);
-                            req.db.query(saveTemplateQuery, function (tempSaveErr, tempSaveResult) {
-                                console.log(tempSaveErr);
-                                if (!tempSaveErr && tempSaveResult) {
-                                    // console.log(tempSaveResult);
-                                    response.status = true;
-                                    //check if there are any receivers, if yes sent and saved
-                                    if (emailReceivers.length != 0 && (isSendgrid || isSMS)) {
-                                        if (isSendgrid && isSMS) {
-                                            response.message = "Mail and SMS Sent and Template Saved successfully";
-                                        }
-                                        else if (!isSendgrid && isSMS) {
-                                            response.message = "SMS is Sent and Template Saved successfully";
-                                        }
-                                        else if (isSendgrid && !isSMS) {
-                                            response.message = "Mail is Sent and Template Saved successfully";
-                                        }
-                                        else {
-                                            response.message = "Template saved successfully";
-                                        }
-                                    }
-                                    //else saved
-                                    else {
-                                        response.message = "Template saved successfully";
-                                    }
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(200).json(response);
-                                }
-                            });
-                        }
                     }
+                    //end of if(token validation)
+                    //else invalid token
+                    else {
+                        res.status(401).json(response);
+                    }
+                    //end of else (token validation)
 
-                });
-
-
-            }
-            //end of if(token validation)
-            //else invalid token
-            else {
-                res.status(401).json(response);
-            }
-            //end of else (token validation)
-        });
+                }
+                catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+    catch (ex) {
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 
 sendgridCtrl.saveMailSentByGmail = function (req, res, next) {
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-    var validationFlag = true;
-
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid tenant';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
 
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+    var error_logger = {
+        details: 'sendgridCtrl.ScreeningMailerPreview'
     }
 
+    try {
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
+        var validationFlag = true;
+
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid tenant';
+            validationFlag *= false;
+        }
+
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
 
 
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the error';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the error';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
 
-                    //request parameters
-                    var tags = req.body.tags || {};
-                    var cc = req.body.cc || [];
-                    var toMail = req.body.toMail || [];
-                    var bcc = req.body.bcc || [];
-                    var stage = req.body.stage || [];
-                    var attachment = req.body.attachment || [];
-                    var reqApplicants = req.body.reqApplicants || [];
-                    var applicants = req.body.applicantId || [];
-                    var client = req.body.clientId || [];
-                    var tableTags = req.body.tableTags || {};
-                    var clientContacts = req.body.clientContacts || [];
-                    var subject = req.body.subject || '';
-                    var mailBody = req.body.mailBody || '';
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            try {
+                                req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                    var whatmateMessage = req.body.whatmateMessage || '';
-                    var smsMsg = req.body.smsMsg || '';
-                    var smsFlag = req.body.smsFlag || 0;
+                                //request parameters
+                                var tags = req.body.tags || {};
+                                var cc = req.body.cc || [];
+                                var toMail = req.body.toMail || [];
+                                var bcc = req.body.bcc || [];
+                                var stage = req.body.stage || [];
+                                var attachment = req.body.attachment || [];
+                                var reqApplicants = req.body.reqApplicants || [];
+                                var applicants = req.body.applicantId || [];
+                                var client = req.body.clientId || [];
+                                var tableTags = req.body.tableTags || {};
+                                var clientContacts = req.body.clientContacts || [];
+                                var subject = req.body.subject || '';
+                                var mailBody = req.body.mailBody || '';
 
-                    var isWeb = req.query.isWeb || 0;
-                    var mailerType = req.body.mailerType || 0;
-                    var userId = req.query.userId || 0;
+                                var whatmateMessage = req.body.whatmateMessage || '';
+                                var smsMsg = req.body.smsMsg || '';
+                                var smsFlag = req.body.smsFlag || 0;
 
-                    var receipients = [];
-                    //html styling for table in submission mailer
+                                var isWeb = req.query.isWeb || 0;
+                                var mailerType = req.body.mailerType || 0;
+                                var userId = req.query.userId || 0;
 
-                    if (typeof (tags) == "string") {
-                        tags = JSON.parse(tags);
-                    }
+                                var receipients = [];
+                                //html styling for table in submission mailer
 
-                    if (typeof (cc) == "string") {
-                        cc = JSON.parse(cc);
-                    }
+                                if (typeof (tags) == "string") {
+                                    tags = JSON.parse(tags);
+                                }
 
-                    if (typeof (toMail) == "string") {
-                        toMail = JSON.parse(toMail);
-                    }
+                                if (typeof (cc) == "string") {
+                                    cc = JSON.parse(cc);
+                                }
 
-                    if (typeof (bcc) == "string") {
-                        bcc = JSON.parse(bcc);
-                    }
+                                if (typeof (toMail) == "string") {
+                                    toMail = JSON.parse(toMail);
+                                }
 
-                    if (typeof (stage) == "string") {
-                        stage = JSON.parse(stage);
-                    }
+                                if (typeof (bcc) == "string") {
+                                    bcc = JSON.parse(bcc);
+                                }
 
-                    if (typeof (attachment) == "string") {
-                        attachment = JSON.parse(attachment);
-                    }
+                                if (typeof (stage) == "string") {
+                                    stage = JSON.parse(stage);
+                                }
 
-                    if (typeof (client) == "string") {
-                        client = JSON.parse(client);
-                    }
+                                if (typeof (attachment) == "string") {
+                                    attachment = JSON.parse(attachment);
+                                }
 
-                    if (typeof (clientContacts) == "string") {
-                        clientContacts = JSON.parse(clientContacts);
-                    }
+                                if (typeof (client) == "string") {
+                                    client = JSON.parse(client);
+                                }
 
-                    if (typeof (tableTags) == "string") {
-                        tableTags = JSON.parse(tableTags);
-                    }
+                                if (typeof (clientContacts) == "string") {
+                                    clientContacts = JSON.parse(clientContacts);
+                                }
 
-                    if (typeof (reqApplicants) == "string") {
-                        reqApplicants = JSON.parse(reqApplicants);
-                    }
+                                if (typeof (tableTags) == "string") {
+                                    tableTags = JSON.parse(tableTags);
+                                }
 
-                    if (mailerType == 1) {   //screening
-                        receipients = reqApplicants;
-                    }
-                    else if (mailerType == 2) {  // submission
-                        receipients = clientContacts;
-                    }
-                    else if (mailerType == 3) {  // // jobseeker
-                        receipients = applicants;
-                    }
-                    else if (mailerType == 4) {   // client
-                        receipients = clientContacts;
-                    }
-                    else if (mailerType == 5) {   //interview
-                        receipients = clientContacts;
-                    }
+                                if (typeof (reqApplicants) == "string") {
+                                    reqApplicants = JSON.parse(reqApplicants);
+                                }
 
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                        req.body.templateId = req.body.templateId ? req.body.templateId : 0;
+                                if (mailerType == 1) {   //screening
+                                    receipients = reqApplicants;
+                                }
+                                else if (mailerType == 2) {  // submission
+                                    receipients = clientContacts;
+                                }
+                                else if (mailerType == 3) {  // // jobseeker
+                                    receipients = applicants;
+                                }
+                                else if (mailerType == 4) {   // client
+                                    receipients = clientContacts;
+                                }
+                                else if (mailerType == 5) {   //interview
+                                    receipients = clientContacts;
+                                }
 
-                        var inputs = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(req.body.heDepartmentId || 0),
-                            req.st.db.escape(mailerType),
-                            req.st.db.escape(req.body.fromMailId),
-                            req.st.db.escape(req.body.toMailId),
-                            req.st.db.escape(req.body.subject),
-                            req.st.db.escape(req.body.html),    // contains mail body
-                            req.st.db.escape(JSON.stringify(cc)),
-                            req.st.db.escape(JSON.stringify(bcc)),
-                            req.st.db.escape(JSON.stringify(attachment)),
-                            req.st.db.escape(req.body.replyMailId),
-                            req.st.db.escape(req.body.priority),
-                            req.st.db.escape(smsMsg),    // sms message
-                            req.st.db.escape(whatmateMessage),
-                            req.st.db.escape(JSON.stringify(receipients)),
-                            req.st.db.escape(JSON.stringify(reqApplicants)),
-                            req.st.db.escape(req.body.interviewerFlag || 0),
-                            req.st.db.escape(req.body.threadId || "")
-                        ];
+                                if (!validationFlag) {
+                                    response.error = error;
+                                    response.message = 'Please check the errors';
+                                    res.status(400).json(response);
+                                    console.log(response);
+                                }
+                                else {
+                                    req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                                    req.body.templateId = req.body.templateId ? req.body.templateId : 0;
 
-                        var procQuery = 'CALL wm_save_sentByGMailerHistory( ' + inputs.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, result) {
-                            console.log(err);
+                                    var inputs = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.query.heMasterId),
+                                        req.st.db.escape(req.body.heDepartmentId || 0),
+                                        req.st.db.escape(mailerType),
+                                        req.st.db.escape(req.body.fromMailId),
+                                        req.st.db.escape(req.body.toMailId),
+                                        req.st.db.escape(req.body.subject),
+                                        req.st.db.escape(req.body.html),    // contains mail body
+                                        req.st.db.escape(JSON.stringify(cc)),
+                                        req.st.db.escape(JSON.stringify(bcc)),
+                                        req.st.db.escape(JSON.stringify(attachment)),
+                                        req.st.db.escape(req.body.replyMailId),
+                                        req.st.db.escape(req.body.priority),
+                                        req.st.db.escape(smsMsg),    // sms message
+                                        req.st.db.escape(whatmateMessage),
+                                        req.st.db.escape(JSON.stringify(receipients)),
+                                        req.st.db.escape(JSON.stringify(reqApplicants)),
+                                        req.st.db.escape(req.body.interviewerFlag || 0),
+                                        req.st.db.escape(req.body.threadId || "")
+                                    ];
 
-                            if (!err && result && result[0][0]) {
-                                response.status = true;
-                                response.message = "mails saved sucessfully";
-                                response.error = null;
-                                response.data = result[0][0];
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
+                                    var procQuery = 'CALL wm_save_sentByGMailerHistory( ' + inputs.join(',') + ')';
+                                    console.log(procQuery);
+                                    req.db.query(procQuery, function (err, result) {
+                                        try {
+                                            console.log(err);
+
+                                            if (!err && result && result[0][0]) {
+                                                response.status = true;
+                                                response.message = "mails saved sucessfully";
+                                                response.error = null;
+                                                response.data = result[0][0];
+                                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                zlib.gzip(buf, function (_, result) {
+                                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                    res.status(200).json(response);
+                                                });
+                                            }
+
+                                            else {
+                                                response.status = false;
+                                                response.message = "Error while saving mails";
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(500).json(response);
+                                            }
+                                        }
+                                        catch (ex) {
+                                            error_logger.error = ex;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
+                                        }
+                                    });
+                                }
                             }
-
-                            else {
-                                response.status = false;
-                                response.message = "Error while saving mails";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
+                            catch (ex) {
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
                             }
                         });
+
+
+
                     }
-
-                });
-
-
-
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
+                    else {
+                        res.status(401).json(response);
+                    }
+                }
+                catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+    catch (ex) {
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
@@ -7948,7 +8576,7 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                             // var JDAttachment = [];
                             var tags = result[2] && result[2][0] ? JSON.parse(result[2][0].tags) : {};
 
-                            isSMS = result[3] && result[3][0] && result[3][0].isSMS ? result[3][0].isSMS : 0 
+                            isSMS = result[3] && result[3][0] && result[3][0].isSMS ? result[3][0].isSMS : 0
 
                             // if (subject != '') {
 
@@ -7998,7 +8626,7 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                                 if (isSMS) {
 
                                     console.log('inside send sms');
-                                    console.log(isdMobile,' ', mobileNo);
+                                    console.log(isdMobile, ' ', mobileNo);
 
                                     if (isdMobile == "+91") {
                                         request({

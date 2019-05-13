@@ -1,0 +1,466 @@
+var charityCtrl = {};
+var error = {};
+var logger = require('../../error-logger/error-log.js');
+var fs = require('fs');
+var zlib = require('zlib');
+var AES_256_encryption = require('../../../../encryption/encryption.js');
+var encryption = new AES_256_encryption();
+
+charityCtrl.saveBeneficiary = function (req, res, next) {
+
+    var error_response = {
+        status: false,
+        message: "Some error occurred!",
+        error: null,
+        data: null
+    }
+
+    var error_logger = {
+        details: 'charityCtrl.saveBeneficiary'
+    }
+
+    var response = {
+        status: false,
+        message: "Some error occured",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    var lngId = (req.query.lngId);
+
+
+    if (!req.query.lngId) {
+        error.lngId = 'Invalid lngId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                            console.log(req.body);
+                            var deviceId = req.body.deviceId || 0;
+
+                            if (!req.body.name) {
+                                error.name = 'Beneficiary name mandatory';
+                                validationFlag *= false;
+                            }
+
+                            if (!validationFlag) {
+                                response.error = error;
+                                response.message = 'Please check the error';
+                                res.status(400).json(response);
+                                console.log(response);
+                            }
+                            else {
+                                var inputs = [
+                                    req.st.db.escape(req.query.token),
+                                    req.st.db.escape(lngId),
+                                    req.st.db.escape(req.body.beneficiaryId || 0),
+                                    req.st.db.escape(req.body.name),
+                                    req.st.db.escape(req.body.profilePicture || ""),
+                                    req.st.db.escape(req.body.unoId || ""),
+                                    req.st.db.escape(req.body.idNumber || ""),
+                                    req.st.db.escape(req.body.idPicture || ""),
+                                    req.st.db.escape(req.body.dob || null),
+                                    req.st.db.escape(req.body.gender || 0),
+                                    req.st.db.escape(req.body.guardianName || ""),
+                                    req.st.db.escape(req.body.guardianMobileIsd || ""),
+                                    req.st.db.escape(req.body.guardianMobileNo || ""),
+                                    req.st.db.escape(req.body.addressLine1 || ""),
+                                    req.st.db.escape(req.body.addressLine2 || ""),
+                                    req.st.db.escape(req.body.latitude || 0),
+                                    req.st.db.escape(req.body.longitude || 0),
+                                    req.st.db.escape(req.body.city || ""),
+                                    req.st.db.escape(req.body.state || ""),
+                                    req.st.db.escape(req.body.country || ""),
+                                    req.st.db.escape(req.body.postalCode || ""),
+                                    req.st.db.escape(req.body.description || ""),
+                                    req.st.db.escape(JSON.stringify(req.body.attachmentList || [])),
+                                    req.st.db.escape(req.body.status || 0)
+                                ];
+
+                                var procQuery = 'CALL nk_save_charityBeneficiaryDetails(' + inputs.join(',') + ')';
+                                console.log(procQuery);
+                                req.db.query(procQuery, function (err, result) {
+                                    try {
+                                        console.log(err);
+
+                                        if (!err && result && result[0] && result[0][0]) {
+                                            response.status = true;
+                                            response.message = "Beneficiary details saved successfully";
+                                            response.error = null;
+                                            result[0][0].attachmentList = result[0][0].attachmentList && JSON.parse(result[0][0].attachmentList) ? JSON.parse(result[0][0].attachmentList) : [];
+
+                                            response.data = {
+                                                beneficiaryDetails: result[0][0]
+                                            };
+                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(response);
+                                            });
+
+                                        }
+
+                                        else if (!err) {
+                                            response.status = false;
+                                            response.message = "Details not saved";
+                                            response.error = null;
+                                            response.data = null;
+                                            res.status(200).json(response);
+                                        }
+                                        else {
+                                            error_logger.error = err;
+                                            error_logger.proc_call = procQuery;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
+                                        }
+                                    } catch (ex) {
+                                        error_logger.error = ex;
+                                        error_logger.proc_call = procQuery;
+                                        logger(req, error_logger);
+                                        res.status(500).json(error_response);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    else {
+                        res.status(401).json(response);
+                    }
+                } catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+        catch (ex) {
+            error_logger.error = ex;
+            logger(req, error_logger);
+            res.status(500).json(error_response);
+        }
+
+    }
+};
+
+
+charityCtrl.getBeneficiaryDetails = function (req, res, next) {
+
+    var error_response = {
+        status: false,
+        message: "Some error occurred!",
+        error: null,
+        data: null
+    }
+
+    var error_logger = {
+        details: 'charity/charity-ctrl : charityCtrl.getBeneficiaryDetails '
+    }
+
+    var response = {
+        status: false,
+        message: "Some error occured",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    var lngId = (req.query.lngId);
+
+
+    if (!req.query.lngId) {
+        error.lngId = 'Invalid lngId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
+                        // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                        //     console.log(req.body);
+                        var deviceId = req.body.deviceId || 0;
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the error';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            var inputs = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(lngId),
+                                req.st.db.escape(req.query.beneficiaryId || 0)
+                            ];
+
+                            var procQuery = 'CALL nk_get_charityBeneficiaryDetails(' + inputs.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, result) {
+                                try {
+                                    console.log(err);
+
+                                    if (!err && result && result[0] && result[0][0]) {
+                                        response.status = true;
+                                        response.message = "Beneficiary details loaded successfully";
+                                        response.error = null;
+                                        result[0][0].attachmentList = result[0][0].attachmentList && JSON.parse(result[0][0].attachmentList) ? JSON.parse(result[0][0].attachmentList) : [];
+
+                                        response.data = {
+                                            beneficiaryDetails: result[0][0]
+                                        };
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        });
+
+                                    }
+
+                                    else if (!err) {
+                                        response.status = true;
+                                        response.message = "Details not loaded";
+                                        response.error = null;
+                                        response.data = {
+                                            beneficiaryDetails: null
+                                        };
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        });
+                                    }
+                                    else {
+                                        error_logger.error = err;
+                                        error_logger.proc_call = procQuery;
+                                        logger(req, error_logger);
+                                        res.status(500).json(error_response);
+                                    }
+                                } catch (ex) {
+                                    error_logger.error = ex;
+                                    error_logger.proc_call = procQuery;
+                                    logger(req, error_logger);
+                                    res.status(500).json(error_response);
+                                }
+                            });
+                        }
+                        // });
+                    }
+                    else {
+                        res.status(401).json(response);
+                    }
+                } catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        } catch (ex) {
+            error_logger.error = ex;
+            logger(req, error_logger);
+            res.status(500).json(error_response);
+        }
+    }
+};
+
+charityCtrl.getBeneficiaryList = function (req, res, next) {
+
+    var error_response = {
+        status: false,
+        message: "Some error occurred!",
+        error: null,
+        data: null
+    }
+
+    var error_logger = {
+        details: 'charity/charity-ctrl : charityCtrl.getBeneficiaryList'
+    }
+
+    var response = {
+        status: false,
+        message: "Some error occured",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    var lngId = (req.query.lngId);
+
+
+    if (!req.query.lngId) {
+        error.lngId = 'Invalid lngId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
+                        // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                        // console.log("req", req);
+                        // fs.writeFile('./request.txt', req, function (err, result) {
+                        //     if (err)
+                        //         console.log(err);
+                        //     console.log('success');
+                        // });
+
+                        // console.log(req.toString());
+
+                        // var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                        // var email = new sendgrid.Email();
+                        // email.from = "sundar@talentmicro.com";
+                        // email.to = "arun@jobraiser.com";
+                        // email.subject = "Request";
+                        // email.html =req.toString().toString();
+
+                        // sendgrid.send(email, function (err, result) {
+                        //     if (!err) {
+                        //         console.log('err',err);
+                        //     }
+                        //     else {
+                        //         console.log('failed to send',err);
+                        //     }
+                        // });
+
+                        var deviceId = req.body.deviceId || 0;
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the error';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            var inputs = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(lngId),
+                                req.st.db.escape(req.query.isAll || 0),
+                                req.st.db.escape(req.query.start || 0),
+                                req.st.db.escape(req.query.limit || 0),
+                                req.st.db.escape(req.query.keywords || ""),
+                                req.st.db.escape(req.query.orderNo || 0)
+                            ];
+
+                            var procQuery = 'CALL nk_get_charityBeneficiaryList(' + inputs.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, result) {
+                                try {
+                                    console.log(err);
+
+                                    if (!err && result && result[0] && result[0][0]) {
+                                        response.status = true;
+                                        response.message = "Beneficiary list loaded successfully";
+                                        response.error = null;
+
+                                        for (var i = 0; i < result[0].length; i++) {
+                                            result[0][i].attachmentList = result[0][i].attachmentList && JSON.parse(result[0][i].attachmentList) ? JSON.parse(result[0][i].attachmentList) : [];
+                                        }
+
+                                        response.data = {
+                                            beneficiaryList: result[0] ? result[0] : [],
+                                            count: result[1][0] && result[1][0].count ? result[1][0].count : 0
+                                        };
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        });
+                                    }
+
+                                    else if (!err) {
+                                        response.status = true;
+                                        response.message = "Details not loaded";
+                                        response.error = null;
+                                        response.data = {
+                                            beneficiaryList: [],
+                                            count: 0
+                                        };
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        });
+                                    }
+                                    else {
+                                        error_logger.error = err;
+                                        error_logger.proc_call = procQuery;
+                                        logger(req, error_logger);
+                                        res.status(500).json(error_response);
+                                    }
+                                } catch (ex) {
+                                    error_logger.error = ex;
+                                    error_logger.proc_call = procQuery;
+                                    logger(req, error_logger);
+                                    res.status(500).json(error_response);
+                                }
+
+                            });
+                        }
+                        // });
+                    }
+                    else {
+                        res.status(401).json(response);
+                    }
+                } catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+
+            });
+        } catch (ex) {
+            error_logger.error = ex;
+            logger(req, error_logger);
+            res.status(500).json(error_response);
+        }
+
+    }
+};
+
+module.exports = charityCtrl;
