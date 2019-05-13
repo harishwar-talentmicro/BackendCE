@@ -18,6 +18,7 @@ var applicantCtrl = {};
 var error = {};
 var CONFIG = require('../../../../ezeone-config.json');
 var DBSecretKey = CONFIG.DB.secretKey;
+var logger = require('../error-logger/error-log.js');
 
 
 
