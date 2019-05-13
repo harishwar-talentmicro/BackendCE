@@ -3,9 +3,9 @@ var fs = require("fs");
 var resumeMaskingCtrl = {};
 var path = require('path');
 var uuid = require('node-uuid');
-
+var request = require('request');
 // var resume_masking = function (original_path, new_path, header, footer, required_data) {
-resumeMaskingCtrl.resume_masking = function (req, res, next) {
+resumeMaskingCtrl.resume_maskinghttps = function (req, res, next) {
 
     var response = {
         status: false,
@@ -61,7 +61,7 @@ resumeMaskingCtrl.resume_masking = function (req, res, next) {
 
                         var uniqueId = uniqueId + "." + orgCVPath.split('.')[1];
 
-                        if (logoFile != ""){
+                        if (logoFile != "") {
                             logoFile = 'https://storage.googleapis.com/ezeone/' + logoFile;
                         }
 
@@ -137,7 +137,45 @@ resumeMaskingCtrl.resume_masking = function (req, res, next) {
             }
         });
     }
-
 }
+
+
+resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
+
+    var heMasterId = req.query.heMasterId;
+    var isWeb = req.query.isWeb;
+    var token = req.query.token;
+
+    var url = 'http://35.237.69.199:3001/api/v1.1/WM/cv/resume-preparationhttp?heMasterId=' + heMasterId + '&isWeb=' + isWeb + '&token=' + token;
+
+    try {
+        request({
+
+            url: url,
+            method: "POST",
+            json: true,
+            body: req.body
+        }, function (error, resp, body) {
+            if (error) {
+                console.log("rsa error", error);
+            }
+            else {
+                console.log("rsa response", body);
+            }
+
+            if(typeof(body)=='string'){
+                body = JSON.parse(body);
+            }
+
+            res.send(body);
+        });
+
+    }
+    catch (ex) {
+        console.log(ex);
+        res.send(ex.toString());
+    }
+};
+
 
 module.exports = resumeMaskingCtrl;
