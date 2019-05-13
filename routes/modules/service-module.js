@@ -6,7 +6,9 @@
  */
 "use strict";
 
+var path = require('path');
 var uuid = require('node-uuid');
+var spawn = require("child_process").spawn;
 
 var st = null;
 var Notification = require('./notification/notification-master.js');
@@ -15,33 +17,33 @@ var notification = null;
 var notificationQmManager = null;
 var moment = require('moment');
 var appConfig = require('../../ezeone-config.json');
-var DBSecretKey=appConfig.DB.secretKey;
+var DBSecretKey = appConfig.DB.secretKey;
 var request = require('request');
 
-function Service(db,stdLib){
+function Service(db, stdLib) {
 
-    if(stdLib){
+    if (stdLib) {
         st = stdLib;
-        notification = new Notification(db,stdLib);
-        notificationQmManager = new NotificationQueryManager(db,stdLib);
+        notification = new Notification(db, stdLib);
+        notificationQmManager = new NotificationQueryManager(db, stdLib);
     }
 };
 
 
-var stream = require( "stream" );
-var chalk = require( "chalk" );
-var util = require( "util" );
+var stream = require("stream");
+var chalk = require("chalk");
+var util = require("util");
 // I turn the given source Buffer into a Readable stream.
-function BufferStream( source ) {
+function BufferStream(source) {
 
-    if ( ! Buffer.isBuffer( source ) ) {
+    if (!Buffer.isBuffer(source)) {
 
-        throw( new Error( "Source must be a buffer." ) );
+        throw (new Error("Source must be a buffer."));
 
     }
 
     // Super constructor.
-    stream.Readable.call( this );
+    stream.Readable.call(this);
 
     this._source = source;
 
@@ -51,17 +53,17 @@ function BufferStream( source ) {
     this._length = source.length;
 
     // When the stream has ended, try to clean up the memory references.
-    this.on( "end", this._destroy );
+    this.on("end", this._destroy);
 
 }
 
-util.inherits( BufferStream, stream.Readable );
+util.inherits(BufferStream, stream.Readable);
 
 // I attempt to clean up variable references once the stream has been ended.
 // --
 // NOTE: I am not sure this is necessary. But, I'm trying to be more cognizant of memory
 // usage since my Node.js apps will (eventually) never restart.
-BufferStream.prototype._destroy = function() {
+BufferStream.prototype._destroy = function () {
 
     this._source = null;
     this._offset = null;
@@ -73,22 +75,22 @@ BufferStream.prototype._destroy = function() {
 // --
 // NOTE: We can assume the size value will always be available since we are not
 // altering the readable state options when initializing the Readable stream.
-BufferStream.prototype._read = function( size ) {
+BufferStream.prototype._read = function (size) {
 
     // If we haven't reached the end of the source buffer, push the next chunk onto
     // the internal stream buffer.
-    if ( this._offset < this._length ) {
+    if (this._offset < this._length) {
 
-        this.push( this._source.slice( this._offset, ( this._offset + size ) ) );
+        this.push(this._source.slice(this._offset, (this._offset + size)));
 
         this._offset += size;
 
     }
 
     // If we've consumed the entire source buffer, close the readable stream.
-    if ( this._offset >= this._length ) {
+    if (this._offset >= this._length) {
 
-        this.push( null );
+        this.push(null);
 
     }
 
@@ -119,36 +121,36 @@ bucket.acl.default.add({
  * @param readStream
  * @param callback
  */
-var uploadDocumentToCloud = function(uniqueName,readStream,callback){
+var uploadDocumentToCloud = function (uniqueName, readStream, callback) {
     var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
     readStream.pipe(remoteWriteStream);
 
-    remoteWriteStream.on('finish', function(){
+    remoteWriteStream.on('finish', function () {
         console.log('done');
-        if(callback){
-            if(typeof(callback)== 'function'){
+        if (callback) {
+            if (typeof (callback) == 'function') {
                 callback(null);
             }
-            else{
+            else {
                 console.log('callback is required for uploadDocumentToCloud');
             }
         }
-        else{
+        else {
             console.log('callback is required for uploadDocumentToCloud');
         }
     });
 
-    remoteWriteStream.on('error', function(err){
-        if(callback){
-            if(typeof(callback)== 'function'){
+    remoteWriteStream.on('error', function (err) {
+        if (callback) {
+            if (typeof (callback) == 'function') {
                 console.log(err);
                 callback(err);
             }
-            else{
+            else {
                 console.log('callback is required for uploadDocumentToCloud');
             }
         }
-        else{
+        else {
             console.log('callback is required for uploadDocumentToCloud');
         }
     });
@@ -162,7 +164,7 @@ var uploadDocumentToCloud = function(uniqueName,readStream,callback){
  * @param next
  * @description api code for get service providers
  */
-Service.prototype.getServiceProviders = function(req,res,next){
+Service.prototype.getServiceProviders = function (req, res, next) {
 
     var token = req.query.token;
     var lat = req.query.lat ? req.query.lat : 0.00;
@@ -172,17 +174,17 @@ Service.prototype.getServiceProviders = function(req,res,next){
 
     var validateStatus = true, error = {};
 
-    if(!token){
+    if (!token) {
         error['token'] = 'Sorry! token is mandatory';
         console.log('token is mandatory');
         validateStatus *= false;
     }
-    if(isNaN(serviceType)){
+    if (isNaN(serviceType)) {
         error['service_type'] = 'Sorry! service_type is invalid';
         console.log('service_type is a integer value');
         validateStatus *= false;
     }
-    if(!validateStatus){
+    if (!validateStatus) {
         res.status(400).json(error);
     }
     else {
@@ -190,20 +192,20 @@ Service.prototype.getServiceProviders = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =   st.db.escape(token) + ',' + st.db.escape(lat)
-                            + ',' + st.db.escape(lng)+ ',' + st.db.escape(serviceType) + ',' + st.db.escape(req.query.service_mid)
-                            + ',' + st.db.escape(req.query.dt)+','+st.db.escape(DBSecretKey);
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(lat)
+                            + ',' + st.db.escape(lng) + ',' + st.db.escape(serviceType) + ',' + st.db.escape(req.query.service_mid)
+                            + ',' + st.db.escape(req.query.dt) + ',' + st.db.escape(DBSecretKey);
 
                         var query = 'CALL pgetserviceproviders(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, serviceResult) {
                             if (!err) {
                                 if (serviceResult) {
-                                    if(serviceResult[0]){
-                                        if(serviceResult[1]){
-                                            for(var i=0; i < serviceResult[0].length; i++){
+                                    if (serviceResult[0]) {
+                                        if (serviceResult[1]) {
+                                            for (var i = 0; i < serviceResult[0].length; i++) {
 
-                                                serviceResult[0][i].OpenStatus = st.getOpenStatus(serviceResult[0][i].OpenStatus,serviceResult[0][i].wh);
+                                                serviceResult[0][i].OpenStatus = st.getOpenStatus(serviceResult[0][i].OpenStatus, serviceResult[0][i].wh);
 
                                                 /**
                                                  * Removing wh property from search results
@@ -211,11 +213,11 @@ Service.prototype.getServiceProviders = function(req,res,next){
                                                 serviceResult[0][i].wh = undefined;
 
                                                 serviceResult[0][i].tilebanner = serviceResult[0][i].tilebanner ?
-                                                req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].tilebanner: '';
+                                                    req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].tilebanner : '';
                                             }
                                             res.status(200).json({
-                                                totalcount : (serviceResult[1][0]) ? serviceResult[1][0].totalcount : 0,
-                                                Result : (serviceResult[0]) ? serviceResult[0] : []
+                                                totalcount: (serviceResult[1][0]) ? serviceResult[1][0].totalcount : 0,
+                                                Result: (serviceResult[0]) ? serviceResult[0] : []
                                             });
                                             console.log('FnGetServiceProviders: service providers loaded successfully');
                                         }
@@ -272,7 +274,7 @@ Service.prototype.getServiceProviders = function(req,res,next){
  * @param next
  * @description api code for get services
  */
-Service.prototype.getServices = function(req,res,next){
+Service.prototype.getServices = function (req, res, next) {
 
     var token = req.query.token;
     var masterId = parseInt(req.query.master_id);
@@ -287,20 +289,20 @@ Service.prototype.getServices = function(req,res,next){
 
     var validateStatus = true, error = {};
 
-    if(!token){
+    if (!token) {
         error['token'] = 'token is mandatory';
         validateStatus *= false;
     }
-    if(!(req.query.s)){
+    if (!(req.query.s)) {
         error['status'] = 'status is invalid';
         validateStatus *= false;
     }
-    if(isNaN(masterId)){
+    if (isNaN(masterId)) {
         error['master_id'] = 'master_id is a integer value';
         validateStatus *= false;
     }
 
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
         res.status(400).json(responseMessage);
@@ -310,20 +312,20 @@ Service.prototype.getServices = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =   st.db.escape(masterId) + ',' + st.db.escape(token)+ ',' + st.db.escape(req.query.s);
+                        var queryParams = st.db.escape(masterId) + ',' + st.db.escape(token) + ',' + st.db.escape(req.query.s);
                         var query = 'CALL ploadservices(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, serviceResult) {
                             if (!err) {
                                 if (serviceResult) {
-                                    if(serviceResult[0]){
+                                    if (serviceResult[0]) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'services loaded successfully';
-                                        for(var i=0;i<serviceResult[0].length;i++){
-                                            serviceResult[0][i].isimage = (serviceResult[0][i].isimage != 0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isimage :0;
-                                            serviceResult[0][i].isattachment = (serviceResult[0][i].isattachment !=0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isattachment :0;
-                                            serviceResult[0][i].isvideo = (serviceResult[0][i].isvideo !=0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isvideo :0;
+                                        for (var i = 0; i < serviceResult[0].length; i++) {
+                                            serviceResult[0][i].isimage = (serviceResult[0][i].isimage != 0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isimage : 0;
+                                            serviceResult[0][i].isattachment = (serviceResult[0][i].isattachment != 0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isattachment : 0;
+                                            serviceResult[0][i].isvideo = (serviceResult[0][i].isvideo != 0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isvideo : 0;
                                         }
                                         responseMessage.data = serviceResult[0];
                                         res.status(200).json(responseMessage);
@@ -363,7 +365,7 @@ Service.prototype.getServices = function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server : 'Internal server error'
+                        server: 'Internal server error'
                     };
                     responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
@@ -394,7 +396,7 @@ Service.prototype.getServices = function(req,res,next){
  * @param next
  * @description api code for get service categories
  */
-Service.prototype.getServiceCategories= function(req,res,next){
+Service.prototype.getServiceCategories = function (req, res, next) {
 
     var token = req.query.token;
     var masterId = parseInt(req.query.master_id);
@@ -408,17 +410,17 @@ Service.prototype.getServiceCategories= function(req,res,next){
 
     var validateStatus = true, error = {};
 
-    if(!token){
+    if (!token) {
         error['token'] = 'token is mandatory';
         validateStatus *= false;
     }
-    if(isNaN(masterId)){
+    if (isNaN(masterId)) {
         error['master_id'] = 'master_id is a integer value';
         validateStatus *= false;
     }
 
 
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
         res.status(400).json(responseMessage);
@@ -428,13 +430,13 @@ Service.prototype.getServiceCategories= function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =   st.db.escape(masterId) + ',' + st.db.escape(token);
+                        var queryParams = st.db.escape(masterId) + ',' + st.db.escape(token);
                         var query = 'CALL pgetservicecatagories(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, categoryResult) {
                             if (!err) {
                                 if (categoryResult) {
-                                    if(categoryResult[0]){
+                                    if (categoryResult[0]) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'service categories loaded successfully';
@@ -476,7 +478,7 @@ Service.prototype.getServiceCategories= function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server : 'Internal server error'
+                        server: 'Internal server error'
                     };
                     responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
@@ -506,7 +508,7 @@ Service.prototype.getServiceCategories= function(req,res,next){
  * @param next
  * @description api code for get service Details
  */
-Service.prototype.getServiceDetails = function(req,res,next){
+Service.prototype.getServiceDetails = function (req, res, next) {
 
     var token = req.query.token;
     var serviceId = parseInt(req.query.id);
@@ -520,16 +522,16 @@ Service.prototype.getServiceDetails = function(req,res,next){
 
     var validateStatus = true, error = {};
 
-    if(!token){
+    if (!token) {
         error['token'] = 'token is mandatory';
         validateStatus *= false;
     }
-    if(isNaN(serviceId)){
+    if (isNaN(serviceId)) {
         error['id'] = 'id is a integer value';
         validateStatus *= false;
     }
 
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
         res.status(400).json(responseMessage);
@@ -539,17 +541,17 @@ Service.prototype.getServiceDetails = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =   st.db.escape(serviceId)+','+ st.db.escape(token);
+                        var queryParams = st.db.escape(serviceId) + ',' + st.db.escape(token);
                         var query = 'CALL ploadservicedetails(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, details) {
                             if (!err) {
                                 if (details) {
-                                    if(details[0]){
+                                    if (details[0]) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'service details loaded successfully';
-                                        if(details[0][0]) {
+                                        if (details[0][0]) {
                                             details[0][0].isimage = details[0][0].isimage ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + details[0][0].isimage : 0;
                                             details[0][0].isattachment = details[0][0].isattachment ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + details[0][0].isattachment : 0;
                                             details[0][0].isvideo = details[0][0].isvideo ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + details[0][0].isvideo : 0;
@@ -592,7 +594,7 @@ Service.prototype.getServiceDetails = function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server : 'Internal server error'
+                        server: 'Internal server error'
                     };
                     responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
@@ -622,9 +624,9 @@ Service.prototype.getServiceDetails = function(req,res,next){
  * @param next
  * @description save service pic
  */
-Service.prototype.saveServicePic = function(req,res,next) {
+Service.prototype.saveServicePic = function (req, res, next) {
 
-    var picUrl='',picFilename='';
+    var picUrl = '', picFilename = '';
 
     var responseMessage = {
         status: false,
@@ -633,10 +635,10 @@ Service.prototype.saveServicePic = function(req,res,next) {
         data: null
     };
 
-    try{
+    try {
 
-        if(req.files) {
-            if(req.files.pic) {
+        if (req.files) {
+            if (req.files.pic) {
                 console.log(req.files.pic);
                 var uniqueId = uuid.v4();
                 var filetype = (req.files.pic.extension) ? req.files.pic.extension : 'jpg';
@@ -649,8 +651,8 @@ Service.prototype.saveServicePic = function(req,res,next) {
                         responseMessage.status = true;
                         responseMessage.message = 'Pic Uploaded successfully';
                         responseMessage.data = {
-                            pic_url : picUrl,
-                            pic_fn :picFilename
+                            pic_url: picUrl,
+                            pic_fn: picFilename
                         };
                         res.status(200).json(responseMessage);
                         console.log('FnSavePic: Pic Uploaded successfully');
@@ -663,7 +665,7 @@ Service.prototype.saveServicePic = function(req,res,next) {
                 });
             }
         }
-        else{
+        else {
             responseMessage.message = 'file is required';
             res.status(200).json(responseMessage);
             console.log('pic file is required');
@@ -690,9 +692,9 @@ Service.prototype.saveServicePic = function(req,res,next) {
  * @param next
  * @description save service pic
  */
-Service.prototype.saveServiceAttachment = function(req,res,next) {
+Service.prototype.saveServiceAttachment = function (req, res, next) {
 
-    var aUrl='',aFilename='';
+    var aUrl = '', aFilename = '';
 
     var responseMessage = {
         status: false,
@@ -701,44 +703,44 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
         data: null
     };
 
-    try{
-        if(req.files) {
-            if(req.files.attachment) {
+    try {
+        if (req.files) {
+            if (req.files.attachment) {
                 var uniqueId = uuid.v4();
                 var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
                 var mimeType = req.files.attachment.mimetype;
-                if(mimeType && filetype==''){
-                    if(mimeType.indexOf('png') > 0|| mimeType.indexOf('jpg') > 0 ){
+                if (mimeType && filetype == '') {
+                    if (mimeType.indexOf('png') > 0 || mimeType.indexOf('jpg') > 0) {
                         filetype = "png";
                     }
-                    else if(mimeType.indexOf('jpeg') > 0 ){
+                    else if (mimeType.indexOf('jpeg') > 0) {
                         filetype = "jpeg";
                     }
-                    else if(mimeType.indexOf('jpg') > 0 ){
+                    else if (mimeType.indexOf('jpg') > 0) {
                         filetype = "jpg"
                     }
-                    else if(mimeType.indexOf('doc') > 0 ){
+                    else if (mimeType.indexOf('doc') > 0) {
                         filetype = "docx"
                     }
-                    else if(mimeType.indexOf('docx') > 0 ){
+                    else if (mimeType.indexOf('docx') > 0) {
                         filetype = "docx"
                     }
-                    else if(mimeType.indexOf('rtf') > 0 ){
+                    else if (mimeType.indexOf('rtf') > 0) {
                         filetype = "rtf"
                     }
-                    else if(mimeType.indexOf('pdf') > 0 ){
+                    else if (mimeType.indexOf('pdf') > 0) {
                         filetype = "pdf"
                     }
-                    else if(mimeType.indexOf('application/msword') > -1 ){
+                    else if (mimeType.indexOf('application/msword') > -1) {
                         filetype = "docx"
                     }
                 }
                 aUrl = uniqueId + '.' + filetype;
                 aFilename = req.files.attachment.originalname;
-                console.log("aFilenameaFilename",aFilename);
-                console.log("aFilenameaFilename",req.files.attachment);
-                
-                console.log("req.files.attachment.path",req.files.attachment.path);
+                console.log("aFilenameaFilename", aFilename);
+                console.log("aFilenameaFilename", req.files.attachment);
+
+                console.log("req.files.attachment.path", req.files.attachment.path);
 
                 var readStream = fs.createReadStream(req.files.attachment.path);
 
@@ -747,10 +749,10 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
                         responseMessage.status = true;
                         responseMessage.message = 'attachment Uploaded successfully';
                         responseMessage.data = {
-                            a_url : aUrl,
-                            a_fn :aFilename
+                            a_url: aUrl,
+                            a_fn: aFilename
                         };
-                        console.log("responseMessage",responseMessage);
+                        console.log("responseMessage", responseMessage);
 
                         res.status(200).json(responseMessage);
                         console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
@@ -763,7 +765,7 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
                 });
             }
         }
-        else{
+        else {
             responseMessage.message = 'file is required';
             res.status(200).json(responseMessage);
             console.log('file is required');
@@ -782,9 +784,9 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
     }
 };
 
-Service.prototype.saveServiceAttachmentForPacehcm = function(req,res,next) {
+Service.prototype.saveServiceAttachmentForPacehcm = function (req, res, next) {
 
-    var aUrl='',aFilename='';
+    var aUrl = '', aFilename = '';
 
     var responseMessage = {
         status: false,
@@ -793,44 +795,44 @@ Service.prototype.saveServiceAttachmentForPacehcm = function(req,res,next) {
         data: null
     };
 
-    try{
-        if(req.files) {
-            if(req.files.attachment) {
+    try {
+        if (req.files) {
+            if (req.files.attachment) {
                 var uniqueId = uuid.v4();
                 var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
                 var mimeType = req.files.attachment.mimetype;
-                if(mimeType){
-                    if(mimeType.indexOf('png') > 0|| mimeType.indexOf('jpg') > 0 ){
+                if (mimeType) {
+                    if (mimeType.indexOf('png') > 0 || mimeType.indexOf('jpg') > 0) {
                         filetype = "png";
                     }
-                    else if(mimeType.indexOf('jpeg') > 0 ){
+                    else if (mimeType.indexOf('jpeg') > 0) {
                         filetype = "jpeg";
                     }
-                    else if(mimeType.indexOf('jpg') > 0 ){
+                    else if (mimeType.indexOf('jpg') > 0) {
                         filetype = "jpg"
                     }
-                    else if(mimeType.indexOf('doc') > 0 ){
+                    else if (mimeType.indexOf('doc') > 0) {
                         filetype = "docx"
                     }
-                    else if(mimeType.indexOf('docx') > 0 ){
+                    else if (mimeType.indexOf('docx') > 0) {
                         filetype = "docx"
                     }
-                    else if(mimeType.indexOf('rtf') > 0 ){
+                    else if (mimeType.indexOf('rtf') > 0) {
                         filetype = "rtf"
                     }
-                    else if(mimeType.indexOf('pdf') > 0 ){
+                    else if (mimeType.indexOf('pdf') > 0) {
                         filetype = "pdf"
                     }
-                    else if(mimeType.indexOf('application/msword') > -1 ){
+                    else if (mimeType.indexOf('application/msword') > -1) {
                         filetype = "docx"
                     }
                 }
                 aUrl = uniqueId + '.' + filetype;
                 aFilename = req.files.attachment.originalname;
-                console.log("aFilenameaFilename",aFilename);
-                console.log("aFilenameaFilename",req.files.attachment);
-                
-                console.log("req.files.attachment.path",req.files.attachment.path);
+                console.log("aFilenameaFilename", aFilename);
+                console.log("aFilenameaFilename", req.files.attachment);
+
+                console.log("req.files.attachment.path", req.files.attachment.path);
 
                 var readStream = fs.createReadStream(req.files.attachment.path);
 
@@ -839,10 +841,10 @@ Service.prototype.saveServiceAttachmentForPacehcm = function(req,res,next) {
                         responseMessage.status = true;
                         responseMessage.message = 'attachment Uploaded successfully';
                         responseMessage.data = {
-                            a_url : aUrl,
-                            a_fn :aFilename
+                            a_url: aUrl,
+                            a_fn: aFilename
                         };
-                        console.log("responseMessage",responseMessage);
+                        console.log("responseMessage", responseMessage);
 
                         res.status(200).json(responseMessage);
                         console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
@@ -855,7 +857,7 @@ Service.prototype.saveServiceAttachmentForPacehcm = function(req,res,next) {
                 });
             }
         }
-        else{
+        else {
             responseMessage.message = 'file is required';
             res.status(200).json(responseMessage);
             console.log('file is required');
@@ -875,9 +877,9 @@ Service.prototype.saveServiceAttachmentForPacehcm = function(req,res,next) {
 };
 
 
-Service.prototype.saveServiceAttachmentPace = function(req,res,next) {
+Service.prototype.saveServiceAttachmentPace = function (req, res, next) {
 
-    var aUrl='',aFilename='';
+    var aUrl = '', aFilename = '';
 
     var responseMessage = {
         status: false,
@@ -886,91 +888,91 @@ Service.prototype.saveServiceAttachmentPace = function(req,res,next) {
         data: null
     };
 
-    try{
-        if(req.files) {
-            if(req.files.attachment) {
+    try {
+        if (req.files) {
+            if (req.files.attachment) {
                 var uniqueId = uuid.v4();
                 var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
                 var mimeType = req.files.attachment.mimetype;
-                if(mimeType){
-                    if(mimeType.indexOf('png') > 0|| mimeType.indexOf('jpg') > 0 ){
+                if (mimeType) {
+                    if (mimeType.indexOf('png') > 0 || mimeType.indexOf('jpg') > 0) {
                         filetype = "png";
                     }
-                    else if(mimeType.indexOf('jpeg') > 0 ){
+                    else if (mimeType.indexOf('jpeg') > 0) {
                         filetype = "jpeg";
                     }
-                    else if(mimeType.indexOf('jpg') > 0 ){
+                    else if (mimeType.indexOf('jpg') > 0) {
                         filetype = "jpg"
                     }
-                    else if(mimeType.indexOf('doc') > 0 ){
+                    else if (mimeType.indexOf('doc') > 0) {
                         filetype = "doc"
                     }
-                    else if(mimeType.indexOf('docx') > 0 ){
+                    else if (mimeType.indexOf('docx') > 0) {
                         filetype = "docx"
                     }
-                    else if(mimeType.indexOf('rtf') > 0 ){
+                    else if (mimeType.indexOf('rtf') > 0) {
                         filetype = "rtf"
                     }
-                    else if(mimeType.indexOf('pdf') > 0 ){
+                    else if (mimeType.indexOf('pdf') > 0) {
                         filetype = "pdf"
                     }
-                    else if(mimeType.indexOf('application/msword') > -1 ){
+                    else if (mimeType.indexOf('application/msword') > -1) {
                         filetype = "doc"
                     }
                 }
 
-                if(filetype!='doc'){
-                aUrl = uniqueId + '.' + filetype;
-                aFilename = req.files.attachment.originalname;
-                console.log("aFilenameaFilename",aFilename);
-                console.log("aFilenameaFilename",req.files.attachment);
-                
-                console.log("req.files.attachment.path",req.files.attachment.path);
+                if (filetype != 'doc') {
+                    aUrl = uniqueId + '.' + filetype;
+                    aFilename = req.files.attachment.originalname;
+                    console.log("aFilenameaFilename", aFilename);
+                    console.log("aFilenameaFilename", req.files.attachment);
 
-                var readStream = fs.createReadStream(req.files.attachment.path);
+                    console.log("req.files.attachment.path", req.files.attachment.path);
 
-                uploadDocumentToCloud(aUrl, readStream, function (err) {
-                    if (!err) {
-                        responseMessage.status = true;
-                        responseMessage.message = 'attachment Uploaded successfully';
-                        responseMessage.data = {
-                            a_url : aUrl,
-                            a_fn :aFilename
-                        };
-                        console.log("responseMessage",responseMessage);
+                    var readStream = fs.createReadStream(req.files.attachment.path);
 
-                        res.status(200).json(responseMessage);
-                        console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
-                    }
-                    else {
-                        responseMessage.message = 'attachment not upload';
-                        res.status(200).json(responseMessage);
-                        console.log('FnSaveServiceAttachment:attachment not upload');
-                    }
-                });
-            }else {
+                    uploadDocumentToCloud(aUrl, readStream, function (err) {
+                        if (!err) {
+                            responseMessage.status = true;
+                            responseMessage.message = 'attachment Uploaded successfully';
+                            responseMessage.data = {
+                                a_url: aUrl,
+                                a_fn: aFilename
+                            };
+                            console.log("responseMessage", responseMessage);
+
+                            res.status(200).json(responseMessage);
+                            console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'attachment not upload';
+                            res.status(200).json(responseMessage);
+                            console.log('FnSaveServiceAttachment:attachment not upload');
+                        }
+                    });
+                } else {
 
 
-                var formData = {
-                    attachment: fs.createReadStream(req.files.attachment.path),
-                  };
-                  request.post({url:'http://23.236.49.140:1002/api/service_attachment_doc', formData: formData}, function (err, httpResponse, body) {
-                    if (err) {
-                      return console.error('upload failed:', err);
-                    }
-                    else{
-                    console.log('Response message convert:', body);
-                    responseMessage.message = "Converted to docx";
-                    // responseMessage.data = body.data;
+                    var formData = {
+                        attachment: fs.createReadStream(req.files.attachment.path),
+                    };
+                    request.post({ url: 'http://23.236.49.140:1002/api/service_attachment_doc', formData: formData }, function (err, httpResponse, body) {
+                        if (err) {
+                            return console.error('upload failed:', err);
+                        }
+                        else {
+                            console.log('Response message convert:', body);
+                            responseMessage.message = "Converted to docx";
+                            // responseMessage.data = body.data;
 
-                    res.status(200).json(JSON.parse(body));
-                }  
-                });
+                            res.status(200).json(JSON.parse(body));
+                        }
+                    });
 
-            }
+                }
             }
         }
-        else{
+        else {
             responseMessage.message = 'file is required';
             res.status(200).json(responseMessage);
             console.log('file is required');
@@ -979,22 +981,22 @@ Service.prototype.saveServiceAttachmentPace = function(req,res,next) {
     catch (ex) {
         responseMessage.error = {
             server: 'Internal Server error',
-            message : ex.toString()
+            message: ex.toString()
         };
         responseMessage.message = 'An error occurred !';
         console.log('FnSaveServiceAttachment:error ' + ex);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ....................');
-        
+
         res.status(400).json(responseMessage);
     }
 };
 
 
-Service.prototype.saveServiceAttachmentDoc = function(req,res,next) {
+Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
 
-    var aUrl='',aFilename='';
+    var aUrl = '', aFilename = '';
 
     var responseMessage = {
         status: false,
@@ -1003,69 +1005,122 @@ Service.prototype.saveServiceAttachmentDoc = function(req,res,next) {
         data: null
     };
 
-    try{
-        if(req.files) {
-            if(req.files.attachment) {
+    try {
+        if (req.files) {
+            if (req.files.attachment) {
                 var uniqueId = uuid.v4();
                 var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
                 var mimeType = req.files.attachment.mimetype;
-                if(mimeType){
-                    if(mimeType.indexOf('png') > 0|| mimeType.indexOf('jpg') > 0 ){
+                if (mimeType) {
+                    if (mimeType.indexOf('png') > 0 || mimeType.indexOf('jpg') > 0) {
                         filetype = "png";
                     }
-                    else if(mimeType.indexOf('jpeg') > 0 ){
+                    else if (mimeType.indexOf('jpeg') > 0) {
                         filetype = "jpeg";
                     }
-                    else if(mimeType.indexOf('jpg') > 0 ){
+                    else if (mimeType.indexOf('jpg') > 0) {
                         filetype = "jpg"
                     }
-                    else if(mimeType.indexOf('doc') > 0 ){
+                    else if (mimeType.indexOf('doc') > 0) {
                         filetype = "doc"
                     }
-                    else if(mimeType.indexOf('docx') > 0 ){
+                    else if (mimeType.indexOf('docx') > 0) {
                         filetype = "docx"
                     }
-                    else if(mimeType.indexOf('rtf') > 0 ){
+                    else if (mimeType.indexOf('rtf') > 0) {
                         filetype = "rtf"
                     }
-                    else if(mimeType.indexOf('pdf') > 0 ){
+                    else if (mimeType.indexOf('pdf') > 0) {
                         filetype = "pdf"
                     }
-                    else if(mimeType.indexOf('application/msword') > -1 ){
+                    else if (mimeType.indexOf('application/msword') > -1) {
                         filetype = "doc"
                     }
                 }
-                aUrl = uniqueId + '.' + filetype;
-                aFilename = req.files.attachment.originalname;
-                console.log("aFilenameaFilename",aFilename);
-                console.log("aFilenameaFilename",req.files.attachment);
-                
-                console.log("req.files.attachment.path",req.files.attachment.path);
+                if (filetype != "doc") {
+                    aUrl = uniqueId + '.' + filetype;
+                    aFilename = req.files.attachment.originalname;
+                    console.log("aFilenameaFilename", aFilename);
+                    console.log("aFilenameaFilename", req.files.attachment);
 
-                var readStream = fs.createReadStream(req.files.attachment.path);
+                    console.log("req.files.attachment.path", req.files.attachment.path);
 
-                uploadDocumentToCloud(aUrl, readStream, function (err) {
-                    if (!err) {
-                        responseMessage.status = true;
-                        responseMessage.message = 'attachment Uploaded successfully';
-                        responseMessage.data = {
-                            a_url : aUrl,
-                            a_fn :aFilename
-                        };
-                        console.log("responseMessage",responseMessage);
+                    var readStream = fs.createReadStream(req.files.attachment.path);
 
-                        res.status(200).json(responseMessage);
-                        console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
-                    }
-                    else {
-                        responseMessage.message = 'attachment not upload';
-                        res.status(200).json(responseMessage);
-                        console.log('FnSaveServiceAttachment:attachment not upload');
-                    }
-                });
+                    uploadDocumentToCloud(aUrl, readStream, function (err) {
+                        if (!err) {
+                            responseMessage.status = true;
+                            responseMessage.message = 'attachment Uploaded successfully';
+                            responseMessage.data = {
+                                a_url: aUrl,
+                                a_fn: aFilename
+                            };
+                            console.log("responseMessage", responseMessage);
+
+                            res.status(200).json(responseMessage);
+                            console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'attachment not upload';
+                            res.status(200).json(responseMessage);
+                            console.log('FnSaveServiceAttachment:attachment not upload');
+                        }
+                    });
+                }
+                else {
+                    var file_name = 'pace' + Date.now() + '.doc';
+                    var file_name_docx = file_name + 'x';
+                    aUrl = uniqueId + '.docx';
+
+                    let writeStream = fs.createWriteStream(path.resolve(__dirname, file_name));
+
+                    // write some data with a base64 encoding
+                    var rs = fs.createReadStream(req.files.attachment.path);
+                    rs.pipe(writeStream);
+
+                    // the finish event is emitted when all data has been flushed from the stream
+                    writeStream.on('finish', () => {
+                        console.log('wrote all data to file');
+                        console.log(path.resolve(__dirname, 'doc2docx.py'));
+                        var process = spawn('python', [path.resolve(__dirname, 'doc2docx.py'), file_name]);
+                        // process.stdout.on('data',function(data){
+                        //     console.log(data.toString());
+                        // })
+                        process.stdout.on('data', function (data) {
+                            console.log("Inside");
+                            if (data)
+                                console.log(data.toString());
+                            process.kill();
+                            setTimeout(function () {
+                                var readStream = fs.createReadStream(path.resolve(__dirname, file_name_docx));
+
+                                uploadDocumentToCloud(aUrl, readStream, function (err) {
+                                    if (!err) {
+                                        responseMessage.status = true;
+                                        responseMessage.message = 'attachment Uploaded successfully';
+                                        responseMessage.data = {
+                                            a_url: aUrl,
+                                            a_fn: aFilename
+                                        };
+                                        console.log("responseMessage", responseMessage);
+
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'attachment not upload';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveServiceAttachment:attachment not upload');
+                                    }
+                                });
+                            }, 1000);
+
+                        })
+                    });
+                }
             }
         }
-        else{
+        else {
             responseMessage.message = 'file is required';
             res.status(200).json(responseMessage);
             console.log('file is required');
@@ -1074,7 +1129,7 @@ Service.prototype.saveServiceAttachmentDoc = function(req,res,next) {
     catch (ex) {
         responseMessage.error = {
             server: 'Internal Server error',
-            message : ex.toString()
+            message: ex.toString()
         };
         responseMessage.message = 'An error occurred !';
         console.log('FnSaveServiceAttachment:error ' + ex);
@@ -1094,9 +1149,9 @@ Service.prototype.saveServiceAttachmentDoc = function(req,res,next) {
  * @param next
  * @description save service video
  */
-Service.prototype.saveServiceVideo = function(req,res,next) {
+Service.prototype.saveServiceVideo = function (req, res, next) {
 
-    var vUrl='',vFilename='';
+    var vUrl = '', vFilename = '';
 
     var responseMessage = {
         status: false,
@@ -1105,11 +1160,11 @@ Service.prototype.saveServiceVideo = function(req,res,next) {
         data: null
     };
 
-    try{
+    try {
 
-        if(req.files) {
+        if (req.files) {
 
-            if(req.files.video) {
+            if (req.files.video) {
                 var uniqueId = uuid.v4();
                 var filetype = (req.files.video.extension) ? req.files.video.extension : '';
                 vUrl = uniqueId + '.' + filetype;
@@ -1121,8 +1176,8 @@ Service.prototype.saveServiceVideo = function(req,res,next) {
                         responseMessage.status = true;
                         responseMessage.message = 'video Uploaded successfully';
                         responseMessage.data = {
-                            v_url : vUrl,
-                            v_fn :vFilename
+                            v_url: vUrl,
+                            v_fn: vFilename
                         };
                         res.status(200).json(responseMessage);
                         console.log('FnSaveServiceVideo: video Uploaded successfully');
@@ -1135,7 +1190,7 @@ Service.prototype.saveServiceVideo = function(req,res,next) {
                 });
             }
         }
-        else{
+        else {
             responseMessage.message = 'file is required';
             res.status(200).json(responseMessage);
             console.log('file is required');
@@ -1162,7 +1217,7 @@ Service.prototype.saveServiceVideo = function(req,res,next) {
  * @param next
  * @description api code for created new service
  */
-Service.prototype.createService = function(req,res,next){
+Service.prototype.createService = function (req, res, next) {
 
     /**
      * checking input parameters are json or not
@@ -1182,9 +1237,9 @@ Service.prototype.createService = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true, error = {};
 
-    if(!isJson){
+    if (!isJson) {
         error['isJson'] = 'Invalid Input ContentType';
         validateStatus *= false;
     }
@@ -1197,13 +1252,13 @@ Service.prototype.createService = function(req,res,next){
         var masterId = parseInt(req.body.master_id);
         var message = req.body.message;
         var categoryId = parseInt(req.body.cid);
-        var pic = req.body.pic_url ? req.body.pic_url :'';
-        var picFilename = req.body.pic_fn ? req.body.pic_fn :'';
-        var attachment = req.body.a_url ? req.body.a_url :'';
-        var aFilename = req.body.a_fn ? req.body.a_fn :'';
-        var videoUrl = req.body.video_url ? req.body.video_url :'';
-        var vFilename = req.body.video_fn ? req.body.video_fn :'';
-        var id = (!isNaN(parseInt(req.body.id))) ? (parseInt(req.body.id)) :0; // new service it s 0 else tid
+        var pic = req.body.pic_url ? req.body.pic_url : '';
+        var picFilename = req.body.pic_fn ? req.body.pic_fn : '';
+        var attachment = req.body.a_url ? req.body.a_url : '';
+        var aFilename = req.body.a_fn ? req.body.a_fn : '';
+        var videoUrl = req.body.video_url ? req.body.video_url : '';
+        var vFilename = req.body.video_fn ? req.body.video_fn : '';
+        var id = (!isNaN(parseInt(req.body.id))) ? (parseInt(req.body.id)) : 0; // new service it s 0 else tid
         var status = req.body.status ? req.body.status : 1; // in case of admin
         if (!token) {
             error['token'] = 'token is Mandatory';
@@ -1220,7 +1275,7 @@ Service.prototype.createService = function(req,res,next){
         }
     }
 
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors below';
         res.status(400).json(responseMessage);
@@ -1233,9 +1288,9 @@ Service.prototype.createService = function(req,res,next){
 
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(masterId)
                             + ',' + st.db.escape(message) + ',' + st.db.escape(categoryId)
-                            + ',' + st.db.escape(pic)+ ',' + st.db.escape(picFilename)
+                            + ',' + st.db.escape(pic) + ',' + st.db.escape(picFilename)
                             + ',' + st.db.escape(attachment) + ',' + st.db.escape(aFilename)
-                            + ',' + st.db.escape(videoUrl)+ ',' + st.db.escape(vFilename)+ ',' + st.db.escape(id)
+                            + ',' + st.db.escape(videoUrl) + ',' + st.db.escape(vFilename) + ',' + st.db.escape(id)
                             + ',' + st.db.escape(status);
 
                         var query = 'CALL ppostservice(' + queryParams + ')';
@@ -1251,17 +1306,17 @@ Service.prototype.createService = function(req,res,next){
                                         master_id: masterId,
                                         message: req.body.message,
                                         cid: categoryId,
-                                        pic_url : req.body.pic_url ? req.body.pic_url :'',
-                                        pic_fn : req.body.pic_fn ? req.body.pic_fn :'',
-                                        a_url : req.body.a_url ? req.body.a_url :'',
-                                        a_fn : req.body.a_fn ? req.body.a_fn :'',
-                                        video_url : req.body.video_url ? req.body.video_url :'',
-                                        video_fn : req.body.video_fn ? req.body.video_fn :''
+                                        pic_url: req.body.pic_url ? req.body.pic_url : '',
+                                        pic_fn: req.body.pic_fn ? req.body.pic_fn : '',
+                                        a_url: req.body.a_url ? req.body.a_url : '',
+                                        a_fn: req.body.a_fn ? req.body.a_fn : '',
+                                        video_url: req.body.video_url ? req.body.video_url : '',
+                                        video_fn: req.body.video_fn ? req.body.video_fn : ''
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnCreateService: Service Created successfully');
 
-                                    if(serviceResult[0]) {
+                                    if (serviceResult[0]) {
 
                                         for (var i = 0; i < serviceResult[0].length; i++) {
 
@@ -1350,7 +1405,7 @@ Service.prototype.createService = function(req,res,next){
  * @param next
  * @description api code for update service
  */
-Service.prototype.updateService = function(req,res,next){
+Service.prototype.updateService = function (req, res, next) {
 
     /**
      * checking input parameters are json or not
@@ -1371,13 +1426,13 @@ Service.prototype.updateService = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true, error = {};
 
-    if(!isJson){
+    if (!isJson) {
         error['isJson'] = 'Invalid Input ContentType';
         validateStatus *= false;
     }
-    else{
+    else {
         /**
          * storing and validating the input parameters
          */
@@ -1385,30 +1440,30 @@ Service.prototype.updateService = function(req,res,next){
         var token = req.body.token;
         var id = parseInt(req.body.id);
         var earnedPoints = req.body.ep ? parseInt(req.body.ep) : 0;
-        var redeemedPoints = req.body.rp ? parseInt(req.body.rp):0;
+        var redeemedPoints = req.body.rp ? parseInt(req.body.rp) : 0;
         var status = parseInt(req.body.st);
         var masterId = parseInt(req.body.master_id);
 
-        if(!token){
+        if (!token) {
             error['token'] = 'token is Mandatory';
             validateStatus *= false;
         }
-        if(isNaN(masterId)){
+        if (isNaN(masterId)) {
             error['masterId'] = 'masterId is not integer value';
             validateStatus *= false;
         }
 
-        if(isNaN(id)){
+        if (isNaN(id)) {
             error['id'] = 'id is not integer value';
             validateStatus *= false;
         }
-        if(isNaN(status)){
+        if (isNaN(status)) {
             error['status'] = 'status is not integer value';
             validateStatus *= false;
         }
     }
 
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors below';
         res.status(400).json(responseMessage);
@@ -1421,7 +1476,7 @@ Service.prototype.updateService = function(req,res,next){
 
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(id)
                             + ',' + st.db.escape(earnedPoints) + ',' + st.db.escape(redeemedPoints)
-                            + ',' + st.db.escape(req.body.replay) + ',' + st.db.escape(status)+ ',' + st.db.escape(masterId);
+                            + ',' + st.db.escape(req.body.replay) + ',' + st.db.escape(status) + ',' + st.db.escape(masterId);
 
                         var query = 'CALL pupdateservice(' + queryParams + ')';
                         console.log(query);
@@ -1432,31 +1487,29 @@ Service.prototype.updateService = function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.message = 'Service updated successfully';
                                     responseMessage.data = {
-                                        id : id,
-                                        ep : earnedPoints,
-                                        rp : redeemedPoints,
-                                        replay : req.body.replay,
-                                        st : status,
-                                        master_id : masterId
+                                        id: id,
+                                        ep: earnedPoints,
+                                        rp: redeemedPoints,
+                                        replay: req.body.replay,
+                                        st: status,
+                                        master_id: masterId
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateService: Service updated successfully');
 
 
                                     //send notification
-                                    if(updateserviceResult[0]) {
+                                    if (updateserviceResult[0]) {
 
                                         for (var i = 0; i < updateserviceResult[0].length; i++) {
 
                                             //send notification
                                             var status;
-                                            if(updateserviceResult[0][i].status == 1){
+                                            if (updateserviceResult[0][i].status == 1) {
                                                 status = 'submit'
                                             }
-                                            else if(updateserviceResult[0][i].status == 2)
-                                            {status = 'close'}
-                                            else if(updateserviceResult[0][i].status == 3)
-                                            {status = 'cancel'}
+                                            else if (updateserviceResult[0][i].status == 2) { status = 'close' }
+                                            else if (updateserviceResult[0][i].status == 3) { status = 'cancel' }
 
                                             var receiverId = updateserviceResult[0][i].groupid;
                                             var senderTitle = updateserviceResult[0][i].sender;
@@ -1542,7 +1595,7 @@ Service.prototype.updateService = function(req,res,next){
  * @param next
  * @description api code for created new service
  */
-Service.prototype.addMembersToService = function(req,res,next){
+Service.prototype.addMembersToService = function (req, res, next) {
 
     /**
      * checking input parameters are json or not
@@ -1559,13 +1612,13 @@ Service.prototype.addMembersToService = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true, error = {};
 
-    if(!isJson){
+    if (!isJson) {
         error['isJson'] = 'Invalid Input ContentType';
         validateStatus *= false;
     }
-    else{
+    else {
         /**
          * storing and validating the input parameters
          */
@@ -1573,21 +1626,21 @@ Service.prototype.addMembersToService = function(req,res,next){
         var token = req.body.token;
         var ezeid = req.st.alterEzeoneId(req.body.ezeoneId);
 
-        if(!(token)){
+        if (!(token)) {
             error['token'] = 'token is Mandatory';
             validateStatus *= false;
         }
-        if (!req.body.communityType){
+        if (!req.body.communityType) {
             error['communityType'] = 'Community type is Mandatory';
             validateStatus *= false;
         }
-        if (!req.body.identifyName){
+        if (!req.body.identifyName) {
             error['identifyName'] = 'Identify name is Mandatory';
             validateStatus *= false;
         }
     }
 
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors below';
         res.status(400).json(responseMessage);
@@ -1608,7 +1661,7 @@ Service.prototype.addMembersToService = function(req,res,next){
                         req.body.dob = (req.body.dob) ? (req.body.dob) : null;
 
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(ezeid)
-                            + ',' + st.db.escape(req.body.identifyName)+ ',' + st.db.escape(req.body.notes);
+                            + ',' + st.db.escape(req.body.identifyName) + ',' + st.db.escape(req.body.notes);
 
                         var query = 'CALL paddmembertoservice(' + queryParams + ')';
                         console.log(query);
@@ -1617,20 +1670,20 @@ Service.prototype.addMembersToService = function(req,res,next){
                                 if (memberResult) {
                                     console.log(memberResult);
                                     if (memberResult.affectedRows > 0) {
-                                    var finalQuery = '';
+                                        var finalQuery = '';
                                         var educationParam = st.db.escape(token) + ',' + st.db.escape(ezeid) + ',' +
-                                        st.db.escape(req.body.batch) + ',' + st.db.escape(req.body.educationId)+ ',' + st.db.escape(req.body.higherEducationId)
-                                            + ',' + st.db.escape(req.body.specializationId)+ ',' + st.db.escape(req.body.identifyName);
+                                            st.db.escape(req.body.batch) + ',' + st.db.escape(req.body.educationId) + ',' + st.db.escape(req.body.higherEducationId)
+                                            + ',' + st.db.escape(req.body.specializationId) + ',' + st.db.escape(req.body.identifyName);
 
                                         var ezeIdParam = st.db.escape(token) + ',' + st.db.escape(req.body.companyName)
-                                            + ',' + st.db.escape(req.body.jobTitle)+ ',' + st.db.escape(req.body.gender)
-                                            + ',' + st.db.escape(req.body.dob)+ ',' + st.db.escape(req.body.communityType);
+                                            + ',' + st.db.escape(req.body.jobTitle) + ',' + st.db.escape(req.body.gender)
+                                            + ',' + st.db.escape(req.body.dob) + ',' + st.db.escape(req.body.communityType);
 
-                                        if (parseInt(req.body.communityType) == 2 || parseInt(req.body.communityType) == 5){
-                                            finalQuery = "CALL pSaveAlumniProfile_v2(" + educationParam + "); CALL pupdate_ezeone_details("+ ezeIdParam +");";
-                                            console.log('finalQuery',finalQuery);
+                                        if (parseInt(req.body.communityType) == 2 || parseInt(req.body.communityType) == 5) {
+                                            finalQuery = "CALL pSaveAlumniProfile_v2(" + educationParam + "); CALL pupdate_ezeone_details(" + ezeIdParam + ");";
+                                            console.log('finalQuery', finalQuery);
                                             st.db.query(finalQuery, function (err, result) {
-                                                if (!err && result){
+                                                if (!err && result) {
                                                     responseMessage.status = true;
                                                     responseMessage.message = 'Member added successfully';
                                                     responseMessage.data = {
@@ -1639,7 +1692,7 @@ Service.prototype.addMembersToService = function(req,res,next){
                                                     };
                                                     res.status(200).json(responseMessage)
                                                 }
-                                                else{
+                                                else {
                                                     responseMessage.status = false;
                                                     responseMessage.message = 'Error while adding member';
                                                     responseMessage.data = null
@@ -1648,11 +1701,11 @@ Service.prototype.addMembersToService = function(req,res,next){
 
                                             });
                                         }
-                                        else if (parseInt(req.body.communityType) == 6){
-                                            finalQuery = "CALL pupdate_ezeone_details("+ ezeIdParam +");";
-                                            console.log('finalQuery',finalQuery);
+                                        else if (parseInt(req.body.communityType) == 6) {
+                                            finalQuery = "CALL pupdate_ezeone_details(" + ezeIdParam + ");";
+                                            console.log('finalQuery', finalQuery);
                                             st.db.query(finalQuery, function (err, result) {
-                                                if (!err && result){
+                                                if (!err && result) {
                                                     responseMessage.status = true;
                                                     responseMessage.message = 'Member added successfully';
                                                     responseMessage.data = {
@@ -1661,7 +1714,7 @@ Service.prototype.addMembersToService = function(req,res,next){
                                                     };
                                                     res.status(200).json(responseMessage)
                                                 }
-                                                else{
+                                                else {
                                                     responseMessage.status = false;
                                                     responseMessage.message = 'Error while adding member';
                                                     responseMessage.data = null;
@@ -1686,14 +1739,14 @@ Service.prototype.addMembersToService = function(req,res,next){
                                                 if (memberResult[0][0].message == -2) {
                                                     responseMessage.status = true;
                                                     responseMessage.message = 'community doesnt exists';
-                                                    responseMessage.data = { message : memberResult[0][0].message };
+                                                    responseMessage.data = { message: memberResult[0][0].message };
                                                     res.status(200).json(responseMessage);
                                                     console.log('FnAddMembersToService: community doesnt exists');
                                                 }
                                                 else {
                                                     responseMessage.status = true;
                                                     responseMessage.message = 'already a member of that community';
-                                                    responseMessage.data = { message : memberResult[0][0].message };
+                                                    responseMessage.data = { message: memberResult[0][0].message };
                                                     res.status(200).json(responseMessage);
                                                     console.log('FnAddMembersToService: already a member of that community');
                                                 }
@@ -1776,7 +1829,7 @@ Service.prototype.addMembersToService = function(req,res,next){
  * @param next
  * @description api code for get service Details
  */
-Service.prototype.getJoinedCommunity = function(req,res,next){
+Service.prototype.getJoinedCommunity = function (req, res, next) {
 
     var token = req.query.token;
 
@@ -1789,12 +1842,12 @@ Service.prototype.getJoinedCommunity = function(req,res,next){
 
     var validateStatus = true, error = {};
 
-    if(!token){
+    if (!token) {
         error['token'] = 'token is mandatory';
         validateStatus *= false;
     }
 
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
         res.status(400).json(responseMessage);
@@ -1810,7 +1863,7 @@ Service.prototype.getJoinedCommunity = function(req,res,next){
                         st.db.query(query, function (err, communityResult) {
                             if (!err) {
                                 if (communityResult) {
-                                    if(communityResult[0]){
+                                    if (communityResult[0]) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'community result loaded successfully';
@@ -1852,7 +1905,7 @@ Service.prototype.getJoinedCommunity = function(req,res,next){
                 }
                 else {
                     responseMessage.error = {
-                        server : 'Internal server error'
+                        server: 'Internal server error'
                     };
                     responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
@@ -1882,7 +1935,7 @@ Service.prototype.getJoinedCommunity = function(req,res,next){
  * @param next
  * @description api code for delete Community Member
  */
-Service.prototype.deleteCommunityMember = function(req,res,next){
+Service.prototype.deleteCommunityMember = function (req, res, next) {
 
     var token = req.query.token;
     var ezeid = req.st.alterEzeoneId(req.query.ezeid);
@@ -1894,14 +1947,14 @@ Service.prototype.deleteCommunityMember = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true, error = {};
 
-    if(!token){
+    if (!token) {
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
 
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors below';
         res.status(400).json(responseMessage);
@@ -1912,8 +1965,8 @@ Service.prototype.deleteCommunityMember = function(req,res,next){
                 if (!err) {
                     if (result) {
 
-                        var queryParams = st.db.escape(ezeid) +','+ st.db.escape(token) ;
-                        var query= 'CALL pdeletecommunitymember(' + queryParams + ')';
+                        var queryParams = st.db.escape(ezeid) + ',' + st.db.escape(token);
+                        var query = 'CALL pdeletecommunitymember(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, deleteResult) {
                             console.log(deleteResult);
@@ -1922,7 +1975,7 @@ Service.prototype.deleteCommunityMember = function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Community member deleted successfully';
-                                    responseMessage.data = {ezeid : req.st.alterEzeoneId(req.query.ezeid)};
+                                    responseMessage.data = { ezeid: req.st.alterEzeoneId(req.query.ezeid) };
                                     res.status(200).json(responseMessage);
                                     console.log('FnDeleteCommunityMember: Community member deleted successfully');
                                 }
@@ -1990,19 +2043,19 @@ Service.prototype.deleteCommunityMember = function(req,res,next){
  * @description
  * Check for the logged in user that user is a member of any communities or not
  */
-Service.prototype.isCommunityMember = function(req,res,next){
-    var token = (req.query.token) ? req.query.token  : '';
+Service.prototype.isCommunityMember = function (req, res, next) {
+    var token = (req.query.token) ? req.query.token : '';
     var respMsg = {
-        status : false,
-        message : 'Please login to continue',
-        error : {token : 'Invalid token'},
-        data : null
+        status: false,
+        message: 'Please login to continue',
+        error: { token: 'Invalid token' },
+        data: null
     };
-    if(req.query.token){
+    if (req.query.token) {
 
-        try{
-            var queryParams = st.db.escape(token) ;
-            var query= 'CALL is_community_member(' + queryParams + ')';
+        try {
+            var queryParams = st.db.escape(token);
+            var query = 'CALL is_community_member(' + queryParams + ')';
             console.log(query);
             st.db.query(query, function (err, communityResult) {
                 console.log(communityResult);
@@ -2011,51 +2064,52 @@ Service.prototype.isCommunityMember = function(req,res,next){
                     respMsg.error = null;
                     respMsg.data = null;
                     respMsg.status = false;
-                    if(communityResult){
-                        if(communityResult[0]){
-                            if(communityResult[0][0]){
-                                if(communityResult[0][0].err_code == 'UNAUTHORIZED'){
-                                    respMsg.error = {token : 'Invalid token'};
+                    if (communityResult) {
+                        if (communityResult[0]) {
+                            if (communityResult[0][0]) {
+                                if (communityResult[0][0].err_code == 'UNAUTHORIZED') {
+                                    respMsg.error = { token: 'Invalid token' };
                                     respMsg.message = 'Please login to continue';
                                     res.status(401).json(respMsg);
                                 }
-                                else{
+                                else {
                                     respMsg.status = true;
                                     respMsg.data = {
-                                        isCommunity : (communityResult[0][0].is_community_member) ? 1 : 0};
+                                        isCommunity: (communityResult[0][0].is_community_member) ? 1 : 0
+                                    };
                                     res.status(200).json(respMsg);
                                 }
                             }
-                            else{
+                            else {
                                 res.status(400).json(respMsg);
                             }
 
                         }
-                        else{
+                        else {
                             res.status(400).json(respMsg);
                         }
                     }
-                    else{
+                    else {
                         res.status(400).json(respMsg);
                     }
                 }
-                else{
+                else {
                     console.log('Error in FnIsCommunityMember : Procedure is_community_member');
                     console.log(err);
                     respMsg.message = 'Internal server error';
-                    respMsg.error = {server : 'Internal server error'};
+                    respMsg.error = { server: 'Internal server error' };
                     res.status(500).json(respMsg);
                 }
             });
         }
-        catch(ex){
+        catch (ex) {
             console.log('Exception in FnIsCommunityMember');
             console.log(err);
             res.status(500).json(respMsg);
         }
 
     }
-    else{
+    else {
         res.status(401).json(respMsg);
     }
 };
