@@ -889,6 +889,7 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                         console.log("dashboard req", ex);
                         response.message = "Please re-login";
                         res.status(401).json(response);
+                        return;
                     }
                 });
 

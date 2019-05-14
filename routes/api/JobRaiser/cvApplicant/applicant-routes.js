@@ -113,10 +113,10 @@ router.post('/applicantView',applicantCtrl.getreqApplicantsWithColumnFilter);
 router.get('/paceMaster',applicantCtrl.paceMasterNew);
 
 
-router.post('/resume-preparationhttp', resumeMaskingCtrl.resume_maskinghttps);
+router.post('/resume-preparationhttp', resumeMaskingCtrl.resume_maskinghttp);
 router.post('/moveOrCopyTaggedTransactions',applicantCtrl.moveOrCopyTaggedTransactions);
 router.post('/sendSmsToCandidates',sendgridCtrl.sendSMSToCandidates);
 
-router.post('/resume-preparation', resumeMaskingCtrl.resume_maskinghttp)
+router.post('/resume-preparation', resumeMaskingCtrl.resume_maskinghttps)
 
 module.exports = router;
