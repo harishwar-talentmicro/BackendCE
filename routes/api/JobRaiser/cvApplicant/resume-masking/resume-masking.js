@@ -156,18 +156,23 @@ resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
             json: true,
             body: req.body
         }, function (error, resp, body) {
-            if (error) {
-                console.log("rsa error", error);
-            }
-            else {
-                console.log("rsa response", body);
-            }
+            try {
+                if (error) {
+                    console.log("rsa error", error);
+                }
+                else {
+                    console.log("rsa response", body);
+                }
 
-            if(typeof(body)=='string'){
-                body = JSON.parse(body);
-            }
+                if (typeof (body) == 'string') {
+                    body = JSON.parse(body);
+                }
 
-            res.send(body);
+                res.send(body);
+            } catch (ex) {
+                console.log(ex);
+                res.send(ex.toString());
+            }
         });
 
     }
