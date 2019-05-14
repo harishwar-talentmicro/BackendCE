@@ -378,7 +378,7 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
                         validationFlag = false;
                         error.heMasterId = "Invalid Company";
                     }
-                
+
                     var venue = req.body.venue;
                     if (typeof (venue) == "string") {
                         venue = JSON.parse(venue);
@@ -629,7 +629,7 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-                
+
                 if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != "") {
                     var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 }
@@ -640,251 +640,256 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
                 }
 
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    try {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                    var requirement = req.body.requirement;
-                    if (typeof (requirement) == "string") {
-                        requirement = JSON.parse(requirement);
-                    }
-                    if (!requirement) {
-                        requirement = [];
-                    }
+                        var requirement = req.body.requirement;
+                        if (typeof (requirement) == "string") {
+                            requirement = JSON.parse(requirement);
+                        }
+                        if (!requirement) {
+                            requirement = [];
+                        }
 
-                    var client = req.body.client;
-                    if (typeof (client) == "string") {
-                        client = JSON.parse(client);
-                    }
-                    if (!client) {
-                        client = [];
-                    }
+                        var client = req.body.client;
+                        if (typeof (client) == "string") {
+                            client = JSON.parse(client);
+                        }
+                        if (!client) {
+                            client = [];
+                        }
 
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        req.query.type = req.query.type ? req.query.type : 1;
-                        req.body.resultType = req.body.resultType ? req.body.resultType : 1;
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            req.query.type = req.query.type ? req.query.type : 1;
+                            req.body.resultType = req.body.resultType ? req.body.resultType : 1;
 
-                        var inputs = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(req.query.userMasterId),
-                            req.st.db.escape(req.query.type),
-                            req.st.db.escape(req.body.from),
-                            req.st.db.escape(req.body.to),
-                            req.st.db.escape(req.body.resultType || 0),
-                            req.st.db.escape(JSON.stringify(client)),
-                            req.st.db.escape(JSON.stringify(requirement))
+                            var inputs = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.query.heMasterId),
+                                req.st.db.escape(req.query.userMasterId),
+                                req.st.db.escape(req.query.type),
+                                req.st.db.escape(req.body.from),
+                                req.st.db.escape(req.body.to),
+                                req.st.db.escape(req.body.resultType || 0),
+                                req.st.db.escape(JSON.stringify(client)),
+                                req.st.db.escape(JSON.stringify(requirement))
 
-                        ];
+                            ];
 
-                        var procQuery = 'CALL wm_get_DashBoard( ' + inputs.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, result) {
-                            console.log(err);
-                            if (!err && result && result[0]) {
-                                response.status = true;
-                                response.message = "data loaded successfully";
-                                response.error = null;
-                                var output = [];
-                                // for (var i = 0; i < result[1].length; i++) {
-                                //     var res2 = {};
-                                //     res2.stage = result[1][i].stage ? JSON.parse(result[1][i].stage) : {};
-                                //     output.push(res2);
-                                // }
+                            var procQuery = 'CALL wm_get_DashBoard( ' + inputs.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, result) {
+                                console.log(err);
+                                if (!err && result && result[0]) {
+                                    response.status = true;
+                                    response.message = "data loaded successfully";
+                                    response.error = null;
+                                    var output = [];
+                                    // for (var i = 0; i < result[1].length; i++) {
+                                    //     var res2 = {};
+                                    //     res2.stage = result[1][i].stage ? JSON.parse(result[1][i].stage) : {};
+                                    //     output.push(res2);
+                                    // }
 
-                                // var output1 = [];
+                                    // var output1 = [];
 
-                                // for (var i = 0; i < result[2].length; i++) {
-                                //     var res3 = {};
-                                //     res3.name = result[2][i] ? result[2][i].name : "";
-                                //     res3.userMasterId = result[2] && result[2][i] ? result[2][i].userMasterId : 0;
-                                //     res3.stage = result[2][i].stage ? JSON.parse(result[2][i].stage) : [];
-                                //     output1.push(res3);
-                                // }
+                                    // for (var i = 0; i < result[2].length; i++) {
+                                    //     var res3 = {};
+                                    //     res3.name = result[2][i] ? result[2][i].name : "";
+                                    //     res3.userMasterId = result[2] && result[2][i] ? result[2][i].userMasterId : 0;
+                                    //     res3.stage = result[2][i].stage ? JSON.parse(result[2][i].stage) : [];
+                                    //     output1.push(res3);
+                                    // }
 
-                                // var output2 = [];
-                                // for (var i = 0; i < result[4].length; i++) {
-                                //     var res4 = {};
-                                //     res4.clientId = result[4][i].clientId;
-                                //     res4.clientName = result[4][i].clientName;
-                                //     res4.stage = result[4][i].stage ? JSON.parse(result[4][i].stage) : {};
-                                //     output2.push(res4);
-                                // }
-                                // if (result[9] && result[9][0]) {
-                                //     for (var i = 0; i < result[9].length; i++) {
-                                //         result[9][i].stageDetails = result[9][i].stageDetails ? JSON.parse(result[9][i].stageDetails) : [];
-                                //         for (var j = 0; j < result[9][i].stageDetails.length; j++) {
-                                //             result[9][i].stageDetails[j].details = result[9][i].stageDetails[j].details ? JSON.parse(result[9][i].stageDetails[j].details) : {};
-                                //         }
-                                //     }
-                                // }
-
-
-                                // if (result[11] && result[11][0]) {
-                                //     for (var i = 0; i < result[11].length; i++) {
-                                //         result[11][i].cvDetails = result[11][i].cvDetails ? JSON.parse(result[11][i].cvDetails) : [];
-
-                                //     }
-                                // }
-
-                                // console.log(result[9][0])
-                                // if (result[10] && result[10][0]) {
-                                //     for (var i = 0; i < result[10].length; i++) {
-                                //         result[10][i].countDetails = result[10][i].countDetails ? JSON.parse(result[10][i].countDetails) : [];
-                                //         for (var j = 0; j < result[10][i].countDetails.length; j++) {
-                                //             result[10][i].countDetails[j].details = result[10][i].countDetails[j].details ? JSON.parse(result[10][i].countDetails[j].details) : {};
-                                //         }
-                                //     }
-
-                                // }
-                                // if (result[12] && result[12][0]) {
-
-                                //     for (var i = 0; i < result[12].length; i++) {
-                                //         result[12][i].cvDetails = result[12][i].cvDetails ? JSON.parse(result[12][i].cvDetails) : [];
-
-                                //     }
-
-                                // }
-                                // for (var i = 0; i < result[7].length; i++) {
-                                //     result[7][i].reqAppDetails = result[7][i].reqAppDetails ? JSON.parse(result[7][i].reqAppDetails) : [];
-                                // }
-
-                                // for (var i = 0; i < result[8].length; i++) {
-                                //     result[8][i].reqAppDetails = result[8][i].reqAppDetails ? JSON.parse(result[8][i].reqAppDetails) : [];
-                                // }
+                                    // var output2 = [];
+                                    // for (var i = 0; i < result[4].length; i++) {
+                                    //     var res4 = {};
+                                    //     res4.clientId = result[4][i].clientId;
+                                    //     res4.clientName = result[4][i].clientName;
+                                    //     res4.stage = result[4][i].stage ? JSON.parse(result[4][i].stage) : {};
+                                    //     output2.push(res4);
+                                    // }
+                                    // if (result[9] && result[9][0]) {
+                                    //     for (var i = 0; i < result[9].length; i++) {
+                                    //         result[9][i].stageDetails = result[9][i].stageDetails ? JSON.parse(result[9][i].stageDetails) : [];
+                                    //         for (var j = 0; j < result[9][i].stageDetails.length; j++) {
+                                    //             result[9][i].stageDetails[j].details = result[9][i].stageDetails[j].details ? JSON.parse(result[9][i].stageDetails[j].details) : {};
+                                    //         }
+                                    //     }
+                                    // }
 
 
-                                if (req.body.resultType == 1) {
-                                    response.data = {
-                                        requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
-                                        stages: result[1],
-                                        converstionReport: result[2][0],
-                                        turnAroundTime: result[3][0],
-                                        firstCVResponse: result[4][0],
+                                    // if (result[11] && result[11][0]) {
+                                    //     for (var i = 0; i < result[11].length; i++) {
+                                    //         result[11][i].cvDetails = result[11][i].cvDetails ? JSON.parse(result[11][i].cvDetails) : [];
 
+                                    //     }
+                                    // }
+
+                                    // console.log(result[9][0])
+                                    // if (result[10] && result[10][0]) {
+                                    //     for (var i = 0; i < result[10].length; i++) {
+                                    //         result[10][i].countDetails = result[10][i].countDetails ? JSON.parse(result[10][i].countDetails) : [];
+                                    //         for (var j = 0; j < result[10][i].countDetails.length; j++) {
+                                    //             result[10][i].countDetails[j].details = result[10][i].countDetails[j].details ? JSON.parse(result[10][i].countDetails[j].details) : {};
+                                    //         }
+                                    //     }
+
+                                    // }
+                                    // if (result[12] && result[12][0]) {
+
+                                    //     for (var i = 0; i < result[12].length; i++) {
+                                    //         result[12][i].cvDetails = result[12][i].cvDetails ? JSON.parse(result[12][i].cvDetails) : [];
+
+                                    //     }
+
+                                    // }
+                                    // for (var i = 0; i < result[7].length; i++) {
+                                    //     result[7][i].reqAppDetails = result[7][i].reqAppDetails ? JSON.parse(result[7][i].reqAppDetails) : [];
+                                    // }
+
+                                    // for (var i = 0; i < result[8].length; i++) {
+                                    //     result[8][i].reqAppDetails = result[8][i].reqAppDetails ? JSON.parse(result[8][i].reqAppDetails) : [];
+                                    // }
+
+
+                                    if (req.body.resultType == 1) {
+                                        response.data = {
+                                            requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
+                                            stages: result[1],
+                                            converstionReport: result[2][0],
+                                            turnAroundTime: result[3][0],
+                                            firstCVResponse: result[4][0],
+
+                                        }
                                     }
-                                }
-                                else if (req.body.resultType == 2) {
-                                    response.data = {
-                                        requirementReport: result[0],
-                                        requirementReportTotalCount: result[1],
+                                    else if (req.body.resultType == 2) {
+                                        response.data = {
+                                            requirementReport: result[0],
+                                            requirementReportTotalCount: result[1],
+                                        }
                                     }
-                                }
 
-                                else if (req.body.resultType == 3) {
-                                    response.data = {
-                                        fullfilmentReport: result[0],
-                                        fullfilmentReportTotalCount: result[1],
+                                    else if (req.body.resultType == 3) {
+                                        response.data = {
+                                            fullfilmentReport: result[0],
+                                            fullfilmentReportTotalCount: result[1],
+                                        }
                                     }
-                                }
 
-                                else if (req.body.resultType == 4) {
-                                    response.data = {
-                                        recruiterWiseReport: result[0],
-                                        stagewiseTurnAroundReport: result[1]
+                                    else if (req.body.resultType == 4) {
+                                        response.data = {
+                                            recruiterWiseReport: result[0],
+                                            stagewiseTurnAroundReport: result[1]
+                                        }
                                     }
-                                }
 
-                                // else if(req.body.resultType ==5){
-                                //     response.data={
-                                //         stagewiseTurnAroundReport: result[0]
-                                //  }
-                                // }
-                                else if (req.body.resultType == 5) {
-                                    response.data = {
-                                        // recruiterWiseReport: result[0],
-                                        // stagewiseTurnAroundReport: result[1],
-                                        cvSourceReport: result[0],
-                                        cvSourceRecruiterReport: result[1],
+                                    // else if(req.body.resultType ==5){
+                                    //     response.data={
+                                    //         stagewiseTurnAroundReport: result[0]
+                                    //  }
+                                    // }
+                                    else if (req.body.resultType == 5) {
+                                        response.data = {
+                                            // recruiterWiseReport: result[0],
+                                            // stagewiseTurnAroundReport: result[1],
+                                            cvSourceReport: result[0],
+                                            cvSourceRecruiterReport: result[1],
 
 
-                                        totalCVCount: result[2][0].count,
-                                        filteredCVCount: result[3][0].count,
+                                            totalCVCount: result[2][0].count,
+                                            filteredCVCount: result[3][0].count,
+                                        }
                                     }
-                                }
 
-                                else if (req.body.resultType == 6) {
-                                    response.data = {
-                                        skillReport: result[0] && result[0][0] ? result[0] : []
+                                    else if (req.body.resultType == 6) {
+                                        response.data = {
+                                            skillReport: result[0] && result[0][0] ? result[0] : []
+                                        }
                                     }
+
+
+                                    // response.data =
+                                    //     {
+                                    //         requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
+                                    //         stages: output,
+                                    //         requirementReport: output1,
+                                    //         requirementReportTotalCount: result[3],
+                                    //         fullfilmentReport: output2,
+                                    //         fullfilmentReportTotalCount: result[5],
+                                    //         converstionReport: result[6][0],
+                                    //         turnAroundTime: result[7][0],
+                                    //         firstCVResponse: result[8][0],
+                                    //         recruiterWiseReport: result[9],
+                                    //         stagewiseTurnAroundReport: result[10],
+                                    //         cvSourceReport: result[11],
+                                    //         cvSourceRecruiterReport: result[12],
+
+
+                                    //         totalCVCount: result[13][0].count,
+                                    //         filteredCVCount: result[14][0].count,
+                                    //         // CVsSentToTheClient_CVsShortlistedByTheClient: result[10][0],
+                                    //         // CVsShortlisted_CandidatesInterviewedByClient: result[11][0],
+                                    //         // CandidatesInterviewedByClient_CandidatesOffered: result[12][0],
+                                    //         // CandidatesOffered_CandidatesJoined: result[13][0]
+
+                                    // };
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
                                 }
 
+                                else if (!err) {
+                                    response.status = false;
+                                    response.message = "No results found";
+                                    response.error = null;
+                                    response.data = {
+                                        requirementStatus: {},
+                                        stages: [],
+                                        requirementReport: [],
+                                        requirementReportTotalCount: [],
+                                        fullfilmentReport: [],
+                                        fullfilmentReportTotalCount: [],
+                                        converstionReport: {},
+                                        turnAroundTime: [],
+                                        firstCVResponse: [],
+                                        stageWiseReport: [],
+                                        stagewiseTurnAroundReport: [],
+                                        cvsourceReport: [],
+                                        cvSourceRecruiterReport: [],
+                                        totalCVCount: [],
+                                        filteredCVCount: [],
+                                        // CVsCalled_SentToTheClient:[],
+                                        // CVsSentToTheClient_CVsShortlistedByTheClient: [],
+                                        // CVsShortlisted_CandidatesInterviewedByClient: [],
+                                        // CandidatesInterviewedByClient_CandidatesOffered: [],
+                                        // CandidatesOffered_CandidatesJoined: []
 
-                                // response.data =
-                                //     {
-                                //         requirementStatus: result[0][0].requirementStatus ? JSON.parse(result[0][0].requirementStatus) : {},
-                                //         stages: output,
-                                //         requirementReport: output1,
-                                //         requirementReportTotalCount: result[3],
-                                //         fullfilmentReport: output2,
-                                //         fullfilmentReportTotalCount: result[5],
-                                //         converstionReport: result[6][0],
-                                //         turnAroundTime: result[7][0],
-                                //         firstCVResponse: result[8][0],
-                                //         recruiterWiseReport: result[9],
-                                //         stagewiseTurnAroundReport: result[10],
-                                //         cvSourceReport: result[11],
-                                //         cvSourceRecruiterReport: result[12],
-
-
-                                //         totalCVCount: result[13][0].count,
-                                //         filteredCVCount: result[14][0].count,
-                                //         // CVsSentToTheClient_CVsShortlistedByTheClient: result[10][0],
-                                //         // CVsShortlisted_CandidatesInterviewedByClient: result[11][0],
-                                //         // CandidatesInterviewedByClient_CandidatesOffered: result[12][0],
-                                //         // CandidatesOffered_CandidatesJoined: result[13][0]
-
-                                // };
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    };
                                     res.status(200).json(response);
-                                });
-                            }
-
-                            else if (!err) {
-                                response.status = false;
-                                response.message = "No results found";
-                                response.error = null;
-                                response.data = {
-                                    requirementStatus: {},
-                                    stages: [],
-                                    requirementReport: [],
-                                    requirementReportTotalCount: [],
-                                    fullfilmentReport: [],
-                                    fullfilmentReportTotalCount: [],
-                                    converstionReport: {},
-                                    turnAroundTime: [],
-                                    firstCVResponse: [],
-                                    stageWiseReport: [],
-                                    stagewiseTurnAroundReport: [],
-                                    cvsourceReport: [],
-                                    cvSourceRecruiterReport: [],
-                                    totalCVCount: [],
-                                    filteredCVCount: [],
-                                    // CVsCalled_SentToTheClient:[],
-                                    // CVsSentToTheClient_CVsShortlistedByTheClient: [],
-                                    // CVsShortlisted_CandidatesInterviewedByClient: [],
-                                    // CandidatesInterviewedByClient_CandidatesOffered: [],
-                                    // CandidatesOffered_CandidatesJoined: []
-
-                                };
-                                res.status(200).json(response);
-                            }
-                            else {
-                                response.status = false;
-                                response.message = "Error while loading dashobard data";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
-                            }
-                        });
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while loading dashobard data";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            });
+                        }
+                    } catch (ex) {
+                        console.log("dashboard req", ex);
+                        response.message = "Please re-login";
+                        res.status(401).json(response);
                     }
-
                 });
 
             }
@@ -3315,11 +3320,11 @@ paceUsersCtrl.getSourcedApplicants = function (req, res, next) {
                         response.status = true;
                         response.message = "Applicants data loaded successfully";
                         response.error = null;
-                        response.data ={
-                                ApplicantsList: result[0] ? result[0] : [],
-                                count : result[1][0] && result[1][0].count ? result[1][0].count : 0,
-                                ApplicantsListForExport : result[2] ? result[2] : []
-                            };
+                        response.data = {
+                            ApplicantsList: result[0] ? result[0] : [],
+                            count: result[1][0] && result[1][0].count ? result[1][0].count : 0,
+                            ApplicantsListForExport: result[2] ? result[2] : []
+                        };
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -3332,9 +3337,9 @@ paceUsersCtrl.getSourcedApplicants = function (req, res, next) {
                         response.message = "No results found";
                         response.error = null;
                         response.data = {
-                            ApplicantsList : [],
-                            count:0,
-                            ApplicantsListForExport:[]
+                            ApplicantsList: [],
+                            count: 0,
+                            ApplicantsListForExport: []
                         };
                         res.status(200).json(response);
                     }
