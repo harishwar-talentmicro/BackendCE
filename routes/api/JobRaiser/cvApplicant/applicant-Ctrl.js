@@ -89,7 +89,15 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                 req.st.validateToken(req.query.token, function (err, tokenResult) {
                     try {
                         if ((!err) && tokenResult) {
-                            var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+
+                            if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != "") {
+                                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                            }
+                            else {
+                                response.message = "Session expired.! Please re-login";
+                                res.status(401).json(response);
+                                return;
+                            }
                             zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                                 try {
                                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
@@ -1662,7 +1670,15 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                     if ((!err) && tokenResult) {
                         req.query.isWeb = 1;
                         if (req.query.isWeb) {
-                            var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                            if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != "") {
+                                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                            }
+                            else {
+                                response.message = "Session expired.! Please re-login";
+                                res.status(401).json(response);
+                                return;
+                            }
+
                             zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                                 try {
                                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
@@ -7621,7 +7637,14 @@ applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != "") {
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                }
+                else {
+                    response.message = "Session expired.! Please re-login";
+                    res.status(401).json(response);
+                    return;
+                }
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
