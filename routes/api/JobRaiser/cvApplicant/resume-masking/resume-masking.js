@@ -47,7 +47,7 @@ resumeMaskingCtrl.resume_maskinghttps = function (req, res, next) {
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, Result) {
                     console.log(err);
-
+                    console.log(Result);
                     if (!err && Result && Result[0] && Result[1] && Result[1][0] && Result[1][0].cvPath != "") {
 
                         var orgCVPath = Result[1][0].cvPath;
@@ -147,6 +147,7 @@ resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
     var token = req.query.token;
 
     var url = 'http://35.237.69.199:3001/api/v1.1/WM/cv/resume-preparationhttp?heMasterId=' + heMasterId + '&isWeb=' + isWeb + '&token=' + token;
+    console.log("http url", url);
 
     try {
         request({
@@ -156,18 +157,23 @@ resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
             json: true,
             body: req.body
         }, function (error, resp, body) {
-            if (error) {
-                console.log("rsa error", error);
-            }
-            else {
-                console.log("rsa response", body);
-            }
+            try {
+                if (error) {
+                    console.log("rsa error", error);
+                }
+                else {
+                    console.log("rsa response", body);
+                }
 
-            if(typeof(body)=='string'){
-                body = JSON.parse(body);
-            }
+                if (typeof (body) == 'string') {
+                    body = JSON.parse(body);
+                }
 
-            res.send(body);
+                res.send(body);
+            } catch (ex) {
+                console.log(ex);
+                res.send(ex.toString());
+            }
         });
 
     }
