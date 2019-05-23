@@ -59,6 +59,7 @@ router.post('/paceAdmin',paceAdmin.paceAdminDashboard);
 router.post('/savePaceAdminConfiguration',paceAdmin.paceSaveHeMasterConfiguration);
 
 router.get('/peepalReport',paceAdmin.PeepalReport);
+router.post('/loginoutReport',paceUsersCtrl.loginoutReport);
 
 
 module.exports = router;

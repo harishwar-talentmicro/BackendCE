@@ -910,10 +910,6 @@ paceUsersCtrl.saveTrackerTemplate = function (req, res, next) {
     };
     var validationFlag = true;
 
-    if (!req.body.heMasterId) {
-        error.heMasterId = "Invalid Company";
-        validationFlag *= false;
-    }
     if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
@@ -934,6 +930,12 @@ paceUsersCtrl.saveTrackerTemplate = function (req, res, next) {
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
+                    console.log(req.body);
+                    if (!req.body.heMasterId) {
+                        error.heMasterId = "Invalid Company";
+                        validationFlag *= false;
+                    }
+                    
                     var tagsJson = req.body.tagsJson;
                     if (typeof (tagsJson) == "string") {
                         tagsJson = JSON.parse(tagsJson);
@@ -3608,6 +3610,105 @@ paceUsersCtrl.smsMailTemplates = function (req, res, next) {
                     else {
                         response.status = false;
                         response.message = "Error while loading templateList";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+paceUsersCtrl.loginoutReport = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.heMasterId) {
+        validationFlag *= false;
+        error.heMasterId = "Invalid Company";
+    }
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.body.from) {
+        error.from = 'Invalid from';
+        validationFlag *= false;
+    }
+
+    if (!req.body.to) {
+        error.to = 'Invalid to';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.from),
+                    req.st.db.escape(req.body.to),
+                    req.st.db.escape(JSON.stringify(req.body.userMasterId || [])),
+                    req.st.db.escape(req.body.startPage || 1),
+                    req.st.db.escape(req.body.limit || 200),
+                    req.st.db.escape(req.body.isExport || 0),
+                    req.st.db.escape(req.body.isCustomRange || 0)
+
+                ];
+
+                var procQuery = 'CALL pace_loginoutreport( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "Loginout report loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            report: result[0] ? result[0] : [],
+                            reportForExport : result[2] && result[2][0] ? result[2] : [],
+                            count : result[1] && result[1][0] && result[1][0].count ? result[1][0].count : 0
+                        };
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                        // });
+                    }
+
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = {
+                            report: [],
+                            reportForExport : [],
+                            count : 0
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading report";
                         response.error = null;
                         response.data = null;
                         res.status(500).json(response);
