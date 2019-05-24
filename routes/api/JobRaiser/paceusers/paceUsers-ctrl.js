@@ -363,6 +363,7 @@ paceUsersCtrl.saveTaskPlanner = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
+                var decryptBuf = '';
                 if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != "") {
                     var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 }
@@ -631,6 +632,7 @@ paceUsersCtrl.getdashBoard = function (req, res, next) {
             if ((!err) && tokenResult) {
 
 
+                var decryptBuf = '';
                 if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != "") {
                     var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 }
