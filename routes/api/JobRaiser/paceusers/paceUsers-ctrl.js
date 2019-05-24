@@ -3137,7 +3137,7 @@ paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
 
                                     notifyMessages.getMessagesNeedToNotify();
                                     respMsg.status = true;
-                                    respMsg.message = userResult[0][0].loggedInWhatmateUser;
+                                    respMsg.message = "Details sent to whatmate";
                                     respMsg.data = null;
                                     res.status(200).json(respMsg);
                                 }
