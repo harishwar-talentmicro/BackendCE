@@ -2998,7 +2998,6 @@ paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
         error['token'] = 'token is mandatory';
         status *= false;
     }
-    var applicantInfo = req.body.applicantInfo || {};
 
     if (status) {
         try {
@@ -3008,7 +3007,9 @@ paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
                     var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                     zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                         req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                        console.log(req.body);
 
+                        var applicantInfo = req.body.applicantInfo || {};
 
                         if (!validationFlag) {
                             response.error = error;
@@ -3018,7 +3019,7 @@ paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
                         }
                         else {
                             var message = "";
-                            message = message + applicantInfo.applicantName + ", " + applicantInfo.mobileIsd + applicantInfo.mobileNumber;
+                            message = applicantInfo.applicantName + ", " + applicantInfo.mobileIsd + applicantInfo.mobileNumber;
                             message = "Contact details: " + message + " --PaceHCM";
 
                             var query = [
@@ -3127,7 +3128,7 @@ paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
                                     //     }
                                     // }
                                     respMsg.status = true;
-                                    respMsg.message = 'Applicant details sent to whatmate.Please login into whatmate';
+                                    respMsg.message = 'Please login to whatmate in mobile to receive details';
                                     respMsg.data = null;
                                     res.status(200).json(respMsg);
 
