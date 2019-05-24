@@ -27,6 +27,7 @@ const accountSid = 'AC3765f2ec587b6b5b893566f1393a00f4';  //'ACcf64b25bcacbac0b6
 const authToken = 'b36eba6376b5939cebe146f06d33ec57';   //'3abf04f536ede7f6964919936a35e614';  //'b36eba6376b5939cebe146f06d33ec57';//
 const FromNumber = appConfig.DB.FromNumber || '+18647547021';
 const client = require('twilio')(accountSid, authToken);
+var validationFlag = true;
 
 
 var qs = require("querystring");
@@ -2984,6 +2985,7 @@ paceUsersCtrl.sendApplicantInfoToPhone = function (req, res, next) {
 
 paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
 
+    var validationFlag = true;
     var status = true, error = {};
     var respMsg = {
         status: false,
