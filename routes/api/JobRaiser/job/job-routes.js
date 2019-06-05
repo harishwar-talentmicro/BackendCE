@@ -40,5 +40,7 @@ router.get('/clientManagerList',jobCtrl.getClientManagerList);
 router.post('/requirementListForMobile',jobCtrl.getrequirementListMobile);
 router.get('/getReqContactsForMobile',jobCtrl.getRequirementContactsOfBranchForMobile);
 
+router.get('/columns',jobCtrl.columns);
+router.post('/report',jobCtrl.dynamicReport);
 module.exports = router;
 

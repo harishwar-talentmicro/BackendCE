@@ -1397,6 +1397,8 @@ jobPortalCtrl.portalsignup = function (req, res, next) {
         console.log('password', password);
         console.log('encryptPwd', encryptPwd);
 
+        console.log(req.body);
+        
         var getStatus = [
             req.st.db.escape(req.body.firstName),
             req.st.db.escape(req.body.lastName),
@@ -1852,7 +1854,7 @@ jobPortalCtrl.portalApplicantHistory = function (req, res, next) {
                     req.st.db.escape(req.body.applicantId),
                     req.st.db.escape(req.body.startPage || 0),
                     req.st.db.escape(req.body.limit || 50),
-                    req.st.db.escape(req.body.heMasterId || 0)
+                    req.st.db.escape(req.query.heMasterId || 0)
                 ];
 
                 var procQuery = 'CALL wm_get_portalApplicantJobHistory( ' + inputs.join(',') + ')';

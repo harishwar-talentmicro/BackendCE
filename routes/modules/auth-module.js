@@ -1101,10 +1101,7 @@ Auth.prototype.pacelogin = function (req, res, next) {
     var isIphone = req.body.device ? parseInt(req.body.device) : 0;
     var deviceToken = req.body.device_token ? req.body.device_token : '';
     var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
-    var ip = req.headers['x-forwarded-for'] ||
-        req.connection.remoteAddress ||
-        req.socket.remoteAddress ||
-        req.connection.socket.remoteAddress;
+    var ip =req.body.ip;
 
     var token = req.body.token ? req.body.token : '';
     var code = req.body.code ? req.st.alterEzeoneId(req.body.code) : '';

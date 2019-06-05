@@ -14,5 +14,7 @@ router.get('/attendanceRegister',TITOCtrl.getAttendanceRegister);
 router.get('/attendanceRegister/details',TITOCtrl.getAttendanceRegisterDetails);
 router.get('/teamMembers',TITOCtrl.getMyTeamMembers);
 
+router.post('/logInOutNew',TITOCtrl.saveAttendenceAndroid);
+
 module.exports = router;
 

@@ -383,7 +383,7 @@ billingCtrl.billmasterTaxTypes = function (req, res, next) {
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
 
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0]) {
                         response.status = true;
                         response.message = "Tax types loaded sucessfully";
                         response.error = null;
@@ -1402,7 +1402,7 @@ billingCtrl.savePaceReqAppBilling = function (req, res, next) {
                             }
                             else if (!err) {
                                 response.status = false;
-                                response.message = "Bill Data saved sucessfully";
+                                response.message = "Cuuld not save data";
                                 response.error = null;
                                 response.data = [];
                                 res.status(200).json(response);

@@ -119,203 +119,203 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                 // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                 //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
                 //     console.log(req.body);
-                    if (!req.body.heMasterId) {
-                        error.heMasterId = 'Invalid tenant';
-                        validationFlag *= false;
-                    }
+                if (!req.body.heMasterId) {
+                    error.heMasterId = 'Invalid tenant';
+                    validationFlag *= false;
+                }
 
-                    var jobType = req.body.jobType;
-                    if (typeof (jobType) == "string") {
-                        jobType = JSON.parse(jobType);
-                    }
-                    if (!jobType) {
-                        jobType = {};
-                    }
-                    var heDepartment = req.body.heDepartment;
-                    if (typeof (heDepartment) == "string") {
-                        heDepartment = JSON.parse(heDepartment);
-                    }
-                    if (!heDepartment) {
-                        heDepartment = [];
-                    }
+                var jobType = req.body.jobType;
+                if (typeof (jobType) == "string") {
+                    jobType = JSON.parse(jobType);
+                }
+                if (!jobType) {
+                    jobType = {};
+                }
+                var heDepartment = req.body.heDepartment;
+                if (typeof (heDepartment) == "string") {
+                    heDepartment = JSON.parse(heDepartment);
+                }
+                if (!heDepartment) {
+                    heDepartment = [];
+                }
 
-                    var currency = req.body.currency;
-                    if (typeof (currency) == "string") {
-                        currency = JSON.parse(currency);
-                    }
-                    if (!currency) {
-                        currency = {};
-                    }
-                    var scale = req.body.scale;
-                    if (typeof (scale) == "string") {
-                        scale = JSON.parse(scale);
-                    }
-                    if (!scale) {
-                        scale = {};
-                    }
-                    var duration = req.body.duration;
-                    if (typeof (duration) == "string") {
-                        duration = JSON.parse(duration);
-                    }
-                    if (!duration) {
-                        duration = {};
-                    }
-                    var country = req.body.country;
-                    if (typeof (country) == "string") {
-                        country = JSON.parse(country);
-                    }
-                    if (!country) {
-                        country = {};
-                    }
+                var currency = req.body.currency;
+                if (typeof (currency) == "string") {
+                    currency = JSON.parse(currency);
+                }
+                if (!currency) {
+                    currency = {};
+                }
+                var scale = req.body.scale;
+                if (typeof (scale) == "string") {
+                    scale = JSON.parse(scale);
+                }
+                if (!scale) {
+                    scale = {};
+                }
+                var duration = req.body.duration;
+                if (typeof (duration) == "string") {
+                    duration = JSON.parse(duration);
+                }
+                if (!duration) {
+                    duration = {};
+                }
+                var country = req.body.country;
+                if (typeof (country) == "string") {
+                    country = JSON.parse(country);
+                }
+                if (!country) {
+                    country = {};
+                }
 
-                    var defaultClient = req.body.defaultClient;
-                    if (typeof (defaultClient) == "string") {
-                        defaultClient = JSON.parse(defaultClient);
-                    }
-                    if (!defaultClient) {
-                        defaultClient = {};
-                    }
+                var defaultClient = req.body.defaultClient;
+                if (typeof (defaultClient) == "string") {
+                    defaultClient = JSON.parse(defaultClient);
+                }
+                if (!defaultClient) {
+                    defaultClient = {};
+                }
 
-                    var stageStatusList = req.body.stageStatusList;
-                    if (typeof (stageStatusList) == "string") {
-                        stageStatusList = JSON.parse(stageStatusList);
-                    }
-                    if (!stageStatusList) {
-                        stageStatusList = [];
-                    }
+                var stageStatusList = req.body.stageStatusList;
+                if (typeof (stageStatusList) == "string") {
+                    stageStatusList = JSON.parse(stageStatusList);
+                }
+                if (!stageStatusList) {
+                    stageStatusList = [];
+                }
 
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the error';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+                if (!validationFlag) {
+                    response.error = error;
+                    response.message = 'Please check the error';
+                    res.status(400).json(response);
+                    console.log(response);
+                }
+                else {
+                    req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
-                        req.body.defId = (req.body.defId) ? req.body.defId : 0;
-                        req.body.purpose = (req.body.purpose) ? req.body.purpose : 0;
-                        req.body.logoFile = (req.body.logoFile) ? req.body.logoFile : '';
-                        req.body.checkboxTimeOut = (req.body.checkboxTimeOut) ? req.body.checkboxTimeOut : 0;
-                        req.body.merge = (req.body.merge) ? req.body.merge : 0;
-                        req.body.timeOutValue = (req.body.timeOutValue) ? req.body.timeOutValue : null;
-                        req.body.invoicePrefix = (req.body.invoicePrefix) ? req.body.invoicePrefix : '';
-                        req.body.invoiceSuffix = (req.body.invoiceSuffix) ? req.body.invoiceSuffix : '';
-                        req.body.lastInsertedInvoiceNo = (req.body.lastInsertedInvoiceNo) ? req.body.lastInsertedInvoiceNo : '';
-                        req.body.invoiceNumberLength = (req.body.invoiceNumberLength) ? req.body.invoiceNumberLength : 0;
+                    req.body.defId = (req.body.defId) ? req.body.defId : 0;
+                    req.body.purpose = (req.body.purpose) ? req.body.purpose : 0;
+                    req.body.logoFile = (req.body.logoFile) ? req.body.logoFile : '';
+                    req.body.checkboxTimeOut = (req.body.checkboxTimeOut) ? req.body.checkboxTimeOut : 0;
+                    req.body.merge = (req.body.merge) ? req.body.merge : 0;
+                    req.body.timeOutValue = (req.body.timeOutValue) ? req.body.timeOutValue : null;
+                    req.body.invoicePrefix = (req.body.invoicePrefix) ? req.body.invoicePrefix : '';
+                    req.body.invoiceSuffix = (req.body.invoiceSuffix) ? req.body.invoiceSuffix : '';
+                    req.body.lastInsertedInvoiceNo = (req.body.lastInsertedInvoiceNo) ? req.body.lastInsertedInvoiceNo : '';
+                    req.body.invoiceNumberLength = (req.body.invoiceNumberLength) ? req.body.invoiceNumberLength : 0;
 
-                        req.body.jobcodePrefix = (req.body.jobcodePrefix) ? req.body.jobcodePrefix : '';
-                        req.body.jobcodeSuffix = (req.body.jobcodeSuffix) ? req.body.jobcodeSuffix : '';
-                        req.body.lastInsertedJobcodeNo = (req.body.lastInsertedJobcodeNo) ? req.body.lastInsertedJobcodeNo : '';
-                        req.body.invoiceNumberLength = (req.body.invoiceNumberLength) ? req.body.invoiceNumberLength : 0;
-                        req.body.isAutoMovement = (req.body.isAutoMovement) ? req.body.isAutoMovement : 0;
-                        req.body.isStrict = (req.body.isStrict) ? req.body.isStrict : 0;
-                        req.body.isGulf = (req.body.isGulf) ? req.body.isGulf : 0;
+                    req.body.jobcodePrefix = (req.body.jobcodePrefix) ? req.body.jobcodePrefix : '';
+                    req.body.jobcodeSuffix = (req.body.jobcodeSuffix) ? req.body.jobcodeSuffix : '';
+                    req.body.lastInsertedJobcodeNo = (req.body.lastInsertedJobcodeNo) ? req.body.lastInsertedJobcodeNo : '';
+                    req.body.invoiceNumberLength = (req.body.invoiceNumberLength) ? req.body.invoiceNumberLength : 0;
+                    req.body.isAutoMovement = (req.body.isAutoMovement) ? req.body.isAutoMovement : 0;
+                    req.body.isStrict = (req.body.isStrict) ? req.body.isStrict : 0;
+                    req.body.isGulf = (req.body.isGulf) ? req.body.isGulf : 0;
 
-                        var inputs = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.body.defId),
-                            req.st.db.escape(req.body.heMasterId),
-                            req.st.db.escape(req.body.purpose),
-                            req.st.db.escape(JSON.stringify(jobType)),
-                            req.st.db.escape(JSON.stringify(currency)),
-                            req.st.db.escape(JSON.stringify(scale)),
-                            req.st.db.escape(JSON.stringify(duration)),
-                            req.st.db.escape(JSON.stringify(country)),
-                            req.st.db.escape(JSON.stringify(heDepartment)),
-                            req.st.db.escape(JSON.stringify(defaultClient)),
-                            req.st.db.escape(req.body.logoFile),
-                            req.st.db.escape(req.body.checkboxTimeOut),
-                            req.st.db.escape(req.body.merge),
-                            req.st.db.escape(req.body.timeOutValue),
-                            req.st.db.escape(req.body.invoicePrefix),
-                            req.st.db.escape(req.body.invoiceSuffix),
-                            req.st.db.escape(req.body.lastInsertedInvoiceNo),
-                            req.st.db.escape(req.body.invoiceNumberLength),
-                            req.st.db.escape(req.body.jobcodePrefix),
-                            req.st.db.escape(req.body.jobcodeSuffix),
-                            req.st.db.escape(req.body.lastInsertedJobcodeNo),
-                            req.st.db.escape(req.body.jobcodeLength),
-                            req.st.db.escape(req.body.isAutoMovement),
-                            req.st.db.escape(JSON.stringify(stageStatusList)),
-                            req.st.db.escape(req.body.isStrict),
+                    var inputs = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.body.defId),
+                        req.st.db.escape(req.body.heMasterId),
+                        req.st.db.escape(req.body.purpose),
+                        req.st.db.escape(JSON.stringify(jobType)),
+                        req.st.db.escape(JSON.stringify(currency)),
+                        req.st.db.escape(JSON.stringify(scale)),
+                        req.st.db.escape(JSON.stringify(duration)),
+                        req.st.db.escape(JSON.stringify(country)),
+                        req.st.db.escape(JSON.stringify(heDepartment)),
+                        req.st.db.escape(JSON.stringify(defaultClient)),
+                        req.st.db.escape(req.body.logoFile),
+                        req.st.db.escape(req.body.checkboxTimeOut),
+                        req.st.db.escape(req.body.merge),
+                        req.st.db.escape(req.body.timeOutValue),
+                        req.st.db.escape(req.body.invoicePrefix),
+                        req.st.db.escape(req.body.invoiceSuffix),
+                        req.st.db.escape(req.body.lastInsertedInvoiceNo),
+                        req.st.db.escape(req.body.invoiceNumberLength),
+                        req.st.db.escape(req.body.jobcodePrefix),
+                        req.st.db.escape(req.body.jobcodeSuffix),
+                        req.st.db.escape(req.body.lastInsertedJobcodeNo),
+                        req.st.db.escape(req.body.jobcodeLength),
+                        req.st.db.escape(req.body.isAutoMovement),
+                        req.st.db.escape(JSON.stringify(stageStatusList)),
+                        req.st.db.escape(req.body.isStrict),
 
-                            req.st.db.escape(req.body.autoScreeningSms || ''),
-                            req.st.db.escape(JSON.stringify(req.body.autoScreeningStageStatus || [])),
-                            req.st.db.escape(JSON.stringify(req.body.autoScreeningStages || {})),
-                            req.st.db.escape(JSON.stringify(req.body.autoSourcerList || [])),
-                            req.st.db.escape(req.body.autoSourcingSms || ''),
-                            req.st.db.escape(JSON.stringify(req.body.autoSubmissionStageStatus || [])),
-                            req.st.db.escape(req.body.isAttachResume || 0),
-                            req.st.db.escape(req.body.isAutoScreening || 0),
-                            req.st.db.escape(req.body.isAutoSourcing || 0),
-                            req.st.db.escape(req.body.isDeleteMail || 0),
-                            req.st.db.escape(req.body.isSendAutoScreeningMail || 0),
-                            req.st.db.escape(req.body.isSendAutoScreeningSms || 0),
-                            req.st.db.escape(req.body.isSendAutoSourceMailer || 0),
-                            req.st.db.escape(req.body.isSendAutoSourceSms || 0),
-                            req.st.db.escape(req.body.autoScreenPercentage || 0.0),
-                            req.st.db.escape(req.body.screeningMailerLimit || 0),
-                            req.st.db.escape(JSON.stringify(req.body.sourcingStageStatus || {})),
-                            req.st.db.escape(req.body.submissionMailerLimit || 0),
-                            req.st.db.escape(JSON.stringify(req.body.updateScreeningStageStatus || {})),
-                            req.st.db.escape(JSON.stringify(req.body.updateSubmissionStageStatus || {})),
-                            req.st.db.escape(req.body.autoSourcingMail || ''),
-                            req.st.db.escape(req.body.autoScreeningMail || ''),
-                            req.st.db.escape(req.body.isGulf || 0),
-                            req.st.db.escape(req.body.isCareerPortal || 0),
-                            req.st.db.escape(req.body.reqOrGroup || 1),
-                            req.st.db.escape(req.body.notifyClientBirthday || 0),
-                            req.st.db.escape(req.body.clientCVHeader || ""),
-                            req.st.db.escape(req.body.clientCVFooter || ""),
-                            req.st.db.escape(req.body.isClientCVHeader || 0),
-                            req.st.db.escape(req.body.isClientCVFooter || 0),
-                            req.st.db.escape(req.body.clientCVMaskMobileNo || 0),
-                            req.st.db.escape(req.body.clientCVMaskEmail || 0),
-                            req.st.db.escape(req.body.clientResumeLogoAttach || 0),
-                            req.st.db.escape(req.body.homePageLogo || ""),
-                            req.st.db.escape(JSON.stringify(req.body.notifyClientBirthdayFor || {}))
-                        ];
+                        req.st.db.escape(req.body.autoScreeningSms || ''),
+                        req.st.db.escape(JSON.stringify(req.body.autoScreeningStageStatus || [])),
+                        req.st.db.escape(JSON.stringify(req.body.autoScreeningStages || {})),
+                        req.st.db.escape(JSON.stringify(req.body.autoSourcerList || [])),
+                        req.st.db.escape(req.body.autoSourcingSms || ''),
+                        req.st.db.escape(JSON.stringify(req.body.autoSubmissionStageStatus || [])),
+                        req.st.db.escape(req.body.isAttachResume || 0),
+                        req.st.db.escape(req.body.isAutoScreening || 0),
+                        req.st.db.escape(req.body.isAutoSourcing || 0),
+                        req.st.db.escape(req.body.isDeleteMail || 0),
+                        req.st.db.escape(req.body.isSendAutoScreeningMail || 0),
+                        req.st.db.escape(req.body.isSendAutoScreeningSms || 0),
+                        req.st.db.escape(req.body.isSendAutoSourceMailer || 0),
+                        req.st.db.escape(req.body.isSendAutoSourceSms || 0),
+                        req.st.db.escape(req.body.autoScreenPercentage || 0.0),
+                        req.st.db.escape(req.body.screeningMailerLimit || 0),
+                        req.st.db.escape(JSON.stringify(req.body.sourcingStageStatus || {})),
+                        req.st.db.escape(req.body.submissionMailerLimit || 0),
+                        req.st.db.escape(JSON.stringify(req.body.updateScreeningStageStatus || {})),
+                        req.st.db.escape(JSON.stringify(req.body.updateSubmissionStageStatus || {})),
+                        req.st.db.escape(req.body.autoSourcingMail || ''),
+                        req.st.db.escape(req.body.autoScreeningMail || ''),
+                        req.st.db.escape(req.body.isGulf || 0),
+                        req.st.db.escape(req.body.isCareerPortal || 0),
+                        req.st.db.escape(req.body.reqOrGroup || 1),
+                        req.st.db.escape(req.body.notifyClientBirthday || 0),
+                        req.st.db.escape(req.body.clientCVHeader || ""),
+                        req.st.db.escape(req.body.clientCVFooter || ""),
+                        req.st.db.escape(req.body.isClientCVHeader || 0),
+                        req.st.db.escape(req.body.isClientCVFooter || 0),
+                        req.st.db.escape(req.body.clientCVMaskMobileNo || 0),
+                        req.st.db.escape(req.body.clientCVMaskEmail || 0),
+                        req.st.db.escape(req.body.clientResumeLogoAttach || 0),
+                        req.st.db.escape(req.body.homePageLogo || ""),
+                        req.st.db.escape(JSON.stringify(req.body.notifyClientBirthdayFor || {}))
+                    ];
 
-                        var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, results) {
-                            console.log(err);
-                            if (!err && results && results[0]) {
-                                response.status = true;
-                                response.error = null;
-                                response.message = "Requirement default saved successfully";
-                                response.data = {
-                                    defaultId: results[0],
-                                    defaultData: (results[1] && results[1][0] && results[1][0].defaultFormData) ? JSON.parse(results[1][0].defaultFormData) : {}
-                                };
-                                if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != null) {
-                                    // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                    // zlib.gzip(buf, function (_, result) {
-                                    //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                        res.status(200).json(response);
-                                    // });
-                                }
-                                else {
-                                    response.status = true;
-                                    response.message = "Could not encrypt response";
-                                    response.error = 'Invalid Key';
-                                    response.data = null;
-                                    res.status(400).json(response);
-                                }
-
-                                // res.status(200).json(response);
+                    var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, results) {
+                        console.log(err);
+                        if (!err && results && results[0]) {
+                            response.status = true;
+                            response.error = null;
+                            response.message = "Requirement default saved successfully";
+                            response.data = {
+                                defaultId: results[0],
+                                defaultData: (results[1] && results[1][0] && results[1][0].defaultFormData) ? JSON.parse(results[1][0].defaultFormData) : {}
+                            };
+                            if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != null) {
+                                // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                // zlib.gzip(buf, function (_, result) {
+                                //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                                // });
                             }
                             else {
-                                response.status = false;
-                                response.message = "Error while saving form default";
-                                response.error = null;
+                                response.status = true;
+                                response.message = "Could not encrypt response";
+                                response.error = 'Invalid Key';
                                 response.data = null;
-                                res.status(500).json(response);
+                                res.status(400).json(response);
                             }
 
-                        });
-                    }
+                            // res.status(200).json(response);
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while saving form default";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+
+                    });
+                }
                 // });
             }
             else {
@@ -746,7 +746,7 @@ jobCtrl.getJobDefaults = function (req, res, next) {
                             // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                             // zlib.gzip(buf, function (_, result) {
                             //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                res.status(200).json(response);
+                            res.status(200).json(response);
                             // });
                         }
                         else {
@@ -1624,7 +1624,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                             formData: (results[0] && results[0][0] && results[0][0].formDataJSON) ? JSON.parse(results[0][0].formDataJSON) : {},
                                             requirementList: (results && results[2] && results[2][0]) ? results[2] : [],
                                             jdTemplateList: (results && results[3] && results[3][0]) ? results[3] : [],
-                                            requirementJobTitle: (results && results[4] && results[4][0]) ? results[4] : []
+                                            requirementJobTitle: (results && results[4] && results[4][0]) ? results[4] : [],
+                                            requirementDetails : (results && results[6] && results[6][0]) ? results[6][0] : {}
                                         }
                                     };
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1632,6 +1633,93 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                         response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                         res.status(200).json(response);
                                     });
+
+                                    var reqId = results[5][0].reqId ? results[5][0].reqId :0;
+                                    var templateId = results[5][0].templateId ? results[5][0].templateId : 0;
+                                    var reqgroupId =  0;
+
+                                    var inputParams = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.body.heMasterId),
+                                        req.st.db.escape(reqId),
+                                        req.st.db.escape(templateId),
+                                        req.st.db.escape(reqgroupId)
+                                    ]
+
+
+                                    var query = 'CALL wm_get_requiremnetTeam_mail( ' + inputParams.join(',') + ')';
+                                    console.log("jejdnvoodsnoivnojasndovn", query);
+                                    req.db.query(query, function (err, result) {
+                                        console.log(result)
+                                        if (result && result[0] && result[0][0]) {
+                                            for (i = 0; i < result[0].length; i++) {
+                                                // var cc=result[0][i].cc;
+                                                // var bcc=result[0][i].bcc;
+
+                                                if (typeof (result[0] && result[0][i] && result[0][i].cc) == 'json') {
+                                                    result[0][i].cc = JSON.stringify(result[0][i].cc);
+                                                }
+
+
+                                                if (typeof (result[0] && result[0][i] && result[0][i].bcc) == 'json') {
+                                                    result[0][i].bcc = JSON.stringify(result[0][i].bcc);
+                                                }
+
+                                                var emailId = result[0][i].emailId;
+                                                var fromEmailId = result[0][i].fromMailId;
+                                                var bodydata = result[0][i].mailbody ? result[0][i].mailbody : "";
+                                                var subject = result[0][i].subject;
+                                                var firstname = result[0][i].firstname ? result[0][i].firstname : "";
+                                                var lastname = result[0][i].lastname ? result[0][i].lastname : "";
+                                                var jobcode = result[0][i].jobcode;
+                                                var jobtitle = result[0][i].jobtitle;
+                                                var shortSignature = result[0][i].shortSignature;
+                                                var displayName = result[0][i].displayName;
+
+                                                if (bodydata != "") {
+                                                    bodydata = bodydata.replace("[FullName]", (firstname + ' ' + lastname));
+                                                    bodydata = bodydata.replace("[FirstName]", firstname);
+                                                    bodydata = bodydata.replace("[Code]", jobcode);
+                                                    bodydata = bodydata.replace("[Title]", jobtitle);
+                                                    bodydata = bodydata.replace("[displayName]", displayName);
+                                                    bodydata = bodydata.replace("[shortSignature]", shortSignature);
+                                                }
+                                                if (result[0][i].cc != "") {
+                                                    result[0][i].cc = result[0][i].cc.replace("[", "");
+                                                    result[0][i].cc = result[0][i].cc.replace("]", "");
+                                                    result[0][i].cc = result[0][i].cc.replace(/["]/g, "");
+                                                }
+                                                if (result[0][i].bcc != "") {
+                                                    result[0][i].bcc = result[0][i].bcc.replace("[", "");
+                                                    result[0][i].bcc = result[0][i].bcc.replace("]", "");
+                                                    result[0][i].bcc = result[0][i].bcc.replace(/["]/g, "");
+                                                }
+
+                                                var mailOptions = {
+                                                    from: fromEmailId,
+                                                    to: emailId,
+                                                    cc: result[0][i].cc,
+                                                    bcc: result[0][i].bcc,
+                                                    subject: result[0][i].subject,
+                                                    html: bodydata// html body
+                                                };
+                                                sendgrid.send(mailOptions, function (err, results) {
+                                                    if (err) {
+                                                        console.log("mail not sent", err);
+
+                                                    }
+                                                    else {
+                                                        console.log('Mail sent successfully');
+
+                                                    }
+                                                });
+
+                                            }
+
+                                        }
+                                    });
+
+
 
                                     // res.status(200).json(response);
                                 }
@@ -2936,5 +3024,151 @@ jobCtrl.getRequirementContactsOfBranchForMobile = function (req, res, next) {
         });
     }
 };
+
+jobCtrl.columns = function (req, res, next) {
+
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    var error = {};
+
+    // if (!req.query.token) {
+    //     error.token = 'Invalid token';
+    //     validationFlag *= false;
+    // }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+            // req.st.validateToken(req.query.token,function(err,tokenResult){
+            //     if((!err) && tokenResult){
+
+
+            var procParams = [
+                req.st.db.escape(req.query.tableName)
+
+            ];
+            var procQuery = 'call wm_get_columnNames( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery, function (err, result) {
+                console.log(result);
+                if (!err && result && result[0]) {
+
+
+                    res.status(200).json({
+                        status: true,
+                        message: "Column list loaded successfully",
+                        error: null,
+                        data: {
+                            columns: result[0]
+                        }
+                    });
+
+                }
+                else {
+                    response.status = false;
+                    response.message = "Error while getting Columns";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+            //  }
+            //         else{
+            //             res.status(401).json(response);
+            //         }
+            //   //  });
+        }
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + '......... error .........');
+            console.log(ex);
+            console.log('Error: ' + ex);
+        }
+    }
+};
+
+jobCtrl.dynamicReport = function (req, res, next) {
+
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    var error = {};
+
+    // if (!req.query.token) {
+    //     error.token = 'Invalid token';
+    //     validationFlag *= false;
+    // }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        try {
+            // req.st.validateToken(req.query.token,function(err,tokenResult){
+            //     if((!err) && tokenResult){
+
+
+            var procParams = [
+                req.st.db.escape(req.body.tableName),
+                req.st.db.escape(JSON.stringify(req.body.columns)),
+                req.st.db.escape(JSON.stringify(req.body.where))
+
+            ];
+            var procQuery = 'call get_dynamicReport( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery, function (err, result) {
+                console.log(result);
+                if (!err) {
+
+
+                            res.status(200).json({status: true,
+                                message: "Data loaded successfully",
+                                error : null,
+                                data:result[0]
+                            });
+
+                }
+                else {
+                    response.status = false;
+                    response.message = "Error while Loading Data";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+            //  }
+            //         else{
+            //             res.status(401).json(response);
+            //         }
+            //   //  });
+        }
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + '......... error .........');
+            console.log(ex);
+            console.log('Error: ' + ex);
+        }
+    }
+};
+
 
 module.exports = jobCtrl;

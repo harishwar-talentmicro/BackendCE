@@ -18,4 +18,7 @@ router.post('/relatedDocument',contentManagerCtrl.saveRelatedDocument);
 router.delete('/relatedDocument',contentManagerCtrl.deleteRelatedDocument);
 router.post('/docFeedback',contentManagerCtrl.savedocumentFeedback);
 router.get('/docFeedback',contentManagerCtrl.getdocumentUpdateFeedback);
+
+router.get('/docFeedbackReadReport',contentManagerCtrl.docFeedbackReadReport);
+
 module.exports = router;

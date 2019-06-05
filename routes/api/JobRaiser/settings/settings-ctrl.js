@@ -754,7 +754,7 @@ settingsCtrl.getOfferTemplateMaster = function (req, res, next) {
                 req.db.query(procQuery, function (err, result) {
                     console.log(err);
 
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result && result[0] || result[2]) {
                         response.status = true;
                         response.message = "Offer templates loaded sucessfully";
                         response.error = null;

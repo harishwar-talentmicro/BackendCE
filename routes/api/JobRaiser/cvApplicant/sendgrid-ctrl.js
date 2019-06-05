@@ -477,7 +477,7 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                             req.body.priority = req.body.priority ? req.body.priority : 0;
                             req.body.updateFlag = req.body.updateFlag ? req.body.updateFlag : 0;
                             req.body.overWrite = req.body.overWrite ? req.body.overWrite : 0;
-                            req.body.SMSMessage = req.body.SMSMessage ? req.body.SMSMessage : '';
+                            req.body.smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
                             req.body.whatmateMessage = req.body.whatmateMessage ? req.body.whatmateMessage : '';
                             var templateInputs = [
                                 req.st.db.escape(req.query.token),
@@ -493,14 +493,14 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                                 req.st.db.escape(req.body.replymailId),
                                 req.st.db.escape(req.body.priority),
                                 req.st.db.escape(req.body.updateFlag),
-                                req.st.db.escape(req.body.SMSMessage),
+                                req.st.db.escape(req.body.smsMsg),
                                 req.st.db.escape(req.body.whatmateMessage),
                                 req.st.db.escape(JSON.stringify(attachment)),
                                 req.st.db.escape(JSON.stringify(tags)),
                                 req.st.db.escape(JSON.stringify(stage)),
                                 req.st.db.escape(req.body.mailerType),
                                 req.st.db.escape(JSON.stringify(tableTags)),
-                                req.st.db.escape(req.body.sendSMS || 0),
+                                req.st.db.escape(req.body.smsFlag || 0),
                                 req.st.db.escape(req.body.attachJD || 0),
                                 req.st.db.escape(req.body.attachResume || 0),
                                 req.st.db.escape(req.body.interviewerFlag || 0),
@@ -1131,7 +1131,7 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                                             req.st.db.escape(JSON.stringify(stage)),
                                             req.st.db.escape(req.body.mailerType),
                                             req.st.db.escape(JSON.stringify(tableTags)),
-                                            req.st.db.escape(req.body.sendSMS || 0),
+                                            req.st.db.escape(req.body.smsFlag || 0),
                                             req.st.db.escape(req.body.attachJD || 0),
                                             req.st.db.escape(req.body.attachResume || 0),
                                             req.st.db.escape(req.body.interviewerFlag || 0),
@@ -1536,6 +1536,7 @@ sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
                                                 var temp2 = smsMsg;
                                                 var applicantData = [];
                                                 var JDAttachment = [];
+                                                var reqAppData = [];
                                                 for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
                                                     // console.log('applicantIndex=', applicantIndex);
 
@@ -1586,6 +1587,7 @@ sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
                                                     mailBody = temp;
                                                     subject = temp1;
                                                     smsMsg = temp2;
+                                                    reqAppData.push(result[0][applicantIndex].reqAppId);
                                                 }
 
                                                 response.status = true;
@@ -1596,7 +1598,8 @@ sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
                                                     subjectPreview: subject_array,
                                                     smsMsgPreview: smsMsg_array,
                                                     applicantData: applicantData,
-                                                    JDAttachment: JDAttachment
+                                                    JDAttachment: JDAttachment,
+                                                    applicantsReqAppId: reqAppData
                                                 };
                                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                                 zlib.gzip(buf, function (_, result) {
@@ -1614,7 +1617,8 @@ sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
                                                     subjectPreview: [],
                                                     smsMsgPreview: [],
                                                     applicantData: [],
-                                                    JDAttachment: []
+                                                    JDAttachment: [],
+                                                    applicantsReqAppId: []
                                                 };
                                                 res.status(200).json(response);
                                             }
@@ -2122,57 +2126,90 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                                             if (subject != '') {
                                                                 if (smsMsg != '' && smsFlag) {
                                                                     response.message = "Mail and SMS sent successfully";
-                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                    response.data = {
+                                                                        transactions: transactions[0] ? transactions[0] : [],
+                                                                        reqAppList: result[4] ? result[4] : []
+                                                                    }
                                                                 }
                                                                 else {
                                                                     response.message = "Mail sent successfully";
-                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                    response.data = {
+                                                                        transactions: transactions[0] ? transactions[0] : [],
+                                                                        reqAppList: result[4] ? result[4] : []
+                                                                    }
                                                                 }
                                                             }
 
                                                             else if (subject == '') {
                                                                 if (smsMsg != '' && smsFlag) {
                                                                     response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
-                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                    response.data = {
+                                                                        transactions: transactions[0] ? transactions[0] : [],
+                                                                        reqAppList: result[4] ? result[4] : []
+                                                                    }
                                                                 }
                                                                 else {
                                                                     response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
-                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                    response.data = {
+                                                                        transactions: transactions[0] ? transactions[0] : [],
+                                                                        reqAppList: result[4] ? result[4] : []
+                                                                    }
                                                                 }
                                                             }
                                                             else {
                                                                 response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                         }
                                                         else if (isSendgrid && !isSMS) {
 
                                                             if (subject != '') {
                                                                 response.message = "Mail sent successfully";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                             else if (subject == '') {
                                                                 response.message = "Mail subject is empty, mail cannot be sent";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                         }
                                                         else if (isSMS && !isSendgrid) {
                                                             if (smsMsg != '' && smsFlag) {
                                                                 response.message = "SMS sent successfully";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                             else if (smsMsg == '' && smsFlag) {
                                                                 response.message = "SMS field is empty, SMS cannot be sent";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                             else {
                                                                 response.message = "SMS flag is not enabled, SMS cannot be sent";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                         }
                                                         else {
                                                             response.message = "Sendgrid or SMS is not configured. Please contact the admin";
-                                                            response.data = null;
+                                                            response.data = {
+                                                                transactions: [],
+                                                                reqAppList: []
+                                                            }
                                                         }
 
                                                         response.error = null;
@@ -2245,7 +2282,7 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                             req.st.db.escape(JSON.stringify(stage)),
                                             req.st.db.escape(req.body.mailerType),
                                             req.st.db.escape(JSON.stringify(tableTags)),
-                                            req.st.db.escape(req.body.sendSMS || 0),
+                                            req.st.db.escape(req.body.smsFlag || 0),
                                             req.st.db.escape(req.body.attachJD || 0),
                                             req.st.db.escape(req.body.attachResume || 0),
                                             req.st.db.escape(req.body.interviewerFlag || 0),
@@ -2378,6 +2415,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                     zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                         req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
+                        console.log(req.body);
                         var mailBody = req.body.mailBody ? req.body.mailBody : '';
                         var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
                         var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
@@ -2413,6 +2451,8 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                             clientContacts = [];
                         }
                         var tableTags = req.body.tableTags;
+                        var sortedTableTags = req.body.sortedTableTags;
+                        
                         if (typeof (tableTags) == "string") {
                             tableTags = JSON.parse(tableTags);
                         }
@@ -2475,7 +2515,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                                     var temp1 = subject;
                                     var temp2 = smsMsg;
                                     var clientData = [];
-
+                                    var clientContactsData = [];
 
                                     for (var clientIndex = 0; clientIndex < clientContacts.length; clientIndex++) {
                                         for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
@@ -2568,39 +2608,39 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                                             }
                                         }
 
-                                        if (tableTags.applicant.length > 0 || tableTags.requirement.length > 0 || tableTags.client.length > 0) {
+                                        if (sortedTableTags.length > 0) {
                                             var position = mailBody.indexOf('@table');
                                             var tableContent = '';
                                             mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
                                             tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
                                             console.log(tableContent, 'mailbody');
-                                            if (tableTags && tableTags.applicant && tableTags.applicant.length)
-                                                for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                                            if (sortedTableTags && sortedTableTags.length)
+                                                for (var tagCount = 0; tagCount < sortedTableTags.length; tagCount++) {
+                                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + sortedTableTags[tagCount].displayTagAs + "</th>";
                                                 }
-                                            if (tableTags && tableTags.requirement && tableTags.requirement.length)
-                                                for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
-                                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.requirement[tagCount].displayTagAs + "</th>";
-                                                }
-                                            if (tableTags && tableTags.client && tableTags.client.length)
-                                                for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
-                                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.client[tagCount].displayTagAs + "</th>";
-                                                }
+                                            // if (tableTags && tableTags.requirement && tableTags.requirement.length)
+                                            //     for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
+                                            //         tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.requirement[tagCount].displayTagAs + "</th>";
+                                            //     }
+                                            // if (tableTags && tableTags.client && tableTags.client.length)
+                                            //     for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
+                                            //         tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.client[tagCount].displayTagAs + "</th>";
+                                            //     }
                                             tableContent += "</tr>";
-                                            if (tableTags && tableTags.applicant && tableTags.applicant.length)
+                                            if (sortedTableTags && sortedTableTags.length)
                                                 for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
                                                     tableContent += "<tr>";
-                                                    for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                                    for (var tagCount = 0; tagCount < sortedTableTags.length; tagCount++) {
+                                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][sortedTableTags[tagCount].tagName] + "</td>";
                                                     }
-                                                    if (tableTags && tableTags.requirement && tableTags.requirement.length)
-                                                        for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
-                                                            tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.requirement[tagCount].tagName] + "</td>";
-                                                        }
-                                                    if (tableTags && tableTags.client && tableTags.client.length)
-                                                        for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
-                                                            tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.client[tagCount].tagName] + "</td>";
-                                                        }
+                                                    // if (tableTags && tableTags.requirement && tableTags.requirement.length)
+                                                    //     for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
+                                                    //         tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.requirement[tagCount].tagName] + "</td>";
+                                                    //     }
+                                                    // if (tableTags && tableTags.client && tableTags.client.length)
+                                                    //     for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
+                                                    //         tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.client[tagCount].tagName] + "</td>";
+                                                    //     }
                                                     tableContent += "</tr>";
                                                 }
 
@@ -2615,6 +2655,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                                         mailBody = temp;
                                         subject = temp1;
                                         smsMsg = temp2;
+                                        clientContactsData.push(result[1][clientIndex].contactId);
                                     }
                                     // console.log(mailbody_array);
 
@@ -2687,7 +2728,8 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                                         originalCVArray: originalCVArray,
                                         clientCVArray: clientCVArray,
                                         resumeFileName: resumeFileNameArray,
-                                        trackerData: ws_data || ""
+                                        trackerData: ws_data || "",
+                                        clientContactsData: clientContactsData
                                     };
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                     zlib.gzip(buf, function (_, result) {
@@ -2708,7 +2750,8 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                                         originalCVArray: [],
                                         clientCVArray: [],
                                         resumeFileName: [],
-                                        trackerData: []
+                                        trackerData: [],
+                                        clientContactsData: []
                                     };
                                     res.status(200).json(response);
                                 }
@@ -2826,7 +2869,9 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                             var reqApplicants = req.body.reqApplicants || [];
                             var applicants = req.body.applicantId || [];
                             var client = req.body.clientId || [];
-                            var tableTags = req.body.tableTags || {};
+                            var tableTags = req.body.tableTags || [];
+                            var sortedTableTags = req.body.sortedTableTags || [];
+                            
                             var clientContacts = req.body.clientContacts || [];
                             var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
                             var mailBody = req.body.mailBody || '';
@@ -3022,39 +3067,39 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                                         }
                                                     }
 
-                                                    if (tableTags.applicant.length > 0 || tableTags.requirement.length > 0 || tableTags.client.length > 0) {
+                                                    if (sortedTableTags.length > 0) {
                                                         var position = mailBody.indexOf('@table');
                                                         var tableContent = '';
                                                         mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
                                                         tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
                                                         console.log(tableContent, 'mailbody');
-                                                        if (tableTags && tableTags.applicant && tableTags.applicant.length)
-                                                            for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                                                        if (sortedTableTags && sortedTableTags.length)
+                                                            for (var tagCount = 0; tagCount < sortedTableTags.length; tagCount++) {
+                                                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + sortedTableTags[tagCount].displayTagAs + "</th>";
                                                             }
-                                                        if (tableTags && tableTags.requirement && tableTags.requirement.length)
-                                                            for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
-                                                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.requirement[tagCount].displayTagAs + "</th>";
-                                                            }
-                                                        if (tableTags && tableTags.client && tableTags.client.length)
-                                                            for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
-                                                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.client[tagCount].displayTagAs + "</th>";
-                                                            }
+                                                        // if (tableTags && tableTags.requirement && tableTags.requirement.length)
+                                                        //     for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
+                                                        //         tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.requirement[tagCount].displayTagAs + "</th>";
+                                                        //     }
+                                                        // if (tableTags && tableTags.client && tableTags.client.length)
+                                                        //     for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
+                                                        //         tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.client[tagCount].displayTagAs + "</th>";
+                                                        //     }
                                                         tableContent += "</tr>";
-                                                        if (tableTags && tableTags.applicant && tableTags.applicant.length)
+                                                        if (sortedTableTags && sortedTableTags.length)
                                                             for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
                                                                 tableContent += "<tr>";
-                                                                for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                                                    tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                                                for (var tagCount = 0; tagCount < sortedTableTags.length; tagCount++) {
+                                                                    tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][sortedTableTags[tagCount].tagName] + "</td>";
                                                                 }
-                                                                if (tableTags && tableTags.requirement && tableTags.requirement.length)
-                                                                    for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
-                                                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.requirement[tagCount].tagName] + "</td>";
-                                                                    }
-                                                                if (tableTags && tableTags.client && tableTags.client.length)
-                                                                    for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
-                                                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.client[tagCount].tagName] + "</td>";
-                                                                    }
+                                                                // if (tableTags && tableTags.requirement && tableTags.requirement.length)
+                                                                //     for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
+                                                                //         tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.requirement[tagCount].tagName] + "</td>";
+                                                                //     }
+                                                                // if (tableTags && tableTags.client && tableTags.client.length)
+                                                                //     for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
+                                                                //         tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.client[tagCount].tagName] + "</td>";
+                                                                //     }
                                                                 tableContent += "</tr>";
                                                             }
 
@@ -3362,57 +3407,90 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                                         if (subject != '') {
                                                             if (smsMsg != '' && smsFlag) {
                                                                 response.message = "Mail and SMS sent successfully";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                             else {
                                                                 response.message = "Mail sent successfully";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                         }
 
                                                         else if (subject == '') {
                                                             if (smsMsg != '' && smsFlag) {
                                                                 response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                             else {
                                                                 response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                         }
                                                         else {
                                                             response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
-                                                            response.data = transactions[0] ? transactions[0] : [];
+                                                            response.data = {
+                                                                transactions: transactions[0] ? transactions[0] : [],
+                                                                reqAppList: result[4] ? result[4] : []
+                                                            }
                                                         }
                                                     }
                                                     else if (isSendgrid && !isSMS) {
 
                                                         if (subject != '') {
                                                             response.message = "Mail sent successfully";
-                                                            response.data = transactions[0] ? transactions[0] : [];
+                                                            response.data = {
+                                                                transactions: transactions[0] ? transactions[0] : [],
+                                                                reqAppList: result[4] ? result[4] : []
+                                                            }
                                                         }
                                                         else if (subject == '') {
                                                             response.message = "Mail subject is empty, mail cannot be sent";
-                                                            response.data = transactions[0] ? transactions[0] : [];
+                                                            response.data = {
+                                                                transactions: transactions[0] ? transactions[0] : [],
+                                                                reqAppList: result[4] ? result[4] : []
+                                                            }
                                                         }
                                                     }
                                                     else if (isSMS && !isSendgrid) {
                                                         if (smsMsg != '' && smsFlag) {
                                                             response.message = "SMS sent successfully";
-                                                            response.data = transactions[0] ? transactions[0] : [];
+                                                            response.data = {
+                                                                transactions: transactions[0] ? transactions[0] : [],
+                                                                reqAppList: result[4] ? result[4] : []
+                                                            }
                                                         }
                                                         else if (smsMsg == '' && smsFlag) {
                                                             response.message = "SMS field is empty, SMS cannot be sent";
-                                                            response.data = transactions[0] ? transactions[0] : [];
+                                                            response.data = {
+                                                                transactions: transactions[0] ? transactions[0] : [],
+                                                                reqAppList: result[4] ? result[4] : []
+                                                            }
                                                         }
                                                         else {
                                                             response.message = "SMS flag is not enabled, SMS cannot be sent";
-                                                            response.data = transactions[0] ? transactions[0] : [];
+                                                            response.data = {
+                                                                transactions: transactions[0] ? transactions[0] : [],
+                                                                reqAppList: result[4] ? result[4] : []
+                                                            }
                                                         }
                                                     }
                                                     else {
                                                         response.message = "Sendgrid or SMS is not configured. Please contact the admin";
-                                                        response.data = null;
+                                                        response.data = {
+                                                            transactions: [],
+                                                            reqAppList: []
+                                                        }
                                                     }
 
                                                     response.error = null;
@@ -3486,7 +3564,7 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                         req.st.db.escape(JSON.stringify(stage)),
                                         req.st.db.escape(req.body.mailerType),
                                         req.st.db.escape(JSON.stringify(tableTags)),
-                                        req.st.db.escape(req.body.sendSMS || 0),
+                                        req.st.db.escape(req.body.smsFlag || 0),
                                         req.st.db.escape(req.body.attachJD || 0),
                                         req.st.db.escape(req.body.attachResume || 0),
                                         req.st.db.escape(req.body.interviewerFlag || 0),
@@ -3666,6 +3744,7 @@ sendgridCtrl.clientMailerPreview = function (req, res, next) {
                                                 var temp1 = subject;
                                                 var temp2 = smsMsg;
                                                 var clientData = [];
+                                                var clientContactsData = [];
 
                                                 for (var clientIndex = 0; clientIndex < idArray.length; clientIndex++) {
 
@@ -3712,6 +3791,7 @@ sendgridCtrl.clientMailerPreview = function (req, res, next) {
                                                     mailBody = temp;
                                                     subject = temp1;
                                                     smsMsg = temp2;
+                                                    clientContactsData.push(result[0][clientIndex].contactId);
                                                 }
 
                                                 response.status = true;
@@ -3721,7 +3801,8 @@ sendgridCtrl.clientMailerPreview = function (req, res, next) {
                                                     tagsPreview: mailbody_array,
                                                     subjectPreview: subject_array,
                                                     smsMsgPreview: smsMsg_array,
-                                                    clientData: clientData
+                                                    clientData: clientData,
+                                                    clientContactsData: clientContactsData
                                                 };
 
                                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -3739,7 +3820,8 @@ sendgridCtrl.clientMailerPreview = function (req, res, next) {
                                                     tagsPreview: [],
                                                     subjectPreview: [],
                                                     smsMsgPreview: [],
-                                                    clientData: []
+                                                    clientData: [],
+                                                    clientContactsData: []
                                                 };
                                                 res.status(200).json(response);
                                             }
@@ -4337,7 +4419,7 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                                             req.st.db.escape(JSON.stringify(stage)),
                                             req.st.db.escape(req.body.mailerType),
                                             req.st.db.escape(JSON.stringify(tableTags)),
-                                            req.st.db.escape(req.body.sendSMS || 0),
+                                            req.st.db.escape(req.body.smsFlag || 0),
                                             req.st.db.escape(req.body.attachJD || 0),
                                             req.st.db.escape(req.body.attachResume || 0),
                                             req.st.db.escape(req.body.interviewerFlag || 0),
@@ -4484,6 +4566,31 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                 var isWeb = req.query.isWeb ? req.query.isWeb : 0;
                                 var interviewerFlag = req.body.interviewerFlag ? req.body.interviewerFlag : 0;  // if 0 mail is for  applicants if 1- mail is for client contacts
 
+                                var trackerTemplate = req.body.trackerTemplate;
+                                var trackerTags = [];
+                                var customTags = [];
+
+
+                                if (trackerTemplate && typeof (trackerTemplate) == "string") {
+                                    trackerTemplate = JSON.parse(trackerTemplate);
+                                }
+                                if (trackerTemplate && trackerTemplate.trackerId) {
+                                    if (typeof (trackerTemplate.trackerTags) == 'string') {
+                                        trackerTags = trackerTemplate && trackerTemplate.trackerTags && JSON.parse(trackerTemplate.trackerTags) ? JSON.parse(trackerTemplate.trackerTags) : [];
+                                    }
+
+                                    if (typeof (trackerTemplate.customTags) == 'string') {
+                                        customTags = trackerTemplate && trackerTemplate.customTags && JSON.parse(trackerTemplate.customTags) ? JSON.parse(trackerTemplate.customTags) : [];
+                                    }
+
+                                }
+                                else {
+                                    trackerTemplate = {};
+                                    trackerTags = [];
+                                    customTags = [];
+                                }
+
+
                                 var tags = req.body.tags;
                                 if (typeof (tags) == "string") {
                                     tags = JSON.parse(tags);
@@ -4508,7 +4615,9 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                 if (!clientContacts) {
                                     clientContacts = [];
                                 }
-                                var tableTags = req.body.tableTags;
+                                var tableTags = req.body.tableTags || [];
+                                var sortedTableTags = req.body.sortedTableTags || [];
+                                console.log(sortedTableTags);
                                 if (typeof (tableTags) == "string") {
                                     tableTags = JSON.parse(tableTags);
                                 }
@@ -4538,6 +4647,8 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                     var mailbody_array = [];
                                     var subject_array = [];
                                     var smsMsg_array = [];
+                                    var clientContactsData = [];
+                                    var applicantsReqAppId = [];
 
                                     var procQuery;
                                     procQuery = 'CALL wm_paceInterviewMailer( ' + inputs.join(',') + ')';
@@ -4639,27 +4750,69 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                                             }
                                                         }
 
-                                                        if (tableTags.applicant.length > 0) {
+                                                        // if (tableTags.applicant.length > 0) {
+                                                        //     var position = mailBody.indexOf('@table');
+                                                        //     var tableContent = '';
+                                                        //     mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
+                                                        //     tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
+                                                        //     console.log(tableContent, 'mailbody');
+                                                        //     for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                                        //         tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
+                                                        //     }
+                                                        //     tableContent += "</tr>";
+                                                        //     for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
+                                                        //         tableContent += "<tr>";
+                                                        //         for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
+                                                        //             tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                                        //         }
+                                                        //         tableContent += "</tr>";
+                                                        //     }
+
+                                                        //     tableContent += "</table>";
+                                                        //     mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
+
+                                                        // }
+
+
+                                                        if (sortedTableTags.length > 0) {
                                                             var position = mailBody.indexOf('@table');
                                                             var tableContent = '';
                                                             mailBody = mailBody.replace(/@table(.*)\:@table/g, '');
                                                             tableContent += '<br><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;"><tr>'
                                                             console.log(tableContent, 'mailbody');
-                                                            for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                                                tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.applicant[tagCount].displayTagAs + "</th>";
-                                                            }
-                                                            tableContent += "</tr>";
-                                                            for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
-                                                                tableContent += "<tr>";
-                                                                for (var tagCount = 0; tagCount < tableTags.applicant.length; tagCount++) {
-                                                                    tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.applicant[tagCount].tagName] + "</td>";
+                                                            console.log('sortedTableTags.length',sortedTableTags.length);
+                                                            if (sortedTableTags && sortedTableTags.length)
+                                                                for (var tagCount = 0; tagCount < sortedTableTags.length; tagCount++) {
+                                                                    tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + sortedTableTags[tagCount].displayTagAs + "</th>";
                                                                 }
-                                                                tableContent += "</tr>";
-                                                            }
+                                                            // if (tableTags && tableTags.requirement && tableTags.requirement.length)
+                                                            //     for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
+                                                            //         tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.requirement[tagCount].displayTagAs + "</th>";
+                                                            //     }
+                                                            // if (tableTags && tableTags.client && tableTags.client.length)
+                                                            //     for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
+                                                            //         tableContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + tableTags.client[tagCount].displayTagAs + "</th>";
+                                                            //     }
+                                                            tableContent += "</tr>";
+                                                            if (sortedTableTags && sortedTableTags.length)
+                                                                for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
+                                                                    tableContent += "<tr>";
+                                                                    for (var tagCount = 0; tagCount < sortedTableTags.length; tagCount++) {
+                                                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][sortedTableTags[tagCount].tagName] + "</td>";
+                                                                    }
+                                                                    // if (tableTags && tableTags.requirement && tableTags.requirement.length)
+                                                                    //     for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
+                                                                    //         tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.requirement[tagCount].tagName] + "</td>";
+                                                                    //     }
+                                                                    // if (tableTags && tableTags.client && tableTags.client.length)
+                                                                    //     for (var tagCount = 0; tagCount < tableTags.client.length; tagCount++) {
+                                                                    //         tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][tableTags.client[tagCount].tagName] + "</td>";
+                                                                    //     }
+                                                                    tableContent += "</tr>";
+                                                                }
 
                                                             tableContent += "</table>";
                                                             mailBody = [mailBody.slice(0, position), tableContent, mailBody.slice(position)].join('');
-
                                                         }
 
                                                         clientData.push(result[1][clientIndex].EmailId);
@@ -4669,6 +4822,7 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                                         mailBody = temp;
                                                         subject = temp1;
                                                         smsMsg = temp2;
+                                                        clientContactsData.push(result[1][clientIndex].contactId);
                                                     }
 
                                                     if (idArray.length == result[0].length) {
@@ -4677,6 +4831,57 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                                             clientCVArray.push(result[0][applicantIndex].clientCVPath);
                                                         }
                                                     }
+
+                                                    var buffer;
+                                                    var ws_data;
+
+                                                    if (trackerTemplate && trackerTemplate.trackerId) {
+                                                        console.log('tracker', trackerTemplate.trackerId);
+                                                        ws_data = '[[';
+                                                        // var trackerTags = JSON.parse(trackerTemplate.trackerTags);
+                                                        for (var i = 0; i < trackerTags.length; i++) {
+                                                            if (i != trackerTags.length - 1)
+                                                                ws_data += '"' + trackerTags[i].displayTagAs + '",';
+                                                            else
+                                                                ws_data += '"' + trackerTags[i].displayTagAs + '"';
+                                                        }
+
+                                                        for (var j = 0; j < customTags.length; j++) {
+                                                            ws_data += ',"' + customTags[j] + '"';
+                                                        }
+
+                                                        ws_data += "]";
+
+                                                        // console.log(new Buffer(buffer).toString("base64"));
+                                                        for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
+                                                            ws_data += ',[';
+                                                            for (var tagIndex = 0; tagIndex < trackerTags.length; tagIndex++) {
+                                                                if (tagIndex < trackerTags.length - 1) {
+                                                                    if (result[0][applicantIndex][trackerTags[tagIndex].tagName] != undefined)
+                                                                        ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '",';
+                                                                    else
+                                                                        ws_data += '"' + "" + '",';
+
+                                                                }
+                                                                else {
+                                                                    if (result[0][applicantIndex][trackerTags[tagIndex].tagName] != undefined)
+                                                                        ws_data += '"' + result[0][applicantIndex][trackerTags[tagIndex].tagName] + '"';
+                                                                    else
+                                                                        ws_data += '"' + "" + '"';
+                                                                }
+                                                            }
+
+                                                            for (var j = 0; j < customTags.length; j++) {
+                                                                ws_data += ',"' + "" + '"';
+                                                            }
+
+                                                            ws_data += ']';
+                                                        }
+                                                        ws_data += ']';
+                                                        console.log(ws_data);
+                                                        // buffer = xlsx.build([{ name: "Resume", data: JSON.parse(ws_data) }]); // Returns a buffer
+                                                    }
+
 
                                                 }
                                                 else {
@@ -4745,6 +4950,7 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                                         mailBody = temp;
                                                         subject = temp1;
                                                         smsMsg = temp2;
+                                                        applicantsReqAppId.push(result[0][applicantIndex].reqAppId);
                                                     }
 
 
@@ -4764,7 +4970,9 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                                     applicantData: applicantData,
                                                     originalCVArray: originalCVArray,
                                                     clientCVArray: clientCVArray,
-                                                    resumeFileName: resumeFileNameArray
+                                                    resumeFileName: resumeFileNameArray,
+                                                    applicantsReqAppId: applicantsReqAppId,
+                                                    trackerData: ws_data || ""
                                                 };
                                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                                 zlib.gzip(buf, function (_, result) {
@@ -4785,7 +4993,9 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                                     applicantData: [],
                                                     originalCVArray: [],
                                                     clientCVArray: [],
-                                                    resumeFileName: []
+                                                    resumeFileName: [],
+                                                    applicantsReqAppId: [],
+                                                    trackerData: ""
                                                 };
                                                 res.status(200).json(response);
                                             }
@@ -4937,6 +5147,26 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                 var isWeb = req.query.isWeb || 0;
                                 var mailerType = req.body.mailerType || 0;
                                 var userId = req.query.userId || 0;
+                                var customTags = [];
+
+                                if (trackerTemplate && typeof (trackerTemplate) == "string") {
+                                    trackerTemplate = JSON.parse(trackerTemplate);
+                                }
+                                if (trackerTemplate && trackerTemplate.trackerId) {
+                                    if (typeof (trackerTemplate.trackerTags) == 'string') {
+                                        trackerTags = trackerTemplate && trackerTemplate.trackerTags && JSON.parse(trackerTemplate.trackerTags) ? JSON.parse(trackerTemplate.trackerTags) : [];
+                                    }
+
+                                    if (typeof (trackerTemplate.customTags) == 'string') {
+                                        customTags = trackerTemplate && trackerTemplate.customTags && JSON.parse(trackerTemplate.customTags) ? JSON.parse(trackerTemplate.customTags) : [];
+                                    }
+
+                                }
+                                else {
+                                    trackerTemplate = {};
+                                    trackerTags = [];
+                                    customTags = [];
+                                }
 
                                 if (typeof (tags) == "string") {
                                     tags = JSON.parse(tags);
@@ -5473,57 +5703,90 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                                             if (subject != '') {
                                                                 if (smsMsg != '' && smsFlag) {
                                                                     response.message = "Mail and SMS sent successfully";
-                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                    response.data = {
+                                                                        transactions: transactions[0] ? transactions[0] : [],
+                                                                        reqAppList: result[4] ? result[4] : []
+                                                                    }
                                                                 }
                                                                 else {
                                                                     response.message = "Mail sent successfully";
-                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                    response.data = {
+                                                                        transactions: transactions[0] ? transactions[0] : [],
+                                                                        reqAppList: result[4] ? result[4] : []
+                                                                    }
                                                                 }
                                                             }
 
                                                             else if (subject == '') {
                                                                 if (smsMsg != '' && smsFlag) {
                                                                     response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
-                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                    response.data = {
+                                                                        transactions: transactions[0] ? transactions[0] : [],
+                                                                        reqAppList: result[4] ? result[4] : []
+                                                                    }
                                                                 }
                                                                 else {
                                                                     response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
-                                                                    response.data = transactions[0] ? transactions[0] : [];
+                                                                    response.data = {
+                                                                        transactions: transactions[0] ? transactions[0] : [],
+                                                                        reqAppList: result[4] ? result[4] : []
+                                                                    }
                                                                 }
                                                             }
                                                             else {
                                                                 response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                         }
                                                         else if (isSendgrid && !isSMS) {
 
                                                             if (subject != '') {
                                                                 response.message = "Mail sent successfully";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                             else if (subject == '') {
                                                                 response.message = "Mail subject is empty, mail cannot be sent";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                         }
                                                         else if (isSMS && !isSendgrid) {
                                                             if (smsMsg != '' && smsFlag) {
                                                                 response.message = "SMS sent successfully";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                             else if (smsMsg == '' && smsFlag) {
                                                                 response.message = "SMS field is empty, SMS cannot be sent";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                             else {
                                                                 response.message = "SMS flag is not enabled, SMS cannot be sent";
-                                                                response.data = transactions[0] ? transactions[0] : [];
+                                                                response.data = {
+                                                                    transactions: transactions[0] ? transactions[0] : [],
+                                                                    reqAppList: result[4] ? result[4] : []
+                                                                }
                                                             }
                                                         }
                                                         else {
                                                             response.message = "Sendgrid or SMS is not configured. Please contact the admin";
-                                                            response.data = null;
+                                                            response.data = {
+                                                                transactions: [],
+                                                                reqAppList: []
+                                                            }
                                                         }
 
                                                         response.error = null;
@@ -5604,7 +5867,7 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                             req.st.db.escape(JSON.stringify(stage)),
                                             req.st.db.escape(req.body.mailerType),
                                             req.st.db.escape(JSON.stringify(tableTags)),
-                                            req.st.db.escape(req.body.sendSMS || 0),
+                                            req.st.db.escape(req.body.smsFlag || 0),
                                             req.st.db.escape(req.body.attachJD || 0),
                                             req.st.db.escape(req.body.attachResume || 0),
                                             req.st.db.escape(req.body.interviewerFlag || 0),
@@ -7382,7 +7645,7 @@ sendgridCtrl.sendSubmissionMailerMobile = function (req, res, next) {
                 //         req.st.db.escape(JSON.stringify(stage)),
                 //         req.st.db.escape(req.body.mailerType),
                 //         req.st.db.escape(JSON.stringify(tableTags)),
-                //         req.st.db.escape(req.body.sendSMS || 0),
+                //         req.st.db.escape(req.body.smsFlag || 0),
                 //         req.st.db.escape(req.body.attachJD || 0),
                 //         req.st.db.escape(req.body.attachResume || 0),
                 //         req.st.db.escape(req.body.interviewerFlag || 0),
@@ -8416,7 +8679,7 @@ sendgridCtrl.sendInterviewMailerForMobile = function (req, res, next) {
                 //         req.st.db.escape(JSON.stringify(stage)),
                 //         req.st.db.escape(req.body.mailerType),
                 //         req.st.db.escape(JSON.stringify(tableTags)),
-                //         req.st.db.escape(req.body.sendSMS || 0),
+                //         req.st.db.escape(req.body.smsFlag || 0),
                 //         req.st.db.escape(req.body.attachJD || 0),
                 //         req.st.db.escape(req.body.attachResume || 0),
                 //         req.st.db.escape(req.body.interviewerFlag || 0),
@@ -8562,6 +8825,15 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                     console.log(procQuery);
                     req.db.query(procQuery, function (err, result) {
                         console.log(err);
+
+                        if (!err && result && result[0] && result[0][0] && result[0][0].MobileNumber=="" || result[0][0].MobileISD=="") {
+                            response.status = true;
+                            response.message = "Mobile number doesn't exist";
+                            response.error = null;
+                            response.data = null;
+                            res.status(200).json(response);
+                            return;
+                        }
 
                         if (!err && result && result[0] && result[0][0] && result[0][0]._error) {
                             response.status = false;
@@ -8713,7 +8985,7 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                                             req.db.query(procQuery, function (smserr, smsresult) {
                                                 if (!smserr && smsresult && smsresult[0] && smsresult[0][0] && smsresult[0][0].errorCode) {
                                                     console.log("Continue sending sms");
-                                                    console.log('receiverIndex',receiverIndex,'MobileNumber.length',MobileNumber.length);
+                                                    console.log('receiverIndex', receiverIndex, 'MobileNumber.length', MobileNumber.length);
                                                     if (receiverIndex == MobileNumber.length) {
                                                         response.status = true;
                                                         response.message = "Sms sent successfully";

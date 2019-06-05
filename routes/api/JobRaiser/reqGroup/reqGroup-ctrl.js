@@ -3,6 +3,8 @@ var CONFIG = require('../../../../ezeone-config.json');
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
+var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+var mailOptions = new sendgrid.Email();
 
 var DBSecretKey = CONFIG.DB.secretKey;
 
@@ -137,6 +139,93 @@ reqGroup.saveRequirementGroup = function (req, res, next) {
                                         zlib.gzip(buf, function (_, result) {
                                             response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                             res.status(200).json(response);
+                                        });
+                                        var reqId=0;
+                                        var templateId=requirementResult[3][0].templateId ? requirementResult[3][0].templateId: 0 ;
+                                        var reqgroupId=requirementResult[3][0].reqgroupId ? requirementResult[3][0].reqgroupId: 0 ; 
+
+                                        var inputParams = [
+                                            req.st.db.escape(req.query.token),
+                                    req.st.db.escape(req.query.heMasterId),
+                                            req.st.db.escape(reqId),
+                                            req.st.db.escape(templateId),
+                                            req.st.db.escape(reqgroupId)
+                                        ]
+
+
+                                        var query = 'CALL wm_get_requiremnetTeam_mail( ' + inputParams.join(',') + ')';
+
+                                        req.db.query(query, function (err, result) {
+                                           console.log(result)
+                                           if(result && result[0] && result [0][0] )
+                                           {
+                                            for (i = 0; i < result[0].length; i++) {
+                                                // var cc=result[0][i].cc;
+                                                // var bcc=result[0][i].bcc;
+
+                                                if (typeof (result[0] && result[0][i] && result[0][i].cc) == 'json') {
+                                                    result[0][i].cc= JSON.stringify(result[0][i].cc);
+                                                }
+
+
+                                                if (typeof (result[0] && result[0][i] && result[0][i].bcc) == 'json') {
+                                                    result[0][i].bcc =  JSON.stringify(result[0][i].bcc);
+                                                }
+
+                                                var emailId = result[0][i].emailId;
+                                                var fromEmailId = result[0][i].fromMailId;
+                                                var bodydata = result[0][i].mailbody ? result[0][i].mailbody : "";
+                                                var subject = result[0][i].subject;
+                                                var firstname = result[0][i].firstname ? result[0][i].firstname:"";
+                                                var lastname = result[0][i].lastname ? result[0][i].lastname:"";
+                                                var jobcode = result[0][i].jobcode;
+                                                var jobtitle = result[0][i].jobtitle;
+                                                var shortSignature = result[0][i].shortSignature;
+                                                var displayName = result[0][i].displayName;
+
+
+                                                if (bodydata != "") {
+                                                    bodydata = bodydata.replace("[FullName]", (firstname+' '+lastname));
+                                                    bodydata = bodydata.replace("[FirstName]", firstname);
+                                                    bodydata = bodydata.replace("[Code]", jobcode);
+                                                    bodydata = bodydata.replace("[Title]", jobtitle);
+                                                    bodydata = bodydata.replace("[displayName]", displayName);
+                                                    bodydata = bodydata.replace("[shortSignature]", shortSignature);
+
+                                                }
+                                                if (result[0][i].cc != "") {
+                                                    result[0][i].cc=result[0][i].cc.replace("[","");
+                                                    result[0][i].cc=result[0][i].cc.replace("]","");
+                                                    result[0][i].cc=result[0][i].cc.replace(/["]/g,"");
+                                                }
+                                                if ( result[0][i].bcc != "") {
+                                                    result[0][i].bcc=result[0][i].bcc.replace("[","");
+                                                    result[0][i].bcc=result[0][i].bcc.replace("]","");
+                                                    result[0][i].bcc=result[0][i].bcc.replace(/["]/g,"");
+                                                }
+
+                                                var mailOptions = {
+                                                    from: fromEmailId,
+                                                    to: emailId,
+                                                    cc: result[0][i].cc,
+                                                    bcc: result[0][i].bcc,
+                                                    subject: result[0][i].subject,
+                                                    html: bodydata// html body
+                                                };
+                                                sendgrid.send(mailOptions, function (err, results) {
+                                                    if (err) {
+                                                        console.log("mail not sent", err);
+                                                        
+                                                    }
+                                                    else {
+                                                        console.log('Mail sent successfully');
+                                                       
+                                                    }
+                                                });
+
+                                            }
+
+                                        }
                                         });
 
                                     }
@@ -959,13 +1048,13 @@ reqGroup.savePaceFollowUpNotesForGroup = function (req, res, next) {
                     else {
                         req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                        if (req.body.type == 1){
+                        if (req.body.type == 1) {
                             clientorReqorResumeId = req.body.clientId || 0;
                         }
-                        else if (req.body.type == 2){
+                        else if (req.body.type == 2) {
                             clientorReqorResumeId = req.body.reqGroupId || 0;
                         }
-                        else{
+                        else {
                             clientorReqorResumeId = req.body.applicantId || 0;
                         }
 
@@ -1373,9 +1462,9 @@ reqGroup.getRecruiterPerformanceReqAppForRequirementGroups = function (req, res,
                                 // }
                                 response.data = {
                                     reqApplicantData: result[0] ? result[0] : [],
-                                    count : result[1][0] && result[1][0].count ? result[1][0].count : 0,
+                                    count: result[1][0] && result[1][0].count ? result[1][0].count : 0,
                                     reqApplicantDataForExport: result[2] && result[2][0] ? result[2] : [],
-                                    countForExport : result[3] && result[3][0] && result[3][0].count ? result[3][0].count : 0                                    
+                                    countForExport: result[3] && result[3][0] && result[3][0].count ? result[3][0].count : 0
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {

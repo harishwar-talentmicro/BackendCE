@@ -335,9 +335,9 @@ gulfCtrl.saveDeparture = function (req, res, next) {
                 var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-
-                    if (!req.body.reqApplicantId) {
-                        error.reqApplicantId = 'Invalid reqApplicantId';
+                    console.log(req.body.reqApp);
+                    if (req.body.reqApp && !req.body.reqApp.length) {
+                        error.reqApp = 'Invalid reqApp';
                         validationFlag *= false;
                     }
 
@@ -390,8 +390,7 @@ gulfCtrl.saveDeparture = function (req, res, next) {
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.query.heMasterId),
                             req.st.db.escape(req.body.departureHistoryId || 0),
-                            req.st.db.escape(req.body.reqApplicantId),
-                            req.st.db.escape(req.body.applicantId),
+                            req.st.db.escape(JSON.stringify(req.body.reqApp)),
                             req.st.db.escape(req.body.requirementId),
                             req.st.db.escape(req.body.statusId),
                             req.st.db.escape(req.body.applicantName),
@@ -515,7 +514,7 @@ gulfCtrl.getDeparture = function (req, res, next) {
                     console.log(err);
 
                     var isWeb = req.query.isWeb;
-                    if (!err && result && result[0] && result[0][0]) {
+                    if (!err && result) {
                         response.status = true;
                         response.message = "Departure data loaded successfully";
                         response.error = null;
@@ -524,12 +523,17 @@ gulfCtrl.getDeparture = function (req, res, next) {
                             result[0][i].departureCurrency = result[0][i].departureCurrency ? JSON.parse(result[0][i].departureCurrency) : {};
                             result[0][i].departureCurrencyScale = result[0][i].departureCurrencyScale ? JSON.parse(result[0][i].departureCurrencyScale) : {};
                         }
-                        // response.data = (result && result[0] && result[0][0]) ? result[0][0] : {};
+
+                        var departureDetails = {};
+                        if (result[0] && result[0][0])
+                            var departureDetails = result[0] && result[0][0] ? result[0][0] : {};
+                        else
+                            departureDetails.applicantName = result[1] && result[1][0] && result[1][0].applicantName ? result[1][0].applicantName : "";
+
                         response.data = {
-                            departureId: result[0] && result[0][0] && result[0][0].departureHistoryId ? result[0][0].departureHistoryId : 0,
+                            departureDetails: departureDetails,
                             departureHistory: result[0] && result[0][0] ? result[0] : []
                         }
-
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
                             response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -591,8 +595,8 @@ gulfCtrl.saveVisa = function (req, res, next) {
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                    if (!req.body.reqApplicantId) {
-                        error.reqApplicantId = 'Invalid reqApplicantId';
+                    if (!req.body.reqApp || !req.body.reqApp.length) {
+                        error.reqApp = 'Invalid reqApplicantId';
                         validationFlag *= false;
                     }
 
@@ -668,8 +672,7 @@ gulfCtrl.saveVisa = function (req, res, next) {
                         var inputs = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(req.body.reqApplicantId),
-                            req.st.db.escape(req.body.applicantId),
+                            req.st.db.escape(JSON.stringify(req.body.reqApp)),
                             req.st.db.escape(req.body.requirementId),
                             req.st.db.escape(req.body.applicantName),
                             req.st.db.escape(req.body.passportNumber),
@@ -721,7 +724,8 @@ gulfCtrl.saveVisa = function (req, res, next) {
                                 response.data = {
                                     visaDetails: (result[0] && result[0][0]) ? result[0][0] : {},
                                     reqAppList: (result[1] && result[1][0]) ? result[1] : [],
-                                    transactionHistory: (result[2] && result[2][0]) ? result[2] : []
+                                    transactionHistory: (result[2] && result[2][0]) ? result[2] : [],
+                                    visaHistory: result[3] && result[3][0] && result[3][0].visaHistory ? JSON.parse(result[3][0].visaHistory) : []
                                 }
 
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -808,9 +812,18 @@ gulfCtrl.getVisa = function (req, res, next) {
                             result[0][0].cdnFilePath = result[0][0].cdnFilePath ? JSON.parse(result[0][0].cdnFilePath) : {};
                         }
 
+                        var visaDetails = {};
+                        if (result[0] && result[0][0]){
+                            visaDetails =(result && result[0] && result[0][0]) ? result[0][0] : {}; 
+                        }
+                        else{
+                            visaDetails.applicantName = result[3] && result[3][0] && result[3][0].applicantName ? result[3][0].applicantName  : ""; 
+                        }
+
                         response.data = {
-                            visaDetails: (result && result[0] && result[0][0]) ? result[0][0] : {},
-                            passportDetails: result[1] && result[1][0] ? result[1][0] : {}
+                            visaDetails: visaDetails,
+                            passportDetails: result[1] && result[1][0] ? result[1][0] : {},
+                            visaHistory: result[2] && result[2][0] && result[2][0].visaHistory ? JSON.parse(result[2][0].visaHistory) : []
                         };
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

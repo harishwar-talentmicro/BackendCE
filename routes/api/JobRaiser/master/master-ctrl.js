@@ -85,7 +85,9 @@ masterCtrl.getReqMasterData = function (req, res, next) {
                             requirementList: result[10] ? result[10] : [],
                             portalList: result[11] ? result[11] : [],
                             reasons: result[12] ? result[12] : [],
-                            teamMembers: result[14] ? result[14] : []
+                            teamMembers: result[14] ? result[14] : [],
+                            industry : result[15] ? result[15] : [],
+                            functionalAreas : result[16] ? result[16] : []
 
                         };
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -578,11 +580,17 @@ masterCtrl.getbranchList = function (req, res, next) {
                             wBranchList: results[2] ? results[2] : [],
                             branch_contacts: results[3] ? results[3] : []
                         };
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+
+                        if (req.query.isWeb==1) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
                             res.status(200).json(response);
-                        });
+                        }
                     }
                     else if (!err) {
                         response.status = true;
@@ -594,11 +602,16 @@ masterCtrl.getbranchList = function (req, res, next) {
                             wBranchList: [],
                             branch_contacts: []
                         };
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                        if (req.query.isWeb==1) {
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
                             res.status(200).json(response);
-                        });
+                        }
                     }
                     else {
                         response.status = false;
@@ -1795,7 +1808,8 @@ masterCtrl.getClientView = function (req, res, next) {
                             req.st.db.escape(req.body.status || ""),
                             req.st.db.escape(req.body.followUpNotes || ""),
                             req.st.db.escape(req.body.createdUserName || ""),
-                            req.st.db.escape(req.body.createdDate || null)
+                            req.st.db.escape(req.body.createdDate || null),
+                            req.st.db.escape(JSON.stringify(req.body.clientStatusId || []))
                         ];
 
                         var procQuery = 'CALL wm_get_clientView( ' + inputs.join(',') + ')';
@@ -2611,7 +2625,8 @@ masterCtrl.saveUserManager = function (req, res, next) {
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(encryptPwd),
                             req.st.db.escape(req.body.mailer),
-                            req.st.db.escape(JSON.stringify(branch))
+                            req.st.db.escape(JSON.stringify(branch)),
+                            req.st.db.escape(req.body.EZEOneId)
                         ];
                         var procQuery = 'CALL save_Pace_User( ' + inputs.join(',') + ')';
                         console.log(procQuery);
@@ -2992,4 +3007,80 @@ masterCtrl.getportalRequirementReport = function (req, res, next) {
     }
 };
 
+
+masterCtrl.jobCodeGenerationMobile = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL wm_paceJobCode_generation( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0] && result[0][0]) {
+                        response.status = true;
+                        response.message = "New Jobcode is generated ";
+                        response.error = null;
+
+                        response.data = result[0][0];
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        // });
+                    }
+
+                    else if (!err) {
+                        response.status = false;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+
+                    else {
+                        response.status = false;
+                        response.message = "Error while generating Jobcode";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
 module.exports = masterCtrl;
