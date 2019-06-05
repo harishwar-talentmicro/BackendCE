@@ -1625,7 +1625,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                             requirementList: (results && results[2] && results[2][0]) ? results[2] : [],
                                             jdTemplateList: (results && results[3] && results[3][0]) ? results[3] : [],
                                             requirementJobTitle: (results && results[4] && results[4][0]) ? results[4] : [],
-                                            requirementDetails : (results && results[6] && results[6][0]) ? results[6][0] : {}
+                                            requirementDetails: (results && results[6] && results[6][0]) ? results[6][0] : {}
                                         }
                                     };
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1634,9 +1634,9 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                         res.status(200).json(response);
                                     });
 
-                                    var reqId = results[5][0].reqId ? results[5][0].reqId :0;
+                                    var reqId = results[5][0].reqId ? results[5][0].reqId : 0;
                                     var templateId = results[5][0].templateId ? results[5][0].templateId : 0;
-                                    var reqgroupId =  0;
+                                    var reqgroupId = 0;
 
                                     var inputParams = [
                                         req.st.db.escape(req.query.token),
@@ -1695,14 +1695,15 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                                     result[0][i].bcc = result[0][i].bcc.replace(/["]/g, "");
                                                 }
 
-                                                var mailOptions = {
-                                                    from: fromEmailId,
-                                                    to: emailId,
-                                                    cc: result[0][i].cc,
-                                                    bcc: result[0][i].bcc,
-                                                    subject: result[0][i].subject,
-                                                    html: bodydata// html body
-                                                };
+                                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                                var mailOptions = new sendgrid.Email();
+                                                mailOptions.from = fromEmailId,
+                                                    mailOptions.to = emailId,
+                                                    mailOptions.cc = result[0][i].cc,
+                                                    mailOptions.bcc = result[0][i].bcc,
+                                                    mailOptions.subject = result[0][i].subject,
+                                                    mailOptions.html = bodydata// html body
+
                                                 sendgrid.send(mailOptions, function (err, results) {
                                                     if (err) {
                                                         console.log("mail not sent", err);
@@ -3140,11 +3141,12 @@ jobCtrl.dynamicReport = function (req, res, next) {
                 if (!err) {
 
 
-                            res.status(200).json({status: true,
-                                message: "Data loaded successfully",
-                                error : null,
-                                data:result[0]
-                            });
+                    res.status(200).json({
+                        status: true,
+                        message: "Data loaded successfully",
+                        error: null,
+                        data: result[0]
+                    });
 
                 }
                 else {
