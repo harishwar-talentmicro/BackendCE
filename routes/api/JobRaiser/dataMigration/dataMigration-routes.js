@@ -3,7 +3,7 @@ var router = express.Router();
 
 var dataMigration = require('./dataMigration-ctrl');
 
-router.post('/saveUser',dataMigration.saveUserManager);
+router.post('/pacebackup',dataMigration.resumeBackUp);
 
 
 module.exports = router;

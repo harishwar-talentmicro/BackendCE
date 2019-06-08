@@ -787,8 +787,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                         reqOrGroup: result[59] && result[59][0] && result[59][0].reqOrGroup ? result[59][0].reqOrGroup : 1,
                                         salutation: result[60] && result[60][0] ? result[60] : [],
                                         clientBirthdayList: result[61] && result[61][0] ? result[61] : [],
-                                        customRangeList: result[62] && result[62][0] ? result[62] : []
-
+                                        customRangeList: result[62] && result[62][0] ? result[62] : [],
+                                        backUpMaster : result[63] && result[63][0] ? result[63] : []
                                     };
 
                                     if (req.query.isWeb == 0) {
@@ -2354,7 +2354,7 @@ applicantCtrl.saveReqAppMapResult = function (req, res, next) {
                                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
                                     if (!req.body.reqId) {
-                                        error.token = 'Invalid requirement';
+                                        error.requirement = 'Invalid requirement';
                                         validationFlag *= false;
                                     }
                                     var applicant = req.body.applicant;
