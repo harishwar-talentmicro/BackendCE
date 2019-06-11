@@ -4750,6 +4750,24 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                                             }
                                                         }
 
+                                                        for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+
+                                                            if ((result[1][clientIndex][tags.interview[tagIndex].tagName] && result[1][clientIndex][tags.interview[tagIndex].tagName] != null && result[1][clientIndex][tags.interview[tagIndex].tagName] != '' && result[1][clientIndex][tags.interview[tagIndex].tagName] != 'null') || result[1][clientIndex][tags.interview[tagIndex].tagName] >= 0) {
+
+                                                                mailBody = replaceAll(mailBody, '[interview.' + tags.interview[tagIndex].tagName + ']', result[1][clientIndex][tags.interview[tagIndex].tagName]);
+
+                                                                subject = replaceAll(subject, '[interview.' + tags.interview[tagIndex].tagName + ']', result[1][clientIndex][tags.interview[tagIndex].tagName]);
+
+                                                                smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[1][clientIndex][tags.interview[tagIndex].tagName]);
+
+                                                                // mailBody = mailBody.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[1][clientIndex][tags.interview[tagIndex].tagName]);
+
+                                                                // subject = subject.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[1][clientIndex][tags.interview[tagIndex].tagName]);
+
+                                                                // smsMsg = smsMsg.replace('[interview.' + tags.interview[tagIndex].tagName + ']', result[1][clientIndex][tags.interview[tagIndex].tagName]);
+                                                            }
+                                                        }
+
                                                         // if (tableTags.applicant.length > 0) {
                                                         //     var position = mailBody.indexOf('@table');
                                                         //     var tableContent = '';
