@@ -4816,7 +4816,9 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                                                 for (var candidateCount = 0; candidateCount < result[0].length; candidateCount++) {
                                                                     tableContent += "<tr>";
                                                                     for (var tagCount = 0; tagCount < sortedTableTags.length; tagCount++) {
-                                                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + result[0][candidateCount][sortedTableTags[tagCount].tagName] + "</td>";
+
+                                                                        var data =  result[0][candidateCount] && result[0][candidateCount][sortedTableTags[tagCount].tagName] ?  result[0][candidateCount][sortedTableTags[tagCount].tagName] : "";
+                                                                        tableContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + data + "</td>";
                                                                     }
                                                                     // if (tableTags && tableTags.requirement && tableTags.requirement.length)
                                                                     //     for (var tagCount = 0; tagCount < tableTags.requirement.length; tagCount++) {
