@@ -1669,20 +1669,21 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                 response.error = null;
                                 var output = [];
                                 for (var i = 0; i < results[0].length; i++) {
-                                    results[0][i].branchList = JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
-                                        results[0][i].contactList = JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
-                                        results[0][i].stageDetail = JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : []
+                                    results[0][i].branchList = results[0][i].branchList && JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
+                                        results[0][i].contactList = results[0][i].contactList && JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
+                                        results[0][i].stageDetail = results[0][i].stageDetail && JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
+                                        results[0][i].followUpNotes = results[0][i].followUpNotes && JSON.parse(results[0][i].followUpNotes) ? JSON.parse(results[0][i].followUpNotes) : []
                                 }
 
-                                for (var i = 0; i < results[2].length; i++) {
-                                    results[2][i].status = results[2] && results[2][i] && JSON.parse(results[2][i].status) ? JSON.parse(results[2][i].status) : [];
+                                for (var i = 0; i < results[3].length; i++) {
+                                    results[3][i].status = results[3] && results[3][i] && JSON.parse(results[3][i].status) ? JSON.parse(results[3][i].status) : [];
                                 }
 
                                 response.data = {
                                     requirementView: results[0] ? results[0] : [],
-                                    requirementCount: (results[1] && results[1][0] && results[1][0].requirementCount) ? results[1][0].requirementCount : 0,
-                                    stageList: results[2] && results[2][0] ? results[2] : []
-                                };
+                                    requirementCount: (results[2] && results[2][0] && results[2][0].requirementCount) ? results[2][0].requirementCount : 0,
+                                    stageList: results[3] && results[3][0] ? results[3] : []
+                            };
 
                                 if (req.query.isWeb == 0) {
                                     // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1706,8 +1707,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                 response.error = null;
                                 response.data = {
                                     requirementView: [],
-                                    stageList: (results && results[1] && results[1][0]) ? JSON.parse(results[1][0].stageList) : []
-
+                                    stageList: (results && results[2] && results[2][0]) && results[2][0].stageList ? JSON.parse(results[2][0].stageList) : []
                                 };
                                 if (req.query.isWeb == 0) {
                                     // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -2637,7 +2637,26 @@ masterCtrl.saveUserManager = function (req, res, next) {
                                 response.status = true;
                                 response.message = "User data saved sucessfully";
                                 response.error = null;
-                                response.data = null;
+
+                                results[1][0].jobTitle = (results[1][0].jobTitle && JSON.parse(results[1][0].jobTitle).jobTitleId) ? JSON.parse(results[1][0].jobTitle) : {};
+
+                                results[1][0].userType = (results[1][0].userType && JSON.parse(results[1][0].userType).userTypeId) ? JSON.parse(results[1][0].userType) : {};
+    
+                                results[1][0].transferredTo = (results[1][0].transferredTo && JSON.parse(results[1][0].transferredTo).transferredToUserId) ? JSON.parse(results[1][0].transferredTo) : {};
+    
+                                results[1][0].reportingTo = results[1][0].reportingTo ? JSON.parse(results[1][0].reportingTo) : [];
+    
+                                results[1][0].accessRights = (results[1][0].accessRights && JSON.parse(results[1][0].accessRights).templateId) ? JSON.parse(results[1][0].accessRights) : {};
+    
+                                results[1][0].department = (results[1][0].department && JSON.parse(results[1][0].department).departmentId) ? JSON.parse(results[1][0].department) : {};
+    
+                                results[1][0].branch = (results[1][0].branch && JSON.parse(results[1][0].branch).branchId) ? JSON.parse(results[1][0].branch) : {};
+    
+                                results[1][0].grade = (results[1][0].grade && JSON.parse(results[1][0].grade).gradeId) ? JSON.parse(results[1][0].grade) : {};
+
+                                response.data = {
+                                    userDetail: results[1][0] ? results[1][0] : {}
+                                };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {
                                     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
