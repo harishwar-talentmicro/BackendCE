@@ -553,7 +553,11 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                                                             result[6][i].followUpNotes = (result[6] && result[6][i]) ? JSON.parse(result[6][i].followUpNotes) : []
                                                         }
 
-                                                        response.status = true;
+                                                        if (req.body.importedFromFolder == 0 && req.body.importedFromExcel == 0)
+                                                            response.status = true;
+                                                        else
+                                                            response.status = false;
+
                                                         response.message = "Resume already exists";
                                                         response.error = null;
                                                         response.data = {
@@ -788,7 +792,8 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                         salutation: result[60] && result[60][0] ? result[60] : [],
                                         clientBirthdayList: result[61] && result[61][0] ? result[61] : [],
                                         customRangeList: result[62] && result[62][0] ? result[62] : [],
-                                        backUpMaster : result[63] && result[63][0] ? result[63] : []
+                                        backUpMaster : result[63] && result[63][0] ? result[63] : [],
+                                        configDetails : result[64] && result[64][0] ? result[64][0] : {}
                                     };
 
                                     if (req.query.isWeb == 0) {
@@ -1500,9 +1505,10 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
                                                 response.status = true;
                                                 response.message = "Requirement positions have been filled";
                                                 response.error = null;
-                                                response.data = {
-                                                    postionFilledRequirements: statusResult[0] ? statusResult[0] : []
-                                                }
+                                                response.data = statusResult[1][0] ? statusResult[1][0] : {},
+                                                response.data.reqAppList = statusResult[3] && statusResult[3][0] ? statusResult[3] : []
+                                                response.data.postionFilledRequirements = statusResult[0] ? statusResult[0] : []
+
                                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                                 zlib.gzip(buf, function (_, result) {
                                                     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -3512,7 +3518,8 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                                             clientLocations: result[6][0] ? result[6] : [],
                                             interviewMailerTemplate: (result[7] && result[7][0]) ? JSON.parse(result[7][0].formDataJson) : [],
                                             branchAddress: (result[8] && result[8][0]) ? result[8][0] : null,
-                                            address: result[8][0] && result[8][0].address ? result[8][0].address : ""
+                                            address: result[8][0] && result[8][0].address ? result[8][0].address : "",
+                                            clientContacts : result[9] && result[9][0] ?  result[9] : []
                                         };
 
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

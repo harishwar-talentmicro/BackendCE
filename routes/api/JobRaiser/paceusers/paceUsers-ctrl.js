@@ -1104,7 +1104,9 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
             req.st.db.escape(req.body.isdMobile),
             req.st.db.escape(req.body.mobileNo),
             req.st.db.escape(req.body.otp),
-            req.st.db.escape(DBSecretKey)
+            req.st.db.escape(DBSecretKey),
+            req.st.db.escape(req.query.heMasterId),
+            req.st.db.escape(req.query.userMasterId || 0)
         ];
 
         var procQuery = 'CALL wm_paceUserManager_verifyOtpInuse( ' + inputs.join(',') + ')';
@@ -1112,24 +1114,24 @@ paceUsersCtrl.toVerifyOtp = function (req, res, next) {
         req.db.query(procQuery, function (err, result) {
             console.log(err);
             // console.log(result);
-            if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].error == "user already exist") {
+            if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0]._error == "Active User Already Exists") {
                 response.status = false;
-                response.message = result[0][0].message;
+                response.message = result[1][0]._error;
                 response.code = 100;
                 response.error = false;
                 response.data = {
-                    message: result[1][0].error
+                    message: result[1][0]._error
                 };
                 res.status(200).json(response);
             }
 
-            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0].error == "user exists but inactive") {
-                response.status = false;
-                response.message = result[0][0].message;
+            else if (!err && result && result[0][0].message == "OTP verified successfully" && result[1][0]._error == "user exists but inactive") {
+                response.status = true;
+                response.message = result[1][0]._error;
                 response.code = 100;
                 response.error = false;
                 response.data = {
-                    message: result[1][0].error
+                    message: result[1][0]._error
                 };
                 res.status(200).json(response);
             }

@@ -1029,8 +1029,8 @@ settingsCtrl.offerGeneration = function (req, res, next) {
 
                                 // fs.readFile('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/offer.html', 'utf-8', function (err, data) {
                                 // fs.readFile(path.basename(__dirname) + '../../../routes/api/JobRaiser/settings/offer.html', 'utf-8', function (err, data) {
-
-                                fs.readFile(path.basename(__dirname) + '/offer.html', 'utf-8', function (err, data) {
+                                var path = require('path');
+                                fs.readFile('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/offer.html', 'utf-8', function (err, data) {
                                     console.log('error from reading', err);
                                     if (err) {
                                         response.status = false;
@@ -1101,13 +1101,13 @@ settingsCtrl.offerGeneration = function (req, res, next) {
                                                 // fs.writeFile("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/offer" + timestamp + ".pdf", buffer, function (err) {
                                                 // fs.writeFile(path.basename(__dirname) + "../../../routes/api/JobRaiser/settings/offer.html" + timestamp + ".pdf", buffer, function (err) {
 
-                                                fs.writeFile(path.basename(__dirname) + "/offer.html" + timestamp + ".pdf", buffer, function (err) {
+                                                fs.writeFile("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/offer.html" + timestamp + ".pdf", buffer, function (err) {
                                                     if (!err) {
                                                         console.log("file written");
                                                         // var readStream = fs.createReadStream('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/offer' + timestamp + '.pdf');
                                                         // var readStream = fs.createReadStream(path.basename(__dirname) + '../../../routes/api/JobRaiser/settings/offer.html' + timestamp + '.pdf');
 
-                                                        var readStream = fs.createReadStream(path.basename(__dirname) + '/offer.html' + timestamp + '.pdf');
+                                                        var readStream = fs.createReadStream('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/offer.html' + timestamp + '.pdf');
                                                         console.log("readStream data");
                                                         uploadDocumentToCloud(aUrl, readStream, function (err) {
                                                             if (!err) {
@@ -1137,7 +1137,7 @@ settingsCtrl.offerGeneration = function (req, res, next) {
                                                                 // fs.unlink('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/offer' + timestamp + '.pdf', function (err) {
                                                                 // fs.unlink(path.basename(__dirname) + '../../../routes/api/JobRaiser/settings/offer.html' + timestamp + '.pdf', function (err) {
 
-                                                                fs.unlink(path.basename(__dirname) + '/offer.html' + timestamp + '.pdf', function (err) {
+                                                                fs.unlink('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/settings/offer.html' + timestamp + '.pdf', function (err) {
                                                                     if (!err) {
                                                                         console.log('File Deleted');
                                                                     }
